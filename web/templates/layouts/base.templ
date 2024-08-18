@@ -1,0 +1,33 @@
+package layouts
+
+import "link-society.com/flowg/web/templates/components"
+
+templ Base(head templ.Component, currentNav string) {
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>FlowG</title>
+
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+      <link rel="stylesheet" href="/static/css/google-font-material-icons.css" />
+      <link rel="stylesheet" href="/static/css/materialize.min.css" />
+
+      <script type="application/javascript" src="/static/js/materialize.min.js"></script>
+      <script type="application/javascript" src="/static/js/htmx.min.js"></script>
+      <script type="application/javascript" src="/static/js/hyperscript.min.js"></script>
+
+      if head != nil {
+        @head
+      }
+    </head>
+    <body class="blue-grey lighten-4">
+      @components.Navbar(currentNav)
+
+      <main>
+        { children... }
+      </main>
+    </body>
+  </html>
+}

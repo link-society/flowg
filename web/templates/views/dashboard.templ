@@ -1,0 +1,53 @@
+package views
+
+import (
+  "fmt"
+
+  "link-society.com/flowg/web/templates/layouts"
+)
+
+templ statCard(icon string, name string, href templ.SafeURL, count int) {
+  <article class="card hoverable grey lighten-3">
+    <main class="card-content black-text">
+      <div style="width: 100%;">
+        <div
+          style="
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+          "
+        >
+          <i class="material-icons">{icon}</i>
+          <b>{name}</b>
+        </div>
+
+        <div style="text-align: center;">
+          {fmt.Sprintf("%d", count)}
+        </div>
+      </div>
+    </main>
+    <footer class="card-action">
+      <a href={href}>View More &gt;&gt;</a>
+    </footer>
+  </article>
+}
+
+templ Dashboard(streamCount, transformerCount, pipelineCount int) {
+  @layouts.Base(nil, "") {
+    <div class="container">
+      <section class="row section">
+        <div class="col s12 m4">
+          @statCard("list", "Streams", "/dashboard/streams", streamCount)
+        </div>
+        <div class="col s12 m4">
+          @statCard("filter_alt", "Transformers", "/dashboard/transformers", transformerCount)
+        </div>
+        <div class="col s12 m4">
+          @statCard("settings", "Pipelines", "/dashboard/pipelines", pipelineCount)
+        </div>
+      </section>
+    </div>
+  }
+}

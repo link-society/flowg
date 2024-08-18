@@ -1,0 +1,58 @@
+version: '3'
+
+tasks:
+  build:
+    desc: "Build the project"
+    cmds:
+      - task: "gen:go"
+      - task: "gen:js"
+      - go build -o bin/ ./...
+
+  "docker:build":
+    desc: "Build the docker image"
+    cmds:
+      - docker build -t linksociety/flowg:latest -f docker/flowg.dockerfile .
+
+  "gen:go":
+    internal: true
+    cmds:
+      - task: "deps:go"
+      - task: "gen:rust"
+      - go generate ./...
+
+  "gen:rust":
+    internal: true
+    cmds:
+      - task: "gen:rust:vrl"
+      - task: "gen:rust:filterdsl"
+
+  "gen:rust:vrl":
+    internal: true
+    dir: ./internal/vrl/rust-crate
+    cmds:
+      - cargo build --release
+
+  "gen:rust:filterdsl":
+    internal: true
+    dir: ./internal/filterdsl/rust-crate
+    cmds:
+      - cargo build --release
+
+  "gen:js":
+    internal: true
+    dir: ./web/components/floweditor
+    cmds:
+      - task: "deps:js:floweditor"
+      - npm run build
+
+  "deps:go":
+    internal: true
+    cmds:
+      - go install github.com/a-h/templ/cmd/templ@latest
+      - go get ./...
+
+  "deps:js:floweditor":
+    internal: true
+    dir: ./web/components/floweditor
+    cmds:
+      - npm i

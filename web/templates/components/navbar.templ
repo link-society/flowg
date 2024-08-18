@@ -1,0 +1,92 @@
+package components
+
+templ Navbar(currentNav string) {
+  <nav class="blue darken-3">
+    <div class="nav-wrapper">
+      <a href="/" class="brand-logo left" style="padding-left: 0.25em;">FlowG</a>
+      <ul id="nav-mobile" class="right hide-on-med-and-down">
+        switch currentNav {
+          case "streams":
+            <li class="active">
+              <a>
+                <i class="left material-icons">list</i>
+                Streams
+              </a>
+            </li>
+            <li>
+              <a href="/dashboard/transformers">
+                <i class="left material-icons">filter_alt</i>
+                Transformers
+              </a>
+            </li>
+            <li>
+              <a href="/dashboard/pipelines">
+                <i class="left material-icons">settings</i>
+                Pipelines
+              </a>
+            </li>
+
+          case "transformers":
+            <li>
+              <a href="/dashboard/streams">
+                <i class="left material-icons">list</i>
+                Streams
+              </a>
+            </li>
+            <li class="active">
+              <a>
+                <i class="left material-icons">filter_alt</i>
+                Transformers
+              </a>
+            </li>
+            <li>
+              <a href="/dashboard/pipelines">
+                <i class="left material-icons">settings</i>
+                Pipelines
+              </a>
+            </li>
+
+          case "pipelines":
+            <li>
+              <a href="/dashboard/streams">
+                <i class="left material-icons">list</i>
+                Streams
+              </a>
+            </li>
+            <li>
+              <a href="/dashboard/transformers">
+                <i class="left material-icons">filter_alt</i>
+                Transformers
+              </a>
+            </li>
+            <li class="active">
+              <a>
+                <i class="left material-icons">settings</i>
+                Pipelines
+              </a>
+            </li>
+
+          default:
+            <li>
+              <a href="/dashboard/streams">
+                <i class="left material-icons">list</i>
+                Streams
+              </a>
+            </li>
+            <li>
+              <a href="/dashboard/transformers">
+                <i class="left material-icons">filter_alt</i>
+                Transformers
+              </a>
+            </li>
+            <li>
+              <a href="/dashboard/pipelines">
+                <i class="left material-icons">settings</i>
+                Pipelines
+              </a>
+            </li>
+        }
+      </ul>
+    </div>
+  </nav>
+}
