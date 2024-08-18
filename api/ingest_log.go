@@ -39,7 +39,7 @@ func IngestLogUsecase(pipelinesManager *pipelines.Manager) usecase.Interactor {
 			}
 
 			entry := storage.NewLogEntry(req.Record)
-			err = pipeline.Run(pipelinesManager, entry)
+			err = pipeline.Run(ctx, pipelinesManager, entry)
 			if err != nil {
 				slog.ErrorContext(
 					ctx,

@@ -54,7 +54,7 @@ func QueryStreamUsecase(db *storage.Storage) usecase.Interactor {
 				filter = nil
 			}
 
-			records, err := db.Query(req.Stream, req.From, req.To, filter)
+			records, err := db.Query(ctx, req.Stream, req.From, req.To, filter)
 			if err != nil {
 				slog.ErrorContext(
 					ctx,

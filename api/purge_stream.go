@@ -24,7 +24,7 @@ func PurgeStreamUsecase(db *storage.Storage) usecase.Interactor {
 			req PurgeStreamRequest,
 			resp *PurgeStreamResponse,
 		) error {
-			err := db.Purge(req.Stream)
+			err := db.Purge(ctx, req.Stream)
 			if err != nil {
 				slog.ErrorContext(
 					ctx,

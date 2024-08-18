@@ -1,6 +1,9 @@
 package storage
 
 import (
+	"context"
+	"log/slog"
+
 	"encoding/json"
 	"fmt"
 
@@ -29,24 +32,59 @@ func NewStorage(dbPath string) (*Storage, error) {
 	return &Storage{db: db}, nil
 }
 
-func (s *Storage) Append(stream string, entry *LogEntry) ([]byte, error) {
+func (s *Storage) Append(
+	ctx context.Context,
+	stream string,
+	entry *LogEntry,
+) ([]byte, error) {
 	key := entry.NewDbKey(stream)
 	val, err := json.Marshal(entry)
 	if err != nil {
+		slog.DebugContext(
+			ctx,
+			"Could not marshal log entry",
+			"channel", "storage",
+			"stream", stream,
+			"error", err.Error(),
+		)
 		return nil, &MarshalError{Reason: err}
 	}
 
 	err = s.db.Update(func(txn *badger.Txn) error {
+		slog.DebugContext(
+			ctx,
+			"Save log entry in BadgerDB",
+			"channel", "storage",
+			"stream", stream,
+			"key", key,
+		)
+
 		if err := txn.Set(key, val); err != nil {
 			return &PersistError{Operation: "append", Reason: err}
 		}
 
 		for field, value := range entry.Fields {
+			slog.DebugContext(
+				ctx,
+				"Save field index in BadgerDB",
+				"channel", "storage",
+				"stream", stream,
+				"key", key,
+				"field", field,
+			)
+
 			fieldIndex := newFieldIndex(txn, stream, field, value)
 			if err := fieldIndex.AddKey(key); err != nil {
 				return &PersistError{Operation: "field-index", Reason: err}
 			}
 		}
+
+		slog.DebugContext(
+			ctx,
+			"Save stream index in BadgerDB",
+			"channel", "storage",
+			"stream", stream,
+		)
 
 		streamKey := []byte(fmt.Sprintf("stream:%s", stream))
 		if err := txn.Set(streamKey, []byte{}); err != nil {
@@ -63,7 +101,12 @@ func (s *Storage) Append(stream string, entry *LogEntry) ([]byte, error) {
 	return key, nil
 }
 
-func (s *Storage) Query(stream string, from, to time.Time, filter Filter) ([]LogEntry, error) {
+func (s *Storage) Query(
+	ctx context.Context,
+	stream string,
+	from, to time.Time,
+	filter Filter,
+) ([]LogEntry, error) {
 	results := []LogEntry{}
 
 	err := s.db.View(func(txn *badger.Txn) error {
@@ -84,6 +127,14 @@ func (s *Storage) Query(stream string, from, to time.Time, filter Filter) ([]Log
 
 			if key < toPrefix {
 				timeKeys = append(timeKeys, key)
+
+				slog.DebugContext(
+					ctx,
+					"Log entry key added to queryset based on time index",
+					"channel", "storage",
+					"stream", stream,
+					"key", key,
+				)
 			} else {
 				break
 			}
@@ -97,6 +148,16 @@ func (s *Storage) Query(stream string, from, to time.Time, filter Filter) ([]Log
 				return &QueryError{Operation: "fields-index", Reason: err}
 			}
 
+			for _, key := range fieldKeys {
+				slog.DebugContext(
+					ctx,
+					"Log entry key added to queryset based on field index",
+					"channel", "storage",
+					"stream", stream,
+					"key", key,
+				)
+			}
+
 			filteredKeys = intersectKeysList(timeKeys, fieldKeys)
 		} else {
 			filteredKeys = timeKeys
@@ -105,6 +166,14 @@ func (s *Storage) Query(stream string, from, to time.Time, filter Filter) ([]Log
 		sort.Sort(sort.Reverse(sort.StringSlice(filteredKeys)))
 
 		for _, key := range filteredKeys {
+			slog.DebugContext(
+				ctx,
+				"Fetching log entry",
+				"channel", "storage",
+				"stream", stream,
+				"key", key,
+			)
+
 			item, err := txn.Get([]byte(key))
 			if err != nil {
 				return &QueryError{Operation: "query", Reason: err}
@@ -135,7 +204,7 @@ func (s *Storage) Query(stream string, from, to time.Time, filter Filter) ([]Log
 	return results, nil
 }
 
-func (s *Storage) Purge(stream string) error {
+func (s *Storage) Purge(ctx context.Context, stream string) error {
 	return s.db.Update(func(txn *badger.Txn) error {
 		prefixes := []string{
 			fmt.Sprintf("entry:%s:", stream),
@@ -143,6 +212,14 @@ func (s *Storage) Purge(stream string) error {
 		}
 
 		for _, prefix := range prefixes {
+			slog.DebugContext(
+				ctx,
+				"Purging key from BadgerDB",
+				"channel", "storage",
+				"stream", stream,
+				"key.prefix", prefix,
+			)
+
 			opts := badger.DefaultIteratorOptions
 			opts.Prefix = []byte(prefix)
 			it := txn.NewIterator(opts)
@@ -155,7 +232,17 @@ func (s *Storage) Purge(stream string) error {
 			}
 		}
 
-		if err := txn.Delete([]byte(fmt.Sprintf("stream:%s", stream))); err != nil {
+		streamKey := []byte(fmt.Sprintf("stream:%s", stream))
+
+		slog.DebugContext(
+			ctx,
+			"Purging key from BadgerDB",
+			"channel", "storage",
+			"stream", stream,
+			"key", streamKey,
+		)
+
+		if err := txn.Delete(streamKey); err != nil {
 			return &PersistError{Operation: "purge", Reason: err}
 		}
 
