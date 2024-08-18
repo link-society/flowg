@@ -21,7 +21,7 @@ import (
 )
 
 func main() {
-	logging.Setup()
+	logging.Setup(*verbose)
 	os.Exit(run())
 }
 
