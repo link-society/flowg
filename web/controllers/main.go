@@ -11,13 +11,13 @@ import (
 	"link-society.com/flowg/web/templates/views"
 )
 
-func DashboardController(
+func MainController(
 	db *storage.Storage,
 	pipelinesManager *pipelines.Manager,
 ) http.Handler {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("GET /dashboard/{$}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET /web/{$}", func(w http.ResponseWriter, r *http.Request) {
 		streamCount := 0
 		transformerCount := 0
 		pipelineCount := 0

@@ -39,13 +39,13 @@ templ Dashboard(streamCount, transformerCount, pipelineCount int) {
     <div class="container">
       <section class="row section">
         <div class="col s12 m4">
-          @statCard("list", "Streams", "/dashboard/streams", streamCount)
+          @statCard("list", "Streams", "/web/streams", streamCount)
         </div>
         <div class="col s12 m4">
-          @statCard("filter_alt", "Transformers", "/dashboard/transformers", transformerCount)
+          @statCard("filter_alt", "Transformers", "/web/transformers", transformerCount)
         </div>
         <div class="col s12 m4">
-          @statCard("settings", "Pipelines", "/dashboard/pipelines", pipelineCount)
+          @statCard("settings", "Pipelines", "/web/pipelines", pipelineCount)
         </div>
       </section>
     </div>

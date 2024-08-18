@@ -25,11 +25,7 @@ func NewHandler(
 	mux := http.NewServeMux()
 	mux.Handle("GET /static/", http.FileServer(http.FS(staticfiles)))
 
-	mux.Handle("/dashboard/", controllers.DashboardController(db, pipelinesManager))
-
-	mux.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/dashboard/", http.StatusPermanentRedirect)
-	})
+	mux.Handle("/web/", controllers.MainController(db, pipelinesManager))
 
 	return mux
 }
