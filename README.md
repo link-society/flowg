@@ -17,7 +17,7 @@ requiring predefined schemas and relies on
  - **Observability:** Query and visualize logs in real-time in the integrated
    Web interface
 
-## :red_question_mark: Why should I use this?
+## :question: Why should I use this?
 
 **FlowG**'s primary goal is to make log refinement and routing as easy as
 possible. As such, it relies on [React Flow](https://reactflow.dev) to help you
