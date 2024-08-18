@@ -46,6 +46,7 @@ func run() int {
 	rootHandler := http.NewServeMux()
 	rootHandler.Handle("/api/", apiHandler)
 	rootHandler.Handle("/web/", webHandler)
+	rootHandler.Handle("/static/", webHandler)
 
 	rootHandler.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/web/", http.StatusPermanentRedirect)
