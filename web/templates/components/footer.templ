@@ -1,0 +1,18 @@
+package components
+
+import (
+  "link-society.com/flowg/internal"
+)
+
+templ Footer() {
+  <footer class="page-footer transparent">
+    <div class="footer-copyright" style="justify-content: end;">
+      <div
+        class="grey-text text-darken-4"
+        style="padding-right: 0.5em; font-weight: 500;"
+      >
+        {internal.FLOWG_VERSION}
+      </div>
+    </div>
+  </footer>
+}

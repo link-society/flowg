@@ -7,6 +7,7 @@ import (
 	"github.com/swaggest/rest/web"
 	"github.com/swaggest/swgui/v5emb"
 
+	"link-society.com/flowg/internal"
 	"link-society.com/flowg/internal/pipelines"
 	"link-society.com/flowg/internal/storage"
 )
@@ -18,7 +19,7 @@ func NewHandler(
 	service := web.NewService(openapi31.NewReflector())
 
 	service.OpenAPISchema().SetTitle("Flowg API")
-	service.OpenAPISchema().SetVersion("v0.1.0")
+	service.OpenAPISchema().SetVersion(internal.FLOWG_VERSION)
 
 	service.Docs("/api/docs", v5emb.New)
 
