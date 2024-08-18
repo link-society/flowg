@@ -122,7 +122,7 @@ func Dashboard(streamCount, transformerCount, pipelineCount int) templ.Component
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = statCard("list", "Streams", "/dashboard/streams", streamCount).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = statCard("list", "Streams", "/web/streams", streamCount).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -130,7 +130,7 @@ func Dashboard(streamCount, transformerCount, pipelineCount int) templ.Component
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = statCard("filter_alt", "Transformers", "/dashboard/transformers", transformerCount).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = statCard("filter_alt", "Transformers", "/web/transformers", transformerCount).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -138,7 +138,7 @@ func Dashboard(streamCount, transformerCount, pipelineCount int) templ.Component
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = statCard("settings", "Pipelines", "/dashboard/pipelines", pipelineCount).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = statCard("settings", "Pipelines", "/web/pipelines", pipelineCount).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

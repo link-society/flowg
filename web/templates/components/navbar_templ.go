@@ -32,22 +32,22 @@ func Navbar(currentNav string) templ.Component {
 		}
 		switch currentNav {
 		case "streams":
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li class=\"active\"><a><i class=\"left material-icons\">list</i> Streams</a></li><li><a href=\"/dashboard/transformers\"><i class=\"left material-icons\">filter_alt</i> Transformers</a></li><li><a href=\"/dashboard/pipelines\"><i class=\"left material-icons\">settings</i> Pipelines</a></li>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li class=\"active\"><a><i class=\"left material-icons\">list</i> Streams</a></li><li><a href=\"/web/transformers\"><i class=\"left material-icons\">filter_alt</i> Transformers</a></li><li><a href=\"/web/pipelines\"><i class=\"left material-icons\">settings</i> Pipelines</a></li>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		case "transformers":
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a href=\"/dashboard/streams\"><i class=\"left material-icons\">list</i> Streams</a></li><li class=\"active\"><a><i class=\"left material-icons\">filter_alt</i> Transformers</a></li><li><a href=\"/dashboard/pipelines\"><i class=\"left material-icons\">settings</i> Pipelines</a></li>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a href=\"/web/streams\"><i class=\"left material-icons\">list</i> Streams</a></li><li class=\"active\"><a><i class=\"left material-icons\">filter_alt</i> Transformers</a></li><li><a href=\"/web/pipelines\"><i class=\"left material-icons\">settings</i> Pipelines</a></li>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		case "pipelines":
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a href=\"/dashboard/streams\"><i class=\"left material-icons\">list</i> Streams</a></li><li><a href=\"/dashboard/transformers\"><i class=\"left material-icons\">filter_alt</i> Transformers</a></li><li class=\"active\"><a><i class=\"left material-icons\">settings</i> Pipelines</a></li>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a href=\"/web/streams\"><i class=\"left material-icons\">list</i> Streams</a></li><li><a href=\"/web/transformers\"><i class=\"left material-icons\">filter_alt</i> Transformers</a></li><li class=\"active\"><a><i class=\"left material-icons\">settings</i> Pipelines</a></li>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		default:
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a href=\"/dashboard/streams\"><i class=\"left material-icons\">list</i> Streams</a></li><li><a href=\"/dashboard/transformers\"><i class=\"left material-icons\">filter_alt</i> Transformers</a></li><li><a href=\"/dashboard/pipelines\"><i class=\"left material-icons\">settings</i> Pipelines</a></li>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a href=\"/web/streams\"><i class=\"left material-icons\">list</i> Streams</a></li><li><a href=\"/web/transformers\"><i class=\"left material-icons\">filter_alt</i> Transformers</a></li><li><a href=\"/web/pipelines\"><i class=\"left material-icons\">settings</i> Pipelines</a></li>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
