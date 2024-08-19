@@ -13,7 +13,7 @@ templ transformerHead() {
       const data_transformer_code = document.getElementById('data_transformer_code')
 
       if (data_transformer_name.value !== '') {
-        history.pushState(null, '', `/web/transformers/edit/${data_transformer_name.value}`)
+        history.pushState(null, '', `/web/transformers/edit/${data_transformer_name.value}/`)
       }
 
       action_save.addEventListener('click', () => {
@@ -136,7 +136,7 @@ templ transformerSideMenu(props transformerSideMenuProps) {
           } else {
             <a
               class="collection-item"
-              href={templ.SafeURL("/web/transformers/edit/" + transformer)}
+              href={templ.SafeURL("/web/transformers/edit/" + transformer + "/")}
             >
               {transformer}
             </a>

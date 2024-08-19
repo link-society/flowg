@@ -21,7 +21,7 @@ templ pipelineHead() {
       }
 
       if (data_pipeline_name.value !== '') {
-        history.pushState(null, '', `/web/pipelines/edit/${data_pipeline_name.value}`)
+        history.pushState(null, '', `/web/pipelines/edit/${data_pipeline_name.value}/`)
       }
 
       action_save.addEventListener('click', () => {
@@ -144,7 +144,7 @@ templ pipelineSideMenu(props pipelineSideMenuProps) {
           } else {
             <a
               class="collection-item"
-              href={templ.SafeURL("/web/pipelines/edit/" + pipeline)}
+              href={templ.SafeURL("/web/pipelines/edit/" + pipeline + "/")}
             >
               {pipeline}
             </a>

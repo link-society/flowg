@@ -52,8 +52,21 @@ func (flowGraph FlowGraph) BuildPipeline() (*Pipeline, error) {
 			pipelineNodes[flowNode.ID] = pipelineNode
 
 		case "switch":
+			conditionSource, exists := flowNode.Data["condition"]
+			if !exists {
+				return nil, &MissingFlowNodeDataError{
+					NodeID: flowNode.ID,
+					Key:    "condition",
+				}
+			}
+
+			condition, err := filterdsl.Compile(conditionSource)
+			if err != nil {
+				return nil, err
+			}
+
 			pipelineNode := &SwitchNode{
-				Branches: make(map[string]SwitchNodeBranch),
+				Condition: condition,
 			}
 			pipelineNodes[flowNode.ID] = pipelineNode
 
@@ -106,28 +119,7 @@ func (flowGraph FlowGraph) BuildPipeline() (*Pipeline, error) {
 				source.Next = append(source.Next, targetNode)
 
 			case *SwitchNode:
-				conditionSource, exists := flowNodesByID[flowEdge.Source].Data[flowEdge.SourceHandle]
-				if !exists {
-					return nil, &MissingFlowNodeDataError{
-						NodeID: flowEdge.Source,
-						Key:    flowEdge.SourceHandle,
-					}
-				}
-
-				condition, err := filterdsl.Compile(conditionSource)
-				if err != nil {
-					return nil, err
-				}
-
-				if branch, exists := source.Branches[flowEdge.SourceHandle]; exists {
-					branch.Next = append(branch.Next, targetNode)
-					source.Branches[flowEdge.SourceHandle] = branch
-				} else {
-					source.Branches[flowEdge.SourceHandle] = SwitchNodeBranch{
-						Condition: condition,
-						Next:      []Node{targetNode},
-					}
-				}
+				source.Next = append(source.Next, targetNode)
 
 			default:
 				panic("unreachable")

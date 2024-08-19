@@ -20,6 +20,8 @@ import { HooksContext } from './context'
 
 import SourceNode from './SourceNode'
 import TransformNode from './TransformNode'
+import SwitchNode from './SwitchNode'
+import RouterNode from './RouterNode'
 
 const defaultSourceNode: Node = {
   id: '__builtin__source',
@@ -40,12 +42,18 @@ const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange, eventTarget
     () => ({
       source: SourceNode,
       transform: TransformNode,
+      switch: SwitchNode,
+      router: RouterNode,
     }),
     [],
   )
 
-  const [nodes, setNodes] = useState<Node[]>([defaultSourceNode])
-  const [edges, setEdges] = useState<Edge[]>([])
+  const flowData = JSON.parse(flow) ?? {}
+  const initialNodes = flowData.nodes ?? [defaultSourceNode]
+  const initialEdges = flowData.edges ?? []
+
+  const [nodes, setNodes] = useState<Node[]>(initialNodes)
+  const [edges, setEdges] = useState<Edge[]>(initialEdges)
 
   const hooksCtx = useContext(HooksContext)
   hooksCtx.setNodes = setNodes
@@ -129,9 +137,8 @@ const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange, eventTarget
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
-        fitView
-        fitViewOptions={{ padding: 0.2 }}
-        defaultEdgeOptions={{ animated: true }}
+        snapToGrid
+        defaultEdgeOptions={{ animated: true, type: 'smoothstep' }}
       >
         <Background />
         <Controls />

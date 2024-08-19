@@ -29,10 +29,6 @@ type TransformNode struct {
 }
 
 type SwitchNode struct {
-	Branches map[string]SwitchNodeBranch
-}
-
-type SwitchNodeBranch struct {
 	Condition storage.Filter
 	Next      []Node
 }
@@ -75,13 +71,11 @@ func (n *SwitchNode) Process(
 	manager *Manager,
 	entry *storage.LogEntry,
 ) error {
-	for _, branch := range n.Branches {
-		if branch.Condition.Evaluate(entry) {
-			for _, next := range branch.Next {
-				err := next.Process(ctx, manager, entry)
-				if err != nil {
-					return err
-				}
+	if n.Condition.Evaluate(entry) {
+		for _, next := range n.Next {
+			err := next.Process(ctx, manager, entry)
+			if err != nil {
+				return err
 			}
 		}
 	}
