@@ -27,6 +27,7 @@ func NewHandler(
 
 	mux.Handle("/web/", controllers.MainController(db, pipelinesManager))
 	mux.Handle("/web/transformers/", controllers.TransformersController(pipelinesManager))
+	mux.Handle("/web/pipelines/", controllers.PipelinesController(pipelinesManager))
 
 	return mux
 }

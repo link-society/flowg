@@ -56,7 +56,7 @@ func Navbar(props NavbarProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</ul></div></nav><div class=\"row hide-on-large-only\"><div class=\"collection\"><a class=\"collection-item\" href=\"/web/streams\"><i class=\"left material-icons\">list</i> Streams</a> <a class=\"collection-item\" href=\"/web/transformers\"><i class=\"left material-icons\">filter_alt</i> Transformers</a> <a class=\"collection-item\" href=\"/web/pipelines\"><i class=\"left material-icons\">settings</i> Pipelines</a> <a class=\"collection-item\" href=\"https://github.com/link-society/flowg\" target=\"_blank\"><i class=\"left material-icons\">code</i> GitHub</a> <a class=\"collection-item\" href=\"/api/docs\" target=\"_blank\"><i class=\"left material-icons\">cloud</i> API Docs</a></div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</ul></div></nav><div class=\"row hide-on-large-only\"><div class=\"collection\"><a class=\"collection-item\" href=\"/web/streams\"><i class=\"left material-icons\">storage</i> Streams</a> <a class=\"collection-item\" href=\"/web/transformers\"><i class=\"left material-icons\">filter_alt</i> Transformers</a> <a class=\"collection-item\" href=\"/web/pipelines\"><i class=\"left material-icons\">settings</i> Pipelines</a> <a class=\"collection-item\" href=\"https://github.com/link-society/flowg\" target=\"_blank\"><i class=\"left material-icons\">code</i> GitHub</a> <a class=\"collection-item\" href=\"/api/docs\" target=\"_blank\"><i class=\"left material-icons\">cloud</i> API Docs</a></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

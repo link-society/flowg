@@ -26,7 +26,7 @@ class CodeEditorElement extends HTMLElement {
     }
   }
 
-  render() {
+  private render() {
     const code = this.getAttribute('code') ?? ''
 
     const handleChange = (value: string) => {

@@ -136,7 +136,7 @@ func Dashboard(props DashboardProps, notifications []string) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			templ_7745c5c3_Err = dashboardStatCard(dashboardStatCardProps{
-				Icon:  "list",
+				Icon:  "storage",
 				Name:  "Streams",
 				Href:  "/web/streams",
 				Count: props.StreamCount,

@@ -11,14 +11,20 @@ interface CodeEditorProps {
 const CodeEditor: React.FC<CodeEditorProps> = ({ code, onCodeChange }) => {
   const [value, setValue] = useState(code)
 
-  useEffect(() => {
-    setValue(code)
-  }, [code])
+  useEffect(
+    () => {
+      setValue(code)
+    },
+    [code],
+  )
 
-  const onChange = useCallback((val: string, viewUpdate: ViewUpdate) => {
-    setValue(val)
-    onCodeChange(val)
-  }, [onCodeChange])
+  const onChange = useCallback(
+    (val: string, viewUpdate: ViewUpdate) => {
+      setValue(val)
+      onCodeChange(val)
+    },
+    [onCodeChange],
+  )
 
   return (
     <div className="w-full h-full">
