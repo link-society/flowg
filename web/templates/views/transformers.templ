@@ -6,9 +6,52 @@ import (
 
 templ transformerHead() {
   <script type="application/javascript" src="/static/webcomponents/code-editor.bundle.js"></script>
+  <script type="application/javascript">
+    document.addEventListener('DOMContentLoaded', () => {
+      const action_save = document.getElementById('action_save')
+      const data_transformer_name = document.getElementById('data_transformer_name')
+      const data_transformer_code = document.getElementById('data_transformer_code')
+
+      if (data_transformer_name.value !== '') {
+        history.pushState(null, '', `/web/transformers/edit/${data_transformer_name.value}`)
+      }
+
+      action_save.addEventListener('click', () => {
+        if (data_transformer_name.value === '') {
+          M.toast({ html: '❌ Please provide a transformer name' })
+          data_transformer_name.classList.add('invalid')
+        } else {
+          const form = document.createElement('form')
+          form.setAttribute('method', 'post')
+          form.setAttribute('action', window.location.href)
+          form.classList.add('hide')
+
+          const input_name = document.createElement('input')
+          input_name.setAttribute('type', 'hidden')
+          input_name.setAttribute('name', 'name')
+          input_name.setAttribute('value', data_transformer_name.value)
+
+          const input_code = document.createElement('input')
+          input_code.setAttribute('type', 'hidden')
+          input_code.setAttribute('name', 'code')
+          input_code.setAttribute('value', data_transformer_code.getAttribute('code'))
+
+          form.appendChild(input_name)
+          form.appendChild(input_code)
+          document.body.appendChild(form)
+
+          form.submit()
+        }
+      })
+
+      data_transformer_name.addEventListener('input', () => {
+        data_transformer_name.classList.remove('invalid')
+      })
+    });
+  </script>
 }
 
-templ transformerToolbar() {
+templ transformerToolbar(currentTransformer string) {
   <div
     class="
       blue darken-1
@@ -27,8 +70,25 @@ templ transformerToolbar() {
         VRL Documentation
       </a>
     </div>
-    <div class="flex flex-row items-center">
-      <button class="waves-effect waves-light btn-small">
+    <div class="flex flex-row items-center gap-3">
+      if currentTransformer != "" {
+        <a
+          class="btn-small blue"
+          href="/web/transformers/new"
+        >
+          <i class="material-icons left">add</i>
+          New
+        </a>
+      } else {
+        <a
+          class="btn-small red"
+          href="#"
+        >
+          <i class="material-icons left">delete</i>
+          Delete
+        </a>
+      }
+      <button id="action_save" class="waves-effect waves-light btn-small">
         <i class="material-icons left">save</i>
         Save
       </button>
@@ -47,16 +107,16 @@ templ transformerSideMenu(props transformerSideMenuProps) {
       <div class="card-panel white flex-shrink">
         <div class="input-field m-0">
           <input
-            id="transformer_name"
+            id="data_transformer_name"
             type="text"
           />
-          <label for="transformer_name">Transformer Name</label>
+          <label for="data_transformer_name">Transformer Name</label>
         </div>
       </div>
     } else {
       <input
         type="hidden"
-        id="transformer_name"
+        id="data_transformer_name"
         value={props.CurrentTransformer}
       />
     }
@@ -96,7 +156,7 @@ templ transformerEditor(code string) {
         flex-grow flex-shrink
       "
     >
-      <code-editor code={code}></code-editor>
+      <code-editor id="data_transformer_code" code={code}></code-editor>
     </div>
   </div>
 }
@@ -115,7 +175,7 @@ templ Transformers(props TransformersProps, notifications []string) {
   }) {
     <div class="w-full h-full flex flex-col">
       <section class="row w-full mb-0">
-        @transformerToolbar()
+        @transformerToolbar(props.CurrentTransformer)
       </section>
       <section class="row w-full mb-0 flex-grow">
         @transformerSideMenu(transformerSideMenuProps{

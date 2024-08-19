@@ -40,7 +40,7 @@ templ Base(props BaseProps) {
             (() => {
               const S = document.currentScript
 
-              document.addEventListener("DOMContentLoaded", () => {
+              document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => {
                   M.toast({
                     html: S.dataset.message,

@@ -30,7 +30,7 @@ func transformerHead() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<script type=\"application/javascript\" src=\"/static/webcomponents/code-editor.bundle.js\"></script>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<script type=\"application/javascript\" src=\"/static/webcomponents/code-editor.bundle.js\"></script><script type=\"application/javascript\">\n    document.addEventListener('DOMContentLoaded', () => {\n      const action_save = document.getElementById('action_save')\n      const data_transformer_name = document.getElementById('data_transformer_name')\n      const data_transformer_code = document.getElementById('data_transformer_code')\n\n      if (data_transformer_name.value !== '') {\n        history.pushState(null, '', `/web/transformers/edit/${data_transformer_name.value}`)\n      }\n\n      action_save.addEventListener('click', () => {\n        if (data_transformer_name.value === '') {\n          M.toast({ html: '❌ Please provide a transformer name' })\n          data_transformer_name.classList.add('invalid')\n        } else {\n          const form = document.createElement('form')\n          form.setAttribute('method', 'post')\n          form.setAttribute('action', window.location.href)\n          form.classList.add('hide')\n\n          const input_name = document.createElement('input')\n          input_name.setAttribute('type', 'hidden')\n          input_name.setAttribute('name', 'name')\n          input_name.setAttribute('value', data_transformer_name.value)\n\n          const input_code = document.createElement('input')\n          input_code.setAttribute('type', 'hidden')\n          input_code.setAttribute('name', 'code')\n          input_code.setAttribute('value', data_transformer_code.getAttribute('code'))\n\n          form.appendChild(input_name)\n          form.appendChild(input_code)\n          document.body.appendChild(form)\n\n          form.submit()\n        }\n      })\n\n      data_transformer_name.addEventListener('input', () => {\n        data_transformer_name.classList.remove('invalid')\n      })\n    });\n  </script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -38,7 +38,7 @@ func transformerHead() templ.Component {
 	})
 }
 
-func transformerToolbar() templ.Component {
+func transformerToolbar(currentTransformer string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -56,7 +56,22 @@ func transformerToolbar() templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"\n      blue darken-1\n      z-depth-1\n      p-3\n      flex flex-row items-center\n    \"><div class=\"flex flex-row flex-grow items-center\"><a class=\"btn-small blue\" href=\"https://vector.dev/docs/reference/vrl/\" target=\"_blank\"><i class=\"material-icons left\">help</i> VRL Documentation</a></div><div class=\"flex flex-row items-center\"><button class=\"waves-effect waves-light btn-small\"><i class=\"material-icons left\">save</i> Save</button></div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"\n      blue darken-1\n      z-depth-1\n      p-3\n      flex flex-row items-center\n    \"><div class=\"flex flex-row flex-grow items-center\"><a class=\"btn-small blue\" href=\"https://vector.dev/docs/reference/vrl/\" target=\"_blank\"><i class=\"material-icons left\">help</i> VRL Documentation</a></div><div class=\"flex flex-row items-center gap-3\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if currentTransformer != "" {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"btn-small blue\" href=\"/web/transformers/new\"><i class=\"material-icons left\">add</i> New</a> ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"btn-small red\" href=\"#\"><i class=\"material-icons left\">delete</i> Delete</a> ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button id=\"action_save\" class=\"waves-effect waves-light btn-small\"><i class=\"material-icons left\">save</i> Save</button></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -92,19 +107,19 @@ func transformerSideMenu(props transformerSideMenuProps) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if props.CurrentTransformer == "" {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"card-panel white flex-shrink\"><div class=\"input-field m-0\"><input id=\"transformer_name\" type=\"text\"> <label for=\"transformer_name\">Transformer Name</label></div></div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"card-panel white flex-shrink\"><div class=\"input-field m-0\"><input id=\"data_transformer_name\" type=\"text\"> <label for=\"data_transformer_name\">Transformer Name</label></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<input type=\"hidden\" id=\"transformer_name\" value=\"")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<input type=\"hidden\" id=\"data_transformer_name\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(props.CurrentTransformer)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/transformers.templ`, Line: 60, Col: 39}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/transformers.templ`, Line: 120, Col: 39}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -128,7 +143,7 @@ func transformerSideMenu(props transformerSideMenuProps) templ.Component {
 				var templ_7745c5c3_Var5 string
 				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(transformer)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/transformers.templ`, Line: 75, Col: 67}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/transformers.templ`, Line: 135, Col: 67}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
@@ -155,7 +170,7 @@ func transformerSideMenu(props transformerSideMenuProps) templ.Component {
 				var templ_7745c5c3_Var7 string
 				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(transformer)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/transformers.templ`, Line: 81, Col: 26}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/transformers.templ`, Line: 141, Col: 26}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
@@ -193,14 +208,14 @@ func transformerEditor(code string) templ.Component {
 			templ_7745c5c3_Var8 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"col s10 h-full flex flex-col\"><div class=\"\n        card-panel white\n        p-0 mb-0 h-0\n        flex-grow flex-shrink\n      \"><code-editor code=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"col s10 h-full flex flex-col\"><div class=\"\n        card-panel white\n        p-0 mb-0 h-0\n        flex-grow flex-shrink\n      \"><code-editor id=\"data_transformer_code\" code=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(code)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/transformers.templ`, Line: 99, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/transformers.templ`, Line: 159, Col: 56}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
@@ -254,7 +269,7 @@ func Transformers(props TransformersProps, notifications []string) templ.Compone
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = transformerToolbar().Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = transformerToolbar(props.CurrentTransformer).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

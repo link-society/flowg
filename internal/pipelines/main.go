@@ -65,6 +65,11 @@ func (m *Manager) GetTransformerScript(name string) (string, error) {
 	return string(file), nil
 }
 
+func (m *Manager) SaveTransformerScript(name, script string) error {
+	filePath := filepath.Join(m.transformersDir, name+".vrl")
+	return os.WriteFile(filePath, []byte(script), os.ModePerm)
+}
+
 func (m *Manager) ListPipelines() ([]string, error) {
 	files, err := os.ReadDir(m.pipelinesDir)
 	if err != nil {

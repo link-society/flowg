@@ -53,7 +53,7 @@ func Base(props BaseProps) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\">\n            (() => {\n              const S = document.currentScript\n\n              document.addEventListener(\"DOMContentLoaded\", () => {\n                setTimeout(() => {\n                  M.toast({\n                    html: S.dataset.message,\n                    completeCallback: () => S.remove(),\n                  });\n                }, 1000);\n              });\n            })();\n          </script>")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\">\n            (() => {\n              const S = document.currentScript\n\n              document.addEventListener('DOMContentLoaded', () => {\n                setTimeout(() => {\n                  M.toast({\n                    html: S.dataset.message,\n                    completeCallback: () => S.remove(),\n                  });\n                }, 1000);\n              });\n            })();\n          </script>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
