@@ -13,19 +13,7 @@ templ Base(head templ.Component, currentNav string) {
 
       <link rel="stylesheet" href="/static/css/google-font-material-icons.css" />
       <link rel="stylesheet" href="/static/css/materialize.min.css" />
-
-      <style type="text/css">
-        body {
-          display: flex;
-          height: 100vh;
-          flex-direction: column;
-          overflow: hidden;
-        }
-
-        main {
-          flex: 1 0 auto;
-        }
-      </style>
+      <link rel="stylesheet" href="/static/css/utilities.css" />
 
       <script type="application/javascript" src="/static/js/materialize.min.js"></script>
       <script type="application/javascript" src="/static/js/htmx.min.js"></script>
@@ -35,10 +23,10 @@ templ Base(head templ.Component, currentNav string) {
         @head
       }
     </head>
-    <body class="blue-grey lighten-4">
+    <body class="blue-grey lighten-4 flex flex-col h-maxvh overflow-hidden">
       @components.Navbar(currentNav)
 
-      <main>
+      <main class="flex-grow">
         { children... }
       </main>
 

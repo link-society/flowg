@@ -32,14 +32,14 @@ func statCard(icon string, name string, href templ.SafeURL, count int) templ.Com
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<article class=\"card hoverable grey lighten-3\"><main class=\"card-content black-text\"><div style=\"width: 100%;\"><div style=\"\n            display: flex;\n            flex-direction: row;\n            align-items: center;\n            justify-content: center;\n            gap: 0.25rem;\n          \"><i class=\"material-icons\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<article class=\"card hoverable grey lighten-3\"><main class=\"card-content black-text\"><div class=\"w-full\"><div class=\"flex flex-row items-center justify-center gap-1\"><i class=\"material-icons\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(icon)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/dashboard.templ`, Line: 22, Col: 41}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/dashboard.templ`, Line: 14, Col: 41}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -52,20 +52,20 @@ func statCard(icon string, name string, href templ.SafeURL, count int) templ.Com
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/dashboard.templ`, Line: 23, Col: 18}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/dashboard.templ`, Line: 15, Col: 18}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</b></div><div style=\"text-align: center;\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</b></div><div class=\"text-center\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", count))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/dashboard.templ`, Line: 27, Col: 35}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/dashboard.templ`, Line: 19, Col: 35}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {

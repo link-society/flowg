@@ -9,21 +9,13 @@ import (
 templ statCard(icon string, name string, href templ.SafeURL, count int) {
   <article class="card hoverable grey lighten-3">
     <main class="card-content black-text">
-      <div style="width: 100%;">
-        <div
-          style="
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: center;
-            gap: 0.25rem;
-          "
-        >
+      <div class="w-full">
+        <div class="flex flex-row items-center justify-center gap-1">
           <i class="material-icons">{icon}</i>
           <b>{name}</b>
         </div>
 
-        <div style="text-align: center;">
+        <div class="text-center">
           {fmt.Sprintf("%d", count)}
         </div>
       </div>
