@@ -4,63 +4,125 @@ import (
   "link-society.com/flowg/web/templates/layouts"
 )
 
-templ head() {
+templ transformerHead() {
   <script type="application/javascript" src="/static/webcomponents/code-editor.bundle.js"></script>
 }
 
-templ Transformers() {
-  @layouts.Base(head(), "transformers") {
+templ transformerToolbar() {
+  <div
+    class="
+      blue darken-1
+      z-depth-1
+      p-3
+      flex flex-row items-center
+    "
+  >
+    <div class="flex flex-row flex-grow items-center">
+      <a
+        class="btn-small blue"
+        href="https://vector.dev/docs/reference/vrl/"
+        target="_blank"
+      >
+        <i class="material-icons left">help</i>
+        VRL Documentation
+      </a>
+    </div>
+    <div class="flex flex-row items-center">
+      <button class="waves-effect waves-light btn-small">
+        <i class="material-icons left">save</i>
+        Save
+      </button>
+    </div>
+  </div>
+}
+
+type transformerSideMenuProps struct {
+  Transformers      []string
+  CurrentTransformer string
+}
+
+templ transformerSideMenu(props transformerSideMenuProps) {
+  <div class="col s2 h-full flex flex-col">
+    if props.CurrentTransformer == "" {
+      <div class="card-panel white flex-shrink">
+        <div class="input-field m-0">
+          <input
+            id="transformer_name"
+            type="text"
+          />
+          <label for="transformer_name">Transformer Name</label>
+        </div>
+      </div>
+    } else {
+      <input
+        type="hidden"
+        id="transformer_name"
+        value={props.CurrentTransformer}
+      />
+    }
+
+    <div
+      class="
+        card-panel white
+        p-0 mb-0 h-0
+        flex-grow flex-shrink
+        overflow-auto
+      "
+    >
+      <div class="collection m-0">
+        for _, transformer := range props.Transformers {
+          if transformer == props.CurrentTransformer {
+            <a class="collection-item active" href="#">{transformer}</a>
+          } else {
+            <a
+              class="collection-item"
+              href={templ.SafeURL("/web/transformers/edit/" + transformer)}
+            >
+              {transformer}
+            </a>
+          }
+        }
+      </div>
+    </div>
+  </div>
+}
+
+templ transformerEditor(code string) {
+  <div class="col s10 h-full flex flex-col">
+    <div
+      class="
+        card-panel white
+        p-0 mb-0 h-0
+        flex-grow flex-shrink
+      "
+    >
+      <code-editor code={code}></code-editor>
+    </div>
+  </div>
+}
+
+type TransformersProps struct {
+  Transformers      []string
+  CurrentTransformer string
+  Code              string
+}
+
+templ Transformers(props TransformersProps, notifications []string) {
+  @layouts.Base(layouts.BaseProps{
+    Head: transformerHead(),
+    CurrentNav: "transformers",
+    Notifications: notifications,
+  }) {
     <div class="w-full h-full flex flex-col">
       <section class="row w-full mb-0">
-        <div
-          class="
-            blue darken-1
-            z-depth-1
-            p-3
-            flex flex-row items-center
-          "
-        >
-          <div class="flex flex-row flex-grow items-center">
-            <a
-              class="btn-small blue"
-              href="https://vector.dev/docs/reference/vrl/"
-              target="_blank"
-            >
-              <i class="material-icons left">help</i>
-              VRL Documentation
-            </a>
-          </div>
-          <div class="flex flex-row items-center">
-            <button class="waves-effect waves-light btn-small">
-              <i class="material-icons left">save</i>
-              Save
-            </button>
-          </div>
-        </div>
+        @transformerToolbar()
       </section>
       <section class="row w-full mb-0 flex-grow">
-        <div class="col s2 h-full flex flex-col">
-          <div
-            class="
-              card-panel white
-              mb-0 h-0
-              flex-grow flex-shrink
-              overflow-auto
-            "
-          >
-          </div>
-        </div>
-        <div class="col s10 h-full flex flex-col">
-          <div
-            class="
-              card-panel white
-              p-0 mb-0 h-0
-              flex-grow flex-shrink
-            "
-          >
-            <code-editor code="."></code-editor>
-          </div>
-        </div>
+        @transformerSideMenu(transformerSideMenuProps{
+          Transformers: props.Transformers,
+          CurrentTransformer: props.CurrentTransformer,
+        })
+        @transformerEditor(props.Code)
       </section>
     </div>
   }

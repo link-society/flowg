@@ -10,7 +10,13 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import "link-society.com/flowg/web/templates/components"
 
-func Base(head templ.Component, currentNav string) templ.Component {
+type BaseProps struct {
+	Head          templ.Component
+	CurrentNav    string
+	Notifications []string
+}
+
+func Base(props BaseProps) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -28,12 +34,33 @@ func Base(head templ.Component, currentNav string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!doctype html><html><head><title>FlowG</title><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><link rel=\"stylesheet\" href=\"/static/css/google-font-material-icons.css\"><link rel=\"stylesheet\" href=\"/static/css/materialize.min.css\"><link rel=\"stylesheet\" href=\"/static/css/utilities.css\"><script type=\"application/javascript\" src=\"/static/js/materialize.min.js\"></script><script type=\"application/javascript\" src=\"/static/js/htmx.min.js\"></script><script type=\"application/javascript\" src=\"/static/js/hyperscript.min.js\"></script>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!doctype html><html><head><title>FlowG</title><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><link rel=\"stylesheet\" href=\"/static/css/google-font-material-icons.css\"><link rel=\"stylesheet\" href=\"/static/css/materialize.min.css\"><link rel=\"stylesheet\" href=\"/static/css/utilities.css\"><script type=\"application/javascript\" src=\"/static/js/materialize.min.js\"></script><script type=\"application/javascript\" src=\"/static/js/htmx.min.js\"></script><script type=\"application/javascript\" src=\"/static/js/hyperscript.min.js\"></script><script type=\"application/javascript\">\n        document.addEventListener('DOMContentLoaded', function() {\n          M.AutoInit();\n        });\n      </script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if head != nil {
-			templ_7745c5c3_Err = head.Render(ctx, templ_7745c5c3_Buffer)
+		if props.Notifications != nil {
+			for _, notification := range props.Notifications {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<script type=\"application/javascript\" data-message=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var2 string
+				templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(notification)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layouts/base.templ`, Line: 38, Col: 38}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\">\n            (() => {\n              const S = document.currentScript\n\n              document.addEventListener(\"DOMContentLoaded\", () => {\n                setTimeout(() => {\n                  M.toast({\n                    html: S.dataset.message,\n                    completeCallback: () => S.remove(),\n                  });\n                }, 1000);\n              });\n            })();\n          </script>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+		}
+		if props.Head != nil {
+			templ_7745c5c3_Err = props.Head.Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -42,7 +69,7 @@ func Base(head templ.Component, currentNav string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = components.Navbar(currentNav).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = components.Navbar(components.NavbarProps{CurrentNav: props.CurrentNav}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

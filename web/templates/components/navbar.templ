@@ -1,6 +1,10 @@
 package components
 
-templ Navbar(currentNav string) {
+type NavbarProps struct {
+  CurrentNav string
+}
+
+templ Navbar(props NavbarProps) {
   <nav class="blue darken-3" style="z-index: 900;">
     <div class="nav-wrapper">
       <a href="/" class="brand-logo center"><b>FlowG</b></a>
@@ -19,7 +23,7 @@ templ Navbar(currentNav string) {
         </li>
       </ul>
       <ul class="right hide-on-med-and-down">
-        switch currentNav {
+        switch props.CurrentNav {
           case "streams":
             <li class="active">
               <a>

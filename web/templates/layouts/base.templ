@@ -2,7 +2,13 @@ package layouts
 
 import "link-society.com/flowg/web/templates/components"
 
-templ Base(head templ.Component, currentNav string) {
+type BaseProps struct {
+  Head templ.Component
+  CurrentNav string
+  Notifications []string
+}
+
+templ Base(props BaseProps) {
   <!DOCTYPE html>
   <html>
     <head>
@@ -19,12 +25,40 @@ templ Base(head templ.Component, currentNav string) {
       <script type="application/javascript" src="/static/js/htmx.min.js"></script>
       <script type="application/javascript" src="/static/js/hyperscript.min.js"></script>
 
-      if head != nil {
-        @head
+      <script type="application/javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+          M.AutoInit();
+        });
+      </script>
+
+      if props.Notifications != nil {
+        for _, notification := range props.Notifications {
+          <script
+            type="application/javascript"
+            data-message={notification}
+          >
+            (() => {
+              const S = document.currentScript
+
+              document.addEventListener("DOMContentLoaded", () => {
+                setTimeout(() => {
+                  M.toast({
+                    html: S.dataset.message,
+                    completeCallback: () => S.remove(),
+                  });
+                }, 1000);
+              });
+            })();
+          </script>
+        }
+      }
+
+      if props.Head != nil {
+        @props.Head
       }
     </head>
     <body class="blue-grey lighten-4 flex flex-col h-maxvh overflow-hidden">
-      @components.Navbar(currentNav)
+      @components.Navbar(components.NavbarProps{CurrentNav: props.CurrentNav})
 
       <main class="flex-grow">
         { children... }

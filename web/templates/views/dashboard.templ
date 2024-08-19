@@ -6,38 +6,70 @@ import (
   "link-society.com/flowg/web/templates/layouts"
 )
 
-templ statCard(icon string, name string, href templ.SafeURL, count int) {
+type dashboardStatCardProps struct {
+  Icon  string
+  Name  string
+  Href  templ.SafeURL
+  Count int
+}
+
+templ dashboardStatCard(props dashboardStatCardProps) {
   <article class="card hoverable grey lighten-3">
     <main class="card-content black-text">
       <div class="w-full">
         <div class="flex flex-row items-center justify-center gap-1">
-          <i class="material-icons">{icon}</i>
-          <b>{name}</b>
+          <i class="material-icons">{props.Icon}</i>
+          <b>{props.Name}</b>
         </div>
 
         <div class="text-center">
-          {fmt.Sprintf("%d", count)}
+          {fmt.Sprintf("%d", props.Count)}
         </div>
       </div>
     </main>
     <footer class="card-action">
-      <a href={href}>View More &gt;&gt;</a>
+      <a href={props.Href}>View More &gt;&gt;</a>
     </footer>
   </article>
 }
 
-templ Dashboard(streamCount, transformerCount, pipelineCount int) {
-  @layouts.Base(nil, "") {
+type DashboardProps struct {
+  StreamCount      int
+  TransformerCount int
+  PipelineCount    int
+}
+
+templ Dashboard(props DashboardProps, notifications []string) {
+  @layouts.Base(layouts.BaseProps{
+    Head: nil,
+    CurrentNav: "",
+    Notifications: notifications,
+  }) {
     <div class="container">
       <section class="row section">
         <div class="col s12 m4">
-          @statCard("list", "Streams", "/web/streams", streamCount)
+          @dashboardStatCard(dashboardStatCardProps{
+            Icon: "list",
+            Name: "Streams",
+            Href: "/web/streams",
+            Count: props.StreamCount,
+          })
         </div>
         <div class="col s12 m4">
-          @statCard("filter_alt", "Transformers", "/web/transformers", transformerCount)
+          @dashboardStatCard(dashboardStatCardProps{
+            Icon: "filter_alt",
+            Name: "Transformers",
+            Href: "/web/transformers",
+            Count: props.TransformerCount,
+          })
         </div>
         <div class="col s12 m4">
-          @statCard("settings", "Pipelines", "/web/pipelines", pipelineCount)
+          @dashboardStatCard(dashboardStatCardProps{
+            Icon: "settings",
+            Name: "Pipelines",
+            Href: "/web/pipelines",
+            Count: props.PipelineCount,
+          })
         </div>
       </section>
     </div>
