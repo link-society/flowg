@@ -40,9 +40,22 @@ tasks:
 
   "gen:js":
     internal: true
+    cmds:
+      - task: "gen:js:floweditor"
+      - task: "gen:js:code-editor"
+
+  "gen:js:floweditor":
+    internal: true
     dir: ./web/components/floweditor
     cmds:
       - task: "deps:js:floweditor"
+      - npm run build
+
+  "gen:js:code-editor":
+    internal: true
+    dir: ./web/components/code-editor
+    cmds:
+      - task: "deps:js:code-editor"
       - npm run build
 
   "deps:go":
@@ -54,5 +67,11 @@ tasks:
   "deps:js:floweditor":
     internal: true
     dir: ./web/components/floweditor
+    cmds:
+      - npm i
+
+  "deps:js:code-editor":
+    internal: true
+    dir: ./web/components/code-editor
     cmds:
       - npm i
