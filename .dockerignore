@@ -4,4 +4,5 @@
 /internal/vrl/rust-crate/target/
 /web/static/webcomponents/
 /web/components/floweditor/node_modules/
+/web/components/code-editor/node_modules/
 .git*
