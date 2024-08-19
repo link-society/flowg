@@ -26,7 +26,7 @@ func Navbar(currentNav string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<nav class=\"blue darken-3\"><div class=\"nav-wrapper\"><a href=\"/\" class=\"brand-logo center\">FlowG</a><ul class=\"left hide-on-med-and-down\"><li><a href=\"https://github.com/link-society/flowg\" target=\"_blank\"><i class=\"left material-icons\">code</i> GitHub</a></li><li><a href=\"/api/docs\" target=\"_blank\"><i class=\"left material-icons\">cloud</i> API Docs</a></li></ul><ul class=\"right hide-on-med-and-down\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<nav class=\"blue darken-3\" style=\"z-index: 900;\"><div class=\"nav-wrapper\"><a href=\"/\" class=\"brand-logo center\"><b>FlowG</b></a><ul class=\"left hide-on-med-and-down\"><li><a href=\"https://github.com/link-society/flowg\" target=\"_blank\"><i class=\"left material-icons\">code</i> GitHub</a></li><li><a href=\"/api/docs\" target=\"_blank\"><i class=\"left material-icons\">cloud</i> API Docs</a></li></ul><ul class=\"right hide-on-med-and-down\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
