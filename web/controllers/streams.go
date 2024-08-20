@@ -84,10 +84,15 @@ func StreamController(db *storage.Storage) http.Handler {
 		}
 
 		// parse filter values in querystring
+		autoRefresh := r.URL.Query().Get("autorefresh")
+		if autoRefresh == "" {
+			autoRefresh = "0"
+		}
+
 		toRaw := r.URL.Query().Get("to")
 		var to time.Time
 		if toRaw != "" {
-			to, err = time.Parse("2006-01-02T15:04", toRaw)
+			to, err = time.Parse("2006-01-02T15:04:05", toRaw)
 			if err != nil {
 				slog.ErrorContext(
 					r.Context(),
@@ -106,7 +111,7 @@ func StreamController(db *storage.Storage) http.Handler {
 		fromRaw := r.URL.Query().Get("from")
 		var from time.Time
 		if fromRaw != "" {
-			from, err = time.Parse("2006-01-02T15:04", fromRaw)
+			from, err = time.Parse("2006-01-02T15:04:05", fromRaw)
 			if err != nil {
 				slog.ErrorContext(
 					r.Context(),
@@ -205,11 +210,12 @@ func StreamController(db *storage.Storage) http.Handler {
 				Streams:       streams,
 				CurrentStream: stream,
 
-				LogEntries: logs,
-				Fields:     fields,
-				From:       from,
-				To:         to,
-				Filter:     filterSource,
+				LogEntries:  logs,
+				Fields:      fields,
+				From:        from,
+				To:          to,
+				Filter:      filterSource,
+				AutoRefresh: autoRefresh,
 
 				HistogramData: string(histogramData),
 			},

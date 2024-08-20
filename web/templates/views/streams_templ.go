@@ -34,7 +34,7 @@ func streamHead() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<script type=\"application/javascript\" src=\"/static/js/apexcharts.min.js\"></script><script type=\"application/javascript\">\n    document.addEventListener('DOMContentLoaded', () => {\n      const histogramElt  = document.getElementById('data_stream_histogram')\n      const histogramData = JSON.parse(histogramElt.dataset.timeserie)\n\n      const chart = new ApexCharts(histogramElt, {\n        series: [\n          {\n            name: 'Logs',\n            data: histogramData,\n          },\n        ],\n        chart: {\n          type: 'bar',\n          width: '100%',\n          height: 150,\n          animations: {\n            enabled: false,\n          }\n        },\n        dataLabels: {\n          enabled: false,\n        },\n        xaxis: {\n          type: 'datetime',\n        },\n      })\n      chart.render()\n    })\n  </script>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<script type=\"application/javascript\" src=\"/static/js/apexcharts.min.js\"></script><script type=\"application/javascript\">\n    document.addEventListener('DOMContentLoaded', () => {\n      const autoRefreshSelector = document.getElementById('data_stream_autorefresh')\n\n      let autoRefreshTimeout = null\n\n      const setupRefreshTimeout = () => {\n        if (autoRefreshTimeout) {\n          clearTimeout(autoRefreshTimeout)\n        }\n\n        const autoRefreshInterval = parseInt(autoRefreshSelector.value) * 1000\n\n        if (autoRefreshInterval > 0) {\n          autoRefreshTimeout = setTimeout(\n            () => {\n              const form = document.getElementById('form_stream')\n              const to = document.getElementById('data_stream_to')\n              to.value = new Date().toISOString().slice(0, 19)\n\n              form.submit()\n            },\n            autoRefreshInterval,\n          )\n        }\n      }\n\n      setupRefreshTimeout()\n      autoRefreshSelector.addEventListener('change', setupRefreshTimeout)\n\n      const histogramElt  = document.getElementById('data_stream_histogram')\n      const histogramData = JSON.parse(histogramElt.dataset.timeserie)\n\n      const chart = new ApexCharts(histogramElt, {\n        series: [\n          {\n            name: 'Logs',\n            data: histogramData,\n          },\n        ],\n        chart: {\n          type: 'bar',\n          width: '100%',\n          height: 150,\n          animations: {\n            enabled: false,\n          }\n        },\n        dataLabels: {\n          enabled: false,\n        },\n        xaxis: {\n          type: 'datetime',\n        },\n      })\n      chart.render()\n    })\n  </script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -78,7 +78,7 @@ func streamSideMenu(props streamSideMenuProps) templ.Component {
 				var templ_7745c5c3_Var3 string
 				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(stream)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/streams.templ`, Line: 63, Col: 62}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/streams.templ`, Line: 91, Col: 62}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 				if templ_7745c5c3_Err != nil {
@@ -105,7 +105,7 @@ func streamSideMenu(props streamSideMenuProps) templ.Component {
 				var templ_7745c5c3_Var5 string
 				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(stream)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/streams.templ`, Line: 69, Col: 21}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/streams.templ`, Line: 97, Col: 21}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
@@ -126,9 +126,10 @@ func streamSideMenu(props streamSideMenuProps) templ.Component {
 }
 
 type streamSearchbarProps struct {
-	From   time.Time
-	To     time.Time
-	Filter string
+	From        time.Time
+	To          time.Time
+	Filter      string
+	AutoRefresh string
 }
 
 func streamSearchbar(props streamSearchbarProps) templ.Component {
@@ -149,14 +150,14 @@ func streamSearchbar(props streamSearchbarProps) templ.Component {
 			templ_7745c5c3_Var6 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form method=\"get\" class=\"flex flex-row items-center gap-2 px-3 py-1 z-depth-1\"><div class=\"flex-grow\"><label for=\"data_stream_filter\">Filter:</label> <input id=\"data_stream_filter\" name=\"filter\" type=\"text\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form id=\"form_stream\" method=\"get\" class=\"flex flex-row items-center gap-2 px-3 py-1 z-depth-1\"><div class=\"flex-grow\"><label for=\"data_stream_filter\">Filter:</label> <input id=\"data_stream_filter\" name=\"filter\" type=\"text\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(props.Filter)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/streams.templ`, Line: 92, Col: 27}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/streams.templ`, Line: 125, Col: 27}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -167,9 +168,9 @@ func streamSearchbar(props streamSearchbarProps) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var8 string
-		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(props.From.Format("2006-01-02T15:04"))
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(props.From.Format("2006-01-02T15:04:05"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/streams.templ`, Line: 102, Col: 52}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/streams.templ`, Line: 135, Col: 55}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -180,15 +181,46 @@ func streamSearchbar(props streamSearchbarProps) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var9 string
-		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(props.To.Format("2006-01-02T15:04"))
+		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(props.To.Format("2006-01-02T15:04:05"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/streams.templ`, Line: 111, Col: 50}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/streams.templ`, Line: 144, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"></div><div><label for=\"data_stream_autorefresh\">Auto Refresh:</label> <select id=\"data_stream_autorefresh\"><option value=\"0\" selected>No Auto Refresh</option> <option value=\"5\">Every 5s</option> <option value=\"10\">Every 10s</option> <option value=\"30\">Every 30s</option> <option value=\"60\">Every 1m</option></select></div><button type=\"submit\" class=\"btn waves-effect waves-light ml-5\"><i class=\"material-icons right\">search</i> Run Query</button></form>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"></div><div><label for=\"data_stream_autorefresh\">Auto Refresh:</label> <select id=\"data_stream_autorefresh\" name=\"autorefresh\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		switch props.AutoRefresh {
+		case "0":
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<option value=\"0\">No Auto Refresh</option> <option value=\"5\">Every 5s</option> <option value=\"10\">Every 10s</option> <option value=\"30\">Every 30s</option> <option value=\"60\">Every 1m</option>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		case "5":
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<option value=\"0\">No Auto Refresh</option> <option value=\"5\" selected>Every 5s</option> <option value=\"10\">Every 10s</option> <option value=\"30\">Every 30s</option> <option value=\"60\">Every 1m</option>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		case "10":
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<option value=\"0\">No Auto Refresh</option> <option value=\"5\">Every 5s</option> <option value=\"10\" selected>Every 10s</option> <option value=\"30\">Every 30s</option> <option value=\"60\">Every 1m</option>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		case "30":
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<option value=\"0\">No Auto Refresh</option> <option value=\"5\">Every 5s</option> <option value=\"10\">Every 10s</option> <option value=\"30\" selected>Every 30s</option> <option value=\"60\">Every 1m</option>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		case "60":
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<option value=\"0\">No Auto Refresh</option> <option value=\"5\">Every 5s</option> <option value=\"10\">Every 10s</option> <option value=\"30\">Every 30s</option> <option value=\"60\" selected>Every 1m</option>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</select></div><button type=\"submit\" class=\"btn waves-effect waves-light ml-5\"><i class=\"material-icons right\">search</i> Run Query</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -221,7 +253,7 @@ func streamHistogram(data string) templ.Component {
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(data)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/streams.templ`, Line: 134, Col: 24}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/streams.templ`, Line: 198, Col: 24}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
@@ -241,6 +273,7 @@ type streamViewerProps struct {
 	From          time.Time
 	To            time.Time
 	Filter        string
+	AutoRefresh   string
 	HistogramData string
 }
 
@@ -267,9 +300,10 @@ func streamViewer(props streamViewerProps) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = streamSearchbar(streamSearchbarProps{
-			From:   props.From,
-			To:     props.To,
-			Filter: props.Filter,
+			From:        props.From,
+			To:          props.To,
+			Filter:      props.Filter,
+			AutoRefresh: props.AutoRefresh,
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -290,7 +324,7 @@ func streamViewer(props streamViewerProps) templ.Component {
 			var templ_7745c5c3_Var13 string
 			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(field)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/streams.templ`, Line: 171, Col: 47}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/streams.templ`, Line: 237, Col: 47}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 			if templ_7745c5c3_Err != nil {
@@ -313,7 +347,7 @@ func streamViewer(props streamViewerProps) templ.Component {
 			var templ_7745c5c3_Var14 string
 			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(entry.Timestamp.Format(time.RFC3339))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/streams.templ`, Line: 179, Col: 78}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/streams.templ`, Line: 245, Col: 78}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 			if templ_7745c5c3_Err != nil {
@@ -332,7 +366,7 @@ func streamViewer(props streamViewerProps) templ.Component {
 					var templ_7745c5c3_Var15 string
 					templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(val)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/streams.templ`, Line: 184, Col: 66}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/streams.templ`, Line: 250, Col: 66}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 					if templ_7745c5c3_Err != nil {
@@ -392,11 +426,12 @@ type StreamsProps struct {
 	Streams       []string
 	CurrentStream string
 
-	LogEntries []storage.LogEntry
-	Fields     []string
-	From       time.Time
-	To         time.Time
-	Filter     string
+	LogEntries  []storage.LogEntry
+	Fields      []string
+	From        time.Time
+	To          time.Time
+	Filter      string
+	AutoRefresh string
 
 	HistogramData string
 }
@@ -454,6 +489,7 @@ func Streams(props StreamsProps, notifications []string) templ.Component {
 					From:          props.From,
 					To:            props.To,
 					Filter:        props.Filter,
+					AutoRefresh:   props.AutoRefresh,
 					HistogramData: props.HistogramData,
 				}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
