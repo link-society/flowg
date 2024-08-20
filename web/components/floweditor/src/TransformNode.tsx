@@ -34,6 +34,7 @@ const TransformNode: React.FC<NodeProps<TransformNode>> = ({ id, data }) => {
           flex flex-row items-center
           z-depth-1 px-3 py-1 gap-2
           light-blue lighten-4 black-text
+          hoverable
         "
       >
         <i className="material-icons small">filter_alt</i>

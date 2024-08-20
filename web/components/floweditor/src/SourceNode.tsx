@@ -10,6 +10,7 @@ const SourceNode: React.FC<NodeProps> = ({}) => {
           flex flex-row items-center
           z-depth-1 px-3 py-1 gap-2
           orange lighten-1 black-text
+          hoverable
         "
       >
         <i className="material-icons small">input</i>

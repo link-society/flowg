@@ -34,6 +34,7 @@ const SwitchNode: React.FC<NodeProps<SwitchNode>> = ({ id, data }) => {
           flex flex-row items-center
           z-depth-1 px-3 py-1 gap-2
           red lighten-4 black-text
+          hoverable
         "
       >
         <i className="material-icons small">device_hub</i>
