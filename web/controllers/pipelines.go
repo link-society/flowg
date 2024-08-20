@@ -232,5 +232,20 @@ func PipelinesController(pipelinesManager *pipelines.Manager) http.Handler {
 		h.ServeHTTP(w, r)
 	})
 
+	mux.HandleFunc("POST /web/pipelines/delete/{name}/{$}", func(w http.ResponseWriter, r *http.Request) {
+		pipelineName := r.PathValue("name")
+		err := pipelinesManager.DeletePipelineFlow(pipelineName)
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error deleting pipeline",
+				"channel", "web",
+				"error", err.Error(),
+			)
+		}
+
+		http.Redirect(w, r, "/web/pipelines/new", http.StatusTemporaryRedirect)
+	})
+
 	return mux
 }

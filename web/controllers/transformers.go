@@ -232,5 +232,20 @@ func TransformersController(pipelinesManager *pipelines.Manager) http.Handler {
 		h.ServeHTTP(w, r)
 	})
 
+	mux.HandleFunc("GET /web/transformers/delete/{name}/{$}", func(w http.ResponseWriter, r *http.Request) {
+		transformerName := r.PathValue("name")
+		err := pipelinesManager.DeleteTransformerScript(transformerName)
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error deleting transformer script",
+				"channel", "web",
+				"error", err.Error(),
+			)
+		}
+
+		http.Redirect(w, r, "/web/transformers/new", http.StatusTemporaryRedirect)
+	})
+
 	return mux
 }

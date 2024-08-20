@@ -79,10 +79,9 @@ templ transformerToolbar(currentTransformer string) {
           <i class="material-icons left">add</i>
           New
         </a>
-      } else {
         <a
           class="btn-small red"
-          href="#"
+          href={templ.SafeURL("/web/transformers/delete/" + currentTransformer + "/")}
         >
           <i class="material-icons left">delete</i>
           Delete

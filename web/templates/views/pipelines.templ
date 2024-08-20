@@ -87,10 +87,9 @@ templ pipelineToolbar(currentPipeline string) {
           <i class="material-icons left">add</i>
           New
         </a>
-      } else {
         <a
           class="btn-small red"
-          href="#"
+          href={templ.SafeURL("/web/pipelines/delete/" + currentPipeline + "/")}
         >
           <i class="material-icons left">delete</i>
           Delete

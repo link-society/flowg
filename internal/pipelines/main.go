@@ -70,6 +70,11 @@ func (m *Manager) SaveTransformerScript(name, script string) error {
 	return os.WriteFile(filePath, []byte(script), os.ModePerm)
 }
 
+func (m *Manager) DeleteTransformerScript(name string) error {
+	filePath := filepath.Join(m.transformersDir, name+".vrl")
+	return os.Remove(filePath)
+}
+
 func (m *Manager) ListPipelines() ([]string, error) {
 	files, err := os.ReadDir(m.pipelinesDir)
 	if err != nil {
@@ -101,6 +106,11 @@ func (m *Manager) GetPipelineFlow(name string) (string, error) {
 func (m *Manager) SavePipelineFlow(name, flow string) error {
 	filePath := filepath.Join(m.pipelinesDir, name+".json")
 	return os.WriteFile(filePath, []byte(flow), os.ModePerm)
+}
+
+func (m *Manager) DeletePipelineFlow(name string) error {
+	filePath := filepath.Join(m.pipelinesDir, name+".json")
+	return os.Remove(filePath)
 }
 
 func (m *Manager) GetPipeline(name string) (*Pipeline, error) {
