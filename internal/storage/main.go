@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"bytes"
 	"context"
 	"log/slog"
 
@@ -272,6 +273,42 @@ func (s *Storage) ListStreams() ([]string, error) {
 	}
 
 	return streams, nil
+}
+
+func (s *Storage) ListStreamFields(stream string) ([]string, error) {
+	fieldsMap := map[string]struct{}{}
+
+	err := s.db.View(func(txn *badger.Txn) error {
+		prefix := []byte(fmt.Sprintf("index:%s:field:", stream))
+		opts := badger.DefaultIteratorOptions
+		opts.Prefix = prefix
+		it := txn.NewIterator(opts)
+		defer it.Close()
+
+		for it.Rewind(); it.Valid(); it.Next() {
+			item := it.Item()
+			key := item.Key()
+
+			keyParts := bytes.SplitN(key[len(prefix):], []byte(":"), 2)
+			if len(keyParts) > 0 {
+				fieldName := string(keyParts[0])
+				fieldsMap[fieldName] = struct{}{}
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	fields := make([]string, 0, len(fieldsMap))
+	for field := range fieldsMap {
+		fields = append(fields, field)
+	}
+
+	return fields, nil
 }
 
 func (s *Storage) Close() error {

@@ -27,6 +27,7 @@ func NewHandler(
 
 	service.Get("/api/v1/streams", ListStreamsUsecase(db))
 	service.Get("/api/v1/streams/{stream}", QueryStreamUsecase(db))
+	service.Get("/api/v1/streams/{stream}/fields", ListStreamFieldsUsecase(db))
 	service.Delete("/api/v1/streams/{stream}", PurgeStreamUsecase(db))
 
 	return service
