@@ -308,6 +308,8 @@ func (s *Storage) ListStreamFields(stream string) ([]string, error) {
 		fields = append(fields, field)
 	}
 
+	sort.Strings(fields)
+
 	return fields, nil
 }
 
