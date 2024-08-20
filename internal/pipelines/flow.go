@@ -84,7 +84,7 @@ func (flowGraph FlowGraph) BuildPipeline() (*Pipeline, error) {
 			}
 			pipelineNodes[flowNode.ID] = pipelineNode
 
-		case "root":
+		case "source":
 			rootFlowNodeId = flowNode.ID
 
 		default:
