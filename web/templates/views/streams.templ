@@ -9,9 +9,36 @@ import (
 )
 
 templ streamHead() {
+  <script type="application/javascript" src="/static/js/apexcharts.min.js"></script>
   <script type="application/javascript">
     document.addEventListener('DOMContentLoaded', () => {
-    });
+      const histogramElt  = document.getElementById('data_stream_histogram')
+      const histogramData = JSON.parse(histogramElt.dataset.timeserie)
+
+      const chart = new ApexCharts(histogramElt, {
+        series: [
+          {
+            name: 'Logs',
+            data: histogramData,
+          },
+        ],
+        chart: {
+          type: 'bar',
+          width: '100%',
+          height: 150,
+          animations: {
+            enabled: false,
+          }
+        },
+        dataLabels: {
+          enabled: false,
+        },
+        xaxis: {
+          type: 'datetime',
+        },
+      })
+      chart.render()
+    })
   </script>
 }
 
@@ -48,17 +75,86 @@ templ streamSideMenu(props streamSideMenuProps) {
   </div>
 }
 
+type streamSearchbarProps struct {
+  From          time.Time
+  To            time.Time
+  Filter        string
+}
+
+templ streamSearchbar(props streamSearchbarProps) {
+  <form method="get" class="flex flex-row items-center gap-2 px-3 py-1 z-depth-1">
+    <div class="flex-grow">
+      <label for="data_stream_filter">Filter:</label>
+      <input
+        id="data_stream_filter"
+        name="filter"
+        type="text"
+        value={props.Filter}
+        placeholder='field = "value"'
+      />
+    </div>
+    <div>
+      <label for="data_stream_from">From:</label>
+      <input
+        id="data_stream_from"
+        name="from"
+        type="datetime-local"
+        value={props.From.Format("2006-01-02T15:04")}
+      />
+    </div>
+    <div>
+      <label for="data_stream_to">To:</label>
+      <input
+        id="data_stream_to"
+        name="to"
+        type="datetime-local"
+        value={props.To.Format("2006-01-02T15:04")}
+      />
+    </div>
+    <div>
+      <label for="data_stream_autorefresh">Auto Refresh:</label>
+      <select id="data_stream_autorefresh">
+        <option value="0" selected>No Auto Refresh</option>
+        <option value="5">Every 5s</option>
+        <option value="10">Every 10s</option>
+        <option value="30">Every 30s</option>
+        <option value="60">Every 1m</option>
+      </select>
+    </div>
+    <button type="submit" class="btn waves-effect waves-light ml-5">
+      <i class="material-icons right">search</i>
+      Run Query
+    </button>
+  </form>
+}
+
+templ streamHistogram(data string) {
+  <div
+    id="data_stream_histogram"
+    data-timeserie={data}
+    class="grey lighten-3 mt-1"
+  ></div>
+}
+
 type streamViewerProps struct {
   LogEntries    []storage.LogEntry
   Fields        []string
   From          time.Time
   To            time.Time
   Filter        string
+  HistogramData string
 }
 
 templ streamViewer(props streamViewerProps) {
   <div class="col s10 h-full flex flex-col">
-    <div class="card-panel white">Search bar</div>
+    <div class="card-panel white p-0">
+      @streamSearchbar(streamSearchbarProps{
+        From:   props.From,
+        To:     props.To,
+        Filter: props.Filter,
+      })
+      @streamHistogram(props.HistogramData)
+    </div>
     <div
       class="
         card-panel white
@@ -80,7 +176,7 @@ templ streamViewer(props streamViewerProps) {
         <tbody>
           for _, entry := range props.LogEntries {
             <tr>
-              <td class="font-monospace">{entry.Timestamp.Format(time.RFC822)}</td>
+              <td class="font-monospace">{entry.Timestamp.Format(time.RFC3339)}</td>
 
               for _, field := range props.Fields {
                 if val, exists := entry.Fields[field]; exists {
@@ -122,6 +218,8 @@ type StreamsProps struct {
   From          time.Time
   To            time.Time
   Filter        string
+
+  HistogramData string
 }
 
 templ Streams(props StreamsProps, notifications []string) {
@@ -140,11 +238,12 @@ templ Streams(props StreamsProps, notifications []string) {
           @streamNoData()
         } else {
           @streamViewer(streamViewerProps{
-            LogEntries: props.LogEntries,
-            Fields:     props.Fields,
-            From:       props.From,
-            To:         props.To,
-            Filter:     props.Filter,
+            LogEntries:    props.LogEntries,
+            Fields:        props.Fields,
+            From:          props.From,
+            To:            props.To,
+            Filter:        props.Filter,
+            HistogramData: props.HistogramData,
           })
         }
       </section>

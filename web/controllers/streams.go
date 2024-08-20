@@ -2,8 +2,10 @@ package controllers
 
 import (
 	"log/slog"
-	"net/http"
 	"time"
+
+	"encoding/json"
+	"net/http"
 
 	"github.com/a-h/templ"
 
@@ -52,6 +54,7 @@ func StreamController(db *storage.Storage) http.Handler {
 	mux.HandleFunc("GET /web/streams/{name}/{$}", func(w http.ResponseWriter, r *http.Request) {
 		notifications := []string{}
 
+		// fetch data for template
 		streams, err := db.ListStreams()
 		if err != nil {
 			slog.ErrorContext(
@@ -80,10 +83,11 @@ func StreamController(db *storage.Storage) http.Handler {
 			notifications = append(notifications, "❌ Could not fetch fields")
 		}
 
+		// parse filter values in querystring
 		toRaw := r.URL.Query().Get("to")
 		var to time.Time
 		if toRaw != "" {
-			to, err = time.Parse(time.RFC3339, toRaw)
+			to, err = time.Parse("2006-01-02T15:04", toRaw)
 			if err != nil {
 				slog.ErrorContext(
 					r.Context(),
@@ -102,7 +106,7 @@ func StreamController(db *storage.Storage) http.Handler {
 		fromRaw := r.URL.Query().Get("from")
 		var from time.Time
 		if fromRaw != "" {
-			from, err = time.Parse(time.RFC3339, fromRaw)
+			from, err = time.Parse("2006-01-02T15:04", fromRaw)
 			if err != nil {
 				slog.ErrorContext(
 					r.Context(),
@@ -138,6 +142,7 @@ func StreamController(db *storage.Storage) http.Handler {
 			filter = nil
 		}
 
+		// fetch logs
 		logs, err := db.Query(r.Context(), stream, from, to, filter)
 		if err != nil {
 			slog.ErrorContext(
@@ -154,6 +159,47 @@ func StreamController(db *storage.Storage) http.Handler {
 			notifications = append(notifications, "❌ Could not fetch logs")
 		}
 
+		// aggregate for histogram
+		interval := to.Sub(from) / 24
+		counts := make([]int, 24)
+		timestamps := make([]time.Time, 24)
+
+		for i := 0; i < 24; i++ {
+			start := from.Add(time.Duration(i) * interval)
+			end := from.Add(time.Duration(i+1) * interval)
+
+			timestamps[i] = start
+
+			for _, log := range logs {
+				if log.Timestamp.After(start) && log.Timestamp.Before(end) {
+					counts[i]++
+				}
+			}
+		}
+
+		var timeserie [][2]interface{}
+		for i := 0; i < 24; i++ {
+			timeserie = append(timeserie, [2]interface{}{
+				timestamps[i].UnixMilli(),
+				counts[i],
+			})
+		}
+
+		histogramData, err := json.Marshal(timeserie)
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error marshalling histogram data",
+				"channel", "web",
+				"stream", stream,
+				"error", err.Error(),
+			)
+
+			histogramData = []byte("[]")
+			notifications = append(notifications, "❌ Could not fetch histogram data")
+		}
+
+		// render
 		h := templ.Handler(views.Streams(
 			views.StreamsProps{
 				Streams:       streams,
@@ -164,6 +210,8 @@ func StreamController(db *storage.Storage) http.Handler {
 				From:       from,
 				To:         to,
 				Filter:     filterSource,
+
+				HistogramData: string(histogramData),
 			},
 			notifications,
 		))

@@ -462,7 +462,6 @@
   flex-shrink: 1 !important;
 }
 
-
 .items-center {
   align-items: center !important;
 }
@@ -477,6 +476,22 @@
 
 .items-stretch {
   align-items: stretch !important;
+}
+
+.self-center {
+  align-self: center !important;
+}
+
+.self-start {
+  align-self: flex-start !important;
+}
+
+.self-end {
+  align-self: flex-end !important;
+}
+
+.self-stretch {
+  align-self: stretch !important;
 }
 
 .justify-start {
@@ -570,4 +585,8 @@ table.logs tr td {
 
 table.logs tr td:last-child {
   width: 100%;
+}
+
+table.logs th:first-child, table.logs td:first-child {
+  border-right-width: 4px;
 }
