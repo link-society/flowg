@@ -5,45 +5,22 @@ import (
 
 	"link-society.com/flowg/internal/storage"
 
+  "link-society.com/flowg/web/templates/components"
   "link-society.com/flowg/web/templates/layouts"
 )
 
 templ streamHead() {
   <script type="application/javascript" src="/static/js/apexcharts.min.js"></script>
   <script type="application/javascript">
-    document.addEventListener('DOMContentLoaded', () => {
-      const autoRefreshSelector = document.getElementById('data_stream_autorefresh')
-
-      let autoRefreshTimeout = null
-
-      const setupRefreshTimeout = () => {
-        if (autoRefreshTimeout) {
-          clearTimeout(autoRefreshTimeout)
-        }
-
-        const autoRefreshInterval = parseInt(autoRefreshSelector.value) * 1000
-
-        if (autoRefreshInterval > 0) {
-          autoRefreshTimeout = setTimeout(
-            () => {
-              const form = document.getElementById('form_stream')
-              const to = document.getElementById('data_stream_to')
-              to.value = new Date().toISOString().slice(0, 19)
-
-              form.submit()
-            },
-            autoRefreshInterval,
-          )
-        }
-      }
-
-      setupRefreshTimeout()
-      autoRefreshSelector.addEventListener('change', setupRefreshTimeout)
-
+    document.addEventListener('htmx:load', () => {
       const histogramElt  = document.getElementById('data_stream_histogram')
       const histogramData = JSON.parse(histogramElt.dataset.timeserie)
 
-      const chart = new ApexCharts(histogramElt, {
+      if (window.chart !== undefined) {
+        window.chart.destroy()
+      }
+
+      window.chart = new ApexCharts(histogramElt, {
         series: [
           {
             name: 'Logs',
@@ -65,7 +42,44 @@ templ streamHead() {
           type: 'datetime',
         },
       })
-      chart.render()
+      window.chart.render()
+
+      const autoRefreshSelector = document.getElementById('data_stream_autorefresh')
+      let autoRefreshToken = null
+
+      const setupAutoRefresh = () => {
+        const autoRefreshInterval = parseInt(autoRefreshSelector.value) * 1000
+
+        if (autoRefreshToken) {
+          clearTimeout(autoRefreshToken)
+        }
+
+        if (autoRefreshInterval > 0) {
+          autoRefreshToken = setTimeout(
+            () => {
+              const form = document.getElementById('form_stream')
+
+              const now = new Date()
+              const YYYY = now.getFullYear()
+              const mm = String(now.getMonth() + 1).padStart(2, '0')
+              const dd = String(now.getDate()).padStart(2, '0')
+              const HH = String(now.getHours()).padStart(2, '0')
+              const MM = String(now.getMinutes()).padStart(2, '0')
+              const SS = String(now.getSeconds()).padStart(2, '0')
+              const to = `${YYYY}-${mm}-${dd}T${HH}:${MM}:${SS}`
+
+              const inputTo = document.getElementById('data_stream_to')
+              inputTo.value = to
+
+              form.dispatchEvent(new Event('submit'))
+            },
+            autoRefreshInterval,
+          )
+        }
+      }
+
+      setupAutoRefresh()
+      autoRefreshSelector.addEventListener('change', setupAutoRefresh)
     })
   </script>
 }
@@ -99,164 +113,6 @@ templ streamSideMenu(props streamSideMenuProps) {
           }
         }
       </div>
-    </div>
-  </div>
-}
-
-type streamSearchbarProps struct {
-  From          time.Time
-  To            time.Time
-  Filter        string
-  AutoRefresh   string
-}
-
-templ streamSearchbar(props streamSearchbarProps) {
-  <form
-    id="form_stream"
-    method="get"
-    class="flex flex-row items-center gap-2 px-3 py-1 z-depth-1"
-  >
-    <div class="flex-grow">
-      <label for="data_stream_filter">Filter:</label>
-      <input
-        id="data_stream_filter"
-        name="filter"
-        type="text"
-        value={props.Filter}
-        placeholder='field = "value"'
-      />
-    </div>
-    <div>
-      <label for="data_stream_from">From:</label>
-      <input
-        id="data_stream_from"
-        name="from"
-        type="datetime-local"
-        value={props.From.Format("2006-01-02T15:04:05")}
-      />
-    </div>
-    <div>
-      <label for="data_stream_to">To:</label>
-      <input
-        id="data_stream_to"
-        name="to"
-        type="datetime-local"
-        value={props.To.Format("2006-01-02T15:04:05")}
-      />
-    </div>
-    <div>
-      <label for="data_stream_autorefresh">Auto Refresh:</label>
-      <select id="data_stream_autorefresh" name="autorefresh">
-        switch props.AutoRefresh {
-        case "0":
-          <option value="0">No Auto Refresh</option>
-          <option value="5">Every 5s</option>
-          <option value="10">Every 10s</option>
-          <option value="30">Every 30s</option>
-          <option value="60">Every 1m</option>
-
-        case "5":
-          <option value="0">No Auto Refresh</option>
-          <option value="5" selected>Every 5s</option>
-          <option value="10">Every 10s</option>
-          <option value="30">Every 30s</option>
-          <option value="60">Every 1m</option>
-
-        case "10":
-          <option value="0">No Auto Refresh</option>
-          <option value="5">Every 5s</option>
-          <option value="10" selected>Every 10s</option>
-          <option value="30">Every 30s</option>
-          <option value="60">Every 1m</option>
-
-        case "30":
-          <option value="0">No Auto Refresh</option>
-          <option value="5">Every 5s</option>
-          <option value="10">Every 10s</option>
-          <option value="30" selected>Every 30s</option>
-          <option value="60">Every 1m</option>
-
-        case "60":
-          <option value="0">No Auto Refresh</option>
-          <option value="5">Every 5s</option>
-          <option value="10">Every 10s</option>
-          <option value="30">Every 30s</option>
-          <option value="60" selected>Every 1m</option>
-        }
-      </select>
-    </div>
-    <button type="submit" class="btn waves-effect waves-light ml-5">
-      <i class="material-icons right">search</i>
-      Run Query
-    </button>
-  </form>
-}
-
-templ streamHistogram(data string) {
-  <div
-    id="data_stream_histogram"
-    data-timeserie={data}
-    class="grey lighten-3 mt-1"
-  ></div>
-}
-
-type streamViewerProps struct {
-  LogEntries    []storage.LogEntry
-  Fields        []string
-  From          time.Time
-  To            time.Time
-  Filter        string
-  AutoRefresh   string
-  HistogramData string
-}
-
-templ streamViewer(props streamViewerProps) {
-  <div class="col s10 h-full flex flex-col">
-    <div class="card-panel white p-0">
-      @streamSearchbar(streamSearchbarProps{
-        From:        props.From,
-        To:          props.To,
-        Filter:      props.Filter,
-        AutoRefresh: props.AutoRefresh,
-      })
-      @streamHistogram(props.HistogramData)
-    </div>
-    <div
-      class="
-        card-panel white
-        p-0 mb-0 h-0
-        flex-grow flex-shrink
-        overflow-auto
-      "
-    >
-      <table class="w-full table-responsive logs highlight">
-        <thead class="grey lighten-2 z-depth-1">
-          <tr>
-            <th class="text-center">Ingested At</th>
-            for _, field := range props.Fields {
-              <th class="font-monospace">{field}</th>
-            }
-          </tr>
-        </thead>
-
-        <tbody>
-          for _, entry := range props.LogEntries {
-            <tr>
-              <td class="font-monospace">{entry.Timestamp.Format(time.RFC3339)}</td>
-
-              for _, field := range props.Fields {
-                if val, exists := entry.Fields[field]; exists {
-                  <td class="font-monospace">
-                    <p class="grey lighten-4 w-full px-1 m-0">{val}</p>
-                  </td>
-                } else {
-                  <td></td>
-                }
-              }
-            </tr>
-          }
-        </tbody>
-      </table>
     </div>
   </div>
 }
@@ -304,7 +160,7 @@ templ Streams(props StreamsProps, notifications []string) {
         if props.CurrentStream == "" {
           @streamNoData()
         } else {
-          @streamViewer(streamViewerProps{
+          @components.StreamViewer(components.StreamViewerProps{
             LogEntries:    props.LogEntries,
             Fields:        props.Fields,
             From:          props.From,
@@ -312,6 +168,8 @@ templ Streams(props StreamsProps, notifications []string) {
             Filter:        props.Filter,
             AutoRefresh:   props.AutoRefresh,
             HistogramData: props.HistogramData,
+
+            Notifications: nil,
           })
         }
       </section>

@@ -34,7 +34,7 @@ func Base(props BaseProps) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!doctype html><html><head><title>FlowG</title><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><link rel=\"stylesheet\" href=\"/static/css/google-font-material-icons.css\"><link rel=\"stylesheet\" href=\"/static/css/materialize.min.css\"><link rel=\"stylesheet\" href=\"/static/css/utilities.css\"><script type=\"application/javascript\" src=\"/static/js/materialize.min.js\"></script><script type=\"application/javascript\" src=\"/static/js/htmx.min.js\"></script><script type=\"application/javascript\">\n        document.addEventListener('DOMContentLoaded', function() {\n          M.AutoInit();\n        });\n      </script>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!doctype html><html><head><title>FlowG</title><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><link rel=\"stylesheet\" href=\"/static/css/google-font-material-icons.css\"><link rel=\"stylesheet\" href=\"/static/css/materialize.min.css\"><link rel=\"stylesheet\" href=\"/static/css/utilities.css\"><script type=\"application/javascript\" src=\"/static/js/materialize.min.js\"></script><script type=\"application/javascript\" src=\"/static/js/htmx.min.js\"></script><script type=\"application/javascript\">\n        document.addEventListener('htmx:load', function() {\n          M.AutoInit();\n        });\n      </script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

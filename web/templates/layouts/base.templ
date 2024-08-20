@@ -25,7 +25,7 @@ templ Base(props BaseProps) {
       <script type="application/javascript" src="/static/js/htmx.min.js"></script>
 
       <script type="application/javascript">
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('htmx:load', function() {
           M.AutoInit();
         });
       </script>

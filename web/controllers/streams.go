@@ -12,6 +12,7 @@ import (
 	"link-society.com/flowg/internal/filterdsl"
 	"link-society.com/flowg/internal/storage"
 
+	"link-society.com/flowg/web/templates/components"
 	"link-society.com/flowg/web/templates/views"
 )
 
@@ -205,23 +206,40 @@ func StreamController(db *storage.Storage) http.Handler {
 		}
 
 		// render
-		h := templ.Handler(views.Streams(
-			views.StreamsProps{
-				Streams:       streams,
-				CurrentStream: stream,
+		if r.Header.Get("HX-Request") == "true" {
+			h := templ.Handler(components.StreamViewer(
+				components.StreamViewerProps{
+					LogEntries:    logs,
+					Fields:        fields,
+					From:          from,
+					To:            to,
+					Filter:        filterSource,
+					AutoRefresh:   autoRefresh,
+					HistogramData: string(histogramData),
 
-				LogEntries:  logs,
-				Fields:      fields,
-				From:        from,
-				To:          to,
-				Filter:      filterSource,
-				AutoRefresh: autoRefresh,
+					Notifications: notifications,
+				},
+			))
+			h.ServeHTTP(w, r)
+		} else {
+			h := templ.Handler(views.Streams(
+				views.StreamsProps{
+					Streams:       streams,
+					CurrentStream: stream,
 
-				HistogramData: string(histogramData),
-			},
-			notifications,
-		))
-		h.ServeHTTP(w, r)
+					LogEntries:  logs,
+					Fields:      fields,
+					From:        from,
+					To:          to,
+					Filter:      filterSource,
+					AutoRefresh: autoRefresh,
+
+					HistogramData: string(histogramData),
+				},
+				notifications,
+			))
+			h.ServeHTTP(w, r)
+		}
 	})
 
 	return mux
