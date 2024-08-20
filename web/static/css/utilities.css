@@ -538,3 +538,36 @@
 .font-semibold {
   font-weight: 500 !important;
 }
+
+.font-monospace {
+  font-family: monospace !important;
+}
+
+table.logs thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+table.logs th, table.logs td {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+table.logs th {
+  border: 1px solid rgba(0, 0, 0, 0.48);
+}
+
+table.logs td {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+table.logs tr td {
+  white-space: nowrap;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+table.logs tr td:last-child {
+  width: 100%;
+}

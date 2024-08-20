@@ -1,0 +1,153 @@
+package views
+
+import (
+  "time"
+
+	"link-society.com/flowg/internal/storage"
+
+  "link-society.com/flowg/web/templates/layouts"
+)
+
+templ streamHead() {
+  <script type="application/javascript">
+    document.addEventListener('DOMContentLoaded', () => {
+    });
+  </script>
+}
+
+type streamSideMenuProps struct {
+  Streams      []string
+  CurrentStream string
+}
+
+templ streamSideMenu(props streamSideMenuProps) {
+  <div class="col s2 h-full flex flex-col">
+    <div
+      class="
+        card-panel white
+        p-0 mb-0 h-0
+        flex-grow flex-shrink
+        overflow-auto
+      "
+    >
+      <div class="collection m-0">
+        for _, stream := range props.Streams {
+          if stream == props.CurrentStream {
+            <a class="collection-item active" href="#">{stream}</a>
+          } else {
+            <a
+              class="collection-item"
+              href={templ.SafeURL("/web/streams/" + stream + "/")}
+            >
+              {stream}
+            </a>
+          }
+        }
+      </div>
+    </div>
+  </div>
+}
+
+type streamViewerProps struct {
+  LogEntries    []storage.LogEntry
+  Fields        []string
+  From          time.Time
+  To            time.Time
+  Filter        string
+}
+
+templ streamViewer(props streamViewerProps) {
+  <div class="col s10 h-full flex flex-col">
+    <div class="card-panel white">Search bar</div>
+    <div
+      class="
+        card-panel white
+        p-0 mb-0 h-0
+        flex-grow flex-shrink
+        overflow-auto
+      "
+    >
+      <table class="w-full table-responsive logs highlight">
+        <thead class="grey lighten-2 z-depth-1">
+          <tr>
+            <th class="text-center">Ingested At</th>
+            for _, field := range props.Fields {
+              <th class="font-monospace">{field}</th>
+            }
+          </tr>
+        </thead>
+
+        <tbody>
+          for _, entry := range props.LogEntries {
+            <tr>
+              <td class="font-monospace">{entry.Timestamp.Format(time.RFC822)}</td>
+
+              for _, field := range props.Fields {
+                if val, exists := entry.Fields[field]; exists {
+                  <td class="font-monospace">
+                    <p class="grey lighten-4 w-full px-1 m-0">{val}</p>
+                  </td>
+                } else {
+                  <td></td>
+                }
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}
+
+templ streamNoData() {
+  <div class="col s10 h-full flex flex-col">
+    <div
+      class="
+        card-panel white
+        p-0 mb-0 h-0
+        flex-grow flex-shrink
+      "
+    >
+      No stream found.
+    </div>
+  </div>
+}
+
+type StreamsProps struct {
+  Streams       []string
+  CurrentStream string
+
+  LogEntries    []storage.LogEntry
+  Fields        []string
+  From          time.Time
+  To            time.Time
+  Filter        string
+}
+
+templ Streams(props StreamsProps, notifications []string) {
+  @layouts.Base(layouts.BaseProps{
+    Head: streamHead(),
+    CurrentNav: "streams",
+    Notifications: notifications,
+  }) {
+    <div class="w-full h-full flex flex-col">
+      <section class="row w-full mb-0 flex-grow">
+        @streamSideMenu(streamSideMenuProps{
+          Streams: props.Streams,
+          CurrentStream: props.CurrentStream,
+        })
+        if props.CurrentStream == "" {
+          @streamNoData()
+        } else {
+          @streamViewer(streamViewerProps{
+            LogEntries: props.LogEntries,
+            Fields:     props.Fields,
+            From:       props.From,
+            To:         props.To,
+            Filter:     props.Filter,
+          })
+        }
+      </section>
+    </div>
+  }
+}

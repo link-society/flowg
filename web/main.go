@@ -26,6 +26,7 @@ func NewHandler(
 	mux.Handle("GET /static/", http.FileServer(http.FS(staticfiles)))
 
 	mux.Handle("/web/", controllers.MainController(db, pipelinesManager))
+	mux.Handle("/web/streams/", controllers.StreamController(db))
 	mux.Handle("/web/transformers/", controllers.TransformersController(pipelinesManager))
 	mux.Handle("/web/pipelines/", controllers.PipelinesController(pipelinesManager))
 
