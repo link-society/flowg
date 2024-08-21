@@ -1,5 +1,7 @@
 # FlowG
 
+[![build](https://github.com/link-society/flowg/actions/workflows/build.yml/badge.svg)](https://github.com/link-society/flowg/actions/workflows/build.yml)
+
 FlowG is a log management platform that lets you ingest, transform, and query
 logs using a visual pipeline builder. It handles structured logs without
 requiring predefined schemas and relies on
