@@ -1,0 +1,59 @@
+---
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: ":arrow_up: :construction_worker: "
+    labels:
+      - ci
+  - package-ecosystem: "docker"
+    directory: "/docker"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: ":arrow_up: :whale: "
+    labels:
+      - docker
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: ":arrow_up: "
+    labels:
+      - go
+  - package-ecosystem: "cargo"
+    directory: "/internal/vrl/rust-crate"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: ":arrow_up: "
+    labels:
+      - rust
+  - package-ecosystem: "cargo"
+    directory: "/internal/filterdsl/rust-crate"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: ":arrow_up: "
+    labels:
+      - rust
+  - package-ecosystem: "npm"
+    directory: "/web/components/floweditor"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: ":arrow_up: "
+    labels:
+      - javascript
+  - package-ecosystem: "npm"
+    directory: "/web/components/code-editor"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: ":arrow_up: "
+    labels:
+      - javascript
