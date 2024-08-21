@@ -1,0 +1,49 @@
+name: Bug Report
+description: File a bug report.
+title: ":bug: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please fill out the sections below to help us reproduce and fix the bug.
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Scope
+      description: What part of the project is this bug related to?
+      options:
+        - docker
+        - webui
+        - api
+        - pipelines
+        - transformers
+        - streams
+        - storage
+        - other
+    validations:
+      required: true
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual Behavior
+      description: What is the current behavior?
+      placeholder: Describe the current, buggy, behavior
+    validations:
+      required: true
+  - type: textarea
+    id: desired-behavior
+    attributes:
+      label: Desired Behavior
+      description: What is the desired behavior?
+      placeholder: Describe the correct, expected, behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs
+      description: If you have logs of the bug, paste them here.
+      placeholder: Paste any relevant logs or error messages.
+      render: shell

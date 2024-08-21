@@ -1,0 +1,34 @@
+name: Feature Request
+description: Request a new feature
+title: ":sparkles: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please fill out the sections below to help us understand the requested feature.
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Scope
+      description: What part of the project is this feature related to?
+      options:
+        - docker
+        - webui
+        - api
+        - pipelines
+        - transformers
+        - streams
+        - storage
+        - other
+    validations:
+      required: true
+  - type: textarea
+    id: desired-behavior
+    attributes:
+      label: Desired Behavior
+      description: What is the desired behavior?
+      placeholder: Describe the correct, expected, behavior
+    validations:
+      required: true
