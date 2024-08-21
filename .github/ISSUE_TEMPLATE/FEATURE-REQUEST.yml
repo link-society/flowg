@@ -2,7 +2,7 @@ name: Feature Request
 description: Request a new feature
 title: ":sparkles: "
 labels:
-  - enhancement
+  - triage
 body:
   - type: markdown
     attributes:

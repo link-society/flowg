@@ -2,7 +2,7 @@ name: Security Bug Report
 description: File a bug report related to security.
 title: ":lock: "
 labels:
-  - bug
+  - triage
 body:
   - type: markdown
     attributes:

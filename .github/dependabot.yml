@@ -8,7 +8,7 @@ updates:
     commit-message:
       prefix: ":arrow_up: :construction_worker: "
     labels:
-      - ci
+      - "deps: ci"
   - package-ecosystem: "docker"
     directory: "/docker"
     schedule:
@@ -16,7 +16,7 @@ updates:
     commit-message:
       prefix: ":arrow_up: :whale: "
     labels:
-      - docker
+      - "deps: docker"
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
@@ -24,7 +24,7 @@ updates:
     commit-message:
       prefix: ":arrow_up: "
     labels:
-      - go
+      - "deps: go"
   - package-ecosystem: "cargo"
     directory: "/internal/vrl/rust-crate"
     schedule:
@@ -32,7 +32,7 @@ updates:
     commit-message:
       prefix: ":arrow_up: "
     labels:
-      - rust
+      - "deps: rust"
   - package-ecosystem: "cargo"
     directory: "/internal/filterdsl/rust-crate"
     schedule:
@@ -40,7 +40,7 @@ updates:
     commit-message:
       prefix: ":arrow_up: "
     labels:
-      - rust
+      - "deps: rust"
   - package-ecosystem: "npm"
     directory: "/web/components/floweditor"
     schedule:
@@ -48,7 +48,7 @@ updates:
     commit-message:
       prefix: ":arrow_up: "
     labels:
-      - javascript
+      - "deps: javascript"
   - package-ecosystem: "npm"
     directory: "/web/components/code-editor"
     schedule:
@@ -56,4 +56,4 @@ updates:
     commit-message:
       prefix: ":arrow_up: "
     labels:
-      - javascript
+      - "deps: javascript"
