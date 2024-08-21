@@ -1,6 +1,8 @@
 package views
 
 import (
+  "link-society.com/flowg/internal"
+
   "link-society.com/flowg/web/templates/layouts"
 )
 
@@ -71,7 +73,7 @@ templ pipelineToolbar(currentPipeline string) {
     <div class="flex flex-row flex-grow items-center">
       <a
         class="btn-small blue"
-        href="/docs"
+        href={templ.SafeURL("https://github.com/link-society/flowg/blob/" + internal.FLOWG_VERSION + "/docs/README.md")}
         target="_blank"
       >
         <i class="material-icons left">help</i>
