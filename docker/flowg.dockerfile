@@ -1,4 +1,4 @@
-FROM golang:1.22-alpine AS builder
+FROM golang:1.23-alpine AS builder
 
 RUN apk add --no-cache npm cargo gcc musl-dev
 RUN go install github.com/go-task/task/v3/cmd/task@latest
