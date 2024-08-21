@@ -23,6 +23,15 @@ func NewHandler(
 
 	service.Docs("/api/docs", v5emb.New)
 
+	service.Get("/api/v1/transformers", ListTransformersUsecase(pipelinesManager))
+	service.Get("/api/v1/transformers/{transformer}", GetTransformerUsecase(pipelinesManager))
+	service.Put("/api/v1/transformers/{transformer}", SaveTransformerUsecase(pipelinesManager))
+	service.Delete("/api/v1/transformers/{transformer}", DeleteTransformerUsecase(pipelinesManager))
+
+	service.Get("/api/v1/pipelines", ListPipelinesUsecase(pipelinesManager))
+	service.Get("/api/v1/pipelines/{pipeline}", GetPipelineUsecase(pipelinesManager))
+	service.Put("/api/v1/pipelines/{pipeline}", SavePipelineUsecase(pipelinesManager))
+	service.Delete("/api/v1/pipelines/{pipeline}", DeletePipelineUsecase(pipelinesManager))
 	service.Post("/api/v1/pipelines/{pipeline}/logs", IngestLogUsecase(pipelinesManager))
 
 	service.Get("/api/v1/streams", ListStreamsUsecase(db))
