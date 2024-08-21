@@ -27,6 +27,7 @@ func NewHandler(
 	service.Get("/api/v1/transformers/{transformer}", GetTransformerUsecase(pipelinesManager))
 	service.Put("/api/v1/transformers/{transformer}", SaveTransformerUsecase(pipelinesManager))
 	service.Delete("/api/v1/transformers/{transformer}", DeleteTransformerUsecase(pipelinesManager))
+	service.Post("/api/v1/transformers/{transformer}/test", TestTransformerUsecase(pipelinesManager))
 
 	service.Get("/api/v1/pipelines", ListPipelinesUsecase(pipelinesManager))
 	service.Get("/api/v1/pipelines/{pipeline}", GetPipelineUsecase(pipelinesManager))
