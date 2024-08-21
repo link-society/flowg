@@ -7,6 +7,10 @@ logs using a visual pipeline builder. It handles structured logs without
 requiring predefined schemas and relies on
 [BadgerDB](https://dgraph.io/docs/badger/) as its storage backend.
 
+For more informations, consult the [documentation](./docs/README.md).
+
+You wish to contribute? Please read our [guidelines](./CONTRIBUTING.md) first.
+
 ## :sparkles: Key Features
 
  - **Pipelines:** Build and manage log processing pipelines visually, with
