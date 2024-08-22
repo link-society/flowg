@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"encoding/json"
+	"strconv"
+
 	"net/http"
 
 	"github.com/a-h/templ"
@@ -91,9 +93,9 @@ func StreamController(db *storage.Storage) http.Handler {
 		}
 
 		toRaw := r.URL.Query().Get("to")
-		var to time.Time
+		var naiveTo time.Time
 		if toRaw != "" {
-			to, err = time.Parse("2006-01-02T15:04:05", toRaw)
+			naiveTo, err = time.Parse("2006-01-02T15:04:05", toRaw)
 			if err != nil {
 				slog.ErrorContext(
 					r.Context(),
@@ -106,13 +108,13 @@ func StreamController(db *storage.Storage) http.Handler {
 				notifications = append(notifications, "❌ Invalid 'to' time")
 			}
 		} else {
-			to = time.Now()
+			naiveTo = time.Now()
 		}
 
 		fromRaw := r.URL.Query().Get("from")
-		var from time.Time
+		var naiveFrom time.Time
 		if fromRaw != "" {
-			from, err = time.Parse("2006-01-02T15:04:05", fromRaw)
+			naiveFrom, err = time.Parse("2006-01-02T15:04:05", fromRaw)
 			if err != nil {
 				slog.ErrorContext(
 					r.Context(),
@@ -125,7 +127,26 @@ func StreamController(db *storage.Storage) http.Handler {
 				notifications = append(notifications, "❌ Invalid 'from' time")
 			}
 		} else {
-			from = to.Add(-5 * time.Minute)
+			naiveFrom = naiveTo.Add(-5 * time.Minute)
+		}
+
+		timeOffsetRaw := r.URL.Query().Get("timeoffset")
+		var timeOffset int
+		if timeOffsetRaw != "" {
+			timeOffset, err = strconv.Atoi(timeOffsetRaw)
+			if err != nil {
+				slog.ErrorContext(
+					r.Context(),
+					"error parsing 'timeoffset'",
+					"channel", "web",
+					"stream", stream,
+					"timeoffset", timeOffsetRaw,
+					"error", err.Error(),
+				)
+				notifications = append(notifications, "❌ Invalid 'timeoffset'")
+			}
+		} else {
+			timeOffset = 0
 		}
 
 		var filter storage.Filter
@@ -149,15 +170,18 @@ func StreamController(db *storage.Storage) http.Handler {
 		}
 
 		// fetch logs
-		logs, err := db.Query(r.Context(), stream, from, to, filter)
+		localFrom := naiveFrom.Add(time.Duration(timeOffset) * time.Minute)
+		localTo := naiveTo.Add(time.Duration(timeOffset) * time.Minute)
+
+		logs, err := db.Query(r.Context(), stream, localFrom, localTo, filter)
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
 				"error querying logs",
 				"channel", "web",
 				"stream", stream,
-				"from", from,
-				"to", to,
+				"from", localFrom,
+				"to", localTo,
 				"filter", filter,
 				"error", err.Error(),
 			)
@@ -166,13 +190,13 @@ func StreamController(db *storage.Storage) http.Handler {
 		}
 
 		// aggregate for histogram
-		interval := to.Sub(from) / 24
+		interval := localTo.Sub(localFrom) / 24
 		counts := make([]int, 24)
 		timestamps := make([]time.Time, 24)
 
 		for i := 0; i < 24; i++ {
-			start := from.Add(time.Duration(i) * interval)
-			end := from.Add(time.Duration(i+1) * interval)
+			start := localFrom.Add(time.Duration(i) * interval)
+			end := localFrom.Add(time.Duration(i+1) * interval)
 
 			timestamps[i] = start
 
@@ -211,8 +235,8 @@ func StreamController(db *storage.Storage) http.Handler {
 				components.StreamViewerProps{
 					LogEntries:    logs,
 					Fields:        fields,
-					From:          from,
-					To:            to,
+					From:          naiveFrom,
+					To:            naiveTo,
 					Filter:        filterSource,
 					AutoRefresh:   autoRefresh,
 					HistogramData: string(histogramData),
@@ -229,8 +253,8 @@ func StreamController(db *storage.Storage) http.Handler {
 
 					LogEntries:  logs,
 					Fields:      fields,
-					From:        from,
-					To:          to,
+					From:        naiveFrom,
+					To:          naiveTo,
 					Filter:      filterSource,
 					AutoRefresh: autoRefresh,
 
