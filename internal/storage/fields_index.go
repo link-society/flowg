@@ -124,7 +124,7 @@ func (index *fieldsIndex) getAllKeys() (map[string]struct{}, error) {
 	defer it.Close()
 
 	for it.Rewind(); it.Valid(); it.Next() {
-		key := string(it.Item().Key())
+		key := string(it.Item().KeyCopy(nil))
 		keys[key] = struct{}{}
 	}
 

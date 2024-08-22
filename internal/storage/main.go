@@ -124,7 +124,7 @@ func (s *Storage) Query(
 
 		for it.Seek(fromPrefix); it.Valid(); it.Next() {
 			item := it.Item()
-			key := string(item.Key())
+			key := string(item.KeyCopy(nil))
 
 			if key < toPrefix {
 				timeKeys = append(timeKeys, key)
@@ -212,39 +212,33 @@ func (s *Storage) Purge(ctx context.Context, stream string) error {
 			fmt.Sprintf("index:%s:", stream),
 		}
 
-		for _, prefix := range prefixes {
-			slog.DebugContext(
-				ctx,
-				"Purging key from BadgerDB",
-				"channel", "storage",
-				"stream", stream,
-				"key.prefix", prefix,
-			)
+		keys := [][]byte{
+			[]byte(fmt.Sprintf("stream:%s", stream)),
+		}
 
+		for _, prefix := range prefixes {
 			opts := badger.DefaultIteratorOptions
 			opts.Prefix = []byte(prefix)
 			it := txn.NewIterator(opts)
 			defer it.Close()
 
 			for it.Rewind(); it.Valid(); it.Next() {
-				if err := txn.Delete(it.Item().Key()); err != nil {
-					return &PersistError{Operation: "purge", Reason: err}
-				}
+				keys = append(keys, it.Item().KeyCopy(nil))
 			}
 		}
 
-		streamKey := []byte(fmt.Sprintf("stream:%s", stream))
+		for _, key := range keys {
+			slog.DebugContext(
+				ctx,
+				"Purging key from BadgerDB",
+				"channel", "storage",
+				"stream", stream,
+				"key", key,
+			)
 
-		slog.DebugContext(
-			ctx,
-			"Purging key from BadgerDB",
-			"channel", "storage",
-			"stream", stream,
-			"key", streamKey,
-		)
-
-		if err := txn.Delete(streamKey); err != nil {
-			return &PersistError{Operation: "purge", Reason: err}
+			if err := txn.Delete(key); err != nil {
+				return &PersistError{Operation: "purge", Reason: err}
+			}
 		}
 
 		return nil
