@@ -23,6 +23,8 @@ You wish to contribute? Please read our [guidelines](./CONTRIBUTING.md) first.
  - **Observability:** Query and visualize logs in real-time in the integrated
    Web interface
 
+![pipeline screenshot](./docs/screenshots/pipelines.png)
+
 ## :question: Why should I use this?
 
 **FlowG**'s primary goal is to make log refinement and routing as easy as
