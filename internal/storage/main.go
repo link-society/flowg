@@ -118,6 +118,7 @@ func (s *Storage) Query(
 		toPrefix := fmt.Sprintf("entry:%s:%020d:", stream, to.UnixMilli())
 
 		opts := badger.DefaultIteratorOptions
+		opts.PrefetchValues = false
 		opts.Prefix = streamPrefix
 		it := txn.NewIterator(opts)
 		defer it.Close()
@@ -218,6 +219,7 @@ func (s *Storage) Purge(ctx context.Context, stream string) error {
 
 		for _, prefix := range prefixes {
 			opts := badger.DefaultIteratorOptions
+			opts.PrefetchValues = false
 			opts.Prefix = []byte(prefix)
 			it := txn.NewIterator(opts)
 			defer it.Close()
@@ -250,6 +252,7 @@ func (s *Storage) ListStreams() ([]string, error) {
 
 	err := s.db.View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
+		opts.PrefetchValues = false
 		opts.Prefix = []byte("stream:")
 		it := txn.NewIterator(opts)
 		defer it.Close()
@@ -275,6 +278,7 @@ func (s *Storage) ListStreamFields(stream string) ([]string, error) {
 	err := s.db.View(func(txn *badger.Txn) error {
 		prefix := []byte(fmt.Sprintf("index:%s:field:", stream))
 		opts := badger.DefaultIteratorOptions
+		opts.PrefetchValues = false
 		opts.Prefix = prefix
 		it := txn.NewIterator(opts)
 		defer it.Close()

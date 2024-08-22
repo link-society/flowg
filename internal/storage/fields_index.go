@@ -119,6 +119,7 @@ func (index *fieldsIndex) getAllKeys() (map[string]struct{}, error) {
 	keys := map[string]struct{}{}
 
 	opts := badger.DefaultIteratorOptions
+	opts.PrefetchValues = false
 	opts.Prefix = []byte(fmt.Sprintf("entry:%s:", index.stream))
 	it := index.txn.NewIterator(opts)
 	defer it.Close()
