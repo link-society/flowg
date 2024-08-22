@@ -232,7 +232,7 @@ func PipelinesController(pipelinesManager *pipelines.Manager) http.Handler {
 		h.ServeHTTP(w, r)
 	})
 
-	mux.HandleFunc("POST /web/pipelines/delete/{name}/{$}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET /web/pipelines/delete/{name}/{$}", func(w http.ResponseWriter, r *http.Request) {
 		pipelineName := r.PathValue("name")
 		err := pipelinesManager.DeletePipelineFlow(pipelineName)
 		if err != nil {
