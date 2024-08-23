@@ -20,11 +20,11 @@ templ streamHead() {
     })
 
     document.addEventListener('htmx:load', () => {
-      // set timezone
       const inputOffset = document.getElementById('data_stream_timeoffset')
       inputOffset.value = `${new Date().getTimezoneOffset()}`
+    })
 
-      // histogram
+    document.addEventListener('htmx:load', () => {
       const histogramElt  = document.getElementById('data_stream_histogram')
       const histogramData = JSON.parse(histogramElt.dataset.timeserie)
 
@@ -55,8 +55,9 @@ templ streamHead() {
         },
       })
       window.chart.render()
+    })
 
-      // auto refresh
+    document.addEventListener('htmx:load', () => {
       const autoRefreshSelector = document.getElementById('data_stream_autorefresh')
 
       if (window.autoRefreshToken !== undefined && window.autoRefreshToken !== null) {
