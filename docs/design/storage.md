@@ -43,19 +43,18 @@ stream:test
 
 ### Field Index
 
-Each field of a log entry is indexed by adding the log entry's key in a list,
-stored at the following key:
+Each field of a log entry is indexed by creating a new key referencing the
+field and the associated log entry's key:
 
 ```
-index:<stream name>:field:<field name>:<field value>
+index:<stream name>:field:<field name>:<base64 encoded field value>:<entry key>
 ```
 
 Example:
 
 ```
-index:test:field:foo:bar = [
-  entry:test:00000001724140167373:057804d1-832f-45bf-8e70-7acbf22ec480
-]
+# base64(bar) = YmFy
+index:test:field:foo:YmFy:entry:test:00000001724140167373:057804d1-832f-45bf-8e70-7acbf22ec480
 ```
 
 ## Querying
@@ -83,12 +82,35 @@ stream:<stream name>:<to timestamp>:
 
 Because of the internal structure of *BadgerDB*, this operation is fast.
 
-Then, if a [filter](../guides/filtering.md) is given, we fetch the indexes that
-match the filter by iterating over keys with the following prefixes:
+Then, if a [filter](../guides/filtering.md) is given:
+
+For `foo = "bar"` filters, we fetch all keys within the time-window with the
+following prefix:
 
 ```
-index:<stream name>:field:<field name>:
+index:<stream name>:field:foo:YmFy:
 ```
 
-Once we got the complete list of log entry keys to fetch, we sort them and fetch
-the actual records.
+For `foo in ["bar", "baz"]` filters, we fetch all keys the time-window with
+the following prefixes:
+
+```
+# base64(bar) = YmFy
+# base64(baz) = YmF6
+
+index:<stream name>:field:foo:YmFy:
+index:<stream name>:field:foo:YmF6:
+```
+
+For `not <sub-filter>` filters, we select all keys in the time-window that do
+not appear in the `<sub-filter>` result.
+
+> **NB:**
+>  - `field != value` is desugared into `not (field = value)`
+>  - `field not in [value, value]` is desugared into `not (field in [value, value])`
+
+For `<lhs> or <rhs>` filters, we select the union of `<lhs>` and `<rhs>`
+results.
+
+For `<lhs> and <rhs>` filters, we select the intersection of `<lhs>` and `<rhs>`
+results.

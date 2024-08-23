@@ -129,14 +129,6 @@ func (s *Storage) Query(
 
 			if key < toPrefix {
 				timeKeys = append(timeKeys, key)
-
-				slog.DebugContext(
-					ctx,
-					"Log entry key added to queryset based on time index",
-					"channel", "storage",
-					"stream", stream,
-					"key", key,
-				)
 			} else {
 				break
 			}
@@ -145,22 +137,7 @@ func (s *Storage) Query(
 		var filteredKeys []string
 		if filter != nil {
 			fieldsIndex := newFieldsIndex(txn, stream)
-			fieldKeys, err := fieldsIndex.Filter(filter)
-			if err != nil {
-				return &QueryError{Operation: "fields-index", Reason: err}
-			}
-
-			for _, key := range fieldKeys {
-				slog.DebugContext(
-					ctx,
-					"Log entry key added to queryset based on field index",
-					"channel", "storage",
-					"stream", stream,
-					"key", key,
-				)
-			}
-
-			filteredKeys = intersectKeysList(timeKeys, fieldKeys)
+			filteredKeys = fieldsIndex.Filter(filter, timeKeys)
 		} else {
 			filteredKeys = timeKeys
 		}

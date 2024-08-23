@@ -1,68 +1,44 @@
 package storage
 
 import (
-	"encoding/json"
+	"encoding/base64"
 	"fmt"
 
 	"github.com/dgraph-io/badger/v3"
 )
 
 type fieldIndex struct {
-	txn *badger.Txn
-	key []byte
+	txn       *badger.Txn
+	keyPrefix []byte
 }
 
 func newFieldIndex(txn *badger.Txn, stream, field, value string) *fieldIndex {
+	encodedValue := base64.StdEncoding.EncodeToString([]byte(value))
+
 	return &fieldIndex{
 		txn: txn,
-		key: []byte(fmt.Sprintf("index:%s:field:%s:%s", stream, field, value)),
+		keyPrefix: []byte(fmt.Sprintf(
+			"index:%s:field:%s:%s:",
+			stream, field, encodedValue,
+		)),
 	}
 }
 
 func (index *fieldIndex) AddKey(entryKey []byte) error {
-	fieldKeys, err := index.load()
-	if err != nil {
-		return err
-	}
-
-	fieldKeys = append(fieldKeys, string(entryKey))
-
-	return index.store(fieldKeys)
+	indexKey := []byte(fmt.Sprintf("%s%s", index.keyPrefix, entryKey))
+	return index.txn.Set(indexKey, []byte{})
 }
 
-func (index *fieldIndex) GetKeys() ([]string, error) {
-	return index.load()
-}
+func (index *fieldIndex) IterKeys(fn func(key string)) {
+	opts := badger.DefaultIteratorOptions
+	opts.PrefetchValues = false
+	opts.Prefix = index.keyPrefix
+	it := index.txn.NewIterator(opts)
+	defer it.Close()
 
-func (index *fieldIndex) load() ([]string, error) {
-	fieldKeys := []string{}
-
-	fieldIndexValue, err := index.txn.Get(index.key)
-	if err == badger.ErrKeyNotFound {
-		return fieldKeys, nil
-	} else if err != nil {
-		return nil, err
+	for it.Rewind(); it.Valid(); it.Next() {
+		indexKey := it.Item().Key()
+		entryKey := string(indexKey[len(index.keyPrefix):])
+		fn(entryKey)
 	}
-
-	err = fieldIndexValue.Value(func(val []byte) error {
-		return json.Unmarshal(val, &fieldKeys)
-	})
-	if err != nil {
-		return nil, &UnmarshalError{Reason: err}
-	}
-
-	return fieldKeys, nil
-}
-
-func (index *fieldIndex) store(fieldKeys []string) error {
-	fieldKeysEncoded, err := json.Marshal(fieldKeys)
-	if err != nil {
-		return &MarshalError{Reason: err}
-	}
-
-	if err := index.txn.Set(index.key, fieldKeysEncoded); err != nil {
-		return err
-	}
-
-	return nil
 }

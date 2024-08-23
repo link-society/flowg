@@ -14,13 +14,6 @@ func intersectKeysMap(a, b map[string]struct{}) map[string]struct{} {
 	return result
 }
 
-func intersectKeysList(a, b []string) []string {
-	ma := sliceToMap(a)
-	mb := sliceToMap(b)
-	mres := intersectKeysMap(ma, mb)
-	return mapToSlice(mres)
-}
-
 func unionKeysMap(a, b map[string]struct{}) map[string]struct{} {
 	result := map[string]struct{}{}
 

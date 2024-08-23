@@ -1,8 +1,6 @@
 package storage
 
 import (
-	"fmt"
-
 	"github.com/dgraph-io/badger/v3"
 )
 
@@ -18,116 +16,69 @@ func newFieldsIndex(txn *badger.Txn, stream string) *fieldsIndex {
 	}
 }
 
-func (index *fieldsIndex) Filter(filter Filter) ([]string, error) {
-	var evaluate func(f Filter) (map[string]struct{}, error)
-	evaluate = func(f Filter) (map[string]struct{}, error) {
+func (index *fieldsIndex) Filter(filter Filter, allKeys []string) []string {
+	allKeysMap := sliceToMap(allKeys)
+
+	var evaluate func(f Filter) map[string]struct{}
+	evaluate = func(f Filter) map[string]struct{} {
 		switch f := f.(type) {
 		case *AndFilter:
-			keys, err := evaluate(f.Filters[0])
-			if err != nil {
-				return nil, err
-			}
+			keys := evaluate(f.Filters[0])
 
 			for _, subFilter := range f.Filters[1:] {
-				subKeys, err := evaluate(subFilter)
-				if err != nil {
-					return nil, err
-				}
-
+				subKeys := evaluate(subFilter)
 				keys = intersectKeysMap(keys, subKeys)
 			}
 
-			return keys, nil
+			return keys
 
 		case *OrFilter:
 			keys := map[string]struct{}{}
 
 			for _, subFilter := range f.Filters {
-				subKeys, err := evaluate(subFilter)
-				if err != nil {
-					return nil, err
-				}
-
+				subKeys := evaluate(subFilter)
 				keys = unionKeysMap(keys, subKeys)
 			}
 
-			return keys, nil
+			return keys
 
 		case *NotFilter:
-			keys, err := evaluate(f.Filter)
-			if err != nil {
-				return nil, err
-			}
-
-			allKeys, err := index.getAllKeys()
-			if err != nil {
-				return nil, err
-			}
-
-			return differenceKeysMap(allKeys, keys), nil
+			keys := evaluate(f.Filter)
+			return differenceKeysMap(allKeysMap, keys)
 
 		case *FieldExact:
 			fieldIndex := newFieldIndex(index.txn, index.stream, f.Field, f.Value)
-			keys, err := fieldIndex.GetKeys()
-			if err != nil {
-				return nil, err
-			}
 
-			return sliceToMap(keys), nil
+			keys := map[string]struct{}{}
+
+			fieldIndex.IterKeys(func(key string) {
+				if _, found := allKeysMap[key]; found {
+					keys[key] = struct{}{}
+				}
+			})
+
+			return keys
 
 		case *FieldIn:
 			keys := map[string]struct{}{}
 
 			for _, value := range f.Values {
 				fieldIndex := newFieldIndex(index.txn, index.stream, f.Field, value)
-				valueKeys, err := fieldIndex.GetKeys()
-				if err != nil {
-					return nil, err
-				}
 
-				for _, key := range valueKeys {
-					keys[key] = struct{}{}
-				}
+				fieldIndex.IterKeys(func(key string) {
+					if _, found := allKeysMap[key]; found {
+						keys[key] = struct{}{}
+					}
+				})
 			}
 
-			return keys, nil
+			return keys
 
 		default:
-			return map[string]struct{}{}, nil
+			return map[string]struct{}{}
 		}
 	}
 
-	keys, err := evaluate(filter)
-	if err != nil {
-
-		return nil, err
-	}
-
-	return mapToSlice(keys), err
-}
-
-func (index *fieldsIndex) GetKeys() ([]string, error) {
-	keys, err := index.getAllKeys()
-	if err != nil {
-		return nil, err
-	}
-
-	return mapToSlice(keys), nil
-}
-
-func (index *fieldsIndex) getAllKeys() (map[string]struct{}, error) {
-	keys := map[string]struct{}{}
-
-	opts := badger.DefaultIteratorOptions
-	opts.PrefetchValues = false
-	opts.Prefix = []byte(fmt.Sprintf("entry:%s:", index.stream))
-	it := index.txn.NewIterator(opts)
-	defer it.Close()
-
-	for it.Rewind(); it.Valid(); it.Next() {
-		key := string(it.Item().KeyCopy(nil))
-		keys[key] = struct{}{}
-	}
-
-	return keys, nil
+	keys := evaluate(filter)
+	return mapToSlice(keys)
 }
