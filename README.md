@@ -25,6 +25,8 @@ You wish to contribute? Please read our [guidelines](./CONTRIBUTING.md) first.
 
 ![pipeline screenshot](./docs/screenshots/pipelines.png)
 
+![stream screenshot](./docs/screenshots/streams.png)
+
 ## :question: Why should I use this?
 
 **FlowG**'s primary goal is to make log refinement and routing as easy as
