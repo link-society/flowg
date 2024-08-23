@@ -40,12 +40,31 @@ It also leverages [BadgerDB](https://dgraph.io/docs/badger/) which is a battle
 tested Key/Value database, with the right feature set to easily support indexing
 dynamically structured logs, as well as log compression.
 
+## :zap: Benchmark
+
+Run with (see *Build* section bellow):
+
+```
+$ task build
+$ task bench
+```
+
+System:
+
+ - **CPU:** 13th Gen Intel(R) Core(TM) i7-13700K
+ - **RAM:** 64GB
+
+Result:
+
+ - **Total requests sent:** 1,000,000
+ - **Total time:** 481.65s
+ - **Average:** 2076.18 request/s
+
 ## :warning: Disclaimer
 
 This project is in a very early stage of development, as such:
 
  - it has not been tested in production
- - no benchmark available
  - not even an automated test suite
 
 Those points will be improved on given enough time.
