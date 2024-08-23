@@ -1,0 +1,2 @@
+. = parse_logfmt!(.message)
+.

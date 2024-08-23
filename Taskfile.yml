@@ -13,6 +13,12 @@ tasks:
     cmds:
       - docker build -t linksociety/flowg:latest -f docker/flowg.dockerfile .
 
+  bench:
+    desc: "Run benchmark"
+    dir: ./tests/benchmark
+    cmds:
+      - sh run.sh
+
   "gen:go":
     internal: true
     cmds:

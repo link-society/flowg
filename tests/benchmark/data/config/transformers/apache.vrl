@@ -1,0 +1,2 @@
+. = parse_apache_log!(.message, "common")
+.
