@@ -1,5 +1,7 @@
 #!/bin/sh
 
+rm -rf logs.txt data/logs
+
 ../../bin/flowg \
     -db ./data/logs \
     -config ./data/config \

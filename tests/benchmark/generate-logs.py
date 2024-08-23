@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 import tomllib
 
 from datetime import datetime
-from time import sleep
+from time import sleep, time
 import random
 
 from urllib.request import Request, urlopen
@@ -41,7 +41,9 @@ def main():
     req_count = args.req_count
     while req_count > 0:
         perc = (args.req_count - req_count) / args.req_count * 100
-        print(f"Progress: {perc}%")
+        print(f"Progress: {perc:.2f}%", end="")
+
+        start = time()
 
         batch_count = 0
         while batch_count < args.req_per_sec:
@@ -54,6 +56,10 @@ def main():
             batch_count += 1
 
         req_count = max(0, req_count - batch_count)
+
+        end = time()
+        print(f" - {batch_count} logs in {end - start:.2f}s")
+
         sleep(1)
 
 
