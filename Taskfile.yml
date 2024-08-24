@@ -67,7 +67,7 @@ tasks:
   "deps:go":
     internal: true
     cmds:
-      - go install github.com/a-h/templ/cmd/templ@latest
+      - go install github.com/a-h/templ/cmd/templ@v0.2.771
       - go get ./...
 
   "deps:js:floweditor":

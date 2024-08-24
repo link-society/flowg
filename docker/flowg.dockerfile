@@ -1,14 +1,14 @@
-FROM golang:1.23-alpine AS builder
+FROM golang:1.23-alpine3.20 AS builder
 
 RUN apk add --no-cache npm cargo gcc musl-dev
-RUN go install github.com/go-task/task/v3/cmd/task@latest
+RUN go install github.com/go-task/task/v3/cmd/task@v3.38.0
 
 ADD . /workspace
 WORKDIR /workspace
 
 RUN task build
 
-FROM alpine:latest AS runner
+FROM alpine:3.20 AS runner
 
 RUN apk add --no-cache libgcc
 
