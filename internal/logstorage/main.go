@@ -13,6 +13,8 @@ import (
 
 	"github.com/dgraph-io/badger/v3"
 	"github.com/dgraph-io/badger/v3/options"
+
+	"link-society.com/flowg/internal/logging"
 )
 
 type Storage struct {
@@ -22,7 +24,7 @@ type Storage struct {
 func NewStorage(dbPath string) (*Storage, error) {
 	opts := badger.
 		DefaultOptions(dbPath).
-		WithLogger(&serverLogger{}).
+		WithLogger(&logging.BadgerLogger{Channel: "logstorage"}).
 		WithCompression(options.ZSTD)
 
 	db, err := badger.Open(opts)
