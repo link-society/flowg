@@ -12,19 +12,19 @@ import (
 	"github.com/a-h/templ"
 
 	"link-society.com/flowg/internal/filterdsl"
-	"link-society.com/flowg/internal/storage"
+	"link-society.com/flowg/internal/logstorage"
 
 	"link-society.com/flowg/web/templates/components"
 	"link-society.com/flowg/web/templates/views"
 )
 
-func StreamController(db *storage.Storage) http.Handler {
+func StreamController(logDb *logstorage.Storage) http.Handler {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /web/streams/{$}", func(w http.ResponseWriter, r *http.Request) {
 		notifications := []string{}
 
-		streams, err := db.ListStreams()
+		streams, err := logDb.ListStreams()
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
@@ -58,7 +58,7 @@ func StreamController(db *storage.Storage) http.Handler {
 		notifications := []string{}
 
 		// fetch data for template
-		streams, err := db.ListStreams()
+		streams, err := logDb.ListStreams()
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
@@ -72,7 +72,7 @@ func StreamController(db *storage.Storage) http.Handler {
 		}
 
 		stream := r.PathValue("name")
-		fields, err := db.ListStreamFields(stream)
+		fields, err := logDb.ListStreamFields(stream)
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
@@ -149,7 +149,7 @@ func StreamController(db *storage.Storage) http.Handler {
 			timeOffset = 0
 		}
 
-		var filter storage.Filter
+		var filter logstorage.Filter
 
 		filterSource := r.URL.Query().Get("filter")
 		if filterSource != "" {
@@ -173,7 +173,7 @@ func StreamController(db *storage.Storage) http.Handler {
 		localFrom := naiveFrom.Add(time.Duration(timeOffset) * time.Minute)
 		localTo := naiveTo.Add(time.Duration(timeOffset) * time.Minute)
 
-		logs, err := db.Query(r.Context(), stream, localFrom, localTo, filter)
+		logs, err := logDb.Query(r.Context(), stream, localFrom, localTo, filter)
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
@@ -185,7 +185,7 @@ func StreamController(db *storage.Storage) http.Handler {
 				"filter", filter,
 				"error", err.Error(),
 			)
-			logs = []storage.LogEntry{}
+			logs = []logstorage.LogEntry{}
 			notifications = append(notifications, "❌ Could not fetch logs")
 		}
 

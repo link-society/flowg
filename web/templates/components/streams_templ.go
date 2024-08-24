@@ -11,7 +11,7 @@ import templruntime "github.com/a-h/templ/runtime"
 import (
 	"time"
 
-	"link-society.com/flowg/internal/storage"
+	"link-society.com/flowg/internal/logstorage"
 )
 
 type streamSearchbarProps struct {
@@ -157,7 +157,7 @@ func streamHistogram(data string) templ.Component {
 }
 
 type StreamViewerProps struct {
-	LogEntries    []storage.LogEntry
+	LogEntries    []logstorage.LogEntry
 	Fields        []string
 	From          time.Time
 	To            time.Time

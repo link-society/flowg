@@ -6,8 +6,7 @@ import (
 
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
-
-	"link-society.com/flowg/internal/storage"
+	"link-society.com/flowg/internal/logstorage"
 )
 
 type ListStreamsRequest struct{}
@@ -16,7 +15,7 @@ type ListStreamsResponse struct {
 	Streams []string `json:"streams"`
 }
 
-func ListStreamsUsecase(db *storage.Storage) usecase.Interactor {
+func ListStreamsUsecase(db *logstorage.Storage) usecase.Interactor {
 	u := usecase.NewInteractor(
 		func(
 			ctx context.Context,

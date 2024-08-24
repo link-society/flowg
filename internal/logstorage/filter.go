@@ -1,4 +1,4 @@
-package storage
+package logstorage
 
 type Filter interface {
 	Evaluate(entry *LogEntry) bool

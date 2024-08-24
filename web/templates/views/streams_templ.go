@@ -11,7 +11,7 @@ import templruntime "github.com/a-h/templ/runtime"
 import (
 	"time"
 
-	"link-society.com/flowg/internal/storage"
+	"link-society.com/flowg/internal/logstorage"
 
 	"link-society.com/flowg/web/templates/components"
 	"link-society.com/flowg/web/templates/layouts"
@@ -156,7 +156,7 @@ type StreamsProps struct {
 	Streams       []string
 	CurrentStream string
 
-	LogEntries  []storage.LogEntry
+	LogEntries  []logstorage.LogEntry
 	Fields      []string
 	From        time.Time
 	To          time.Time

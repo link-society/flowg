@@ -8,12 +8,12 @@ import (
 	"github.com/swaggest/swgui/v5emb"
 
 	"link-society.com/flowg/internal"
+	"link-society.com/flowg/internal/logstorage"
 	"link-society.com/flowg/internal/pipelines"
-	"link-society.com/flowg/internal/storage"
 )
 
 func NewHandler(
-	db *storage.Storage,
+	db *logstorage.Storage,
 	pipelinesManager *pipelines.Manager,
 ) http.Handler {
 	service := web.NewService(openapi31.NewReflector())

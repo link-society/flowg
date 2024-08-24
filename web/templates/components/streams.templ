@@ -3,7 +3,7 @@ package components
 import (
   "time"
 
-	"link-society.com/flowg/internal/storage"
+	"link-society.com/flowg/internal/logstorage"
 )
 
 type streamSearchbarProps struct {
@@ -115,7 +115,7 @@ templ streamHistogram(data string) {
 }
 
 type StreamViewerProps struct {
-  LogEntries    []storage.LogEntry
+  LogEntries    []logstorage.LogEntry
   Fields        []string
   From          time.Time
   To            time.Time

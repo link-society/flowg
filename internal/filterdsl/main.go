@@ -3,37 +3,37 @@ package filterdsl
 import (
 	"encoding/json"
 
-	"link-society.com/flowg/internal/storage"
+	"link-society.com/flowg/internal/logstorage"
 )
 
-func astToFilter(ast map[string]interface{}) storage.Filter {
+func astToFilter(ast map[string]interface{}) logstorage.Filter {
 	if val, exists := ast["$and"]; exists {
 		v := val.([]interface{})
-		filters := make([]storage.Filter, len(v))
+		filters := make([]logstorage.Filter, len(v))
 		for i, filter := range v {
 			filters[i] = astToFilter(filter.(map[string]interface{}))
 		}
-		return &storage.AndFilter{Filters: filters}
+		return &logstorage.AndFilter{Filters: filters}
 	}
 
 	if val, exists := ast["$or"]; exists {
 		v := val.([]interface{})
-		filters := make([]storage.Filter, len(v))
+		filters := make([]logstorage.Filter, len(v))
 		for i, filter := range v {
 			filters[i] = astToFilter(filter.(map[string]interface{}))
 		}
-		return &storage.OrFilter{Filters: filters}
+		return &logstorage.OrFilter{Filters: filters}
 	}
 
 	if val, exists := ast["$not"]; exists {
-		return &storage.NotFilter{Filter: astToFilter(val.(map[string]interface{}))}
+		return &logstorage.NotFilter{Filter: astToFilter(val.(map[string]interface{}))}
 	}
 
 	if val, exists := ast["$eq"]; exists {
 		v := val.(map[string]interface{})
 		field := v["field"].(string)
 		value := v["value"].(string)
-		return &storage.FieldExact{Field: field, Value: value}
+		return &logstorage.FieldExact{Field: field, Value: value}
 	}
 
 	if val, exists := ast["$in"]; exists {
@@ -44,13 +44,13 @@ func astToFilter(ast map[string]interface{}) storage.Filter {
 		for i, value := range iValues {
 			values[i] = value.(string)
 		}
-		return &storage.FieldIn{Field: field, Values: values}
+		return &logstorage.FieldIn{Field: field, Values: values}
 	}
 
 	panic("unreachable")
 }
 
-func Compile(input string) (storage.Filter, error) {
+func Compile(input string) (logstorage.Filter, error) {
 	output, err := compile(input)
 	if err != nil {
 		return nil, err

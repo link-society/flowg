@@ -89,8 +89,8 @@ Then run:
 
 ```
 $ ./bin/flowg \
-  -db ./data/logs \
-  -config ./data/config  \
+  -log-dir ./data/logs \
+  -config-dir ./data/config  \
   -bind 127.0.0.1:5080
 ```
 
