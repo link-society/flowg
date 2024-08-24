@@ -13,8 +13,8 @@ import (
 	"net/http"
 
 	"link-society.com/flowg/internal/logging"
+	"link-society.com/flowg/internal/logstorage"
 	"link-society.com/flowg/internal/pipelines"
-	"link-society.com/flowg/internal/storage"
 
 	"link-society.com/flowg/api"
 	"link-society.com/flowg/web"
@@ -26,22 +26,22 @@ func main() {
 }
 
 func run() int {
-	db, err := storage.NewStorage(*dbPath)
+	logDb, err := logstorage.NewStorage(*logDir)
 	if err != nil {
 		slog.Error(
-			"Failed to open database",
+			"Failed to open logs database",
 			"channel", "main",
-			"dbpath", *dbPath,
+			"path", *logDir,
 			"error", err,
 		)
 		return 1
 	}
-	defer db.Close()
+	defer logDb.Close()
 
-	pipelinesManager := pipelines.NewManager(db, *configDir)
+	pipelinesManager := pipelines.NewManager(logDb, *configDir)
 
-	apiHandler := api.NewHandler(db, pipelinesManager)
-	webHandler := web.NewHandler(db, pipelinesManager)
+	apiHandler := api.NewHandler(logDb, pipelinesManager)
+	webHandler := web.NewHandler(logDb, pipelinesManager)
 
 	rootHandler := http.NewServeMux()
 	rootHandler.Handle("/api/", apiHandler)

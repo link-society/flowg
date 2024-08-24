@@ -7,8 +7,8 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
+	"link-society.com/flowg/internal/logstorage"
 	"link-society.com/flowg/internal/pipelines"
-	"link-society.com/flowg/internal/storage"
 )
 
 type IngestLogRequest struct {
@@ -38,7 +38,7 @@ func IngestLogUsecase(pipelinesManager *pipelines.Manager) usecase.Interactor {
 				return status.Wrap(err, status.NotFound)
 			}
 
-			entry := storage.NewLogEntry(req.Record)
+			entry := logstorage.NewLogEntry(req.Record)
 			err = pipeline.Run(ctx, pipelinesManager, entry)
 			if err != nil {
 				slog.ErrorContext(

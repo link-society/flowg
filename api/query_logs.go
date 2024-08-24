@@ -10,7 +10,7 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/internal/filterdsl"
-	"link-society.com/flowg/internal/storage"
+	"link-society.com/flowg/internal/logstorage"
 )
 
 type QueryStreamRequest struct {
@@ -21,18 +21,18 @@ type QueryStreamRequest struct {
 }
 
 type QueryStreamResponse struct {
-	Success bool               `json:"success"`
-	Records []storage.LogEntry `json:"records"`
+	Success bool                  `json:"success"`
+	Records []logstorage.LogEntry `json:"records"`
 }
 
-func QueryStreamUsecase(db *storage.Storage) usecase.Interactor {
+func QueryStreamUsecase(db *logstorage.Storage) usecase.Interactor {
 	u := usecase.NewInteractor(
 		func(
 			ctx context.Context,
 			req QueryStreamRequest,
 			resp *QueryStreamResponse,
 		) error {
-			var filter storage.Filter
+			var filter logstorage.Filter
 
 			if req.Filter != nil {
 				var err error

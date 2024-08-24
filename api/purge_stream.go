@@ -6,8 +6,7 @@ import (
 
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
-
-	"link-society.com/flowg/internal/storage"
+	"link-society.com/flowg/internal/logstorage"
 )
 
 type PurgeStreamRequest struct {
@@ -17,7 +16,7 @@ type PurgeStreamResponse struct {
 	Success bool `json:"success"`
 }
 
-func PurgeStreamUsecase(db *storage.Storage) usecase.Interactor {
+func PurgeStreamUsecase(db *logstorage.Storage) usecase.Interactor {
 	u := usecase.NewInteractor(
 		func(
 			ctx context.Context,

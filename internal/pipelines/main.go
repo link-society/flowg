@@ -5,17 +5,17 @@ import (
 	"os"
 	"path/filepath"
 
-	"link-society.com/flowg/internal/storage"
+	"link-society.com/flowg/internal/logstorage"
 )
 
 type Manager struct {
 	transformersDir string
 	pipelinesDir    string
 
-	db *storage.Storage
+	db *logstorage.Storage
 }
 
-func NewManager(db *storage.Storage, configDir string) *Manager {
+func NewManager(db *logstorage.Storage, configDir string) *Manager {
 	if _, err := os.Stat(configDir); os.IsNotExist(err) {
 		os.MkdirAll(configDir, os.ModePerm)
 	}

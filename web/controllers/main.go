@@ -7,14 +7,14 @@ import (
 
 	"github.com/a-h/templ"
 
+	"link-society.com/flowg/internal/logstorage"
 	"link-society.com/flowg/internal/pipelines"
-	"link-society.com/flowg/internal/storage"
 
 	"link-society.com/flowg/web/templates/views"
 )
 
 func MainController(
-	db *storage.Storage,
+	logDb *logstorage.Storage,
 	pipelinesManager *pipelines.Manager,
 ) http.Handler {
 	mux := http.NewServeMux()
@@ -26,7 +26,7 @@ func MainController(
 
 		notifications := []string{}
 
-		streamList, err := db.ListStreams()
+		streamList, err := logDb.ListStreams()
 		if err == nil {
 			streamCount = len(streamList)
 		} else {

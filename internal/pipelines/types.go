@@ -3,7 +3,7 @@ package pipelines
 import (
 	"context"
 
-	"link-society.com/flowg/internal/storage"
+	"link-society.com/flowg/internal/logstorage"
 	"link-society.com/flowg/internal/vrl"
 )
 
@@ -14,13 +14,13 @@ type Pipeline struct {
 func (p *Pipeline) Run(
 	ctx context.Context,
 	manager *Manager,
-	entry *storage.LogEntry,
+	entry *logstorage.LogEntry,
 ) error {
 	return p.Root.Process(ctx, manager, entry)
 }
 
 type Node interface {
-	Process(ctx context.Context, manager *Manager, entry *storage.LogEntry) error
+	Process(ctx context.Context, manager *Manager, entry *logstorage.LogEntry) error
 }
 
 type TransformNode struct {
@@ -29,7 +29,7 @@ type TransformNode struct {
 }
 
 type SwitchNode struct {
-	Condition storage.Filter
+	Condition logstorage.Filter
 	Next      []Node
 }
 
@@ -40,7 +40,7 @@ type RouterNode struct {
 func (n *TransformNode) Process(
 	ctx context.Context,
 	manager *Manager,
-	entry *storage.LogEntry,
+	entry *logstorage.LogEntry,
 ) error {
 	vrlScript, err := manager.GetTransformerScript(n.TransformerName)
 	if err != nil {
@@ -53,7 +53,7 @@ func (n *TransformNode) Process(
 	}
 
 	for _, next := range n.Next {
-		newEntry := &storage.LogEntry{
+		newEntry := &logstorage.LogEntry{
 			Timestamp: entry.Timestamp,
 			Fields:    output,
 		}
@@ -69,7 +69,7 @@ func (n *TransformNode) Process(
 func (n *SwitchNode) Process(
 	ctx context.Context,
 	manager *Manager,
-	entry *storage.LogEntry,
+	entry *logstorage.LogEntry,
 ) error {
 	if n.Condition.Evaluate(entry) {
 		for _, next := range n.Next {
@@ -86,7 +86,7 @@ func (n *SwitchNode) Process(
 func (n *RouterNode) Process(
 	ctx context.Context,
 	manager *Manager,
-	entry *storage.LogEntry,
+	entry *logstorage.LogEntry,
 ) error {
 	_, err := manager.db.Append(ctx, n.Stream, entry)
 	return err

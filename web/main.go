@@ -5,8 +5,8 @@ import (
 
 	"net/http"
 
+	"link-society.com/flowg/internal/logstorage"
 	"link-society.com/flowg/internal/pipelines"
-	"link-society.com/flowg/internal/storage"
 
 	"link-society.com/flowg/web/controllers"
 )
@@ -19,14 +19,14 @@ var staticfiles embed.FS
 //go:generate templ generate
 
 func NewHandler(
-	db *storage.Storage,
+	logDb *logstorage.Storage,
 	pipelinesManager *pipelines.Manager,
 ) http.Handler {
 	mux := http.NewServeMux()
 	mux.Handle("GET /static/", http.FileServer(http.FS(staticfiles)))
 
-	mux.Handle("/web/", controllers.MainController(db, pipelinesManager))
-	mux.Handle("/web/streams/", controllers.StreamController(db))
+	mux.Handle("/web/", controllers.MainController(logDb, pipelinesManager))
+	mux.Handle("/web/streams/", controllers.StreamController(logDb))
 	mux.Handle("/web/transformers/", controllers.TransformersController(pipelinesManager))
 	mux.Handle("/web/pipelines/", controllers.PipelinesController(pipelinesManager))
 
