@@ -88,10 +88,10 @@ $ task build
 Then run:
 
 ```
-$ ./bin/flowg \
-  -log-dir ./data/logs \
-  -config-dir ./data/config  \
-  -bind 127.0.0.1:5080
+$ ./bin/flowg serve \
+  --log-dir ./data/logs \
+  --config-dir ./data/config  \
+  --bind 127.0.0.1:5080
 ```
 
 Then you can access:
