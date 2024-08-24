@@ -120,6 +120,7 @@ func NewServeCommand() *cobra.Command {
 		"./data/logs",
 		"Path to the log database directory",
 	)
+	cmd.MarkFlagDirname("log-dir")
 
 	cmd.Flags().StringVar(
 		&opts.configDir,
@@ -127,6 +128,7 @@ func NewServeCommand() *cobra.Command {
 		"./data/config",
 		"Path to the config directory",
 	)
+	cmd.MarkFlagDirname("config-dir")
 
 	return cmd
 }
