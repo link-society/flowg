@@ -36,6 +36,16 @@ func ParseScope(s string) (Scope, error) {
 	}
 }
 
+func (r Role) HasScope(scope Scope) bool {
+	for _, s := range r.Scopes {
+		if s == scope {
+			return true
+		}
+	}
+
+	return false
+}
+
 func (u *User) Can(scope Scope) bool {
 	for _, role := range u.Roles {
 		for _, s := range role.Scopes {
