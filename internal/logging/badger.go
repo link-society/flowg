@@ -3,6 +3,7 @@ package logging
 import (
 	"fmt"
 	"log/slog"
+	"strings"
 )
 
 type BadgerLogger struct {
@@ -10,17 +11,33 @@ type BadgerLogger struct {
 }
 
 func (l *BadgerLogger) Errorf(format string, v ...interface{}) {
-	slog.Error(fmt.Sprintf(format, v...), "channel", l.Channel)
+	content := fmt.Sprintf(format, v...)
+	lines := strings.FieldsFunc(content, func(c rune) bool { return c == '\n' || c == '\r' })
+	for _, line := range lines {
+		slog.Error(line, "channel", l.Channel)
+	}
 }
 
 func (l *BadgerLogger) Warningf(format string, v ...interface{}) {
-	slog.Warn(fmt.Sprintf(format, v...), "channel", l.Channel)
+	content := fmt.Sprintf(format, v...)
+	lines := strings.FieldsFunc(content, func(c rune) bool { return c == '\n' || c == '\r' })
+	for _, line := range lines {
+		slog.Warn(line, "channel", l.Channel)
+	}
 }
 
 func (l *BadgerLogger) Infof(format string, v ...interface{}) {
-	slog.Info(fmt.Sprintf(format, v...), "channel", l.Channel)
+	content := fmt.Sprintf(format, v...)
+	lines := strings.FieldsFunc(content, func(c rune) bool { return c == '\n' || c == '\r' })
+	for _, line := range lines {
+		slog.Info(line, "channel", l.Channel)
+	}
 }
 
 func (l *BadgerLogger) Debugf(format string, v ...interface{}) {
-	slog.Debug(fmt.Sprintf(format, v...), "channel", l.Channel)
+	content := fmt.Sprintf(format, v...)
+	lines := strings.FieldsFunc(content, func(c rune) bool { return c == '\n' || c == '\r' })
+	for _, line := range lines {
+		slog.Debug(line, "channel", l.Channel)
+	}
 }
