@@ -9,7 +9,9 @@ func NewAdminCommand() *cobra.Command {
 	}
 
 	cmd.AddCommand(
+		NewAdminListRolesCommand(),
 		NewAdminCreateRoleCommand(),
+		NewAdminDeleteRoleCommand(),
 	)
 
 	return cmd
