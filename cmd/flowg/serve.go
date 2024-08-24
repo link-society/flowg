@@ -46,7 +46,18 @@ func NewServeCommand() *cobra.Command {
 				exitCode = 1
 				return
 			}
-			defer logDb.Close()
+			defer func() {
+				err := logDb.Close()
+				if err != nil {
+					slog.Error(
+						"Failed to close logs database",
+						"channel", "main",
+						"path", opts.logDir,
+						"error", err,
+					)
+					exitCode = 1
+				}
+			}()
 
 			pipelinesManager := pipelines.NewManager(logDb, opts.configDir)
 
