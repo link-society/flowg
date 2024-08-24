@@ -2,11 +2,11 @@
 
 rm -rf logs.txt data/logs
 
-../../bin/flowg \
-    -log-dir ./data/logs \
-    -config-dir ./data/config \
-    -bind 127.0.0.1:5080 \
-    -verbose \
+../../bin/flowg serve \
+    --log-dir ./data/logs \
+    --config-dir ./data/config \
+    --bind 127.0.0.1:5080 \
+    --verbose \
   > logs.txt &
 pid=$!
 trap "kill $pid" EXIT
