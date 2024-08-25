@@ -5,6 +5,10 @@ logs using a visual pipeline builder. It handles structured logs without
 requiring predefined schemas and relies on
 [BadgerDB](https://dgraph.io/docs/badger/) as its storage backend.
 
+## Reference
+
+  - [Command Line Interface](./cli.md)
+
 ## Guides
 
  - [Filtering Data](./guides/filtering.md)
