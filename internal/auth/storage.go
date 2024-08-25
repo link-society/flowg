@@ -6,6 +6,8 @@ import (
 	"github.com/dgraph-io/badger/v3"
 	"github.com/dgraph-io/badger/v3/options"
 
+	"github.com/google/uuid"
+
 	"link-society.com/flowg/internal/hash"
 	"link-society.com/flowg/internal/logging"
 )
@@ -220,7 +222,7 @@ func (d *Database) GetUser(name string) (*User, error) {
 func (d *Database) SaveUser(user User, password string) error {
 	passwordHash, err := hash.HashPassword(password)
 	if err != nil {
-		return err
+		return &PersistError{Operation: "hash-password", Reason: err}
 	}
 
 	return d.db.Update(func(txn *badger.Txn) error {
@@ -277,17 +279,31 @@ func (d *Database) SaveUser(user User, password string) error {
 
 func (d *Database) DeleteUser(name string) error {
 	return d.db.Update(func(txn *badger.Txn) error {
-		opts := badger.DefaultIteratorOptions
-		opts.PrefetchValues = false
-		opts.Prefix = []byte(fmt.Sprintf("user:%s:", name))
-		it := txn.NewIterator(opts)
-		defer it.Close()
-
 		keys := make([][]byte, 0)
 
-		for it.Rewind(); it.Valid(); it.Next() {
-			keys = append(keys, it.Item().KeyCopy(nil))
-		}
+		(func() {
+			opts := badger.DefaultIteratorOptions
+			opts.PrefetchValues = false
+			opts.Prefix = []byte(fmt.Sprintf("user:%s:", name))
+			it := txn.NewIterator(opts)
+			defer it.Close()
+
+			for it.Rewind(); it.Valid(); it.Next() {
+				keys = append(keys, it.Item().KeyCopy(nil))
+			}
+		})()
+
+		(func() {
+			opts := badger.DefaultIteratorOptions
+			opts.PrefetchValues = false
+			opts.Prefix = []byte(fmt.Sprintf("pat:%s:", name))
+			it := txn.NewIterator(opts)
+			defer it.Close()
+
+			for it.Rewind(); it.Valid(); it.Next() {
+				keys = append(keys, it.Item().KeyCopy(nil))
+			}
+		})()
 
 		for _, key := range keys {
 			err := txn.Delete(key)
@@ -381,4 +397,75 @@ func (d *Database) VerifyUserPermission(name string, scope Scope) (bool, error) 
 	}
 
 	return hasPermission, nil
+}
+
+func (d *Database) AddPersonalAccessToken(username string, token string) error {
+	tokenHash, err := hash.HashPassword(token)
+	if err != nil {
+		return &PersistError{Operation: "hash-token", Reason: err}
+	}
+
+	return d.db.Update(func(txn *badger.Txn) error {
+		userKey := []byte(fmt.Sprintf("index:user:%s", username))
+		_, err := txn.Get(userKey)
+		if err != nil {
+			return &QueryError{Operation: "get-user", Reason: err}
+		}
+
+		tokenKey := []byte(fmt.Sprintf("pat:%s:%s", username, uuid.New().String()))
+		err = txn.Set(tokenKey, []byte(tokenHash))
+		if err != nil {
+			return &PersistError{Operation: "add-token", Reason: err}
+		}
+
+		return nil
+	})
+}
+
+func (d *Database) VerifyPersonalAccessToken(token string) (string, error) {
+	var username string
+
+	err := d.db.View(func(txn *badger.Txn) error {
+		opts := badger.DefaultIteratorOptions
+		opts.Prefix = []byte("pat:")
+		it := txn.NewIterator(opts)
+		defer it.Close()
+
+		for it.Rewind(); it.Valid(); it.Next() {
+			key := it.Item().Key()
+			associatedUser := string(key[4:])
+			found := false
+
+			err := it.Item().Value(func(val []byte) error {
+				tokenHash := string(val)
+				isValid, err := hash.VerifyPassword(token, tokenHash)
+				if err != nil {
+					return &QueryError{Operation: "verify-token", Reason: err}
+				}
+
+				if isValid {
+					username = associatedUser
+					found = true
+				}
+
+				return nil
+			})
+
+			if err != nil {
+				return err
+			}
+
+			if found {
+				break
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	return username, nil
 }
