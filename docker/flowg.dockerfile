@@ -7,6 +7,7 @@ ADD . /workspace
 WORKDIR /workspace
 
 RUN task build
+RUN task test
 
 FROM alpine:3.20 AS runner
 
