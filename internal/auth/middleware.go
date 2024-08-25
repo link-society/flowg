@@ -74,6 +74,13 @@ func ApiMiddleware(db *Database) func(http.Handler) http.Handler {
 				return
 			}
 
+			slog.DebugContext(
+				r.Context(),
+				"Authenticated user",
+				"channel", "api",
+				"user", username,
+			)
+
 			ctx := ContextWithUsername(r.Context(), username)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
@@ -86,8 +93,9 @@ func RequireScopeApiMiddleware[Req any, Resp any](
 	next func(context.Context, Req, *Resp) error,
 ) func(context.Context, Req, *Resp) error {
 	return func(ctx context.Context, req Req, resp *Resp) error {
+		user := ctx.Value(CONTEXT_USERNAME).(string)
 		authorized, err := db.VerifyUserPermission(
-			ctx.Value(CONTEXT_USERNAME).(string),
+			user,
 			scope,
 		)
 		if err != nil {
@@ -103,6 +111,14 @@ func RequireScopeApiMiddleware[Req any, Resp any](
 		if !authorized {
 			return status.PermissionDenied
 		}
+
+		slog.DebugContext(
+			ctx,
+			"Authorized user",
+			"channel", "api",
+			"user", user,
+			"scope", scope,
+		)
 
 		return next(ctx, req, resp)
 	}
