@@ -1,7 +1,5 @@
 package auth
 
-import "fmt"
-
 const (
 	SCOPE_READ_PIPELINES     Scope = "read_pipelines"
 	SCOPE_WRITE_PIPELINES    Scope = "write_pipelines"
@@ -32,28 +30,6 @@ func ParseScope(s string) (Scope, error) {
 	case "send_logs":
 		return SCOPE_SEND_LOGS, nil
 	default:
-		return "", fmt.Errorf("invalid scope: %s", s)
+		return "", &InvalidScopeError{Scope: s}
 	}
-}
-
-func (r Role) HasScope(scope Scope) bool {
-	for _, s := range r.Scopes {
-		if s == scope {
-			return true
-		}
-	}
-
-	return false
-}
-
-func (u *User) Can(scope Scope) bool {
-	for _, role := range u.Roles {
-		for _, s := range role.Scopes {
-			if s == scope {
-				return true
-			}
-		}
-	}
-
-	return false
 }
