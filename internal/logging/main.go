@@ -1,6 +1,10 @@
 package logging
 
-import "log/slog"
+import (
+	"io"
+	"log/slog"
+	"os"
+)
 
 func Setup(verbose bool) {
 	var level slog.Level
@@ -11,5 +15,10 @@ func Setup(verbose bool) {
 	}
 
 	opts := &slog.HandlerOptions{Level: level}
-	slog.SetDefault(slog.New(newHandler(opts)))
+	slog.SetDefault(slog.New(newHandler(os.Stdout, opts)))
+}
+
+func Discard() {
+	opts := &slog.HandlerOptions{Level: slog.LevelInfo}
+	slog.SetDefault(slog.New(newHandler(io.Discard, opts)))
 }

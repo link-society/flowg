@@ -2,17 +2,17 @@ package logging
 
 import (
 	"context"
+	"io"
 	"log/slog"
-	"os"
 )
 
 type handler struct {
 	parent slog.Handler
 }
 
-func newHandler(opts *slog.HandlerOptions) *handler {
+func newHandler(w io.Writer, opts *slog.HandlerOptions) *handler {
 	return &handler{
-		parent: slog.NewTextHandler(os.Stdout, opts),
+		parent: slog.NewTextHandler(w, opts),
 	}
 }
 
