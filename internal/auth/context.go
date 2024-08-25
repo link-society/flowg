@@ -7,7 +7,7 @@ import (
 
 type authContext struct {
 	parent   context.Context
-	username *string
+	username string
 }
 
 type authContextKey string
@@ -17,7 +17,7 @@ const CONTEXT_USERNAME authContextKey = "auth_context_username"
 func ContextWithUsername(ctx context.Context, username string) context.Context {
 	return &authContext{
 		parent:   ctx,
-		username: &username,
+		username: username,
 	}
 }
 
@@ -34,7 +34,7 @@ func (ac *authContext) Err() error {
 }
 
 func (ac *authContext) Value(key interface{}) interface{} {
-	if key == CONTEXT_USERNAME {
+	if key == CONTEXT_USERNAME && ac.username != "" {
 		return ac.username
 	}
 
