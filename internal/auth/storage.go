@@ -434,7 +434,8 @@ func (d *Database) VerifyPersonalAccessToken(token string) (string, bool, error)
 
 		for it.Rewind(); it.Valid(); it.Next() {
 			key := it.Item().Key()
-			associatedUser := string(key[4:])
+			keySuffix := string(key[4:])
+			associatedUser := keySuffix[:len(keySuffix)-37] // remove UUID
 
 			err := it.Item().Value(func(val []byte) error {
 				tokenHash := string(val)
