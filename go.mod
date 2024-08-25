@@ -5,6 +5,7 @@ go 1.22.2
 require (
 	github.com/a-h/templ v0.2.771
 	github.com/dgraph-io/badger/v3 v3.2103.5
+	github.com/go-chi/chi/v5 v5.0.12
 	github.com/google/uuid v1.6.0
 	github.com/spf13/cobra v0.0.5
 	github.com/swaggest/openapi-go v0.2.53
@@ -20,7 +21,6 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
-	github.com/go-chi/chi/v5 v5.0.12 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
 	github.com/golang/groupcache v0.0.0-20190702054246-869f871628b6 // indirect
