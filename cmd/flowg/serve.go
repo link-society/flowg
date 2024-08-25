@@ -14,6 +14,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"link-society.com/flowg/internal/auth"
 	"link-society.com/flowg/internal/logging"
 	"link-society.com/flowg/internal/logstorage"
 	"link-society.com/flowg/internal/pipelines"
@@ -24,6 +25,7 @@ import (
 
 type serveCommandOpts struct {
 	bindAddress string
+	authDir     string
 	logDir      string
 	configDir   string
 }
@@ -35,6 +37,30 @@ func NewServeCommand() *cobra.Command {
 		Use:   "serve",
 		Short: "Start FlowG standalone server",
 		Run: func(cmd *cobra.Command, args []string) {
+			authDb, err := auth.NewDatabase(opts.authDir)
+			if err != nil {
+				slog.Error(
+					"Failed to open auth database",
+					"channel", "main",
+					"path", opts.authDir,
+					"error", err,
+				)
+				exitCode = 1
+				return
+			}
+			defer func() {
+				err := authDb.Close()
+				if err != nil {
+					slog.Error(
+						"Failed to close auth database",
+						"channel", "main",
+						"path", opts.authDir,
+						"error", err,
+					)
+					exitCode = 1
+				}
+			}()
+
 			logDb, err := logstorage.NewStorage(opts.logDir)
 			if err != nil {
 				slog.Error(
@@ -61,7 +87,7 @@ func NewServeCommand() *cobra.Command {
 
 			pipelinesManager := pipelines.NewManager(logDb, opts.configDir)
 
-			apiHandler := api.NewHandler(logDb, pipelinesManager)
+			apiHandler := api.NewHandler(authDb, logDb, pipelinesManager)
 			webHandler := web.NewHandler(logDb, pipelinesManager)
 
 			rootHandler := http.NewServeMux()
@@ -123,6 +149,13 @@ func NewServeCommand() *cobra.Command {
 		"bind",
 		":5080",
 		"Address to bind the server to",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.authDir,
+		"auth-dir",
+		"./data/auth",
+		"Path to the auth database directory",
 	)
 
 	cmd.Flags().StringVar(

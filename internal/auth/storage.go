@@ -422,8 +422,9 @@ func (d *Database) AddPersonalAccessToken(username string, token string) error {
 	})
 }
 
-func (d *Database) VerifyPersonalAccessToken(token string) (string, error) {
+func (d *Database) VerifyPersonalAccessToken(token string) (string, bool, error) {
 	var username string
+	found := false
 
 	err := d.db.View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
@@ -434,7 +435,6 @@ func (d *Database) VerifyPersonalAccessToken(token string) (string, error) {
 		for it.Rewind(); it.Valid(); it.Next() {
 			key := it.Item().Key()
 			associatedUser := string(key[4:])
-			found := false
 
 			err := it.Item().Value(func(val []byte) error {
 				tokenHash := string(val)
@@ -464,8 +464,8 @@ func (d *Database) VerifyPersonalAccessToken(token string) (string, error) {
 	})
 
 	if err != nil {
-		return "", err
+		return "", false, err
 	}
 
-	return username, nil
+	return username, found, nil
 }
