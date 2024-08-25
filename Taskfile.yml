@@ -8,6 +8,11 @@ tasks:
       - task: "gen:js"
       - go build -o bin/ ./...
 
+  test:
+    desc: "Run tests"
+    cmds:
+      - go test -v ./...
+
   "docker:build":
     desc: "Build the docker image"
     cmds:
