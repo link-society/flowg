@@ -28,6 +28,7 @@ type serveCommandOpts struct {
 	authDir     string
 	logDir      string
 	configDir   string
+	verbose     bool
 }
 
 func NewServeCommand() *cobra.Command {
@@ -36,6 +37,9 @@ func NewServeCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "serve",
 		Short: "Start FlowG standalone server",
+		PreRun: func(cmd *cobra.Command, args []string) {
+			logging.Setup(opts.verbose)
+		},
 		Run: func(cmd *cobra.Command, args []string) {
 			authDb, err := auth.NewDatabase(opts.authDir)
 			if err != nil {
@@ -173,6 +177,13 @@ func NewServeCommand() *cobra.Command {
 		"Path to the config directory",
 	)
 	cmd.MarkFlagDirname("config-dir")
+
+	cmd.Flags().BoolVar(
+		&opts.verbose,
+		"verbose",
+		false,
+		"Enable verbose logging",
+	)
 
 	return cmd
 }

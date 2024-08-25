@@ -12,22 +12,13 @@ import (
 var exitCode int = 0
 
 func main() {
-	var verbose bool
-
 	rootCmd := &cobra.Command{
 		Use:   "flowg",
 		Short: "Low-Code log management solution",
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			logging.Setup(verbose)
+			logging.Discard()
 		},
 	}
-
-	rootCmd.PersistentFlags().BoolVar(
-		&verbose,
-		"verbose",
-		false,
-		"Enable verbose logging",
-	)
 
 	rootCmd.AddCommand(
 		NewAdminCommand(),

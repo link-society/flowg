@@ -1,23 +1,26 @@
 package main
 
 import (
-	"log/slog"
+	"os"
+
+	"fmt"
+	"text/tabwriter"
 
 	"github.com/spf13/cobra"
 
 	"link-society.com/flowg/internal/auth"
 )
 
-type adminCreateRoleOpts struct {
+type adminRoleCreateOpts struct {
 	authDir string
 	name    string
 }
 
-func NewAdminCreateRoleCommand() *cobra.Command {
-	opts := &adminCreateRoleOpts{}
+func NewAdminRoleCreateCommand() *cobra.Command {
+	opts := &adminRoleCreateOpts{}
 
 	cmd := &cobra.Command{
-		Use:   "createrole",
+		Use:   "create",
 		Short: "Create a new role",
 		Run: func(cmd *cobra.Command, args []string) {
 			role := auth.Role{
@@ -28,12 +31,7 @@ func NewAdminCreateRoleCommand() *cobra.Command {
 			for i, scopeName := range args {
 				scope, err := auth.ParseScope(scopeName)
 				if err != nil {
-					slog.Error(
-						"Failed to parse scope",
-						"channel", "main",
-						"scope", scopeName,
-						"error", err.Error(),
-					)
+					fmt.Fprintln(os.Stderr, "ERROR: Failed to parse scope:", err)
 					exitCode = 1
 					return
 				}
@@ -42,39 +40,31 @@ func NewAdminCreateRoleCommand() *cobra.Command {
 
 			authDb, err := auth.NewDatabase(opts.authDir)
 			if err != nil {
-				slog.Error(
-					"Failed to open auth database",
-					"channel", "main",
-					"path", opts.authDir,
-					"error", err,
-				)
+				fmt.Fprintln(os.Stderr, "ERROR: Failed to open auth database:", err)
 				exitCode = 1
 				return
 			}
 			defer func() {
 				err := authDb.Close()
 				if err != nil {
-					slog.Error(
-						"Failed to close auth database",
-						"channel", "main",
-						"path", opts.authDir,
-						"error", err,
-					)
+					fmt.Fprintln(os.Stderr, "ERROR: Failed to close auth database:", err)
 					exitCode = 1
 				}
 			}()
 
 			err = authDb.SaveRole(role)
 			if err != nil {
-				slog.Error(
-					"Failed to save role",
-					"channel", "main",
-					"role", role.Name,
-					"error", err,
-				)
+				fmt.Fprintln(os.Stderr, "ERROR: Failed to save role:", err)
 				exitCode = 1
 				return
 			}
+
+			writer := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+
+			fmt.Fprintln(writer, "Name\tScopes")
+			fmt.Fprintf(writer, "%s\t%s\n", role.Name, role.Scopes)
+
+			writer.Flush()
 		},
 	}
 
