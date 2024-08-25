@@ -7,6 +7,7 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
+	"link-society.com/flowg/internal/auth"
 	"link-society.com/flowg/internal/pipelines"
 	"link-society.com/flowg/internal/vrl"
 )
@@ -21,45 +22,52 @@ type TestTransformerResponse struct {
 	Record  map[string]string `json:"record"`
 }
 
-func TestTransformerUsecase(pipelinesManager *pipelines.Manager) usecase.Interactor {
+func TestTransformerUsecase(
+	authDb *auth.Database,
+	pipelinesManager *pipelines.Manager,
+) usecase.Interactor {
 	u := usecase.NewInteractor(
-		func(
-			ctx context.Context,
-			req TestTransformerRequest,
-			resp *TestTransformerResponse,
-		) error {
-			script, err := pipelinesManager.GetTransformerScript(req.Transformer)
-			if err != nil {
-				slog.ErrorContext(
-					ctx,
-					"Failed to get transformer script",
-					"channel", "api",
-					"transformer", req.Transformer,
-					"error", err.Error(),
-				)
+		auth.RequireScopeApiMiddleware(
+			authDb,
+			auth.SCOPE_WRITE_TRANSFORMERS,
+			func(
+				ctx context.Context,
+				req TestTransformerRequest,
+				resp *TestTransformerResponse,
+			) error {
+				script, err := pipelinesManager.GetTransformerScript(req.Transformer)
+				if err != nil {
+					slog.ErrorContext(
+						ctx,
+						"Failed to get transformer script",
+						"channel", "api",
+						"transformer", req.Transformer,
+						"error", err.Error(),
+					)
 
-				resp.Success = false
-				return status.Wrap(err, status.NotFound)
-			}
+					resp.Success = false
+					return status.Wrap(err, status.NotFound)
+				}
 
-			resp.Record, err = vrl.ProcessRecord(req.Record, script)
-			if err != nil {
-				slog.ErrorContext(
-					ctx,
-					"Failed to execute transformer script",
-					"channel", "api",
-					"transformer", req.Transformer,
-					"errorr", err.Error(),
-				)
+				resp.Record, err = vrl.ProcessRecord(req.Record, script)
+				if err != nil {
+					slog.ErrorContext(
+						ctx,
+						"Failed to execute transformer script",
+						"channel", "api",
+						"transformer", req.Transformer,
+						"errorr", err.Error(),
+					)
 
-				resp.Success = false
-				return status.Wrap(err, status.Internal)
-			}
+					resp.Success = false
+					return status.Wrap(err, status.Internal)
+				}
 
-			resp.Success = true
+				resp.Success = true
 
-			return nil
-		},
+				return nil
+			},
+		),
 	)
 
 	u.SetName("test_transformer")
@@ -67,7 +75,7 @@ func TestTransformerUsecase(pipelinesManager *pipelines.Manager) usecase.Interac
 	u.SetDescription("Test Transformer Script")
 	u.SetTags("transformers")
 
-	u.SetExpectedErrors(status.NotFound, status.Internal)
+	u.SetExpectedErrors(status.PermissionDenied, status.NotFound, status.Internal)
 
 	return u
 }

@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"context"
+
 	"errors"
 	"log/slog"
 
@@ -75,5 +77,33 @@ func ApiMiddleware(db *Database) func(http.Handler) http.Handler {
 			ctx := ContextWithUsername(r.Context(), username)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
+	}
+}
+
+func RequireScopeApiMiddleware[Req any, Resp any](
+	db *Database,
+	scope Scope,
+	next func(context.Context, Req, *Resp) error,
+) func(context.Context, Req, *Resp) error {
+	return func(ctx context.Context, req Req, resp *Resp) error {
+		authorized, err := db.VerifyUserPermission(
+			ctx.Value(CONTEXT_USERNAME).(string),
+			scope,
+		)
+		if err != nil {
+			slog.ErrorContext(
+				ctx,
+				"Failed to verify user permission",
+				"channel", "api",
+				"error", err.Error(),
+			)
+			return status.Wrap(err, status.PermissionDenied)
+		}
+
+		if !authorized {
+			return status.PermissionDenied
+		}
+
+		return next(ctx, req, resp)
 	}
 }

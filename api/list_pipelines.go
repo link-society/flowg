@@ -7,6 +7,7 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
+	"link-society.com/flowg/internal/auth"
 	"link-society.com/flowg/internal/pipelines"
 )
 
@@ -16,31 +17,38 @@ type ListPipelinesResponse struct {
 	Pipelines []string `json:"pipelines"`
 }
 
-func ListPipelinesUsecase(pipelinesManager *pipelines.Manager) usecase.Interactor {
+func ListPipelinesUsecase(
+	authDb *auth.Database,
+	pipelinesManager *pipelines.Manager,
+) usecase.Interactor {
 	u := usecase.NewInteractor(
-		func(
-			ctx context.Context,
-			req ListPipelinesRequest,
-			resp *ListPipelinesResponse,
-		) error {
-			pipelines, err := pipelinesManager.ListPipelines()
-			if err != nil {
-				slog.ErrorContext(
-					ctx,
-					"Failed to list pipelines",
-					"channel", "api",
-					"error", err.Error(),
-				)
+		auth.RequireScopeApiMiddleware(
+			authDb,
+			auth.SCOPE_READ_PIPELINES,
+			func(
+				ctx context.Context,
+				req ListPipelinesRequest,
+				resp *ListPipelinesResponse,
+			) error {
+				pipelines, err := pipelinesManager.ListPipelines()
+				if err != nil {
+					slog.ErrorContext(
+						ctx,
+						"Failed to list pipelines",
+						"channel", "api",
+						"error", err.Error(),
+					)
 
-				resp.Success = false
-				return status.Wrap(err, status.Internal)
-			}
+					resp.Success = false
+					return status.Wrap(err, status.Internal)
+				}
 
-			resp.Success = true
-			resp.Pipelines = pipelines
+				resp.Success = true
+				resp.Pipelines = pipelines
 
-			return nil
-		},
+				return nil
+			},
+		),
 	)
 
 	u.SetName("list_pipelines")
@@ -48,7 +56,7 @@ func ListPipelinesUsecase(pipelinesManager *pipelines.Manager) usecase.Interacto
 	u.SetDescription("List pipelines")
 	u.SetTags("pipelines")
 
-	u.SetExpectedErrors(status.Internal)
+	u.SetExpectedErrors(status.PermissionDenied, status.Internal)
 
 	return u
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
+	"link-society.com/flowg/internal/auth"
 	"link-society.com/flowg/internal/pipelines"
 )
 
@@ -18,31 +19,37 @@ type DeletePipelineResponse struct {
 	Success bool `json:"success"`
 }
 
-func DeletePipelineUsecase(pipelinesManager *pipelines.Manager) usecase.Interactor {
+func DeletePipelineUsecase(
+	authDb *auth.Database,
+	pipelinesManager *pipelines.Manager,
+) usecase.Interactor {
 	u := usecase.NewInteractor(
-		func(
-			ctx context.Context,
-			req DeletePipelineRequest,
-			resp *DeletePipelineResponse,
-		) error {
-			err := pipelinesManager.DeletePipelineFlow(req.Pipeline)
-			if err != nil {
-				slog.ErrorContext(
-					ctx,
-					"Failed to delete pipeline flow",
-					"channel", "api",
-					"pipeline", req.Pipeline,
-					"error", err.Error(),
-				)
+		auth.RequireScopeApiMiddleware(
+			authDb,
+			auth.SCOPE_WRITE_PIPELINES,
+			func(
+				ctx context.Context,
+				req DeletePipelineRequest,
+				resp *DeletePipelineResponse,
+			) error {
+				err := pipelinesManager.DeletePipelineFlow(req.Pipeline)
+				if err != nil {
+					slog.ErrorContext(
+						ctx,
+						"Failed to delete pipeline flow",
+						"channel", "api",
+						"pipeline", req.Pipeline,
+						"error", err.Error(),
+					)
 
-				resp.Success = false
-				return status.Wrap(err, status.Internal)
-			}
+					resp.Success = false
+					return status.Wrap(err, status.Internal)
+				}
 
-			resp.Success = true
-
-			return nil
-		},
+				resp.Success = true
+				return nil
+			},
+		),
 	)
 
 	u.SetName("delete_pipeline")
@@ -50,7 +57,7 @@ func DeletePipelineUsecase(pipelinesManager *pipelines.Manager) usecase.Interact
 	u.SetDescription("Delete pipeline flow")
 	u.SetTags("pipelines")
 
-	u.SetExpectedErrors(status.Internal)
+	u.SetExpectedErrors(status.PermissionDenied, status.Internal)
 
 	return u
 }
