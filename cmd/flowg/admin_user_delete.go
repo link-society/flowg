@@ -1,60 +1,48 @@
 package main
 
 import (
-	"log/slog"
+	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 
 	"link-society.com/flowg/internal/auth"
 )
 
-type adminDeleteRoleOpts struct {
+type adminUserDeleteOpts struct {
 	authDir string
 	name    string
 }
 
-func NewAdminDeleteRoleCommand() *cobra.Command {
-	opts := &adminDeleteRoleOpts{}
+func NewAdminUserDeleteCommand() *cobra.Command {
+	opts := &adminUserDeleteOpts{}
 
 	cmd := &cobra.Command{
-		Use:   "deleterole",
-		Short: "Delete an existing role",
+		Use:   "delete",
+		Short: "Delete an existing user",
 		Run: func(cmd *cobra.Command, args []string) {
 			authDb, err := auth.NewDatabase(opts.authDir)
 			if err != nil {
-				slog.Error(
-					"Failed to open auth database",
-					"channel", "main",
-					"path", opts.authDir,
-					"error", err,
-				)
+				fmt.Fprintln(os.Stderr, "ERROR: Failed to open auth database:", err)
 				exitCode = 1
 				return
 			}
 			defer func() {
 				err := authDb.Close()
 				if err != nil {
-					slog.Error(
-						"Failed to close auth database",
-						"channel", "main",
-						"path", opts.authDir,
-						"error", err,
-					)
+					fmt.Fprintln(os.Stderr, "ERROR: Failed to close auth database:", err)
 					exitCode = 1
 				}
 			}()
 
-			err = authDb.DeleteRole(opts.name)
+			err = authDb.DeleteUser(opts.name)
 			if err != nil {
-				slog.Error(
-					"Failed to delete role",
-					"channel", "main",
-					"role", opts.name,
-					"error", err,
-				)
+				fmt.Fprintln(os.Stderr, "ERROR: Failed to delete user:", err)
 				exitCode = 1
 				return
 			}
+
+			fmt.Println("User deleted")
 		},
 	}
 
@@ -70,7 +58,7 @@ func NewAdminDeleteRoleCommand() *cobra.Command {
 		&opts.name,
 		"name",
 		"",
-		"Name of the role",
+		"Name of the user",
 	)
 	cmd.MarkFlagRequired("name")
 
