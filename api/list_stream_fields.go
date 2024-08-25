@@ -6,6 +6,7 @@ import (
 
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
+	"link-society.com/flowg/internal/auth"
 	"link-society.com/flowg/internal/logstorage"
 )
 
@@ -17,32 +18,39 @@ type ListStreamFieldsResponse struct {
 	Fields  []string `json:"fields"`
 }
 
-func ListStreamFieldsUsecase(db *logstorage.Storage) usecase.Interactor {
+func ListStreamFieldsUsecase(
+	authDb *auth.Database,
+	logDb *logstorage.Storage,
+) usecase.Interactor {
 	u := usecase.NewInteractor(
-		func(
-			ctx context.Context,
-			req ListStreamFieldsRequest,
-			resp *ListStreamFieldsResponse,
-		) error {
-			fields, err := db.ListStreamFields(req.Stream)
-			if err != nil {
-				slog.ErrorContext(
-					ctx,
-					"Failed to list stream fields",
-					"channel", "api",
-					"stream", req.Stream,
-					"error", err.Error(),
-				)
+		auth.RequireScopeApiMiddleware(
+			authDb,
+			auth.SCOPE_READ_STREAMS,
+			func(
+				ctx context.Context,
+				req ListStreamFieldsRequest,
+				resp *ListStreamFieldsResponse,
+			) error {
+				fields, err := logDb.ListStreamFields(req.Stream)
+				if err != nil {
+					slog.ErrorContext(
+						ctx,
+						"Failed to list stream fields",
+						"channel", "api",
+						"stream", req.Stream,
+						"error", err.Error(),
+					)
 
-				resp.Success = false
-				return status.Wrap(err, status.Internal)
-			}
+					resp.Success = false
+					return status.Wrap(err, status.Internal)
+				}
 
-			resp.Success = true
-			resp.Fields = fields
+				resp.Success = true
+				resp.Fields = fields
 
-			return nil
-		},
+				return nil
+			},
+		),
 	)
 
 	u.SetName("list_stream_fields")
@@ -50,7 +58,7 @@ func ListStreamFieldsUsecase(db *logstorage.Storage) usecase.Interactor {
 	u.SetDescription("List known fields for a stream")
 	u.SetTags("streams")
 
-	u.SetExpectedErrors(status.Internal)
+	u.SetExpectedErrors(status.PermissionDenied, status.Internal)
 
 	return u
 }

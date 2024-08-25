@@ -6,6 +6,8 @@ import (
 
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
+
+	"link-society.com/flowg/internal/auth"
 	"link-society.com/flowg/internal/logstorage"
 )
 
@@ -16,37 +18,44 @@ type PurgeStreamResponse struct {
 	Success bool `json:"success"`
 }
 
-func PurgeStreamUsecase(db *logstorage.Storage) usecase.Interactor {
+func PurgeStreamUsecase(
+	authDb *auth.Database,
+	logDb *logstorage.Storage,
+) usecase.Interactor {
 	u := usecase.NewInteractor(
-		func(
-			ctx context.Context,
-			req PurgeStreamRequest,
-			resp *PurgeStreamResponse,
-		) error {
-			err := db.Purge(ctx, req.Stream)
-			if err != nil {
-				slog.ErrorContext(
+		auth.RequireScopeApiMiddleware(
+			authDb,
+			auth.SCOPE_WRITE_STREAMS,
+			func(
+				ctx context.Context,
+				req PurgeStreamRequest,
+				resp *PurgeStreamResponse,
+			) error {
+				err := logDb.Purge(ctx, req.Stream)
+				if err != nil {
+					slog.ErrorContext(
+						ctx,
+						"Failed to purge stream",
+						"channel", "api",
+						"stream", req.Stream,
+						"error", err.Error(),
+					)
+
+					resp.Success = false
+					return status.Wrap(err, status.Internal)
+				}
+
+				slog.InfoContext(
 					ctx,
-					"Failed to purge stream",
+					"Log stream purged",
 					"channel", "api",
 					"stream", req.Stream,
-					"error", err.Error(),
 				)
+				resp.Success = true
 
-				resp.Success = false
-				return status.Wrap(err, status.Internal)
-			}
-
-			slog.InfoContext(
-				ctx,
-				"Log stream purged",
-				"channel", "api",
-				"stream", req.Stream,
-			)
-			resp.Success = true
-
-			return nil
-		},
+				return nil
+			},
+		),
 	)
 
 	u.SetName("purge_stream")
@@ -54,7 +63,7 @@ func PurgeStreamUsecase(db *logstorage.Storage) usecase.Interactor {
 	u.SetDescription("Remove all logs (and indexes) related to a stream")
 	u.SetTags("streams")
 
-	u.SetExpectedErrors(status.Internal)
+	u.SetExpectedErrors(status.PermissionDenied, status.Internal)
 
 	return u
 }

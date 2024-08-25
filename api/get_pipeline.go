@@ -9,6 +9,7 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
+	"link-society.com/flowg/internal/auth"
 	"link-society.com/flowg/internal/pipelines"
 )
 
@@ -21,44 +22,51 @@ type GetPipelineResponse struct {
 	Flow    pipelines.FlowGraph `json:"flow"`
 }
 
-func GetPipelineUsecase(pipelinesManager *pipelines.Manager) usecase.Interactor {
+func GetPipelineUsecase(
+	authDb *auth.Database,
+	pipelinesManager *pipelines.Manager,
+) usecase.Interactor {
 	u := usecase.NewInteractor(
-		func(
-			ctx context.Context,
-			req GetPipelineRequest,
-			resp *GetPipelineResponse,
-		) error {
-			flowData, err := pipelinesManager.GetPipelineFlow(req.Pipeline)
-			if err != nil {
-				slog.ErrorContext(
-					ctx,
-					"Failed to get pipeline flow",
-					"channel", "api",
-					"pipeline", req.Pipeline,
-					"error", err.Error(),
-				)
+		auth.RequireScopeApiMiddleware(
+			authDb,
+			auth.SCOPE_READ_PIPELINES,
+			func(
+				ctx context.Context,
+				req GetPipelineRequest,
+				resp *GetPipelineResponse,
+			) error {
+				flowData, err := pipelinesManager.GetPipelineFlow(req.Pipeline)
+				if err != nil {
+					slog.ErrorContext(
+						ctx,
+						"Failed to get pipeline flow",
+						"channel", "api",
+						"pipeline", req.Pipeline,
+						"error", err.Error(),
+					)
 
-				resp.Success = false
-				return status.Wrap(err, status.NotFound)
-			}
+					resp.Success = false
+					return status.Wrap(err, status.NotFound)
+				}
 
-			if err := json.Unmarshal([]byte(flowData), &resp.Flow); err != nil {
-				slog.ErrorContext(
-					ctx,
-					"Failed to decode pipeline flow",
-					"channel", "api",
-					"pipeline", req.Pipeline,
-					"error", err.Error(),
-				)
+				if err := json.Unmarshal([]byte(flowData), &resp.Flow); err != nil {
+					slog.ErrorContext(
+						ctx,
+						"Failed to decode pipeline flow",
+						"channel", "api",
+						"pipeline", req.Pipeline,
+						"error", err.Error(),
+					)
 
-				resp.Success = false
-				return status.Wrap(err, status.Internal)
-			}
+					resp.Success = false
+					return status.Wrap(err, status.Internal)
+				}
 
-			resp.Success = true
+				resp.Success = true
 
-			return nil
-		},
+				return nil
+			},
+		),
 	)
 
 	u.SetName("get_pipeline")
@@ -66,7 +74,7 @@ func GetPipelineUsecase(pipelinesManager *pipelines.Manager) usecase.Interactor 
 	u.SetDescription("Get pipeline flow")
 	u.SetTags("pipelines")
 
-	u.SetExpectedErrors(status.NotFound, status.Internal)
+	u.SetExpectedErrors(status.PermissionDenied, status.NotFound, status.Internal)
 
 	return u
 }

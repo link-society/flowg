@@ -38,22 +38,22 @@ func NewHandler(
 	).Group(func(router chi.Router) {
 		r := &routerWrapper{Router: router}
 
-		r.Get("/api/v1/transformers", ListTransformersUsecase(pipelinesManager))
-		r.Get("/api/v1/transformers/{transformer}", GetTransformerUsecase(pipelinesManager))
-		r.Put("/api/v1/transformers/{transformer}", SaveTransformerUsecase(pipelinesManager))
-		r.Delete("/api/v1/transformers/{transformer}", DeleteTransformerUsecase(pipelinesManager))
-		r.Post("/api/v1/transformers/{transformer}/test", TestTransformerUsecase(pipelinesManager))
+		r.Get("/api/v1/transformers", ListTransformersUsecase(authDb, pipelinesManager))
+		r.Get("/api/v1/transformers/{transformer}", GetTransformerUsecase(authDb, pipelinesManager))
+		r.Put("/api/v1/transformers/{transformer}", SaveTransformerUsecase(authDb, pipelinesManager))
+		r.Delete("/api/v1/transformers/{transformer}", DeleteTransformerUsecase(authDb, pipelinesManager))
+		r.Post("/api/v1/transformers/{transformer}/test", TestTransformerUsecase(authDb, pipelinesManager))
 
-		r.Get("/api/v1/pipelines", ListPipelinesUsecase(pipelinesManager))
-		r.Get("/api/v1/pipelines/{pipeline}", GetPipelineUsecase(pipelinesManager))
-		r.Put("/api/v1/pipelines/{pipeline}", SavePipelineUsecase(pipelinesManager))
-		r.Delete("/api/v1/pipelines/{pipeline}", DeletePipelineUsecase(pipelinesManager))
-		r.Post("/api/v1/pipelines/{pipeline}/logs", IngestLogUsecase(pipelinesManager))
+		r.Get("/api/v1/pipelines", ListPipelinesUsecase(authDb, pipelinesManager))
+		r.Get("/api/v1/pipelines/{pipeline}", GetPipelineUsecase(authDb, pipelinesManager))
+		r.Put("/api/v1/pipelines/{pipeline}", SavePipelineUsecase(authDb, pipelinesManager))
+		r.Delete("/api/v1/pipelines/{pipeline}", DeletePipelineUsecase(authDb, pipelinesManager))
+		r.Post("/api/v1/pipelines/{pipeline}/logs", IngestLogUsecase(authDb, pipelinesManager))
 
-		r.Get("/api/v1/streams", ListStreamsUsecase(logDb))
-		r.Get("/api/v1/streams/{stream}", QueryStreamUsecase(logDb))
-		r.Get("/api/v1/streams/{stream}/fields", ListStreamFieldsUsecase(logDb))
-		r.Delete("/api/v1/streams/{stream}", PurgeStreamUsecase(logDb))
+		r.Get("/api/v1/streams", ListStreamsUsecase(authDb, logDb))
+		r.Get("/api/v1/streams/{stream}", QueryStreamUsecase(authDb, logDb))
+		r.Get("/api/v1/streams/{stream}/fields", ListStreamFieldsUsecase(authDb, logDb))
+		r.Delete("/api/v1/streams/{stream}", PurgeStreamUsecase(authDb, logDb))
 	})
 
 	return service

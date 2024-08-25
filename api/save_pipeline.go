@@ -9,6 +9,7 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
+	"link-society.com/flowg/internal/auth"
 	"link-society.com/flowg/internal/pipelines"
 )
 
@@ -21,45 +22,52 @@ type SavePipelineResponse struct {
 	Success bool `json:"success"`
 }
 
-func SavePipelineUsecase(pipelinesManager *pipelines.Manager) usecase.Interactor {
+func SavePipelineUsecase(
+	authDb *auth.Database,
+	pipelinesManager *pipelines.Manager,
+) usecase.Interactor {
 	u := usecase.NewInteractor(
-		func(
-			ctx context.Context,
-			req SavePipelineRequest,
-			resp *SavePipelineResponse,
-		) error {
-			flowData, err := json.Marshal(req.Flow)
-			if err != nil {
-				slog.ErrorContext(
-					ctx,
-					"Failed to marshal pipeline flow",
-					"channel", "api",
-					"pipeline", req.Pipeline,
-					"error", err.Error(),
-				)
+		auth.RequireScopeApiMiddleware(
+			authDb,
+			auth.SCOPE_WRITE_PIPELINES,
+			func(
+				ctx context.Context,
+				req SavePipelineRequest,
+				resp *SavePipelineResponse,
+			) error {
+				flowData, err := json.Marshal(req.Flow)
+				if err != nil {
+					slog.ErrorContext(
+						ctx,
+						"Failed to marshal pipeline flow",
+						"channel", "api",
+						"pipeline", req.Pipeline,
+						"error", err.Error(),
+					)
 
-				resp.Success = false
-				return status.Wrap(err, status.InvalidArgument)
-			}
+					resp.Success = false
+					return status.Wrap(err, status.InvalidArgument)
+				}
 
-			err = pipelinesManager.SavePipelineFlow(req.Pipeline, string(flowData))
-			if err != nil {
-				slog.ErrorContext(
-					ctx,
-					"Failed to save pipeline flow",
-					"channel", "api",
-					"pipeline", req.Pipeline,
-					"error", err.Error(),
-				)
+				err = pipelinesManager.SavePipelineFlow(req.Pipeline, string(flowData))
+				if err != nil {
+					slog.ErrorContext(
+						ctx,
+						"Failed to save pipeline flow",
+						"channel", "api",
+						"pipeline", req.Pipeline,
+						"error", err.Error(),
+					)
 
-				resp.Success = false
-				return status.Wrap(err, status.Internal)
-			}
+					resp.Success = false
+					return status.Wrap(err, status.Internal)
+				}
 
-			resp.Success = true
+				resp.Success = true
 
-			return nil
-		},
+				return nil
+			},
+		),
 	)
 
 	u.SetName("save_pipeline")
@@ -67,7 +75,7 @@ func SavePipelineUsecase(pipelinesManager *pipelines.Manager) usecase.Interactor
 	u.SetDescription("Save pipeline flow")
 	u.SetTags("pipelines")
 
-	u.SetExpectedErrors(status.InvalidArgument, status.Internal)
+	u.SetExpectedErrors(status.PermissionDenied, status.InvalidArgument, status.Internal)
 
 	return u
 }

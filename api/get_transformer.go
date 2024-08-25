@@ -7,6 +7,7 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
+	"link-society.com/flowg/internal/auth"
 	"link-society.com/flowg/internal/pipelines"
 )
 
@@ -19,32 +20,39 @@ type GetTransformerResponse struct {
 	Script  string `json:"script"`
 }
 
-func GetTransformerUsecase(pipelinesManager *pipelines.Manager) usecase.Interactor {
+func GetTransformerUsecase(
+	authDb *auth.Database,
+	pipelinesManager *pipelines.Manager,
+) usecase.Interactor {
 	u := usecase.NewInteractor(
-		func(
-			ctx context.Context,
-			req GetTransformerRequest,
-			resp *GetTransformerResponse,
-		) error {
-			script, err := pipelinesManager.GetTransformerScript(req.Transformer)
-			if err != nil {
-				slog.ErrorContext(
-					ctx,
-					"Failed to get transformer script",
-					"channel", "api",
-					"transformer", req.Transformer,
-					"error", err.Error(),
-				)
+		auth.RequireScopeApiMiddleware(
+			authDb,
+			auth.SCOPE_READ_TRANSFORMERS,
+			func(
+				ctx context.Context,
+				req GetTransformerRequest,
+				resp *GetTransformerResponse,
+			) error {
+				script, err := pipelinesManager.GetTransformerScript(req.Transformer)
+				if err != nil {
+					slog.ErrorContext(
+						ctx,
+						"Failed to get transformer script",
+						"channel", "api",
+						"transformer", req.Transformer,
+						"error", err.Error(),
+					)
 
-				resp.Success = false
-				return status.Wrap(err, status.NotFound)
-			}
+					resp.Success = false
+					return status.Wrap(err, status.NotFound)
+				}
 
-			resp.Success = true
-			resp.Script = script
+				resp.Success = true
+				resp.Script = script
 
-			return nil
-		},
+				return nil
+			},
+		),
 	)
 
 	u.SetName("get_transformer")
@@ -52,7 +60,7 @@ func GetTransformerUsecase(pipelinesManager *pipelines.Manager) usecase.Interact
 	u.SetDescription("Get Transformer Script")
 	u.SetTags("transformers")
 
-	u.SetExpectedErrors(status.NotFound)
+	u.SetExpectedErrors(status.PermissionDenied, status.NotFound)
 
 	return u
 }
