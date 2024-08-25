@@ -13,6 +13,11 @@ tasks:
     cmds:
       - go test -v ./...
 
+  doc:
+    desc: "Generate documentation"
+    cmds:
+      - sh scripts/gen_cli_doc.sh
+
   "docker:build":
     desc: "Build the docker image"
     cmds:
