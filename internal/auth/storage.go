@@ -382,7 +382,20 @@ func (d *Database) VerifyUserPermission(name string, scope Scope) (bool, error) 
 					return err
 				}
 
-				if roleScope == scope {
+				switch {
+				case scope == roleScope:
+					hasPermission = true
+					return nil
+
+				case scope == SCOPE_READ_PIPELINES && roleScope == SCOPE_WRITE_PIPELINES:
+					hasPermission = true
+					return nil
+
+				case scope == SCOPE_READ_TRANSFORMERS && roleScope == SCOPE_WRITE_TRANSFORMERS:
+					hasPermission = true
+					return nil
+
+				case scope == SCOPE_READ_STREAMS && roleScope == SCOPE_WRITE_STREAMS:
 					hasPermission = true
 					return nil
 				}
