@@ -11,6 +11,7 @@ func NewAdminCommand() *cobra.Command {
 	cmd.AddCommand(
 		NewAdminRoleCommand(),
 		NewAdminUserCommand(),
+		NewAdminTokenCommand(),
 	)
 
 	return cmd
