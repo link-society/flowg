@@ -11,6 +11,20 @@ const (
 	SCOPE_SEND_LOGS          Scope = "send_logs"
 )
 
+type Permissions struct {
+	CanViewPipelines bool
+	CanEditPipelines bool
+
+	CanViewTransformers bool
+	CanEditTransformers bool
+
+	CanViewStreams bool
+	CanEditStreams bool
+
+	CanCreateUsers bool
+	CanSendLogs    bool
+}
+
 func ParseScope(s string) (Scope, error) {
 	switch s {
 	case "read_pipelines":
@@ -32,4 +46,29 @@ func ParseScope(s string) (Scope, error) {
 	default:
 		return "", &InvalidScopeError{Scope: s}
 	}
+}
+
+func PermissionsFromScopes(scopes []Scope) Permissions {
+	permissions := Permissions{}
+	for _, scope := range scopes {
+		switch scope {
+		case SCOPE_READ_PIPELINES:
+			permissions.CanViewPipelines = true
+		case SCOPE_WRITE_PIPELINES:
+			permissions.CanEditPipelines = true
+		case SCOPE_READ_TRANSFORMERS:
+			permissions.CanViewTransformers = true
+		case SCOPE_WRITE_TRANSFORMERS:
+			permissions.CanEditTransformers = true
+		case SCOPE_READ_STREAMS:
+			permissions.CanViewStreams = true
+		case SCOPE_WRITE_STREAMS:
+			permissions.CanEditStreams = true
+		case SCOPE_CREATE_USERS:
+			permissions.CanCreateUsers = true
+		case SCOPE_SEND_LOGS:
+			permissions.CanSendLogs = true
+		}
+	}
+	return permissions
 }
