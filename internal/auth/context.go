@@ -40,3 +40,12 @@ func (ac *authContext) Value(key interface{}) interface{} {
 
 	return ac.parent.Value(key)
 }
+
+func GetContextUser(ctx context.Context) string {
+	res := ctx.Value(CONTEXT_USERNAME)
+	if res == nil {
+		return ""
+	}
+
+	return res.(string)
+}
