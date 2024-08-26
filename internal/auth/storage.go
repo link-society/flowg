@@ -497,3 +497,70 @@ func (d *Database) VerifyPersonalAccessToken(token string) (string, bool, error)
 
 	return username, found, nil
 }
+
+func (d *Database) ListUserScopes(username string) ([]Scope, error) {
+	scopeMap := map[Scope]struct{}{}
+
+	err := d.db.View(func(txn *badger.Txn) error {
+		opts := badger.DefaultIteratorOptions
+		opts.PrefetchValues = false
+		opts.Prefix = []byte(fmt.Sprintf("user:%s:role:", username))
+		it := txn.NewIterator(opts)
+		defer it.Close()
+
+		roles := make([]string, 0)
+
+		for it.Rewind(); it.Valid(); it.Next() {
+			key := it.Item().Key()
+			roleName := string(key[len(username)+11:])
+			roles = append(roles, roleName)
+		}
+
+		for _, roleName := range roles {
+			opts := badger.DefaultIteratorOptions
+			opts.PrefetchValues = false
+			opts.Prefix = []byte(fmt.Sprintf("role:%s:", roleName))
+			it := txn.NewIterator(opts)
+			defer it.Close()
+
+			for it.Rewind(); it.Valid(); it.Next() {
+				key := it.Item().Key()
+				scopeName := string(key[len(roleName)+6:])
+				roleScope, err := ParseScope(scopeName)
+				if err != nil {
+					return err
+				}
+
+				switch roleScope {
+				case SCOPE_WRITE_PIPELINES:
+					scopeMap[SCOPE_READ_PIPELINES] = struct{}{}
+					scopeMap[SCOPE_WRITE_PIPELINES] = struct{}{}
+
+				case SCOPE_WRITE_TRANSFORMERS:
+					scopeMap[SCOPE_READ_TRANSFORMERS] = struct{}{}
+					scopeMap[SCOPE_WRITE_TRANSFORMERS] = struct{}{}
+
+				case SCOPE_WRITE_STREAMS:
+					scopeMap[SCOPE_READ_STREAMS] = struct{}{}
+					scopeMap[SCOPE_WRITE_STREAMS] = struct{}{}
+
+				default:
+					scopeMap[roleScope] = struct{}{}
+				}
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	scopes := make([]Scope, 0, len(scopeMap))
+	for scope := range scopeMap {
+		scopes = append(scopes, scope)
+	}
+
+	return scopes, nil
+}
