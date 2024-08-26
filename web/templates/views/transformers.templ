@@ -1,57 +1,64 @@
 package views
 
 import (
+  "link-society.com/flowg/internal/auth"
+
   "link-society.com/flowg/web/templates/layouts"
 )
 
-templ transformerHead() {
+templ transformerHead(permissions auth.Permissions) {
   <script type="application/javascript" src="/static/webcomponents/code-editor.bundle.js"></script>
-  <script type="application/javascript">
-    document.addEventListener('DOMContentLoaded', () => {
-      const action_save = document.getElementById('action_save')
-      const data_transformer_name = document.getElementById('data_transformer_name')
-      const data_transformer_code = document.getElementById('data_transformer_code')
+  if permissions.CanEditTransformers {
+    <script type="application/javascript">
+      document.addEventListener('DOMContentLoaded', () => {
+        const action_save = document.getElementById('action_save')
+        const data_transformer_name = document.getElementById('data_transformer_name')
+        const data_transformer_code = document.getElementById('data_transformer_code')
 
-      if (data_transformer_name.value !== '') {
-        history.pushState(null, '', `/web/transformers/edit/${data_transformer_name.value}/`)
-      }
-
-      action_save.addEventListener('click', () => {
-        if (data_transformer_name.value === '') {
-          M.toast({ html: '❌ Please provide a transformer name' })
-          data_transformer_name.classList.add('invalid')
-        } else {
-          const form = document.createElement('form')
-          form.setAttribute('method', 'post')
-          form.setAttribute('action', window.location.href)
-          form.classList.add('hide')
-
-          const input_name = document.createElement('input')
-          input_name.setAttribute('type', 'hidden')
-          input_name.setAttribute('name', 'name')
-          input_name.setAttribute('value', data_transformer_name.value)
-
-          const input_code = document.createElement('input')
-          input_code.setAttribute('type', 'hidden')
-          input_code.setAttribute('name', 'code')
-          input_code.setAttribute('value', data_transformer_code.getAttribute('code'))
-
-          form.appendChild(input_name)
-          form.appendChild(input_code)
-          document.body.appendChild(form)
-
-          form.submit()
+        if (data_transformer_name.value !== '') {
+          history.pushState(null, '', `/web/transformers/edit/${data_transformer_name.value}/`)
         }
-      })
 
-      data_transformer_name.addEventListener('input', () => {
-        data_transformer_name.classList.remove('invalid')
-      })
-    });
-  </script>
+        action_save.addEventListener('click', () => {
+          if (data_transformer_name.value === '') {
+            M.toast({ html: '❌ Please provide a transformer name' })
+            data_transformer_name.classList.add('invalid')
+          } else {
+            const form = document.createElement('form')
+            form.setAttribute('method', 'post')
+            form.setAttribute('action', window.location.href)
+            form.classList.add('hide')
+
+            const input_name = document.createElement('input')
+            input_name.setAttribute('type', 'hidden')
+            input_name.setAttribute('name', 'name')
+            input_name.setAttribute('value', data_transformer_name.value)
+
+            const input_code = document.createElement('input')
+            input_code.setAttribute('type', 'hidden')
+            input_code.setAttribute('name', 'code')
+            input_code.setAttribute('value', data_transformer_code.getAttribute('code'))
+
+            form.appendChild(input_name)
+            form.appendChild(input_code)
+            document.body.appendChild(form)
+
+            form.submit()
+          }
+        })
+
+        data_transformer_name.addEventListener('input', () => {
+          data_transformer_name.classList.remove('invalid')
+        })
+      });
+    </script>
+  }
 }
 
-templ transformerToolbar(currentTransformer string) {
+templ transformerToolbar(
+  currentTransformer string,
+  permissions auth.Permissions,
+) {
   <div
     class="
       blue darken-1
@@ -71,26 +78,28 @@ templ transformerToolbar(currentTransformer string) {
       </a>
     </div>
     <div class="flex flex-row items-center gap-3">
-      if currentTransformer != "" {
-        <a
-          class="btn-small blue"
-          href="/web/transformers/new"
-        >
-          <i class="material-icons left">add</i>
-          New
-        </a>
-        <a
-          class="btn-small red"
-          href={templ.SafeURL("/web/transformers/delete/" + currentTransformer + "/")}
-        >
-          <i class="material-icons left">delete</i>
-          Delete
-        </a>
+      if permissions.CanEditTransformers {
+        if currentTransformer != "" {
+          <a
+            class="btn-small blue"
+            href="/web/transformers/new"
+          >
+            <i class="material-icons left">add</i>
+            New
+          </a>
+          <a
+            class="btn-small red"
+            href={templ.SafeURL("/web/transformers/delete/" + currentTransformer + "/")}
+          >
+            <i class="material-icons left">delete</i>
+            Delete
+          </a>
+        }
+        <button id="action_save" class="waves-effect waves-light btn-small">
+          <i class="material-icons left">save</i>
+          Save
+        </button>
       }
-      <button id="action_save" class="waves-effect waves-light btn-small">
-        <i class="material-icons left">save</i>
-        Save
-      </button>
     </div>
   </div>
 }
@@ -100,24 +109,29 @@ type transformerSideMenuProps struct {
   CurrentTransformer string
 }
 
-templ transformerSideMenu(props transformerSideMenuProps) {
+templ transformerSideMenu(
+  props transformerSideMenuProps,
+  permissions auth.Permissions,
+) {
   <div class="col s2 h-full flex flex-col">
-    if props.CurrentTransformer == "" {
-      <div class="card-panel white flex-shrink">
-        <div class="input-field m-0">
-          <input
-            id="data_transformer_name"
-            type="text"
-          />
-          <label for="data_transformer_name">Transformer Name</label>
+    if permissions.CanEditTransformers {
+      if props.CurrentTransformer == "" {
+        <div class="card-panel white flex-shrink">
+          <div class="input-field m-0">
+            <input
+              id="data_transformer_name"
+              type="text"
+            />
+            <label for="data_transformer_name">Transformer Name</label>
+          </div>
         </div>
-      </div>
-    } else {
-      <input
-        type="hidden"
-        id="data_transformer_name"
-        value={props.CurrentTransformer}
-      />
+      } else {
+        <input
+          type="hidden"
+          id="data_transformer_name"
+          value={props.CurrentTransformer}
+        />
+      }
     }
 
     <div
@@ -161,26 +175,34 @@ templ transformerEditor(code string) {
 }
 
 type TransformersProps struct {
-  Transformers      []string
+  Transformers       []string
   CurrentTransformer string
-  Code              string
+  Code               string
 }
 
-templ Transformers(props TransformersProps, notifications []string) {
+templ Transformers(
+  props TransformersProps,
+  permissions auth.Permissions,
+  notifications []string,
+) {
   @layouts.App(layouts.AppProps{
-    Head: transformerHead(),
-    CurrentNav: "transformers",
+    Head:          transformerHead(permissions),
+    CurrentNav:    "transformers",
+    Permissions:   permissions,
     Notifications: notifications,
   }) {
     <div class="w-full h-full flex flex-col">
       <section class="row w-full mb-0">
-        @transformerToolbar(props.CurrentTransformer)
+        @transformerToolbar(props.CurrentTransformer, permissions)
       </section>
       <section class="row w-full mb-0 flex-grow">
-        @transformerSideMenu(transformerSideMenuProps{
-          Transformers: props.Transformers,
-          CurrentTransformer: props.CurrentTransformer,
-        })
+        @transformerSideMenu(
+          transformerSideMenuProps{
+            Transformers: props.Transformers,
+            CurrentTransformer: props.CurrentTransformer,
+          },
+          permissions,
+        )
         @transformerEditor(props.Code)
       </section>
     </div>

@@ -1,16 +1,24 @@
 package layouts
 
-import "link-society.com/flowg/web/templates/components"
+import (
+  "link-society.com/flowg/internal/auth"
+
+  "link-society.com/flowg/web/templates/components"
+)
 
 type AppProps struct {
-  Head templ.Component
-  CurrentNav string
+  Head          templ.Component
+  CurrentNav    string
+  Permissions   auth.Permissions
   Notifications []string
 }
 
 templ App(props AppProps) {
   @Base(BaseProps{Head: props.Head, Notifications: props.Notifications}) {
-    @components.Navbar(components.NavbarProps{CurrentNav: props.CurrentNav})
+    @components.Navbar(components.NavbarProps{
+      CurrentNav:  props.CurrentNav,
+      Permissions: props.Permissions,
+    })
 
     <main class="flex-grow">
       { children... }

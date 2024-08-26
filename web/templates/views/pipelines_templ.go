@@ -10,11 +10,12 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"link-society.com/flowg/internal"
+	"link-society.com/flowg/internal/auth"
 
 	"link-society.com/flowg/web/templates/layouts"
 )
 
-func pipelineHead() templ.Component {
+func pipelineHead(permissions auth.Permissions) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -32,15 +33,21 @@ func pipelineHead() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<link rel=\"stylesheet\" href=\"/static/webcomponents/floweditor.bundle.css\"><script type=\"application/javascript\" src=\"/static/webcomponents/floweditor.bundle.js\"></script><script type=\"application/javascript\">\n    document.addEventListener('DOMContentLoaded', () => {\n      const action_save = document.getElementById('action_save')\n      const data_pipeline_name = document.getElementById('data_pipeline_name')\n      const data_pipeline_flow = document.getElementById('data_pipeline_flow')\n\n      const add_node_fabs = document.querySelectorAll('.flowg-addnode-btn')\n      for (const fab of add_node_fabs) {\n        fab.addEventListener('click', (e) => {\n          data_pipeline_flow.addNode(fab.dataset.nodetype)\n        })\n      }\n\n      if (data_pipeline_name.value !== '') {\n        history.pushState(null, '', `/web/pipelines/edit/${data_pipeline_name.value}/`)\n      }\n\n      action_save.addEventListener('click', () => {\n        if (data_pipeline_name.value === '') {\n          M.toast({ html: '❌ Please provide a pipeline name' })\n          data_pipeline_name.classList.add('invalid')\n        } else {\n          const form = document.createElement('form')\n          form.setAttribute('method', 'post')\n          form.setAttribute('action', window.location.href)\n          form.classList.add('hide')\n\n          const input_name = document.createElement('input')\n          input_name.setAttribute('type', 'hidden')\n          input_name.setAttribute('name', 'name')\n          input_name.setAttribute('value', data_pipeline_name.value)\n\n          const input_flow = document.createElement('input')\n          input_flow.setAttribute('type', 'hidden')\n          input_flow.setAttribute('name', 'flow')\n          input_flow.setAttribute('value', data_pipeline_flow.getAttribute('flow'))\n\n          form.appendChild(input_name)\n          form.appendChild(input_flow)\n          document.body.appendChild(form)\n\n          form.submit()\n        }\n      })\n\n      data_pipeline_name.addEventListener('input', () => {\n        data_pipeline_name.classList.remove('invalid')\n      })\n    });\n  </script>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<link rel=\"stylesheet\" href=\"/static/webcomponents/floweditor.bundle.css\"><script type=\"application/javascript\" src=\"/static/webcomponents/floweditor.bundle.js\"></script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
+		}
+		if permissions.CanEditPipelines {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<script type=\"application/javascript\">\n      document.addEventListener('DOMContentLoaded', () => {\n        const action_save = document.getElementById('action_save')\n        const data_pipeline_name = document.getElementById('data_pipeline_name')\n        const data_pipeline_flow = document.getElementById('data_pipeline_flow')\n\n        const add_node_fabs = document.querySelectorAll('.flowg-addnode-btn')\n        for (const fab of add_node_fabs) {\n          fab.addEventListener('click', (e) => {\n            data_pipeline_flow.addNode(fab.dataset.nodetype)\n          })\n        }\n\n        if (data_pipeline_name.value !== '') {\n          history.pushState(null, '', `/web/pipelines/edit/${data_pipeline_name.value}/`)\n        }\n\n        action_save.addEventListener('click', () => {\n          if (data_pipeline_name.value === '') {\n            M.toast({ html: '❌ Please provide a pipeline name' })\n            data_pipeline_name.classList.add('invalid')\n          } else {\n            const form = document.createElement('form')\n            form.setAttribute('method', 'post')\n            form.setAttribute('action', window.location.href)\n            form.classList.add('hide')\n\n            const input_name = document.createElement('input')\n            input_name.setAttribute('type', 'hidden')\n            input_name.setAttribute('name', 'name')\n            input_name.setAttribute('value', data_pipeline_name.value)\n\n            const input_flow = document.createElement('input')\n            input_flow.setAttribute('type', 'hidden')\n            input_flow.setAttribute('name', 'flow')\n            input_flow.setAttribute('value', data_pipeline_flow.getAttribute('flow'))\n\n            form.appendChild(input_name)\n            form.appendChild(input_flow)\n            document.body.appendChild(form)\n\n            form.submit()\n          }\n        })\n\n        data_pipeline_name.addEventListener('input', () => {\n          data_pipeline_name.classList.remove('invalid')\n        })\n      });\n    </script>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		}
 		return templ_7745c5c3_Err
 	})
 }
 
-func pipelineToolbar(currentPipeline string) templ.Component {
+func pipelineToolbar(currentPipeline string, permissions auth.Permissions) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -71,22 +78,28 @@ func pipelineToolbar(currentPipeline string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if currentPipeline != "" {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"btn-small blue\" href=\"/web/pipelines/new\"><i class=\"material-icons left\">add</i> New</a> <a class=\"btn-small red\" href=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
+		if permissions.CanEditPipelines {
+			if currentPipeline != "" {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"btn-small blue\" href=\"/web/pipelines/new\"><i class=\"material-icons left\">add</i> New</a> <a class=\"btn-small red\" href=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var4 templ.SafeURL = templ.SafeURL("/web/pipelines/delete/" + currentPipeline + "/")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var4)))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><i class=\"material-icons left\">delete</i> Delete</a>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
 			}
-			var templ_7745c5c3_Var4 templ.SafeURL = templ.SafeURL("/web/pipelines/delete/" + currentPipeline + "/")
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var4)))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><i class=\"material-icons left\">delete</i> Delete</a> ")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" <button id=\"action_save\" class=\"waves-effect waves-light btn-small\"><i class=\"material-icons left\">save</i> Save</button>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button id=\"action_save\" class=\"waves-effect waves-light btn-small\"><i class=\"material-icons left\">save</i> Save</button></div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -99,7 +112,7 @@ type pipelineSideMenuProps struct {
 	CurrentPipeline string
 }
 
-func pipelineSideMenu(props pipelineSideMenuProps) templ.Component {
+func pipelineSideMenu(props pipelineSideMenuProps, permissions auth.Permissions) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -121,28 +134,30 @@ func pipelineSideMenu(props pipelineSideMenuProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if props.CurrentPipeline == "" {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"card-panel white flex-shrink\"><div class=\"input-field m-0\"><input id=\"data_pipeline_name\" type=\"text\"> <label for=\"data_pipeline_name\">Pipeline Name</label></div></div>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		} else {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<input type=\"hidden\" id=\"data_pipeline_name\" value=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var6 string
-			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(props.CurrentPipeline)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/pipelines.templ`, Line: 129, Col: 36}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
+		if permissions.CanEditPipelines {
+			if props.CurrentPipeline == "" {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"card-panel white flex-shrink\"><div class=\"input-field m-0\"><input id=\"data_pipeline_name\" type=\"text\"> <label for=\"data_pipeline_name\">Pipeline Name</label></div></div>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			} else {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<input type=\"hidden\" id=\"data_pipeline_name\" value=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var6 string
+				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(props.CurrentPipeline)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/pipelines.templ`, Line: 135, Col: 38}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
 			}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"\n        card-panel white\n        p-0 mb-0 h-0\n        flex-grow flex-shrink\n        overflow-auto\n      \"><div class=\"collection m-0\">")
@@ -158,7 +173,7 @@ func pipelineSideMenu(props pipelineSideMenuProps) templ.Component {
 				var templ_7745c5c3_Var7 string
 				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(pipeline)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/pipelines.templ`, Line: 144, Col: 64}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/pipelines.templ`, Line: 151, Col: 64}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
@@ -185,7 +200,7 @@ func pipelineSideMenu(props pipelineSideMenuProps) templ.Component {
 				var templ_7745c5c3_Var9 string
 				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(pipeline)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/pipelines.templ`, Line: 150, Col: 23}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/pipelines.templ`, Line: 157, Col: 23}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
@@ -230,7 +245,7 @@ func pipelineEditor(flow string) templ.Component {
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(flow)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/pipelines.templ`, Line: 168, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/pipelines.templ`, Line: 175, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
@@ -276,7 +291,11 @@ type PipelinesProps struct {
 	Flow            string
 }
 
-func Pipelines(props PipelinesProps, notifications []string) templ.Component {
+func Pipelines(
+	props PipelinesProps,
+	permissions auth.Permissions,
+	notifications []string,
+) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -310,7 +329,7 @@ func Pipelines(props PipelinesProps, notifications []string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = pipelineToolbar(props.CurrentPipeline).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = pipelineToolbar(props.CurrentPipeline, permissions).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -318,10 +337,13 @@ func Pipelines(props PipelinesProps, notifications []string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = pipelineSideMenu(pipelineSideMenuProps{
-				Pipelines:       props.Pipelines,
-				CurrentPipeline: props.CurrentPipeline,
-			}).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = pipelineSideMenu(
+				pipelineSideMenuProps{
+					Pipelines:       props.Pipelines,
+					CurrentPipeline: props.CurrentPipeline,
+				},
+				permissions,
+			).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -333,15 +355,18 @@ func Pipelines(props PipelinesProps, notifications []string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = pipelineFABs().Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
+			if permissions.CanEditPipelines {
+				templ_7745c5c3_Err = pipelineFABs().Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
 			}
 			return templ_7745c5c3_Err
 		})
 		templ_7745c5c3_Err = layouts.App(layouts.AppProps{
-			Head:          pipelineHead(),
+			Head:          pipelineHead(permissions),
 			CurrentNav:    "pipelines",
+			Permissions:   permissions,
 			Notifications: notifications,
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var14), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {

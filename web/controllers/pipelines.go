@@ -1,17 +1,22 @@
 package controllers
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
 
 	"github.com/a-h/templ"
 
+	"link-society.com/flowg/internal/auth"
 	"link-society.com/flowg/internal/pipelines"
 
 	"link-society.com/flowg/web/templates/views"
 )
 
-func PipelinesController(pipelinesManager *pipelines.Manager) http.Handler {
+func PipelinesController(
+	authDb *auth.Database,
+	pipelinesManager *pipelines.Manager,
+) http.Handler {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /web/pipelines/{$}", func(w http.ResponseWriter, r *http.Request) {
@@ -19,7 +24,28 @@ func PipelinesController(pipelinesManager *pipelines.Manager) http.Handler {
 	})
 
 	mux.HandleFunc("GET /web/pipelines/new/{$}", func(w http.ResponseWriter, r *http.Request) {
+		permissions := auth.Permissions{}
 		notifications := []string{}
+
+		user := auth.GetContextUser(r.Context())
+		scopes, err := authDb.ListUserScopes(user)
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error listing user scopes",
+				"channel", "web",
+				"error", err.Error(),
+			)
+
+			notifications = append(notifications, "❌ Could not fetch user permissions")
+		} else {
+			permissions = auth.PermissionsFromScopes(scopes)
+		}
+
+		if !permissions.CanViewPipelines {
+			http.Redirect(w, r, "/web", http.StatusSeeOther)
+			return
+		}
 
 		pipelines, err := pipelinesManager.ListPipelines()
 		if err != nil {
@@ -40,17 +66,40 @@ func PipelinesController(pipelinesManager *pipelines.Manager) http.Handler {
 				CurrentPipeline: "",
 				Flow:            "null",
 			},
+			permissions,
 			notifications,
 		))
 		h.ServeHTTP(w, r)
 	})
 
 	mux.HandleFunc("POST /web/pipelines/new/{$}", func(w http.ResponseWriter, r *http.Request) {
+		permissions := auth.Permissions{}
 		notifications := []string{}
+
+		user := auth.GetContextUser(r.Context())
+		scopes, err := authDb.ListUserScopes(user)
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error listing user scopes",
+				"channel", "web",
+				"error", err.Error(),
+			)
+
+			notifications = append(notifications, "❌ Could not fetch user permissions")
+		} else {
+			permissions = auth.PermissionsFromScopes(scopes)
+		}
+
+		if !permissions.CanViewPipelines {
+			http.Redirect(w, r, "/web", http.StatusSeeOther)
+			return
+		}
+
 		pipelineName := ""
 		pipelineFlow := "."
 
-		err := r.ParseForm()
+		err = r.ParseForm()
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
@@ -64,27 +113,29 @@ func PipelinesController(pipelinesManager *pipelines.Manager) http.Handler {
 			pipelineName = r.FormValue("name")
 			pipelineFlow = r.FormValue("flow")
 
-			if pipelineName == "" {
-				notifications = append(notifications, "❌ Pipeline name is required")
-			}
+			if permissions.CanEditPipelines {
+				if pipelineName == "" {
+					notifications = append(notifications, "❌ Pipeline name is required")
+				}
 
-			if pipelineFlow == "" {
-				notifications = append(notifications, "❌ Pipeline flow is required")
-			}
+				if pipelineFlow == "" {
+					notifications = append(notifications, "❌ Pipeline flow is required")
+				}
 
-			if pipelineName != "" && pipelineFlow != "" {
-				err = pipelinesManager.SavePipelineFlow(pipelineName, pipelineFlow)
-				if err != nil {
-					slog.ErrorContext(
-						r.Context(),
-						"error saving pipeline flow",
-						"channel", "web",
-						"error", err.Error(),
-					)
+				if pipelineName != "" && pipelineFlow != "" {
+					err = pipelinesManager.SavePipelineFlow(pipelineName, pipelineFlow)
+					if err != nil {
+						slog.ErrorContext(
+							r.Context(),
+							"error saving pipeline flow",
+							"channel", "web",
+							"error", err.Error(),
+						)
 
-					notifications = append(notifications, "❌ Could not save pipeline")
-				} else {
-					notifications = append(notifications, "✅ Pipeline saved")
+						notifications = append(notifications, "❌ Could not save pipeline")
+					} else {
+						notifications = append(notifications, "✅ Pipeline saved")
+					}
 				}
 			}
 		}
@@ -108,6 +159,7 @@ func PipelinesController(pipelinesManager *pipelines.Manager) http.Handler {
 				CurrentPipeline: pipelineName,
 				Flow:            pipelineFlow,
 			},
+			permissions,
 			notifications,
 		))
 		h.ServeHTTP(w, r)
@@ -127,7 +179,28 @@ func PipelinesController(pipelinesManager *pipelines.Manager) http.Handler {
 			return
 		}
 
+		permissions := auth.Permissions{}
 		notifications := []string{}
+
+		user := auth.GetContextUser(r.Context())
+		scopes, err := authDb.ListUserScopes(user)
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error listing user scopes",
+				"channel", "web",
+				"error", err.Error(),
+			)
+
+			notifications = append(notifications, "❌ Could not fetch user permissions")
+		} else {
+			permissions = auth.PermissionsFromScopes(scopes)
+		}
+
+		if !permissions.CanViewPipelines {
+			http.Redirect(w, r, "/web", http.StatusSeeOther)
+			return
+		}
 
 		pipelines, err := pipelinesManager.ListPipelines()
 		if err != nil {
@@ -148,6 +221,7 @@ func PipelinesController(pipelinesManager *pipelines.Manager) http.Handler {
 				CurrentPipeline: pipelineName,
 				Flow:            pipelineFlow,
 			},
+			permissions,
 			notifications,
 		))
 		h.ServeHTTP(w, r)
@@ -167,7 +241,28 @@ func PipelinesController(pipelinesManager *pipelines.Manager) http.Handler {
 			return
 		}
 
+		permissions := auth.Permissions{}
 		notifications := []string{}
+
+		user := auth.GetContextUser(r.Context())
+		scopes, err := authDb.ListUserScopes(user)
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error listing user scopes",
+				"channel", "web",
+				"error", err.Error(),
+			)
+
+			notifications = append(notifications, "❌ Could not fetch user permissions")
+		} else {
+			permissions = auth.PermissionsFromScopes(scopes)
+		}
+
+		if !permissions.CanViewPipelines {
+			http.Redirect(w, r, "/web", http.StatusSeeOther)
+			return
+		}
 
 		err = r.ParseForm()
 		if err != nil {
@@ -183,27 +278,29 @@ func PipelinesController(pipelinesManager *pipelines.Manager) http.Handler {
 			pipelineName = r.FormValue("name")
 			pipelineFlow = r.FormValue("flow")
 
-			if pipelineName == "" {
-				notifications = append(notifications, "❌ Pipeline name is required")
-			}
+			if !permissions.CanEditPipelines {
+				if pipelineName == "" {
+					notifications = append(notifications, "❌ Pipeline name is required")
+				}
 
-			if pipelineFlow == "" {
-				notifications = append(notifications, "❌ Pipeline flow is required")
-			}
+				if pipelineFlow == "" {
+					notifications = append(notifications, "❌ Pipeline flow is required")
+				}
 
-			if pipelineName != "" && pipelineFlow != "" {
-				err = pipelinesManager.SavePipelineFlow(pipelineName, pipelineFlow)
-				if err != nil {
-					slog.ErrorContext(
-						r.Context(),
-						"error saving pipeline flow",
-						"channel", "web",
-						"error", err.Error(),
-					)
+				if pipelineName != "" && pipelineFlow != "" {
+					err = pipelinesManager.SavePipelineFlow(pipelineName, pipelineFlow)
+					if err != nil {
+						slog.ErrorContext(
+							r.Context(),
+							"error saving pipeline flow",
+							"channel", "web",
+							"error", err.Error(),
+						)
 
-					notifications = append(notifications, "❌ Could not save pipeline")
-				} else {
-					notifications = append(notifications, "✅ Pipeline saved")
+						notifications = append(notifications, "❌ Could not save pipeline")
+					} else {
+						notifications = append(notifications, "✅ Pipeline saved")
+					}
 				}
 			}
 		}
@@ -227,6 +324,7 @@ func PipelinesController(pipelinesManager *pipelines.Manager) http.Handler {
 				CurrentPipeline: pipelineName,
 				Flow:            pipelineFlow,
 			},
+			permissions,
 			notifications,
 		))
 		h.ServeHTTP(w, r)
@@ -234,7 +332,30 @@ func PipelinesController(pipelinesManager *pipelines.Manager) http.Handler {
 
 	mux.HandleFunc("GET /web/pipelines/delete/{name}/{$}", func(w http.ResponseWriter, r *http.Request) {
 		pipelineName := r.PathValue("name")
-		err := pipelinesManager.DeletePipelineFlow(pipelineName)
+
+		permissions := auth.Permissions{}
+		user := auth.GetContextUser(r.Context())
+		scopes, err := authDb.ListUserScopes(user)
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error listing user scopes",
+				"channel", "web",
+				"error", err.Error(),
+			)
+		} else {
+			permissions = auth.PermissionsFromScopes(scopes)
+		}
+
+		if !permissions.CanViewPipelines {
+			http.Redirect(w, r, "/web", http.StatusSeeOther)
+			return
+		} else if !permissions.CanEditPipelines {
+			http.Redirect(w, r, fmt.Sprintf("/web/pipelines/edit/%s", pipelineName), http.StatusSeeOther)
+			return
+		}
+
+		err = pipelinesManager.DeletePipelineFlow(pipelineName)
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),

@@ -11,6 +11,7 @@ import (
 
 	"github.com/a-h/templ"
 
+	"link-society.com/flowg/internal/auth"
 	"link-society.com/flowg/internal/filterdsl"
 	"link-society.com/flowg/internal/logstorage"
 
@@ -18,12 +19,35 @@ import (
 	"link-society.com/flowg/web/templates/views"
 )
 
-func StreamController(logDb *logstorage.Storage) http.Handler {
+func StreamController(
+	authDb *auth.Database,
+	logDb *logstorage.Storage,
+) http.Handler {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /web/streams/{$}", func(w http.ResponseWriter, r *http.Request) {
+		permissions := auth.Permissions{}
 		notifications := []string{}
 
+		user := auth.GetContextUser(r.Context())
+		scopes, err := authDb.ListUserScopes(user)
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error listing user scopes",
+				"channel", "web",
+				"error", err.Error(),
+			)
+
+			notifications = append(notifications, "❌ Could not fetch user permissions")
+		} else {
+			permissions = auth.PermissionsFromScopes(scopes)
+		}
+
+		if !permissions.CanViewStreams {
+			http.Redirect(w, r, "/web", http.StatusSeeOther)
+			return
+		}
 		streams, err := logDb.ListStreams()
 		if err != nil {
 			slog.ErrorContext(
@@ -49,13 +73,35 @@ func StreamController(logDb *logstorage.Storage) http.Handler {
 				Streams:       streams,
 				CurrentStream: "",
 			},
+			permissions,
 			notifications,
 		))
 		h.ServeHTTP(w, r)
 	})
 
 	mux.HandleFunc("GET /web/streams/{name}/{$}", func(w http.ResponseWriter, r *http.Request) {
+		permissions := auth.Permissions{}
 		notifications := []string{}
+
+		user := auth.GetContextUser(r.Context())
+		scopes, err := authDb.ListUserScopes(user)
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error listing user scopes",
+				"channel", "web",
+				"error", err.Error(),
+			)
+
+			notifications = append(notifications, "❌ Could not fetch user permissions")
+		} else {
+			permissions = auth.PermissionsFromScopes(scopes)
+		}
+
+		if !permissions.CanViewStreams {
+			http.Redirect(w, r, "/web", http.StatusSeeOther)
+			return
+		}
 
 		// fetch data for template
 		streams, err := logDb.ListStreams()
@@ -260,6 +306,7 @@ func StreamController(logDb *logstorage.Storage) http.Handler {
 
 					HistogramData: string(histogramData),
 				},
+				permissions,
 				notifications,
 			))
 			h.ServeHTTP(w, r)
