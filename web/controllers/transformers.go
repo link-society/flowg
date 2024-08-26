@@ -1,17 +1,22 @@
 package controllers
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
 
 	"github.com/a-h/templ"
 
+	"link-society.com/flowg/internal/auth"
 	"link-society.com/flowg/internal/pipelines"
 
 	"link-society.com/flowg/web/templates/views"
 )
 
-func TransformersController(pipelinesManager *pipelines.Manager) http.Handler {
+func TransformersController(
+	authDb *auth.Database,
+	pipelinesManager *pipelines.Manager,
+) http.Handler {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /web/transformers/{$}", func(w http.ResponseWriter, r *http.Request) {
@@ -19,7 +24,28 @@ func TransformersController(pipelinesManager *pipelines.Manager) http.Handler {
 	})
 
 	mux.HandleFunc("GET /web/transformers/new/{$}", func(w http.ResponseWriter, r *http.Request) {
+		permissions := auth.Permissions{}
 		notifications := []string{}
+
+		user := auth.GetContextUser(r.Context())
+		scopes, err := authDb.ListUserScopes(user)
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error listing user scopes",
+				"channel", "web",
+				"error", err.Error(),
+			)
+
+			notifications = append(notifications, "❌ Could not fetch user permissions")
+		} else {
+			permissions = auth.PermissionsFromScopes(scopes)
+		}
+
+		if !permissions.CanViewTransformers {
+			http.Redirect(w, r, "/web", http.StatusSeeOther)
+			return
+		}
 
 		transformers, err := pipelinesManager.ListTransformers()
 		if err != nil {
@@ -40,17 +66,40 @@ func TransformersController(pipelinesManager *pipelines.Manager) http.Handler {
 				CurrentTransformer: "",
 				Code:               ".",
 			},
+			permissions,
 			notifications,
 		))
 		h.ServeHTTP(w, r)
 	})
 
 	mux.HandleFunc("POST /web/transformers/new/{$}", func(w http.ResponseWriter, r *http.Request) {
+		permissions := auth.Permissions{}
 		notifications := []string{}
+
+		user := auth.GetContextUser(r.Context())
+		scopes, err := authDb.ListUserScopes(user)
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error listing user scopes",
+				"channel", "web",
+				"error", err.Error(),
+			)
+
+			notifications = append(notifications, "❌ Could not fetch user permissions")
+		} else {
+			permissions = auth.PermissionsFromScopes(scopes)
+		}
+
+		if !permissions.CanViewTransformers {
+			http.Redirect(w, r, "/web", http.StatusSeeOther)
+			return
+		}
+
 		transformerName := ""
 		transformerCode := "."
 
-		err := r.ParseForm()
+		err = r.ParseForm()
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
@@ -64,27 +113,29 @@ func TransformersController(pipelinesManager *pipelines.Manager) http.Handler {
 			transformerName = r.FormValue("name")
 			transformerCode = r.FormValue("code")
 
-			if transformerName == "" {
-				notifications = append(notifications, "❌ Transformer name is required")
-			}
+			if permissions.CanEditTransformers {
+				if transformerName == "" {
+					notifications = append(notifications, "❌ Transformer name is required")
+				}
 
-			if transformerCode == "" {
-				notifications = append(notifications, "❌ Transformer code is required")
-			}
+				if transformerCode == "" {
+					notifications = append(notifications, "❌ Transformer code is required")
+				}
 
-			if transformerName != "" && transformerCode != "" {
-				err = pipelinesManager.SaveTransformerScript(transformerName, transformerCode)
-				if err != nil {
-					slog.ErrorContext(
-						r.Context(),
-						"error saving transformer script",
-						"channel", "web",
-						"error", err.Error(),
-					)
+				if transformerName != "" && transformerCode != "" {
+					err = pipelinesManager.SaveTransformerScript(transformerName, transformerCode)
+					if err != nil {
+						slog.ErrorContext(
+							r.Context(),
+							"error saving transformer script",
+							"channel", "web",
+							"error", err.Error(),
+						)
 
-					notifications = append(notifications, "❌ Could not save transformer script")
-				} else {
-					notifications = append(notifications, "✅ Transformer script saved")
+						notifications = append(notifications, "❌ Could not save transformer script")
+					} else {
+						notifications = append(notifications, "✅ Transformer script saved")
+					}
 				}
 			}
 		}
@@ -108,6 +159,7 @@ func TransformersController(pipelinesManager *pipelines.Manager) http.Handler {
 				CurrentTransformer: transformerName,
 				Code:               transformerCode,
 			},
+			permissions,
 			notifications,
 		))
 		h.ServeHTTP(w, r)
@@ -127,7 +179,28 @@ func TransformersController(pipelinesManager *pipelines.Manager) http.Handler {
 			return
 		}
 
+		permissions := auth.Permissions{}
 		notifications := []string{}
+
+		user := auth.GetContextUser(r.Context())
+		scopes, err := authDb.ListUserScopes(user)
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error listing user scopes",
+				"channel", "web",
+				"error", err.Error(),
+			)
+
+			notifications = append(notifications, "❌ Could not fetch user permissions")
+		} else {
+			permissions = auth.PermissionsFromScopes(scopes)
+		}
+
+		if !permissions.CanViewTransformers {
+			http.Redirect(w, r, "/web", http.StatusSeeOther)
+			return
+		}
 
 		transformers, err := pipelinesManager.ListTransformers()
 		if err != nil {
@@ -148,6 +221,7 @@ func TransformersController(pipelinesManager *pipelines.Manager) http.Handler {
 				CurrentTransformer: transformerName,
 				Code:               transformerCode,
 			},
+			permissions,
 			notifications,
 		))
 		h.ServeHTTP(w, r)
@@ -167,7 +241,28 @@ func TransformersController(pipelinesManager *pipelines.Manager) http.Handler {
 			return
 		}
 
+		permissions := auth.Permissions{}
 		notifications := []string{}
+
+		user := auth.GetContextUser(r.Context())
+		scopes, err := authDb.ListUserScopes(user)
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error listing user scopes",
+				"channel", "web",
+				"error", err.Error(),
+			)
+
+			notifications = append(notifications, "❌ Could not fetch user permissions")
+		} else {
+			permissions = auth.PermissionsFromScopes(scopes)
+		}
+
+		if !permissions.CanViewTransformers {
+			http.Redirect(w, r, "/web", http.StatusSeeOther)
+			return
+		}
 
 		err = r.ParseForm()
 		if err != nil {
@@ -183,27 +278,29 @@ func TransformersController(pipelinesManager *pipelines.Manager) http.Handler {
 			transformerName = r.FormValue("name")
 			transformerCode = r.FormValue("code")
 
-			if transformerName == "" {
-				notifications = append(notifications, "❌ Transformer name is required")
-			}
+			if permissions.CanEditTransformers {
+				if transformerName == "" {
+					notifications = append(notifications, "❌ Transformer name is required")
+				}
 
-			if transformerCode == "" {
-				notifications = append(notifications, "❌ Transformer code is required")
-			}
+				if transformerCode == "" {
+					notifications = append(notifications, "❌ Transformer code is required")
+				}
 
-			if transformerName != "" && transformerCode != "" {
-				err = pipelinesManager.SaveTransformerScript(transformerName, transformerCode)
-				if err != nil {
-					slog.ErrorContext(
-						r.Context(),
-						"error saving transformer script",
-						"channel", "web",
-						"error", err.Error(),
-					)
+				if transformerName != "" && transformerCode != "" {
+					err = pipelinesManager.SaveTransformerScript(transformerName, transformerCode)
+					if err != nil {
+						slog.ErrorContext(
+							r.Context(),
+							"error saving transformer script",
+							"channel", "web",
+							"error", err.Error(),
+						)
 
-					notifications = append(notifications, "❌ Could not save transformer script")
-				} else {
-					notifications = append(notifications, "✅ Transformer script saved")
+						notifications = append(notifications, "❌ Could not save transformer script")
+					} else {
+						notifications = append(notifications, "✅ Transformer script saved")
+					}
 				}
 			}
 		}
@@ -227,6 +324,7 @@ func TransformersController(pipelinesManager *pipelines.Manager) http.Handler {
 				CurrentTransformer: transformerName,
 				Code:               transformerCode,
 			},
+			permissions,
 			notifications,
 		))
 		h.ServeHTTP(w, r)
@@ -234,7 +332,34 @@ func TransformersController(pipelinesManager *pipelines.Manager) http.Handler {
 
 	mux.HandleFunc("GET /web/transformers/delete/{name}/{$}", func(w http.ResponseWriter, r *http.Request) {
 		transformerName := r.PathValue("name")
-		err := pipelinesManager.DeleteTransformerScript(transformerName)
+
+		permissions := auth.Permissions{}
+		notifications := []string{}
+
+		user := auth.GetContextUser(r.Context())
+		scopes, err := authDb.ListUserScopes(user)
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error listing user scopes",
+				"channel", "web",
+				"error", err.Error(),
+			)
+
+			notifications = append(notifications, "❌ Could not fetch user permissions")
+		} else {
+			permissions = auth.PermissionsFromScopes(scopes)
+		}
+
+		if !permissions.CanViewTransformers {
+			http.Redirect(w, r, "/web", http.StatusSeeOther)
+			return
+		} else if !permissions.CanEditTransformers {
+			http.Redirect(w, r, fmt.Sprintf("/web/transformers/edit/%s", transformerName), http.StatusSeeOther)
+			return
+		}
+
+		err = pipelinesManager.DeleteTransformerScript(transformerName)
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),

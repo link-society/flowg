@@ -8,11 +8,16 @@ package layouts
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "link-society.com/flowg/web/templates/components"
+import (
+	"link-society.com/flowg/internal/auth"
+
+	"link-society.com/flowg/web/templates/components"
+)
 
 type AppProps struct {
 	Head          templ.Component
 	CurrentNav    string
+	Permissions   auth.Permissions
 	Notifications []string
 }
 
@@ -46,7 +51,10 @@ func App(props AppProps) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = components.Navbar(components.NavbarProps{CurrentNav: props.CurrentNav}).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = components.Navbar(components.NavbarProps{
+				CurrentNav:  props.CurrentNav,
+				Permissions: props.Permissions,
+			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

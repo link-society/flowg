@@ -7,6 +7,7 @@ import (
 
 	"github.com/a-h/templ"
 
+	"link-society.com/flowg/internal/auth"
 	"link-society.com/flowg/internal/logstorage"
 	"link-society.com/flowg/internal/pipelines"
 
@@ -14,6 +15,7 @@ import (
 )
 
 func MainController(
+	authDb *auth.Database,
 	logDb *logstorage.Storage,
 	pipelinesManager *pipelines.Manager,
 ) http.Handler {
@@ -24,7 +26,23 @@ func MainController(
 		transformerCount := 0
 		pipelineCount := 0
 
+		permissions := auth.Permissions{}
 		notifications := []string{}
+
+		user := auth.GetContextUser(r.Context())
+		scopes, err := authDb.ListUserScopes(user)
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error listing user scopes",
+				"channel", "web",
+				"error", err.Error(),
+			)
+
+			notifications = append(notifications, "❌ Could not fetch user permissions")
+		} else {
+			permissions = auth.PermissionsFromScopes(scopes)
+		}
 
 		streamList, err := logDb.ListStreams()
 		if err == nil {
@@ -71,6 +89,7 @@ func MainController(
 				TransformerCount: transformerCount,
 				PipelineCount:    pipelineCount,
 			},
+			permissions,
 			notifications,
 		))
 

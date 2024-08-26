@@ -33,19 +33,19 @@ func NewHandler(
 
 	mux.Handle(
 		"/web/",
-		authMiddleware(controllers.MainController(logDb, pipelinesManager)),
+		authMiddleware(controllers.MainController(authDb, logDb, pipelinesManager)),
 	)
 	mux.Handle(
 		"/web/streams/",
-		authMiddleware(controllers.StreamController(logDb)),
+		authMiddleware(controllers.StreamController(authDb, logDb)),
 	)
 	mux.Handle(
 		"/web/transformers/",
-		authMiddleware(controllers.TransformersController(pipelinesManager)),
+		authMiddleware(controllers.TransformersController(authDb, pipelinesManager)),
 	)
 	mux.Handle(
 		"/web/pipelines/",
-		authMiddleware(controllers.PipelinesController(pipelinesManager)),
+		authMiddleware(controllers.PipelinesController(authDb, pipelinesManager)),
 	)
 
 	return mux

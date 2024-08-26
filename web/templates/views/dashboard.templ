@@ -3,14 +3,17 @@ package views
 import (
   "fmt"
 
+	"link-society.com/flowg/internal/auth"
+
   "link-society.com/flowg/web/templates/layouts"
 )
 
 type dashboardStatCardProps struct {
-  Icon  string
-  Name  string
-  Href  templ.SafeURL
-  Count int
+  Icon    string
+  Name    string
+  Href    templ.SafeURL
+  Count   int
+  CanView bool
 }
 
 templ dashboardStatCard(props dashboardStatCardProps) {
@@ -27,9 +30,11 @@ templ dashboardStatCard(props dashboardStatCardProps) {
         </div>
       </div>
     </main>
-    <footer class="card-action">
-      <a href={props.Href}>View More &gt;&gt;</a>
-    </footer>
+    if props.CanView {
+      <footer class="card-action">
+        <a href={props.Href}>View More &gt;&gt;</a>
+      </footer>
+    }
   </article>
 }
 
@@ -39,36 +44,44 @@ type DashboardProps struct {
   PipelineCount    int
 }
 
-templ Dashboard(props DashboardProps, notifications []string) {
+templ Dashboard(
+  props DashboardProps,
+  permissions auth.Permissions,
+  notifications []string,
+) {
   @layouts.App(layouts.AppProps{
-    Head: nil,
-    CurrentNav: "",
+    Head:          nil,
+    CurrentNav:    "",
+    Permissions:   permissions,
     Notifications: notifications,
   }) {
     <div class="container">
       <section class="row section">
         <div class="col s12 m4">
           @dashboardStatCard(dashboardStatCardProps{
-            Icon: "storage",
-            Name: "Streams",
-            Href: "/web/streams",
-            Count: props.StreamCount,
+            Icon:    "storage",
+            Name:    "Streams",
+            Href:    "/web/streams",
+            Count:   props.StreamCount,
+            CanView: permissions.CanViewStreams,
           })
         </div>
         <div class="col s12 m4">
           @dashboardStatCard(dashboardStatCardProps{
-            Icon: "filter_alt",
-            Name: "Transformers",
-            Href: "/web/transformers",
-            Count: props.TransformerCount,
+            Icon:    "filter_alt",
+            Name:    "Transformers",
+            Href:    "/web/transformers",
+            Count:   props.TransformerCount,
+            CanView: permissions.CanViewTransformers,
           })
         </div>
         <div class="col s12 m4">
           @dashboardStatCard(dashboardStatCardProps{
-            Icon: "settings",
-            Name: "Pipelines",
-            Href: "/web/pipelines",
-            Count: props.PipelineCount,
+            Icon:    "settings",
+            Name:    "Pipelines",
+            Href:    "/web/pipelines",
+            Count:   props.PipelineCount,
+            CanView: permissions.CanViewPipelines,
           })
         </div>
       </section>

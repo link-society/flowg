@@ -8,8 +8,11 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
+import "link-society.com/flowg/internal/auth"
+
 type NavbarProps struct {
-	CurrentNav string
+	CurrentNav  string
+	Permissions auth.Permissions
 }
 
 func Navbar(props NavbarProps) templ.Component {
@@ -36,27 +39,137 @@ func Navbar(props NavbarProps) templ.Component {
 		}
 		switch props.CurrentNav {
 		case "streams":
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li class=\"active\"><a><i class=\"left material-icons\">list</i> Streams</a></li><li><a href=\"/web/transformers\"><i class=\"left material-icons\">filter_alt</i> Transformers</a></li><li><a href=\"/web/pipelines\"><i class=\"left material-icons\">settings</i> Pipelines</a></li>")
+			if props.Permissions.CanViewStreams {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li class=\"active\"><a><i class=\"left material-icons\">list</i> Streams</a></li>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
+			}
+			if props.Permissions.CanViewTransformers {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a href=\"/web/transformers\"><i class=\"left material-icons\">filter_alt</i> Transformers</a></li>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if props.Permissions.CanViewPipelines {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a href=\"/web/pipelines\"><i class=\"left material-icons\">settings</i> Pipelines</a></li>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
 			}
 		case "transformers":
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a href=\"/web/streams\"><i class=\"left material-icons\">list</i> Streams</a></li><li class=\"active\"><a><i class=\"left material-icons\">filter_alt</i> Transformers</a></li><li><a href=\"/web/pipelines\"><i class=\"left material-icons\">settings</i> Pipelines</a></li>")
+			if props.Permissions.CanViewStreams {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a href=\"/web/streams\"><i class=\"left material-icons\">list</i> Streams</a></li>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
+			}
+			if props.Permissions.CanViewTransformers {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li class=\"active\"><a><i class=\"left material-icons\">filter_alt</i> Transformers</a></li>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if props.Permissions.CanViewPipelines {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a href=\"/web/pipelines\"><i class=\"left material-icons\">settings</i> Pipelines</a></li>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
 			}
 		case "pipelines":
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a href=\"/web/streams\"><i class=\"left material-icons\">list</i> Streams</a></li><li><a href=\"/web/transformers\"><i class=\"left material-icons\">filter_alt</i> Transformers</a></li><li class=\"active\"><a><i class=\"left material-icons\">settings</i> Pipelines</a></li>")
+			if props.Permissions.CanViewStreams {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a href=\"/web/streams\"><i class=\"left material-icons\">list</i> Streams</a></li>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
+			if props.Permissions.CanViewTransformers {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a href=\"/web/transformers\"><i class=\"left material-icons\">filter_alt</i> Transformers</a></li>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if props.Permissions.CanViewPipelines {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li class=\"active\"><a><i class=\"left material-icons\">settings</i> Pipelines</a></li>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
 		default:
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a href=\"/web/streams\"><i class=\"left material-icons\">list</i> Streams</a></li><li><a href=\"/web/transformers\"><i class=\"left material-icons\">filter_alt</i> Transformers</a></li><li><a href=\"/web/pipelines\"><i class=\"left material-icons\">settings</i> Pipelines</a></li>")
+			if props.Permissions.CanViewStreams {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a href=\"/web/streams\"><i class=\"left material-icons\">list</i> Streams</a></li>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if props.Permissions.CanViewTransformers {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a href=\"/web/transformers\"><i class=\"left material-icons\">filter_alt</i> Transformers</a></li>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if props.Permissions.CanViewPipelines {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a href=\"/web/pipelines\"><i class=\"left material-icons\">settings</i> Pipelines</a></li>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a href=\"/auth/logout\"><i class=\"left material-icons\">exit_to_app</i> Logout</a></li></ul></div></nav><div class=\"row w-full hide-on-large-only\"><div class=\"collection\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if props.Permissions.CanViewStreams {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"collection-item\" href=\"/web/streams\"><i class=\"left material-icons\">storage</i> Streams</a> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</ul></div></nav><div class=\"row hide-on-large-only\"><div class=\"collection\"><a class=\"collection-item\" href=\"/web/streams\"><i class=\"left material-icons\">storage</i> Streams</a> <a class=\"collection-item\" href=\"/web/transformers\"><i class=\"left material-icons\">filter_alt</i> Transformers</a> <a class=\"collection-item\" href=\"/web/pipelines\"><i class=\"left material-icons\">settings</i> Pipelines</a> <a class=\"collection-item\" href=\"https://github.com/link-society/flowg\" target=\"_blank\"><i class=\"left material-icons\">code</i> GitHub</a> <a class=\"collection-item\" href=\"/api/docs\" target=\"_blank\"><i class=\"left material-icons\">cloud</i> API Docs</a></div></div>")
+		if props.Permissions.CanViewTransformers {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"collection-item\" href=\"/web/transformers\"><i class=\"left material-icons\">filter_alt</i> Transformers</a> ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		if props.Permissions.CanViewPipelines {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"collection-item\" href=\"/web/pipelines\"><i class=\"left material-icons\">settings</i> Pipelines</a> ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"collection-item\" href=\"/auth/logout\"><i class=\"left material-icons\">exit_to_app</i> Logout</a> <a class=\"collection-item\" href=\"https://github.com/link-society/flowg\" target=\"_blank\"><i class=\"left material-icons\">code</i> GitHub</a> <a class=\"collection-item\" href=\"/api/docs\" target=\"_blank\"><i class=\"left material-icons\">cloud</i> API Docs</a></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

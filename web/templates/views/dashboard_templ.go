@@ -11,14 +11,17 @@ import templruntime "github.com/a-h/templ/runtime"
 import (
 	"fmt"
 
+	"link-society.com/flowg/internal/auth"
+
 	"link-society.com/flowg/web/templates/layouts"
 )
 
 type dashboardStatCardProps struct {
-	Icon  string
-	Name  string
-	Href  templ.SafeURL
-	Count int
+	Icon    string
+	Name    string
+	Href    templ.SafeURL
+	Count   int
+	CanView bool
 }
 
 func dashboardStatCard(props dashboardStatCardProps) templ.Component {
@@ -46,7 +49,7 @@ func dashboardStatCard(props dashboardStatCardProps) templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(props.Icon)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/dashboard.templ`, Line: 21, Col: 47}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/dashboard.templ`, Line: 24, Col: 47}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -59,7 +62,7 @@ func dashboardStatCard(props dashboardStatCardProps) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(props.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/dashboard.templ`, Line: 22, Col: 24}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/dashboard.templ`, Line: 25, Col: 24}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -72,22 +75,32 @@ func dashboardStatCard(props dashboardStatCardProps) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", props.Count))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/dashboard.templ`, Line: 26, Col: 41}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/views/dashboard.templ`, Line: 29, Col: 41}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div></main><footer class=\"card-action\"><a href=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div></main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var5 templ.SafeURL = props.Href
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var5)))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
+		if props.CanView {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<footer class=\"card-action\"><a href=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var5 templ.SafeURL = props.Href
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var5)))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\">View More &gt;&gt;</a></footer>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\">View More &gt;&gt;</a></footer></article>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</article>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -101,7 +114,11 @@ type DashboardProps struct {
 	PipelineCount    int
 }
 
-func Dashboard(props DashboardProps, notifications []string) templ.Component {
+func Dashboard(
+	props DashboardProps,
+	permissions auth.Permissions,
+	notifications []string,
+) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -136,10 +153,11 @@ func Dashboard(props DashboardProps, notifications []string) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			templ_7745c5c3_Err = dashboardStatCard(dashboardStatCardProps{
-				Icon:  "storage",
-				Name:  "Streams",
-				Href:  "/web/streams",
-				Count: props.StreamCount,
+				Icon:    "storage",
+				Name:    "Streams",
+				Href:    "/web/streams",
+				Count:   props.StreamCount,
+				CanView: permissions.CanViewStreams,
 			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -149,10 +167,11 @@ func Dashboard(props DashboardProps, notifications []string) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			templ_7745c5c3_Err = dashboardStatCard(dashboardStatCardProps{
-				Icon:  "filter_alt",
-				Name:  "Transformers",
-				Href:  "/web/transformers",
-				Count: props.TransformerCount,
+				Icon:    "filter_alt",
+				Name:    "Transformers",
+				Href:    "/web/transformers",
+				Count:   props.TransformerCount,
+				CanView: permissions.CanViewTransformers,
 			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -162,10 +181,11 @@ func Dashboard(props DashboardProps, notifications []string) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			templ_7745c5c3_Err = dashboardStatCard(dashboardStatCardProps{
-				Icon:  "settings",
-				Name:  "Pipelines",
-				Href:  "/web/pipelines",
-				Count: props.PipelineCount,
+				Icon:    "settings",
+				Name:    "Pipelines",
+				Href:    "/web/pipelines",
+				Count:   props.PipelineCount,
+				CanView: permissions.CanViewPipelines,
 			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -179,6 +199,7 @@ func Dashboard(props DashboardProps, notifications []string) templ.Component {
 		templ_7745c5c3_Err = layouts.App(layouts.AppProps{
 			Head:          nil,
 			CurrentNav:    "",
+			Permissions:   permissions,
 			Notifications: notifications,
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var7), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
