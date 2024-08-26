@@ -9,6 +9,9 @@ WORKDIR /workspace
 RUN task build
 
 FROM alpine:latest AS runner
+
+RUN apk add --no-cache libgcc
+
 COPY --from=builder /workspace/bin/ /usr/local/bin/
 
 ADD docker/docker-entrypoint.sh /docker-entrypoint.sh
