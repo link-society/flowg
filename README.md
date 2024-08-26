@@ -80,15 +80,35 @@ Those points will be improved on given enough time.
  - Rust and Cargo (edition 2021)
  - NodeJS
 
-```
-$ go install github.com/go-task/task/v3/cmd/task@latest
-$ task build
+```bash
+go install github.com/go-task/task/v3/cmd/task@latest
+task build
 ```
 
-Then run:
+Then, create a superuser:
 
+```bash
+./bin/flowg admin create role \
+  --auth-dir ./data/auth \
+  --name admin \
+  write_streams \
+  write_transformers \
+  write_pipelines \
+  create_users \
+  send_logs
+
+./bin/flowg admin create user \
+  --auth-dir ./data/auth \
+  --name root \
+  --password root \
+  admin
 ```
-$ ./bin/flowg serve \
+
+Finally, start the server with:
+
+```bash
+./bin/flowg serve \
+  --auth-dir ./data/auth \
   --log-dir ./data/logs \
   --config-dir ./data/config  \
   --bind 127.0.0.1:5080
@@ -101,16 +121,33 @@ Then you can access:
 
 ## :whale: Build the Docker Image
 
-```
-$ task docker:build
+```bash
+task docker:build
 ```
 
 This will build `linksociety/flowg:latest` locally.
 
-Then run with:
+Then, create a superuser:
 
+```bash
+docker run --rm -it -v flowg-data:/data linksociety/flowg:latest admin create role \
+  --name admin \
+  write_streams \
+  write_transformers \
+  write_pipelines \
+  create_users \
+  send_logs
+
+docker run --rm -it -v flowg-data:/data linksociety/flowg:latest admin create user \
+  --name root \
+  --password root \
+  admin
 ```
-$ docker run -p 5080:5080 -v ./data:/data linksociety/flowg:latest
+
+Finally, start the server with:
+
+```bash
+docker run -p 5080:5080 -v flowg-data:/data linksociety/flowg:latest
 ```
 
 ## :memo: License
