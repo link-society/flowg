@@ -42,7 +42,7 @@ func dashboardStatCard(props dashboardStatCardProps) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<article class=\"card hoverable grey lighten-3\"><main class=\"card-content black-text\"><div class=\"w-full\"><div class=\"flex flex-row items-center justify-center gap-1\"><i class=\"material-icons\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<article class=\"card hoverable grey lighten-3 flex flex-col h-full\"><main class=\"card-content black-text flex-grow\"><div class=\"w-full\"><div class=\"flex flex-row items-center justify-center gap-1\"><i class=\"material-icons\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -148,7 +148,7 @@ func Dashboard(
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"container\"><section class=\"row section\"><div class=\"col s12 m4\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"container\"><section class=\"row section flex flex-row items-stretch\"><div class=\"col s12 m4\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
