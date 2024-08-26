@@ -19,3 +19,4 @@ requiring predefined schemas and relies on
 ## Design
 
  - [How Logs Are Stored?](./design/storage.md)
+ - [How Authentication Works?](./design/auth.md)
