@@ -20,7 +20,7 @@ func NewAdminRoleCreateCommand() *cobra.Command {
 	opts := &adminRoleCreateOpts{}
 
 	cmd := &cobra.Command{
-		Use:   "create",
+		Use:   "create [flags] [...scopes]",
 		Short: "Create a new role",
 		Run: func(cmd *cobra.Command, args []string) {
 			role := auth.Role{

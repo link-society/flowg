@@ -21,7 +21,7 @@ func NewAdminUserCreateCommand() *cobra.Command {
 	opts := &adminUserCreateOpts{}
 
 	cmd := &cobra.Command{
-		Use:   "create",
+		Use:   "create [flags] [...roles]",
 		Short: "Create a new user",
 		Run: func(cmd *cobra.Command, args []string) {
 			user := auth.User{
