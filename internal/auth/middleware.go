@@ -93,7 +93,7 @@ func RequireScopeApiMiddleware[Req any, Resp any](
 	next func(context.Context, Req, *Resp) error,
 ) func(context.Context, Req, *Resp) error {
 	return func(ctx context.Context, req Req, resp *Resp) error {
-		user := ctx.Value(CONTEXT_USERNAME).(string)
+		user := GetContextUser(ctx)
 		authorized, err := db.VerifyUserPermission(
 			user,
 			scope,
