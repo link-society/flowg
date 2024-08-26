@@ -78,7 +78,7 @@ Use "flowg admin role [command] --help" for more information about a command.
 Create a new role
 
 Usage:
-  flowg admin role create [flags]
+  flowg admin role create [flags] [...scopes]
 
 Flags:
       --auth-dir string   Path to the log database directory (default "./data/auth")
@@ -138,7 +138,7 @@ Use "flowg admin user [command] --help" for more information about a command.
 Create a new user
 
 Usage:
-  flowg admin user create [flags]
+  flowg admin user create [flags] [...roles]
 
 Flags:
       --auth-dir string   Path to the log database directory (default "./data/auth")
