@@ -217,7 +217,7 @@ type PipelinesProps struct {
 }
 
 templ Pipelines(props PipelinesProps, notifications []string) {
-  @layouts.Base(layouts.BaseProps{
+  @layouts.App(layouts.AppProps{
     Head: pipelineHead(),
     CurrentNav: "pipelines",
     Notifications: notifications,

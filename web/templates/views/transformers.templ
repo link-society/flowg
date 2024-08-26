@@ -167,7 +167,7 @@ type TransformersProps struct {
 }
 
 templ Transformers(props TransformersProps, notifications []string) {
-  @layouts.Base(layouts.BaseProps{
+  @layouts.App(layouts.AppProps{
     Head: transformerHead(),
     CurrentNav: "transformers",
     Notifications: notifications,

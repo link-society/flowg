@@ -92,10 +92,11 @@ func NewServeCommand() *cobra.Command {
 			pipelinesManager := pipelines.NewManager(logDb, opts.configDir)
 
 			apiHandler := api.NewHandler(authDb, logDb, pipelinesManager)
-			webHandler := web.NewHandler(logDb, pipelinesManager)
+			webHandler := web.NewHandler(authDb, logDb, pipelinesManager)
 
 			rootHandler := http.NewServeMux()
 			rootHandler.Handle("/api/", apiHandler)
+			rootHandler.Handle("/auth/", webHandler)
 			rootHandler.Handle("/web/", webHandler)
 			rootHandler.Handle("/static/", webHandler)
 
