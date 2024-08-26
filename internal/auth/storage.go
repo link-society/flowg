@@ -194,9 +194,20 @@ func (d *Database) ListUsers() ([]string, error) {
 }
 
 func (d *Database) GetUser(name string) (*User, error) {
-	user := &User{Name: name}
+	var user *User = nil
 
 	err := d.db.View(func(txn *badger.Txn) error {
+		_, err := txn.Get([]byte(fmt.Sprintf("index:user:%s", name)))
+		if err != nil {
+			if err == badger.ErrKeyNotFound {
+				return nil
+			}
+
+			return &QueryError{Operation: "get-user-index", Reason: err}
+		}
+
+		user = &User{Name: name}
+
 		opts := badger.DefaultIteratorOptions
 		opts.PrefetchValues = false
 		opts.Prefix = []byte(fmt.Sprintf("user:%s:role:", name))
@@ -334,7 +345,10 @@ func (d *Database) VerifyUserPassword(name, password string) (bool, error) {
 		err = item.Value(func(val []byte) error {
 			passwordHash := string(val)
 			isValid, err = hash.VerifyPassword(password, passwordHash)
-			return &QueryError{Operation: "verify-user-password", Reason: err}
+			if err != nil {
+				return &QueryError{Operation: "verify-user-password", Reason: err}
+			}
+			return nil
 		})
 		if err != nil {
 			return err
