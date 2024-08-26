@@ -1,0 +1,21 @@
+package layouts
+
+import "link-society.com/flowg/web/templates/components"
+
+type AppProps struct {
+  Head templ.Component
+  CurrentNav string
+  Notifications []string
+}
+
+templ App(props AppProps) {
+  @Base(BaseProps{Head: props.Head, Notifications: props.Notifications}) {
+    @components.Navbar(components.NavbarProps{CurrentNav: props.CurrentNav})
+
+    <main class="flex-grow">
+      { children... }
+    </main>
+
+    @components.Footer()
+  }
+}

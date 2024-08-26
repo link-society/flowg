@@ -40,7 +40,7 @@ type DashboardProps struct {
 }
 
 templ Dashboard(props DashboardProps, notifications []string) {
-  @layouts.Base(layouts.BaseProps{
+  @layouts.App(layouts.AppProps{
     Head: nil,
     CurrentNav: "",
     Notifications: notifications,

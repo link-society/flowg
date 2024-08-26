@@ -5,6 +5,7 @@ import (
 
 	"net/http"
 
+	"link-society.com/flowg/internal/auth"
 	"link-society.com/flowg/internal/logstorage"
 	"link-society.com/flowg/internal/pipelines"
 
@@ -19,16 +20,33 @@ var staticfiles embed.FS
 //go:generate templ generate
 
 func NewHandler(
+	authDb *auth.Database,
 	logDb *logstorage.Storage,
 	pipelinesManager *pipelines.Manager,
 ) http.Handler {
 	mux := http.NewServeMux()
 	mux.Handle("GET /static/", http.FileServer(http.FS(staticfiles)))
 
-	mux.Handle("/web/", controllers.MainController(logDb, pipelinesManager))
-	mux.Handle("/web/streams/", controllers.StreamController(logDb))
-	mux.Handle("/web/transformers/", controllers.TransformersController(pipelinesManager))
-	mux.Handle("/web/pipelines/", controllers.PipelinesController(pipelinesManager))
+	mux.Handle("/auth/", controllers.AuthController(authDb))
+
+	authMiddleware := auth.WebMiddleware(authDb)
+
+	mux.Handle(
+		"/web/",
+		authMiddleware(controllers.MainController(logDb, pipelinesManager)),
+	)
+	mux.Handle(
+		"/web/streams/",
+		authMiddleware(controllers.StreamController(logDb)),
+	)
+	mux.Handle(
+		"/web/transformers/",
+		authMiddleware(controllers.TransformersController(pipelinesManager)),
+	)
+	mux.Handle(
+		"/web/pipelines/",
+		authMiddleware(controllers.PipelinesController(pipelinesManager)),
+	)
 
 	return mux
 }

@@ -176,7 +176,7 @@ func Dashboard(props DashboardProps, notifications []string) templ.Component {
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = layouts.Base(layouts.BaseProps{
+		templ_7745c5c3_Err = layouts.App(layouts.AppProps{
 			Head:          nil,
 			CurrentNav:    "",
 			Notifications: notifications,

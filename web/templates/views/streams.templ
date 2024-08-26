@@ -175,7 +175,7 @@ type StreamsProps struct {
 }
 
 templ Streams(props StreamsProps, notifications []string) {
-  @layouts.Base(layouts.BaseProps{
+  @layouts.App(layouts.AppProps{
     Head: streamHead(),
     CurrentNav: "streams",
     Notifications: notifications,

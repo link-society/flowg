@@ -298,7 +298,7 @@ func Transformers(props TransformersProps, notifications []string) templ.Compone
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = layouts.Base(layouts.BaseProps{
+		templ_7745c5c3_Err = layouts.App(layouts.AppProps{
 			Head:          transformerHead(),
 			CurrentNav:    "transformers",
 			Notifications: notifications,
