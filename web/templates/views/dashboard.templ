@@ -17,8 +17,8 @@ type dashboardStatCardProps struct {
 }
 
 templ dashboardStatCard(props dashboardStatCardProps) {
-  <article class="card hoverable grey lighten-3">
-    <main class="card-content black-text">
+  <article class="card hoverable grey lighten-3 flex flex-col h-full">
+    <main class="card-content black-text flex-grow">
       <div class="w-full">
         <div class="flex flex-row items-center justify-center gap-1">
           <i class="material-icons">{props.Icon}</i>
@@ -56,7 +56,7 @@ templ Dashboard(
     Notifications: notifications,
   }) {
     <div class="container">
-      <section class="row section">
+      <section class="row section flex flex-row items-stretch">
         <div class="col s12 m4">
           @dashboardStatCard(dashboardStatCardProps{
             Icon:    "storage",
