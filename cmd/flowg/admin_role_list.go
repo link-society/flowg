@@ -75,7 +75,7 @@ func NewAdminRoleListCommand() *cobra.Command {
 	cmd.Flags().StringVar(
 		&opts.authDir,
 		"auth-dir",
-		"./data/auth",
+		defaultAuthDir,
 		"Path to the log database directory",
 	)
 	cmd.MarkFlagDirname("auth-dir")

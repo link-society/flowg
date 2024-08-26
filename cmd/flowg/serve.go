@@ -152,21 +152,21 @@ func NewServeCommand() *cobra.Command {
 	cmd.Flags().StringVar(
 		&opts.bindAddress,
 		"bind",
-		":5080",
+		defaultBindAddress,
 		"Address to bind the server to",
 	)
 
 	cmd.Flags().StringVar(
 		&opts.authDir,
 		"auth-dir",
-		"./data/auth",
+		defaultAuthDir,
 		"Path to the auth database directory",
 	)
 
 	cmd.Flags().StringVar(
 		&opts.logDir,
 		"log-dir",
-		"./data/logs",
+		defaultLogDir,
 		"Path to the log database directory",
 	)
 	cmd.MarkFlagDirname("log-dir")
@@ -174,7 +174,7 @@ func NewServeCommand() *cobra.Command {
 	cmd.Flags().StringVar(
 		&opts.configDir,
 		"config-dir",
-		"./data/config",
+		defaultConfigDir,
 		"Path to the config directory",
 	)
 	cmd.MarkFlagDirname("config-dir")
