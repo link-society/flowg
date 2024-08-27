@@ -412,6 +412,10 @@ func (d *Database) VerifyUserPermission(name string, scope Scope) (bool, error) 
 				case scope == SCOPE_READ_STREAMS && roleScope == SCOPE_WRITE_STREAMS:
 					hasPermission = true
 					return nil
+
+				case scope == SCOPE_READ_ACLS && roleScope == SCOPE_WRITE_ACLS:
+					hasPermission = true
+					return nil
 				}
 			}
 		}
@@ -543,6 +547,10 @@ func (d *Database) ListUserScopes(username string) ([]Scope, error) {
 				case SCOPE_WRITE_STREAMS:
 					scopeMap[SCOPE_READ_STREAMS] = struct{}{}
 					scopeMap[SCOPE_WRITE_STREAMS] = struct{}{}
+
+				case SCOPE_WRITE_ACLS:
+					scopeMap[SCOPE_READ_ACLS] = struct{}{}
+					scopeMap[SCOPE_WRITE_ACLS] = struct{}{}
 
 				default:
 					scopeMap[roleScope] = struct{}{}
