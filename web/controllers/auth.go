@@ -45,7 +45,7 @@ func AuthController(authDb *auth.Database) http.Handler {
 				"error", err.Error(),
 			)
 
-			notifications = append(notifications, "❌ Invalid form data")
+			notifications = append(notifications, "&#10060; Invalid form data")
 		} else {
 			username := r.FormValue("username")
 			password := r.FormValue("password")
@@ -59,9 +59,9 @@ func AuthController(authDb *auth.Database) http.Handler {
 					"error", err.Error(),
 				)
 
-				notifications = append(notifications, "❌ Invalid credentials")
+				notifications = append(notifications, "&#10060; Invalid credentials")
 			} else if user == nil {
-				notifications = append(notifications, "❌ Invalid credentials")
+				notifications = append(notifications, "&#10060; Invalid credentials")
 			} else {
 				valid, err := authDb.VerifyUserPassword(username, password)
 				if err != nil {
@@ -72,9 +72,9 @@ func AuthController(authDb *auth.Database) http.Handler {
 						"error", err.Error(),
 					)
 
-					notifications = append(notifications, "❌ Invalid credentials")
+					notifications = append(notifications, "&#10060; Invalid credentials")
 				} else if !valid {
-					notifications = append(notifications, "❌ Invalid credentials")
+					notifications = append(notifications, "&#10060; Invalid credentials")
 				} else {
 					cookie := &http.Cookie{
 						Name:     "session_id",

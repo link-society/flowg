@@ -21,7 +21,7 @@ templ transformerHead(permissions auth.Permissions) {
 
         action_save.addEventListener('click', () => {
           if (data_transformer_name.value === '') {
-            M.toast({ html: '❌ Please provide a transformer name' })
+            M.toast({ html: '&#10060; Please provide a transformer name' })
             data_transformer_name.classList.add('invalid')
           } else {
             const form = document.createElement('form')

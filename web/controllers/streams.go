@@ -39,7 +39,7 @@ func StreamController(
 				"error", err.Error(),
 			)
 
-			notifications = append(notifications, "❌ Could not fetch user permissions")
+			notifications = append(notifications, "&#10060; Could not fetch user permissions")
 		} else {
 			permissions = auth.PermissionsFromScopes(scopes)
 		}
@@ -58,7 +58,7 @@ func StreamController(
 			)
 
 			streams = []string{}
-			notifications = append(notifications, "❌ Could not fetch streams")
+			notifications = append(notifications, "&#10060; Could not fetch streams")
 		}
 
 		if len(streams) > 0 {
@@ -93,7 +93,7 @@ func StreamController(
 				"error", err.Error(),
 			)
 
-			notifications = append(notifications, "❌ Could not fetch user permissions")
+			notifications = append(notifications, "&#10060; Could not fetch user permissions")
 		} else {
 			permissions = auth.PermissionsFromScopes(scopes)
 		}
@@ -114,7 +114,7 @@ func StreamController(
 			)
 
 			streams = []string{}
-			notifications = append(notifications, "❌ Could not fetch streams")
+			notifications = append(notifications, "&#10060; Could not fetch streams")
 		}
 
 		stream := r.PathValue("name")
@@ -129,7 +129,7 @@ func StreamController(
 			)
 
 			fields = []string{}
-			notifications = append(notifications, "❌ Could not fetch fields")
+			notifications = append(notifications, "&#10060; Could not fetch fields")
 		}
 
 		// parse filter values in querystring
@@ -151,7 +151,7 @@ func StreamController(
 					"to", toRaw,
 					"error", err.Error(),
 				)
-				notifications = append(notifications, "❌ Invalid 'to' time")
+				notifications = append(notifications, "&#10060; Invalid 'to' time")
 			}
 		} else {
 			naiveTo = time.Now()
@@ -170,7 +170,7 @@ func StreamController(
 					"from", fromRaw,
 					"error", err.Error(),
 				)
-				notifications = append(notifications, "❌ Invalid 'from' time")
+				notifications = append(notifications, "&#10060; Invalid 'from' time")
 			}
 		} else {
 			naiveFrom = naiveTo.Add(-5 * time.Minute)
@@ -189,7 +189,7 @@ func StreamController(
 					"timeoffset", timeOffsetRaw,
 					"error", err.Error(),
 				)
-				notifications = append(notifications, "❌ Invalid 'timeoffset'")
+				notifications = append(notifications, "&#10060; Invalid 'timeoffset'")
 			}
 		} else {
 			timeOffset = 0
@@ -209,7 +209,7 @@ func StreamController(
 					"filter", filterSource,
 					"error", err.Error(),
 				)
-				notifications = append(notifications, "❌ Invalid filter")
+				notifications = append(notifications, "&#10060; Invalid filter")
 			}
 		} else {
 			filter = nil
@@ -232,7 +232,7 @@ func StreamController(
 				"error", err.Error(),
 			)
 			logs = []logstorage.LogEntry{}
-			notifications = append(notifications, "❌ Could not fetch logs")
+			notifications = append(notifications, "&#10060; Could not fetch logs")
 		}
 
 		// aggregate for histogram
@@ -272,7 +272,7 @@ func StreamController(
 			)
 
 			histogramData = []byte("[]")
-			notifications = append(notifications, "❌ Could not fetch histogram data")
+			notifications = append(notifications, "&#10060; Could not fetch histogram data")
 		}
 
 		// render

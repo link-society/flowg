@@ -39,7 +39,7 @@ func MainController(
 				"error", err.Error(),
 			)
 
-			notifications = append(notifications, "❌ Could not fetch user permissions")
+			notifications = append(notifications, "&#10060; Could not fetch user permissions")
 		} else {
 			permissions = auth.PermissionsFromScopes(scopes)
 		}
@@ -54,7 +54,7 @@ func MainController(
 				"channel", "web",
 				"error", err.Error(),
 			)
-			notifications = append(notifications, "❌ Could not fetch streams")
+			notifications = append(notifications, "&#10060; Could not fetch streams")
 		}
 
 		transformerList, err := pipelinesManager.ListTransformers()
@@ -67,7 +67,7 @@ func MainController(
 				"channel", "web",
 				"error", err.Error(),
 			)
-			notifications = append(notifications, "❌ Could not fetch transformers")
+			notifications = append(notifications, "&#10060; Could not fetch transformers")
 		}
 
 		pipelineList, err := pipelinesManager.ListPipelines()
@@ -80,7 +80,7 @@ func MainController(
 				"channel", "web",
 				"error", err.Error(),
 			)
-			notifications = append(notifications, "❌ Could not fetch pipelines")
+			notifications = append(notifications, "&#10060; Could not fetch pipelines")
 		}
 
 		h := templ.Handler(views.Dashboard(
