@@ -334,7 +334,6 @@ func TransformersController(
 		transformerName := r.PathValue("name")
 
 		permissions := auth.Permissions{}
-		notifications := []string{}
 
 		user := auth.GetContextUser(r.Context())
 		scopes, err := authDb.ListUserScopes(user)
@@ -345,8 +344,6 @@ func TransformersController(
 				"channel", "web",
 				"error", err.Error(),
 			)
-
-			notifications = append(notifications, "❌ Could not fetch user permissions")
 		} else {
 			permissions = auth.PermissionsFromScopes(scopes)
 		}
