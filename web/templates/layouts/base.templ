@@ -22,9 +22,9 @@ templ Base(props BaseProps) {
       <script type="application/javascript" src="/static/js/htmx.min.js"></script>
 
       <script type="application/javascript">
-        document.addEventListener('htmx:load', function() {
-          M.AutoInit();
-        });
+        document.addEventListener('htmx:load', (event) => {
+          M.AutoInit(event.detail.elt)
+        })
       </script>
 
       if props.Notifications != nil {
@@ -41,10 +41,10 @@ templ Base(props BaseProps) {
                   M.toast({
                     html: S.dataset.message,
                     completeCallback: () => S.remove(),
-                  });
-                }, 1000);
-              });
-            })();
+                  })
+                }, 1000)
+              })
+            })()
           </script>
         }
       }
@@ -55,6 +55,32 @@ templ Base(props BaseProps) {
     </head>
     <body class="blue-grey lighten-4 flex flex-col h-maxvh overflow-hidden">
       { children... }
+
+      <div id="modal" class="modal">
+        <div class="modal-content" id="modal-content">
+          <h5>hello</h5>
+        </div>
+      </div>
+
+      <script type="application/javascript">
+        document.body.addEventListener('htmx-custom-modal-open', () => {
+          const modalElement  = document.getElementById('modal')
+          const modalInstance = M.Modal.getInstance(modalElement)
+          modalInstance.open()
+        })
+
+        document.body.addEventListener('htmx-custom-modal-close', () => {
+          const modalElement  = document.getElementById('modal')
+          const modalInstance = M.Modal.getInstance(modalElement)
+          modalInstance.close()
+        })
+
+        document.body.addEventListener('htmx-custom-toast', (event) => {
+          for (const msg of event.detail.messages) {
+            M.toast({ html: msg })
+          }
+        })
+      </script>
     </body>
   </html>
 }

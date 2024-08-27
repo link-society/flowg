@@ -47,6 +47,10 @@ func NewHandler(
 		"/web/pipelines/",
 		authMiddleware(controllers.PipelinesController(authDb, pipelinesManager)),
 	)
+	mux.Handle(
+		"/web/admin/",
+		authMiddleware(controllers.AdminController(authDb)),
+	)
 
 	return mux
 }

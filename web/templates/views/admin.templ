@@ -1,0 +1,163 @@
+package views
+
+import (
+	"link-society.com/flowg/internal/auth"
+
+  "link-society.com/flowg/web/templates/layouts"
+)
+
+templ adminRoleList(roles []auth.Role, permissions auth.Permissions) {
+  <div class="col s12 m6 h-full">
+    <article class="card h-full flex flex-col p-0">
+      <section class="card-content p-0 h-0 flex-grow flex-shrink flex flex-col">
+        <header
+          class="
+            flex flex-row items-center
+            p-3
+            blue lighten-2
+            white-text
+          "
+        >
+          <p class="card-title flex-grow mb-0 font-semibold">Roles</p>
+          if permissions.CanEditACLs {
+            <button
+              class="waves-effect waves-light btn-small"
+              hx-get="/web/admin/roles/new"
+              hx-target="#modal-content"
+            >
+              <i class="material-icons left">add</i>
+              Add Role
+            </button>
+          }
+        </header>
+
+        <main class="flex-grow flex-shrink h-0 overflow-auto">
+          <table class="w-full table-responsive acl highlight">
+            <thead class="grey lighten-2 z-depth-1">
+              <tr>
+                <th>Name</th>
+                <th>Permissions</th>
+                if permissions.CanEditACLs {
+                  <th>Actions</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              for _, role := range roles {
+                <tr>
+                  <td>{role.Name}</td>
+                  <td>
+                    <div class="w-full flex flex-row gap-2 py-1 items-center justify-start">
+                      for _, perm := range role.Scopes {
+                        <span class="grey lighten-2 z-depth-1 px-2 py-1">
+                          {string(perm)}
+                        </span>
+                      }
+                    </div>
+                  </td>
+                  if permissions.CanEditACLs {
+                    <td>
+                      <button
+                        class="waves-effect waves-light btn-small red"
+                        hx-get={"/web/admin/roles/delete/"+role.Name+"/"}
+                      >
+                        <i class="material-icons">delete</i>
+                      </button>
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </main>
+      </section>
+    </article>
+  </div>
+}
+
+templ adminUserList(users []*auth.User, permissions auth.Permissions) {
+  <div class="col s12 m6 h-full">
+    <article class="card h-full flex flex-col p-0">
+      <section class="card-content p-0 h-0 flex-grow flex-shrink flex flex-col">
+        <header
+          class="
+            flex flex-row items-center
+            p-3
+            blue lighten-2
+            white-text
+          "
+        >
+          <p class="card-title flex-grow mb-0 font-semibold">Users</p>
+          if permissions.CanEditACLs {
+            <button class="waves-effect waves-light btn-small">
+              <i class="material-icons left">add</i>
+              Add User
+            </button>
+          }
+        </header>
+
+        <main class="flex-grow flex-shrink h-0 overflow-auto">
+          <table class="w-full table-responsive acl highlight">
+            <thead class="grey lighten-2 z-depth-1">
+              <tr>
+                <th>Name</th>
+                <th>Roles</th>
+                if permissions.CanEditACLs {
+                  <th>Actions</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              for _, user := range users {
+                <tr>
+                  <td>{user.Name}</td>
+                  <td>
+                    <div class="w-full flex flex-row gap-2 py-1 items-center justify-start">
+                      for _, role := range user.Roles {
+                        <span class="grey lighten-2 z-depth-1 px-2 py-1">
+                          {role}
+                        </span>
+                      }
+                    </div>
+                  </td>
+                  if permissions.CanEditACLs {
+                    <td>
+                      <button class="waves-effect waves-light btn-small red">
+                        <i class="material-icons">delete</i>
+                      </button>
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </main>
+      </section>
+    </article>
+  </div>
+}
+
+type AdminProps struct {
+  Roles []auth.Role
+  Users []*auth.User
+}
+
+templ Admin(
+  props         AdminProps,
+  permissions   auth.Permissions,
+  notifications []string,
+) {
+  @layouts.App(layouts.AppProps{
+    Head:          nil,
+    CurrentNav:    "admin",
+    Permissions:   permissions,
+    Notifications: notifications,
+  }) {
+    <div class="w-full h-full flex flex-col">
+      <section class="row section w-full mb-0 flex-grow">
+        @adminRoleList(props.Roles, permissions)
+        @adminUserList(props.Users, permissions)
+      </section>
+    </div>
+  }
+}
