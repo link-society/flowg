@@ -135,7 +135,7 @@ docker run --rm -it -v flowg-data:/data linksociety/flowg:latest admin create ro
   write_streams \
   write_transformers \
   write_pipelines \
-  create_users \
+  write_acls \
   send_logs
 
 docker run --rm -it -v flowg-data:/data linksociety/flowg:latest admin create user \
