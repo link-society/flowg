@@ -171,7 +171,7 @@ func Navbar(props NavbarProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		if props.Permissions.CanCreateUsers {
+		if props.Permissions.CanViewACLs {
 			templ_7745c5c3_Err = navbarItem(navbarItemProps{
 				Icon:   "dashboard",
 				Label:  "Admin",
@@ -222,7 +222,7 @@ func Navbar(props NavbarProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		if props.Permissions.CanCreateUsers {
+		if props.Permissions.CanViewACLs {
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"collection-item\" href=\"/web/admin\"><i class=\"left material-icons\">dashboard</i> Admin</a> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err

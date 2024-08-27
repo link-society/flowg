@@ -79,7 +79,7 @@ templ Navbar(props NavbarProps) {
             Active: props.CurrentNav == "pipelines",
           })
         }
-        if props.Permissions.CanCreateUsers {
+        if props.Permissions.CanViewACLs {
           @navbarItem(navbarItemProps{
             Icon:   "dashboard",
             Label:  "Admin",
@@ -123,7 +123,7 @@ templ Navbar(props NavbarProps) {
           Pipelines
         </a>
       }
-      if props.Permissions.CanCreateUsers {
+      if props.Permissions.CanViewACLs {
         <a class="collection-item" href="/web/admin">
           <i class="left material-icons">dashboard</i>
           Admin
