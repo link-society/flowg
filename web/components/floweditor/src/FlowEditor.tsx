@@ -64,7 +64,21 @@ const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange, eventTarget
       const initialNodes = flowData.nodes ?? [defaultSourceNode]
       const initialEdges = flowData.edges ?? []
 
-      setNodes(initialNodes)
+      setNodes((oldNodes) => {
+        const oldNodesById = oldNodes.reduce((acc, node) => {
+          acc[node.id] = node
+          return acc
+        }, {} as { [key: string]: Node })
+
+        return initialNodes.map((node: Node) => {
+          const oldNode = oldNodesById[node.id]
+          if (oldNode !== undefined && oldNode.measured) {
+            node.measured = oldNode.measured
+          }
+
+          return node
+        })
+      })
       setEdges(initialEdges)
     },
     [flow],
