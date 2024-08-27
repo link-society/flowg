@@ -30,7 +30,7 @@ templ pipelineHead(permissions auth.Permissions) {
 
         action_save.addEventListener('click', () => {
           if (data_pipeline_name.value === '') {
-            M.toast({ html: '❌ Please provide a pipeline name' })
+            M.toast({ html: '&#10060; Please provide a pipeline name' })
             data_pipeline_name.classList.add('invalid')
           } else {
             const form = document.createElement('form')

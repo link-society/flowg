@@ -37,7 +37,7 @@ func PipelinesController(
 				"error", err.Error(),
 			)
 
-			notifications = append(notifications, "❌ Could not fetch user permissions")
+			notifications = append(notifications, "&#10060; Could not fetch user permissions")
 		} else {
 			permissions = auth.PermissionsFromScopes(scopes)
 		}
@@ -57,7 +57,7 @@ func PipelinesController(
 			)
 
 			pipelines = []string{}
-			notifications = append(notifications, "❌ Could not fetch pipelines")
+			notifications = append(notifications, "&#10060; Could not fetch pipelines")
 		}
 
 		h := templ.Handler(views.Pipelines(
@@ -86,7 +86,7 @@ func PipelinesController(
 				"error", err.Error(),
 			)
 
-			notifications = append(notifications, "❌ Could not fetch user permissions")
+			notifications = append(notifications, "&#10060; Could not fetch user permissions")
 		} else {
 			permissions = auth.PermissionsFromScopes(scopes)
 		}
@@ -108,18 +108,18 @@ func PipelinesController(
 				"error", err.Error(),
 			)
 
-			notifications = append(notifications, "❌ Could not parse form")
+			notifications = append(notifications, "&#10060; Could not parse form")
 		} else {
 			pipelineName = r.FormValue("name")
 			pipelineFlow = r.FormValue("flow")
 
 			if permissions.CanEditPipelines {
 				if pipelineName == "" {
-					notifications = append(notifications, "❌ Pipeline name is required")
+					notifications = append(notifications, "&#10060; Pipeline name is required")
 				}
 
 				if pipelineFlow == "" {
-					notifications = append(notifications, "❌ Pipeline flow is required")
+					notifications = append(notifications, "&#10060; Pipeline flow is required")
 				}
 
 				if pipelineName != "" && pipelineFlow != "" {
@@ -132,9 +132,9 @@ func PipelinesController(
 							"error", err.Error(),
 						)
 
-						notifications = append(notifications, "❌ Could not save pipeline")
+						notifications = append(notifications, "&#10060; Could not save pipeline")
 					} else {
-						notifications = append(notifications, "✅ Pipeline saved")
+						notifications = append(notifications, "&#9989; Pipeline saved")
 					}
 				}
 			}
@@ -150,7 +150,7 @@ func PipelinesController(
 			)
 
 			pipelines = []string{}
-			notifications = append(notifications, "❌ Could not fetch pipelines")
+			notifications = append(notifications, "&#10060; Could not fetch pipelines")
 		}
 
 		h := templ.Handler(views.Pipelines(
@@ -192,7 +192,7 @@ func PipelinesController(
 				"error", err.Error(),
 			)
 
-			notifications = append(notifications, "❌ Could not fetch user permissions")
+			notifications = append(notifications, "&#10060; Could not fetch user permissions")
 		} else {
 			permissions = auth.PermissionsFromScopes(scopes)
 		}
@@ -212,7 +212,7 @@ func PipelinesController(
 			)
 
 			pipelines = []string{}
-			notifications = append(notifications, "❌ Could not fetch pipelines")
+			notifications = append(notifications, "&#10060; Could not fetch pipelines")
 		}
 
 		h := templ.Handler(views.Pipelines(
@@ -254,7 +254,7 @@ func PipelinesController(
 				"error", err.Error(),
 			)
 
-			notifications = append(notifications, "❌ Could not fetch user permissions")
+			notifications = append(notifications, "&#10060; Could not fetch user permissions")
 		} else {
 			permissions = auth.PermissionsFromScopes(scopes)
 		}
@@ -273,18 +273,18 @@ func PipelinesController(
 				"error", err.Error(),
 			)
 
-			notifications = append(notifications, "❌ Could not parse form")
+			notifications = append(notifications, "&#10060; Could not parse form")
 		} else {
 			pipelineName = r.FormValue("name")
 			pipelineFlow = r.FormValue("flow")
 
 			if !permissions.CanEditPipelines {
 				if pipelineName == "" {
-					notifications = append(notifications, "❌ Pipeline name is required")
+					notifications = append(notifications, "&#10060; Pipeline name is required")
 				}
 
 				if pipelineFlow == "" {
-					notifications = append(notifications, "❌ Pipeline flow is required")
+					notifications = append(notifications, "&#10060; Pipeline flow is required")
 				}
 
 				if pipelineName != "" && pipelineFlow != "" {
@@ -297,9 +297,9 @@ func PipelinesController(
 							"error", err.Error(),
 						)
 
-						notifications = append(notifications, "❌ Could not save pipeline")
+						notifications = append(notifications, "&#10060; Could not save pipeline")
 					} else {
-						notifications = append(notifications, "✅ Pipeline saved")
+						notifications = append(notifications, "&#9989; Pipeline saved")
 					}
 				}
 			}
@@ -315,7 +315,7 @@ func PipelinesController(
 			)
 
 			pipelines = []string{}
-			notifications = append(notifications, "❌ Could not fetch pipelines")
+			notifications = append(notifications, "&#10060; Could not fetch pipelines")
 		}
 
 		h := templ.Handler(views.Pipelines(

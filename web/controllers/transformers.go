@@ -37,7 +37,7 @@ func TransformersController(
 				"error", err.Error(),
 			)
 
-			notifications = append(notifications, "❌ Could not fetch user permissions")
+			notifications = append(notifications, "&#10060; Could not fetch user permissions")
 		} else {
 			permissions = auth.PermissionsFromScopes(scopes)
 		}
@@ -57,7 +57,7 @@ func TransformersController(
 			)
 
 			transformers = []string{}
-			notifications = append(notifications, "❌ Could not fetch transformers")
+			notifications = append(notifications, "&#10060; Could not fetch transformers")
 		}
 
 		h := templ.Handler(views.Transformers(
@@ -86,7 +86,7 @@ func TransformersController(
 				"error", err.Error(),
 			)
 
-			notifications = append(notifications, "❌ Could not fetch user permissions")
+			notifications = append(notifications, "&#10060; Could not fetch user permissions")
 		} else {
 			permissions = auth.PermissionsFromScopes(scopes)
 		}
@@ -108,18 +108,18 @@ func TransformersController(
 				"error", err.Error(),
 			)
 
-			notifications = append(notifications, "❌ Could not parse form")
+			notifications = append(notifications, "&#10060; Could not parse form")
 		} else {
 			transformerName = r.FormValue("name")
 			transformerCode = r.FormValue("code")
 
 			if permissions.CanEditTransformers {
 				if transformerName == "" {
-					notifications = append(notifications, "❌ Transformer name is required")
+					notifications = append(notifications, "&#10060; Transformer name is required")
 				}
 
 				if transformerCode == "" {
-					notifications = append(notifications, "❌ Transformer code is required")
+					notifications = append(notifications, "&#10060; Transformer code is required")
 				}
 
 				if transformerName != "" && transformerCode != "" {
@@ -132,9 +132,9 @@ func TransformersController(
 							"error", err.Error(),
 						)
 
-						notifications = append(notifications, "❌ Could not save transformer script")
+						notifications = append(notifications, "&#10060; Could not save transformer script")
 					} else {
-						notifications = append(notifications, "✅ Transformer script saved")
+						notifications = append(notifications, "&#9989; Transformer script saved")
 					}
 				}
 			}
@@ -150,7 +150,7 @@ func TransformersController(
 			)
 
 			transformers = []string{}
-			notifications = append(notifications, "❌ Could not fetch transformers")
+			notifications = append(notifications, "&#10060; Could not fetch transformers")
 		}
 
 		h := templ.Handler(views.Transformers(
@@ -192,7 +192,7 @@ func TransformersController(
 				"error", err.Error(),
 			)
 
-			notifications = append(notifications, "❌ Could not fetch user permissions")
+			notifications = append(notifications, "&#10060; Could not fetch user permissions")
 		} else {
 			permissions = auth.PermissionsFromScopes(scopes)
 		}
@@ -212,7 +212,7 @@ func TransformersController(
 			)
 
 			transformers = []string{}
-			notifications = append(notifications, "❌ Could not fetch transformers")
+			notifications = append(notifications, "&#10060; Could not fetch transformers")
 		}
 
 		h := templ.Handler(views.Transformers(
@@ -254,7 +254,7 @@ func TransformersController(
 				"error", err.Error(),
 			)
 
-			notifications = append(notifications, "❌ Could not fetch user permissions")
+			notifications = append(notifications, "&#10060; Could not fetch user permissions")
 		} else {
 			permissions = auth.PermissionsFromScopes(scopes)
 		}
@@ -273,18 +273,18 @@ func TransformersController(
 				"error", err.Error(),
 			)
 
-			notifications = append(notifications, "❌ Could not parse form")
+			notifications = append(notifications, "&#10060; Could not parse form")
 		} else {
 			transformerName = r.FormValue("name")
 			transformerCode = r.FormValue("code")
 
 			if permissions.CanEditTransformers {
 				if transformerName == "" {
-					notifications = append(notifications, "❌ Transformer name is required")
+					notifications = append(notifications, "&#10060; Transformer name is required")
 				}
 
 				if transformerCode == "" {
-					notifications = append(notifications, "❌ Transformer code is required")
+					notifications = append(notifications, "&#10060; Transformer code is required")
 				}
 
 				if transformerName != "" && transformerCode != "" {
@@ -297,9 +297,9 @@ func TransformersController(
 							"error", err.Error(),
 						)
 
-						notifications = append(notifications, "❌ Could not save transformer script")
+						notifications = append(notifications, "&#10060; Could not save transformer script")
 					} else {
-						notifications = append(notifications, "✅ Transformer script saved")
+						notifications = append(notifications, "&#9989; Transformer script saved")
 					}
 				}
 			}
@@ -315,7 +315,7 @@ func TransformersController(
 			)
 
 			transformers = []string{}
-			notifications = append(notifications, "❌ Could not fetch transformers")
+			notifications = append(notifications, "&#10060; Could not fetch transformers")
 		}
 
 		h := templ.Handler(views.Transformers(
