@@ -69,10 +69,17 @@ templ Base(props BaseProps) {
           modalInstance.open()
         })
 
-        document.body.addEventListener('htmx-custom-modal-close', () => {
+        document.body.addEventListener('htmx-custom-modal-close', (event) => {
           const modalElement  = document.getElementById('modal')
           const modalInstance = M.Modal.getInstance(modalElement)
           modalInstance.close()
+
+          if (event.detail.after === 'reload') {
+            setTimeout(
+              () => { window.location.reload() },
+              150,
+            )
+          }
         })
 
         document.body.addEventListener('htmx-custom-toast', (event) => {

@@ -22,7 +22,7 @@ templ adminRoleList(roles []auth.Role, permissions auth.Permissions) {
           if permissions.CanEditACLs {
             <button
               class="waves-effect waves-light btn-small"
-              hx-get="/web/admin/roles/new"
+              hx-get="/web/admin/roles/new/"
               hx-target="#modal-content"
             >
               <i class="material-icons left">add</i>
@@ -44,7 +44,7 @@ templ adminRoleList(roles []auth.Role, permissions auth.Permissions) {
             </thead>
             <tbody>
               for _, role := range roles {
-                <tr>
+                <tr data-role={role.Name}>
                   <td>{role.Name}</td>
                   <td>
                     <div class="w-full flex flex-row gap-2 py-1 items-center justify-start">
