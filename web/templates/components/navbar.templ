@@ -2,6 +2,31 @@ package components
 
 import "link-society.com/flowg/internal/auth"
 
+type navbarItemProps struct {
+  Icon   string
+  Label  string
+  Link   string
+  Active bool
+}
+
+templ navbarItem(props navbarItemProps) {
+  if props.Active {
+    <li class="active">
+      <a>
+        <i class="left material-icons">{props.Icon}</i>
+        {props.Label}
+      </a>
+    </li>
+  } else {
+    <li>
+      <a href={templ.SafeURL(props.Link)}>
+        <i class="left material-icons">{props.Icon}</i>
+        {props.Label}
+      </a>
+    </li>
+  }
+}
+
 type NavbarProps struct {
   CurrentNav  string
   Permissions auth.Permissions
@@ -9,9 +34,13 @@ type NavbarProps struct {
 
 templ Navbar(props NavbarProps) {
   <nav class="blue darken-3" style="z-index: 900;">
-    <div class="nav-wrapper">
-      <a href="/" class="brand-logo center"><b>FlowG</b></a>
-      <ul class="left hide-on-med-and-down">
+    <div class="nav-wrapper flex flex-row items-center">
+      <ul>
+        <li>
+          <a class="text-4xl font-semibold" href="/">FlowG</a>
+        </li>
+      </ul>
+      <ul class="flex-grow hide-on-med-and-down">
         <li>
           <a href="https://github.com/link-society/flowg" target="_blank">
             <i class="left material-icons">code</i>
@@ -25,119 +54,51 @@ templ Navbar(props NavbarProps) {
           </a>
         </li>
       </ul>
-      <ul class="right hide-on-med-and-down">
-        switch props.CurrentNav {
-          case "streams":
-            if props.Permissions.CanViewStreams {
-              <li class="active">
-                <a>
-                  <i class="left material-icons">list</i>
-                  Streams
-                </a>
-              </li>
-            }
-            if props.Permissions.CanViewTransformers {
-              <li>
-                <a href="/web/transformers">
-                  <i class="left material-icons">filter_alt</i>
-                  Transformers
-                </a>
-              </li>
-            }
-            if props.Permissions.CanViewPipelines {
-              <li>
-                <a href="/web/pipelines">
-                  <i class="left material-icons">settings</i>
-                  Pipelines
-                </a>
-              </li>
-            }
-
-          case "transformers":
-            if props.Permissions.CanViewStreams {
-              <li>
-                <a href="/web/streams">
-                  <i class="left material-icons">list</i>
-                  Streams
-                </a>
-              </li>
-            }
-            if props.Permissions.CanViewTransformers {
-              <li class="active">
-                <a>
-                  <i class="left material-icons">filter_alt</i>
-                  Transformers
-                </a>
-              </li>
-            }
-            if props.Permissions.CanViewPipelines {
-              <li>
-                <a href="/web/pipelines">
-                  <i class="left material-icons">settings</i>
-                  Pipelines
-                </a>
-              </li>
-            }
-
-          case "pipelines":
-            if props.Permissions.CanViewStreams {
-              <li>
-                <a href="/web/streams">
-                  <i class="left material-icons">list</i>
-                  Streams
-                </a>
-              </li>
-            }
-            if props.Permissions.CanViewTransformers {
-              <li>
-                <a href="/web/transformers">
-                  <i class="left material-icons">filter_alt</i>
-                  Transformers
-                </a>
-              </li>
-            }
-            if props.Permissions.CanViewPipelines {
-              <li class="active">
-                <a>
-                  <i class="left material-icons">settings</i>
-                  Pipelines
-                </a>
-              </li>
-            }
-
-          default:
-            if props.Permissions.CanViewStreams {
-              <li>
-                <a href="/web/streams">
-                  <i class="left material-icons">list</i>
-                  Streams
-                </a>
-              </li>
-            }
-            if props.Permissions.CanViewTransformers {
-              <li>
-                <a href="/web/transformers">
-                  <i class="left material-icons">filter_alt</i>
-                  Transformers
-                </a>
-              </li>
-            }
-            if props.Permissions.CanViewPipelines {
-              <li>
-                <a href="/web/pipelines">
-                  <i class="left material-icons">settings</i>
-                  Pipelines
-                </a>
-              </li>
-            }
+      <ul class="hide-on-med-and-down">
+        if props.Permissions.CanViewStreams {
+          @navbarItem(navbarItemProps{
+            Icon:   "storage",
+            Label:  "Streams",
+            Link:   "/web/streams",
+            Active: props.CurrentNav == "streams",
+          })
         }
-
-        <li>
-          <a href="/auth/logout">
-            <i class="left material-icons">exit_to_app</i>
-            Logout
-          </a>
-        </li>
+        if props.Permissions.CanViewTransformers {
+          @navbarItem(navbarItemProps{
+            Icon:   "filter_alt",
+            Label:  "Transformers",
+            Link:   "/web/transformers",
+            Active: props.CurrentNav == "transformers",
+          })
+        }
+        if props.Permissions.CanViewPipelines {
+          @navbarItem(navbarItemProps{
+            Icon:   "settings",
+            Label:  "Pipelines",
+            Link:   "/web/pipelines",
+            Active: props.CurrentNav == "pipelines",
+          })
+        }
+        if props.Permissions.CanCreateUsers {
+          @navbarItem(navbarItemProps{
+            Icon:   "dashboard",
+            Label:  "Admin",
+            Link:   "/web/admin",
+            Active: props.CurrentNav == "admin",
+          })
+        }
+        @navbarItem(navbarItemProps{
+          Icon:   "account_circle",
+          Label:  "Account",
+          Link:   "/web/account",
+          Active: props.CurrentNav == "account",
+        })
+        @navbarItem(navbarItemProps{
+          Icon:   "exit_to_app",
+          Label:  "Logout",
+          Link:   "/auth/logout",
+          Active: false,
+        })
       </ul>
     </div>
   </nav>
@@ -162,6 +123,16 @@ templ Navbar(props NavbarProps) {
           Pipelines
         </a>
       }
+      if props.Permissions.CanCreateUsers {
+        <a class="collection-item" href="/web/admin">
+          <i class="left material-icons">dashboard</i>
+          Admin
+        </a>
+      }
+      <a class="collection-item" href="/web/account">
+        <i class="left material-icons">account_circle</i>
+        Account
+      </a>
       <a class="collection-item" href="/auth/logout">
         <i class="left material-icons">exit_to_app</i>
         Logout
