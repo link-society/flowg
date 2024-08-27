@@ -59,7 +59,7 @@ func NewAdminRoleListCommand() *cobra.Command {
 					roles[i] = role
 				}
 
-				writer := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
+				writer := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 
 				fmt.Fprintln(writer, "Name\tScopes")
 
