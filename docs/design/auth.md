@@ -11,7 +11,8 @@ assigns permissions to one or more of the following **scopes**:
 | `write_transformers` | Can create, read, update, or delete a transformer script |
 | `read_streams` | Can query a stream |
 | `write_streams` | Can purge a stream |
-| `create_users` | Can create new users |
+| `read_acls` | Can list users and roles, but cannot update them nor delete them |
+| `write_acls`| Can create, read, update or delete roles and users |
 | `send_logs` | Can send logs to a pipeline for processing (useful for log sources) |
 
 Each user is associated to one or more roles. A user has a required password,
