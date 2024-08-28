@@ -62,7 +62,8 @@ func NewHandler(
 		r.Get("/api/v1/users", ListUsersUsecase(authDb))
 		r.Put("/api/v1/users/{user}", SaveUserUsecase(authDb))
 		r.Delete("/api/v1/users/{user}", DeleteUserUsecase(authDb))
-		r.Post("/api/v1/users/{user}/token", CreateTokenUsecase(authDb))
+
+		r.Post("/api/v1/token", CreateTokenUsecase(authDb))
 	})
 
 	return service
