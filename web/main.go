@@ -51,6 +51,10 @@ func NewHandler(
 		"/web/admin/",
 		authMiddleware(controllers.AdminController(authDb)),
 	)
+	mux.Handle(
+		"/web/account/",
+		authMiddleware(controllers.AccountController(authDb)),
+	)
 
 	return mux
 }
