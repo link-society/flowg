@@ -502,6 +502,43 @@ func (d *Database) VerifyPersonalAccessToken(token string) (string, bool, error)
 	return username, found, nil
 }
 
+func (d *Database) ListPersonalAccessTokens(username string) ([]string, error) {
+	tokenUUIDs := []string{}
+
+	err := d.db.View(func(txn *badger.Txn) error {
+		opts := badger.DefaultIteratorOptions
+		opts.PrefetchValues = false
+		opts.Prefix = []byte(fmt.Sprintf("pat:%s:", username))
+		it := txn.NewIterator(opts)
+		defer it.Close()
+
+		for it.Rewind(); it.Valid(); it.Next() {
+			key := it.Item().Key()
+			tokenUUIDs = append(tokenUUIDs, string(key[len(username)+5:]))
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return tokenUUIDs, nil
+}
+
+func (d *Database) DeletePersonalAccessToken(username string, tokenUUID string) error {
+	return d.db.Update(func(txn *badger.Txn) error {
+		key := []byte(fmt.Sprintf("pat:%s:%s", username, tokenUUID))
+		err := txn.Delete(key)
+		if err != nil && err != badger.ErrKeyNotFound {
+			return &PersistError{Operation: "delete-token", Reason: err}
+		}
+
+		return nil
+	})
+}
+
 func (d *Database) ListUserScopes(username string) ([]Scope, error) {
 	scopeMap := map[Scope]struct{}{}
 
