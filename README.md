@@ -88,16 +88,16 @@ task build
 Then, create a superuser:
 
 ```bash
-./bin/flowg admin create role \
+./bin/flowg admin role create \
   --auth-dir ./data/auth \
   --name admin \
   write_streams \
   write_transformers \
   write_pipelines \
-  create_users \
+  write_acls \
   send_logs
 
-./bin/flowg admin create user \
+./bin/flowg admin user create \
   --auth-dir ./data/auth \
   --name root \
   --password root \
@@ -130,7 +130,7 @@ This will build `linksociety/flowg:latest` locally.
 Then, create a superuser:
 
 ```bash
-docker run --rm -it -v flowg-data:/data linksociety/flowg:latest admin create role \
+docker run --rm -it -v flowg-data:/data linksociety/flowg:latest admin role create \
   --name admin \
   write_streams \
   write_transformers \
@@ -138,7 +138,7 @@ docker run --rm -it -v flowg-data:/data linksociety/flowg:latest admin create ro
   write_acls \
   send_logs
 
-docker run --rm -it -v flowg-data:/data linksociety/flowg:latest admin create user \
+docker run --rm -it -v flowg-data:/data linksociety/flowg:latest admin user create \
   --name root \
   --password root \
   admin
