@@ -603,37 +603,43 @@
 }
 
 table.logs thead,
-table.acl thead {
+table.acl thead,
+table.pat thead {
   position: sticky;
   top: 0;
   z-index: 1;
 }
 
 table.logs th, table.logs td,
-table.acl th, table.acl td {
+table.acl th, table.acl td,
+table.pat th, table.pat td {
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
 }
 
 table.logs th,
-table.acl th {
+table.acl th,
+table.pat th {
   border: 1px solid rgba(0, 0, 0, 0.48);
 }
 
 table.logs td,
-table.acl td {
+table.acl td,
+table.pat td {
   border: 1px solid rgba(0, 0, 0, 0.12);
 }
 
 table.logs tr td,
-table.acl tr td {
+table.acl tr td,
+table.pat tr td {
   white-space: nowrap;
   padding-left: 0.75rem;
   padding-right: 0.75rem;
 }
 
 table.logs tr td:last-child,
-table.acl tr td:nth-child(2) {
+table.acl tr td:nth-child(2),
+table.pat tr td:first-child {
   width: 100%;
 }
 

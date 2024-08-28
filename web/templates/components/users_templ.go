@@ -36,20 +36,20 @@ func UserForm(props UserFormProps) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form class=\"flex flex-col\" hx-post=\"/web/admin/users/new/\" hx-target=\"#modal-content\"><header class=\"text-center font-semibold text-2xl\">Add a new user</header><div class=\"divider\"></div><section><div class=\"input-field\"><i class=\"material-icons prefix\">account_circle</i> <input type=\"text\" name=\"name\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form class=\"flex flex-col\" hx-post=\"/web/admin/users/new/\" hx-target=\"#modal-content\"><header class=\"text-center font-semibold text-2xl\">Add a new user</header><div class=\"divider\"></div><section><div class=\"input-field\"><i class=\"material-icons prefix\">account_circle</i> <input type=\"text\" id=\"user_name\" name=\"name\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(props.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/users.templ`, Line: 26, Col: 56}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/users.templ`, Line: 26, Col: 71}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" required> <label for=\"name\">User Name</label></div><div class=\"input-field\"><i class=\"material-icons prefix\">lock</i> <input type=\"password\" name=\"password\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" required> <label for=\"user_name\">User Name</label></div><div class=\"input-field\"><i class=\"material-icons prefix\">lock</i> <input type=\"password\" name=\"password\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

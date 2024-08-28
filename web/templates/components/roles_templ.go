@@ -36,20 +36,20 @@ func RoleForm(props RoleFormProps) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form class=\"flex flex-col\" hx-post=\"/web/admin/roles/new/\" hx-target=\"#modal-content\"><header class=\"text-center font-semibold text-2xl\">Add a new role</header><div class=\"divider\"></div><section><div class=\"input-field\"><i class=\"material-icons prefix\">supervisor_account</i> <input type=\"text\" name=\"name\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form class=\"flex flex-col\" hx-post=\"/web/admin/roles/new/\" hx-target=\"#modal-content\"><header class=\"text-center font-semibold text-2xl\">Add a new role</header><div class=\"divider\"></div><section><div class=\"input-field\"><i class=\"material-icons prefix\">supervisor_account</i> <input type=\"text\" id=\"role_name\" name=\"name\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(props.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/roles.templ`, Line: 26, Col: 56}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/roles.templ`, Line: 26, Col: 71}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" required> <label for=\"name\">Role Name</label></div></section><section><header class=\"font-semibold\">Scopes:</header>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" required> <label for=\"role_name\">Role Name</label></div></section><section><header class=\"font-semibold\">Scopes:</header>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
