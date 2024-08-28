@@ -324,6 +324,8 @@ func AdminController(authDb *auth.Database) http.Handler {
 		}
 
 		if !permissions.CanEditACLs {
+			w.Header().Add("HX-Reswap", "none")
+
 			notifications = append(notifications, "&#10060; You do not have permission to delete roles")
 		} else {
 			roleName := r.PathValue("name")
@@ -336,6 +338,8 @@ func AdminController(authDb *auth.Database) http.Handler {
 					"channel", "web",
 					"error", err.Error(),
 				)
+
+				w.Header().Add("HX-Reswap", "none")
 
 				notifications = append(notifications, "&#10060; Could not delete role")
 			} else {
@@ -613,6 +617,8 @@ func AdminController(authDb *auth.Database) http.Handler {
 		}
 
 		if !permissions.CanEditACLs {
+			w.Header().Add("HX-Reswap", "none")
+
 			notifications = append(notifications, "&#10060; You do not have permission to delete users")
 		} else {
 			userName := r.PathValue("name")
@@ -625,6 +631,8 @@ func AdminController(authDb *auth.Database) http.Handler {
 					"channel", "web",
 					"error", err.Error(),
 				)
+
+				w.Header().Add("HX-Reswap", "none")
 
 				notifications = append(notifications, "&#10060; Could not delete user")
 			} else {
