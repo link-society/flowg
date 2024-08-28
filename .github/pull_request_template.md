@@ -35,5 +35,4 @@ Please use https://gitmoji.dev to categorize the changes.
 ## License Agreement
 
  - [x] I guarantee that I have the rights on the code submitted in this PR
- - [x] I accept that this contribution will be released under the terms of the
-       MIT License
+ - [x] I accept that this contribution will be released under the terms of the MIT License
