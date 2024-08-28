@@ -92,7 +92,7 @@ func CreateTokenUsecase(authDb *auth.Database) usecase.Interactor {
 	u.SetDescription("Create a new Personal Access Token for the current user")
 	u.SetTags("acls")
 
-	u.SetExpectedErrors(status.PermissionDenied, status.NotFound, status.Internal)
+	u.SetExpectedErrors(status.NotFound, status.Internal)
 
 	return u
 }
