@@ -3,13 +3,13 @@ package auth
 type Scope string
 
 type Role struct {
-	Name   string
-	Scopes []Scope
+	Name   string  `json:"name"`
+	Scopes []Scope `json:"scopes"`
 }
 
 type User struct {
-	Name  string
-	Roles []string
+	Name  string   `json:"name"`
+	Roles []string `json:"roles"`
 }
 
 func (r Role) HasScope(scope Scope) bool {
