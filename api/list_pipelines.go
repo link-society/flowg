@@ -22,7 +22,7 @@ func ListPipelinesUsecase(
 	pipelinesManager *pipelines.Manager,
 ) usecase.Interactor {
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiMiddleware(
+		auth.RequireScopeApiDecorator(
 			authDb,
 			auth.SCOPE_READ_PIPELINES,
 			func(

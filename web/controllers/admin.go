@@ -20,12 +20,15 @@ import (
 func AdminController(authDb *auth.Database) http.Handler {
 	mux := http.NewServeMux()
 
+	roleSys := auth.NewRoleSystem(authDb)
+	userSys := auth.NewUserSystem(authDb)
+
 	mux.HandleFunc("GET /web/admin/{$}", func(w http.ResponseWriter, r *http.Request) {
 		permissions := auth.Permissions{}
 		notifications := []string{}
 
 		user := auth.GetContextUser(r.Context())
-		scopes, err := authDb.ListUserScopes(user)
+		scopes, err := userSys.ListUserScopes(user.Name)
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
@@ -44,8 +47,7 @@ func AdminController(authDb *auth.Database) http.Handler {
 			return
 		}
 
-		roles := []auth.Role{}
-		roleNames, err := authDb.ListRoles()
+		roles, err := roleSys.ListRoles()
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
@@ -55,27 +57,11 @@ func AdminController(authDb *auth.Database) http.Handler {
 			)
 
 			notifications = append(notifications, "&#10060; Could not fetch roles")
-		} else {
-			for _, roleName := range roleNames {
-				role, err := authDb.GetRole(roleName)
-				if err != nil {
-					slog.ErrorContext(
-						r.Context(),
-						"error fetching role",
-						"channel", "web",
-						"error", err.Error(),
-					)
 
-					notifications = append(notifications, fmt.Sprintf("&#10060; Could not fetch role '%s'", roleName))
-					continue
-				}
-
-				roles = append(roles, role)
-			}
+			roles = []auth.Role{}
 		}
 
-		users := []*auth.User{}
-		usernames, err := authDb.ListUsers()
+		users, err := userSys.ListUsers()
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
@@ -85,23 +71,8 @@ func AdminController(authDb *auth.Database) http.Handler {
 			)
 
 			notifications = append(notifications, "&#10060; Could not fetch users")
-		} else {
-			for _, username := range usernames {
-				user, err := authDb.GetUser(username)
-				if err != nil {
-					slog.ErrorContext(
-						r.Context(),
-						"error fetching user",
-						"channel", "web",
-						"error", err.Error(),
-					)
 
-					notifications = append(notifications, fmt.Sprintf("&#10060; Could not fetch user '%s'", username))
-					continue
-				}
-
-				users = append(users, user)
-			}
+			users = []auth.User{}
 		}
 
 		h := templ.Handler(views.Admin(
@@ -120,7 +91,7 @@ func AdminController(authDb *auth.Database) http.Handler {
 		notifications := []string{}
 
 		user := auth.GetContextUser(r.Context())
-		scopes, err := authDb.ListUserScopes(user)
+		scopes, err := userSys.ListUserScopes(user.Name)
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
@@ -185,7 +156,7 @@ func AdminController(authDb *auth.Database) http.Handler {
 		notifications := []string{}
 
 		user := auth.GetContextUser(r.Context())
-		scopes, err := authDb.ListUserScopes(user)
+		scopes, err := userSys.ListUserScopes(user.Name)
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
@@ -245,7 +216,7 @@ func AdminController(authDb *auth.Database) http.Handler {
 					}
 				}
 
-				err := authDb.SaveRole(role)
+				err := roleSys.SaveRole(role)
 				if err != nil {
 					slog.ErrorContext(
 						r.Context(),
@@ -309,7 +280,7 @@ func AdminController(authDb *auth.Database) http.Handler {
 		notifications := []string{}
 
 		user := auth.GetContextUser(r.Context())
-		scopes, err := authDb.ListUserScopes(user)
+		scopes, err := userSys.ListUserScopes(user.Name)
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
@@ -330,7 +301,7 @@ func AdminController(authDb *auth.Database) http.Handler {
 		} else {
 			roleName := r.PathValue("name")
 
-			err := authDb.DeleteRole(roleName)
+			err := roleSys.DeleteRole(roleName)
 			if err != nil {
 				slog.ErrorContext(
 					r.Context(),
@@ -376,7 +347,7 @@ func AdminController(authDb *auth.Database) http.Handler {
 		notifications := []string{}
 
 		user := auth.GetContextUser(r.Context())
-		scopes, err := authDb.ListUserScopes(user)
+		scopes, err := userSys.ListUserScopes(user.Name)
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
@@ -393,12 +364,12 @@ func AdminController(authDb *auth.Database) http.Handler {
 		if permissions.CanEditACLs {
 			w.Header().Add("HX-Trigger", "htmx-custom-modal-open")
 
-			roles := []struct {
+			roleFields := []struct {
 				Name     string
 				Selected bool
 			}{}
 
-			roleNames, err := authDb.ListRoles()
+			roles, err := roleSys.ListRoles()
 			if err != nil {
 				slog.ErrorContext(
 					r.Context(),
@@ -409,14 +380,14 @@ func AdminController(authDb *auth.Database) http.Handler {
 
 				notifications = append(notifications, "&#10060; Could not fetch roles")
 			} else {
-				for _, roleName := range roleNames {
-					roles = append(
-						roles,
+				for _, role := range roles {
+					roleFields = append(
+						roleFields,
 						struct {
 							Name     string
 							Selected bool
 						}{
-							Name:     roleName,
+							Name:     role.Name,
 							Selected: false,
 						},
 					)
@@ -444,7 +415,7 @@ func AdminController(authDb *auth.Database) http.Handler {
 			h := templ.Handler(components.UserForm(components.UserFormProps{
 				Name:     "",
 				Password: "",
-				Roles:    roles,
+				Roles:    roleFields,
 			}))
 			h.ServeHTTP(w, r)
 		} else {
@@ -477,7 +448,7 @@ func AdminController(authDb *auth.Database) http.Handler {
 		notifications := []string{}
 
 		user := auth.GetContextUser(r.Context())
-		scopes, err := authDb.ListUserScopes(user)
+		scopes, err := userSys.ListUserScopes(user.Name)
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
@@ -492,12 +463,12 @@ func AdminController(authDb *auth.Database) http.Handler {
 		}
 
 		if permissions.CanEditACLs {
-			roles := []struct {
+			roleFields := []struct {
 				Name     string
 				Selected bool
 			}{}
 
-			roleNames, err := authDb.ListRoles()
+			roles, err := roleSys.ListRoles()
 			if err != nil {
 				slog.ErrorContext(
 					r.Context(),
@@ -508,14 +479,14 @@ func AdminController(authDb *auth.Database) http.Handler {
 
 				notifications = append(notifications, "&#10060; Could not fetch roles")
 			} else {
-				for _, roleName := range roleNames {
-					roles = append(
-						roles,
+				for _, role := range roles {
+					roleFields = append(
+						roleFields,
 						struct {
 							Name     string
 							Selected bool
 						}{
-							Name:     roleName,
+							Name:     role.Name,
 							Selected: false,
 						},
 					)
@@ -525,7 +496,7 @@ func AdminController(authDb *auth.Database) http.Handler {
 			props := components.UserFormProps{
 				Name:     "",
 				Password: "",
-				Roles:    roles,
+				Roles:    roleFields,
 			}
 
 			trigger := map[string]interface{}{}
@@ -556,7 +527,7 @@ func AdminController(authDb *auth.Database) http.Handler {
 					}
 				}
 
-				err := authDb.SaveUser(user, props.Password)
+				err := userSys.SaveUser(user, props.Password)
 				if err != nil {
 					slog.ErrorContext(
 						r.Context(),
@@ -620,7 +591,7 @@ func AdminController(authDb *auth.Database) http.Handler {
 		notifications := []string{}
 
 		user := auth.GetContextUser(r.Context())
-		scopes, err := authDb.ListUserScopes(user)
+		scopes, err := userSys.ListUserScopes(user.Name)
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
@@ -641,7 +612,7 @@ func AdminController(authDb *auth.Database) http.Handler {
 		} else {
 			userName := r.PathValue("name")
 
-			err := authDb.DeleteUser(userName)
+			err := userSys.DeleteUser(userName)
 			if err != nil {
 				slog.ErrorContext(
 					r.Context(),

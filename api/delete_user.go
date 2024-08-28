@@ -19,8 +19,10 @@ type DeleteUserResponse struct {
 }
 
 func DeleteUserUsecase(authDb *auth.Database) usecase.Interactor {
+	userSys := auth.NewUserSystem(authDb)
+
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiMiddleware(
+		auth.RequireScopeApiDecorator(
 			authDb,
 			auth.SCOPE_WRITE_ACLS,
 			func(
@@ -28,7 +30,7 @@ func DeleteUserUsecase(authDb *auth.Database) usecase.Interactor {
 				req DeleteUserRequest,
 				resp *DeleteUserResponse,
 			) error {
-				err := authDb.DeleteUser(req.User)
+				err := userSys.DeleteUser(req.User)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,

@@ -15,10 +15,12 @@ import (
 func AuthController(authDb *auth.Database) http.Handler {
 	mux := http.NewServeMux()
 
+	userSys := auth.NewUserSystem(authDb)
+
 	mux.HandleFunc("GET /auth/login/{$}", func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("session_id")
 		if err == nil && cookie.Value != "" {
-			user, err := authDb.GetUser(cookie.Value)
+			user, err := userSys.GetUser(cookie.Value)
 			if err == nil && user != nil {
 				http.Redirect(w, r, "/web", http.StatusSeeOther)
 				return
@@ -50,7 +52,7 @@ func AuthController(authDb *auth.Database) http.Handler {
 			username := r.FormValue("username")
 			password := r.FormValue("password")
 
-			user, err := authDb.GetUser(username)
+			user, err := userSys.GetUser(username)
 			if err != nil {
 				slog.ErrorContext(
 					r.Context(),
@@ -63,7 +65,7 @@ func AuthController(authDb *auth.Database) http.Handler {
 			} else if user == nil {
 				notifications = append(notifications, "&#10060; Invalid credentials")
 			} else {
-				valid, err := authDb.VerifyUserPassword(username, password)
+				valid, err := userSys.VerifyUserPassword(username, password)
 				if err != nil {
 					slog.ErrorContext(
 						r.Context(),

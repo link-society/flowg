@@ -36,29 +36,17 @@ func NewAdminUserListCommand() *cobra.Command {
 				}
 			}()
 
-			usernames, err := authDb.ListUsers()
+			userSys := auth.NewUserSystem(authDb)
+			users, err := userSys.ListUsers()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to list users:", err)
 				exitCode = 1
 				return
 			}
 
-			if len(usernames) == 0 {
+			if len(users) == 0 {
 				fmt.Println("No users found")
 			} else {
-				users := make([]*auth.User, len(usernames))
-
-				for i, username := range usernames {
-					user, err := authDb.GetUser(username)
-					if err != nil {
-						fmt.Fprintln(os.Stderr, "ERROR: Failed to get user:", err)
-						exitCode = 1
-						return
-					}
-
-					users[i] = user
-				}
-
 				writer := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 
 				fmt.Fprintln(writer, "Name\tRoles")

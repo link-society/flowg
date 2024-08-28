@@ -19,6 +19,8 @@ func PipelinesController(
 ) http.Handler {
 	mux := http.NewServeMux()
 
+	userSys := auth.NewUserSystem(authDb)
+
 	mux.HandleFunc("GET /web/pipelines/{$}", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/web/pipelines/new", http.StatusPermanentRedirect)
 	})
@@ -28,7 +30,7 @@ func PipelinesController(
 		notifications := []string{}
 
 		user := auth.GetContextUser(r.Context())
-		scopes, err := authDb.ListUserScopes(user)
+		scopes, err := userSys.ListUserScopes(user.Name)
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
@@ -77,7 +79,7 @@ func PipelinesController(
 		notifications := []string{}
 
 		user := auth.GetContextUser(r.Context())
-		scopes, err := authDb.ListUserScopes(user)
+		scopes, err := userSys.ListUserScopes(user.Name)
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
@@ -183,7 +185,7 @@ func PipelinesController(
 		notifications := []string{}
 
 		user := auth.GetContextUser(r.Context())
-		scopes, err := authDb.ListUserScopes(user)
+		scopes, err := userSys.ListUserScopes(user.Name)
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
@@ -245,7 +247,7 @@ func PipelinesController(
 		notifications := []string{}
 
 		user := auth.GetContextUser(r.Context())
-		scopes, err := authDb.ListUserScopes(user)
+		scopes, err := userSys.ListUserScopes(user.Name)
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
@@ -335,7 +337,7 @@ func PipelinesController(
 
 		permissions := auth.Permissions{}
 		user := auth.GetContextUser(r.Context())
-		scopes, err := authDb.ListUserScopes(user)
+		scopes, err := userSys.ListUserScopes(user.Name)
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),

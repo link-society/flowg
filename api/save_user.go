@@ -21,8 +21,10 @@ type SaveUserResponse struct {
 }
 
 func SaveUserUsecase(authDb *auth.Database) usecase.Interactor {
+	userSys := auth.NewUserSystem(authDb)
+
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiMiddleware(
+		auth.RequireScopeApiDecorator(
 			authDb,
 			auth.SCOPE_WRITE_ACLS,
 			func(
@@ -35,7 +37,7 @@ func SaveUserUsecase(authDb *auth.Database) usecase.Interactor {
 					Roles: req.Roles,
 				}
 
-				err := authDb.SaveUser(user, req.Password)
+				err := userSys.SaveUser(user, req.Password)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,

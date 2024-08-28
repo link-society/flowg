@@ -16,8 +16,10 @@ type ListRolesResponse struct {
 }
 
 func ListRolesUsecase(authDb *auth.Database) usecase.Interactor {
+	roleSys := auth.NewRoleSystem(authDb)
+
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiMiddleware(
+		auth.RequireScopeApiDecorator(
 			authDb,
 			auth.SCOPE_READ_ACLS,
 			func(
@@ -25,7 +27,7 @@ func ListRolesUsecase(authDb *auth.Database) usecase.Interactor {
 				req ListRolesRequest,
 				resp *ListRolesResponse,
 			) error {
-				roleNames, err := authDb.ListRoles()
+				roles, err := roleSys.ListRoles()
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
@@ -36,26 +38,6 @@ func ListRolesUsecase(authDb *auth.Database) usecase.Interactor {
 
 					resp.Success = false
 					return status.Wrap(err, status.Internal)
-				}
-
-				roles := make([]auth.Role, 0, len(roleNames))
-
-				for i, roleName := range roleNames {
-					role, err := authDb.GetRole(roleName)
-					if err != nil {
-						slog.ErrorContext(
-							ctx,
-							"Failed to get role",
-							"channel", "api",
-							"role", roleName,
-							"error", err.Error(),
-						)
-
-						resp.Success = false
-						return status.Wrap(err, status.Internal)
-					}
-
-					roles[i] = role
 				}
 
 				resp.Success = true

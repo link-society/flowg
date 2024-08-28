@@ -27,7 +27,7 @@ func TestTransformerUsecase(
 	pipelinesManager *pipelines.Manager,
 ) usecase.Interactor {
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiMiddleware(
+		auth.RequireScopeApiDecorator(
 			authDb,
 			auth.SCOPE_WRITE_TRANSFORMERS,
 			func(

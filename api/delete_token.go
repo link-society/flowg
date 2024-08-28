@@ -19,21 +19,23 @@ type DeleteTokenResponse struct {
 }
 
 func DeleteTokenUsecase(authDb *auth.Database) usecase.Interactor {
+	tokenSys := auth.NewTokenSystem(authDb)
+
 	u := usecase.NewInteractor(
 		func(
 			ctx context.Context,
 			req DeleteTokenRequest,
 			resp *DeleteTokenResponse,
 		) error {
-			username := auth.GetContextUser(ctx)
+			user := auth.GetContextUser(ctx)
 
-			err := authDb.DeletePersonalAccessToken(username, req.TokenUUID)
+			err := tokenSys.DeleteToken(user.Name, req.TokenUUID)
 			if err != nil {
 				slog.ErrorContext(
 					ctx,
 					"Failed to delete token",
 					"channel", "api",
-					"user", username,
+					"user", user.Name,
 					"token-uuid", req.TokenUUID,
 					"error", err.Error(),
 				)

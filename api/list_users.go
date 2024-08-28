@@ -11,13 +11,15 @@ import (
 
 type ListUsersRequest struct{}
 type ListUsersResponse struct {
-	Success bool         `json:"success"`
-	Users   []*auth.User `json:"Users"`
+	Success bool        `json:"success"`
+	Users   []auth.User `json:"Users"`
 }
 
 func ListUsersUsecase(authDb *auth.Database) usecase.Interactor {
+	userSys := auth.NewUserSystem(authDb)
+
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiMiddleware(
+		auth.RequireScopeApiDecorator(
 			authDb,
 			auth.SCOPE_READ_ACLS,
 			func(
@@ -25,7 +27,7 @@ func ListUsersUsecase(authDb *auth.Database) usecase.Interactor {
 				req ListUsersRequest,
 				resp *ListUsersResponse,
 			) error {
-				usernames, err := authDb.ListUsers()
+				users, err := userSys.ListUsers()
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
@@ -36,26 +38,6 @@ func ListUsersUsecase(authDb *auth.Database) usecase.Interactor {
 
 					resp.Success = false
 					return status.Wrap(err, status.Internal)
-				}
-
-				users := make([]*auth.User, 0, len(usernames))
-
-				for i, username := range usernames {
-					user, err := authDb.GetUser(username)
-					if err != nil {
-						slog.ErrorContext(
-							ctx,
-							"Failed to get user",
-							"channel", "api",
-							"user", username,
-							"error", err.Error(),
-						)
-
-						resp.Success = false
-						return status.Wrap(err, status.Internal)
-					}
-
-					users[i] = user
 				}
 
 				resp.Success = true

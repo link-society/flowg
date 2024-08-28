@@ -45,7 +45,8 @@ func NewAdminUserCreateCommand() *cobra.Command {
 
 			copy(user.Roles, args)
 
-			err = authDb.SaveUser(user, opts.password)
+			userSys := auth.NewUserSystem(authDb)
+			err = userSys.SaveUser(user, opts.password)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to save user:", err)
 				exitCode = 1

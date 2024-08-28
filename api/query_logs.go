@@ -31,7 +31,7 @@ func QueryStreamUsecase(
 	logDb *logstorage.Storage,
 ) usecase.Interactor {
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiMiddleware(
+		auth.RequireScopeApiDecorator(
 			authDb,
 			auth.SCOPE_READ_STREAMS,
 			func(

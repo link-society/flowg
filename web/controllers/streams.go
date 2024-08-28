@@ -25,12 +25,14 @@ func StreamController(
 ) http.Handler {
 	mux := http.NewServeMux()
 
+	userSys := auth.NewUserSystem(authDb)
+
 	mux.HandleFunc("GET /web/streams/{$}", func(w http.ResponseWriter, r *http.Request) {
 		permissions := auth.Permissions{}
 		notifications := []string{}
 
 		user := auth.GetContextUser(r.Context())
-		scopes, err := authDb.ListUserScopes(user)
+		scopes, err := userSys.ListUserScopes(user.Name)
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
@@ -84,7 +86,7 @@ func StreamController(
 		notifications := []string{}
 
 		user := auth.GetContextUser(r.Context())
-		scopes, err := authDb.ListUserScopes(user)
+		scopes, err := userSys.ListUserScopes(user.Name)
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),

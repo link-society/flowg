@@ -142,7 +142,7 @@ func adminRoleList(roles []auth.Role, permissions auth.Permissions) templ.Compon
 	})
 }
 
-func adminUserList(users []*auth.User, permissions auth.Permissions) templ.Component {
+func adminUserList(users []auth.User, permissions auth.Permissions) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -272,7 +272,7 @@ func adminUserList(users []*auth.User, permissions auth.Permissions) templ.Compo
 
 type AdminProps struct {
 	Roles []auth.Role
-	Users []*auth.User
+	Users []auth.User
 }
 
 func Admin(

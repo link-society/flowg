@@ -35,7 +35,8 @@ func NewAdminUserDeleteCommand() *cobra.Command {
 				}
 			}()
 
-			err = authDb.DeleteUser(opts.name)
+			userSys := auth.NewUserSystem(authDb)
+			err = userSys.DeleteUser(opts.name)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to delete user:", err)
 				exitCode = 1
