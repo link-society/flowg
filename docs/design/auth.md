@@ -16,8 +16,7 @@ assigns permissions to one or more of the following **scopes**:
 | `send_logs` | Can send logs to a pipeline for processing (useful for log sources) |
 
 Each user is associated to one or more roles. A user has a required password,
-and can have zero or more personal access tokens (each with an optional
-expiration date).
+and can have zero or more personal access tokens.
 
 ## Password and Token encryption
 
