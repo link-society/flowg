@@ -423,6 +423,24 @@ func AdminController(authDb *auth.Database) http.Handler {
 				}
 			}
 
+			trigger := map[string]interface{}{
+				"htmx-custom-toast": map[string]interface{}{
+					"messages": notifications,
+				},
+			}
+
+			triggerData, err := json.Marshal(trigger)
+			if err != nil {
+				slog.ErrorContext(
+					r.Context(),
+					"error marshalling trigger",
+					"channel", "web",
+					"error", err.Error(),
+				)
+			} else {
+				w.Header().Add("HX-Trigger", string(triggerData))
+			}
+
 			h := templ.Handler(components.UserForm(components.UserFormProps{
 				Name:     "",
 				Password: "",
