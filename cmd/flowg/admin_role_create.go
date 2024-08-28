@@ -52,7 +52,8 @@ func NewAdminRoleCreateCommand() *cobra.Command {
 				}
 			}()
 
-			err = authDb.SaveRole(role)
+			roleSys := auth.NewRoleSystem(authDb)
+			err = roleSys.SaveRole(role)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to save role:", err)
 				exitCode = 1

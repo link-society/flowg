@@ -1,5 +1,9 @@
 package auth
 
+import "fmt"
+
+type Scope string
+
 const (
 	SCOPE_READ_PIPELINES     Scope = "read_pipelines"
 	SCOPE_WRITE_PIPELINES    Scope = "write_pipelines"
@@ -49,7 +53,7 @@ func ParseScope(s string) (Scope, error) {
 	case "send_logs":
 		return SCOPE_SEND_LOGS, nil
 	default:
-		return "", &InvalidScopeError{Scope: s}
+		return "", fmt.Errorf("invalid scope: %s", s)
 	}
 }
 

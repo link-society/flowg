@@ -19,8 +19,10 @@ type DeleteRoleResponse struct {
 }
 
 func DeleteRoleUsecase(authDb *auth.Database) usecase.Interactor {
+	roleSys := auth.NewRoleSystem(authDb)
+
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiMiddleware(
+		auth.RequireScopeApiDecorator(
 			authDb,
 			auth.SCOPE_WRITE_ACLS,
 			func(
@@ -28,7 +30,7 @@ func DeleteRoleUsecase(authDb *auth.Database) usecase.Interactor {
 				req DeleteRoleRequest,
 				resp *DeleteRoleResponse,
 			) error {
-				err := authDb.DeleteRole(req.Role)
+				err := roleSys.DeleteRole(req.Role)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,

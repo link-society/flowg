@@ -36,23 +36,25 @@ func NewAdminTokenCreateCommand() *cobra.Command {
 				}
 			}()
 
-			user, err := authDb.GetUser(opts.user)
+			userSys := auth.NewUserSystem(authDb)
+			tokenSys := auth.NewTokenSystem(authDb)
+
+			user, err := userSys.GetUser(opts.user)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to get user:", err)
 				exitCode = 1
 				return
 			}
 
-			token, err := auth.NewToken(32)
-			if err != nil {
-				fmt.Fprintln(os.Stderr, "ERROR: Failed to generate token:", err)
+			if user == nil {
+				fmt.Fprintln(os.Stderr, "ERROR: User not found")
 				exitCode = 1
 				return
 			}
 
-			err = authDb.AddPersonalAccessToken(user.Name, token)
+			token, err := tokenSys.CreateToken(user.Name)
 			if err != nil {
-				fmt.Fprintln(os.Stderr, "ERROR: Failed to add token:", err)
+				fmt.Fprintln(os.Stderr, "ERROR: Failed to generate token:", err)
 				exitCode = 1
 				return
 			}

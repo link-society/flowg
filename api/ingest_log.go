@@ -25,7 +25,7 @@ func IngestLogUsecase(
 	pipelinesManager *pipelines.Manager,
 ) usecase.Interactor {
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiMiddleware(
+		auth.RequireScopeApiDecorator(
 			authDb,
 			auth.SCOPE_SEND_LOGS,
 			func(

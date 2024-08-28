@@ -17,12 +17,15 @@ import (
 func AccountController(authDb *auth.Database) http.Handler {
 	mux := http.NewServeMux()
 
+	userSys := auth.NewUserSystem(authDb)
+	tokenSys := auth.NewTokenSystem(authDb)
+
 	mux.HandleFunc("GET /web/account/{$}", func(w http.ResponseWriter, r *http.Request) {
 		permissions := auth.Permissions{}
 		notifications := []string{}
 
-		username := auth.GetContextUser(r.Context())
-		scopes, err := authDb.ListUserScopes(username)
+		user := auth.GetContextUser(r.Context())
+		scopes, err := userSys.ListUserScopes(user.Name)
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
@@ -36,31 +39,13 @@ func AccountController(authDb *auth.Database) http.Handler {
 			permissions = auth.PermissionsFromScopes(scopes)
 		}
 
-		user, err := authDb.GetUser(username)
-		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error fetching user",
-				"channel", "web",
-				"user", username,
-				"error", err.Error(),
-			)
-
-			notifications = append(notifications, "&#10060; Could not fetch user details")
-
-			user = &auth.User{
-				Name:  username,
-				Roles: []string{},
-			}
-		}
-
-		tokenUUIDs, err := authDb.ListPersonalAccessTokens(user.Name)
+		tokenUUIDs, err := tokenSys.ListTokens(user.Name)
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
 				"error listing personal access tokens",
 				"channel", "web",
-				"user", username,
+				"user", user.Name,
 				"error", err.Error(),
 			)
 
@@ -82,66 +67,53 @@ func AccountController(authDb *auth.Database) http.Handler {
 	mux.HandleFunc("POST /web/account/change-password/{$}", func(w http.ResponseWriter, r *http.Request) {
 		notifications := []string{}
 
-		username := auth.GetContextUser(r.Context())
-		user, err := authDb.GetUser(username)
+		user := auth.GetContextUser(r.Context())
+		err := r.ParseForm()
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
-				"error fetching user",
+				"error parsing form",
 				"channel", "web",
-				"user", username,
 				"error", err.Error(),
 			)
 
-			notifications = append(notifications, "&#10060; Could not fetch user details")
+			notifications = append(notifications, "&#10060; Could not parse form")
 		} else {
-			err := r.ParseForm()
+			oldPassword := r.Form.Get("old_password")
+			newPassword := r.Form.Get("new_password")
+
+			valid, err := userSys.VerifyUserPassword(user.Name, oldPassword)
 			if err != nil {
 				slog.ErrorContext(
 					r.Context(),
-					"error parsing form",
+					"error verifying user password",
 					"channel", "web",
+					"user", user.Name,
 					"error", err.Error(),
 				)
 
-				notifications = append(notifications, "&#10060; Could not parse form")
-			} else {
-				oldPassword := r.Form.Get("old_password")
-				newPassword := r.Form.Get("new_password")
+				notifications = append(notifications, "&#10060; Could not verify user password")
+			}
 
-				valid, err := authDb.VerifyUserPassword(user.Name, oldPassword)
+			if !valid {
+				notifications = append(notifications, "&#10060; Invalid password")
+			} else {
+				err := userSys.SaveUser(
+					*user,
+					newPassword,
+				)
 				if err != nil {
 					slog.ErrorContext(
 						r.Context(),
-						"error verifying user password",
+						"error saving user",
 						"channel", "web",
-						"user", username,
+						"user", user.Name,
 						"error", err.Error(),
 					)
 
-					notifications = append(notifications, "&#10060; Could not verify user password")
-				}
-
-				if !valid {
-					notifications = append(notifications, "&#10060; Invalid password")
+					notifications = append(notifications, "&#10060; Could not change user password")
 				} else {
-					err := authDb.SaveUser(
-						auth.User{Name: user.Name, Roles: user.Roles},
-						newPassword,
-					)
-					if err != nil {
-						slog.ErrorContext(
-							r.Context(),
-							"error saving user",
-							"channel", "web",
-							"user", username,
-							"error", err.Error(),
-						)
-
-						notifications = append(notifications, "&#10060; Could not change user password")
-					} else {
-						notifications = append(notifications, "&#9989; Password changed")
-					}
+					notifications = append(notifications, "&#9989; Password changed")
 				}
 			}
 		}
@@ -170,34 +142,21 @@ func AccountController(authDb *auth.Database) http.Handler {
 	mux.HandleFunc("POST /web/account/token/new/{$}", func(w http.ResponseWriter, r *http.Request) {
 		success := false
 		notifications := []string{}
-		username := auth.GetContextUser(r.Context())
+		user := auth.GetContextUser(r.Context())
 
-		token, err := auth.NewToken(32)
+		token, err := tokenSys.CreateToken(user.Name)
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
 				"error generating token",
 				"channel", "web",
-				"user", username,
+				"user", user.Name,
 				"error", err.Error(),
 			)
 
-			notifications = append(notifications, "&#10060; Could not generate token")
+			notifications = append(notifications, "&#10060; Could not create token")
 		} else {
-			err := authDb.AddPersonalAccessToken(username, token)
-			if err != nil {
-				slog.ErrorContext(
-					r.Context(),
-					"error saving token",
-					"channel", "web",
-					"user", username,
-					"error", err.Error(),
-				)
-
-				notifications = append(notifications, "&#10060; Could not save token")
-			} else {
-				success = true
-			}
+			success = true
 		}
 
 		trigger := map[string]interface{}{
@@ -227,17 +186,17 @@ func AccountController(authDb *auth.Database) http.Handler {
 	})
 
 	mux.HandleFunc("GET /web/account/token/delete/{tokenUUID}/{$}", func(w http.ResponseWriter, r *http.Request) {
-		username := auth.GetContextUser(r.Context())
+		user := auth.GetContextUser(r.Context())
 		notifications := []string{}
 
 		tokenUUID := r.PathValue("tokenUUID")
-		err := authDb.DeletePersonalAccessToken(username, tokenUUID)
+		err := tokenSys.DeleteToken(user.Name, tokenUUID)
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
 				"error deleting token",
 				"channel", "web",
-				"user", username,
+				"user", user.Name,
 				"tokenUUID", tokenUUID,
 				"error", err.Error(),
 			)

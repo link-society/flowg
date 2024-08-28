@@ -35,7 +35,8 @@ func NewAdminRoleDeleteCommand() *cobra.Command {
 				}
 			}()
 
-			err = authDb.DeleteRole(opts.name)
+			roleSys := auth.NewRoleSystem(authDb)
+			err = roleSys.DeleteRole(opts.name)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to delete role:", err)
 				exitCode = 1

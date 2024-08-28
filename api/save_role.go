@@ -20,8 +20,10 @@ type SaveRoleResponse struct {
 }
 
 func SaveRoleUsecase(authDb *auth.Database) usecase.Interactor {
+	roleSys := auth.NewRoleSystem(authDb)
+
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiMiddleware(
+		auth.RequireScopeApiDecorator(
 			authDb,
 			auth.SCOPE_WRITE_ACLS,
 			func(
@@ -54,7 +56,7 @@ func SaveRoleUsecase(authDb *auth.Database) usecase.Interactor {
 					Scopes: scopes,
 				}
 
-				err := authDb.SaveRole(role)
+				err := roleSys.SaveRole(role)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,

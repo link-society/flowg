@@ -36,29 +36,17 @@ func NewAdminRoleListCommand() *cobra.Command {
 				}
 			}()
 
-			roleNames, err := authDb.ListRoles()
+			roleSys := auth.NewRoleSystem(authDb)
+			roles, err := roleSys.ListRoles()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to list roles:", err)
 				exitCode = 1
 				return
 			}
 
-			if len(roleNames) == 0 {
+			if len(roles) == 0 {
 				fmt.Println("No roles found")
 			} else {
-				roles := make([]auth.Role, len(roleNames))
-
-				for i, roleName := range roleNames {
-					role, err := authDb.GetRole(roleName)
-					if err != nil {
-						fmt.Fprintln(os.Stderr, "ERROR: Failed to get role:", err)
-						exitCode = 1
-						return
-					}
-
-					roles[i] = role
-				}
-
 				writer := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 
 				fmt.Fprintln(writer, "Name\tScopes")

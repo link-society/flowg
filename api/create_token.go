@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"errors"
 	"log/slog"
 
 	"github.com/swaggest/usecase"
@@ -19,58 +18,21 @@ type CreateTokenResponse struct {
 }
 
 func CreateTokenUsecase(authDb *auth.Database) usecase.Interactor {
+	tokenSys := auth.NewTokenSystem(authDb)
+
 	u := usecase.NewInteractor(
 		func(
 			ctx context.Context,
 			req CreateTokenRequest,
 			resp *CreateTokenResponse,
 		) error {
-			username := auth.GetContextUser(ctx)
-			user, err := authDb.GetUser(username)
-			if err != nil {
-				slog.ErrorContext(
-					ctx,
-					"Failed to get user",
-					"channel", "api",
-					"user", username,
-					"error", err.Error(),
-				)
+			user := auth.GetContextUser(ctx)
 
-				resp.Success = false
-				return status.Wrap(err, status.Internal)
-			}
-
-			if user == nil {
-				slog.ErrorContext(
-					ctx,
-					"User not found",
-					"channel", "api",
-					"user", username,
-				)
-
-				resp.Success = false
-				return status.Wrap(errors.New("user not found"), status.NotFound)
-			}
-
-			token, err := auth.NewToken(32)
+			token, err := tokenSys.CreateToken(user.Name)
 			if err != nil {
 				slog.ErrorContext(
 					ctx,
 					"Failed to create token",
-					"channel", "api",
-					"user", user.Name,
-					"error", err.Error(),
-				)
-
-				resp.Success = false
-				return status.Wrap(err, status.Internal)
-			}
-
-			err = authDb.AddPersonalAccessToken(user.Name, token)
-			if err != nil {
-				slog.ErrorContext(
-					ctx,
-					"Failed to save token",
 					"channel", "api",
 					"user", user.Name,
 					"error", err.Error(),

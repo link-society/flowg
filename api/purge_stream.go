@@ -23,7 +23,7 @@ func PurgeStreamUsecase(
 	logDb *logstorage.Storage,
 ) usecase.Interactor {
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiMiddleware(
+		auth.RequireScopeApiDecorator(
 			authDb,
 			auth.SCOPE_WRITE_STREAMS,
 			func(

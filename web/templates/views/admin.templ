@@ -75,7 +75,7 @@ templ adminRoleList(roles []auth.Role, permissions auth.Permissions) {
   </div>
 }
 
-templ adminUserList(users []*auth.User, permissions auth.Permissions) {
+templ adminUserList(users []auth.User, permissions auth.Permissions) {
   <div class="col s12 m6 h-full">
     <article class="card h-full flex flex-col p-0">
       <section class="card-content p-0 h-0 flex-grow flex-shrink flex flex-col">
@@ -146,7 +146,7 @@ templ adminUserList(users []*auth.User, permissions auth.Permissions) {
 
 type AdminProps struct {
   Roles []auth.Role
-  Users []*auth.User
+  Users []auth.User
 }
 
 templ Admin(

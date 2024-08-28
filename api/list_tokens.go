@@ -18,21 +18,23 @@ type ListTokensResponse struct {
 }
 
 func ListTokensUsecase(authDb *auth.Database) usecase.Interactor {
+	tokenSys := auth.NewTokenSystem(authDb)
+
 	u := usecase.NewInteractor(
 		func(
 			ctx context.Context,
 			req ListTokensRequest,
 			resp *ListTokensResponse,
 		) error {
-			username := auth.GetContextUser(ctx)
+			user := auth.GetContextUser(ctx)
 
-			tokenUUIDs, err := authDb.ListPersonalAccessTokens(username)
+			tokenUUIDs, err := tokenSys.ListTokens(user.Name)
 			if err != nil {
 				slog.ErrorContext(
 					ctx,
 					"Failed to list tokens",
 					"channel", "api",
-					"user", username,
+					"user", user.Name,
 					"error", err.Error(),
 				)
 
