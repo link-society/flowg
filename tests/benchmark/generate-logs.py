@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 import tomllib
 
 from datetime import datetime
-from time import sleep, time
+from time import time
 import random
 
 from urllib.request import Request, urlopen
@@ -16,12 +16,15 @@ def format_syslog(hostname: str, appname: str, message: str) -> str:
     return f"{timestamp} {hostname} {appname}: {message}"
 
 
-def send_log(log: str):
+def send_log(token: str, log: str):
     payload = json.dumps({"record": {"message": log}}).encode("utf-8")
     req = Request(
         "http://localhost:5080/api/v1/pipelines/test/logs",
         data=payload,
-        headers={"Content-Type": "application/json"},
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {token}",
+        },
     )
 
     with urlopen(req) as resp:
@@ -30,6 +33,7 @@ def send_log(log: str):
 
 def main():
     parser = ArgumentParser()
+    parser.add_argument("--token", required=True)
     parser.add_argument("--conftest", default="conftest.toml")
     parser.add_argument("--req-count", type=int, default=1_000_000)
     args = parser.parse_args()
@@ -50,7 +54,10 @@ def main():
             app = random.choice(data["apps"])
             message = random.choice(app["messages"])
 
-            send_log(format_syslog(hostname, app["name"], message))
+            send_log(
+                args.token,
+                format_syslog(hostname, app["name"], message),
+            )
 
             batch_count += 1
             req_count -= 1
