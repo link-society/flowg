@@ -1,3 +1,3 @@
 package internal
 
-const FLOWG_VERSION = "v0.1.4"
+const FLOWG_VERSION = "v0.2.0"
