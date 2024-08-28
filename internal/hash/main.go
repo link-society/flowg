@@ -21,10 +21,10 @@ type hashParams struct {
 
 func HashPassword(password string) (string, error) {
 	hp := hashParams{
-		memory:      64 * 1024,
-		iterations:  3,
-		parallelism: 2,
-		saltLength:  16,
+		memory:      1, // 1 kB
+		iterations:  1,
+		parallelism: 1,
+		saltLength:  4,
 		keyLength:   32,
 	}
 
