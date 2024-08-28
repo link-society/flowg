@@ -324,7 +324,7 @@ func AdminController(authDb *auth.Database) http.Handler {
 		}
 
 		if !permissions.CanEditACLs {
-			notifications = append(notifications, "&#10060; You do not have permission to create roles")
+			notifications = append(notifications, "&#10060; You do not have permission to delete roles")
 		} else {
 			roleName := r.PathValue("name")
 
@@ -343,6 +343,295 @@ func AdminController(authDb *auth.Database) http.Handler {
 				w.Header().Add("HX-Retarget", "tr[data-role="+strconv.Quote(roleName)+"]")
 
 				notifications = append(notifications, "&#9989; Role deleted")
+			}
+		}
+
+		trigger := map[string]interface{}{
+			"htmx-custom-toast": map[string]interface{}{
+				"messages": notifications,
+			},
+		}
+
+		triggerData, err := json.Marshal(trigger)
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error marshalling trigger",
+				"channel", "web",
+				"error", err.Error(),
+			)
+		} else {
+			w.Header().Add("HX-Trigger", string(triggerData))
+		}
+
+		w.WriteHeader(http.StatusOK)
+	})
+
+	mux.HandleFunc("GET /web/admin/users/new/{$}", func(w http.ResponseWriter, r *http.Request) {
+		permissions := auth.Permissions{}
+		notifications := []string{}
+
+		user := auth.GetContextUser(r.Context())
+		scopes, err := authDb.ListUserScopes(user)
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error listing user scopes",
+				"channel", "web",
+				"error", err.Error(),
+			)
+
+			notifications = append(notifications, "&#10060; Could not fetch user permissions")
+		} else {
+			permissions = auth.PermissionsFromScopes(scopes)
+		}
+
+		if permissions.CanEditACLs {
+			w.Header().Add("HX-Trigger", "htmx-custom-modal-open")
+
+			roles := []struct {
+				Name     string
+				Selected bool
+			}{}
+
+			roleNames, err := authDb.ListRoles()
+			if err != nil {
+				slog.ErrorContext(
+					r.Context(),
+					"error listing roles",
+					"channel", "web",
+					"error", err.Error(),
+				)
+
+				notifications = append(notifications, "&#10060; Could not fetch roles")
+			} else {
+				for _, roleName := range roleNames {
+					roles = append(
+						roles,
+						struct {
+							Name     string
+							Selected bool
+						}{
+							Name:     roleName,
+							Selected: false,
+						},
+					)
+				}
+			}
+
+			h := templ.Handler(components.UserForm(components.UserFormProps{
+				Name:     "",
+				Password: "",
+				Roles:    roles,
+			}))
+			h.ServeHTTP(w, r)
+		} else {
+			trigger := map[string]interface{}{
+				"htmx-custom-modal-open": map[string]interface{}{},
+				"htmx-custom-toast": map[string]interface{}{
+					"messages": notifications,
+				},
+			}
+			triggerData, err := json.Marshal(trigger)
+			if err != nil {
+				slog.ErrorContext(
+					r.Context(),
+					"error marshalling trigger",
+					"channel", "web",
+					"error", err.Error(),
+				)
+
+				triggerData = []byte("htmx-custom-modal-open")
+			}
+
+			w.Header().Add("HX-Trigger", string(triggerData))
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("&#10060; You do not have permission to create users"))
+		}
+	})
+
+	mux.HandleFunc("POST /web/admin/users/new/{$}", func(w http.ResponseWriter, r *http.Request) {
+		permissions := auth.Permissions{}
+		notifications := []string{}
+
+		user := auth.GetContextUser(r.Context())
+		scopes, err := authDb.ListUserScopes(user)
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error listing user scopes",
+				"channel", "web",
+				"error", err.Error(),
+			)
+
+			notifications = append(notifications, "&#10060; Could not fetch user permissions")
+		} else {
+			permissions = auth.PermissionsFromScopes(scopes)
+		}
+
+		if permissions.CanEditACLs {
+			roles := []struct {
+				Name     string
+				Selected bool
+			}{}
+
+			roleNames, err := authDb.ListRoles()
+			if err != nil {
+				slog.ErrorContext(
+					r.Context(),
+					"error listing roles",
+					"channel", "web",
+					"error", err.Error(),
+				)
+
+				notifications = append(notifications, "&#10060; Could not fetch roles")
+			} else {
+				for _, roleName := range roleNames {
+					roles = append(
+						roles,
+						struct {
+							Name     string
+							Selected bool
+						}{
+							Name:     roleName,
+							Selected: false,
+						},
+					)
+				}
+			}
+
+			props := components.UserFormProps{
+				Name:     "",
+				Password: "",
+				Roles:    roles,
+			}
+
+			trigger := map[string]interface{}{}
+
+			err = r.ParseForm()
+			if err != nil {
+				slog.ErrorContext(
+					r.Context(),
+					"error parsing form",
+					"channel", "web",
+					"error", err.Error(),
+				)
+
+				notifications = append(notifications, "&#10060; Could not parse form")
+
+			} else {
+				user := auth.User{}
+
+				props.Name = r.FormValue("name")
+				props.Password = r.FormValue("password")
+				user.Name = props.Name
+
+				for i, role := range props.Roles {
+					props.Roles[i].Selected = r.FormValue(fmt.Sprintf("role_%s", role.Name)) == "on"
+
+					if props.Roles[i].Selected {
+						user.Roles = append(user.Roles, role.Name)
+					}
+				}
+
+				err := authDb.SaveUser(user, props.Password)
+				if err != nil {
+					slog.ErrorContext(
+						r.Context(),
+						"error saving user",
+						"channel", "web",
+						"error", err.Error(),
+					)
+
+					notifications = append(notifications, "&#10060; Could not save user")
+				} else {
+					trigger["htmx-custom-modal-close"] = map[string]interface{}{
+						"after": "reload",
+					}
+				}
+			}
+
+			trigger["htmx-custom-toast"] = map[string]interface{}{
+				"messages": notifications,
+			}
+
+			triggerData, err := json.Marshal(trigger)
+			if err != nil {
+				slog.ErrorContext(
+					r.Context(),
+					"error marshalling trigger",
+					"channel", "web",
+					"error", err.Error(),
+				)
+			} else {
+				w.Header().Add("HX-Trigger", string(triggerData))
+			}
+
+			h := templ.Handler(components.UserForm(props))
+			h.ServeHTTP(w, r)
+		} else {
+			trigger := map[string]interface{}{
+				"htmx-custom-toast": map[string]interface{}{
+					"messages": notifications,
+				},
+			}
+			triggerData, err := json.Marshal(trigger)
+			if err != nil {
+				slog.ErrorContext(
+					r.Context(),
+					"error marshalling trigger",
+					"channel", "web",
+					"error", err.Error(),
+				)
+
+				triggerData = []byte("htmx-custom-modal-open")
+			}
+
+			w.Header().Add("HX-Trigger", string(triggerData))
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("&#10060; You do not have permission to create users"))
+		}
+	})
+
+	mux.HandleFunc("GET /web/admin/users/delete/{name}/{$}", func(w http.ResponseWriter, r *http.Request) {
+		permissions := auth.Permissions{}
+		notifications := []string{}
+
+		user := auth.GetContextUser(r.Context())
+		scopes, err := authDb.ListUserScopes(user)
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error listing user scopes",
+				"channel", "web",
+				"error", err.Error(),
+			)
+
+			notifications = append(notifications, "&#10060; Could not fetch user permissions")
+		} else {
+			permissions = auth.PermissionsFromScopes(scopes)
+		}
+
+		if !permissions.CanEditACLs {
+			notifications = append(notifications, "&#10060; You do not have permission to delete users")
+		} else {
+			userName := r.PathValue("name")
+
+			err := authDb.DeleteUser(userName)
+			if err != nil {
+				slog.ErrorContext(
+					r.Context(),
+					"error deleting user",
+					"channel", "web",
+					"error", err.Error(),
+				)
+
+				notifications = append(notifications, "&#10060; Could not delete user")
+			} else {
+				w.Header().Add("HX-Reswap", "delete")
+				w.Header().Add("HX-Retarget", "tr[data-user="+strconv.Quote(userName)+"]")
+
+				notifications = append(notifications, "&#9989; User deleted")
 			}
 		}
 

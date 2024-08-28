@@ -89,7 +89,11 @@ templ adminUserList(users []*auth.User, permissions auth.Permissions) {
         >
           <p class="card-title flex-grow mb-0 font-semibold">Users</p>
           if permissions.CanEditACLs {
-            <button class="waves-effect waves-light btn-small">
+            <button
+              class="waves-effect waves-light btn-small"
+              hx-get="/web/admin/users/new/"
+              hx-target="#modal-content"
+            >
               <i class="material-icons left">add</i>
               Add User
             </button>
@@ -109,7 +113,7 @@ templ adminUserList(users []*auth.User, permissions auth.Permissions) {
             </thead>
             <tbody>
               for _, user := range users {
-                <tr>
+                <tr data-user={user.Name}>
                   <td>{user.Name}</td>
                   <td>
                     <div class="w-full flex flex-row gap-2 py-1 items-center justify-start">
@@ -122,7 +126,10 @@ templ adminUserList(users []*auth.User, permissions auth.Permissions) {
                   </td>
                   if permissions.CanEditACLs {
                     <td>
-                      <button class="waves-effect waves-light btn-small red">
+                      <button
+                        class="waves-effect waves-light btn-small red"
+                        hx-get={"/web/admin/users/delete/"+user.Name+"/"}
+                      >
                         <i class="material-icons">delete</i>
                       </button>
                     </td>

@@ -1,0 +1,63 @@
+package components
+
+type UserFormProps struct {
+  Name     string
+  Password string
+
+  Roles []struct{
+    Name     string
+    Selected bool
+  }
+}
+
+templ UserForm(props UserFormProps) {
+  <form
+    class="flex flex-col"
+    hx-post="/web/admin/users/new/"
+    hx-target="#modal-content"
+  >
+    <header class="text-center font-semibold text-2xl">Add a new user</header>
+
+    <div class="divider"></div>
+
+    <section>
+      <div class="input-field">
+        <input type="text" name="name" value={props.Name} required />
+        <label for="name">User Name</label>
+      </div>
+
+      <div class="input-field">
+        <input type="password" name="password" value={props.Password} required />
+        <label for="password">Password</label>
+      </div>
+    </section>
+
+    <section>
+      <header class="font-semibold">Roles:</header>
+
+      for _, role := range props.Roles {
+        <p>
+          <label>
+            <input
+              type="checkbox"
+              class="filled-in"
+              name={"role_"+role.Name}
+              if role.Selected {
+                checked
+              }
+            />
+            <span>{role.Name}</span>
+          </label>
+        </p>
+      }
+    </section>
+
+    <div class="divider"></div>
+
+    <section class="section">
+      <button class="btn waves-effect waves-light w-full" type="submit">
+        Add new user
+      </button>
+    </section>
+  </form>
+}
