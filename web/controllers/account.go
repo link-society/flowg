@@ -10,6 +10,7 @@ import (
 
 	"link-society.com/flowg/internal/auth"
 
+	"link-society.com/flowg/web/templates/components"
 	"link-society.com/flowg/web/templates/views"
 )
 
@@ -41,6 +42,7 @@ func AccountController(authDb *auth.Database) http.Handler {
 				r.Context(),
 				"error fetching user",
 				"channel", "web",
+				"user", username,
 				"error", err.Error(),
 			)
 
@@ -52,10 +54,24 @@ func AccountController(authDb *auth.Database) http.Handler {
 			}
 		}
 
+		tokenUUIDs, err := authDb.ListPersonalAccessTokens(user.Name)
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error listing personal access tokens",
+				"channel", "web",
+				"user", username,
+				"error", err.Error(),
+			)
+
+			notifications = append(notifications, "&#10060; Could not fetch personal access tokens")
+			tokenUUIDs = []string{}
+		}
+
 		h := templ.Handler(views.Account(
 			views.AccountProps{
 				User:       user,
-				TokenUUIDs: []string{},
+				TokenUUIDs: tokenUUIDs,
 			},
 			permissions,
 			notifications,
@@ -128,6 +144,112 @@ func AccountController(authDb *auth.Database) http.Handler {
 					}
 				}
 			}
+		}
+
+		trigger := map[string]interface{}{
+			"htmx-custom-toast": map[string]interface{}{
+				"messages": notifications,
+			},
+		}
+
+		triggerData, err := json.Marshal(trigger)
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error marshalling trigger",
+				"channel", "web",
+				"error", err.Error(),
+			)
+		} else {
+			w.Header().Add("HX-Trigger", string(triggerData))
+		}
+
+		w.WriteHeader(http.StatusOK)
+	})
+
+	mux.HandleFunc("POST /web/account/token/new/{$}", func(w http.ResponseWriter, r *http.Request) {
+		success := false
+		notifications := []string{}
+		username := auth.GetContextUser(r.Context())
+
+		token, err := auth.NewToken(32)
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error generating token",
+				"channel", "web",
+				"user", username,
+				"error", err.Error(),
+			)
+
+			notifications = append(notifications, "&#10060; Could not generate token")
+		} else {
+			err := authDb.AddPersonalAccessToken(username, token)
+			if err != nil {
+				slog.ErrorContext(
+					r.Context(),
+					"error saving token",
+					"channel", "web",
+					"user", username,
+					"error", err.Error(),
+				)
+
+				notifications = append(notifications, "&#10060; Could not save token")
+			} else {
+				success = true
+			}
+		}
+
+		trigger := map[string]interface{}{
+			"htmx-custom-toast": map[string]interface{}{
+				"messages": notifications,
+			},
+		}
+
+		if success {
+			trigger["htmx-custom-modal-open"] = map[string]interface{}{}
+		}
+
+		triggerData, err := json.Marshal(trigger)
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error marshalling trigger",
+				"channel", "web",
+				"error", err.Error(),
+			)
+		} else {
+			w.Header().Add("HX-Trigger", string(triggerData))
+		}
+
+		h := templ.Handler(components.TokenViewer(token))
+		h.ServeHTTP(w, r)
+	})
+
+	mux.HandleFunc("GET /web/account/token/delete/{tokenUUID}/{$}", func(w http.ResponseWriter, r *http.Request) {
+		username := auth.GetContextUser(r.Context())
+		notifications := []string{}
+
+		tokenUUID := r.PathValue("tokenUUID")
+		err := authDb.DeletePersonalAccessToken(username, tokenUUID)
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error deleting token",
+				"channel", "web",
+				"user", username,
+				"tokenUUID", tokenUUID,
+				"error", err.Error(),
+			)
+
+			w.Header().Add("HX-Reswap", "none")
+
+			notifications = append(notifications, "&#10060; Could not delete token")
+		} else {
+			w.Header().Add("HX-Reswap", "delete")
+			w.Header().Add("HX-Retarget", "tr[data-token='"+tokenUUID+"']")
+
+			notifications = append(notifications, "&#9989; Token deleted")
 		}
 
 		trigger := map[string]interface{}{
