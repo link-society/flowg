@@ -7,7 +7,7 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	"link-society.com/flowg/internal/auth"
+	"link-society.com/flowg/internal/data/auth"
 )
 
 type DeleteTokenRequest struct {

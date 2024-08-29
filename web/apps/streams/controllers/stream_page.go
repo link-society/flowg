@@ -11,7 +11,7 @@ import (
 
 	"github.com/a-h/templ"
 
-	"link-society.com/flowg/internal/auth"
+	"link-society.com/flowg/internal/data/auth"
 	"link-society.com/flowg/internal/filterdsl"
 	"link-society.com/flowg/internal/logstorage"
 

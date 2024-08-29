@@ -9,7 +9,7 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"link-society.com/flowg/internal/auth"
+	"link-society.com/flowg/internal/data/auth"
 )
 
 type SideMenuProps struct {

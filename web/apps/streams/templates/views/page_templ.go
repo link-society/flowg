@@ -11,7 +11,7 @@ import templruntime "github.com/a-h/templ/runtime"
 import (
 	"time"
 
-	"link-society.com/flowg/internal/auth"
+	"link-society.com/flowg/internal/data/auth"
 	"link-society.com/flowg/internal/logstorage"
 
 	"link-society.com/flowg/web/apps/streams/templates/components"

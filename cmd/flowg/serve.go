@@ -15,7 +15,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"link-society.com/flowg/internal/app/logging"
-	"link-society.com/flowg/internal/auth"
+	"link-society.com/flowg/internal/data/auth"
 	"link-society.com/flowg/internal/logstorage"
 	"link-society.com/flowg/internal/pipelines"
 

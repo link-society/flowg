@@ -7,7 +7,7 @@ import (
 
 	"github.com/a-h/templ"
 
-	"link-society.com/flowg/internal/auth"
+	"link-society.com/flowg/internal/data/auth"
 
 	"link-society.com/flowg/web/apps/admin/templates/views"
 )

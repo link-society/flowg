@@ -7,7 +7,7 @@ import (
 
 	"net/http"
 
-	"link-society.com/flowg/internal/auth"
+	"link-society.com/flowg/internal/data/auth"
 )
 
 func ChangePassword(
