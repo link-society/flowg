@@ -15,8 +15,7 @@ import (
 	"link-society.com/flowg/web/apps/onboarding"
 	"link-society.com/flowg/web/apps/pipelines"
 	"link-society.com/flowg/web/apps/streams"
-
-	"link-society.com/flowg/web/controllers"
+	"link-society.com/flowg/web/apps/transformers"
 )
 
 //go:embed static/**/*.css
@@ -48,7 +47,7 @@ func NewHandler(
 	)
 	mux.Handle(
 		"/web/transformers/",
-		authMiddleware(controllers.TransformersController(authDb, pipelinesManager)),
+		authMiddleware(transformers.Application(authDb, pipelinesManager)),
 	)
 	mux.Handle(
 		"/web/pipelines/",
