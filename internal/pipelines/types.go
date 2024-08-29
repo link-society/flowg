@@ -3,7 +3,7 @@ package pipelines
 import (
 	"context"
 
-	"link-society.com/flowg/internal/logstorage"
+	"link-society.com/flowg/internal/data/logstorage"
 	"link-society.com/flowg/internal/vrl"
 )
 

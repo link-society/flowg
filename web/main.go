@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/logstorage"
+	"link-society.com/flowg/internal/data/logstorage"
 	pipelineStorage "link-society.com/flowg/internal/pipelines"
 
 	"link-society.com/flowg/web/apps/account"
