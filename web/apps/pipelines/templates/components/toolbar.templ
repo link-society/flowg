@@ -1,0 +1,58 @@
+package components
+
+
+import (
+  "link-society.com/flowg/internal"
+	"link-society.com/flowg/internal/auth"
+)
+
+type ToolbarProps struct {
+  CurrentPipeline string
+  Permissions     auth.Permissions
+}
+
+templ Toolbar(props ToolbarProps) {
+  <div
+    class="
+      blue darken-1
+      z-depth-1
+      p-3
+      flex flex-row items-center
+    "
+  >
+    <div class="flex flex-row flex-grow items-center">
+      <a
+        class="btn-small blue"
+        href={templ.SafeURL("https://github.com/link-society/flowg/blob/" + internal.FLOWG_VERSION + "/docs/README.md")}
+        target="_blank"
+      >
+        <i class="material-icons left">help</i>
+        Documentation
+      </a>
+    </div>
+    <div class="flex flex-row items-center gap-3">
+      if props.Permissions.CanEditPipelines {
+        if props.CurrentPipeline != "" {
+          <a
+            class="btn-small blue"
+            href="/web/pipelines/new"
+          >
+            <i class="material-icons left">add</i>
+            New
+          </a>
+          <a
+            class="btn-small red"
+            href={templ.SafeURL("/web/pipelines/delete/" + props.CurrentPipeline + "/")}
+          >
+            <i class="material-icons left">delete</i>
+            Delete
+          </a>
+        }
+        <button id="action_save" class="waves-effect waves-light btn-small">
+          <i class="material-icons left">save</i>
+          Save
+        </button>
+      }
+    </div>
+  </div>
+}

@@ -1,0 +1,41 @@
+package components
+
+templ FABs() {
+  <div class="fixed-action-btn" style="margin-bottom: 5em;">
+    <button class="btn-floating btn-large">
+      <i class="large material-icons">add</i>
+    </button>
+    <ul>
+      <li>
+        <button
+          class="btn-floating tooltipped blue flowg-addnode-btn"
+          data-position="left"
+          data-tooltip="Add Transform Node"
+          data-nodetype="transform"
+        >
+          <i class="material-icons">filter_alt</i>
+        </button>
+      </li>
+      <li>
+        <button
+          class="btn-floating tooltipped red flowg-addnode-btn"
+          data-position="left"
+          data-tooltip="Add Switch Node"
+          data-nodetype="switch"
+        >
+          <i class="material-icons">device_hub</i>
+        </button>
+      </li>
+      <li>
+        <button
+          class="btn-floating tooltipped purple flowg-addnode-btn"
+          data-position="left"
+          data-tooltip="Add Router Node"
+          data-nodetype="router"
+        >
+          <i class="material-icons">storage</i>
+        </button>
+      </li>
+    </ul>
+  </div>
+}
