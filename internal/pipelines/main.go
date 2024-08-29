@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"link-society.com/flowg/internal/logstorage"
+	"link-society.com/flowg/internal/data/logstorage"
 )
 
 type Manager struct {

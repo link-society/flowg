@@ -8,7 +8,7 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/logstorage"
+	"link-society.com/flowg/internal/data/logstorage"
 )
 
 type PurgeStreamRequest struct {

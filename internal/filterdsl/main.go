@@ -3,7 +3,7 @@ package filterdsl
 import (
 	"encoding/json"
 
-	"link-society.com/flowg/internal/logstorage"
+	"link-society.com/flowg/internal/data/logstorage"
 )
 
 func astToFilter(ast map[string]interface{}) logstorage.Filter {
