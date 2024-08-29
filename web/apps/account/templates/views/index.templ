@@ -1,0 +1,36 @@
+package views
+
+import (
+	"link-society.com/flowg/internal/auth"
+
+  "link-society.com/flowg/web/apps/account/templates/components"
+  "link-society.com/flowg/web/templates/layouts"
+)
+
+type IndexProps struct {
+  User       *auth.User
+  TokenUUIDs []string
+
+  Permissions   auth.Permissions
+  Notifications []string
+}
+
+templ Index(props IndexProps) {
+  @layouts.App(layouts.AppProps{
+    Head:          nil,
+    CurrentNav:    "account",
+    Permissions:   props.Permissions,
+    Notifications: props.Notifications,
+  }) {
+    <div class="w-full h-full flex flex-col">
+      <section class="row section w-full mb-0 flex-grow">
+        @components.UserInfo(components.UserInfoProps{
+          User: props.User,
+        })
+        @components.TokenList(components.TokenListProps{
+          TokenUUIDs: props.TokenUUIDs,
+        })
+      </section>
+    </div>
+  }
+}
