@@ -11,19 +11,15 @@ import (
 	"link-society.com/flowg/internal/logstorage"
 	"link-society.com/flowg/internal/pipelines"
 
-	"link-society.com/flowg/web/templates/views"
+	"link-society.com/flowg/web/apps/dashboard/templates/views"
 )
 
-func MainController(
-	authDb *auth.Database,
+func Index(
+	userSys *auth.UserSystem,
 	logDb *logstorage.Storage,
 	pipelinesManager *pipelines.Manager,
-) http.Handler {
-	mux := http.NewServeMux()
-
-	userSys := auth.NewUserSystem(authDb)
-
-	mux.HandleFunc("GET /web/{$}", func(w http.ResponseWriter, r *http.Request) {
+) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		streamCount := 0
 		transformerCount := 0
 		pipelineCount := 0
@@ -85,18 +81,17 @@ func MainController(
 			notifications = append(notifications, "&#10060; Could not fetch pipelines")
 		}
 
-		h := templ.Handler(views.Dashboard(
-			views.DashboardProps{
+		h := templ.Handler(views.Index(
+			views.IndexProps{
 				StreamCount:      streamCount,
 				TransformerCount: transformerCount,
 				PipelineCount:    pipelineCount,
+
+				Permissions:   permissions,
+				Notifications: notifications,
 			},
-			permissions,
-			notifications,
 		))
 
 		h.ServeHTTP(w, r)
-	})
-
-	return mux
+	}
 }

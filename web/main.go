@@ -11,6 +11,7 @@ import (
 
 	"link-society.com/flowg/web/apps/account"
 	"link-society.com/flowg/web/apps/admin"
+	"link-society.com/flowg/web/apps/dashboard"
 
 	"link-society.com/flowg/web/controllers"
 )
@@ -36,7 +37,7 @@ func NewHandler(
 
 	mux.Handle(
 		"/web/",
-		authMiddleware(controllers.MainController(authDb, logDb, pipelinesManager)),
+		authMiddleware(dashboard.Application(authDb, logDb, pipelinesManager)),
 	)
 	mux.Handle(
 		"/web/streams/",
