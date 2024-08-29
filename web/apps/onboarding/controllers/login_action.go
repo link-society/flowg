@@ -2,40 +2,21 @@ package controllers
 
 import (
 	"log/slog"
-	"net/http"
 	"time"
+
+	"net/http"
 
 	"github.com/a-h/templ"
 
 	"link-society.com/flowg/internal/auth"
 
-	"link-society.com/flowg/web/templates/views"
+	"link-society.com/flowg/web/apps/onboarding/templates/views"
 )
 
-func AuthController(authDb *auth.Database) http.Handler {
-	mux := http.NewServeMux()
-
-	userSys := auth.NewUserSystem(authDb)
-
-	mux.HandleFunc("GET /auth/login/{$}", func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie("session_id")
-		if err == nil && cookie.Value != "" {
-			user, err := userSys.GetUser(cookie.Value)
-			if err == nil && user != nil {
-				http.Redirect(w, r, "/web", http.StatusSeeOther)
-				return
-			}
-		}
-
-		h := templ.Handler(views.Login(
-			views.LoginProps{},
-			[]string{},
-		))
-
-		h.ServeHTTP(w, r)
-	})
-
-	mux.HandleFunc("POST /auth/login/{$}", func(w http.ResponseWriter, r *http.Request) {
+func LoginAction(
+	userSys *auth.UserSystem,
+) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		notifications := []string{}
 
 		err := r.ParseForm()
@@ -94,26 +75,11 @@ func AuthController(authDb *auth.Database) http.Handler {
 		}
 
 		h := templ.Handler(views.Login(
-			views.LoginProps{},
-			notifications,
+			views.LoginProps{
+				Notifications: notifications,
+			},
 		))
 
 		h.ServeHTTP(w, r)
-	})
-
-	mux.HandleFunc("GET /auth/logout/{$}", func(w http.ResponseWriter, r *http.Request) {
-		cookie := &http.Cookie{
-			Name:     "session_id",
-			Value:    "",
-			Expires:  time.Unix(0, 0),
-			MaxAge:   -1,
-			Path:     "/",
-			HttpOnly: true,
-		}
-
-		http.SetCookie(w, cookie)
-		http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
-	})
-
-	return mux
+	}
 }

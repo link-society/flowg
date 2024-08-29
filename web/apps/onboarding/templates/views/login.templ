@@ -2,12 +2,14 @@ package views
 
 import "link-society.com/flowg/web/templates/layouts"
 
-type LoginProps struct {}
+type LoginProps struct {
+  Notifications []string
+}
 
-templ Login(props LoginProps, notifications []string) {
+templ Login(props LoginProps) {
   @layouts.Base(layouts.BaseProps{
     Head:          nil,
-    Notifications: notifications,
+    Notifications: props.Notifications,
   }) {
     <div class="container">
       <div class="row">
