@@ -2,7 +2,7 @@ package components
 
 
 import (
-  "link-society.com/flowg/internal"
+  "link-society.com/flowg/internal/app"
 	"link-society.com/flowg/internal/data/auth"
 )
 
@@ -23,7 +23,7 @@ templ Toolbar(props ToolbarProps) {
     <div class="flex flex-row flex-grow items-center">
       <a
         class="btn-small blue"
-        href={templ.SafeURL("https://github.com/link-society/flowg/blob/" + internal.FLOWG_VERSION + "/docs/README.md")}
+        href={templ.SafeURL("https://github.com/link-society/flowg/blob/" + app.FLOWG_VERSION + "/docs/README.md")}
         target="_blank"
       >
         <i class="material-icons left">help</i>

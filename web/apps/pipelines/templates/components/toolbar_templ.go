@@ -9,7 +9,7 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"link-society.com/flowg/internal"
+	"link-society.com/flowg/internal/app"
 	"link-society.com/flowg/internal/data/auth"
 )
 
@@ -40,7 +40,7 @@ func Toolbar(props ToolbarProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var2 templ.SafeURL = templ.SafeURL("https://github.com/link-society/flowg/blob/" + internal.FLOWG_VERSION + "/docs/README.md")
+		var templ_7745c5c3_Var2 templ.SafeURL = templ.SafeURL("https://github.com/link-society/flowg/blob/" + app.FLOWG_VERSION + "/docs/README.md")
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var2)))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

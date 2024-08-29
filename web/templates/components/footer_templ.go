@@ -9,7 +9,7 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"link-society.com/flowg/internal"
+	"link-society.com/flowg/internal/app"
 )
 
 func Footer() templ.Component {
@@ -35,9 +35,9 @@ func Footer() templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(internal.FLOWG_VERSION)
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(app.FLOWG_VERSION)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/footer.templ`, Line: 11, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/footer.templ`, Line: 11, Col: 26}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
