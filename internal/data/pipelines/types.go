@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"link-society.com/flowg/internal/data/logstorage"
-	"link-society.com/flowg/internal/vrl"
+	"link-society.com/flowg/internal/ffi/vrl"
 )
 
 type Pipeline struct {
