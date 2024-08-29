@@ -50,7 +50,7 @@ tasks:
 
   "gen:rust:filterdsl":
     internal: true
-    dir: ./internal/filterdsl/rust-crate
+    dir: ./internal/ffi/filterdsl/rust-crate
     cmds:
       - cargo build --release
 

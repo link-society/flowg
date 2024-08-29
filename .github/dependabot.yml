@@ -34,7 +34,7 @@ updates:
     labels:
       - "deps: rust"
   - package-ecosystem: "cargo"
-    directory: "/internal/filterdsl/rust-crate"
+    directory: "/internal/ffi/filterdsl/rust-crate"
     schedule:
       interval: "weekly"
     commit-message:

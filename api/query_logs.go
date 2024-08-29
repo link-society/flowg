@@ -11,7 +11,7 @@ import (
 
 	"link-society.com/flowg/internal/data/auth"
 	"link-society.com/flowg/internal/data/logstorage"
-	"link-society.com/flowg/internal/filterdsl"
+	"link-society.com/flowg/internal/ffi/filterdsl"
 )
 
 type QueryStreamRequest struct {

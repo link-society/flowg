@@ -13,7 +13,7 @@ import (
 
 	"link-society.com/flowg/internal/data/auth"
 	"link-society.com/flowg/internal/data/logstorage"
-	"link-society.com/flowg/internal/filterdsl"
+	"link-society.com/flowg/internal/ffi/filterdsl"
 
 	"link-society.com/flowg/web/apps/streams/templates/components"
 	"link-society.com/flowg/web/apps/streams/templates/views"

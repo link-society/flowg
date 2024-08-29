@@ -1,6 +1,6 @@
 /bin/
 /data/
-/internal/filterdsl/rust-crate/target/
+/internal/ffi/filterdsl/rust-crate/target/
 /internal/vrl/rust-crate/target/
 /web/static/webcomponents/
 /web/components/floweditor/node_modules/

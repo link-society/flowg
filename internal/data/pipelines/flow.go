@@ -1,6 +1,6 @@
 package pipelines
 
-import "link-society.com/flowg/internal/filterdsl"
+import "link-society.com/flowg/internal/ffi/filterdsl"
 
 type FlowGraph struct {
 	Nodes []*FlowNode `json:"nodes"`
