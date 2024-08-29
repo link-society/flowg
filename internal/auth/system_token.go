@@ -7,7 +7,8 @@ import (
 
 	"github.com/dgraph-io/badger/v3"
 	"github.com/google/uuid"
-	"link-society.com/flowg/internal/hash"
+
+	"link-society.com/flowg/internal/auth/hash"
 )
 
 const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
