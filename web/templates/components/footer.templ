@@ -1,14 +1,14 @@
 package components
 
 import (
-  "link-society.com/flowg/internal"
+  "link-society.com/flowg/internal/app"
 )
 
 templ Footer() {
   <footer class="page-footer transparent">
     <div class="footer-copyright justify-end">
       <div class="grey-text text-darken-4 pr-2 font-semibold">
-        {internal.FLOWG_VERSION}
+        {app.FLOWG_VERSION}
       </div>
     </div>
   </footer>
