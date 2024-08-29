@@ -44,7 +44,7 @@ tasks:
 
   "gen:rust:vrl":
     internal: true
-    dir: ./internal/vrl/rust-crate
+    dir: ./internal/ffi/vrl/rust-crate
     cmds:
       - cargo build --release
 

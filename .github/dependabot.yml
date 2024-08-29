@@ -26,7 +26,7 @@ updates:
     labels:
       - "deps: go"
   - package-ecosystem: "cargo"
-    directory: "/internal/vrl/rust-crate"
+    directory: "/internal/ffi/vrl/rust-crate"
     schedule:
       interval: "weekly"
     commit-message:

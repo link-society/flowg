@@ -9,7 +9,7 @@ import (
 
 	"link-society.com/flowg/internal/data/auth"
 	"link-society.com/flowg/internal/data/pipelines"
-	"link-society.com/flowg/internal/vrl"
+	"link-society.com/flowg/internal/ffi/vrl"
 )
 
 type TestTransformerRequest struct {
