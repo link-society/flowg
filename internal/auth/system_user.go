@@ -4,7 +4,8 @@ import (
 	"fmt"
 
 	"github.com/dgraph-io/badger/v3"
-	"link-society.com/flowg/internal/hash"
+
+	"link-society.com/flowg/internal/auth/hash"
 )
 
 type UserSystem struct {
