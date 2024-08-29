@@ -9,6 +9,7 @@ import (
 	"link-society.com/flowg/internal/logstorage"
 	"link-society.com/flowg/internal/pipelines"
 
+	"link-society.com/flowg/web/apps/admin"
 	"link-society.com/flowg/web/controllers"
 )
 
@@ -49,7 +50,7 @@ func NewHandler(
 	)
 	mux.Handle(
 		"/web/admin/",
-		authMiddleware(controllers.AdminController(authDb)),
+		authMiddleware(admin.Application(authDb)),
 	)
 	mux.Handle(
 		"/web/account/",

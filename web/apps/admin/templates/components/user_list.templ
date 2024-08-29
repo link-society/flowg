@@ -1,0 +1,79 @@
+package components
+
+import (
+	"link-society.com/flowg/internal/auth"
+)
+
+type UserListProps struct {
+  Users        []auth.User
+  Permissions  auth.Permissions
+}
+
+templ UserList(props UserListProps) {
+  <div class="col s12 m6 h-full">
+    <article class="card h-full flex flex-col p-0">
+      <section class="card-content p-0 h-0 flex-grow flex-shrink flex flex-col">
+        <header
+          class="
+            flex flex-row items-center
+            p-3
+            blue lighten-2
+            white-text
+          "
+        >
+          <p class="card-title flex-grow mb-0 font-semibold">Users</p>
+          if props.Permissions.CanEditACLs {
+            <button
+              class="waves-effect waves-light btn-small"
+              hx-get="/web/admin/users/new/"
+              hx-target="#modal-content"
+            >
+              <i class="material-icons left">add</i>
+              Add User
+            </button>
+          }
+        </header>
+
+        <main class="flex-grow flex-shrink h-0 overflow-auto">
+          <table class="w-full table-responsive acl highlight">
+            <thead class="grey lighten-2 z-depth-1">
+              <tr>
+                <th>Name</th>
+                <th>Roles</th>
+                if props.Permissions.CanEditACLs {
+                  <th>Actions</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              for _, user := range props.Users {
+                <tr data-user={user.Name}>
+                  <td>{user.Name}</td>
+                  <td>
+                    <div class="w-full flex flex-row gap-2 py-1 items-center justify-start">
+                      for _, role := range user.Roles {
+                        <span class="grey lighten-2 z-depth-1 px-2 py-1">
+                          {role}
+                        </span>
+                      }
+                    </div>
+                  </td>
+                  if props.Permissions.CanEditACLs {
+                    <td>
+                      <button
+                        class="waves-effect waves-light btn-small red"
+                        hx-post={"/web/admin/users/delete/"+user.Name+"/"}
+                      >
+                        <i class="material-icons">delete</i>
+                      </button>
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </main>
+      </section>
+    </article>
+  </div>
+}
