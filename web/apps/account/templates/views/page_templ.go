@@ -15,7 +15,7 @@ import (
 	"link-society.com/flowg/web/templates/layouts"
 )
 
-type IndexProps struct {
+type PageProps struct {
 	User       *auth.User
 	TokenUUIDs []string
 
@@ -23,7 +23,7 @@ type IndexProps struct {
 	Notifications []string
 }
 
-func Index(props IndexProps) templ.Component {
+func Page(props PageProps) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)

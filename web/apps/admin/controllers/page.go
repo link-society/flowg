@@ -9,12 +9,12 @@ import (
 
 	"link-society.com/flowg/internal/auth"
 
-	"link-society.com/flowg/web/apps/account/templates/views"
+	"link-society.com/flowg/web/apps/admin/templates/views"
 )
 
-func Index(
+func Page(
+	roleSys *auth.RoleSystem,
 	userSys *auth.UserSystem,
-	tokenSys *auth.TokenSystem,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		permissions := auth.Permissions{}
@@ -35,24 +35,43 @@ func Index(
 			permissions = auth.PermissionsFromScopes(scopes)
 		}
 
-		tokenUUIDs, err := tokenSys.ListTokens(user.Name)
+		if !permissions.CanViewACLs {
+			http.Redirect(w, r, "/web/", http.StatusSeeOther)
+			return
+		}
+
+		roles, err := roleSys.ListRoles()
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
-				"error listing personal access tokens",
+				"error listing roles",
 				"channel", "web",
-				"user", user.Name,
 				"error", err.Error(),
 			)
 
-			notifications = append(notifications, "&#10060; Could not fetch personal access tokens")
-			tokenUUIDs = []string{}
+			notifications = append(notifications, "&#10060; Could not fetch roles")
+
+			roles = []auth.Role{}
 		}
 
-		h := templ.Handler(views.Index(
-			views.IndexProps{
-				User:       user,
-				TokenUUIDs: tokenUUIDs,
+		users, err := userSys.ListUsers()
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error listing users",
+				"channel", "web",
+				"error", err.Error(),
+			)
+
+			notifications = append(notifications, "&#10060; Could not fetch users")
+
+			users = []auth.User{}
+		}
+
+		h := templ.Handler(views.Page(
+			views.PageProps{
+				Roles: roles,
+				Users: users,
 
 				Permissions:   permissions,
 				Notifications: notifications,

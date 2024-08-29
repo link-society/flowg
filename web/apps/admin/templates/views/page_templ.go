@@ -11,20 +11,19 @@ import templruntime "github.com/a-h/templ/runtime"
 import (
 	"link-society.com/flowg/internal/auth"
 
-	"link-society.com/flowg/web/apps/dashboard/templates/components"
+	"link-society.com/flowg/web/apps/admin/templates/components"
 	"link-society.com/flowg/web/templates/layouts"
 )
 
-type IndexProps struct {
-	StreamCount      int
-	TransformerCount int
-	PipelineCount    int
+type PageProps struct {
+	Roles []auth.Role
+	Users []auth.User
 
 	Permissions   auth.Permissions
 	Notifications []string
 }
 
-func Index(props IndexProps) templ.Component {
+func Page(props PageProps) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -54,49 +53,25 @@ func Index(props IndexProps) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"container\"><section class=\"row section flex flex-row items-stretch\"><div class=\"col s12 m4\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"w-full h-full flex flex-col\"><section class=\"row section w-full mb-0 flex-grow\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = components.StatCard(components.StatCardProps{
-				Icon:    "storage",
-				Name:    "Streams",
-				Href:    "/web/streams",
-				Count:   props.StreamCount,
-				CanView: props.Permissions.CanViewStreams,
+			templ_7745c5c3_Err = components.RoleList(components.RoleListProps{
+				Roles:       props.Roles,
+				Permissions: props.Permissions,
 			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><div class=\"col s12 m4\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = components.StatCard(components.StatCardProps{
-				Icon:    "filter_alt",
-				Name:    "Transformers",
-				Href:    "/web/transformers",
-				Count:   props.TransformerCount,
-				CanView: props.Permissions.CanViewTransformers,
+			templ_7745c5c3_Err = components.UserList(components.UserListProps{
+				Users:       props.Users,
+				Permissions: props.Permissions,
 			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><div class=\"col s12 m4\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = components.StatCard(components.StatCardProps{
-				Icon:    "settings",
-				Name:    "Pipelines",
-				Href:    "/web/pipelines",
-				Count:   props.PipelineCount,
-				CanView: props.Permissions.CanViewPipelines,
-			}).Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></section></div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</section></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -104,7 +79,7 @@ func Index(props IndexProps) templ.Component {
 		})
 		templ_7745c5c3_Err = layouts.App(layouts.AppProps{
 			Head:          nil,
-			CurrentNav:    "",
+			CurrentNav:    "admin",
 			Permissions:   props.Permissions,
 			Notifications: props.Notifications,
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)

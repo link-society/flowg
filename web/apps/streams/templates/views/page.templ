@@ -10,7 +10,7 @@ import (
   "link-society.com/flowg/web/templates/layouts"
 )
 
-type IndexProps struct {
+type PageProps struct {
   Streams       []string
   CurrentStream string
 
@@ -27,7 +27,7 @@ type IndexProps struct {
   Notifications []string
 }
 
-templ Index(props IndexProps) {
+templ Page(props PageProps) {
   @layouts.App(layouts.AppProps{
     Head:          components.Head(),
     CurrentNav:    "streams",

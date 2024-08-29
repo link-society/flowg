@@ -19,11 +19,11 @@ func Application(
 
 	mux.HandleFunc(
 		"GET /web/streams/{$}",
-		controllers.Index(userSys, logDb),
+		controllers.DefaultPage(userSys, logDb),
 	)
 	mux.HandleFunc(
 		"GET /web/streams/{name}/{$}",
-		controllers.Detail(userSys, logDb),
+		controllers.StreamPage(userSys, logDb),
 	)
 
 	return mux

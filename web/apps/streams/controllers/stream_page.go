@@ -19,7 +19,7 @@ import (
 	"link-society.com/flowg/web/apps/streams/templates/views"
 )
 
-func Detail(
+func StreamPage(
 	userSys *auth.UserSystem,
 	logDb *logstorage.Storage,
 ) http.HandlerFunc {
@@ -253,8 +253,8 @@ func Detail(
 			))
 			h.ServeHTTP(w, r)
 		} else {
-			h := templ.Handler(views.Index(
-				views.IndexProps{
+			h := templ.Handler(views.Page(
+				views.PageProps{
 					Streams:       streams,
 					CurrentStream: stream,
 
