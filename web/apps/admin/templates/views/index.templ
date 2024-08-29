@@ -1,0 +1,38 @@
+package views
+
+import (
+	"link-society.com/flowg/internal/auth"
+
+	"link-society.com/flowg/web/apps/admin/templates/components"
+	"link-society.com/flowg/web/templates/layouts"
+)
+
+type IndexProps struct {
+  Roles []auth.Role
+  Users []auth.User
+
+  Permissions   auth.Permissions
+  Notifications []string
+}
+
+templ Index(props IndexProps) {
+  @layouts.App(layouts.AppProps{
+    Head:          nil,
+    CurrentNav:    "admin",
+    Permissions:   props.Permissions,
+    Notifications: props.Notifications,
+  }) {
+    <div class="w-full h-full flex flex-col">
+      <section class="row section w-full mb-0 flex-grow">
+        @components.RoleList(components.RoleListProps{
+          Roles:       props.Roles,
+          Permissions: props.Permissions,
+        })
+        @components.UserList(components.UserListProps{
+          Users:       props.Users,
+          Permissions: props.Permissions,
+        })
+      </section>
+    </div>
+  }
+}
