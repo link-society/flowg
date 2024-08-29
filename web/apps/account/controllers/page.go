@@ -8,14 +8,13 @@ import (
 	"github.com/a-h/templ"
 
 	"link-society.com/flowg/internal/auth"
-	"link-society.com/flowg/internal/logstorage"
 
-	"link-society.com/flowg/web/apps/streams/templates/views"
+	"link-society.com/flowg/web/apps/account/templates/views"
 )
 
-func Index(
+func Page(
 	userSys *auth.UserSystem,
-	logDb *logstorage.Storage,
+	tokenSys *auth.TokenSystem,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		permissions := auth.Permissions{}
@@ -36,34 +35,24 @@ func Index(
 			permissions = auth.PermissionsFromScopes(scopes)
 		}
 
-		if !permissions.CanViewStreams {
-			http.Redirect(w, r, "/web", http.StatusSeeOther)
-			return
-		}
-		streams, err := logDb.ListStreams()
+		tokenUUIDs, err := tokenSys.ListTokens(user.Name)
 		if err != nil {
 			slog.ErrorContext(
 				r.Context(),
-				"error listing streams",
+				"error listing personal access tokens",
 				"channel", "web",
+				"user", user.Name,
 				"error", err.Error(),
 			)
 
-			streams = []string{}
-			notifications = append(notifications, "&#10060; Could not fetch streams")
+			notifications = append(notifications, "&#10060; Could not fetch personal access tokens")
+			tokenUUIDs = []string{}
 		}
 
-		if len(streams) > 0 {
-			defaultStream := streams[0]
-
-			http.Redirect(w, r, "/web/streams/"+defaultStream+"/", http.StatusFound)
-			return
-		}
-
-		h := templ.Handler(views.Index(
-			views.IndexProps{
-				Streams:       streams,
-				CurrentStream: "",
+		h := templ.Handler(views.Page(
+			views.PageProps{
+				User:       user,
+				TokenUUIDs: tokenUUIDs,
 
 				Permissions:   permissions,
 				Notifications: notifications,

@@ -8,13 +8,14 @@ import (
 	"github.com/a-h/templ"
 
 	"link-society.com/flowg/internal/auth"
+	"link-society.com/flowg/internal/logstorage"
 
-	"link-society.com/flowg/web/apps/admin/templates/views"
+	"link-society.com/flowg/web/apps/streams/templates/views"
 )
 
-func Index(
-	roleSys *auth.RoleSystem,
+func DefaultPage(
 	userSys *auth.UserSystem,
+	logDb *logstorage.Storage,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		permissions := auth.Permissions{}
@@ -35,43 +36,34 @@ func Index(
 			permissions = auth.PermissionsFromScopes(scopes)
 		}
 
-		if !permissions.CanViewACLs {
-			http.Redirect(w, r, "/web/", http.StatusSeeOther)
+		if !permissions.CanViewStreams {
+			http.Redirect(w, r, "/web", http.StatusSeeOther)
+			return
+		}
+		streams, err := logDb.ListStreams()
+		if err != nil {
+			slog.ErrorContext(
+				r.Context(),
+				"error listing streams",
+				"channel", "web",
+				"error", err.Error(),
+			)
+
+			streams = []string{}
+			notifications = append(notifications, "&#10060; Could not fetch streams")
+		}
+
+		if len(streams) > 0 {
+			defaultStream := streams[0]
+
+			http.Redirect(w, r, "/web/streams/"+defaultStream+"/", http.StatusFound)
 			return
 		}
 
-		roles, err := roleSys.ListRoles()
-		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error listing roles",
-				"channel", "web",
-				"error", err.Error(),
-			)
-
-			notifications = append(notifications, "&#10060; Could not fetch roles")
-
-			roles = []auth.Role{}
-		}
-
-		users, err := userSys.ListUsers()
-		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error listing users",
-				"channel", "web",
-				"error", err.Error(),
-			)
-
-			notifications = append(notifications, "&#10060; Could not fetch users")
-
-			users = []auth.User{}
-		}
-
-		h := templ.Handler(views.Index(
-			views.IndexProps{
-				Roles: roles,
-				Users: users,
+		h := templ.Handler(views.Page(
+			views.PageProps{
+				Streams:       streams,
+				CurrentStream: "",
 
 				Permissions:   permissions,
 				Notifications: notifications,

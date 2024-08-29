@@ -16,7 +16,7 @@ func Application(authDb *auth.Database) http.Handler {
 
 	mux.HandleFunc(
 		"GET /web/admin/{$}",
-		controllers.Index(roleSys, userSys),
+		controllers.Page(roleSys, userSys),
 	)
 
 	mux.HandleFunc(

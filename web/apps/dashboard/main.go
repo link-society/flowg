@@ -21,7 +21,7 @@ func Application(
 
 	mux.HandleFunc(
 		"GET /web/{$}",
-		controllers.Index(userSys, logDb, pipelinesManager),
+		controllers.Page(userSys, logDb, pipelinesManager),
 	)
 
 	return mux

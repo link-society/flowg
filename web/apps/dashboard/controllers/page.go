@@ -14,7 +14,7 @@ import (
 	"link-society.com/flowg/web/apps/dashboard/templates/views"
 )
 
-func Index(
+func Page(
 	userSys *auth.UserSystem,
 	logDb *logstorage.Storage,
 	pipelinesManager *pipelines.Manager,
@@ -81,8 +81,8 @@ func Index(
 			notifications = append(notifications, "&#10060; Could not fetch pipelines")
 		}
 
-		h := templ.Handler(views.Index(
-			views.IndexProps{
+		h := templ.Handler(views.Page(
+			views.PageProps{
 				StreamCount:      streamCount,
 				TransformerCount: transformerCount,
 				PipelineCount:    pipelineCount,
