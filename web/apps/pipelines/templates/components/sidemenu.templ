@@ -1,0 +1,60 @@
+package components
+
+import (
+	"link-society.com/flowg/internal/auth"
+)
+
+type SideMenuProps struct {
+  Pipelines       []string
+  CurrentPipeline string
+
+  Permissions auth.Permissions
+}
+
+templ SideMenu(props SideMenuProps) {
+  <div class="col s2 h-full flex flex-col">
+    if props.Permissions.CanEditPipelines {
+      if props.CurrentPipeline == "" {
+        <div class="card-panel white flex-shrink">
+          <div class="input-field m-0">
+            <input
+              id="data_pipeline_name"
+              type="text"
+            />
+            <label for="data_pipeline_name">Pipeline Name</label>
+          </div>
+        </div>
+      } else {
+        <input
+          type="hidden"
+          id="data_pipeline_name"
+          value={props.CurrentPipeline}
+        />
+      }
+    }
+
+    <div
+      class="
+        card-panel white
+        p-0 mb-0 h-0
+        flex-grow flex-shrink
+        overflow-auto
+      "
+    >
+      <div class="collection m-0">
+        for _, pipeline := range props.Pipelines {
+          if pipeline == props.CurrentPipeline {
+            <a class="collection-item active" href="#">{pipeline}</a>
+          } else {
+            <a
+              class="collection-item"
+              href={templ.SafeURL("/web/pipelines/edit/" + pipeline + "/")}
+            >
+              {pipeline}
+            </a>
+          }
+        }
+      </div>
+    </div>
+  </div>
+}
