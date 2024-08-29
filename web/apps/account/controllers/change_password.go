@@ -3,11 +3,10 @@ package controllers
 import (
 	"log/slog"
 
-	"encoding/json"
-
 	"net/http"
 
 	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/webutils/htmx"
 )
 
 func ChangePassword(
@@ -67,24 +66,13 @@ func ChangePassword(
 			}
 		}
 
-		trigger := map[string]interface{}{
-			"htmx-custom-toast": map[string]interface{}{
-				"messages": notifications,
+		trigger := htmx.Trigger{
+			ToastEvent: &htmx.ToastEvent{
+				Messages: notifications,
 			},
 		}
 
-		triggerData, err := json.Marshal(trigger)
-		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error marshalling trigger",
-				"channel", "web",
-				"error", err.Error(),
-			)
-		} else {
-			w.Header().Add("HX-Trigger", string(triggerData))
-		}
-
+		trigger.Write(r.Context(), w)
 		w.WriteHeader(http.StatusOK)
 	}
 }

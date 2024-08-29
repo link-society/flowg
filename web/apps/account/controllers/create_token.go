@@ -3,13 +3,12 @@ package controllers
 import (
 	"log/slog"
 
-	"encoding/json"
-
 	"net/http"
 
 	"github.com/a-h/templ"
 
 	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/webutils/htmx"
 
 	"link-society.com/flowg/web/apps/account/templates/components"
 )
@@ -37,27 +36,17 @@ func CreateToken(
 			success = true
 		}
 
-		trigger := map[string]interface{}{
-			"htmx-custom-toast": map[string]interface{}{
-				"messages": notifications,
+		trigger := htmx.Trigger{
+			ToastEvent: &htmx.ToastEvent{
+				Messages: notifications,
 			},
 		}
 
 		if success {
-			trigger["htmx-custom-modal-open"] = map[string]interface{}{}
+			trigger.ModalOpenEvent = &htmx.ModalOpenEvent{}
 		}
 
-		triggerData, err := json.Marshal(trigger)
-		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error marshalling trigger",
-				"channel", "web",
-				"error", err.Error(),
-			)
-		} else {
-			w.Header().Add("HX-Trigger", string(triggerData))
-		}
+		trigger.Write(r.Context(), w)
 
 		h := templ.Handler(components.TokenViewer(
 			components.TokenViewerProps{

@@ -3,13 +3,12 @@ package controllers
 import (
 	"log/slog"
 
-	"encoding/json"
-
 	"net/http"
 
 	"github.com/a-h/templ"
 
 	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/webutils/htmx"
 
 	"link-society.com/flowg/web/apps/admin/templates/components"
 )
@@ -37,7 +36,10 @@ func DisplayRoleCreateForm(
 		}
 
 		if permissions.CanEditACLs {
-			w.Header().Add("HX-Trigger", "htmx-custom-modal-open")
+			trigger := htmx.Trigger{
+				ModalOpenEvent: &htmx.ModalOpenEvent{},
+			}
+			trigger.Write(r.Context(), w)
 
 			h := templ.Handler(components.RoleForm(components.RoleFormProps{
 				Name: "",
@@ -58,25 +60,14 @@ func DisplayRoleCreateForm(
 			}))
 			h.ServeHTTP(w, r)
 		} else {
-			trigger := map[string]interface{}{
-				"htmx-custom-modal-open": map[string]interface{}{},
-				"htmx-custom-toast": map[string]interface{}{
-					"messages": notifications,
+			trigger := htmx.Trigger{
+				ModalOpenEvent: &htmx.ModalOpenEvent{},
+				ToastEvent: &htmx.ToastEvent{
+					Messages: notifications,
 				},
 			}
-			triggerData, err := json.Marshal(trigger)
-			if err != nil {
-				slog.ErrorContext(
-					r.Context(),
-					"error marshalling trigger",
-					"channel", "web",
-					"error", err.Error(),
-				)
 
-				triggerData = []byte("htmx-custom-modal-open")
-			}
-
-			w.Header().Add("HX-Trigger", string(triggerData))
+			trigger.Write(r.Context(), w)
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte("&#10060; You do not have permission to create roles"))
 		}
