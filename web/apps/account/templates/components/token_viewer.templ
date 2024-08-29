@@ -1,12 +1,16 @@
 package components
 
-templ TokenViewer(token string) {
+type TokenViewerProps struct {
+  Token string
+}
+
+templ TokenViewer(props TokenViewerProps) {
   <section class="section">
     <label for="token" class="font-semibold">Your Personal Access Token:</label>
 
     <div class="input-field">
       <i class="material-icons prefix">vpn_key</i>
-      <input id="token" type="text" value={token} readonly />
+      <input id="token" type="text" value={props.Token} readonly />
     </div>
 
     <p>
