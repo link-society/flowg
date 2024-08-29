@@ -128,12 +128,12 @@ func (sys *RoleSystem) DeleteRole(name string) error {
 			keys = append(keys, it.Item().KeyCopy(nil))
 		}
 
-		for scope, key := range keys {
+		for _, key := range keys {
 			err := txn.Delete(key)
 			if err != nil && err != badger.ErrKeyNotFound {
 				return fmt.Errorf(
-					"failed to delete scope '%s' from role '%s': %w",
-					string(scope), name, err,
+					"failed to delete key '%s' from role '%s': %w",
+					string(key), name, err,
 				)
 			}
 		}
