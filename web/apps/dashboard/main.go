@@ -5,7 +5,7 @@ import (
 
 	"link-society.com/flowg/internal/data/auth"
 	"link-society.com/flowg/internal/data/logstorage"
-	"link-society.com/flowg/internal/pipelines"
+	"link-society.com/flowg/internal/data/pipelines"
 
 	"link-society.com/flowg/web/apps/dashboard/controllers"
 )

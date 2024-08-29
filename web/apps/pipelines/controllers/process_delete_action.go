@@ -8,7 +8,7 @@ import (
 	"net/http"
 
 	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/pipelines"
+	"link-society.com/flowg/internal/data/pipelines"
 )
 
 func ProcessDeleteAction(

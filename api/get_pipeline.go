@@ -10,7 +10,7 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/pipelines"
+	"link-society.com/flowg/internal/data/pipelines"
 )
 
 type GetPipelineRequest struct {

@@ -7,7 +7,7 @@ import (
 
 	"link-society.com/flowg/internal/data/auth"
 	"link-society.com/flowg/internal/data/logstorage"
-	pipelineStorage "link-society.com/flowg/internal/pipelines"
+	pipelineStorage "link-society.com/flowg/internal/data/pipelines"
 
 	"link-society.com/flowg/web/apps/account"
 	"link-society.com/flowg/web/apps/admin"
