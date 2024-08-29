@@ -1,0 +1,73 @@
+package components
+
+import (
+  "time"
+
+	"link-society.com/flowg/internal/logstorage"
+)
+
+type ViewerProps struct {
+  LogEntries    []logstorage.LogEntry
+  Fields        []string
+  From          time.Time
+  To            time.Time
+  Filter        string
+  AutoRefresh   string
+  HistogramData string
+}
+
+templ Viewer(props ViewerProps) {
+  <div
+    id="stream_viewer"
+    class="col s10 h-full flex flex-col"
+  >
+    <div class="card-panel white p-0">
+      @Searchbar(SearchbarProps{
+        From:        props.From,
+        To:          props.To,
+        Filter:      props.Filter,
+        AutoRefresh: props.AutoRefresh,
+      })
+      @Histogram(HistogramProps{
+        Data: props.HistogramData,
+      })
+    </div>
+    <div
+      class="
+        card-panel white
+        p-0 mb-0 h-0
+        flex-grow flex-shrink
+        overflow-auto
+      "
+    >
+      <table class="w-full table-responsive logs highlight">
+        <thead class="grey lighten-2 z-depth-1">
+          <tr>
+            <th class="text-center">Ingested At</th>
+            for _, field := range props.Fields {
+              <th class="font-monospace">{field}</th>
+            }
+          </tr>
+        </thead>
+
+        <tbody>
+          for _, entry := range props.LogEntries {
+            <tr>
+              <td class="font-monospace">{entry.Timestamp.Format(time.RFC3339)}</td>
+
+              for _, field := range props.Fields {
+                if val, exists := entry.Fields[field]; exists {
+                  <td class="font-monospace">
+                    <p class="grey lighten-4 w-full px-1 m-0">{val}</p>
+                  </td>
+                } else {
+                  <td></td>
+                }
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}
