@@ -12,6 +12,7 @@ import (
 	"link-society.com/flowg/web/apps/account"
 	"link-society.com/flowg/web/apps/admin"
 	"link-society.com/flowg/web/apps/dashboard"
+	"link-society.com/flowg/web/apps/onboarding"
 	"link-society.com/flowg/web/apps/streams"
 
 	"link-society.com/flowg/web/controllers"
@@ -32,7 +33,7 @@ func NewHandler(
 	mux := http.NewServeMux()
 	mux.Handle("GET /static/", http.FileServer(http.FS(staticfiles)))
 
-	mux.Handle("/auth/", controllers.AuthController(authDb))
+	mux.Handle("/auth/", onboarding.Application(authDb))
 
 	authMiddleware := auth.WebMiddleware(authDb)
 
