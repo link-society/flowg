@@ -6,7 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/internal/logging"
+	"link-society.com/flowg/internal/app/logging"
 )
 
 var exitCode int = 0

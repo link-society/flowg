@@ -14,7 +14,7 @@ import (
 	"github.com/dgraph-io/badger/v3"
 	"github.com/dgraph-io/badger/v3/options"
 
-	"link-society.com/flowg/internal/logging"
+	"link-society.com/flowg/internal/app/logging"
 )
 
 type Storage struct {
