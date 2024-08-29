@@ -10,7 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"link-society.com/flowg/internal"
-	"link-society.com/flowg/internal/auth"
+	"link-society.com/flowg/internal/data/auth"
 )
 
 type ToolbarProps struct {

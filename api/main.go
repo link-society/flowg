@@ -11,7 +11,7 @@ import (
 	"github.com/swaggest/usecase"
 
 	"link-society.com/flowg/internal"
-	"link-society.com/flowg/internal/auth"
+	"link-society.com/flowg/internal/data/auth"
 	"link-society.com/flowg/internal/logstorage"
 	"link-society.com/flowg/internal/pipelines"
 )

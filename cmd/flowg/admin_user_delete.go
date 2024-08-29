@@ -6,7 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/internal/auth"
+	"link-society.com/flowg/internal/data/auth"
 )
 
 type adminUserDeleteOpts struct {
