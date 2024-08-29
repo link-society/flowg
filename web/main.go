@@ -12,6 +12,7 @@ import (
 	"link-society.com/flowg/web/apps/account"
 	"link-society.com/flowg/web/apps/admin"
 	"link-society.com/flowg/web/apps/dashboard"
+	"link-society.com/flowg/web/apps/streams"
 
 	"link-society.com/flowg/web/controllers"
 )
@@ -41,7 +42,7 @@ func NewHandler(
 	)
 	mux.Handle(
 		"/web/streams/",
-		authMiddleware(controllers.StreamController(authDb, logDb)),
+		authMiddleware(streams.Application(authDb, logDb)),
 	)
 	mux.Handle(
 		"/web/transformers/",

@@ -1,0 +1,13 @@
+package components
+
+type HistogramProps struct {
+  Data string
+}
+
+templ Histogram(props HistogramProps) {
+  <div
+    id="data_stream_histogram"
+    data-timeserie={props.Data}
+    class="grey lighten-3 mt-1"
+  ></div>
+}

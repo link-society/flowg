@@ -1,19 +1,15 @@
 package components
 
-import (
-  "time"
+import "time"
 
-	"link-society.com/flowg/internal/logstorage"
-)
-
-type streamSearchbarProps struct {
+type SearchbarProps struct {
   From          time.Time
   To            time.Time
   Filter        string
   AutoRefresh   string
 }
 
-templ streamSearchbar(props streamSearchbarProps) {
+templ Searchbar(props SearchbarProps) {
   <form
     id="form_stream"
     hx-get=""
@@ -104,100 +100,4 @@ templ streamSearchbar(props streamSearchbarProps) {
       Run Query
     </button>
   </form>
-}
-
-templ streamHistogram(data string) {
-  <div
-    id="data_stream_histogram"
-    data-timeserie={data}
-    class="grey lighten-3 mt-1"
-  ></div>
-}
-
-type StreamViewerProps struct {
-  LogEntries    []logstorage.LogEntry
-  Fields        []string
-  From          time.Time
-  To            time.Time
-  Filter        string
-  AutoRefresh   string
-  HistogramData string
-
-  Notifications []string
-}
-
-templ StreamViewer(props StreamViewerProps) {
-  <div
-    id="stream_viewer"
-    class="col s10 h-full flex flex-col"
-  >
-    <div class="card-panel white p-0">
-      @streamSearchbar(streamSearchbarProps{
-        From:        props.From,
-        To:          props.To,
-        Filter:      props.Filter,
-        AutoRefresh: props.AutoRefresh,
-      })
-      @streamHistogram(props.HistogramData)
-    </div>
-    <div
-      class="
-        card-panel white
-        p-0 mb-0 h-0
-        flex-grow flex-shrink
-        overflow-auto
-      "
-    >
-      <table class="w-full table-responsive logs highlight">
-        <thead class="grey lighten-2 z-depth-1">
-          <tr>
-            <th class="text-center">Ingested At</th>
-            for _, field := range props.Fields {
-              <th class="font-monospace">{field}</th>
-            }
-          </tr>
-        </thead>
-
-        <tbody>
-          for _, entry := range props.LogEntries {
-            <tr>
-              <td class="font-monospace">{entry.Timestamp.Format(time.RFC3339)}</td>
-
-              for _, field := range props.Fields {
-                if val, exists := entry.Fields[field]; exists {
-                  <td class="font-monospace">
-                    <p class="grey lighten-4 w-full px-1 m-0">{val}</p>
-                  </td>
-                } else {
-                  <td></td>
-                }
-              }
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  if props.Notifications != nil {
-    for _, notification := range props.Notifications {
-      <script
-        type="application/javascript"
-        data-message={notification}
-      >
-        (() => {
-          const S = document.currentScript
-
-          document.addEventListener('htmx:load', () => {
-            setTimeout(() => {
-              M.toast({
-                html: S.dataset.message,
-                completeCallback: () => S.remove(),
-              });
-            }, 1000);
-          }, { once: true });
-        })();
-      </script>
-    }
-  }
 }

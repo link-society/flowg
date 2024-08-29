@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"log/slog"
-	"time"
 
 	"encoding/json"
 	"strconv"
+	"time"
 
 	"net/http"
 
@@ -15,73 +15,15 @@ import (
 	"link-society.com/flowg/internal/filterdsl"
 	"link-society.com/flowg/internal/logstorage"
 
-	"link-society.com/flowg/web/templates/components"
-	"link-society.com/flowg/web/templates/views"
+	"link-society.com/flowg/web/apps/streams/templates/components"
+	"link-society.com/flowg/web/apps/streams/templates/views"
 )
 
-func StreamController(
-	authDb *auth.Database,
+func Detail(
+	userSys *auth.UserSystem,
 	logDb *logstorage.Storage,
-) http.Handler {
-	mux := http.NewServeMux()
-
-	userSys := auth.NewUserSystem(authDb)
-
-	mux.HandleFunc("GET /web/streams/{$}", func(w http.ResponseWriter, r *http.Request) {
-		permissions := auth.Permissions{}
-		notifications := []string{}
-
-		user := auth.GetContextUser(r.Context())
-		scopes, err := userSys.ListUserScopes(user.Name)
-		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error listing user scopes",
-				"channel", "web",
-				"error", err.Error(),
-			)
-
-			notifications = append(notifications, "&#10060; Could not fetch user permissions")
-		} else {
-			permissions = auth.PermissionsFromScopes(scopes)
-		}
-
-		if !permissions.CanViewStreams {
-			http.Redirect(w, r, "/web", http.StatusSeeOther)
-			return
-		}
-		streams, err := logDb.ListStreams()
-		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error listing streams",
-				"channel", "web",
-				"error", err.Error(),
-			)
-
-			streams = []string{}
-			notifications = append(notifications, "&#10060; Could not fetch streams")
-		}
-
-		if len(streams) > 0 {
-			defaultStream := streams[0]
-
-			http.Redirect(w, r, "/web/streams/"+defaultStream+"/", http.StatusFound)
-			return
-		}
-
-		h := templ.Handler(views.Streams(
-			views.StreamsProps{
-				Streams:       streams,
-				CurrentStream: "",
-			},
-			permissions,
-			notifications,
-		))
-		h.ServeHTTP(w, r)
-	})
-
-	mux.HandleFunc("GET /web/streams/{name}/{$}", func(w http.ResponseWriter, r *http.Request) {
+) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		permissions := auth.Permissions{}
 		notifications := []string{}
 
@@ -279,8 +221,27 @@ func StreamController(
 
 		// render
 		if r.Header.Get("HX-Request") == "true" {
-			h := templ.Handler(components.StreamViewer(
-				components.StreamViewerProps{
+			trigger := map[string]interface{}{
+				"htmx-custom-toast": map[string]interface{}{
+					"messages": notifications,
+				},
+			}
+			triggerData, err := json.Marshal(trigger)
+			if err != nil {
+				slog.ErrorContext(
+					r.Context(),
+					"error marshalling trigger",
+					"channel", "web",
+					"error", err.Error(),
+				)
+
+				triggerData = []byte("htmx-custom-modal-open")
+			}
+
+			w.Header().Add("HX-Trigger", string(triggerData))
+
+			h := templ.Handler(components.Viewer(
+				components.ViewerProps{
 					LogEntries:    logs,
 					Fields:        fields,
 					From:          naiveFrom,
@@ -288,14 +249,12 @@ func StreamController(
 					Filter:        filterSource,
 					AutoRefresh:   autoRefresh,
 					HistogramData: string(histogramData),
-
-					Notifications: notifications,
 				},
 			))
 			h.ServeHTTP(w, r)
 		} else {
-			h := templ.Handler(views.Streams(
-				views.StreamsProps{
+			h := templ.Handler(views.Index(
+				views.IndexProps{
 					Streams:       streams,
 					CurrentStream: stream,
 
@@ -307,13 +266,12 @@ func StreamController(
 					AutoRefresh: autoRefresh,
 
 					HistogramData: string(histogramData),
+
+					Permissions:   permissions,
+					Notifications: notifications,
 				},
-				permissions,
-				notifications,
 			))
 			h.ServeHTTP(w, r)
 		}
-	})
-
-	return mux
+	}
 }
