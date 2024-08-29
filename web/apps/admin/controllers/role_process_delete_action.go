@@ -3,12 +3,12 @@ package controllers
 import (
 	"log/slog"
 
-	"encoding/json"
 	"strconv"
 
 	"net/http"
 
 	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/webutils/htmx"
 )
 
 func ProcessRoleDeleteAction(
@@ -35,7 +35,7 @@ func ProcessRoleDeleteAction(
 		}
 
 		if !permissions.CanEditACLs {
-			w.Header().Add("HX-Reswap", "none")
+			htmx.Reswap(w, "none")
 
 			notifications = append(notifications, "&#10060; You do not have permission to delete roles")
 		} else {
@@ -50,35 +50,24 @@ func ProcessRoleDeleteAction(
 					"error", err.Error(),
 				)
 
-				w.Header().Add("HX-Reswap", "none")
+				htmx.Reswap(w, "none")
 
 				notifications = append(notifications, "&#10060; Could not delete role")
 			} else {
-				w.Header().Add("HX-Reswap", "delete")
-				w.Header().Add("HX-Retarget", "tr[data-role="+strconv.Quote(roleName)+"]")
+				htmx.Reswap(w, "delete")
+				htmx.Retarget(w, "tr[data-role="+strconv.Quote(roleName)+"]")
 
 				notifications = append(notifications, "&#9989; Role deleted")
 			}
 		}
 
-		trigger := map[string]interface{}{
-			"htmx-custom-toast": map[string]interface{}{
-				"messages": notifications,
+		trigger := htmx.Trigger{
+			ToastEvent: &htmx.ToastEvent{
+				Messages: notifications,
 			},
 		}
 
-		triggerData, err := json.Marshal(trigger)
-		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error marshalling trigger",
-				"channel", "web",
-				"error", err.Error(),
-			)
-		} else {
-			w.Header().Add("HX-Trigger", string(triggerData))
-		}
-
+		trigger.Write(r.Context(), w)
 		w.WriteHeader(http.StatusOK)
 	}
 }
