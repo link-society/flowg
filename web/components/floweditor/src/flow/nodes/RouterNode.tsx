@@ -1,7 +1,7 @@
 import React, { useCallback, useContext } from 'react'
 import { Handle, Position, Node, NodeProps } from '@xyflow/react'
 
-import { HooksContext } from './context'
+import HooksContext from '../hooks'
 
 export type RouterNode = Node<{
   stream: string
@@ -28,17 +28,29 @@ const RouterNode: React.FC<NodeProps<RouterNode>> = ({ id, data }) => {
 
   return (
     <>
-      <Handle type="target" position={Position.Left} />
+      <Handle
+        type="target"
+        position={Position.Left}
+        style={{
+          width: '12px',
+          height: '12px',
+        }}
+      />
       <div
         className="
-          flex flex-row items-center
-          z-depth-1 px-3 py-1 gap-2
-          purple lighten-4 black-text
+          flex flex-row items-stretch
+          z-depth-1 p-0 gap-2
+          white black-text
           hoverable
         "
+        style={{
+          border: '4px solid #6A1B9A',
+        }}
       >
-        <i className="material-icons small">storage</i>
-        <div className="input-field">
+        <div className="purple white-text px-3 py-1 flex flex-row items-center">
+          <i className="material-icons small">storage</i>
+        </div>
+        <div className="input-field px-3 py-1">
           <input
             className="nodrag"
             id={`router-${id}`}

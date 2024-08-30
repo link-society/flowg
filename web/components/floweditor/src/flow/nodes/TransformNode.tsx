@@ -1,7 +1,7 @@
 import React, { useCallback, useContext } from 'react'
 import { Handle, Position, Node, NodeProps } from '@xyflow/react'
 
-import { HooksContext } from './context'
+import HooksContext from '../hooks'
 
 export type TransformNode = Node<{
   transformer: string
@@ -28,17 +28,29 @@ const TransformNode: React.FC<NodeProps<TransformNode>> = ({ id, data }) => {
 
   return (
     <>
-      <Handle type="target" position={Position.Left} />
+      <Handle
+        type="target"
+        position={Position.Left}
+        style={{
+          width: '12px',
+          height: '12px',
+        }}
+      />
       <div
         className="
-          flex flex-row items-center
-          z-depth-1 px-3 py-1 gap-2
-          light-blue lighten-4 black-text
+          flex flex-row items-stretch
+          z-depth-1 p-0 gap-2
+          white black-text
           hoverable
         "
+        style={{
+          border: '4px solid #1565C0',
+        }}
       >
-        <i className="material-icons small">filter_alt</i>
-        <div className="input-field">
+        <div className="blue darken-2 white-text px-3 py-1 flex flex-row items-center">
+          <i className="material-icons small">filter_alt</i>
+        </div>
+        <div className="input-field px-3 py-1">
           <input
             className="nodrag"
             id={`transformer-${id}`}
@@ -51,7 +63,14 @@ const TransformNode: React.FC<NodeProps<TransformNode>> = ({ id, data }) => {
           </label>
         </div>
       </div>
-      <Handle type="source" position={Position.Right} />
+      <Handle
+        type="source"
+        position={Position.Right}
+        style={{
+          width: '12px',
+          height: '12px',
+        }}
+      />
     </>
   )
 }
