@@ -14,6 +14,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"link-society.com/flowg/internal/app/bootstrap"
 	"link-society.com/flowg/internal/app/logging"
 	"link-society.com/flowg/internal/data/auth"
 	"link-society.com/flowg/internal/data/logstorage"
@@ -90,6 +91,26 @@ func NewServeCommand() *cobra.Command {
 			}()
 
 			pipelinesManager := pipelines.NewManager(logDb, opts.configDir)
+
+			if err := bootstrap.DefaultRolesAndUsers(authDb); err != nil {
+				slog.Error(
+					"Failed to bootstrap default roles and users",
+					"channel", "main",
+					"error", err,
+				)
+				exitCode = 1
+				return
+			}
+
+			if err := bootstrap.DefaultPipeline(pipelinesManager); err != nil {
+				slog.Error(
+					"Failed to bootstrap default pipeline",
+					"channel", "main",
+					"error", err,
+				)
+				exitCode = 1
+				return
+			}
 
 			apiHandler := api.NewHandler(authDb, logDb, pipelinesManager)
 			webHandler := web.NewHandler(authDb, logDb, pipelinesManager)
