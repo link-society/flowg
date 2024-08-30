@@ -1,18 +1,17 @@
 import ReactDOM from 'react-dom/client'
+import { ReactFlowProvider } from '@xyflow/react'
 
-import FlowEditor from './FlowEditor'
-import { AddNodeEvent } from './event'
+import FlowEditor from './flow/FlowEditor'
+import { DnDProvider } from './dnd/context'
 
 
 class FlowEditorElement extends HTMLElement {
   private root: ReactDOM.Root
-  private eventTarget: EventTarget
 
   constructor() {
     super()
 
     this.root = ReactDOM.createRoot(this)
-    this.eventTarget = new EventTarget()
   }
 
   connectedCallback() {
@@ -37,17 +36,15 @@ class FlowEditorElement extends HTMLElement {
     }
 
     this.root.render(
-      <FlowEditor
-        flow={flow}
-        onFlowChange={handleChange}
-        eventTarget={this.eventTarget}
-      />
+      <ReactFlowProvider>
+        <DnDProvider>
+          <FlowEditor
+            flow={flow}
+            onFlowChange={handleChange}
+          />
+        </DnDProvider>
+      </ReactFlowProvider>
     )
-  }
-
-  addNode(type: string) {
-    const event = new AddNodeEvent(type)
-    this.eventTarget.dispatchEvent(event)
   }
 }
 

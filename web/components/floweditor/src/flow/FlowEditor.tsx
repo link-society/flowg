@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import React, { DragEventHandler, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import {
   ReactFlow,
   Background,
@@ -6,6 +6,7 @@ import {
   addEdge,
   applyEdgeChanges,
   applyNodeChanges,
+  useReactFlow,
   type Node,
   type Edge,
   type OnNodesChange,
@@ -15,13 +16,15 @@ import {
 
 import '@xyflow/react/dist/style.css'
 
-import { AddNodeEvent } from './event'
-import { HooksContext } from './context'
+import HooksContext from './hooks'
 
-import SourceNode from './SourceNode'
-import TransformNode from './TransformNode'
-import SwitchNode from './SwitchNode'
-import RouterNode from './RouterNode'
+import NodeSelector from './NodeSelector'
+
+import SourceNode from './nodes/SourceNode'
+import TransformNode from './nodes/TransformNode'
+import SwitchNode from './nodes/SwitchNode'
+import RouterNode from './nodes/RouterNode'
+import { useDnD } from '../dnd/context'
 
 const defaultSourceNode: Node = {
   id: '__builtin__source',
@@ -34,10 +37,12 @@ const defaultSourceNode: Node = {
 interface FlowEditorProps {
   flow: string
   onFlowChange: (value: string) => void
-  eventTarget: EventTarget
 }
 
-const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange, eventTarget }) => {
+const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange }) => {
+  const { screenToFlowPosition } = useReactFlow()
+  const [dndNodeType] = useDnD()
+
   const nodeTypes = useMemo(
     () => ({
       source: SourceNode,
@@ -83,7 +88,7 @@ const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange, eventTarget
     },
     [flow],
   )
-
+/*
   useEffect(
     () => {
       const handleAddNode = (event: Event) => {
@@ -118,7 +123,7 @@ const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange, eventTarget
       }
     },
     [eventTarget, setNodes],
-  )
+  )*/
 
   useEffect(
     () => {
@@ -142,6 +147,52 @@ const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange, eventTarget
     [setEdges],
   )
 
+  const onDragOver: DragEventHandler<HTMLDivElement> = useCallback(
+    (event) => {
+      event.preventDefault()
+      event.dataTransfer.dropEffect = 'move'
+    },
+    [],
+  )
+
+  const onDrop: DragEventHandler<HTMLDivElement> = useCallback(
+    (event) => {
+      event.preventDefault()
+
+      if (!dndNodeType) {
+        return
+      }
+
+      const type = dndNodeType
+      const position = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      })
+
+      setNodes((nds) => {
+        const newNode = {
+          id: `node-${nds.length}`,
+          type,
+          position,
+          data: {},
+        }
+
+        switch (type) {
+          case 'transform':
+            newNode.data = {transformer: ''}
+            break
+
+          case 'router':
+            newNode.data = {stream: ''}
+            break
+        }
+
+        return [...nds, newNode]
+      })
+    },
+    [screenToFlowPosition, setNodes, dndNodeType],
+  )
+
   return (
     <div className="w-full h-full">
       <ReactFlow
@@ -151,11 +202,14 @@ const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange, eventTarget
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onDrop={onDrop}
+        onDragOver={onDragOver}
         snapToGrid
         defaultEdgeOptions={{ animated: true, type: 'smoothstep' }}
       >
         <Background />
         <Controls />
+        <NodeSelector />
       </ReactFlow>
     </div>
   )
