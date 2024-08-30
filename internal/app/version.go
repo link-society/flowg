@@ -1,3 +1,3 @@
 package app
 
-const FLOWG_VERSION = "v0.3.0"
+const FLOWG_VERSION = "v0.4.0"
