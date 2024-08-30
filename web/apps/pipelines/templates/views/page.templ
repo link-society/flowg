@@ -39,8 +39,5 @@ templ Page(props PageProps) {
         @components.Editor(components.EditorProps{Flow: props.Flow})
       </section>
     </div>
-    if props.Permissions.CanEditPipelines {
-      @components.FABs()
-    }
   }
 }

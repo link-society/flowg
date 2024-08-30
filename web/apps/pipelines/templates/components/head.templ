@@ -18,13 +18,6 @@ templ Head(props HeadProps) {
         const data_pipeline_name = document.getElementById('data_pipeline_name')
         const data_pipeline_flow = document.getElementById('data_pipeline_flow')
 
-        const add_node_fabs = document.querySelectorAll('.flowg-addnode-btn')
-        for (const fab of add_node_fabs) {
-          fab.addEventListener('click', (e) => {
-            data_pipeline_flow.addNode(fab.dataset.nodetype)
-          })
-        }
-
         if (data_pipeline_name.value !== '') {
           history.pushState(null, '', `/web/pipelines/edit/${data_pipeline_name.value}/`)
         }
