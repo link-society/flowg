@@ -85,26 +85,7 @@ go install github.com/go-task/task/v3/cmd/task@latest
 task build
 ```
 
-Then, create a superuser:
-
-```bash
-./bin/flowg admin role create \
-  --auth-dir ./data/auth \
-  --name admin \
-  write_streams \
-  write_transformers \
-  write_pipelines \
-  write_acls \
-  send_logs
-
-./bin/flowg admin user create \
-  --auth-dir ./data/auth \
-  --name root \
-  --password root \
-  admin
-```
-
-Finally, start the server with:
+Then, start the server with:
 
 ```bash
 ./bin/flowg serve \
@@ -114,10 +95,13 @@ Finally, start the server with:
   --bind 127.0.0.1:5080
 ```
 
-Then you can access:
+Now, you can access:
 
  - the WebUI at http://localhost:5080
  - the API documentation at http://localhost:5080/api/docs
+
+A default user `root` (password: `root`) and a default pipeline are bootsrapped
+if no configuration exists during startup.
 
 ## :whale: Build the Docker Image
 
@@ -127,24 +111,7 @@ task docker:build
 
 This will build `linksociety/flowg:latest` locally.
 
-Then, create a superuser:
-
-```bash
-docker run --rm -it -v flowg-data:/data linksociety/flowg:latest admin role create \
-  --name admin \
-  write_streams \
-  write_transformers \
-  write_pipelines \
-  write_acls \
-  send_logs
-
-docker run --rm -it -v flowg-data:/data linksociety/flowg:latest admin user create \
-  --name root \
-  --password root \
-  admin
-```
-
-Finally, start the server with:
+Then, start the server with:
 
 ```bash
 docker run -p 5080:5080 -v flowg-data:/data linksociety/flowg:latest
