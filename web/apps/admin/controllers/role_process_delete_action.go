@@ -1,13 +1,12 @@
 package controllers
 
 import (
-	"log/slog"
-
 	"strconv"
 
 	"net/http"
 
 	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/webutils"
 	"link-society.com/flowg/internal/webutils/htmx"
 )
 
@@ -16,54 +15,32 @@ func ProcessRoleDeleteAction(
 	userSys *auth.UserSystem,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		permissions := auth.Permissions{}
-		notifications := []string{}
+		r = r.WithContext(webutils.WithNotificationSystem(r.Context()))
+		r = r.WithContext(webutils.WithPermissionSystem(r.Context(), userSys))
 
-		user := auth.GetContextUser(r.Context())
-		scopes, err := userSys.ListUserScopes(user.Name)
-		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error listing user scopes",
-				"channel", "web",
-				"error", err.Error(),
-			)
+		roleName := r.PathValue("name")
 
-			notifications = append(notifications, "&#10060; Could not fetch user permissions")
-		} else {
-			permissions = auth.PermissionsFromScopes(scopes)
-		}
-
-		if !permissions.CanEditACLs {
+		if !webutils.Permissions(r.Context()).CanEditACLs {
 			htmx.Reswap(w, "none")
-
-			notifications = append(notifications, "&#10060; You do not have permission to delete roles")
-		} else {
-			roleName := r.PathValue("name")
-
-			err := roleSys.DeleteRole(roleName)
-			if err != nil {
-				slog.ErrorContext(
-					r.Context(),
-					"error deleting role",
-					"channel", "web",
-					"error", err.Error(),
-				)
-
-				htmx.Reswap(w, "none")
-
-				notifications = append(notifications, "&#10060; Could not delete role")
-			} else {
-				htmx.Reswap(w, "delete")
-				htmx.Retarget(w, "tr[data-role="+strconv.Quote(roleName)+"]")
-
-				notifications = append(notifications, "&#9989; Role deleted")
-			}
+			webutils.NotifyError(r.Context(), "You do not have permission to delete roles")
+			goto response
 		}
 
+		if err := roleSys.DeleteRole(roleName); err != nil {
+			webutils.LogError(r.Context(), "Failed to delete role", err)
+			webutils.NotifyError(r.Context(), "Could not delete role")
+			htmx.Reswap(w, "none")
+			goto response
+		}
+
+		htmx.Reswap(w, "delete")
+		htmx.Retarget(w, "tr[data-role="+strconv.Quote(roleName)+"]")
+		webutils.NotifyInfo(r.Context(), "Role deleted")
+
+	response:
 		trigger := htmx.Trigger{
 			ToastEvent: &htmx.ToastEvent{
-				Messages: notifications,
+				Messages: webutils.Notifications(r.Context()),
 			},
 		}
 

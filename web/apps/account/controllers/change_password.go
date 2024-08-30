@@ -1,11 +1,10 @@
 package controllers
 
 import (
-	"log/slog"
-
 	"net/http"
 
 	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/webutils"
 	"link-society.com/flowg/internal/webutils/htmx"
 )
 
@@ -13,62 +12,46 @@ func ChangePassword(
 	userSys *auth.UserSystem,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		notifications := []string{}
-
+		r = r.WithContext(webutils.WithNotificationSystem(r.Context()))
 		user := auth.GetContextUser(r.Context())
-		err := r.ParseForm()
-		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error parsing form",
-				"channel", "web",
-				"error", err.Error(),
-			)
 
-			notifications = append(notifications, "&#10060; Could not parse form")
-		} else {
-			oldPassword := r.Form.Get("old_password")
-			newPassword := r.Form.Get("new_password")
+		var (
+			oldPassword string
+			newPassword string
+		)
 
-			valid, err := userSys.VerifyUserPassword(user.Name, oldPassword)
-			if err != nil {
-				slog.ErrorContext(
-					r.Context(),
-					"error verifying user password",
-					"channel", "web",
-					"user", user.Name,
-					"error", err.Error(),
-				)
-
-				notifications = append(notifications, "&#10060; Could not verify user password")
-			}
-
-			if !valid {
-				notifications = append(notifications, "&#10060; Invalid password")
-			} else {
-				err := userSys.SaveUser(
-					*user,
-					newPassword,
-				)
-				if err != nil {
-					slog.ErrorContext(
-						r.Context(),
-						"error saving user",
-						"channel", "web",
-						"user", user.Name,
-						"error", err.Error(),
-					)
-
-					notifications = append(notifications, "&#10060; Could not change user password")
-				} else {
-					notifications = append(notifications, "&#9989; Password changed")
-				}
-			}
+		if err := r.ParseForm(); err != nil {
+			webutils.LogError(r.Context(), "Failed to parse form data", err)
+			webutils.NotifyError(r.Context(), "Could not parse form")
+			goto response
 		}
 
+		oldPassword = r.Form.Get("old_password")
+		newPassword = r.Form.Get("new_password")
+
+		switch valid, err := userSys.VerifyUserPassword(user.Name, oldPassword); {
+		case err != nil:
+			webutils.LogError(r.Context(), "Failed to verify user password", err)
+			webutils.NotifyError(r.Context(), "Could not verify user password")
+			goto response
+
+		case !valid:
+			webutils.NotifyError(r.Context(), "Invalid password")
+			goto response
+		}
+
+		if err := userSys.SaveUser(*user, newPassword); err != nil {
+			webutils.LogError(r.Context(), "Failed to save user", err)
+			webutils.NotifyError(r.Context(), "Could not change user password")
+			goto response
+		}
+
+		webutils.NotifyInfo(r.Context(), "Password changed")
+
+	response:
 		trigger := htmx.Trigger{
 			ToastEvent: &htmx.ToastEvent{
-				Messages: notifications,
+				Messages: webutils.Notifications(r.Context()),
 			},
 		}
 

@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"log/slog"
-
 	"net/http"
 
 	"github.com/a-h/templ"
@@ -10,6 +8,7 @@ import (
 	"link-society.com/flowg/internal/data/auth"
 	"link-society.com/flowg/internal/data/logstorage"
 	"link-society.com/flowg/internal/data/pipelines"
+	"link-society.com/flowg/internal/webutils"
 
 	"link-society.com/flowg/web/apps/dashboard/templates/views"
 )
@@ -20,65 +19,35 @@ func Page(
 	pipelinesManager *pipelines.Manager,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		r = r.WithContext(webutils.WithNotificationSystem(r.Context()))
+		r = r.WithContext(webutils.WithPermissionSystem(r.Context(), userSys))
+
 		streamCount := 0
 		transformerCount := 0
 		pipelineCount := 0
-
-		permissions := auth.Permissions{}
-		notifications := []string{}
-
-		user := auth.GetContextUser(r.Context())
-		scopes, err := userSys.ListUserScopes(user.Name)
-		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error listing user scopes",
-				"channel", "web",
-				"error", err.Error(),
-			)
-
-			notifications = append(notifications, "&#10060; Could not fetch user permissions")
-		} else {
-			permissions = auth.PermissionsFromScopes(scopes)
-		}
 
 		streamList, err := logDb.ListStreams()
 		if err == nil {
 			streamCount = len(streamList)
 		} else {
-			slog.ErrorContext(
-				r.Context(),
-				"error listing streams",
-				"channel", "web",
-				"error", err.Error(),
-			)
-			notifications = append(notifications, "&#10060; Could not fetch streams")
+			webutils.LogError(r.Context(), "Failed to fetch streams", err)
+			webutils.NotifyError(r.Context(), "Could not fetch streams")
 		}
 
 		transformerList, err := pipelinesManager.ListTransformers()
 		if err == nil {
 			transformerCount = len(transformerList)
 		} else {
-			slog.ErrorContext(
-				r.Context(),
-				"error listing transformers",
-				"channel", "web",
-				"error", err.Error(),
-			)
-			notifications = append(notifications, "&#10060; Could not fetch transformers")
+			webutils.LogError(r.Context(), "Failed to fetch transformers", err)
+			webutils.NotifyError(r.Context(), "Could not fetch transformers")
 		}
 
 		pipelineList, err := pipelinesManager.ListPipelines()
 		if err == nil {
 			pipelineCount = len(pipelineList)
 		} else {
-			slog.ErrorContext(
-				r.Context(),
-				"error listing pipelines",
-				"channel", "web",
-				"error", err.Error(),
-			)
-			notifications = append(notifications, "&#10060; Could not fetch pipelines")
+			webutils.LogError(r.Context(), "Failed to fetch pipelines", err)
+			webutils.NotifyError(r.Context(), "Could not fetch pipelines")
 		}
 
 		h := templ.Handler(views.Page(
@@ -87,8 +56,8 @@ func Page(
 				TransformerCount: transformerCount,
 				PipelineCount:    pipelineCount,
 
-				Permissions:   permissions,
-				Notifications: notifications,
+				Permissions:   webutils.Permissions(r.Context()),
+				Notifications: webutils.Notifications(r.Context()),
 			},
 		))
 
