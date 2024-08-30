@@ -1,13 +1,12 @@
 package controllers
 
 import (
-	"log/slog"
-
 	"net/http"
 
 	"github.com/a-h/templ"
 
 	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/webutils"
 
 	"link-society.com/flowg/web/apps/admin/templates/views"
 )
@@ -17,54 +16,25 @@ func Page(
 	userSys *auth.UserSystem,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		permissions := auth.Permissions{}
-		notifications := []string{}
+		r = r.WithContext(webutils.WithNotificationSystem(r.Context()))
+		r = r.WithContext(webutils.WithPermissionSystem(r.Context(), userSys))
 
-		user := auth.GetContextUser(r.Context())
-		scopes, err := userSys.ListUserScopes(user.Name)
-		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error listing user scopes",
-				"channel", "web",
-				"error", err.Error(),
-			)
-
-			notifications = append(notifications, "&#10060; Could not fetch user permissions")
-		} else {
-			permissions = auth.PermissionsFromScopes(scopes)
-		}
-
-		if !permissions.CanViewACLs {
+		if !webutils.Permissions(r.Context()).CanViewACLs {
 			http.Redirect(w, r, "/web/", http.StatusSeeOther)
 			return
 		}
 
 		roles, err := roleSys.ListRoles()
 		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error listing roles",
-				"channel", "web",
-				"error", err.Error(),
-			)
-
-			notifications = append(notifications, "&#10060; Could not fetch roles")
-
+			webutils.LogError(r.Context(), "Failed to fetch roles", err)
+			webutils.NotifyError(r.Context(), "Could not fetch roles")
 			roles = []auth.Role{}
 		}
 
 		users, err := userSys.ListUsers()
 		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error listing users",
-				"channel", "web",
-				"error", err.Error(),
-			)
-
-			notifications = append(notifications, "&#10060; Could not fetch users")
-
+			webutils.LogError(r.Context(), "Failed to fetch users", err)
+			webutils.NotifyError(r.Context(), "Could not fetch users")
 			users = []auth.User{}
 		}
 
@@ -73,8 +43,8 @@ func Page(
 				Roles: roles,
 				Users: users,
 
-				Permissions:   permissions,
-				Notifications: notifications,
+				Permissions:   webutils.Permissions(r.Context()),
+				Notifications: webutils.Notifications(r.Context()),
 			},
 		))
 		h.ServeHTTP(w, r)

@@ -1,14 +1,13 @@
 package controllers
 
 import (
-	"log/slog"
-
 	"fmt"
 
 	"net/http"
 
 	"link-society.com/flowg/internal/data/auth"
 	"link-society.com/flowg/internal/data/pipelines"
+	"link-society.com/flowg/internal/webutils"
 )
 
 func ProcessDeleteAction(
@@ -16,39 +15,21 @@ func ProcessDeleteAction(
 	pipelinesManager *pipelines.Manager,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		r = r.WithContext(webutils.WithNotificationSystem(r.Context()))
+		r = r.WithContext(webutils.WithPermissionSystem(r.Context(), userSys))
 		transformerName := r.PathValue("name")
 
-		permissions := auth.Permissions{}
-
-		user := auth.GetContextUser(r.Context())
-		scopes, err := userSys.ListUserScopes(user.Name)
-		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error listing user scopes",
-				"channel", "web",
-				"error", err.Error(),
-			)
-		} else {
-			permissions = auth.PermissionsFromScopes(scopes)
-		}
-
-		if !permissions.CanViewTransformers {
+		if !webutils.Permissions(r.Context()).CanViewTransformers {
 			http.Redirect(w, r, "/web", http.StatusSeeOther)
 			return
-		} else if !permissions.CanEditTransformers {
-			http.Redirect(w, r, fmt.Sprintf("/web/transformers/edit/%s", transformerName), http.StatusSeeOther)
+		} else if !webutils.Permissions(r.Context()).CanEditTransformers {
+			url := fmt.Sprintf("/web/transformers/edit/%s", transformerName)
+			http.Redirect(w, r, url, http.StatusSeeOther)
 			return
 		}
 
-		err = pipelinesManager.DeleteTransformerScript(transformerName)
-		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error deleting transformer script",
-				"channel", "web",
-				"error", err.Error(),
-			)
+		if err := pipelinesManager.DeleteTransformerScript(transformerName); err != nil {
+			webutils.LogError(r.Context(), "Failed to delete transformer script", err)
 		}
 
 		http.Redirect(w, r, "/web/transformers/new", http.StatusTemporaryRedirect)

@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"log/slog"
-
 	"encoding/json"
 	"strconv"
 	"time"
@@ -14,6 +12,7 @@ import (
 	"link-society.com/flowg/internal/data/auth"
 	"link-society.com/flowg/internal/data/logstorage"
 	"link-society.com/flowg/internal/ffi/filterdsl"
+	"link-society.com/flowg/internal/webutils"
 	"link-society.com/flowg/internal/webutils/htmx"
 
 	"link-society.com/flowg/web/apps/streams/templates/components"
@@ -25,25 +24,10 @@ func StreamPage(
 	logDb *logstorage.Storage,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		permissions := auth.Permissions{}
-		notifications := []string{}
+		r = r.WithContext(webutils.WithNotificationSystem(r.Context()))
+		r = r.WithContext(webutils.WithPermissionSystem(r.Context(), userSys))
 
-		user := auth.GetContextUser(r.Context())
-		scopes, err := userSys.ListUserScopes(user.Name)
-		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error listing user scopes",
-				"channel", "web",
-				"error", err.Error(),
-			)
-
-			notifications = append(notifications, "&#10060; Could not fetch user permissions")
-		} else {
-			permissions = auth.PermissionsFromScopes(scopes)
-		}
-
-		if !permissions.CanViewStreams {
+		if !webutils.Permissions(r.Context()).CanViewStreams {
 			http.Redirect(w, r, "/web", http.StatusSeeOther)
 			return
 		}
@@ -51,30 +35,17 @@ func StreamPage(
 		// fetch data for template
 		streams, err := logDb.ListStreams()
 		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error listing streams",
-				"channel", "web",
-				"error", err.Error(),
-			)
-
+			webutils.LogError(r.Context(), "Failed to fetch streams", err)
+			webutils.NotifyError(r.Context(), "Could not fetch streams")
 			streams = []string{}
-			notifications = append(notifications, "&#10060; Could not fetch streams")
 		}
 
 		stream := r.PathValue("name")
 		fields, err := logDb.ListStreamFields(stream)
 		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error listing fields",
-				"channel", "web",
-				"stream", stream,
-				"error", err.Error(),
-			)
-
+			webutils.LogError(r.Context(), "Failed to fetch fields", err)
+			webutils.NotifyError(r.Context(), "Could not fetch fields")
 			fields = []string{}
-			notifications = append(notifications, "&#10060; Could not fetch fields")
 		}
 
 		// parse filter values in querystring
@@ -88,15 +59,8 @@ func StreamPage(
 		if toRaw != "" {
 			naiveTo, err = time.Parse("2006-01-02T15:04:05", toRaw)
 			if err != nil {
-				slog.ErrorContext(
-					r.Context(),
-					"error parsing 'to' time",
-					"channel", "web",
-					"stream", stream,
-					"to", toRaw,
-					"error", err.Error(),
-				)
-				notifications = append(notifications, "&#10060; Invalid 'to' time")
+				webutils.LogError(r.Context(), "Failed to parse 'to' time", err)
+				webutils.NotifyError(r.Context(), "Invalid 'to' time")
 			}
 		} else {
 			naiveTo = time.Now()
@@ -107,15 +71,8 @@ func StreamPage(
 		if fromRaw != "" {
 			naiveFrom, err = time.Parse("2006-01-02T15:04:05", fromRaw)
 			if err != nil {
-				slog.ErrorContext(
-					r.Context(),
-					"error parsing 'from' time",
-					"channel", "web",
-					"stream", stream,
-					"from", fromRaw,
-					"error", err.Error(),
-				)
-				notifications = append(notifications, "&#10060; Invalid 'from' time")
+				webutils.LogError(r.Context(), "Failed to parse 'from' time", err)
+				webutils.NotifyError(r.Context(), "Invalid 'from' time")
 			}
 		} else {
 			naiveFrom = naiveTo.Add(-5 * time.Minute)
@@ -126,15 +83,8 @@ func StreamPage(
 		if timeOffsetRaw != "" {
 			timeOffset, err = strconv.Atoi(timeOffsetRaw)
 			if err != nil {
-				slog.ErrorContext(
-					r.Context(),
-					"error parsing 'timeoffset'",
-					"channel", "web",
-					"stream", stream,
-					"timeoffset", timeOffsetRaw,
-					"error", err.Error(),
-				)
-				notifications = append(notifications, "&#10060; Invalid 'timeoffset'")
+				webutils.LogError(r.Context(), "Failed to parse 'timeoffset'", err)
+				webutils.NotifyError(r.Context(), "Invalid 'timeoffset'")
 			}
 		} else {
 			timeOffset = 0
@@ -146,15 +96,8 @@ func StreamPage(
 		if filterSource != "" {
 			filter, err = filterdsl.Compile(filterSource)
 			if err != nil {
-				slog.ErrorContext(
-					r.Context(),
-					"error compiling filter",
-					"channel", "web",
-					"stream", stream,
-					"filter", filterSource,
-					"error", err.Error(),
-				)
-				notifications = append(notifications, "&#10060; Invalid filter")
+				webutils.LogError(r.Context(), "Failed to compile filter", err)
+				webutils.NotifyError(r.Context(), "Invalid filter")
 			}
 		} else {
 			filter = nil
@@ -166,18 +109,9 @@ func StreamPage(
 
 		logs, err := logDb.Query(r.Context(), stream, localFrom, localTo, filter)
 		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error querying logs",
-				"channel", "web",
-				"stream", stream,
-				"from", localFrom,
-				"to", localTo,
-				"filter", filter,
-				"error", err.Error(),
-			)
+			webutils.LogError(r.Context(), "Failed to fetch logs", err)
+			webutils.NotifyError(r.Context(), "Could not fetch logs")
 			logs = []logstorage.LogEntry{}
-			notifications = append(notifications, "&#10060; Could not fetch logs")
 		}
 
 		// aggregate for histogram
@@ -208,23 +142,16 @@ func StreamPage(
 
 		histogramData, err := json.Marshal(timeserie)
 		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error marshalling histogram data",
-				"channel", "web",
-				"stream", stream,
-				"error", err.Error(),
-			)
-
+			webutils.LogError(r.Context(), "Failed to marshal histogram data", err)
+			webutils.NotifyError(r.Context(), "Could not fetch histogram data")
 			histogramData = []byte("[]")
-			notifications = append(notifications, "&#10060; Could not fetch histogram data")
 		}
 
 		// render
 		if htmx.IsHtmxRequest(r) {
 			trigger := htmx.Trigger{
 				ToastEvent: &htmx.ToastEvent{
-					Messages: notifications,
+					Messages: webutils.Notifications(r.Context()),
 				},
 			}
 
@@ -256,8 +183,8 @@ func StreamPage(
 
 					HistogramData: string(histogramData),
 
-					Permissions:   permissions,
-					Notifications: notifications,
+					Permissions:   webutils.Permissions(r.Context()),
+					Notifications: webutils.Notifications(r.Context()),
 				},
 			))
 			h.ServeHTTP(w, r)

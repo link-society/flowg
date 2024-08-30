@@ -1,14 +1,13 @@
 package controllers
 
 import (
-	"log/slog"
-
 	"net/http"
 
 	"github.com/a-h/templ"
 
 	"link-society.com/flowg/internal/data/auth"
 	"link-society.com/flowg/internal/data/pipelines"
+	"link-society.com/flowg/internal/webutils"
 
 	"link-society.com/flowg/web/apps/transformers/templates/views"
 )
@@ -18,94 +17,66 @@ func ProcessEditSaveAction(
 	pipelinesManager *pipelines.Manager,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		transformerName := r.PathValue("name")
-		transformerCode, err := pipelinesManager.GetTransformerScript(transformerName)
-		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error getting transformer script",
-				"channel", "web",
-				"error", err.Error(),
-			)
-			http.Redirect(w, r, "/web/transformers/new", http.StatusTemporaryRedirect)
-			return
-		}
+		r = r.WithContext(webutils.WithNotificationSystem(r.Context()))
+		r = r.WithContext(webutils.WithPermissionSystem(r.Context(), userSys))
 
-		permissions := auth.Permissions{}
-		notifications := []string{}
-
-		user := auth.GetContextUser(r.Context())
-		scopes, err := userSys.ListUserScopes(user.Name)
-		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error listing user scopes",
-				"channel", "web",
-				"error", err.Error(),
-			)
-
-			notifications = append(notifications, "&#10060; Could not fetch user permissions")
-		} else {
-			permissions = auth.PermissionsFromScopes(scopes)
-		}
-
-		if !permissions.CanViewTransformers {
+		if !webutils.Permissions(r.Context()).CanViewTransformers {
 			http.Redirect(w, r, "/web", http.StatusSeeOther)
 			return
 		}
 
-		err = r.ParseForm()
+		_, err := pipelinesManager.GetTransformerScript(r.PathValue("name"))
 		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error parsing form",
-				"channel", "web",
-				"error", err.Error(),
-			)
-
-			notifications = append(notifications, "&#10060; Could not parse form")
-		} else {
-			transformerName = r.FormValue("name")
-			transformerCode = r.FormValue("code")
-
-			if permissions.CanEditTransformers {
-				if transformerName == "" {
-					notifications = append(notifications, "&#10060; Transformer name is required")
-				}
-
-				if transformerCode == "" {
-					notifications = append(notifications, "&#10060; Transformer code is required")
-				}
-
-				if transformerName != "" && transformerCode != "" {
-					err = pipelinesManager.SaveTransformerScript(transformerName, transformerCode)
-					if err != nil {
-						slog.ErrorContext(
-							r.Context(),
-							"error saving transformer script",
-							"channel", "web",
-							"error", err.Error(),
-						)
-
-						notifications = append(notifications, "&#10060; Could not save transformer script")
-					} else {
-						notifications = append(notifications, "&#9989; Transformer script saved")
-					}
-				}
-			}
+			webutils.LogError(r.Context(), "Failed to fetch transformer script", err)
+			http.Redirect(w, r, "/web/transformers/new", http.StatusTemporaryRedirect)
+			return
 		}
 
+		var (
+			transformerName string
+			transformerCode string
+		)
+
+		if !webutils.Permissions(r.Context()).CanEditTransformers {
+			webutils.NotifyError(r.Context(), "You do not have permission to edit transformers")
+			goto response
+		}
+
+		if err := r.ParseForm(); err != nil {
+			webutils.LogError(r.Context(), "Failed to parse form data", err)
+			webutils.NotifyError(r.Context(), "Could not parse form data")
+			goto response
+		}
+
+		transformerName = r.FormValue("name")
+		transformerCode = r.FormValue("code")
+
+		if transformerName == "" {
+			webutils.NotifyError(r.Context(), "Transformer name is required")
+		}
+
+		if transformerCode == "" {
+			webutils.NotifyError(r.Context(), "Transformer code is required")
+		}
+
+		if transformerName == "" || transformerCode == "" {
+			goto response
+		}
+
+		if err := pipelinesManager.SaveTransformerScript(transformerName, transformerCode); err != nil {
+			webutils.LogError(r.Context(), "Failed to save transformer script", err)
+			webutils.NotifyError(r.Context(), "Could not save transformer script")
+			goto response
+		}
+
+		webutils.NotifyInfo(r.Context(), "Transformer script saved")
+
+	response:
 		transformers, err := pipelinesManager.ListTransformers()
 		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error listing transformers",
-				"channel", "web",
-				"error", err.Error(),
-			)
-
+			webutils.LogError(r.Context(), "Failed to fetch transformers", err)
+			webutils.NotifyError(r.Context(), "Could not fetch transformers")
 			transformers = []string{}
-			notifications = append(notifications, "&#10060; Could not fetch transformers")
 		}
 
 		h := templ.Handler(views.Page(
@@ -114,8 +85,8 @@ func ProcessEditSaveAction(
 				CurrentTransformer: transformerName,
 				Code:               transformerCode,
 
-				Permissions:   permissions,
-				Notifications: notifications,
+				Permissions:   webutils.Permissions(r.Context()),
+				Notifications: webutils.Notifications(r.Context()),
 			},
 		))
 		h.ServeHTTP(w, r)

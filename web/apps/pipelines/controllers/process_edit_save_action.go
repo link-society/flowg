@@ -1,14 +1,13 @@
 package controllers
 
 import (
-	"log/slog"
-
 	"net/http"
 
 	"github.com/a-h/templ"
 
 	"link-society.com/flowg/internal/data/auth"
 	"link-society.com/flowg/internal/data/pipelines"
+	"link-society.com/flowg/internal/webutils"
 
 	"link-society.com/flowg/web/apps/pipelines/templates/views"
 )
@@ -18,94 +17,66 @@ func ProcessEditSaveAction(
 	pipelinesManager *pipelines.Manager,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		pipelineName := r.PathValue("name")
-		pipelineFlow, err := pipelinesManager.GetPipelineFlow(pipelineName)
-		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error getting pipeline flow",
-				"channel", "web",
-				"error", err.Error(),
-			)
-			http.Redirect(w, r, "/web/pipelines/new", http.StatusTemporaryRedirect)
-			return
-		}
+		r = r.WithContext(webutils.WithNotificationSystem(r.Context()))
+		r = r.WithContext(webutils.WithPermissionSystem(r.Context(), userSys))
 
-		permissions := auth.Permissions{}
-		notifications := []string{}
-
-		user := auth.GetContextUser(r.Context())
-		scopes, err := userSys.ListUserScopes(user.Name)
-		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error listing user scopes",
-				"channel", "web",
-				"error", err.Error(),
-			)
-
-			notifications = append(notifications, "&#10060; Could not fetch user permissions")
-		} else {
-			permissions = auth.PermissionsFromScopes(scopes)
-		}
-
-		if !permissions.CanViewPipelines {
+		if !webutils.Permissions(r.Context()).CanViewPipelines {
 			http.Redirect(w, r, "/web", http.StatusSeeOther)
 			return
 		}
 
-		err = r.ParseForm()
+		_, err := pipelinesManager.GetPipelineFlow(r.PathValue("name"))
 		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error parsing form",
-				"channel", "web",
-				"error", err.Error(),
-			)
-
-			notifications = append(notifications, "&#10060; Could not parse form")
-		} else {
-			pipelineName = r.FormValue("name")
-			pipelineFlow = r.FormValue("flow")
-
-			if !permissions.CanEditPipelines {
-				if pipelineName == "" {
-					notifications = append(notifications, "&#10060; Pipeline name is required")
-				}
-
-				if pipelineFlow == "" {
-					notifications = append(notifications, "&#10060; Pipeline flow is required")
-				}
-
-				if pipelineName != "" && pipelineFlow != "" {
-					err = pipelinesManager.SavePipelineFlow(pipelineName, pipelineFlow)
-					if err != nil {
-						slog.ErrorContext(
-							r.Context(),
-							"error saving pipeline flow",
-							"channel", "web",
-							"error", err.Error(),
-						)
-
-						notifications = append(notifications, "&#10060; Could not save pipeline")
-					} else {
-						notifications = append(notifications, "&#9989; Pipeline saved")
-					}
-				}
-			}
+			webutils.LogError(r.Context(), "Failed to fetch pipeline flow", err)
+			http.Redirect(w, r, "/web/pipelines/new", http.StatusTemporaryRedirect)
+			return
 		}
 
+		var (
+			pipelineName string
+			pipelineFlow string
+		)
+
+		if !webutils.Permissions(r.Context()).CanEditPipelines {
+			webutils.NotifyError(r.Context(), "You do not have permission to edit pipelines")
+			goto response
+		}
+
+		if err = r.ParseForm(); err != nil {
+			webutils.LogError(r.Context(), "Failed to parse form data", err)
+			webutils.NotifyError(r.Context(), "Could not parse form")
+			goto response
+		}
+
+		pipelineName = r.FormValue("name")
+		pipelineFlow = r.FormValue("flow")
+
+		if pipelineName == "" {
+			webutils.NotifyError(r.Context(), "Pipeline name is required")
+		}
+
+		if pipelineFlow == "" {
+			webutils.NotifyError(r.Context(), "Pipeline flow is required")
+		}
+
+		if pipelineName == "" || pipelineFlow == "" {
+			goto response
+		}
+
+		if err = pipelinesManager.SavePipelineFlow(pipelineName, pipelineFlow); err != nil {
+			webutils.LogError(r.Context(), "Failed to save pipeline flow", err)
+			webutils.NotifyError(r.Context(), "Could not save pipeline")
+			goto response
+		}
+
+		webutils.NotifyInfo(r.Context(), "Pipeline saved")
+
+	response:
 		pipelines, err := pipelinesManager.ListPipelines()
 		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error listing pipeline",
-				"channel", "web",
-				"error", err.Error(),
-			)
-
+			webutils.LogError(r.Context(), "Failed to fetch pipelines", err)
+			webutils.NotifyError(r.Context(), "Could not fetch pipelines")
 			pipelines = []string{}
-			notifications = append(notifications, "&#10060; Could not fetch pipelines")
 		}
 
 		h := templ.Handler(views.Page(
@@ -114,8 +85,8 @@ func ProcessEditSaveAction(
 				CurrentPipeline: pipelineName,
 				Flow:            pipelineFlow,
 
-				Permissions:   permissions,
-				Notifications: notifications,
+				Permissions:   webutils.Permissions(r.Context()),
+				Notifications: webutils.Notifications(r.Context()),
 			},
 		))
 		h.ServeHTTP(w, r)

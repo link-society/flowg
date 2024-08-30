@@ -1,13 +1,12 @@
 package controllers
 
 import (
-	"log/slog"
-
 	"strconv"
 
 	"net/http"
 
 	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/webutils"
 	"link-society.com/flowg/internal/webutils/htmx"
 )
 
@@ -15,57 +14,34 @@ func ProcessUserDeleteAction(
 	userSys *auth.UserSystem,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		permissions := auth.Permissions{}
-		notifications := []string{}
+		r = r.WithContext(webutils.WithNotificationSystem(r.Context()))
+		r = r.WithContext(webutils.WithPermissionSystem(r.Context(), userSys))
 
-		user := auth.GetContextUser(r.Context())
-		scopes, err := userSys.ListUserScopes(user.Name)
-		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error listing user scopes",
-				"channel", "web",
-				"error", err.Error(),
-			)
+		username := r.PathValue("name")
 
-			notifications = append(notifications, "&#10060; Could not fetch user permissions")
-		} else {
-			permissions = auth.PermissionsFromScopes(scopes)
-		}
-
-		if !permissions.CanEditACLs {
+		if !webutils.Permissions(r.Context()).CanEditACLs {
 			htmx.Reswap(w, "none")
-
-			notifications = append(notifications, "&#10060; You do not have permission to delete users")
-		} else {
-			userName := r.PathValue("name")
-
-			err := userSys.DeleteUser(userName)
-			if err != nil {
-				slog.ErrorContext(
-					r.Context(),
-					"error deleting user",
-					"channel", "web",
-					"error", err.Error(),
-				)
-
-				htmx.Reswap(w, "none")
-
-				notifications = append(notifications, "&#10060; Could not delete user")
-			} else {
-				htmx.Reswap(w, "delete")
-				htmx.Retarget(w, "tr[data-user="+strconv.Quote(userName)+"]")
-
-				notifications = append(notifications, "&#9989; User deleted")
-			}
+			webutils.NotifyError(r.Context(), "You do not have permission to delete users")
+			goto response
 		}
 
+		if err := userSys.DeleteUser(username); err != nil {
+			webutils.LogError(r.Context(), "Failed to delete user", err)
+			webutils.NotifyError(r.Context(), "Could not delete user")
+			htmx.Reswap(w, "none")
+			goto response
+		}
+
+		htmx.Reswap(w, "delete")
+		htmx.Retarget(w, "tr[data-user="+strconv.Quote(username)+"]")
+		webutils.NotifyInfo(r.Context(), "User deleted")
+
+	response:
 		trigger := htmx.Trigger{
 			ToastEvent: &htmx.ToastEvent{
-				Messages: notifications,
+				Messages: webutils.Notifications(r.Context()),
 			},
 		}
-
 		trigger.Write(r.Context(), w)
 		w.WriteHeader(http.StatusOK)
 	}

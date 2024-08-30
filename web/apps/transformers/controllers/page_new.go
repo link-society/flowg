@@ -1,14 +1,13 @@
 package controllers
 
 import (
-	"log/slog"
-
 	"net/http"
 
 	"github.com/a-h/templ"
 
 	"link-society.com/flowg/internal/data/auth"
 	"link-society.com/flowg/internal/data/pipelines"
+	"link-society.com/flowg/internal/webutils"
 
 	"link-society.com/flowg/web/apps/transformers/templates/views"
 )
@@ -18,40 +17,19 @@ func PageNew(
 	pipelinesManager *pipelines.Manager,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		permissions := auth.Permissions{}
-		notifications := []string{}
+		r = r.WithContext(webutils.WithNotificationSystem(r.Context()))
+		r = r.WithContext(webutils.WithPermissionSystem(r.Context(), userSys))
 
-		user := auth.GetContextUser(r.Context())
-		scopes, err := userSys.ListUserScopes(user.Name)
-		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error listing user scopes",
-				"channel", "web",
-				"error", err.Error(),
-			)
-
-			notifications = append(notifications, "&#10060; Could not fetch user permissions")
-		} else {
-			permissions = auth.PermissionsFromScopes(scopes)
-		}
-
-		if !permissions.CanViewTransformers {
+		if !webutils.Permissions(r.Context()).CanViewTransformers {
 			http.Redirect(w, r, "/web", http.StatusSeeOther)
 			return
 		}
 
 		transformers, err := pipelinesManager.ListTransformers()
 		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error listing transformers",
-				"channel", "web",
-				"error", err.Error(),
-			)
-
+			webutils.LogError(r.Context(), "Failed to fetch transformers", err)
+			webutils.NotifyError(r.Context(), "Could not fetch transformers")
 			transformers = []string{}
-			notifications = append(notifications, "&#10060; Could not fetch transformers")
 		}
 
 		h := templ.Handler(views.Page(
@@ -60,8 +38,8 @@ func PageNew(
 				CurrentTransformer: "",
 				Code:               ".",
 
-				Permissions:   permissions,
-				Notifications: notifications,
+				Permissions:   webutils.Permissions(r.Context()),
+				Notifications: webutils.Notifications(r.Context()),
 			},
 		))
 		h.ServeHTTP(w, r)

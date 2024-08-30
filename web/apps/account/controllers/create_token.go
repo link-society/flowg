@@ -1,13 +1,12 @@
 package controllers
 
 import (
-	"log/slog"
-
 	"net/http"
 
 	"github.com/a-h/templ"
 
 	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/webutils"
 	"link-society.com/flowg/internal/webutils/htmx"
 
 	"link-society.com/flowg/web/apps/account/templates/components"
@@ -17,33 +16,23 @@ func CreateToken(
 	tokenSys *auth.TokenSystem,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		success := false
-		notifications := []string{}
-		user := auth.GetContextUser(r.Context())
+		var trigger htmx.Trigger
 
+		r = r.WithContext(webutils.WithNotificationSystem(r.Context()))
+
+		user := auth.GetContextUser(r.Context())
 		token, err := tokenSys.CreateToken(user.Name)
 		if err != nil {
-			slog.ErrorContext(
-				r.Context(),
-				"error generating token",
-				"channel", "web",
-				"user", user.Name,
-				"error", err.Error(),
-			)
-
-			notifications = append(notifications, "&#10060; Could not create token")
-		} else {
-			success = true
+			webutils.LogError(r.Context(), "Failed to create token", err)
+			webutils.NotifyError(r.Context(), "Could not create token")
+			goto response
 		}
 
-		trigger := htmx.Trigger{
-			ToastEvent: &htmx.ToastEvent{
-				Messages: notifications,
-			},
-		}
+		trigger.ModalOpenEvent = &htmx.ModalOpenEvent{}
 
-		if success {
-			trigger.ModalOpenEvent = &htmx.ModalOpenEvent{}
+	response:
+		trigger.ToastEvent = &htmx.ToastEvent{
+			Messages: webutils.Notifications(r.Context()),
 		}
 
 		trigger.Write(r.Context(), w)
