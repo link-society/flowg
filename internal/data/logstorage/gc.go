@@ -63,42 +63,54 @@ func (w *garbageCollectorWorker) CollectGarbage(ctx actor.Context) {
 					"Collecting garbage",
 					"channel", "logstorage",
 					"stream", stream,
-					"retention_size", config.RetentionSize,
 				)
 
 				streamSize := int64(0)
-				garbageKeys := [][]byte{}
 
 				opts := badger.DefaultIteratorOptions
-				opts.PrefetchValues = false
+				opts.PrefetchValues = true
 				opts.Prefix = []byte(fmt.Sprintf("entry:%s:", stream))
-				opts.Reverse = true
 				it := txn.NewIterator(opts)
 				defer it.Close()
 
 				for it.Rewind(); it.Valid(); it.Next() {
 					item := it.Item()
-					streamSize += item.EstimatedSize()
-
-					if streamSize > config.RetentionSize {
-						garbageKeys = append(garbageKeys, item.KeyCopy(nil))
-					}
+					streamSize += int64(item.EstimatedSize())
 				}
 
-				for _, key := range garbageKeys {
+				if streamSize > config.RetentionSize {
 					slog.DebugContext(
 						ctx,
-						"Purging key from BadgerDB",
+						"Stream too big, purging garbage",
 						"channel", "logstorage",
 						"stream", stream,
-						"key", key,
+						"size", streamSize,
+						"retention_size", config.RetentionSize,
 					)
 
-					if err := txn.Delete(key); err != nil {
-						return fmt.Errorf(
-							"could not delete key '%s' from stream '%s': %w",
-							key, stream, err,
+					for it.Rewind(); it.Valid(); it.Next() {
+						item := it.Item()
+						streamSize -= int64(item.EstimatedSize())
+
+						key := item.KeyCopy(nil)
+						slog.DebugContext(
+							ctx,
+							"Purging key from BadgerDB",
+							"channel", "logstorage",
+							"stream", stream,
+							"key", key,
 						)
+
+						if err := txn.Delete(key); err != nil {
+							return fmt.Errorf(
+								"could not delete key '%s' from stream '%s': %w",
+								key, stream, err,
+							)
+						}
+
+						if streamSize <= config.RetentionSize {
+							break
+						}
 					}
 				}
 			}

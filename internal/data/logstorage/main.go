@@ -85,7 +85,7 @@ func (s *Storage) Append(
 
 		entry := badger.NewEntry(key, val)
 		if streamConfig.RetentionTime > 0 {
-			entry = entry.WithTTL(streamConfig.RetentionTime)
+			entry = entry.WithTTL(streamConfig.RetentionTime * time.Second)
 		}
 
 		if err := txn.SetEntry(entry); err != nil {
@@ -215,10 +215,6 @@ func (s *Storage) Purge(ctx context.Context, stream string) error {
 			fmt.Sprintf("index:%s:", stream),
 		}
 
-		keys := [][]byte{
-			[]byte(fmt.Sprintf("stream:%s", stream)),
-		}
-
 		for _, prefix := range prefixes {
 			opts := badger.DefaultIteratorOptions
 			opts.PrefetchValues = false
@@ -227,24 +223,21 @@ func (s *Storage) Purge(ctx context.Context, stream string) error {
 			defer it.Close()
 
 			for it.Rewind(); it.Valid(); it.Next() {
-				keys = append(keys, it.Item().KeyCopy(nil))
-			}
-		}
-
-		for _, key := range keys {
-			slog.DebugContext(
-				ctx,
-				"Purging key from BadgerDB",
-				"channel", "storage",
-				"stream", stream,
-				"key", key,
-			)
-
-			if err := txn.Delete(key); err != nil {
-				return fmt.Errorf(
-					"could not delete key '%s' from stream '%s': %w",
-					key, stream, err,
+				key := it.Item().KeyCopy(nil)
+				slog.DebugContext(
+					ctx,
+					"Purging key from BadgerDB",
+					"channel", "storage",
+					"stream", stream,
+					"key", key,
 				)
+
+				if err := txn.Delete(key); err != nil {
+					return fmt.Errorf(
+						"could not delete key '%s' from stream '%s': %w",
+						key, stream, err,
+					)
+				}
 			}
 		}
 
