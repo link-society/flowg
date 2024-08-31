@@ -19,6 +19,7 @@ import (
 
 type Storage struct {
 	db *badger.DB
+	gc *garbageCollector
 }
 
 func NewStorage(dbPath string) (*Storage, error) {
@@ -32,7 +33,15 @@ func NewStorage(dbPath string) (*Storage, error) {
 		return nil, err
 	}
 
-	return &Storage{db: db}, nil
+	gc := newGarbageCollector(db, 5*time.Minute)
+	gc.Start()
+
+	return &Storage{db: db, gc: gc}, nil
+}
+
+func (s *Storage) Close() error {
+	s.gc.Stop()
+	return s.db.Close()
 }
 
 func (s *Storage) Append(
@@ -50,7 +59,7 @@ func (s *Storage) Append(
 			"stream", stream,
 			"error", err.Error(),
 		)
-		return nil, &MarshalError{Reason: err}
+		return nil, fmt.Errorf("could not marshal log entry: %w", err)
 	}
 
 	err = s.db.Update(func(txn *badger.Txn) error {
@@ -61,31 +70,9 @@ func (s *Storage) Append(
 			"stream", stream,
 		)
 
-		var streamConfig StreamConfig
-
-		streamKey := []byte(fmt.Sprintf("stream:%s", stream))
-		switch streamConfigItem, err := txn.Get(streamKey); {
-		case err != nil && err != badger.ErrKeyNotFound:
-			return &QueryError{Operation: "stream-config", Reason: err}
-
-		case err == badger.ErrKeyNotFound:
-			err := txn.Set(streamKey, []byte(""))
-			if err != nil {
-				return &PersistError{Operation: "stream-config", Reason: err}
-			}
-
-		case err == nil:
-			err := streamConfigItem.Value(func(val []byte) error {
-				if len(val) > 0 {
-					if err := json.Unmarshal(val, &streamConfig); err != nil {
-						return &UnmarshalError{Reason: err}
-					}
-				}
-				return nil
-			})
-			if err != nil {
-				return err
-			}
+		streamConfig, err := s.getOrCreateStreamConfig(txn, stream)
+		if err != nil {
+			return err
 		}
 
 		slog.DebugContext(
@@ -102,7 +89,10 @@ func (s *Storage) Append(
 		}
 
 		if err := txn.SetEntry(entry); err != nil {
-			return &PersistError{Operation: "append", Reason: err}
+			return fmt.Errorf(
+				"could not add log entry '%s' to stream '%s': %w",
+				key, stream, err,
+			)
 		}
 
 		for field, value := range logEntry.Fields {
@@ -117,7 +107,10 @@ func (s *Storage) Append(
 
 			fieldIndex := newFieldIndex(txn, stream, field, value)
 			if err := fieldIndex.AddKey(key); err != nil {
-				return &PersistError{Operation: "field-index", Reason: err}
+				return fmt.Errorf(
+					"could not add field index '%s' of log entry '%s' to stream '%s': %w",
+					field, key, stream, err,
+				)
 			}
 		}
 
@@ -184,13 +177,16 @@ func (s *Storage) Query(
 
 			item, err := txn.Get([]byte(key))
 			if err != nil {
-				return &QueryError{Operation: "query", Reason: err}
+				return fmt.Errorf(
+					"could not fetch log entry '%s' from stream '%s': %w",
+					key, stream, err,
+				)
 			}
 
 			var entry LogEntry
 			err = item.Value(func(val []byte) error {
 				if err := json.Unmarshal(val, &entry); err != nil {
-					return &UnmarshalError{Reason: err}
+					return fmt.Errorf("could not unmarshal log entry '%s': %w", key, err)
 				}
 
 				return nil
@@ -245,7 +241,10 @@ func (s *Storage) Purge(ctx context.Context, stream string) error {
 			)
 
 			if err := txn.Delete(key); err != nil {
-				return &PersistError{Operation: "purge", Reason: err}
+				return fmt.Errorf(
+					"could not delete key '%s' from stream '%s': %w",
+					key, stream, err,
+				)
 			}
 		}
 
@@ -270,7 +269,7 @@ func (s *Storage) ListStreams() (map[string]StreamConfig, error) {
 			err := it.Item().Value(func(val []byte) error {
 				if len(val) > 0 {
 					if err := json.Unmarshal(val, &streamConfig); err != nil {
-						return &UnmarshalError{Reason: err}
+						return fmt.Errorf("could not unmarshal stream config '%s': %w", stream, err)
 					}
 				}
 				return nil
@@ -331,6 +330,42 @@ func (s *Storage) ListStreamFields(stream string) ([]string, error) {
 	return fields, nil
 }
 
-func (s *Storage) Close() error {
-	return s.db.Close()
+func (s *Storage) getOrCreateStreamConfig(txn *badger.Txn, stream string) (StreamConfig, error) {
+	var streamConfig StreamConfig
+
+	streamKey := []byte(fmt.Sprintf("stream:%s", stream))
+	switch streamConfigItem, err := txn.Get(streamKey); {
+	case err != nil && err != badger.ErrKeyNotFound:
+		return StreamConfig{}, fmt.Errorf(
+			"could not fetch stream config '%s': %w",
+			stream, err,
+		)
+
+	case err == badger.ErrKeyNotFound:
+		err := txn.Set(streamKey, []byte(""))
+		if err != nil {
+			return StreamConfig{}, fmt.Errorf(
+				"could not create default stream config '%s': %w",
+				stream, err,
+			)
+		}
+
+	case err == nil:
+		err := streamConfigItem.Value(func(val []byte) error {
+			if len(val) > 0 {
+				if err := json.Unmarshal(val, &streamConfig); err != nil {
+					return fmt.Errorf(
+						"could not unmarshal stream config '%s': %w",
+						stream, err,
+					)
+				}
+			}
+			return nil
+		})
+		if err != nil {
+			return StreamConfig{}, err
+		}
+	}
+
+	return streamConfig, nil
 }
