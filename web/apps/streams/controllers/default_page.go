@@ -14,10 +14,8 @@ import (
 
 func DefaultPage(
 	userSys *auth.UserSystem,
-	logDb *logstorage.Storage,
+	metaSys *logstorage.MetaSystem,
 ) http.HandlerFunc {
-	metaSys := logstorage.NewMetaSystem(logDb)
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		r = r.WithContext(webutils.WithNotificationSystem(r.Context()))
 		r = r.WithContext(webutils.WithPermissionSystem(r.Context(), userSys))

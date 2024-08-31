@@ -18,10 +18,11 @@ func Application(
 	mux := http.NewServeMux()
 
 	userSys := auth.NewUserSystem(authDb)
+	metaSys := logstorage.NewMetaSystem(logDb)
 
 	mux.HandleFunc(
 		"GET /web/{$}",
-		controllers.Page(userSys, logDb, pipelinesManager),
+		controllers.Page(userSys, metaSys, pipelinesManager),
 	)
 
 	return mux

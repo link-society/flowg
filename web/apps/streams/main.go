@@ -16,14 +16,16 @@ func Application(
 	mux := http.NewServeMux()
 
 	userSys := auth.NewUserSystem(authDb)
+	metaSys := logstorage.NewMetaSystem(logDb)
+	querySys := logstorage.NewQuerySystem(logDb)
 
 	mux.HandleFunc(
 		"GET /web/streams/{$}",
-		controllers.DefaultPage(userSys, logDb),
+		controllers.DefaultPage(userSys, metaSys),
 	)
 	mux.HandleFunc(
 		"GET /web/streams/{name}/{$}",
-		controllers.StreamPage(userSys, logDb),
+		controllers.StreamPage(userSys, metaSys, querySys),
 	)
 
 	return mux
