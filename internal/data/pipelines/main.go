@@ -12,10 +12,13 @@ type Manager struct {
 	transformersDir string
 	pipelinesDir    string
 
-	db *logstorage.Storage
+	collectorSys *logstorage.CollectorSystem
 }
 
-func NewManager(db *logstorage.Storage, configDir string) *Manager {
+func NewManager(
+	collectorSys *logstorage.CollectorSystem,
+	configDir string,
+) *Manager {
 	if _, err := os.Stat(configDir); os.IsNotExist(err) {
 		os.MkdirAll(configDir, os.ModePerm)
 	}
@@ -33,7 +36,7 @@ func NewManager(db *logstorage.Storage, configDir string) *Manager {
 	return &Manager{
 		transformersDir: transformersDir,
 		pipelinesDir:    pipelinesDir,
-		db:              db,
+		collectorSys:    collectorSys,
 	}
 }
 

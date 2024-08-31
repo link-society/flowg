@@ -23,6 +23,9 @@ func StreamPage(
 	userSys *auth.UserSystem,
 	logDb *logstorage.Storage,
 ) http.HandlerFunc {
+	metaSys := logstorage.NewMetaSystem(logDb)
+	querySys := logstorage.NewQuerySystem(logDb)
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		r = r.WithContext(webutils.WithNotificationSystem(r.Context()))
 		r = r.WithContext(webutils.WithPermissionSystem(r.Context(), userSys))
@@ -34,7 +37,7 @@ func StreamPage(
 
 		// fetch data for template
 		streamNames := []string{}
-		streams, err := logDb.ListStreams()
+		streams, err := metaSys.ListStreams()
 		if err != nil {
 			webutils.LogError(r.Context(), "Failed to fetch streams", err)
 			webutils.NotifyError(r.Context(), "Could not fetch streams")
@@ -45,7 +48,7 @@ func StreamPage(
 		}
 
 		stream := r.PathValue("name")
-		fields, err := logDb.ListStreamFields(stream)
+		fields, err := metaSys.ListStreamFields(stream)
 		if err != nil {
 			webutils.LogError(r.Context(), "Failed to fetch fields", err)
 			webutils.NotifyError(r.Context(), "Could not fetch fields")
@@ -111,7 +114,7 @@ func StreamPage(
 		localFrom := naiveFrom.Add(time.Duration(timeOffset) * time.Minute)
 		localTo := naiveTo.Add(time.Duration(timeOffset) * time.Minute)
 
-		logs, err := logDb.Query(r.Context(), stream, localFrom, localTo, filter)
+		logs, err := querySys.FetchLogs(r.Context(), stream, localFrom, localTo, filter)
 		if err != nil {
 			webutils.LogError(r.Context(), "Failed to fetch logs", err)
 			webutils.NotifyError(r.Context(), "Could not fetch logs")

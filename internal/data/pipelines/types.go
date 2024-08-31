@@ -88,6 +88,6 @@ func (n *RouterNode) Process(
 	manager *Manager,
 	entry *logstorage.LogEntry,
 ) error {
-	_, err := manager.db.Append(ctx, n.Stream, entry)
+	_, err := manager.collectorSys.Ingest(ctx, n.Stream, entry)
 	return err
 }

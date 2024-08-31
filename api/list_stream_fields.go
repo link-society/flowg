@@ -22,6 +22,8 @@ func ListStreamFieldsUsecase(
 	authDb *auth.Database,
 	logDb *logstorage.Storage,
 ) usecase.Interactor {
+	metaSys := logstorage.NewMetaSystem(logDb)
+
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
 			authDb,
@@ -31,7 +33,7 @@ func ListStreamFieldsUsecase(
 				req ListStreamFieldsRequest,
 				resp *ListStreamFieldsResponse,
 			) error {
-				fields, err := logDb.ListStreamFields(req.Stream)
+				fields, err := metaSys.ListStreamFields(req.Stream)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,

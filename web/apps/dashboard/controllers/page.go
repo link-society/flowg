@@ -18,6 +18,8 @@ func Page(
 	logDb *logstorage.Storage,
 	pipelinesManager *pipelines.Manager,
 ) http.HandlerFunc {
+	metaSys := logstorage.NewMetaSystem(logDb)
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		r = r.WithContext(webutils.WithNotificationSystem(r.Context()))
 		r = r.WithContext(webutils.WithPermissionSystem(r.Context(), userSys))
@@ -26,7 +28,7 @@ func Page(
 		transformerCount := 0
 		pipelineCount := 0
 
-		streamList, err := logDb.ListStreams()
+		streamList, err := metaSys.ListStreams()
 		if err == nil {
 			streamCount = len(streamList)
 		} else {
