@@ -60,6 +60,33 @@ func (sys *QuerySystem) FetchLogs(
 	return results, nil
 }
 
+func fetchKeysByTime(txn *badger.Txn, stream string, from, to time.Time) []string {
+	keys := []string{}
+
+	streamPrefix := []byte(fmt.Sprintf("entry:%s:", stream))
+	fromPrefix := []byte(fmt.Sprintf("entry:%s:%020d:", stream, from.UnixMilli()))
+	toPrefix := fmt.Sprintf("entry:%s:%020d:", stream, to.UnixMilli())
+
+	opts := badger.DefaultIteratorOptions
+	opts.PrefetchValues = false
+	opts.Prefix = streamPrefix
+	it := txn.NewIterator(opts)
+	defer it.Close()
+
+	for it.Seek(fromPrefix); it.Valid(); it.Next() {
+		item := it.Item()
+		key := string(item.KeyCopy(nil))
+
+		if key < toPrefix {
+			keys = append(keys, key)
+		} else {
+			break
+		}
+	}
+
+	return keys
+}
+
 func filterKeysByIndex(
 	txn *badger.Txn,
 	stream string,
@@ -130,33 +157,6 @@ func filterKeysByIndex(
 
 	keys := evaluate(filter)
 	return mapToSlice(keys)
-}
-
-func fetchKeysByTime(txn *badger.Txn, stream string, from, to time.Time) []string {
-	keys := []string{}
-
-	streamPrefix := []byte(fmt.Sprintf("entry:%s:", stream))
-	fromPrefix := []byte(fmt.Sprintf("entry:%s:%020d:", stream, from.UnixMilli()))
-	toPrefix := fmt.Sprintf("entry:%s:%020d:", stream, to.UnixMilli())
-
-	opts := badger.DefaultIteratorOptions
-	opts.PrefetchValues = false
-	opts.Prefix = streamPrefix
-	it := txn.NewIterator(opts)
-	defer it.Close()
-
-	for it.Seek(fromPrefix); it.Valid(); it.Next() {
-		item := it.Item()
-		key := string(item.KeyCopy(nil))
-
-		if key < toPrefix {
-			keys = append(keys, key)
-		} else {
-			break
-		}
-	}
-
-	return keys
 }
 
 func fetchEntry(txn *badger.Txn, stream string, key string) (LogEntry, error) {
