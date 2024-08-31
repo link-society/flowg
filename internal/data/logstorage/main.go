@@ -307,6 +307,22 @@ func (s *Storage) ListStreamFields(stream string) ([]string, error) {
 	return fields, nil
 }
 
+func (s *Storage) ConfigureStream(stream string, config StreamConfig) error {
+	return s.db.Update(func(txn *badger.Txn) error {
+		streamKey := []byte(fmt.Sprintf("stream:%s", stream))
+		configVal, err := json.Marshal(config)
+		if err != nil {
+			return fmt.Errorf("could not marshal stream config '%s': %w", stream, err)
+		}
+
+		if err := txn.Set(streamKey, configVal); err != nil {
+			return fmt.Errorf("could not save stream config '%s': %w", stream, err)
+		}
+
+		return nil
+	})
+}
+
 func (s *Storage) getOrCreateStreamConfig(txn *badger.Txn, stream string) (StreamConfig, error) {
 	var streamConfig StreamConfig
 

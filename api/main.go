@@ -51,7 +51,8 @@ func NewHandler(
 		r.Post("/api/v1/pipelines/{pipeline}/logs", IngestLogUsecase(authDb, pipelinesManager))
 
 		r.Get("/api/v1/streams", ListStreamsUsecase(authDb, logDb))
-		r.Get("/api/v1/streams/{stream}", QueryStreamUsecase(authDb, logDb))
+		r.Put("/api/v1/streams/{stream}", ConfigureStreamUsecase(authDb, logDb))
+		r.Get("/api/v1/streams/{stream}/logs", QueryStreamUsecase(authDb, logDb))
 		r.Get("/api/v1/streams/{stream}/fields", ListStreamFieldsUsecase(authDb, logDb))
 		r.Delete("/api/v1/streams/{stream}", PurgeStreamUsecase(authDb, logDb))
 
