@@ -24,6 +24,8 @@ func ConfigureStreamUsecase(
 	authDb *auth.Database,
 	logDb *logstorage.Storage,
 ) usecase.Interactor {
+	metaSys := logstorage.NewMetaSystem(logDb)
+
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
 			authDb,
@@ -33,7 +35,7 @@ func ConfigureStreamUsecase(
 				req ConfigureStreamRequest,
 				resp *ConfigureStreamResponse,
 			) error {
-				err := logDb.ConfigureStream(req.Stream, req.Config)
+				err := metaSys.ConfigureStream(req.Stream, req.Config)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,

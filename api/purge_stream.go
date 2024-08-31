@@ -22,6 +22,8 @@ func PurgeStreamUsecase(
 	authDb *auth.Database,
 	logDb *logstorage.Storage,
 ) usecase.Interactor {
+	metaSys := logstorage.NewMetaSystem(logDb)
+
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
 			authDb,
@@ -31,7 +33,7 @@ func PurgeStreamUsecase(
 				req PurgeStreamRequest,
 				resp *PurgeStreamResponse,
 			) error {
-				err := logDb.Purge(ctx, req.Stream)
+				err := metaSys.DeleteStream(ctx, req.Stream)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,

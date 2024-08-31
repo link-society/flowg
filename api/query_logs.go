@@ -30,6 +30,8 @@ func QueryStreamUsecase(
 	authDb *auth.Database,
 	logDb *logstorage.Storage,
 ) usecase.Interactor {
+	querySys := logstorage.NewQuerySystem(logDb)
+
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
 			authDb,
@@ -61,7 +63,7 @@ func QueryStreamUsecase(
 					filter = nil
 				}
 
-				records, err := logDb.Query(ctx, req.Stream, req.From, req.To, filter)
+				records, err := querySys.FetchLogs(ctx, req.Stream, req.From, req.To, filter)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,

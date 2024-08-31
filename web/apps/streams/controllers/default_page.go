@@ -16,6 +16,8 @@ func DefaultPage(
 	userSys *auth.UserSystem,
 	logDb *logstorage.Storage,
 ) http.HandlerFunc {
+	metaSys := logstorage.NewMetaSystem(logDb)
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		r = r.WithContext(webutils.WithNotificationSystem(r.Context()))
 		r = r.WithContext(webutils.WithPermissionSystem(r.Context(), userSys))
@@ -26,7 +28,7 @@ func DefaultPage(
 		}
 
 		streamNames := []string{}
-		streams, err := logDb.ListStreams()
+		streams, err := metaSys.ListStreams()
 		if err != nil {
 			webutils.LogError(r.Context(), "Failed to fetch streams", err)
 			webutils.NotifyError(r.Context(), "Could not fetch streams")

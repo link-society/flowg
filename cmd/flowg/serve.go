@@ -90,7 +90,8 @@ func NewServeCommand() *cobra.Command {
 				}
 			}()
 
-			pipelinesManager := pipelines.NewManager(logDb, opts.configDir)
+			collectorSys := logstorage.NewCollectorSystem(logDb)
+			pipelinesManager := pipelines.NewManager(collectorSys, opts.configDir)
 
 			if err := bootstrap.DefaultRolesAndUsers(authDb); err != nil {
 				slog.Error(
