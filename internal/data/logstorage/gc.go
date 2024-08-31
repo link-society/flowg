@@ -1,6 +1,7 @@
 package logstorage
 
 import (
+	"fmt"
 	"log/slog"
 	"time"
 
@@ -50,6 +51,58 @@ func (w *garbageCollectorWorker) DoWork(ctx actor.Context) actor.WorkerStatus {
 
 func (w *garbageCollectorWorker) CollectGarbage(ctx actor.Context) {
 	err := w.db.Update(func(txn *badger.Txn) error {
+		streams, err := fetchStreamconfigs(txn)
+		if err != nil {
+			return err
+		}
+
+		for stream, config := range streams {
+			if config.RetentionSize > 0 {
+				slog.DebugContext(
+					ctx,
+					"Collecting garbage",
+					"channel", "logstorage",
+					"stream", stream,
+					"retention_size", config.RetentionSize,
+				)
+
+				streamSize := int64(0)
+				garbageKeys := [][]byte{}
+
+				opts := badger.DefaultIteratorOptions
+				opts.PrefetchValues = false
+				opts.Prefix = []byte(fmt.Sprintf("entry:%s:", stream))
+				opts.Reverse = true
+				it := txn.NewIterator(opts)
+				defer it.Close()
+
+				for it.Rewind(); it.Valid(); it.Next() {
+					item := it.Item()
+					streamSize += item.EstimatedSize()
+
+					if streamSize > config.RetentionSize {
+						garbageKeys = append(garbageKeys, item.KeyCopy(nil))
+					}
+				}
+
+				for _, key := range garbageKeys {
+					slog.DebugContext(
+						ctx,
+						"Purging key from BadgerDB",
+						"channel", "logstorage",
+						"stream", stream,
+						"key", key,
+					)
+
+					if err := txn.Delete(key); err != nil {
+						return fmt.Errorf(
+							"could not delete key '%s' from stream '%s': %w",
+							key, stream, err,
+						)
+					}
+				}
+			}
+		}
 
 		return nil
 	})
