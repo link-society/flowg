@@ -51,7 +51,7 @@ func (w *garbageCollectorWorker) DoWork(ctx actor.Context) actor.WorkerStatus {
 
 func (w *garbageCollectorWorker) CollectGarbage(ctx actor.Context) {
 	err := w.db.Update(func(txn *badger.Txn) error {
-		streams, err := fetchStreamconfigs(txn)
+		streams, err := fetchStreamConfigs(txn)
 		if err != nil {
 			return err
 		}
@@ -107,6 +107,8 @@ func (w *garbageCollectorWorker) CollectGarbage(ctx actor.Context) {
 								key, stream, err,
 							)
 						}
+
+						purgeEntryFromFieldIndex(txn, stream, key)
 
 						if streamSize <= config.RetentionSize {
 							break
