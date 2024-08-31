@@ -65,19 +65,19 @@ We fetch the keys to lookup by iterating over all keys with the following
 prefix:
 
 ```
-stream:<stream name>:
+entry:<stream name>:
 ```
 
 Then, we select all keys that are "higher" than
 
 ```
-stream:<stream name>:<from timestamp>:
+entry:<stream name>:<from timestamp>:
 ```
 
 And "lower" than:
 
 ```
-stream:<stream name>:<to timestamp>:
+entry:<stream name>:<to timestamp>:
 ```
 
 Because of the internal structure of *BadgerDB*, this operation is fast.
