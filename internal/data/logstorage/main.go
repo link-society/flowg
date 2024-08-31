@@ -38,10 +38,10 @@ func NewStorage(dbPath string) (*Storage, error) {
 func (s *Storage) Append(
 	ctx context.Context,
 	stream string,
-	entry *LogEntry,
+	logEntry *LogEntry,
 ) ([]byte, error) {
-	key := entry.NewDbKey(stream)
-	val, err := json.Marshal(entry)
+	key := logEntry.NewDbKey(stream)
+	val, err := json.Marshal(logEntry)
 	if err != nil {
 		slog.DebugContext(
 			ctx,
@@ -56,17 +56,56 @@ func (s *Storage) Append(
 	err = s.db.Update(func(txn *badger.Txn) error {
 		slog.DebugContext(
 			ctx,
+			"Fetch stream configuration",
+			"channel", "storage",
+			"stream", stream,
+		)
+
+		var streamConfig StreamConfig
+
+		streamKey := []byte(fmt.Sprintf("stream:%s", stream))
+		switch streamConfigItem, err := txn.Get(streamKey); {
+		case err != nil && err != badger.ErrKeyNotFound:
+			return &QueryError{Operation: "stream-config", Reason: err}
+
+		case err == badger.ErrKeyNotFound:
+			err := txn.Set(streamKey, []byte(""))
+			if err != nil {
+				return &PersistError{Operation: "stream-config", Reason: err}
+			}
+
+		case err == nil:
+			err := streamConfigItem.Value(func(val []byte) error {
+				if len(val) > 0 {
+					if err := json.Unmarshal(val, &streamConfig); err != nil {
+						return &UnmarshalError{Reason: err}
+					}
+				}
+				return nil
+			})
+			if err != nil {
+				return err
+			}
+		}
+
+		slog.DebugContext(
+			ctx,
 			"Save log entry in BadgerDB",
 			"channel", "storage",
 			"stream", stream,
 			"key", key,
 		)
 
-		if err := txn.Set(key, val); err != nil {
+		entry := badger.NewEntry(key, val)
+		if streamConfig.RetentionTime > 0 {
+			entry = entry.WithTTL(streamConfig.RetentionTime)
+		}
+
+		if err := txn.SetEntry(entry); err != nil {
 			return &PersistError{Operation: "append", Reason: err}
 		}
 
-		for field, value := range entry.Fields {
+		for field, value := range logEntry.Fields {
 			slog.DebugContext(
 				ctx,
 				"Save field index in BadgerDB",
@@ -80,18 +119,6 @@ func (s *Storage) Append(
 			if err := fieldIndex.AddKey(key); err != nil {
 				return &PersistError{Operation: "field-index", Reason: err}
 			}
-		}
-
-		slog.DebugContext(
-			ctx,
-			"Save stream index in BadgerDB",
-			"channel", "storage",
-			"stream", stream,
-		)
-
-		streamKey := []byte(fmt.Sprintf("stream:%s", stream))
-		if err := txn.Set(streamKey, []byte{}); err != nil {
-			return &PersistError{Operation: "stream-index", Reason: err}
 		}
 
 		return nil
@@ -226,19 +253,33 @@ func (s *Storage) Purge(ctx context.Context, stream string) error {
 	})
 }
 
-func (s *Storage) ListStreams() ([]string, error) {
-	streams := []string{}
+func (s *Storage) ListStreams() (map[string]StreamConfig, error) {
+	streams := map[string]StreamConfig{}
 
 	err := s.db.View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
-		opts.PrefetchValues = false
+		opts.PrefetchValues = true
 		opts.Prefix = []byte("stream:")
 		it := txn.NewIterator(opts)
 		defer it.Close()
 
 		for it.Rewind(); it.Valid(); it.Next() {
 			stream := string(it.Item().Key()[7:])
-			streams = append(streams, stream)
+
+			var streamConfig StreamConfig
+			err := it.Item().Value(func(val []byte) error {
+				if len(val) > 0 {
+					if err := json.Unmarshal(val, &streamConfig); err != nil {
+						return &UnmarshalError{Reason: err}
+					}
+				}
+				return nil
+			})
+			if err != nil {
+				return err
+			}
+
+			streams[stream] = streamConfig
 		}
 
 		return nil

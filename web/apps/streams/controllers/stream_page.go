@@ -33,11 +33,15 @@ func StreamPage(
 		}
 
 		// fetch data for template
+		streamNames := []string{}
 		streams, err := logDb.ListStreams()
 		if err != nil {
 			webutils.LogError(r.Context(), "Failed to fetch streams", err)
 			webutils.NotifyError(r.Context(), "Could not fetch streams")
-			streams = []string{}
+		} else {
+			for streamName := range streams {
+				streamNames = append(streamNames, streamName)
+			}
 		}
 
 		stream := r.PathValue("name")
@@ -171,7 +175,7 @@ func StreamPage(
 		} else {
 			h := templ.Handler(views.Page(
 				views.PageProps{
-					Streams:       streams,
+					Streams:       streamNames,
 					CurrentStream: stream,
 
 					LogEntries:  logs,

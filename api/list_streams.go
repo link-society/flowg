@@ -12,8 +12,8 @@ import (
 
 type ListStreamsRequest struct{}
 type ListStreamsResponse struct {
-	Success bool     `json:"success"`
-	Streams []string `json:"streams"`
+	Success bool                               `json:"success"`
+	Streams map[string]logstorage.StreamConfig `json:"streams"`
 }
 
 func ListStreamsUsecase(
