@@ -25,22 +25,26 @@ func DefaultPage(
 			return
 		}
 
+		streamNames := []string{}
 		streams, err := logDb.ListStreams()
 		if err != nil {
 			webutils.LogError(r.Context(), "Failed to fetch streams", err)
 			webutils.NotifyError(r.Context(), "Could not fetch streams")
-			streams = []string{}
+		} else {
+			for streamName := range streams {
+				streamNames = append(streamNames, streamName)
+			}
 		}
 
-		if len(streams) > 0 {
-			defaultStream := streams[0]
+		if len(streamNames) > 0 {
+			defaultStream := streamNames[0]
 			http.Redirect(w, r, "/web/streams/"+defaultStream+"/", http.StatusFound)
 			return
 		}
 
 		h := templ.Handler(views.Page(
 			views.PageProps{
-				Streams:       streams,
+				Streams:       streamNames,
 				CurrentStream: "",
 
 				Permissions:   webutils.Permissions(r.Context()),
