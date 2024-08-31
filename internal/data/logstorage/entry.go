@@ -23,7 +23,7 @@ func NewLogEntry(fields map[string]string) *LogEntry {
 func NewLogEntryFromRaw(rawData []byte) (*LogEntry, error) {
 	var data map[string]interface{}
 	if err := json.Unmarshal(rawData, &data); err != nil {
-		return nil, &UnmarshalError{Reason: err}
+		return nil, fmt.Errorf("could not unmarshal log entry: %w", err)
 	}
 
 	flattenedData := map[string]string{}
