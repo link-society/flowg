@@ -84,7 +84,7 @@ func ProcessRetentionSaveAction(
 		streamConfig.RetentionTime = retentionTime
 		streamConfig.RetentionSize = retentionSize
 
-		err = metaSys.ConfigureStream(streamName, *streamConfig)
+		err = metaSys.ConfigureStream(streamName, streamConfig)
 		if err != nil {
 			webutils.LogError(r.Context(), "Failed to configure stream", err)
 			webutils.NotifyError(r.Context(), "Could not configure stream")
