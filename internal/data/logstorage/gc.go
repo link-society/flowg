@@ -59,7 +59,9 @@ func (w *garbageCollectorWorker) CollectGarbage(ctx actor.Context) {
 		}
 
 		for stream, config := range streams {
-			if config.RetentionSize > 0 {
+			retentionSize := config.RetentionSize * 1024 * 1024 // MB to bytes
+
+			if retentionSize > 0 {
 				slog.DebugContext(
 					ctx,
 					"Collecting garbage",
@@ -80,14 +82,14 @@ func (w *garbageCollectorWorker) CollectGarbage(ctx actor.Context) {
 					streamSize += int64(item.EstimatedSize())
 				}
 
-				if streamSize > config.RetentionSize {
+				if streamSize > retentionSize {
 					slog.DebugContext(
 						ctx,
 						"Stream too big, purging garbage",
 						"channel", "logstorage",
 						"stream", stream,
 						"size", streamSize,
-						"retention_size", config.RetentionSize,
+						"retention_size", retentionSize,
 					)
 
 					for it.Rewind(); it.Valid(); it.Next() {
@@ -112,7 +114,7 @@ func (w *garbageCollectorWorker) CollectGarbage(ctx actor.Context) {
 
 						purgeEntryFromFieldIndex(txn, stream, key)
 
-						if streamSize <= config.RetentionSize {
+						if streamSize <= retentionSize {
 							break
 						}
 					}
