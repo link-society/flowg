@@ -30,7 +30,9 @@ func (sys *QuerySystem) FetchLogs(
 
 	err := sys.storage.db.View(func(txn *badger.Txn) error {
 		keys := fetchKeysByTime(txn, stream, from, to)
-		keys = filterKeysByIndex(txn, stream, keys, filter)
+		if filter != nil {
+			keys = filterKeysByIndex(txn, stream, keys, filter)
+		}
 		sort.Sort(sort.Reverse(sort.StringSlice(keys)))
 
 		for _, key := range keys {
