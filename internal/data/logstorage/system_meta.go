@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log/slog"
 
-	"bytes"
 	"encoding/json"
 	"sort"
 
@@ -233,30 +232,4 @@ func fetchStreamConfigs(txn *badger.Txn) (map[string]StreamConfig, error) {
 	}
 
 	return streams, nil
-}
-
-func fetchStreamConfig(txn *badger.Txn, stream string) (*StreamConfig, error) {
-	var streamConfig *StreamConfig
-
-	item, err := txn.Get([]byte(fmt.Sprintf("stream:%s", stream)))
-	if err == badger.ErrKeyNotFound {
-		return nil, nil
-	} else if err != nil {
-		return nil, err
-	}
-
-	err = item.Value(func(val []byte) error {
-		if len(val) > 0 {
-			if err := json.Unmarshal(val, &streamConfig); err != nil {
-				return fmt.Errorf("could not unmarshal stream config '%s': %w", stream, err)
-			}
-		}
-		return nil
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	return streamConfig, nil
 }
