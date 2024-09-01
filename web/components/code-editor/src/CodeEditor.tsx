@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 
-import CodeMirror, { ViewUpdate } from '@uiw/react-codemirror'
-import { vscodeLight } from '@uiw/codemirror-theme-vscode'
+import Editor, { useMonaco } from '@monaco-editor/react'
 
 interface CodeEditorProps {
   code: string
@@ -10,6 +9,7 @@ interface CodeEditorProps {
 
 const CodeEditor: React.FC<CodeEditorProps> = ({ code, onCodeChange }) => {
   const [value, setValue] = useState(code)
+  const monaco = useMonaco()
 
   useEffect(
     () => {
@@ -18,23 +18,29 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ code, onCodeChange }) => {
     [code],
   )
 
+  useEffect(
+    () => {
+      // todo...
+    },
+    [monaco],
+  )
+
   const onChange = useCallback(
-    (val: string, viewUpdate: ViewUpdate) => {
-      setValue(val)
-      onCodeChange(val)
+    (val?: string) => {
+      setValue(val ?? '')
+      onCodeChange(val ?? '')
     },
     [onCodeChange],
   )
 
   return (
     <div className="w-full h-full">
-      <CodeMirror
-        value={value}
+      <Editor
+        defaultValue={value}
         width='100%'
         height='100%'
-        theme={vscodeLight}
         onChange={onChange}
-        style={{ height: '100%', overflow: 'auto' }}
+        options={{minimap: {enabled: false}}}
       />
     </div>
   )
