@@ -10,19 +10,21 @@ for the following:
 
  - **Time-based retention:** how long will the log entry be kept (in seconds)
  - **Size-based retention:** the maximum size (in MB) of the stream before deleting older entries
+ - **Indexed fields:** the list of fields in the log entries to index
 
-If any of those is set to 0 (the default), it is assumed to be "unlimited".
-For each stream, the configuration is stored (as JSON) at the following key:
+If any of the retention parameters is set to 0 (the default), it is assumed to
+be "unlimited". For each stream, the configuration is stored (as JSON) at the
+following key:
 
 ```
-stream:<stream name> = { ... }
+stream:config:<stream name> = { ... }
 ```
 
 Example:
 
 ```
 # TTL of 5min and max size of 1GB
-stream:test = {"ttl": 300, "size": 1024}
+stream:config:test = {"ttl": 300, "size": 1024, "indexed_fields": ["foo", "bar"]}
 ```
 
 ## Log Entries
@@ -50,12 +52,25 @@ entry:test:00000001724140167373:057804d1-832f-45bf-8e70-7acbf22ec480
 When added to the database, if no stream configuration exists, a default one is
 added.
 
+For each field of the log record, the following key is added to the database:
+
+```
+stream:field:<stream name>:<field name>
+```
+
+Example:
+
+```
+stream:field:test:foo
+stream:field:test:bar
+```
+
 ## Indexes
 
 ### Field Index
 
-Each field of a log entry is indexed by creating a new key referencing the
-field and the associated log entry's key:
+A field of a log entry is indexed by creating a new key referencing the field
+and the associated log entry's key:
 
 ```
 index:<stream name>:field:<field name>:<base64 encoded field value>:<entry key>
@@ -102,6 +117,8 @@ following prefix:
 index:<stream name>:field:foo:YmFy:
 ```
 
+If the field is not indexed, all keys in the time-window are returned.
+
 For `foo in ["bar", "baz"]` filters, we fetch all keys the time-window with
 the following prefixes:
 
@@ -112,6 +129,8 @@ the following prefixes:
 index:<stream name>:field:foo:YmFy:
 index:<stream name>:field:foo:YmF6:
 ```
+
+If the field is not indexed, all keys in the time-window are returned.
 
 For `not <sub-filter>` filters, we select all keys in the time-window that do
 not appear in the `<sub-filter>` result.
@@ -125,3 +144,7 @@ results.
 
 For `<lhs> and <rhs>` filters, we select the intersection of `<lhs>` and `<rhs>`
 results.
+
+Once the set of keys to fetch is determined, we load the values and run them
+through the filter once again (to account for unindexed fields), and return the
+final set of log entries.
