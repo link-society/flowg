@@ -171,6 +171,17 @@ func Navbar(props NavbarProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
+		if props.Permissions.CanViewStreams {
+			templ_7745c5c3_Err = navbarItem(navbarItemProps{
+				Icon:   "sd_storage",
+				Label:  "Storage",
+				Link:   "/web/storage",
+				Active: props.CurrentNav == "storage",
+			}).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
 		if props.Permissions.CanViewACLs {
 			templ_7745c5c3_Err = navbarItem(navbarItemProps{
 				Icon:   "dashboard",
@@ -218,6 +229,12 @@ func Navbar(props NavbarProps) templ.Component {
 		}
 		if props.Permissions.CanViewPipelines {
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"collection-item\" href=\"/web/pipelines\"><i class=\"left material-icons\">settings</i> Pipelines</a> ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		if props.Permissions.CanViewStreams {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"collection-item\" href=\"/web/storage\"><i class=\"left material-icons\">sd_storage</i> Storage</a> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

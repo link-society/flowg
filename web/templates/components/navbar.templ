@@ -79,6 +79,14 @@ templ Navbar(props NavbarProps) {
             Active: props.CurrentNav == "pipelines",
           })
         }
+        if props.Permissions.CanViewStreams {
+          @navbarItem(navbarItemProps{
+            Icon:   "sd_storage",
+            Label:  "Storage",
+            Link:   "/web/storage",
+            Active: props.CurrentNav == "storage",
+          })
+        }
         if props.Permissions.CanViewACLs {
           @navbarItem(navbarItemProps{
             Icon:   "dashboard",
@@ -121,6 +129,12 @@ templ Navbar(props NavbarProps) {
         <a class="collection-item" href="/web/pipelines">
           <i class="left material-icons">settings</i>
           Pipelines
+        </a>
+      }
+      if props.Permissions.CanViewStreams {
+        <a class="collection-item" href="/web/storage">
+          <i class="left material-icons">sd_storage</i>
+          Storage
         </a>
       }
       if props.Permissions.CanViewACLs {
