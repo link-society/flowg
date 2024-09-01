@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 
 import Editor, { useMonaco } from '@monaco-editor/react'
+import { vrlLanguageDefinition, vrlThemeDefinition } from './vrl-highlighter'
 
 interface CodeEditorProps {
   code: string
@@ -20,7 +21,11 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ code, onCodeChange }) => {
 
   useEffect(
     () => {
-      // todo...
+      if (!monaco) return
+
+      monaco.languages.register({id: 'vrl'})
+      monaco.editor.defineTheme('vrl-theme', vrlThemeDefinition)
+      monaco.languages.setMonarchTokensProvider('vrl', vrlLanguageDefinition)
     },
     [monaco],
   )
@@ -37,6 +42,8 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ code, onCodeChange }) => {
     <div className="w-full h-full">
       <Editor
         defaultValue={value}
+        defaultLanguage='vrl'
+        theme='vrl-theme'
         width='100%'
         height='100%'
         onChange={onChange}
