@@ -5,3 +5,12 @@ type StreamConfig struct {
 	RetentionSize int64    `json:"size" description:"Maximum size in MB, 0 to disable"`
 	IndexedFields []string `json:"indexed_fields"`
 }
+
+func (s StreamConfig) IsFieldIndexed(field string) bool {
+	for _, f := range s.IndexedFields {
+		if f == field {
+			return true
+		}
+	}
+	return false
+}
