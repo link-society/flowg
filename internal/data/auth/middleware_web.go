@@ -3,6 +3,8 @@ package auth
 import (
 	"log/slog"
 	"net/http"
+
+	"link-society.com/flowg/internal/webutils/htmx"
 )
 
 func WebMiddleware(db *Database) func(http.Handler) http.Handler {
@@ -27,7 +29,12 @@ func WebMiddleware(db *Database) func(http.Handler) http.Handler {
 					)
 				}
 
-				http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
+				if htmx.IsHtmxRequest(r) {
+					w.Header().Set("HX-Redirect", "/auth/login")
+					w.WriteHeader(http.StatusOK)
+				} else {
+					http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
+				}
 				return
 			}
 
@@ -40,7 +47,12 @@ func WebMiddleware(db *Database) func(http.Handler) http.Handler {
 					"error", err.Error(),
 				)
 
-				http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
+				if htmx.IsHtmxRequest(r) {
+					w.Header().Set("HX-Redirect", "/auth/login")
+					w.WriteHeader(http.StatusOK)
+				} else {
+					http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
+				}
 				return
 			}
 
@@ -51,7 +63,12 @@ func WebMiddleware(db *Database) func(http.Handler) http.Handler {
 					"channel", "web",
 				)
 
-				http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
+				if htmx.IsHtmxRequest(r) {
+					w.Header().Set("HX-Redirect", "/auth/login")
+					w.WriteHeader(http.StatusOK)
+				} else {
+					http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
+				}
 				return
 			}
 
