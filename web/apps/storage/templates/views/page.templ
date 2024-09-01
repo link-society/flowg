@@ -1,0 +1,42 @@
+package views
+
+import (
+  "link-society.com/flowg/internal/data/auth"
+  "link-society.com/flowg/internal/data/logstorage"
+
+  "link-society.com/flowg/web/apps/storage/templates/components"
+  "link-society.com/flowg/web/templates/layouts"
+)
+
+type PageProps struct {
+  StreamNames         []string
+  CurrentStreamName   string
+  CurrentStreamConfig *logstorage.StreamConfig
+
+  Permissions   auth.Permissions
+  Notifications []string
+}
+
+templ Page(props PageProps) {
+  @layouts.App(layouts.AppProps{
+    Head:          nil,
+    CurrentNav:    "storage",
+    Permissions:   props.Permissions,
+    Notifications: props.Notifications,
+  }) {
+    <div class="w-full h-full flex flex-col">
+      <section class="row w-full mb-0 flex-grow">
+        @components.SideMenu(components.SideMenuProps{
+          Streams:       props.StreamNames,
+          CurrentStream: props.CurrentStreamName,
+        })
+        @components.ConfigEditor(components.ConfigEditorProps{
+          StreamName: props.CurrentStreamName,
+          Config:     props.CurrentStreamConfig,
+
+          Permissions: props.Permissions,
+        })
+      </section>
+    </div>
+  }
+}

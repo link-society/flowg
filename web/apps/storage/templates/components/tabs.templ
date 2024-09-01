@@ -1,0 +1,37 @@
+package components
+
+import (
+  "link-society.com/flowg/internal/data/auth"
+  "link-society.com/flowg/internal/data/logstorage"
+)
+
+type TabsProps struct {
+  StreamName string
+  Config     *logstorage.StreamConfig
+
+  Permissions auth.Permissions
+}
+
+templ Tabs(props TabsProps) {
+  <div class="row">
+    <div class="col s12">
+      <ul class="tabs z-depth-1">
+        <li class="tab col s6"><a class="active" href="#tab_retention">Retention</a></li>
+        <li class="tab col s6"><a href="#tab_indexes">Indexes</a></li>
+      </ul>
+    </div>
+
+    @RetentionTab(RetentionTabProps{
+      StreamName: props.StreamName,
+      Config:     props.Config,
+
+      Permissions: props.Permissions,
+    })
+    @IndexesTab(IndexesTabProps{
+      StreamName: props.StreamName,
+      Config:     props.Config,
+
+      Permissions: props.Permissions,
+    })
+  </div>
+}

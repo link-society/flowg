@@ -1,0 +1,56 @@
+package components
+
+import (
+  "fmt"
+
+  "link-society.com/flowg/internal/data/auth"
+  "link-society.com/flowg/internal/data/logstorage"
+)
+
+type RetentionTabProps struct {
+  StreamName string
+  Config     *logstorage.StreamConfig
+
+  Permissions auth.Permissions
+}
+
+templ RetentionTab(props RetentionTabProps) {
+  <section class="col s12" id="tab_retention">
+    <form class="p-3" hx-post={"/web/storage/"+props.StreamName+"/retention/"}>
+      <section class="input-field">
+        <input
+          id="retention_time"
+          type="number"
+          class="validate"
+          name="retention_time"
+          min="0"
+          value={fmt.Sprintf("%d", props.Config.RetentionTime)}
+        />
+        <label for="retention_days">Retention Time (in seconds) - 0 to disable</label>
+      </section>
+
+      <section class="input-field">
+        <input
+          id="retention_size"
+          type="number"
+          class="validate"
+          name="retention_size"
+          min="0"
+          value={fmt.Sprintf("%d", props.Config.RetentionSize)}
+        />
+        <label for="retention_size">Retention Size (MB) - 0 to disable</label>
+      </section>
+
+      <button
+        class="btn waves-effect waves-light"
+        type="submit"
+        if !props.Permissions.CanEditStreams {
+          disabled
+        }
+      >
+        <i class="material-icons left">save</i>
+        Save
+      </button>
+    </form>
+  </section>
+}

@@ -1,0 +1,19 @@
+package components
+
+import (
+  "link-society.com/flowg/internal/data/auth"
+  "link-society.com/flowg/internal/data/logstorage"
+)
+
+type IndexesTabProps struct {
+  StreamName string
+  Config     *logstorage.StreamConfig
+
+  Permissions auth.Permissions
+}
+
+templ IndexesTab(props IndexesTabProps) {
+  <section class="col s12" id="tab_indexes">
+    <h4 class="text-center">&#128679; Work In Progress</h4>
+  </section>
+}
