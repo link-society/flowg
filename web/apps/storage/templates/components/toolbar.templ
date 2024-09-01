@@ -1,0 +1,52 @@
+package components
+
+import (
+  "link-society.com/flowg/internal/app"
+  "link-society.com/flowg/internal/data/auth"
+)
+
+type ToolbarProps struct {
+  StreamName  string
+  Permissions auth.Permissions
+}
+
+templ Toolbar(props ToolbarProps) {
+  <div
+    class="
+      blue darken-1
+      z-depth-1
+      p-3
+      flex flex-row items-center
+    "
+  >
+    <div class="flex flex-row flex-grow items-center">
+      <a
+        class="btn-small blue"
+        href={templ.SafeURL("https://github.com/link-society/flowg/blob/" + app.FLOWG_VERSION + "/docs/README.md")}
+        target="_blank"
+      >
+        <i class="material-icons left">help</i>
+        Documentation
+      </a>
+    </div>
+    <div class="flex flex-row items-center gap-3">
+      if props.Permissions.CanEditStreams {
+        <a
+          class="btn-small blue"
+          hx-get="/web/storage/new/"
+          hx-target="#modal-content"
+        >
+          <i class="material-icons left">add</i>
+          New
+        </a>
+        <a
+          class="btn-small red"
+          hx-post={"/web/storage/delete/" + props.StreamName + "/"}
+        >
+          <i class="material-icons left">delete</i>
+          Delete
+        </a>
+      }
+    </div>
+  </div>
+}

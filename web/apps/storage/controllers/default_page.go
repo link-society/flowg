@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"sort"
 
 	"github.com/a-h/templ"
 
@@ -38,9 +39,11 @@ func DefaultPage(
 
 		if len(streamNames) > 0 {
 			defaultStream := streamNames[0]
-			http.Redirect(w, r, "/web/storage/"+defaultStream+"/", http.StatusFound)
+			http.Redirect(w, r, "/web/storage/edit/"+defaultStream+"/", http.StatusFound)
 			return
 		}
+
+		sort.Strings(streamNames)
 
 		h := templ.Handler(views.Page(
 			views.PageProps{

@@ -25,6 +25,12 @@ templ Page(props PageProps) {
     Notifications: props.Notifications,
   }) {
     <div class="w-full h-full flex flex-col">
+      <section class="row w-full mb-0">
+        @components.Toolbar(components.ToolbarProps{
+          StreamName:  props.CurrentStreamName,
+          Permissions: props.Permissions,
+        })
+      </section>
       <section class="row w-full mb-0 flex-grow">
         @components.SideMenu(components.SideMenuProps{
           Streams:       props.StreamNames,

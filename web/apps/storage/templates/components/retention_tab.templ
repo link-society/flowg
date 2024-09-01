@@ -16,7 +16,7 @@ type RetentionTabProps struct {
 
 templ RetentionTab(props RetentionTabProps) {
   <section class="col s12" id="tab_retention">
-    <form class="p-3" hx-post={"/web/storage/"+props.StreamName+"/retention/"}>
+    <form class="p-3" hx-post={"/web/storage/edit/"+props.StreamName+"/retention/"}>
       <section class="input-field">
         <input
           id="retention_time"
