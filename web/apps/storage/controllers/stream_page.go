@@ -50,7 +50,7 @@ func StreamPage(
 			views.PageProps{
 				StreamNames:         streamNames,
 				CurrentStreamName:   streamName,
-				CurrentStreamConfig: streamConfig,
+				CurrentStreamConfig: &streamConfig,
 
 				Permissions:   webutils.Permissions(r.Context()),
 				Notifications: webutils.Notifications(r.Context()),
