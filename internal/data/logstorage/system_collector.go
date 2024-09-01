@@ -71,21 +71,31 @@ func (sys *CollectorSystem) Ingest(
 		}
 
 		for field, value := range logEntry.Fields {
-			slog.DebugContext(
-				ctx,
-				"Save field index in BadgerDB",
-				"channel", "storage",
-				"stream", stream,
-				"key", key,
-				"field", field,
-			)
-
-			fieldIndex := newFieldIndex(txn, stream, field, value)
-			if err := fieldIndex.AddKey(key, streamConfig.RetentionTime); err != nil {
+			fieldKey := []byte(fmt.Sprintf("stream:field:%s:%s", stream, field))
+			if err := txn.Set(fieldKey, []byte{}); err != nil {
 				return fmt.Errorf(
-					"could not add field index '%s' of log entry '%s' to stream '%s': %w",
+					"could not save field '%s' of log entry '%s' to stream '%s': %w",
 					field, key, stream, err,
 				)
+			}
+
+			if streamConfig.IsFieldIndexed(field) {
+				slog.DebugContext(
+					ctx,
+					"Save field index in BadgerDB",
+					"channel", "storage",
+					"stream", stream,
+					"key", key,
+					"field", field,
+				)
+
+				fieldIndex := newFieldIndex(txn, stream, field, value)
+				if err := fieldIndex.AddKey(key, streamConfig.RetentionTime); err != nil {
+					return fmt.Errorf(
+						"could not add field index '%s' of log entry '%s' to stream '%s': %w",
+						field, key, stream, err,
+					)
+				}
 			}
 		}
 
