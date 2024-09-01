@@ -21,7 +21,6 @@ templ RetentionTab(props RetentionTabProps) {
         <input
           id="retention_time"
           type="number"
-          class="validate"
           name="retention_time"
           min="0"
           value={fmt.Sprintf("%d", props.Config.RetentionTime)}
@@ -33,7 +32,6 @@ templ RetentionTab(props RetentionTabProps) {
         <input
           id="retention_size"
           type="number"
-          class="validate"
           name="retention_size"
           min="0"
           value={fmt.Sprintf("%d", props.Config.RetentionSize)}
