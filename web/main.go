@@ -14,6 +14,7 @@ import (
 	"link-society.com/flowg/web/apps/dashboard"
 	"link-society.com/flowg/web/apps/onboarding"
 	"link-society.com/flowg/web/apps/pipelines"
+	"link-society.com/flowg/web/apps/storage"
 	"link-society.com/flowg/web/apps/streams"
 	"link-society.com/flowg/web/apps/transformers"
 )
@@ -52,6 +53,10 @@ func NewHandler(
 	mux.Handle(
 		"/web/pipelines/",
 		authMiddleware(pipelines.Application(authDb, pipelinesManager)),
+	)
+	mux.Handle(
+		"/web/storage/",
+		authMiddleware(storage.Application(authDb, logDb)),
 	)
 	mux.Handle(
 		"/web/admin/",
