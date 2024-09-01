@@ -10,8 +10,9 @@ import (
 )
 
 type Storage struct {
-	db *badger.DB
-	gc *garbageCollector
+	db      *badger.DB
+	gc      *garbageCollector
+	indexer *indexer
 }
 
 func NewStorage(dbPath string) (*Storage, error) {
@@ -28,10 +29,14 @@ func NewStorage(dbPath string) (*Storage, error) {
 	gc := newGarbageCollector(db, 5*time.Minute)
 	gc.Start()
 
-	return &Storage{db: db, gc: gc}, nil
+	indexer := newIndexer(db)
+	indexer.Start()
+
+	return &Storage{db: db, gc: gc, indexer: indexer}, nil
 }
 
 func (s *Storage) Close() error {
+	s.indexer.Stop()
 	s.gc.Stop()
 	return s.db.Close()
 }
