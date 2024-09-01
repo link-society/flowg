@@ -3,6 +3,7 @@ package logstorage
 import (
 	"encoding/base64"
 	"fmt"
+	"time"
 
 	"github.com/dgraph-io/badger/v3"
 )
@@ -24,9 +25,15 @@ func newFieldIndex(txn *badger.Txn, stream, field, value string) *fieldIndex {
 	}
 }
 
-func (index *fieldIndex) AddKey(entryKey []byte) error {
+func (index *fieldIndex) AddKey(entryKey []byte, retentionTime int64) error {
 	indexKey := []byte(fmt.Sprintf("%s%s", index.keyPrefix, entryKey))
-	return index.txn.Set(indexKey, []byte{})
+	entry := badger.NewEntry(indexKey, []byte{})
+
+	if retentionTime > 0 {
+		entry = entry.WithTTL(time.Duration(retentionTime) * time.Second)
+	}
+
+	return index.txn.SetEntry(entry)
 }
 
 func (index *fieldIndex) IterKeys(fn func(key string)) {

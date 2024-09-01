@@ -81,7 +81,7 @@ func (sys *CollectorSystem) Ingest(
 			)
 
 			fieldIndex := newFieldIndex(txn, stream, field, value)
-			if err := fieldIndex.AddKey(key); err != nil {
+			if err := fieldIndex.AddKey(key, streamConfig.RetentionTime); err != nil {
 				return fmt.Errorf(
 					"could not add field index '%s' of log entry '%s' to stream '%s': %w",
 					field, key, stream, err,
