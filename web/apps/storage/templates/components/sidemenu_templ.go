@@ -59,7 +59,7 @@ func SideMenu(props SideMenuProps) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var3 templ.SafeURL = templ.SafeURL("/web/storage/" + stream + "/")
+				var templ_7745c5c3_Var3 templ.SafeURL = templ.SafeURL("/web/storage/edit/" + stream + "/")
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var3)))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err

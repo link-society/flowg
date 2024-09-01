@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"sort"
 
 	"github.com/a-h/templ"
 
@@ -42,6 +43,8 @@ func StreamPage(
 			webutils.LogError(r.Context(), "Failed to fetch stream config", err)
 			webutils.NotifyError(r.Context(), "Could not fetch stream config")
 		}
+
+		sort.Strings(streamNames)
 
 		h := templ.Handler(views.Page(
 			views.PageProps{

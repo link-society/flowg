@@ -204,6 +204,7 @@ const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange }) => {
         onConnect={onConnect}
         onDrop={onDrop}
         onDragOver={onDragOver}
+        fitView
         snapToGrid
         defaultEdgeOptions={{ animated: true, type: 'smoothstep' }}
       >
