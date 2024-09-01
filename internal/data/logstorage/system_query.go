@@ -29,9 +29,14 @@ func (sys *QuerySystem) FetchLogs(
 	results := []LogEntry{}
 
 	err := sys.storage.db.View(func(txn *badger.Txn) error {
+		streamConfig, err := getOrCreateStreamConfig(txn, stream)
+		if err != nil {
+			return err
+		}
+
 		keys := fetchKeysByTime(txn, stream, from, to)
 		if filter != nil {
-			keys = filterKeysByIndex(txn, stream, keys, filter)
+			keys = filterKeysByIndex(txn, stream, streamConfig, keys, filter)
 		}
 		sort.Sort(sort.Reverse(sort.StringSlice(keys)))
 
@@ -49,7 +54,9 @@ func (sys *QuerySystem) FetchLogs(
 				return err
 			}
 
-			results = append(results, entry)
+			if filter == nil || filter.Evaluate(&entry) {
+				results = append(results, entry)
+			}
 		}
 
 		return nil
@@ -92,6 +99,7 @@ func fetchKeysByTime(txn *badger.Txn, stream string, from, to time.Time) []strin
 func filterKeysByIndex(
 	txn *badger.Txn,
 	stream string,
+	streamConfig StreamConfig,
 	allKeys []string,
 	filter Filter,
 ) []string {
@@ -121,36 +129,63 @@ func filterKeysByIndex(
 			return keys
 
 		case *NotFilter:
-			keys := evaluate(f.Filter)
-			return differenceKeysMap(allKeysMap, keys)
+			switch sub := f.Filter.(type) {
+			case *FieldExact:
+				if streamConfig.IsFieldIndexed(sub.Field) {
+					keys := evaluate(f.Filter)
+					return differenceKeysMap(allKeysMap, keys)
+				} else {
+					return allKeysMap
+				}
+
+			case *FieldIn:
+				if streamConfig.IsFieldIndexed(sub.Field) {
+					keys := evaluate(f.Filter)
+					return differenceKeysMap(allKeysMap, keys)
+				} else {
+					return allKeysMap
+				}
+
+			default:
+				keys := evaluate(f.Filter)
+				return differenceKeysMap(allKeysMap, keys)
+			}
 
 		case *FieldExact:
-			fieldIndex := newFieldIndex(txn, stream, f.Field, f.Value)
+			if streamConfig.IsFieldIndexed(f.Field) {
+				fieldIndex := newFieldIndex(txn, stream, f.Field, f.Value)
 
-			keys := map[string]struct{}{}
-
-			fieldIndex.IterKeys(func(key string) {
-				if _, found := allKeysMap[key]; found {
-					keys[key] = struct{}{}
-				}
-			})
-
-			return keys
-
-		case *FieldIn:
-			keys := map[string]struct{}{}
-
-			for _, value := range f.Values {
-				fieldIndex := newFieldIndex(txn, stream, f.Field, value)
+				keys := map[string]struct{}{}
 
 				fieldIndex.IterKeys(func(key string) {
 					if _, found := allKeysMap[key]; found {
 						keys[key] = struct{}{}
 					}
 				})
+
+				return keys
+			} else {
+				return allKeysMap
 			}
 
-			return keys
+		case *FieldIn:
+			if streamConfig.IsFieldIndexed(f.Field) {
+				keys := map[string]struct{}{}
+
+				for _, value := range f.Values {
+					fieldIndex := newFieldIndex(txn, stream, f.Field, value)
+
+					fieldIndex.IterKeys(func(key string) {
+						if _, found := allKeysMap[key]; found {
+							keys[key] = struct{}{}
+						}
+					})
+				}
+
+				return keys
+			} else {
+				return allKeysMap
+			}
 
 		default:
 			return map[string]struct{}{}
