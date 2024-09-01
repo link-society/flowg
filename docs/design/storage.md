@@ -3,6 +3,28 @@
 The storage backend of **FlowG** is the key/value store
 [BadgerDB](https://dgraph.io/docs/badger/).
 
+## Streams
+
+A stream is the destination of log entries. The stream hold the configuration
+for the following:
+
+ - **Time-based retention:** how long will the log entry be kept (in seconds)
+ - **Size-based retention:** the maximum size (in MB) of the stream before deleting older entries
+
+If any of those is set to 0 (the default), it is assumed to be "unlimited".
+For each stream, the configuration is stored (as JSON) at the following key:
+
+```
+stream:<stream name> = { ... }
+```
+
+Example:
+
+```
+# TTL of 5min and max size of 1GB
+stream:test = {"ttl": 300, "size": 1024}
+```
+
 ## Log Entries
 
 A log entry is composed of:
@@ -25,21 +47,10 @@ Example:
 entry:test:00000001724140167373:057804d1-832f-45bf-8e70-7acbf22ec480
 ```
 
+When added to the database, if no stream configuration exists, a default one is
+added.
+
 ## Indexes
-
-### Stream Index
-
-For each stream, an empty value is stored at the following key:
-
-```
-stream:<stream name>
-```
-
-Example:
-
-```
-stream:test
-```
 
 ### Field Index
 
