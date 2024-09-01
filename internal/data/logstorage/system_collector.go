@@ -60,7 +60,7 @@ func (sys *CollectorSystem) Ingest(
 
 		entry := badger.NewEntry(key, val)
 		if streamConfig.RetentionTime > 0 {
-			entry = entry.WithTTL(streamConfig.RetentionTime * time.Second)
+			entry = entry.WithTTL(time.Duration(streamConfig.RetentionTime) * time.Second)
 		}
 
 		if err := txn.SetEntry(entry); err != nil {
