@@ -40,7 +40,7 @@ func (sys *MetaSystem) ListStreamFields(stream string) ([]string, error) {
 	fieldsMap := map[string]struct{}{}
 
 	err := sys.storage.db.View(func(txn *badger.Txn) error {
-		prefix := []byte(fmt.Sprintf("index:%s:field:", stream))
+		prefix := []byte(fmt.Sprintf("stream:field:%s:", stream))
 		opts := badger.DefaultIteratorOptions
 		opts.PrefetchValues = false
 		opts.Prefix = prefix
@@ -51,11 +51,8 @@ func (sys *MetaSystem) ListStreamFields(stream string) ([]string, error) {
 			item := it.Item()
 			key := item.Key()
 
-			keyParts := bytes.SplitN(key[len(prefix):], []byte(":"), 2)
-			if len(keyParts) > 0 {
-				fieldName := string(keyParts[0])
-				fieldsMap[fieldName] = struct{}{}
-			}
+			fieldName := string(key[len(prefix):])
+			fieldsMap[fieldName] = struct{}{}
 		}
 
 		return nil
@@ -65,35 +62,40 @@ func (sys *MetaSystem) ListStreamFields(stream string) ([]string, error) {
 		return nil, err
 	}
 
-	fields := make([]string, 0, len(fieldsMap))
-	for field := range fieldsMap {
-		fields = append(fields, field)
-	}
-
+	fields := mapToSlice(fieldsMap)
 	sort.Strings(fields)
 
 	return fields, nil
 }
 
-func (sys *MetaSystem) GetStreamConfig(stream string) (*StreamConfig, error) {
-	var streamConfig *StreamConfig
+func (sys *MetaSystem) GetStreamConfig(stream string) (StreamConfig, error) {
+	var streamConfig StreamConfig
 
 	err := sys.storage.db.View(func(txn *badger.Txn) error {
 		var err error
-		streamConfig, err = fetchStreamConfig(txn, stream)
+		streamConfig, err = getOrCreateStreamConfig(txn, stream)
 		return err
 	})
 
 	if err != nil {
-		return nil, err
+		return StreamConfig{}, err
 	}
 
 	return streamConfig, nil
 }
 
 func (sys *MetaSystem) ConfigureStream(stream string, config StreamConfig) error {
+	if config.IndexedFields == nil {
+		config.IndexedFields = []string{}
+	}
+
 	return sys.storage.db.Update(func(txn *badger.Txn) error {
-		streamKey := []byte(fmt.Sprintf("stream:%s", stream))
+		oldConfig, err := getOrCreateStreamConfig(txn, stream)
+		if err != nil {
+			return fmt.Errorf("could not fetch old stream config '%s': %w", stream, err)
+		}
+
+		streamKey := []byte(fmt.Sprintf("stream:config:%s", stream))
 		configVal, err := json.Marshal(config)
 		if err != nil {
 			return fmt.Errorf("could not marshal stream config '%s': %w", stream, err)
@@ -101,6 +103,18 @@ func (sys *MetaSystem) ConfigureStream(stream string, config StreamConfig) error
 
 		if err := txn.Set(streamKey, configVal); err != nil {
 			return fmt.Errorf("could not save stream config '%s': %w", stream, err)
+		}
+
+		for _, field := range config.IndexedFields {
+			if !oldConfig.IsFieldIndexed(field) {
+				sys.storage.indexer.IndexField(stream, field)
+			}
+		}
+
+		for _, field := range oldConfig.IndexedFields {
+			if !config.IsFieldIndexed(field) {
+				sys.storage.indexer.UnindexField(stream, field)
+			}
 		}
 
 		return nil
@@ -112,6 +126,7 @@ func (sys *MetaSystem) DeleteStream(ctx context.Context, stream string) error {
 		prefixes := []string{
 			fmt.Sprintf("entry:%s:", stream),
 			fmt.Sprintf("index:%s:", stream),
+			fmt.Sprintf("stream:field:%s:", stream),
 		}
 
 		for _, prefix := range prefixes {
@@ -140,7 +155,7 @@ func (sys *MetaSystem) DeleteStream(ctx context.Context, stream string) error {
 			}
 		}
 
-		streamKey := []byte(fmt.Sprintf("stream:%s", stream))
+		streamKey := []byte(fmt.Sprintf("stream:config:%s", stream))
 		if err := txn.Delete(streamKey); err != nil {
 			return fmt.Errorf("could not delete stream config '%s': %w", stream, err)
 		}
@@ -152,7 +167,7 @@ func (sys *MetaSystem) DeleteStream(ctx context.Context, stream string) error {
 func getOrCreateStreamConfig(txn *badger.Txn, stream string) (StreamConfig, error) {
 	var streamConfig StreamConfig
 
-	streamKey := []byte(fmt.Sprintf("stream:%s", stream))
+	streamKey := []byte(fmt.Sprintf("stream:config:%s", stream))
 	switch streamConfigItem, err := txn.Get(streamKey); {
 	case err != nil && err != badger.ErrKeyNotFound:
 		return StreamConfig{}, fmt.Errorf(
@@ -194,12 +209,12 @@ func fetchStreamConfigs(txn *badger.Txn) (map[string]StreamConfig, error) {
 
 	opts := badger.DefaultIteratorOptions
 	opts.PrefetchValues = true
-	opts.Prefix = []byte("stream:")
+	opts.Prefix = []byte("stream:config:")
 	it := txn.NewIterator(opts)
 	defer it.Close()
 
 	for it.Rewind(); it.Valid(); it.Next() {
-		stream := string(it.Item().Key()[7:])
+		stream := string(it.Item().Key()[len(opts.Prefix):])
 
 		var streamConfig StreamConfig
 		err := it.Item().Value(func(val []byte) error {
