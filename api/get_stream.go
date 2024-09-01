@@ -16,8 +16,8 @@ type GetStreamRequest struct {
 }
 
 type GetStreamResponse struct {
-	Success bool                    `json:"success"`
-	Config  logstorage.StreamConfig `json:"config"`
+	Success bool                     `json:"success"`
+	Config  *logstorage.StreamConfig `json:"config"`
 }
 
 func GetStreamUsecase(

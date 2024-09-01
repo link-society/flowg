@@ -75,8 +75,8 @@ func (sys *MetaSystem) ListStreamFields(stream string) ([]string, error) {
 	return fields, nil
 }
 
-func (sys *MetaSystem) GetStreamConfig(stream string) (StreamConfig, error) {
-	var streamConfig StreamConfig
+func (sys *MetaSystem) GetStreamConfig(stream string) (*StreamConfig, error) {
+	var streamConfig *StreamConfig
 
 	err := sys.storage.db.View(func(txn *badger.Txn) error {
 		var err error
@@ -85,7 +85,7 @@ func (sys *MetaSystem) GetStreamConfig(stream string) (StreamConfig, error) {
 	})
 
 	if err != nil {
-		return StreamConfig{}, err
+		return nil, err
 	}
 
 	return streamConfig, nil
@@ -220,14 +220,14 @@ func fetchStreamConfigs(txn *badger.Txn) (map[string]StreamConfig, error) {
 	return streams, nil
 }
 
-func fetchStreamConfig(txn *badger.Txn, stream string) (StreamConfig, error) {
-	var streamConfig StreamConfig
+func fetchStreamConfig(txn *badger.Txn, stream string) (*StreamConfig, error) {
+	var streamConfig *StreamConfig
 
 	item, err := txn.Get([]byte(fmt.Sprintf("stream:%s", stream)))
 	if err == badger.ErrKeyNotFound {
-		return StreamConfig{}, nil
+		return nil, nil
 	} else if err != nil {
-		return StreamConfig{}, err
+		return nil, err
 	}
 
 	err = item.Value(func(val []byte) error {
@@ -240,7 +240,7 @@ func fetchStreamConfig(txn *badger.Txn, stream string) (StreamConfig, error) {
 	})
 
 	if err != nil {
-		return StreamConfig{}, err
+		return nil, err
 	}
 
 	return streamConfig, nil
