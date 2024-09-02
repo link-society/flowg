@@ -18,7 +18,7 @@ func ProcessRetentionSaveAction(
 		r = r.WithContext(webutils.WithNotificationSystem(r.Context()))
 		r = r.WithContext(webutils.WithPermissionSystem(r.Context(), userSys))
 
-		if !webutils.Permissions(r.Context()).CanEditACLs {
+		if !webutils.Permissions(r.Context()).CanEditStreams {
 			trigger := htmx.Trigger{
 				ToastEvent: &htmx.ToastEvent{
 					Messages: webutils.Notifications(r.Context()),
