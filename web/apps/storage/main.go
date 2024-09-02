@@ -22,14 +22,10 @@ func Application(
 		"GET /web/storage/{$}",
 		controllers.DefaultPage(userSys, metaSys),
 	)
+
 	mux.Handle(
 		"GET /web/storage/edit/{name}/{$}",
 		controllers.StreamPage(userSys, metaSys),
-	)
-
-	mux.Handle(
-		"POST /web/storage/edit/{name}/retention/{$}",
-		controllers.ProcessRetentionSaveAction(userSys, metaSys),
 	)
 	mux.Handle(
 		"POST /web/storage/delete/{name}/{$}",
@@ -43,6 +39,23 @@ func Application(
 	mux.Handle(
 		"POST /web/storage/new/{$}",
 		controllers.ProcessStreamCreateForm(userSys, metaSys),
+	)
+
+	mux.Handle(
+		"POST /web/storage/edit/{name}/retention/{$}",
+		controllers.ProcessRetentionSaveAction(userSys, metaSys),
+	)
+	mux.Handle(
+		"GET /web/storage/edit/{name}/index/add/{$}",
+		controllers.ProcessIndexAddAction(userSys),
+	)
+	mux.Handle(
+		"POST /web/storage/edit/{name}/index/add/{$}",
+		controllers.ProcessIndexAddForm(userSys, metaSys),
+	)
+	mux.Handle(
+		"GET /web/storage/edit/{name}/index/delete/{field}/{$}",
+		controllers.ProcessIndexDeleteAction(userSys, metaSys),
 	)
 
 	return mux

@@ -8,19 +8,11 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import (
-	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/logstorage"
-)
-
-type TabsProps struct {
+type NewIndexFieldFormProps struct {
 	StreamName string
-	Config     *logstorage.StreamConfig
-
-	Permissions auth.Permissions
 }
 
-func Tabs(props TabsProps) templ.Component {
+func NewIndexFieldForm(props NewIndexFieldFormProps) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -38,29 +30,20 @@ func Tabs(props TabsProps) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"h-full overflow-x-hidden overflow-y-auto\"><div class=\"row\"><div class=\"col s12\" style=\"position: sticky; top: 0; z-index: 1;\"><ul class=\"tabs z-depth-1\"><li class=\"tab col s6\"><a class=\"active\" href=\"#tab_retention\">Retention</a></li><li class=\"tab col s6\"><a href=\"#tab_indexes\">Indexes</a></li></ul></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form class=\"flex flex-row items-center gap-2\" hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = RetentionTab(RetentionTabProps{
-			StreamName: props.StreamName,
-			Config:     props.Config,
-
-			Permissions: props.Permissions,
-		}).Render(ctx, templ_7745c5c3_Buffer)
+		var templ_7745c5c3_Var2 string
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs("/web/storage/edit/" + props.StreamName + "/index/add/")
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `apps/storage/templates/components/new_index_field_form.templ`, Line: 10, Col: 64}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = IndexesTab(IndexesTabProps{
-			StreamName: props.StreamName,
-			Config:     props.Config,
-
-			Permissions: props.Permissions,
-		}).Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-swap=\"outerHTML\"><div class=\"input-field flex-grow mb-0\"><input id=\"data_field_name\" name=\"data_field_name\" type=\"text\" required> <label for=\"data_field_name\">Field Name</label></div><div class=\"flex-shrink\"><button class=\"btn-small waves-effect waves-light\" type=\"submit\"><i class=\"material-icons\">send</i></button></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

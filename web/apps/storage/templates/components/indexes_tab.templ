@@ -14,6 +14,29 @@ type IndexesTabProps struct {
 
 templ IndexesTab(props IndexesTabProps) {
   <section class="col s12" id="tab_indexes">
-    <h4 class="text-center">&#128679; Work In Progress</h4>
+    <div class="p-3">
+      <div id="data_stream_index_fields">
+        for _, field := range props.Config.IndexedFields {
+          @IndexFieldForm(IndexFieldFormProps{
+            StreamName: props.StreamName,
+            Field:      field,
+
+            Permissions: props.Permissions,
+          })
+        }
+      </div>
+
+      if props.Permissions.CanEditStreams {
+        <button
+          hx-get={"/web/storage/edit/"+props.StreamName+"/index/add/"}
+          hx-target="#data_stream_index_fields"
+          hx-swap="beforeend"
+          class="btn waves-effect waves-light"
+        >
+          <i class="material-icons left">add</i>
+          Add new index
+        </button>
+      }
+    </div>
   </section>
 }
