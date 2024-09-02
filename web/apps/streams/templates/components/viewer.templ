@@ -33,6 +33,7 @@ templ Viewer(props ViewerProps) {
       })
     </div>
     <div
+      id="stream_logs"
       class="
         card-panel white
         p-0 mb-0 h-0
@@ -41,7 +42,7 @@ templ Viewer(props ViewerProps) {
       "
     >
       <table class="w-full table-responsive logs highlight">
-        <thead class="grey lighten-2 z-depth-1">
+        <thead id="stream_logs_header" class="grey lighten-2 z-depth-1">
           <tr>
             <th class="text-center">Ingested At</th>
             for _, field := range props.Fields {
@@ -50,7 +51,10 @@ templ Viewer(props ViewerProps) {
           </tr>
         </thead>
 
-        <tbody>
+        <tbody id="stream_logs_content">
+        </tbody>
+
+        <template id="stream_logs_data">
           for _, entry := range props.LogEntries {
             <tr>
               <td class="font-monospace">{entry.Timestamp.Format(time.RFC3339)}</td>
@@ -66,8 +70,9 @@ templ Viewer(props ViewerProps) {
               }
             </tr>
           }
-        </tbody>
+        </template>
       </table>
     </div>
   </div>
+
 }
