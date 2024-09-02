@@ -61,7 +61,7 @@ func Viewer(props ViewerProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><div class=\"\n        card-panel white\n        p-0 mb-0 h-0\n        flex-grow flex-shrink\n        overflow-auto\n      \"><table class=\"w-full table-responsive logs highlight\"><thead class=\"grey lighten-2 z-depth-1\"><tr><th class=\"text-center\">Ingested At</th>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><div id=\"stream_logs\" class=\"\n        card-panel white\n        p-0 mb-0 h-0\n        flex-grow flex-shrink\n        overflow-auto\n      \"><table class=\"w-full table-responsive logs highlight\"><thead id=\"stream_logs_header\" class=\"grey lighten-2 z-depth-1\"><tr><th class=\"text-center\">Ingested At</th>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -73,7 +73,7 @@ func Viewer(props ViewerProps) templ.Component {
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(field)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `apps/streams/templates/components/viewer.templ`, Line: 48, Col: 47}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `apps/streams/templates/components/viewer.templ`, Line: 49, Col: 47}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
@@ -84,7 +84,7 @@ func Viewer(props ViewerProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</tr></thead> <tbody>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</tr></thead> <tbody id=\"stream_logs_content\"></tbody><template id=\"stream_logs_data\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -96,7 +96,7 @@ func Viewer(props ViewerProps) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(entry.Timestamp.Format(time.RFC3339))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `apps/streams/templates/components/viewer.templ`, Line: 56, Col: 78}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `apps/streams/templates/components/viewer.templ`, Line: 60, Col: 78}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -115,7 +115,7 @@ func Viewer(props ViewerProps) templ.Component {
 					var templ_7745c5c3_Var4 string
 					templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(val)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `apps/streams/templates/components/viewer.templ`, Line: 61, Col: 66}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `apps/streams/templates/components/viewer.templ`, Line: 65, Col: 66}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 					if templ_7745c5c3_Err != nil {
@@ -137,7 +137,7 @@ func Viewer(props ViewerProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</tbody></table></div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</template></table></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
