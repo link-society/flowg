@@ -1,5 +1,5 @@
-import React, { useCallback, useContext } from 'react'
-import { Handle, Position, Node, NodeProps } from '@xyflow/react'
+import React, { useCallback, useContext, useEffect } from 'react'
+import { Handle, Position, Node, NodeProps, NodeToolbar } from '@xyflow/react'
 
 import HooksContext from '../hooks'
 
@@ -7,8 +7,22 @@ export type TransformNode = Node<{
   transformer: string
 }>
 
-const TransformNode: React.FC<NodeProps<TransformNode>> = ({ id, data }) => {
+const TransformNode: React.FC<NodeProps<TransformNode>> = ({ id, data, selected }) => {
   const hooksCtx = useContext(HooksContext)
+
+  useEffect(
+    () => {
+      const saveBtn = document.getElementById('action_save')
+
+      if (selected) {
+        saveBtn?.classList.add('pulse', 'orange')
+      }
+      else {
+        saveBtn?.classList.remove('pulse', 'orange')
+      }
+    },
+    [selected],
+  )
 
   const onChange: React.ChangeEventHandler<HTMLInputElement> = useCallback(
     (evt) => {
@@ -28,6 +42,22 @@ const TransformNode: React.FC<NodeProps<TransformNode>> = ({ id, data }) => {
 
   return (
     <>
+    {data.transformer
+      ? (
+        <NodeToolbar>
+          <a
+            href={`/web/transformers/edit/${data.transformer}/`}
+            className="btn-small waves-effect waves-light"
+          >
+            <i className="material-icons left">build</i>
+            Edit
+          </a>
+        </NodeToolbar>
+      )
+      : (
+        <></>
+      )
+    }
       <Handle
         type="target"
         position={Position.Left}
