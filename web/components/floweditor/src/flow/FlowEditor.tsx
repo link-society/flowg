@@ -88,42 +88,6 @@ const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange }) => {
     },
     [flow],
   )
-/*
-  useEffect(
-    () => {
-      const handleAddNode = (event: Event) => {
-        const type = (event as AddNodeEvent).detail.type
-
-        setNodes((nds) => {
-          const newNode = {
-            id: `node-${nds.length}`,
-            type,
-            position: { x: 0, y: 0 },
-            data: {},
-          }
-
-          switch (type) {
-            case 'transform':
-              newNode.data = {transformer: ''}
-              break
-
-            case 'router':
-              newNode.data = {stream: ''}
-              break
-          }
-
-          return [...nds, newNode]
-        })
-      }
-
-      eventTarget.addEventListener('add-node', handleAddNode)
-
-      return () => {
-        eventTarget.removeEventListener('add-node', handleAddNode)
-      }
-    },
-    [eventTarget, setNodes],
-  )*/
 
   useEffect(
     () => {
