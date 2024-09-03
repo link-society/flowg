@@ -26,6 +26,13 @@ func StreamPage(
 			return
 		}
 
+		streamName := r.PathValue("name")
+		streamConfig, err := metaSys.GetStreamConfig(streamName)
+		if err != nil {
+			webutils.LogError(r.Context(), "Failed to fetch stream config", err)
+			webutils.NotifyError(r.Context(), "Could not fetch stream config")
+		}
+
 		streamNames := []string{}
 		streams, err := metaSys.ListStreams()
 		if err != nil {
@@ -35,13 +42,6 @@ func StreamPage(
 			for streamName := range streams {
 				streamNames = append(streamNames, streamName)
 			}
-		}
-
-		streamName := r.PathValue("name")
-		streamConfig, err := metaSys.GetStreamConfig(streamName)
-		if err != nil {
-			webutils.LogError(r.Context(), "Failed to fetch stream config", err)
-			webutils.NotifyError(r.Context(), "Could not fetch stream config")
 		}
 
 		sort.Strings(streamNames)
