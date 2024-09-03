@@ -37,10 +37,15 @@ templ Head(props HeadProps) {
             input_name.setAttribute('name', 'name')
             input_name.setAttribute('value', data_pipeline_name.value)
 
+            const flow = JSON.parse(data_pipeline_flow.getAttribute('flow'))
+            for (const node of flow.nodes) {
+              delete node.selected
+            }
+
             const input_flow = document.createElement('input')
             input_flow.setAttribute('type', 'hidden')
             input_flow.setAttribute('name', 'flow')
-            input_flow.setAttribute('value', data_pipeline_flow.getAttribute('flow'))
+            input_flow.setAttribute('value', JSON.stringify(flow))
 
             form.appendChild(input_name)
             form.appendChild(input_flow)
