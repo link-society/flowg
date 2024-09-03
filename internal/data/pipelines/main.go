@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"link-society.com/flowg/internal/data/lognotify"
 	"link-society.com/flowg/internal/data/logstorage"
 )
 
@@ -13,10 +14,12 @@ type Manager struct {
 	pipelinesDir    string
 
 	collectorSys *logstorage.CollectorSystem
+	notifier     *lognotify.LogNotifier
 }
 
 func NewManager(
 	collectorSys *logstorage.CollectorSystem,
+	notifier *lognotify.LogNotifier,
 	configDir string,
 ) *Manager {
 	if _, err := os.Stat(configDir); os.IsNotExist(err) {
@@ -37,6 +40,7 @@ func NewManager(
 		transformersDir: transformersDir,
 		pipelinesDir:    pipelinesDir,
 		collectorSys:    collectorSys,
+		notifier:        notifier,
 	}
 }
 

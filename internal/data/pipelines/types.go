@@ -88,6 +88,10 @@ func (n *RouterNode) Process(
 	manager *Manager,
 	entry *logstorage.LogEntry,
 ) error {
-	_, err := manager.collectorSys.Ingest(ctx, n.Stream, entry)
+	key, err := manager.collectorSys.Ingest(ctx, n.Stream, entry)
+	if err == nil {
+		manager.notifier.Notify(n.Stream, string(key), *entry)
+	}
+
 	return err
 }
