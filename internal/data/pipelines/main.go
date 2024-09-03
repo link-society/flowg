@@ -133,5 +133,5 @@ func (m *Manager) GetPipeline(name string) (*Pipeline, error) {
 		return nil, err
 	}
 
-	return flowGraph.BuildPipeline()
+	return flowGraph.BuildPipeline(name)
 }

@@ -26,7 +26,7 @@ type FlowPosition struct {
 	Y float64 `json:"y"`
 }
 
-func (flowGraph FlowGraph) BuildPipeline() (*Pipeline, error) {
+func (flowGraph FlowGraph) BuildPipeline(name string) (*Pipeline, error) {
 	pipelineNodes := make(map[string]Node)
 	flowNodesByID := make(map[string]*FlowNode)
 
@@ -132,6 +132,7 @@ func (flowGraph FlowGraph) BuildPipeline() (*Pipeline, error) {
 	}
 
 	return &Pipeline{
+		Name: name,
 		Root: rootPipelineNode,
 	}, nil
 }

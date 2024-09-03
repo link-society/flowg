@@ -3,11 +3,13 @@ package pipelines
 import (
 	"context"
 
+	"link-society.com/flowg/internal/app/metrics"
 	"link-society.com/flowg/internal/data/logstorage"
 	"link-society.com/flowg/internal/ffi/vrl"
 )
 
 type Pipeline struct {
+	Name string
 	Root Node
 }
 
@@ -16,6 +18,7 @@ func (p *Pipeline) Run(
 	manager *Manager,
 	entry *logstorage.LogEntry,
 ) error {
+	metrics.IncPipelineLogCounter(p.Name)
 	return p.Root.Process(ctx, manager, entry)
 }
 
@@ -91,6 +94,7 @@ func (n *RouterNode) Process(
 	key, err := manager.collectorSys.Ingest(ctx, n.Stream, entry)
 	if err == nil {
 		manager.notifier.Notify(n.Stream, string(key), *entry)
+		metrics.IncStreamLogCounter(n.Stream)
 	}
 
 	return err
