@@ -1,6 +1,7 @@
 package pipelines
 
 import (
+	"log/slog"
 	"net/http"
 
 	"link-society.com/flowg/internal/data/auth"
@@ -20,7 +21,23 @@ func Application(
 	mux.HandleFunc(
 		"GET /web/pipelines/{$}",
 		func(w http.ResponseWriter, r *http.Request) {
-			http.Redirect(w, r, "/web/pipelines/new", http.StatusPermanentRedirect)
+			switch pipelines, err := pipelinesManager.ListPipelines(); {
+			case err == nil && len(pipelines) > 0:
+				url := "/web/pipelines/edit/" + pipelines[0] + "/"
+				http.Redirect(w, r, url, http.StatusSeeOther)
+
+			case err != nil:
+				slog.ErrorContext(
+					r.Context(),
+					"Failed to list pipelines",
+					"channel", "web",
+					"error", err,
+				)
+				fallthrough
+
+			default:
+				http.Redirect(w, r, "/web/pipelines/new", http.StatusSeeOther)
+			}
 		},
 	)
 

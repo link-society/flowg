@@ -1,6 +1,7 @@
 package transformers
 
 import (
+	"log/slog"
 	"net/http"
 
 	"link-society.com/flowg/internal/data/auth"
@@ -20,7 +21,23 @@ func Application(
 	mux.HandleFunc(
 		"GET /web/transformers/{$}",
 		func(w http.ResponseWriter, r *http.Request) {
-			http.Redirect(w, r, "/web/transformers/new", http.StatusPermanentRedirect)
+			switch transformers, err := pipelinesManager.ListTransformers(); {
+			case err == nil && len(transformers) > 0:
+				url := "/web/transformers/edit/" + transformers[0] + "/"
+				http.Redirect(w, r, url, http.StatusSeeOther)
+
+			case err != nil:
+				slog.ErrorContext(
+					r.Context(),
+					"Failed to list transformers",
+					"channel", "web",
+					"error", err,
+				)
+				fallthrough
+
+			default:
+				http.Redirect(w, r, "/web/transformers/new", http.StatusSeeOther)
+			}
 		},
 	)
 
