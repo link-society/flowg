@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/swaggest/openapi-go"
 	"github.com/swaggest/openapi-go/openapi31"
 	"github.com/swaggest/rest/nethttp"
 	"github.com/swaggest/rest/web"
@@ -12,6 +13,7 @@ import (
 
 	"link-society.com/flowg/internal/app"
 	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/data/lognotify"
 	"link-society.com/flowg/internal/data/logstorage"
 	"link-society.com/flowg/internal/data/pipelines"
 )
@@ -20,8 +22,10 @@ func NewHandler(
 	authDb *auth.Database,
 	logDb *logstorage.Storage,
 	pipelinesManager *pipelines.Manager,
+	logNotifier *lognotify.LogNotifier,
 ) http.Handler {
-	service := web.NewService(openapi31.NewReflector())
+	reflector := openapi31.NewReflector()
+	service := web.NewService(reflector)
 
 	service.OpenAPISchema().SetTitle("Flowg API")
 	service.OpenAPISchema().SetVersion(app.FLOWG_VERSION)
@@ -56,6 +60,25 @@ func NewHandler(
 		r.Get("/api/v1/streams/{stream}/logs", QueryStreamUsecase(authDb, logDb))
 		r.Get("/api/v1/streams/{stream}/fields", ListStreamFieldsUsecase(authDb, logDb))
 		r.Delete("/api/v1/streams/{stream}", PurgeStreamUsecase(authDb, logDb))
+
+		service.OpenAPICollector.AnnotateOperation(
+			"GET", "/api/v1/streams/{stream}/logs/watch",
+			func(oc openapi.OperationContext) error {
+				contentUnits := oc.Response()
+				for i, cu := range contentUnits {
+					if cu.HTTPStatus == 200 {
+						cu.ContentType = "text/event-stream"
+						cu.Description = "Stream of log entries"
+						cu.Format = "Server-Sent Events"
+					}
+
+					contentUnits[i] = cu
+				}
+
+				return nil
+			},
+		)
+		r.Get("/api/v1/streams/{stream}/logs/watch", WatchLogsUsecase(authDb, logNotifier))
 
 		r.Get("/api/v1/roles", ListRolesUsecase(authDb))
 		r.Put("/api/v1/roles/{role}", SaveRoleUsecase(authDb))
