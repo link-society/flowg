@@ -126,6 +126,13 @@ func NewServeCommand() *cobra.Command {
 			webHandler := web.NewHandler(authDb, logDb, pipelinesManager)
 
 			rootHandler := http.NewServeMux()
+			rootHandler.HandleFunc(
+				"/health",
+				func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusOK)
+					w.Write([]byte("OK\r\n"))
+				},
+			)
 			rootHandler.Handle("/api/", apiHandler)
 			rootHandler.Handle("/auth/", webHandler)
 			rootHandler.Handle("/web/", webHandler)
