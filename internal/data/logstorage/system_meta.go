@@ -70,7 +70,7 @@ func (sys *MetaSystem) ListStreamFields(stream string) ([]string, error) {
 func (sys *MetaSystem) GetStreamConfig(stream string) (StreamConfig, error) {
 	var streamConfig StreamConfig
 
-	err := sys.storage.db.View(func(txn *badger.Txn) error {
+	err := sys.storage.db.Update(func(txn *badger.Txn) error {
 		var err error
 		streamConfig, err = getOrCreateStreamConfig(txn, stream)
 		return err
