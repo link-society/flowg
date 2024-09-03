@@ -17,6 +17,7 @@ import (
 	"link-society.com/flowg/internal/app/bootstrap"
 	"link-society.com/flowg/internal/app/logging"
 	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/data/lognotify"
 	"link-society.com/flowg/internal/data/logstorage"
 	"link-society.com/flowg/internal/data/pipelines"
 
@@ -90,8 +91,16 @@ func NewServeCommand() *cobra.Command {
 				}
 			}()
 
+			logNotifier := lognotify.NewLogNotifier()
+			logNotifier.Start()
+			defer logNotifier.Stop()
+
 			collectorSys := logstorage.NewCollectorSystem(logDb)
-			pipelinesManager := pipelines.NewManager(collectorSys, opts.configDir)
+			pipelinesManager := pipelines.NewManager(
+				collectorSys,
+				logNotifier,
+				opts.configDir,
+			)
 
 			if err := bootstrap.DefaultRolesAndUsers(authDb); err != nil {
 				slog.Error(
@@ -113,7 +122,7 @@ func NewServeCommand() *cobra.Command {
 				return
 			}
 
-			apiHandler := api.NewHandler(authDb, logDb, pipelinesManager)
+			apiHandler := api.NewHandler(authDb, logDb, pipelinesManager, logNotifier)
 			webHandler := web.NewHandler(authDb, logDb, pipelinesManager)
 
 			rootHandler := http.NewServeMux()
