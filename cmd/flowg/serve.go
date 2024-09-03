@@ -14,8 +14,12 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+
 	"link-society.com/flowg/internal/app/bootstrap"
 	"link-society.com/flowg/internal/app/logging"
+	"link-society.com/flowg/internal/app/metrics"
+
 	"link-society.com/flowg/internal/data/auth"
 	"link-society.com/flowg/internal/data/lognotify"
 	"link-society.com/flowg/internal/data/logstorage"
@@ -41,6 +45,7 @@ func NewServeCommand() *cobra.Command {
 		Short: "Start FlowG standalone server",
 		PreRun: func(cmd *cobra.Command, args []string) {
 			logging.Setup(opts.verbose)
+			metrics.Setup()
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			authDb, err := auth.NewDatabase(opts.authDir)
@@ -124,6 +129,7 @@ func NewServeCommand() *cobra.Command {
 
 			apiHandler := api.NewHandler(authDb, logDb, pipelinesManager, logNotifier)
 			webHandler := web.NewHandler(authDb, logDb, pipelinesManager)
+			metricsHandler := promhttp.Handler()
 
 			rootHandler := http.NewServeMux()
 			rootHandler.HandleFunc(
@@ -133,6 +139,8 @@ func NewServeCommand() *cobra.Command {
 					w.Write([]byte("OK\r\n"))
 				},
 			)
+			rootHandler.Handle("/metrics", metricsHandler)
+
 			rootHandler.Handle("/api/", apiHandler)
 			rootHandler.Handle("/auth/", webHandler)
 			rootHandler.Handle("/web/", webHandler)
