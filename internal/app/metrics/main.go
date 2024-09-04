@@ -20,7 +20,7 @@ func Setup() {
 			Name: "flowg_pipeline_log_total",
 			Help: "Total number of log messages processed in a pipeline",
 		},
-		[]string{"pipeline"},
+		[]string{"pipeline", "status"},
 	)
 
 	prometheus.MustRegister(
@@ -33,6 +33,13 @@ func IncStreamLogCounter(stream string) {
 	streamLogCounter.WithLabelValues(stream).Inc()
 }
 
-func IncPipelineLogCounter(pipeline string) {
-	pipelineLogCounter.WithLabelValues(pipeline).Inc()
+func IncPipelineLogCounter(pipeline string, success bool) {
+	var status string
+	if success {
+		status = "success"
+	} else {
+		status = "error"
+	}
+
+	pipelineLogCounter.WithLabelValues(pipeline, status).Inc()
 }

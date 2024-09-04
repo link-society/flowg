@@ -20,8 +20,9 @@ func (p *Pipeline) Run(
 	manager *Manager,
 	entry *logstorage.LogEntry,
 ) error {
-	metrics.IncPipelineLogCounter(p.Name)
-	return p.Root.Process(ctx, manager, entry)
+	err := p.Root.Process(ctx, manager, entry)
+	metrics.IncPipelineLogCounter(p.Name, err == nil)
+	return err
 }
 
 type Node interface {
