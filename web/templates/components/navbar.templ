@@ -33,6 +33,57 @@ type NavbarProps struct {
 }
 
 templ Navbar(props NavbarProps) {
+  <ul id="nav-dropdown-user" class="dropdown-content">
+    @navbarItem(navbarItemProps{
+      Icon:   "account_circle",
+      Label:  "Account",
+      Link:   "/web/account",
+      Active: props.CurrentNav == "account",
+    })
+    if props.Permissions.CanViewACLs {
+      @navbarItem(navbarItemProps{
+        Icon:   "dashboard",
+        Label:  "Admin",
+        Link:   "/web/admin",
+        Active: props.CurrentNav == "admin",
+      })
+    }
+    <li class="divider"></li>
+    @navbarItem(navbarItemProps{
+      Icon:   "exit_to_app",
+      Label:  "Logout",
+      Link:   "/auth/logout",
+      Active: false,
+    })
+  </ul>
+
+  <ul id="nav-dropdown-settings" class="dropdown-content">
+    if props.Permissions.CanViewTransformers {
+      @navbarItem(navbarItemProps{
+        Icon:   "filter_alt",
+        Label:  "Transformers",
+        Link:   "/web/transformers",
+        Active: props.CurrentNav == "transformers",
+      })
+    }
+    if props.Permissions.CanViewPipelines {
+      @navbarItem(navbarItemProps{
+        Icon:   "settings",
+        Label:  "Pipelines",
+        Link:   "/web/pipelines",
+        Active: props.CurrentNav == "pipelines",
+      })
+    }
+    if props.Permissions.CanViewStreams {
+      @navbarItem(navbarItemProps{
+        Icon:   "sd_storage",
+        Label:  "Storage",
+        Link:   "/web/storage",
+        Active: props.CurrentNav == "storage",
+      })
+    }
+  </ul>
+
   <nav class="blue darken-3" style="z-index: 900;">
     <div class="nav-wrapper flex flex-row items-center">
       <ul>
@@ -63,50 +114,20 @@ templ Navbar(props NavbarProps) {
             Active: props.CurrentNav == "streams",
           })
         }
-        if props.Permissions.CanViewTransformers {
-          @navbarItem(navbarItemProps{
-            Icon:   "filter_alt",
-            Label:  "Transformers",
-            Link:   "/web/transformers",
-            Active: props.CurrentNav == "transformers",
-          })
-        }
-        if props.Permissions.CanViewPipelines {
-          @navbarItem(navbarItemProps{
-            Icon:   "settings",
-            Label:  "Pipelines",
-            Link:   "/web/pipelines",
-            Active: props.CurrentNav == "pipelines",
-          })
-        }
-        if props.Permissions.CanViewStreams {
-          @navbarItem(navbarItemProps{
-            Icon:   "sd_storage",
-            Label:  "Storage",
-            Link:   "/web/storage",
-            Active: props.CurrentNav == "storage",
-          })
-        }
-        if props.Permissions.CanViewACLs {
-          @navbarItem(navbarItemProps{
-            Icon:   "dashboard",
-            Label:  "Admin",
-            Link:   "/web/admin",
-            Active: props.CurrentNav == "admin",
-          })
-        }
-        @navbarItem(navbarItemProps{
-          Icon:   "account_circle",
-          Label:  "Account",
-          Link:   "/web/account",
-          Active: props.CurrentNav == "account",
-        })
-        @navbarItem(navbarItemProps{
-          Icon:   "exit_to_app",
-          Label:  "Logout",
-          Link:   "/auth/logout",
-          Active: false,
-        })
+        <li>
+          <a class="dropdown-trigger" href="#" data-target="nav-dropdown-settings">
+            <i class="left material-icons">settings</i>
+            Settings
+            <i class="right material-icons">arrow_drop_down</i>
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-trigger" href="#" data-target="nav-dropdown-user">
+            <i class="left material-icons">account_circle</i>
+            { auth.GetContextUser(ctx).Name }
+            <i class="right material-icons">arrow_drop_down</i>
+          </a>
+        </li>
       </ul>
     </div>
   </nav>
