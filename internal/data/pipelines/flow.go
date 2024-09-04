@@ -70,6 +70,20 @@ func (flowGraph FlowGraph) BuildPipeline(name string) (*Pipeline, error) {
 			}
 			pipelineNodes[flowNode.ID] = pipelineNode
 
+		case "pipeline":
+			pipeline, exists := flowNode.Data["pipeline"]
+			if !exists {
+				return nil, &MissingFlowNodeDataError{
+					NodeID: flowNode.ID,
+					Key:    "pipeline",
+				}
+			}
+
+			pipelineNode := &PipelineNode{
+				Pipeline: pipeline,
+			}
+			pipelineNodes[flowNode.ID] = pipelineNode
+
 		case "router":
 			stream, exists := flowNode.Data["stream"]
 			if !exists {

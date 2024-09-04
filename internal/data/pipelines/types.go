@@ -39,6 +39,10 @@ type SwitchNode struct {
 	Next      []Node
 }
 
+type PipelineNode struct {
+	Pipeline string
+}
+
 type RouterNode struct {
 	Stream string
 }
@@ -126,6 +130,19 @@ func (n *SwitchNode) Process(
 	}
 
 	return nil
+}
+
+func (n *PipelineNode) Process(
+	ctx context.Context,
+	manager *Manager,
+	entry *logstorage.LogEntry,
+) error {
+	pipeline, err := manager.GetPipeline(n.Pipeline)
+	if err != nil {
+		return err
+	}
+
+	return pipeline.Run(ctx, manager, entry)
 }
 
 func (n *RouterNode) Process(
