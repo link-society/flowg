@@ -23,6 +23,7 @@ import NodeSelector from './NodeSelector'
 import SourceNode from './nodes/SourceNode'
 import TransformNode from './nodes/TransformNode'
 import SwitchNode from './nodes/SwitchNode'
+import PipelineNode from './nodes/PipelineNode'
 import RouterNode from './nodes/RouterNode'
 import { useDnD } from '../dnd/context'
 
@@ -48,6 +49,7 @@ const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange }) => {
       source: SourceNode,
       transform: TransformNode,
       switch: SwitchNode,
+      pipeline: PipelineNode,
       router: RouterNode,
     }),
     [],
