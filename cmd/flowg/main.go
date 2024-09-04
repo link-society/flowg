@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+
 	"os"
+	"syscall"
 
 	"github.com/spf13/cobra"
 
@@ -24,6 +26,7 @@ func main() {
 		Short: "Low-Code log management solution",
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			logging.Discard()
+			syscall.Umask(0077)
 		},
 	}
 
