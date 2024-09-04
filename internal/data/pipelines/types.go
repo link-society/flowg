@@ -2,6 +2,8 @@ package pipelines
 
 import (
 	"context"
+	"errors"
+	"sync"
 
 	"link-society.com/flowg/internal/app/metrics"
 	"link-society.com/flowg/internal/data/logstorage"
@@ -55,15 +57,35 @@ func (n *TransformNode) Process(
 		return err
 	}
 
+	errC := make(chan error, len(n.Next))
+	wg := sync.WaitGroup{}
+
 	for _, next := range n.Next {
-		newEntry := &logstorage.LogEntry{
-			Timestamp: entry.Timestamp,
-			Fields:    output,
-		}
-		err := next.Process(ctx, manager, newEntry)
-		if err != nil {
-			return err
-		}
+		wg.Add(1)
+		go func(next Node) {
+			defer wg.Done()
+
+			newEntry := &logstorage.LogEntry{
+				Timestamp: entry.Timestamp,
+				Fields:    output,
+			}
+			err := next.Process(ctx, manager, newEntry)
+			if err != nil {
+				errC <- err
+			}
+		}(next)
+	}
+
+	wg.Wait()
+	close(errC)
+
+	var errs []error
+	for err := range errC {
+		errs = append(errs, err)
+	}
+
+	if len(errs) > 0 {
+		return errors.Join(errs...)
 	}
 
 	return nil
@@ -75,11 +97,30 @@ func (n *SwitchNode) Process(
 	entry *logstorage.LogEntry,
 ) error {
 	if n.Condition.Evaluate(entry) {
+		errC := make(chan error, len(n.Next))
+		wg := sync.WaitGroup{}
+
 		for _, next := range n.Next {
-			err := next.Process(ctx, manager, entry)
-			if err != nil {
-				return err
-			}
+			wg.Add(1)
+			go func(next Node) {
+				defer wg.Done()
+				err := next.Process(ctx, manager, entry)
+				if err != nil {
+					errC <- err
+				}
+			}(next)
+		}
+
+		wg.Wait()
+		close(errC)
+
+		var errs []error
+		for err := range errC {
+			errs = append(errs, err)
+		}
+
+		if len(errs) > 0 {
+			return errors.Join(errs...)
 		}
 	}
 
