@@ -105,12 +105,15 @@ RUN go test -v ./...
 
 FROM alpine:3.20 AS runner
 
-RUN apk add --no-cache libgcc
+RUN apk add --no-cache libgcc su-exec
 
 COPY --from=builder-go /workspace/bin/ /usr/local/bin/
 
 ADD docker/docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
+RUN chmod 0700 /docker-entrypoint.sh
+
+RUN addgroup -S flowg && adduser -S -G flowg -h /app flowg
+WORKDIR /app
 
 ENV FLOWG_BIND_ADDRESS=":5080"
 ENV FLOWG_AUTH_DIR="/data/auth"

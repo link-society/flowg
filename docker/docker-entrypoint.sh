@@ -1,17 +1,23 @@
 #!/bin/sh
 
+set -e
+
+mkdir -p /data
+chmod 0700 /data
+chown -R flowg:flowg /data
+
 case "$1" in
   serve)
     shift
-    exec /usr/local/bin/flowg serve $@
+    exec su-exec flowg /usr/local/bin/flowg serve $@
     ;;
 
   admin)
     shift
-    exec /usr/local/bin/flowg admin $@
+    exec su-exec flowg /usr/local/bin/flowg admin $@
     ;;
 
   *)
-    exec /usr/local/bin/flowg --help
+    exec su-exec flowg /usr/local/bin/flowg --help
     ;;
 esac
