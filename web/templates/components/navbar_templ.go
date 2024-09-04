@@ -134,20 +134,46 @@ func Navbar(props NavbarProps) templ.Component {
 			templ_7745c5c3_Var7 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<nav class=\"blue darken-3\" style=\"z-index: 900;\"><div class=\"nav-wrapper flex flex-row items-center\"><ul><li><a class=\"text-4xl font-semibold\" href=\"/\">FlowG</a></li></ul><ul class=\"flex-grow hide-on-med-and-down\"><li><a href=\"https://github.com/link-society/flowg\" target=\"_blank\"><i class=\"left material-icons\">code</i> GitHub</a></li><li><a href=\"/api/docs\" target=\"_blank\"><i class=\"left material-icons\">cloud</i> API Docs</a></li></ul><ul class=\"hide-on-med-and-down\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<ul id=\"nav-dropdown-user\" class=\"dropdown-content\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if props.Permissions.CanViewStreams {
+		templ_7745c5c3_Err = navbarItem(navbarItemProps{
+			Icon:   "account_circle",
+			Label:  "Account",
+			Link:   "/web/account",
+			Active: props.CurrentNav == "account",
+		}).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if props.Permissions.CanViewACLs {
 			templ_7745c5c3_Err = navbarItem(navbarItemProps{
-				Icon:   "storage",
-				Label:  "Streams",
-				Link:   "/web/streams",
-				Active: props.CurrentNav == "streams",
+				Icon:   "dashboard",
+				Label:  "Admin",
+				Link:   "/web/admin",
+				Active: props.CurrentNav == "admin",
 			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li class=\"divider\"></li>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = navbarItem(navbarItemProps{
+			Icon:   "exit_to_app",
+			Label:  "Logout",
+			Link:   "/auth/logout",
+			Active: false,
+		}).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</ul><ul id=\"nav-dropdown-settings\" class=\"dropdown-content\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
 		}
 		if props.Permissions.CanViewTransformers {
 			templ_7745c5c3_Err = navbarItem(navbarItemProps{
@@ -182,36 +208,35 @@ func Navbar(props NavbarProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		if props.Permissions.CanViewACLs {
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</ul><nav class=\"blue darken-3\" style=\"z-index: 900;\"><div class=\"nav-wrapper flex flex-row items-center\"><ul><li><a class=\"text-4xl font-semibold\" href=\"/\">FlowG</a></li></ul><ul class=\"flex-grow hide-on-med-and-down\"><li><a href=\"https://github.com/link-society/flowg\" target=\"_blank\"><i class=\"left material-icons\">code</i> GitHub</a></li><li><a href=\"/api/docs\" target=\"_blank\"><i class=\"left material-icons\">cloud</i> API Docs</a></li></ul><ul class=\"hide-on-med-and-down\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if props.Permissions.CanViewStreams {
 			templ_7745c5c3_Err = navbarItem(navbarItemProps{
-				Icon:   "dashboard",
-				Label:  "Admin",
-				Link:   "/web/admin",
-				Active: props.CurrentNav == "admin",
+				Icon:   "storage",
+				Label:  "Streams",
+				Link:   "/web/streams",
+				Active: props.CurrentNav == "streams",
 			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = navbarItem(navbarItemProps{
-			Icon:   "account_circle",
-			Label:  "Account",
-			Link:   "/web/account",
-			Active: props.CurrentNav == "account",
-		}).Render(ctx, templ_7745c5c3_Buffer)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li><a class=\"dropdown-trigger\" href=\"#\" data-target=\"nav-dropdown-settings\"><i class=\"left material-icons\">settings</i> Settings <i class=\"right material-icons\">arrow_drop_down</i></a></li><li><a class=\"dropdown-trigger\" href=\"#\" data-target=\"nav-dropdown-user\"><i class=\"left material-icons\">account_circle</i> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = navbarItem(navbarItemProps{
-			Icon:   "exit_to_app",
-			Label:  "Logout",
-			Link:   "/auth/logout",
-			Active: false,
-		}).Render(ctx, templ_7745c5c3_Buffer)
+		var templ_7745c5c3_Var8 string
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(auth.GetContextUser(ctx).Name)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/navbar.templ`, Line: 127, Col: 43}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</ul></div></nav><div class=\"row w-full hide-on-large-only\"><div class=\"collection\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" <i class=\"right material-icons\">arrow_drop_down</i></a></li></ul></div></nav><div class=\"row w-full hide-on-large-only\"><div class=\"collection\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
