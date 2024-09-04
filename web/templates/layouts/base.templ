@@ -23,7 +23,11 @@ templ Base(props BaseProps) {
 
       <script type="application/javascript">
         document.addEventListener('htmx:load', (event) => {
-          M.AutoInit(event.detail.elt)
+          M.AutoInit(event.detail.elt, {
+            Dropdown: {
+              constrainWidth: false,
+            }
+          })
         })
       </script>
 

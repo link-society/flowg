@@ -31,7 +31,7 @@ func Base(props BaseProps) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!doctype html><html><head><title>FlowG</title><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><link rel=\"stylesheet\" href=\"/static/css/google-font-material-icons.css\"><link rel=\"stylesheet\" href=\"/static/css/materialize.min.css\"><link rel=\"stylesheet\" href=\"/static/css/utilities.css\"><script type=\"application/javascript\" src=\"/static/js/materialize.min.js\"></script><script type=\"application/javascript\" src=\"/static/js/htmx.min.js\"></script><script type=\"application/javascript\">\n        document.addEventListener('htmx:load', (event) => {\n          M.AutoInit(event.detail.elt)\n        })\n      </script>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!doctype html><html><head><title>FlowG</title><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><link rel=\"stylesheet\" href=\"/static/css/google-font-material-icons.css\"><link rel=\"stylesheet\" href=\"/static/css/materialize.min.css\"><link rel=\"stylesheet\" href=\"/static/css/utilities.css\"><script type=\"application/javascript\" src=\"/static/js/materialize.patched.js\"></script><script type=\"application/javascript\" src=\"/static/js/htmx.min.js\"></script><script type=\"application/javascript\">\n        document.addEventListener('htmx:load', (event) => {\n          M.AutoInit(event.detail.elt, {\n            Dropdown: {\n              constrainWidth: false,\n            }\n          })\n        })\n      </script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -44,7 +44,7 @@ func Base(props BaseProps) templ.Component {
 				var templ_7745c5c3_Var2 string
 				templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(notification)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layouts/base.templ`, Line: 34, Col: 38}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layouts/base.templ`, Line: 38, Col: 38}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 				if templ_7745c5c3_Err != nil {
