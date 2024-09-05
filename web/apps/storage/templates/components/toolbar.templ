@@ -2,12 +2,11 @@ package components
 
 import (
   "link-society.com/flowg/internal/app"
-  "link-society.com/flowg/internal/data/auth"
+  "link-society.com/flowg/internal/webutils"
 )
 
 type ToolbarProps struct {
   StreamName  string
-  Permissions auth.Permissions
 }
 
 templ Toolbar(props ToolbarProps) {
@@ -30,7 +29,7 @@ templ Toolbar(props ToolbarProps) {
       </a>
     </div>
     <div class="flex flex-row items-center gap-3">
-      if props.Permissions.CanEditStreams {
+      if webutils.Permissions(ctx).CanEditStreams {
         <a
           class="btn-small blue"
           hx-get="/web/storage/new/"

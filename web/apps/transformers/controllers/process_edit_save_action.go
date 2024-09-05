@@ -84,9 +84,6 @@ func ProcessEditSaveAction(
 				Transformers:       transformers,
 				CurrentTransformer: transformerName,
 				Code:               transformerCode,
-
-				Permissions:   webutils.Permissions(r.Context()),
-				Notifications: webutils.Notifications(r.Context()),
 			},
 		))
 		h.ServeHTTP(w, r)

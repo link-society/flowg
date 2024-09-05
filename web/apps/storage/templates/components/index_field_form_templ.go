@@ -9,14 +9,12 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/webutils"
 )
 
 type IndexFieldFormProps struct {
 	StreamName string
 	Field      string
-
-	Permissions auth.Permissions
 }
 
 func IndexFieldForm(props IndexFieldFormProps) templ.Component {
@@ -44,7 +42,7 @@ func IndexFieldForm(props IndexFieldFormProps) templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs("/web/storage/edit/" + props.StreamName + "/index/delete/" + props.Field + "/")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `apps/storage/templates/components/index_field_form.templ`, Line: 17, Col: 82}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `apps/storage/templates/components/index_field_form.templ`, Line: 15, Col: 82}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -57,7 +55,7 @@ func IndexFieldForm(props IndexFieldFormProps) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(props.Field)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `apps/storage/templates/components/index_field_form.templ`, Line: 23, Col: 26}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `apps/storage/templates/components/index_field_form.templ`, Line: 21, Col: 26}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -67,7 +65,7 @@ func IndexFieldForm(props IndexFieldFormProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if props.Permissions.CanEditStreams {
+		if webutils.Permissions(ctx).CanEditStreams {
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button class=\"btn-small red waves-effect waves-light\" type=\"submit\"><i class=\"material-icons\">delete</i></button>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err

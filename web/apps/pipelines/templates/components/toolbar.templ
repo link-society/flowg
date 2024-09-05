@@ -3,12 +3,11 @@ package components
 
 import (
   "link-society.com/flowg/internal/app"
-	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/webutils"
 )
 
 type ToolbarProps struct {
   CurrentPipeline string
-  Permissions     auth.Permissions
 }
 
 templ Toolbar(props ToolbarProps) {
@@ -31,7 +30,7 @@ templ Toolbar(props ToolbarProps) {
       </a>
     </div>
     <div class="flex flex-row items-center gap-3">
-      if props.Permissions.CanEditPipelines {
+      if webutils.Permissions(ctx).CanEditPipelines {
         if props.CurrentPipeline != "" {
           <a
             class="btn-small blue"

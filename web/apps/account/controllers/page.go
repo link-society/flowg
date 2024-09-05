@@ -33,9 +33,6 @@ func Page(
 			views.PageProps{
 				User:       user,
 				TokenUUIDs: tokenUUIDs,
-
-				Permissions:   webutils.Permissions(r.Context()),
-				Notifications: webutils.Notifications(r.Context()),
 			},
 		))
 		h.ServeHTTP(w, r)

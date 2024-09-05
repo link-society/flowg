@@ -2,11 +2,11 @@ package components
 
 import (
 	"link-society.com/flowg/internal/data/auth"
+  "link-society.com/flowg/internal/webutils"
 )
 
 type RoleListProps struct {
-  Roles        []auth.Role
-  Permissions  auth.Permissions
+  Roles []auth.Role
 }
 
 templ RoleList(props RoleListProps) {
@@ -22,7 +22,7 @@ templ RoleList(props RoleListProps) {
           "
         >
           <p class="card-title flex-grow mb-0 font-semibold">Roles</p>
-          if props.Permissions.CanEditACLs {
+          if webutils.Permissions(ctx).CanEditACLs {
             <button
               class="waves-effect waves-light btn-small"
               hx-get="/web/admin/roles/new/"
@@ -40,7 +40,7 @@ templ RoleList(props RoleListProps) {
               <tr>
                 <th>Name</th>
                 <th>Permissions</th>
-                if props.Permissions.CanEditACLs {
+                if webutils.Permissions(ctx).CanEditACLs {
                   <th>Actions</th>
                 }
               </tr>
@@ -58,7 +58,7 @@ templ RoleList(props RoleListProps) {
                       }
                     </div>
                   </td>
-                  if props.Permissions.CanEditACLs {
+                  if webutils.Permissions(ctx).CanEditACLs {
                     <td>
                       <button
                         class="waves-effect waves-light btn-small red"

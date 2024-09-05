@@ -18,9 +18,6 @@ import (
 type PageProps struct {
 	User       *auth.User
 	TokenUUIDs []string
-
-	Permissions   auth.Permissions
-	Notifications []string
 }
 
 func Page(props PageProps) templ.Component {
@@ -76,10 +73,8 @@ func Page(props PageProps) templ.Component {
 			return templ_7745c5c3_Err
 		})
 		templ_7745c5c3_Err = layouts.App(layouts.AppProps{
-			Head:          nil,
-			CurrentNav:    "account",
-			Permissions:   props.Permissions,
-			Notifications: props.Notifications,
+			Head:       nil,
+			CurrentNav: "account",
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

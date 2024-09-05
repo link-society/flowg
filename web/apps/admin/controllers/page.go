@@ -42,9 +42,6 @@ func Page(
 			views.PageProps{
 				Roles: roles,
 				Users: users,
-
-				Permissions:   webutils.Permissions(r.Context()),
-				Notifications: webutils.Notifications(r.Context()),
 			},
 		))
 		h.ServeHTTP(w, r)

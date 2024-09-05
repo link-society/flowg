@@ -1,15 +1,12 @@
 package components
 
 import (
-  "link-society.com/flowg/internal/data/auth"
   "link-society.com/flowg/internal/data/logstorage"
 )
 
 type TabsProps struct {
   StreamName string
   Config     *logstorage.StreamConfig
-
-  Permissions auth.Permissions
 }
 
 templ Tabs(props TabsProps) {
@@ -25,14 +22,10 @@ templ Tabs(props TabsProps) {
       @RetentionTab(RetentionTabProps{
         StreamName: props.StreamName,
         Config:     props.Config,
-
-        Permissions: props.Permissions,
       })
       @IndexesTab(IndexesTabProps{
         StreamName: props.StreamName,
         Config:     props.Config,
-
-        Permissions: props.Permissions,
       })
     </div>
   </div>

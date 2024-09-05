@@ -9,15 +9,13 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"link-society.com/flowg/internal/data/auth"
 	"link-society.com/flowg/internal/data/logstorage"
+	"link-society.com/flowg/internal/webutils"
 )
 
 type IndexesTabProps struct {
 	StreamName string
 	Config     *logstorage.StreamConfig
-
-	Permissions auth.Permissions
 }
 
 func IndexesTab(props IndexesTabProps) templ.Component {
@@ -46,8 +44,6 @@ func IndexesTab(props IndexesTabProps) templ.Component {
 			templ_7745c5c3_Err = IndexFieldForm(IndexFieldFormProps{
 				StreamName: props.StreamName,
 				Field:      field,
-
-				Permissions: props.Permissions,
 			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -57,7 +53,7 @@ func IndexesTab(props IndexesTabProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if props.Permissions.CanEditStreams {
+		if webutils.Permissions(ctx).CanEditStreams {
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button hx-get=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -65,7 +61,7 @@ func IndexesTab(props IndexesTabProps) templ.Component {
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs("/web/storage/edit/" + props.StreamName + "/index/add/")
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `apps/storage/templates/components/indexes_tab.templ`, Line: 31, Col: 69}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `apps/storage/templates/components/indexes_tab.templ`, Line: 27, Col: 69}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {

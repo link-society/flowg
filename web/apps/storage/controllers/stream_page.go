@@ -51,9 +51,6 @@ func StreamPage(
 				StreamNames:         streamNames,
 				CurrentStreamName:   streamName,
 				CurrentStreamConfig: &streamConfig,
-
-				Permissions:   webutils.Permissions(r.Context()),
-				Notifications: webutils.Notifications(r.Context()),
 			},
 		))
 		h.ServeHTTP(w, r)

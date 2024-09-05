@@ -11,7 +11,6 @@ import templruntime "github.com/a-h/templ/runtime"
 import (
 	"time"
 
-	"link-society.com/flowg/internal/data/auth"
 	"link-society.com/flowg/internal/data/logstorage"
 
 	"link-society.com/flowg/web/apps/streams/templates/components"
@@ -30,9 +29,6 @@ type PageProps struct {
 	AutoRefresh string
 
 	HistogramData string
-
-	Permissions   auth.Permissions
-	Notifications []string
 }
 
 func Page(props PageProps) templ.Component {
@@ -102,10 +98,8 @@ func Page(props PageProps) templ.Component {
 			return templ_7745c5c3_Err
 		})
 		templ_7745c5c3_Err = layouts.App(layouts.AppProps{
-			Head:          components.Head(),
-			CurrentNav:    "streams",
-			Permissions:   props.Permissions,
-			Notifications: props.Notifications,
+			Head:       components.Head(),
+			CurrentNav: "streams",
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

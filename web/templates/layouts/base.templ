@@ -1,8 +1,9 @@
 package layouts
 
+import "link-society.com/flowg/internal/webutils"
+
 type BaseProps struct {
   Head templ.Component
-  Notifications []string
 }
 
 templ Base(props BaseProps) {
@@ -31,8 +32,8 @@ templ Base(props BaseProps) {
         })
       </script>
 
-      if props.Notifications != nil {
-        for _, notification := range props.Notifications {
+      if webutils.Notifications(ctx) != nil {
+        for _, notification := range webutils.Notifications(ctx) {
           <script
             type="application/javascript"
             data-message={notification}

@@ -1,16 +1,12 @@
 package components
 
 import (
-  "link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/webutils"
 )
 
-type HeadProps struct {
-  Permissions auth.Permissions
-}
-
-templ Head(props HeadProps) {
+templ Head() {
   <script type="application/javascript" src="/static/webcomponents/code-editor.bundle.js"></script>
-  if props.Permissions.CanEditTransformers {
+  if webutils.Permissions(ctx).CanEditTransformers {
     <script type="application/javascript">
       document.addEventListener('DOMContentLoaded', () => {
         const action_save = document.getElementById('action_save')

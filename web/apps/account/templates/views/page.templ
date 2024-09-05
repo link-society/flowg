@@ -10,17 +10,12 @@ import (
 type PageProps struct {
   User       *auth.User
   TokenUUIDs []string
-
-  Permissions   auth.Permissions
-  Notifications []string
 }
 
 templ Page(props PageProps) {
   @layouts.App(layouts.AppProps{
-    Head:          nil,
-    CurrentNav:    "account",
-    Permissions:   props.Permissions,
-    Notifications: props.Notifications,
+    Head:       nil,
+    CurrentNav: "account",
   }) {
     <div class="w-full h-full flex flex-col">
       <section class="row section w-full mb-0 flex-grow">

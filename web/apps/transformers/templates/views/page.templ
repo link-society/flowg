@@ -1,8 +1,6 @@
 package views
 
 import (
-  "link-society.com/flowg/internal/data/auth"
-
   "link-society.com/flowg/web/apps/transformers/templates/components"
   "link-society.com/flowg/web/templates/layouts"
 )
@@ -11,30 +9,23 @@ type PageProps struct {
   Transformers       []string
   CurrentTransformer string
   Code               string
-
-  Permissions   auth.Permissions
-  Notifications []string
 }
 
 templ Page(props PageProps) {
   @layouts.App(layouts.AppProps{
-    Head:          components.Head(components.HeadProps{Permissions: props.Permissions}),
-    CurrentNav:    "transformers",
-    Permissions:   props.Permissions,
-    Notifications: props.Notifications,
+    Head:       components.Head(),
+    CurrentNav: "transformers",
   }) {
     <div class="w-full h-full flex flex-col">
       <section class="row w-full mb-0">
         @components.Toolbar(components.ToolbarProps{
           CurrentTransformer: props.CurrentTransformer,
-          Permissions:        props.Permissions,
         })
       </section>
       <section class="row w-full mb-0 flex-grow">
         @components.SideMenu(components.SideMenuProps{
           Transformers:       props.Transformers,
           CurrentTransformer: props.CurrentTransformer,
-          Permissions:        props.Permissions,
         })
         @components.Editor(components.EditorProps{
           Code: props.Code,

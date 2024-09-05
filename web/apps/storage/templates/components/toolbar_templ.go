@@ -10,12 +10,11 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"link-society.com/flowg/internal/app"
-	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/webutils"
 )
 
 type ToolbarProps struct {
-	StreamName  string
-	Permissions auth.Permissions
+	StreamName string
 }
 
 func Toolbar(props ToolbarProps) templ.Component {
@@ -49,7 +48,7 @@ func Toolbar(props ToolbarProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if props.Permissions.CanEditStreams {
+		if webutils.Permissions(ctx).CanEditStreams {
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"btn-small blue\" hx-get=\"/web/storage/new/\" hx-target=\"#modal-content\"><i class=\"material-icons left\">add</i> New</a> <a class=\"btn-small red\" hx-post=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -57,7 +56,7 @@ func Toolbar(props ToolbarProps) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs("/web/storage/delete/" + props.StreamName + "/")
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `apps/storage/templates/components/toolbar.templ`, Line: 44, Col: 66}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `apps/storage/templates/components/toolbar.templ`, Line: 43, Col: 66}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {

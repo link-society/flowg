@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"sort"
 	"strconv"
 	"time"
 
@@ -43,6 +44,8 @@ func StreamPage(
 			for streamName := range streams {
 				streamNames = append(streamNames, streamName)
 			}
+
+			sort.Strings(streamNames)
 		}
 
 		stream := r.PathValue("name")
@@ -187,9 +190,6 @@ func StreamPage(
 					AutoRefresh: autoRefresh,
 
 					HistogramData: string(histogramData),
-
-					Permissions:   webutils.Permissions(r.Context()),
-					Notifications: webutils.Notifications(r.Context()),
 				},
 			))
 			h.ServeHTTP(w, r)

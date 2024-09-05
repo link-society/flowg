@@ -9,8 +9,6 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"link-society.com/flowg/internal/data/auth"
-
 	"link-society.com/flowg/web/apps/pipelines/templates/components"
 	"link-society.com/flowg/web/templates/layouts"
 )
@@ -19,9 +17,6 @@ type PageProps struct {
 	Pipelines       []string
 	CurrentPipeline string
 	Flow            string
-
-	Permissions   auth.Permissions
-	Notifications []string
 }
 
 func Page(props PageProps) templ.Component {
@@ -60,7 +55,6 @@ func Page(props PageProps) templ.Component {
 			}
 			templ_7745c5c3_Err = components.Toolbar(components.ToolbarProps{
 				CurrentPipeline: props.CurrentPipeline,
-				Permissions:     props.Permissions,
 			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -72,7 +66,6 @@ func Page(props PageProps) templ.Component {
 			templ_7745c5c3_Err = components.SideMenu(components.SideMenuProps{
 				Pipelines:       props.Pipelines,
 				CurrentPipeline: props.CurrentPipeline,
-				Permissions:     props.Permissions,
 			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -88,10 +81,8 @@ func Page(props PageProps) templ.Component {
 			return templ_7745c5c3_Err
 		})
 		templ_7745c5c3_Err = layouts.App(layouts.AppProps{
-			Head:          components.Head(components.HeadProps{Permissions: props.Permissions}),
-			CurrentNav:    "pipelines",
-			Permissions:   props.Permissions,
-			Notifications: props.Notifications,
+			Head:       components.Head(),
+			CurrentNav: "pipelines",
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

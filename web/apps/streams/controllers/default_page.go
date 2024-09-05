@@ -46,9 +46,6 @@ func DefaultPage(
 			views.PageProps{
 				Streams:       streamNames,
 				CurrentStream: "",
-
-				Permissions:   webutils.Permissions(r.Context()),
-				Notifications: webutils.Notifications(r.Context()),
 			},
 		))
 		h.ServeHTTP(w, r)

@@ -9,15 +9,12 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"link-society.com/flowg/internal/data/auth"
 	"link-society.com/flowg/internal/data/logstorage"
 )
 
 type TabsProps struct {
 	StreamName string
 	Config     *logstorage.StreamConfig
-
-	Permissions auth.Permissions
 }
 
 func Tabs(props TabsProps) templ.Component {
@@ -45,8 +42,6 @@ func Tabs(props TabsProps) templ.Component {
 		templ_7745c5c3_Err = RetentionTab(RetentionTabProps{
 			StreamName: props.StreamName,
 			Config:     props.Config,
-
-			Permissions: props.Permissions,
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -54,8 +49,6 @@ func Tabs(props TabsProps) templ.Component {
 		templ_7745c5c3_Err = IndexesTab(IndexesTabProps{
 			StreamName: props.StreamName,
 			Config:     props.Config,
-
-			Permissions: props.Permissions,
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

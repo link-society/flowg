@@ -9,15 +9,12 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"link-society.com/flowg/internal/data/auth"
 	"link-society.com/flowg/internal/data/logstorage"
 )
 
 type ConfigEditorProps struct {
 	StreamName string
 	Config     *logstorage.StreamConfig
-
-	Permissions auth.Permissions
 }
 
 func ConfigEditor(props ConfigEditorProps) templ.Component {
@@ -51,8 +48,6 @@ func ConfigEditor(props ConfigEditorProps) templ.Component {
 			templ_7745c5c3_Err = Tabs(TabsProps{
 				StreamName: props.StreamName,
 				Config:     props.Config,
-
-				Permissions: props.Permissions,
 			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err

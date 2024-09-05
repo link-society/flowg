@@ -9,7 +9,6 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"link-society.com/flowg/internal/data/auth"
 	"link-society.com/flowg/internal/data/logstorage"
 
 	"link-society.com/flowg/web/apps/storage/templates/components"
@@ -20,9 +19,6 @@ type PageProps struct {
 	StreamNames         []string
 	CurrentStreamName   string
 	CurrentStreamConfig *logstorage.StreamConfig
-
-	Permissions   auth.Permissions
-	Notifications []string
 }
 
 func Page(props PageProps) templ.Component {
@@ -60,8 +56,7 @@ func Page(props PageProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			templ_7745c5c3_Err = components.Toolbar(components.ToolbarProps{
-				StreamName:  props.CurrentStreamName,
-				Permissions: props.Permissions,
+				StreamName: props.CurrentStreamName,
 			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -80,8 +75,6 @@ func Page(props PageProps) templ.Component {
 			templ_7745c5c3_Err = components.ConfigEditor(components.ConfigEditorProps{
 				StreamName: props.CurrentStreamName,
 				Config:     props.CurrentStreamConfig,
-
-				Permissions: props.Permissions,
 			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -93,10 +86,8 @@ func Page(props PageProps) templ.Component {
 			return templ_7745c5c3_Err
 		})
 		templ_7745c5c3_Err = layouts.App(layouts.AppProps{
-			Head:          nil,
-			CurrentNav:    "storage",
-			Permissions:   props.Permissions,
-			Notifications: props.Notifications,
+			Head:       nil,
+			CurrentNav: "storage",
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

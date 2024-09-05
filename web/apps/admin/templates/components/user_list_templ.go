@@ -10,11 +10,11 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/webutils"
 )
 
 type UserListProps struct {
-	Users       []auth.User
-	Permissions auth.Permissions
+	Users []auth.User
 }
 
 func UserList(props UserListProps) templ.Component {
@@ -39,7 +39,7 @@ func UserList(props UserListProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if props.Permissions.CanEditACLs {
+		if webutils.Permissions(ctx).CanEditACLs {
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button class=\"waves-effect waves-light btn-small\" hx-get=\"/web/admin/users/new/\" hx-target=\"#modal-content\"><i class=\"material-icons left\">add</i> Add User</button>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -49,7 +49,7 @@ func UserList(props UserListProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if props.Permissions.CanEditACLs {
+		if webutils.Permissions(ctx).CanEditACLs {
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<th>Actions</th>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -113,7 +113,7 @@ func UserList(props UserListProps) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if props.Permissions.CanEditACLs {
+			if webutils.Permissions(ctx).CanEditACLs {
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<td><button class=\"waves-effect waves-light btn-small red\" hx-post=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err

@@ -9,7 +9,7 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/webutils"
 
 	"link-society.com/flowg/web/apps/dashboard/templates/components"
 	"link-society.com/flowg/web/templates/layouts"
@@ -19,9 +19,6 @@ type PageProps struct {
 	StreamCount      int
 	TransformerCount int
 	PipelineCount    int
-
-	Permissions   auth.Permissions
-	Notifications []string
 }
 
 func Page(props PageProps) templ.Component {
@@ -63,7 +60,7 @@ func Page(props PageProps) templ.Component {
 				Name:    "Streams",
 				Href:    "/web/streams",
 				Count:   props.StreamCount,
-				CanView: props.Permissions.CanViewStreams,
+				CanView: webutils.Permissions(ctx).CanViewStreams,
 			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -77,7 +74,7 @@ func Page(props PageProps) templ.Component {
 				Name:    "Transformers",
 				Href:    "/web/transformers",
 				Count:   props.TransformerCount,
-				CanView: props.Permissions.CanViewTransformers,
+				CanView: webutils.Permissions(ctx).CanViewTransformers,
 			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -91,7 +88,7 @@ func Page(props PageProps) templ.Component {
 				Name:    "Pipelines",
 				Href:    "/web/pipelines",
 				Count:   props.PipelineCount,
-				CanView: props.Permissions.CanViewPipelines,
+				CanView: webutils.Permissions(ctx).CanViewPipelines,
 			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -103,10 +100,8 @@ func Page(props PageProps) templ.Component {
 			return templ_7745c5c3_Err
 		})
 		templ_7745c5c3_Err = layouts.App(layouts.AppProps{
-			Head:          nil,
-			CurrentNav:    "",
-			Permissions:   props.Permissions,
-			Notifications: props.Notifications,
+			Head:       nil,
+			CurrentNav: "",
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

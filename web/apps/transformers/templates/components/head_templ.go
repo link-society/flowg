@@ -9,14 +9,10 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/webutils"
 )
 
-type HeadProps struct {
-	Permissions auth.Permissions
-}
-
-func Head(props HeadProps) templ.Component {
+func Head() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -38,7 +34,7 @@ func Head(props HeadProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if props.Permissions.CanEditTransformers {
+		if webutils.Permissions(ctx).CanEditTransformers {
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<script type=\"application/javascript\">\n      document.addEventListener('DOMContentLoaded', () => {\n        const action_save = document.getElementById('action_save')\n        const data_transformer_name = document.getElementById('data_transformer_name')\n        const data_transformer_code = document.getElementById('data_transformer_code')\n\n        if (data_transformer_name.value !== '') {\n          history.pushState(null, '', `/web/transformers/edit/${data_transformer_name.value}/`)\n        }\n\n        action_save.addEventListener('click', () => {\n          if (data_transformer_name.value === '') {\n            M.toast({ html: '&#10060; Please provide a transformer name' })\n            data_transformer_name.classList.add('invalid')\n          } else {\n            const form = document.createElement('form')\n            form.setAttribute('method', 'post')\n            form.setAttribute('action', window.location.href)\n            form.classList.add('hide')\n\n            const input_name = document.createElement('input')\n            input_name.setAttribute('type', 'hidden')\n            input_name.setAttribute('name', 'name')\n            input_name.setAttribute('value', data_transformer_name.value)\n\n            const input_code = document.createElement('input')\n            input_code.setAttribute('type', 'hidden')\n            input_code.setAttribute('name', 'code')\n            input_code.setAttribute('value', data_transformer_code.getAttribute('code'))\n\n            form.appendChild(input_name)\n            form.appendChild(input_code)\n            document.body.appendChild(form)\n\n            form.submit()\n          }\n        })\n\n        data_transformer_name.addEventListener('input', () => {\n          data_transformer_name.classList.remove('invalid')\n        })\n      })\n    </script>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err

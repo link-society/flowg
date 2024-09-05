@@ -2,15 +2,8 @@ package views
 
 import "link-society.com/flowg/web/templates/layouts"
 
-type LoginProps struct {
-  Notifications []string
-}
-
-templ Login(props LoginProps) {
-  @layouts.Base(layouts.BaseProps{
-    Head:          nil,
-    Notifications: props.Notifications,
-  }) {
+templ Login() {
+  @layouts.Base(layouts.BaseProps{Head: nil}) {
     <div class="container">
       <div class="row">
         <div class="col s12 m6 offset-m3 card-panel white">

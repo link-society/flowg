@@ -1,7 +1,7 @@
 package views
 
 import (
-	"link-society.com/flowg/internal/data/auth"
+  "link-society.com/flowg/internal/webutils"
 
   "link-society.com/flowg/web/apps/dashboard/templates/components"
   "link-society.com/flowg/web/templates/layouts"
@@ -11,17 +11,12 @@ type PageProps struct {
   StreamCount      int
   TransformerCount int
   PipelineCount    int
-
-  Permissions auth.Permissions
-  Notifications []string
 }
 
 templ Page(props PageProps) {
   @layouts.App(layouts.AppProps{
-    Head:          nil,
-    CurrentNav:    "",
-    Permissions:   props.Permissions,
-    Notifications: props.Notifications,
+    Head:       nil,
+    CurrentNav: "",
   }) {
     <div class="container">
       <section class="row section flex flex-row items-stretch">
@@ -31,7 +26,7 @@ templ Page(props PageProps) {
             Name:    "Streams",
             Href:    "/web/streams",
             Count:   props.StreamCount,
-            CanView: props.Permissions.CanViewStreams,
+            CanView: webutils.Permissions(ctx).CanViewStreams,
           })
         </div>
         <div class="col s12 m4">
@@ -40,7 +35,7 @@ templ Page(props PageProps) {
             Name:    "Transformers",
             Href:    "/web/transformers",
             Count:   props.TransformerCount,
-            CanView: props.Permissions.CanViewTransformers,
+            CanView: webutils.Permissions(ctx).CanViewTransformers,
           })
         </div>
         <div class="col s12 m4">
@@ -49,7 +44,7 @@ templ Page(props PageProps) {
             Name:    "Pipelines",
             Href:    "/web/pipelines",
             Count:   props.PipelineCount,
-            CanView: props.Permissions.CanViewPipelines,
+            CanView: webutils.Permissions(ctx).CanViewPipelines,
           })
         </div>
       </section>

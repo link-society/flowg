@@ -10,12 +10,11 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"link-society.com/flowg/internal/app"
-	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/webutils"
 )
 
 type ToolbarProps struct {
 	CurrentPipeline string
-	Permissions     auth.Permissions
 }
 
 func Toolbar(props ToolbarProps) templ.Component {
@@ -49,7 +48,7 @@ func Toolbar(props ToolbarProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if props.Permissions.CanEditPipelines {
+		if webutils.Permissions(ctx).CanEditPipelines {
 			if props.CurrentPipeline != "" {
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"btn-small blue\" href=\"/web/pipelines/new\"><i class=\"material-icons left\">add</i> New</a> <a class=\"btn-small red\" href=\"")
 				if templ_7745c5c3_Err != nil {

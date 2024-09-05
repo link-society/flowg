@@ -1,20 +1,18 @@
 package components
 
 import (
-  "link-society.com/flowg/internal/data/auth"
+  "link-society.com/flowg/internal/webutils"
 )
 
 
 type SideMenuProps struct {
   Transformers       []string
   CurrentTransformer string
-
-  Permissions auth.Permissions
 }
 
 templ SideMenu(props SideMenuProps) {
   <div class="col s2 h-full flex flex-col">
-    if props.Permissions.CanEditTransformers {
+    if webutils.Permissions(ctx).CanEditTransformers {
       if props.CurrentTransformer == "" {
         <div class="card-panel white flex-shrink">
           <div class="input-field m-0">

@@ -3,15 +3,13 @@ package components
 import (
   "fmt"
 
-  "link-society.com/flowg/internal/data/auth"
+  "link-society.com/flowg/internal/webutils"
   "link-society.com/flowg/internal/data/logstorage"
 )
 
 type RetentionTabProps struct {
   StreamName string
   Config     *logstorage.StreamConfig
-
-  Permissions auth.Permissions
 }
 
 templ RetentionTab(props RetentionTabProps) {
@@ -42,7 +40,7 @@ templ RetentionTab(props RetentionTabProps) {
       <button
         class="btn waves-effect waves-light"
         type="submit"
-        if !props.Permissions.CanEditStreams {
+        if !webutils.Permissions(ctx).CanEditStreams {
           disabled
         }
       >

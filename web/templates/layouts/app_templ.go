@@ -9,16 +9,12 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"link-society.com/flowg/internal/data/auth"
-
 	"link-society.com/flowg/web/templates/components"
 )
 
 type AppProps struct {
-	Head          templ.Component
-	CurrentNav    string
-	Permissions   auth.Permissions
-	Notifications []string
+	Head       templ.Component
+	CurrentNav string
 }
 
 func App(props AppProps) templ.Component {
@@ -51,10 +47,7 @@ func App(props AppProps) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = components.Navbar(components.NavbarProps{
-				CurrentNav:  props.CurrentNav,
-				Permissions: props.Permissions,
-			}).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = components.Navbar(components.NavbarProps{CurrentNav: props.CurrentNav}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -76,7 +69,7 @@ func App(props AppProps) templ.Component {
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = Base(BaseProps{Head: props.Head, Notifications: props.Notifications}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Base(BaseProps{Head: props.Head}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

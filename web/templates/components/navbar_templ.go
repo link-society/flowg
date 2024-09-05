@@ -8,7 +8,10 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "link-society.com/flowg/internal/data/auth"
+import (
+	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/webutils"
+)
 
 type navbarItemProps struct {
 	Icon   string
@@ -43,7 +46,7 @@ func navbarItem(props navbarItemProps) templ.Component {
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(props.Icon)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/navbar.templ`, Line: 16, Col: 50}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/navbar.templ`, Line: 19, Col: 50}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
@@ -56,7 +59,7 @@ func navbarItem(props navbarItemProps) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(props.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/navbar.templ`, Line: 17, Col: 20}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/navbar.templ`, Line: 20, Col: 20}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -83,7 +86,7 @@ func navbarItem(props navbarItemProps) templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(props.Icon)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/navbar.templ`, Line: 23, Col: 50}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/navbar.templ`, Line: 26, Col: 50}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -96,7 +99,7 @@ func navbarItem(props navbarItemProps) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(props.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/navbar.templ`, Line: 24, Col: 20}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/navbar.templ`, Line: 27, Col: 20}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -112,8 +115,7 @@ func navbarItem(props navbarItemProps) templ.Component {
 }
 
 type NavbarProps struct {
-	CurrentNav  string
-	Permissions auth.Permissions
+	CurrentNav string
 }
 
 func Navbar(props NavbarProps) templ.Component {
@@ -147,7 +149,7 @@ func Navbar(props NavbarProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if props.Permissions.CanViewACLs {
+		if webutils.Permissions(ctx).CanViewACLs {
 			templ_7745c5c3_Err = navbarItem(navbarItemProps{
 				Icon:   "dashboard",
 				Label:  "Admin",
@@ -175,7 +177,7 @@ func Navbar(props NavbarProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if props.Permissions.CanViewTransformers {
+		if webutils.Permissions(ctx).CanViewTransformers {
 			templ_7745c5c3_Err = navbarItem(navbarItemProps{
 				Icon:   "filter_alt",
 				Label:  "Transformers",
@@ -186,7 +188,7 @@ func Navbar(props NavbarProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		if props.Permissions.CanViewPipelines {
+		if webutils.Permissions(ctx).CanViewPipelines {
 			templ_7745c5c3_Err = navbarItem(navbarItemProps{
 				Icon:   "settings",
 				Label:  "Pipelines",
@@ -197,7 +199,7 @@ func Navbar(props NavbarProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		if props.Permissions.CanViewStreams {
+		if webutils.Permissions(ctx).CanViewStreams {
 			templ_7745c5c3_Err = navbarItem(navbarItemProps{
 				Icon:   "sd_storage",
 				Label:  "Storage",
@@ -212,7 +214,7 @@ func Navbar(props NavbarProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if props.Permissions.CanViewStreams {
+		if webutils.Permissions(ctx).CanViewStreams {
 			templ_7745c5c3_Err = navbarItem(navbarItemProps{
 				Icon:   "storage",
 				Label:  "Streams",
@@ -230,7 +232,7 @@ func Navbar(props NavbarProps) templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(auth.GetContextUser(ctx).Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/navbar.templ`, Line: 127, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/navbar.templ`, Line: 129, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -240,31 +242,31 @@ func Navbar(props NavbarProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if props.Permissions.CanViewStreams {
+		if webutils.Permissions(ctx).CanViewStreams {
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"collection-item\" href=\"/web/streams\"><i class=\"left material-icons\">storage</i> Streams</a> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		if props.Permissions.CanViewTransformers {
+		if webutils.Permissions(ctx).CanViewTransformers {
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"collection-item\" href=\"/web/transformers\"><i class=\"left material-icons\">filter_alt</i> Transformers</a> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		if props.Permissions.CanViewPipelines {
+		if webutils.Permissions(ctx).CanViewPipelines {
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"collection-item\" href=\"/web/pipelines\"><i class=\"left material-icons\">settings</i> Pipelines</a> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		if props.Permissions.CanViewStreams {
+		if webutils.Permissions(ctx).CanViewStreams {
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"collection-item\" href=\"/web/storage\"><i class=\"left material-icons\">sd_storage</i> Storage</a> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		if props.Permissions.CanViewACLs {
+		if webutils.Permissions(ctx).CanViewACLs {
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"collection-item\" href=\"/web/admin\"><i class=\"left material-icons\">dashboard</i> Admin</a> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err

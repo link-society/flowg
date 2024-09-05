@@ -1,6 +1,9 @@
 package components
 
-import "link-society.com/flowg/internal/data/auth"
+import (
+  "link-society.com/flowg/internal/data/auth"
+  "link-society.com/flowg/internal/webutils"
+)
 
 type navbarItemProps struct {
   Icon   string
@@ -28,8 +31,7 @@ templ navbarItem(props navbarItemProps) {
 }
 
 type NavbarProps struct {
-  CurrentNav  string
-  Permissions auth.Permissions
+  CurrentNav string
 }
 
 templ Navbar(props NavbarProps) {
@@ -40,7 +42,7 @@ templ Navbar(props NavbarProps) {
       Link:   "/web/account",
       Active: props.CurrentNav == "account",
     })
-    if props.Permissions.CanViewACLs {
+    if webutils.Permissions(ctx).CanViewACLs {
       @navbarItem(navbarItemProps{
         Icon:   "dashboard",
         Label:  "Admin",
@@ -58,7 +60,7 @@ templ Navbar(props NavbarProps) {
   </ul>
 
   <ul id="nav-dropdown-settings" class="dropdown-content">
-    if props.Permissions.CanViewTransformers {
+    if webutils.Permissions(ctx).CanViewTransformers {
       @navbarItem(navbarItemProps{
         Icon:   "filter_alt",
         Label:  "Transformers",
@@ -66,7 +68,7 @@ templ Navbar(props NavbarProps) {
         Active: props.CurrentNav == "transformers",
       })
     }
-    if props.Permissions.CanViewPipelines {
+    if webutils.Permissions(ctx).CanViewPipelines {
       @navbarItem(navbarItemProps{
         Icon:   "settings",
         Label:  "Pipelines",
@@ -74,7 +76,7 @@ templ Navbar(props NavbarProps) {
         Active: props.CurrentNav == "pipelines",
       })
     }
-    if props.Permissions.CanViewStreams {
+    if webutils.Permissions(ctx).CanViewStreams {
       @navbarItem(navbarItemProps{
         Icon:   "sd_storage",
         Label:  "Storage",
@@ -106,7 +108,7 @@ templ Navbar(props NavbarProps) {
         </li>
       </ul>
       <ul class="hide-on-med-and-down">
-        if props.Permissions.CanViewStreams {
+        if webutils.Permissions(ctx).CanViewStreams {
           @navbarItem(navbarItemProps{
             Icon:   "storage",
             Label:  "Streams",
@@ -134,31 +136,31 @@ templ Navbar(props NavbarProps) {
 
   <div class="row w-full hide-on-large-only">
     <div class="collection">
-      if props.Permissions.CanViewStreams {
+      if webutils.Permissions(ctx).CanViewStreams {
         <a class="collection-item" href="/web/streams">
           <i class="left material-icons">storage</i>
           Streams
         </a>
       }
-      if props.Permissions.CanViewTransformers {
+      if webutils.Permissions(ctx).CanViewTransformers {
         <a class="collection-item" href="/web/transformers">
           <i class="left material-icons">filter_alt</i>
           Transformers
         </a>
       }
-      if props.Permissions.CanViewPipelines {
+      if webutils.Permissions(ctx).CanViewPipelines {
         <a class="collection-item" href="/web/pipelines">
           <i class="left material-icons">settings</i>
           Pipelines
         </a>
       }
-      if props.Permissions.CanViewStreams {
+      if webutils.Permissions(ctx).CanViewStreams {
         <a class="collection-item" href="/web/storage">
           <i class="left material-icons">sd_storage</i>
           Storage
         </a>
       }
-      if props.Permissions.CanViewACLs {
+      if webutils.Permissions(ctx).CanViewACLs {
         <a class="collection-item" href="/web/admin">
           <i class="left material-icons">dashboard</i>
           Admin

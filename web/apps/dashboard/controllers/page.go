@@ -55,9 +55,6 @@ func Page(
 				StreamCount:      streamCount,
 				TransformerCount: transformerCount,
 				PipelineCount:    pipelineCount,
-
-				Permissions:   webutils.Permissions(r.Context()),
-				Notifications: webutils.Notifications(r.Context()),
 			},
 		))
 

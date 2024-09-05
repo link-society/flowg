@@ -2,11 +2,11 @@ package components
 
 import (
 	"link-society.com/flowg/internal/data/auth"
+  "link-society.com/flowg/internal/webutils"
 )
 
 type UserListProps struct {
-  Users        []auth.User
-  Permissions  auth.Permissions
+  Users []auth.User
 }
 
 templ UserList(props UserListProps) {
@@ -22,7 +22,7 @@ templ UserList(props UserListProps) {
           "
         >
           <p class="card-title flex-grow mb-0 font-semibold">Users</p>
-          if props.Permissions.CanEditACLs {
+          if webutils.Permissions(ctx).CanEditACLs {
             <button
               class="waves-effect waves-light btn-small"
               hx-get="/web/admin/users/new/"
@@ -40,7 +40,7 @@ templ UserList(props UserListProps) {
               <tr>
                 <th>Name</th>
                 <th>Roles</th>
-                if props.Permissions.CanEditACLs {
+                if webutils.Permissions(ctx).CanEditACLs {
                   <th>Actions</th>
                 }
               </tr>
@@ -58,7 +58,7 @@ templ UserList(props UserListProps) {
                       }
                     </div>
                   </td>
-                  if props.Permissions.CanEditACLs {
+                  if webutils.Permissions(ctx).CanEditACLs {
                     <td>
                       <button
                         class="waves-effect waves-light btn-small red"

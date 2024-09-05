@@ -23,11 +23,7 @@ func LoginForm(
 			}
 		}
 
-		h := templ.Handler(views.Login(
-			views.LoginProps{
-				Notifications: []string{},
-			},
-		))
+		h := templ.Handler(views.Login())
 
 		h.ServeHTTP(w, r)
 	}

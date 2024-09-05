@@ -9,14 +9,12 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/webutils"
 )
 
 type SideMenuProps struct {
 	Transformers       []string
 	CurrentTransformer string
-
-	Permissions auth.Permissions
 }
 
 func SideMenu(props SideMenuProps) templ.Component {
@@ -41,7 +39,7 @@ func SideMenu(props SideMenuProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if props.Permissions.CanEditTransformers {
+		if webutils.Permissions(ctx).CanEditTransformers {
 			if props.CurrentTransformer == "" {
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"card-panel white flex-shrink\"><div class=\"input-field m-0\"><input id=\"data_transformer_name\" type=\"text\"> <label for=\"data_transformer_name\">Transformer Name</label></div></div>")
 				if templ_7745c5c3_Err != nil {
@@ -55,7 +53,7 @@ func SideMenu(props SideMenuProps) templ.Component {
 				var templ_7745c5c3_Var2 string
 				templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(props.CurrentTransformer)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `apps/transformers/templates/components/sidemenu.templ`, Line: 32, Col: 41}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `apps/transformers/templates/components/sidemenu.templ`, Line: 30, Col: 41}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 				if templ_7745c5c3_Err != nil {
@@ -80,7 +78,7 @@ func SideMenu(props SideMenuProps) templ.Component {
 				var templ_7745c5c3_Var3 string
 				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(transformer)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `apps/transformers/templates/components/sidemenu.templ`, Line: 48, Col: 67}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `apps/transformers/templates/components/sidemenu.templ`, Line: 46, Col: 67}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 				if templ_7745c5c3_Err != nil {
@@ -107,7 +105,7 @@ func SideMenu(props SideMenuProps) templ.Component {
 				var templ_7745c5c3_Var5 string
 				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(transformer)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `apps/transformers/templates/components/sidemenu.templ`, Line: 54, Col: 26}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `apps/transformers/templates/components/sidemenu.templ`, Line: 52, Col: 26}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {

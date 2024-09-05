@@ -1,15 +1,13 @@
 package components
 
 import (
-  "link-society.com/flowg/internal/data/auth"
+  "link-society.com/flowg/internal/webutils"
   "link-society.com/flowg/internal/data/logstorage"
 )
 
 type IndexesTabProps struct {
   StreamName string
   Config     *logstorage.StreamConfig
-
-  Permissions auth.Permissions
 }
 
 templ IndexesTab(props IndexesTabProps) {
@@ -20,13 +18,11 @@ templ IndexesTab(props IndexesTabProps) {
           @IndexFieldForm(IndexFieldFormProps{
             StreamName: props.StreamName,
             Field:      field,
-
-            Permissions: props.Permissions,
           })
         }
       </div>
 
-      if props.Permissions.CanEditStreams {
+      if webutils.Permissions(ctx).CanEditStreams {
         <button
           hx-get={"/web/storage/edit/"+props.StreamName+"/index/add/"}
           hx-target="#data_stream_index_fields"

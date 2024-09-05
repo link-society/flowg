@@ -45,9 +45,6 @@ func PageEdit(
 				Pipelines:       pipelines,
 				CurrentPipeline: pipelineName,
 				Flow:            pipelineFlow,
-
-				Permissions:   webutils.Permissions(r.Context()),
-				Notifications: webutils.Notifications(r.Context()),
 			},
 		))
 		h.ServeHTTP(w, r)

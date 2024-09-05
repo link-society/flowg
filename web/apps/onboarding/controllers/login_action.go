@@ -69,11 +69,7 @@ func LoginAction(
 		}
 
 	response:
-		h := templ.Handler(views.Login(
-			views.LoginProps{
-				Notifications: webutils.Notifications(r.Context()),
-			},
-		))
+		h := templ.Handler(views.Login())
 
 		h.ServeHTTP(w, r)
 	}

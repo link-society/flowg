@@ -37,9 +37,6 @@ func PageNew(
 				Pipelines:       pipelines,
 				CurrentPipeline: "",
 				Flow:            "null",
-
-				Permissions:   webutils.Permissions(r.Context()),
-				Notifications: webutils.Notifications(r.Context()),
 			},
 		))
 		h.ServeHTTP(w, r)

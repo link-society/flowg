@@ -117,8 +117,6 @@ func ProcessIndexAddForm(
 			components.IndexFieldFormProps{
 				StreamName: streamName,
 				Field:      fieldName,
-
-				Permissions: webutils.Permissions(r.Context()),
 			},
 		))
 		h.ServeHTTP(w, r)

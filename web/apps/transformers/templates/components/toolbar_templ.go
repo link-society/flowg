@@ -9,12 +9,11 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/webutils"
 )
 
 type ToolbarProps struct {
 	CurrentTransformer string
-	Permissions        auth.Permissions
 }
 
 func Toolbar(props ToolbarProps) templ.Component {
@@ -39,7 +38,7 @@ func Toolbar(props ToolbarProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if props.Permissions.CanEditTransformers {
+		if webutils.Permissions(ctx).CanEditTransformers {
 			if props.CurrentTransformer != "" {
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"btn-small blue\" href=\"/web/transformers/new\"><i class=\"material-icons left\">add</i> New</a> <a class=\"btn-small red\" href=\"")
 				if templ_7745c5c3_Err != nil {

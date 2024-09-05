@@ -3,7 +3,6 @@ package views
 import (
   "time"
 
-	"link-society.com/flowg/internal/data/auth"
 	"link-society.com/flowg/internal/data/logstorage"
 
   "link-society.com/flowg/web/apps/streams/templates/components"
@@ -22,17 +21,12 @@ type PageProps struct {
   AutoRefresh   string
 
   HistogramData string
-
-  Permissions   auth.Permissions
-  Notifications []string
 }
 
 templ Page(props PageProps) {
   @layouts.App(layouts.AppProps{
-    Head:          components.Head(),
-    CurrentNav:    "streams",
-    Permissions:   props.Permissions,
-    Notifications: props.Notifications,
+    Head:       components.Head(),
+    CurrentNav: "streams",
   }) {
     <div class="w-full h-full flex flex-col">
       <section class="row w-full mb-0 flex-grow">
