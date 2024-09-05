@@ -93,7 +93,7 @@ templ Navbar(props NavbarProps) {
           <a class="text-4xl font-semibold" href="/">FlowG</a>
         </li>
       </ul>
-      <ul class="flex-grow hide-on-med-and-down">
+      <ul class="flex-grow hide-on-small-only">
         <li>
           <a href="https://github.com/link-society/flowg" target="_blank">
             <i class="left material-icons">code</i>
@@ -107,7 +107,7 @@ templ Navbar(props NavbarProps) {
           </a>
         </li>
       </ul>
-      <ul class="hide-on-med-and-down">
+      <ul class="hide-on-small-only">
         if webutils.Permissions(ctx).CanViewStreams {
           @navbarItem(navbarItemProps{
             Icon:   "storage",
@@ -134,7 +134,7 @@ templ Navbar(props NavbarProps) {
     </div>
   </nav>
 
-  <div class="row w-full hide-on-large-only">
+  <div class="w-full hide-on-med-and-up">
     <div class="collection">
       if webutils.Permissions(ctx).CanViewStreams {
         <a class="collection-item" href="/web/streams">
@@ -160,6 +160,8 @@ templ Navbar(props NavbarProps) {
           Storage
         </a>
       }
+    </div>
+    <div class="collection">
       if webutils.Permissions(ctx).CanViewACLs {
         <a class="collection-item" href="/web/admin">
           <i class="left material-icons">dashboard</i>
@@ -174,6 +176,8 @@ templ Navbar(props NavbarProps) {
         <i class="left material-icons">exit_to_app</i>
         Logout
       </a>
+    </div>
+    <div class="collection">
       <a class="collection-item" href="https://github.com/link-society/flowg" target="_blank">
         <i class="left material-icons">code</i>
         GitHub

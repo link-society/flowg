@@ -210,7 +210,7 @@ func Navbar(props NavbarProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</ul><nav class=\"blue darken-3\" style=\"z-index: 900;\"><div class=\"nav-wrapper flex flex-row items-center\"><ul><li><a class=\"text-4xl font-semibold\" href=\"/\">FlowG</a></li></ul><ul class=\"flex-grow hide-on-med-and-down\"><li><a href=\"https://github.com/link-society/flowg\" target=\"_blank\"><i class=\"left material-icons\">code</i> GitHub</a></li><li><a href=\"/api/docs\" target=\"_blank\"><i class=\"left material-icons\">cloud</i> API Docs</a></li></ul><ul class=\"hide-on-med-and-down\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</ul><nav class=\"blue darken-3\" style=\"z-index: 900;\"><div class=\"nav-wrapper flex flex-row items-center\"><ul><li><a class=\"text-4xl font-semibold\" href=\"/\">FlowG</a></li></ul><ul class=\"flex-grow hide-on-small-only\"><li><a href=\"https://github.com/link-society/flowg\" target=\"_blank\"><i class=\"left material-icons\">code</i> GitHub</a></li><li><a href=\"/api/docs\" target=\"_blank\"><i class=\"left material-icons\">cloud</i> API Docs</a></li></ul><ul class=\"hide-on-small-only\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -238,7 +238,7 @@ func Navbar(props NavbarProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" <i class=\"right material-icons\">arrow_drop_down</i></a></li></ul></div></nav><div class=\"row w-full hide-on-large-only\"><div class=\"collection\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" <i class=\"right material-icons\">arrow_drop_down</i></a></li></ul></div></nav><div class=\"w-full hide-on-med-and-up\"><div class=\"collection\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -261,10 +261,14 @@ func Navbar(props NavbarProps) templ.Component {
 			}
 		}
 		if webutils.Permissions(ctx).CanViewStreams {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"collection-item\" href=\"/web/storage\"><i class=\"left material-icons\">sd_storage</i> Storage</a> ")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"collection-item\" href=\"/web/storage\"><i class=\"left material-icons\">sd_storage</i> Storage</a>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><div class=\"collection\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
 		}
 		if webutils.Permissions(ctx).CanViewACLs {
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"collection-item\" href=\"/web/admin\"><i class=\"left material-icons\">dashboard</i> Admin</a> ")
@@ -272,7 +276,7 @@ func Navbar(props NavbarProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"collection-item\" href=\"/web/account\"><i class=\"left material-icons\">account_circle</i> Account</a> <a class=\"collection-item\" href=\"/auth/logout\"><i class=\"left material-icons\">exit_to_app</i> Logout</a> <a class=\"collection-item\" href=\"https://github.com/link-society/flowg\" target=\"_blank\"><i class=\"left material-icons\">code</i> GitHub</a> <a class=\"collection-item\" href=\"/api/docs\" target=\"_blank\"><i class=\"left material-icons\">cloud</i> API Docs</a></div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"collection-item\" href=\"/web/account\"><i class=\"left material-icons\">account_circle</i> Account</a> <a class=\"collection-item\" href=\"/auth/logout\"><i class=\"left material-icons\">exit_to_app</i> Logout</a></div><div class=\"collection\"><a class=\"collection-item\" href=\"https://github.com/link-society/flowg\" target=\"_blank\"><i class=\"left material-icons\">code</i> GitHub</a> <a class=\"collection-item\" href=\"/api/docs\" target=\"_blank\"><i class=\"left material-icons\">cloud</i> API Docs</a></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
