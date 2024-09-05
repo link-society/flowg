@@ -36,6 +36,10 @@ func notify(ctx context.Context, message string) {
 }
 
 func Notifications(ctx context.Context) []string {
-	system := ctx.Value(CONTEXT_NOTIFY_SYSTEM).(*notifySystem)
-	return system.notifications
+	system := ctx.Value(CONTEXT_NOTIFY_SYSTEM)
+	if system == nil {
+		return nil
+	}
+
+	return system.(*notifySystem).notifications
 }
