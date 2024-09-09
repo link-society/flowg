@@ -28,6 +28,10 @@ type PipelineNode struct {
 	Pipeline string
 }
 
+type AlertNode struct {
+	Alert string
+}
+
 type RouterNode struct {
 	Stream string
 }
@@ -118,6 +122,16 @@ func (n *PipelineNode) Process(ctx context.Context, entry *logstorage.LogEntry) 
 	}
 
 	return pipeline.Process(ctx, entry)
+}
+
+func (n *AlertNode) Process(ctx context.Context, entry *logstorage.LogEntry) error {
+	alertSys := getAlertSystem(ctx)
+	alert, err := alertSys.Read(n.Alert)
+	if err != nil {
+		return err
+	}
+
+	return alert.Call(ctx, entry)
 }
 
 func (n *RouterNode) Process(ctx context.Context, entry *logstorage.LogEntry) error {

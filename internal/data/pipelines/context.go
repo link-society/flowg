@@ -26,6 +26,11 @@ func getPipelineSystem(ctx context.Context) *config.PipelineSystem {
 	return config.NewPipelineSystem(configStorage)
 }
 
+func getAlertSystem(ctx context.Context) *config.AlertSystem {
+	configStorage := ctx.Value(configStorageKey).(*config.Storage)
+	return config.NewAlertSystem(configStorage)
+}
+
 func getCollectorSystem(ctx context.Context) *logstorage.CollectorSystem {
 	logStorage := ctx.Value(logStorageKey).(*logstorage.Storage)
 	return logstorage.NewCollectorSystem(logStorage)
