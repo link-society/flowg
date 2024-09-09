@@ -77,6 +77,20 @@ func Build(pipelineSys *config.PipelineSystem, name string) (*Pipeline, error) {
 			}
 			pipelineNodes[flowNode.ID] = pipelineNode
 
+		case "alert":
+			alert, exists := flowNode.Data["alert"]
+			if !exists {
+				return nil, &MissingFlowNodeDataError{
+					NodeID: flowNode.ID,
+					Key:    "alert",
+				}
+			}
+
+			pipelineNode := &AlertNode{
+				Alert: alert,
+			}
+			pipelineNodes[flowNode.ID] = pipelineNode
+
 		case "router":
 			stream, exists := flowNode.Data["stream"]
 			if !exists {
