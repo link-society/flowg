@@ -6,13 +6,13 @@ import (
 	"net/http"
 
 	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/pipelines"
+	"link-society.com/flowg/internal/data/config"
 	"link-society.com/flowg/internal/webutils"
 )
 
 func ProcessDeleteAction(
 	userSys *auth.UserSystem,
-	pipelinesManager *pipelines.Manager,
+	pipelineSys *config.PipelineSystem,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		r = r.WithContext(webutils.WithNotificationSystem(r.Context()))
@@ -29,7 +29,7 @@ func ProcessDeleteAction(
 			return
 		}
 
-		err := pipelinesManager.DeletePipelineFlow(pipelineName)
+		err := pipelineSys.Delete(pipelineName)
 		if err != nil {
 			webutils.LogError(r.Context(), "Failed to delete pipeline flow", err)
 

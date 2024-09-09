@@ -8,7 +8,7 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/pipelines"
+	"link-society.com/flowg/internal/data/config"
 )
 
 type GetTransformerRequest struct {
@@ -22,8 +22,10 @@ type GetTransformerResponse struct {
 
 func GetTransformerUsecase(
 	authDb *auth.Database,
-	pipelinesManager *pipelines.Manager,
+	configStorage *config.Storage,
 ) usecase.Interactor {
+	transformerSys := config.NewTransformerSystem(configStorage)
+
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
 			authDb,
@@ -33,11 +35,11 @@ func GetTransformerUsecase(
 				req GetTransformerRequest,
 				resp *GetTransformerResponse,
 			) error {
-				script, err := pipelinesManager.GetTransformerScript(req.Transformer)
+				script, err := transformerSys.Read(req.Transformer)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
-						"Failed to get transformer script",
+						"Failed to get transformer",
 						"channel", "api",
 						"transformer", req.Transformer,
 						"error", err.Error(),
@@ -56,8 +58,8 @@ func GetTransformerUsecase(
 	)
 
 	u.SetName("get_transformer")
-	u.SetTitle("Get Transformer Script")
-	u.SetDescription("Get Transformer Script")
+	u.SetTitle("Get Transformer")
+	u.SetDescription("Get Transformer")
 	u.SetTags("transformers")
 
 	u.SetExpectedErrors(status.PermissionDenied, status.NotFound)

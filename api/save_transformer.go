@@ -8,7 +8,7 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/pipelines"
+	"link-society.com/flowg/internal/data/config"
 )
 
 type SaveTransformerRequest struct {
@@ -22,8 +22,10 @@ type SaveTransformerResponse struct {
 
 func SaveTransformerUsecase(
 	authDb *auth.Database,
-	pipelinesManager *pipelines.Manager,
+	configStorage *config.Storage,
 ) usecase.Interactor {
+	transformerSys := config.NewTransformerSystem(configStorage)
+
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
 			authDb,
@@ -33,11 +35,11 @@ func SaveTransformerUsecase(
 				req SaveTransformerRequest,
 				resp *SaveTransformerResponse,
 			) error {
-				err := pipelinesManager.SaveTransformerScript(req.Transformer, req.Script)
+				err := transformerSys.Write(req.Transformer, req.Script)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
-						"Failed to save transformer script",
+						"Failed to save transformer",
 						"channel", "api",
 						"transformer", req.Transformer,
 						"error", err.Error(),
@@ -55,8 +57,8 @@ func SaveTransformerUsecase(
 	)
 
 	u.SetName("save_transformer")
-	u.SetTitle("Save Transformer Script")
-	u.SetDescription("Save Transformer Script")
+	u.SetTitle("Save Transformer")
+	u.SetDescription("Save Transformer")
 	u.SetTags("transformers")
 
 	u.SetExpectedErrors(status.PermissionDenied, status.Internal)

@@ -8,7 +8,7 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/pipelines"
+	"link-society.com/flowg/internal/data/config"
 )
 
 type ListTransformersRequest struct{}
@@ -19,8 +19,10 @@ type ListTransformersResponse struct {
 
 func ListTransformersUsecase(
 	authDb *auth.Database,
-	pipelinesManager *pipelines.Manager,
+	configStorage *config.Storage,
 ) usecase.Interactor {
+	transformerSys := config.NewTransformerSystem(configStorage)
+
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
 			authDb,
@@ -30,7 +32,7 @@ func ListTransformersUsecase(
 				req ListTransformersRequest,
 				resp *ListTransformersResponse,
 			) error {
-				transformers, err := pipelinesManager.ListTransformers()
+				transformers, err := transformerSys.List()
 				if err != nil {
 					slog.ErrorContext(
 						ctx,

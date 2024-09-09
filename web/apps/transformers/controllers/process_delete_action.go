@@ -6,13 +6,13 @@ import (
 	"net/http"
 
 	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/pipelines"
+	"link-society.com/flowg/internal/data/config"
 	"link-society.com/flowg/internal/webutils"
 )
 
 func ProcessDeleteAction(
 	userSys *auth.UserSystem,
-	pipelinesManager *pipelines.Manager,
+	transformerSys *config.TransformerSystem,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		r = r.WithContext(webutils.WithNotificationSystem(r.Context()))
@@ -28,7 +28,7 @@ func ProcessDeleteAction(
 			return
 		}
 
-		if err := pipelinesManager.DeleteTransformerScript(transformerName); err != nil {
+		if err := transformerSys.Delete(transformerName); err != nil {
 			webutils.LogError(r.Context(), "Failed to delete transformer script", err)
 		}
 

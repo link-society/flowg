@@ -21,9 +21,9 @@ import (
 	"link-society.com/flowg/internal/app/metrics"
 
 	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/data/config"
 	"link-society.com/flowg/internal/data/lognotify"
 	"link-society.com/flowg/internal/data/logstorage"
-	"link-society.com/flowg/internal/data/pipelines"
 
 	"link-society.com/flowg/api"
 	"link-society.com/flowg/web"
@@ -100,12 +100,7 @@ func NewServeCommand() *cobra.Command {
 			logNotifier.Start()
 			defer logNotifier.Stop()
 
-			collectorSys := logstorage.NewCollectorSystem(logDb)
-			pipelinesManager := pipelines.NewManager(
-				collectorSys,
-				logNotifier,
-				opts.configDir,
-			)
+			configStorage := config.NewStorage(opts.configDir)
 
 			if err := bootstrap.DefaultRolesAndUsers(authDb); err != nil {
 				slog.Error(
@@ -117,7 +112,7 @@ func NewServeCommand() *cobra.Command {
 				return
 			}
 
-			if err := bootstrap.DefaultPipeline(pipelinesManager); err != nil {
+			if err := bootstrap.DefaultPipeline(configStorage); err != nil {
 				slog.Error(
 					"Failed to bootstrap default pipeline",
 					"channel", "main",
@@ -127,8 +122,8 @@ func NewServeCommand() *cobra.Command {
 				return
 			}
 
-			apiHandler := api.NewHandler(authDb, logDb, pipelinesManager, logNotifier)
-			webHandler := web.NewHandler(authDb, logDb, pipelinesManager)
+			apiHandler := api.NewHandler(authDb, logDb, configStorage, logNotifier)
+			webHandler := web.NewHandler(authDb, logDb, configStorage)
 			metricsHandler := promhttp.Handler()
 
 			rootHandler := http.NewServeMux()

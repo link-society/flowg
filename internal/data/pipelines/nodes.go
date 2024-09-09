@@ -10,23 +10,8 @@ import (
 	"link-society.com/flowg/internal/ffi/vrl"
 )
 
-type Pipeline struct {
-	Name string
-	Root Node
-}
-
-func (p *Pipeline) Run(
-	ctx context.Context,
-	manager *Manager,
-	entry *logstorage.LogEntry,
-) error {
-	err := p.Root.Process(ctx, manager, entry)
-	metrics.IncPipelineLogCounter(p.Name, err == nil)
-	return err
-}
-
 type Node interface {
-	Process(ctx context.Context, manager *Manager, entry *logstorage.LogEntry) error
+	Process(ctx context.Context, entry *logstorage.LogEntry) error
 }
 
 type TransformNode struct {
@@ -47,12 +32,9 @@ type RouterNode struct {
 	Stream string
 }
 
-func (n *TransformNode) Process(
-	ctx context.Context,
-	manager *Manager,
-	entry *logstorage.LogEntry,
-) error {
-	vrlScript, err := manager.GetTransformerScript(n.TransformerName)
+func (n *TransformNode) Process(ctx context.Context, entry *logstorage.LogEntry) error {
+	transformerSys := getTransformerSystem(ctx)
+	vrlScript, err := transformerSys.Read(n.TransformerName)
 	if err != nil {
 		return err
 	}
@@ -74,7 +56,7 @@ func (n *TransformNode) Process(
 				Timestamp: entry.Timestamp,
 				Fields:    output,
 			}
-			err := next.Process(ctx, manager, newEntry)
+			err := next.Process(ctx, newEntry)
 			if err != nil {
 				errC <- err
 			}
@@ -96,11 +78,7 @@ func (n *TransformNode) Process(
 	return nil
 }
 
-func (n *SwitchNode) Process(
-	ctx context.Context,
-	manager *Manager,
-	entry *logstorage.LogEntry,
-) error {
+func (n *SwitchNode) Process(ctx context.Context, entry *logstorage.LogEntry) error {
 	if n.Condition.Evaluate(entry) {
 		errC := make(chan error, len(n.Next))
 		wg := sync.WaitGroup{}
@@ -109,7 +87,7 @@ func (n *SwitchNode) Process(
 			wg.Add(1)
 			go func(next Node) {
 				defer wg.Done()
-				err := next.Process(ctx, manager, entry)
+				err := next.Process(ctx, entry)
 				if err != nil {
 					errC <- err
 				}
@@ -132,27 +110,23 @@ func (n *SwitchNode) Process(
 	return nil
 }
 
-func (n *PipelineNode) Process(
-	ctx context.Context,
-	manager *Manager,
-	entry *logstorage.LogEntry,
-) error {
-	pipeline, err := manager.GetPipeline(n.Pipeline)
+func (n *PipelineNode) Process(ctx context.Context, entry *logstorage.LogEntry) error {
+	pipelineSys := getPipelineSystem(ctx)
+	pipeline, err := Build(pipelineSys, n.Pipeline)
 	if err != nil {
 		return err
 	}
 
-	return pipeline.Run(ctx, manager, entry)
+	return pipeline.Process(ctx, entry)
 }
 
-func (n *RouterNode) Process(
-	ctx context.Context,
-	manager *Manager,
-	entry *logstorage.LogEntry,
-) error {
-	key, err := manager.collectorSys.Ingest(ctx, n.Stream, entry)
+func (n *RouterNode) Process(ctx context.Context, entry *logstorage.LogEntry) error {
+	collectorSys := getCollectorSystem(ctx)
+	logNotifier := getLogNotifier(ctx)
+
+	key, err := collectorSys.Ingest(ctx, n.Stream, entry)
 	if err == nil {
-		manager.notifier.Notify(n.Stream, string(key), *entry)
+		logNotifier.Notify(n.Stream, string(key), *entry)
 		metrics.IncStreamLogCounter(n.Stream)
 	}
 

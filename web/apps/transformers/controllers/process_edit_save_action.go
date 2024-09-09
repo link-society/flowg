@@ -6,7 +6,7 @@ import (
 	"github.com/a-h/templ"
 
 	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/pipelines"
+	"link-society.com/flowg/internal/data/config"
 	"link-society.com/flowg/internal/webutils"
 
 	"link-society.com/flowg/web/apps/transformers/templates/views"
@@ -14,7 +14,7 @@ import (
 
 func ProcessEditSaveAction(
 	userSys *auth.UserSystem,
-	pipelinesManager *pipelines.Manager,
+	transformerSys *config.TransformerSystem,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		r = r.WithContext(webutils.WithNotificationSystem(r.Context()))
@@ -25,7 +25,7 @@ func ProcessEditSaveAction(
 			return
 		}
 
-		_, err := pipelinesManager.GetTransformerScript(r.PathValue("name"))
+		_, err := transformerSys.Read(r.PathValue("name"))
 		if err != nil {
 			webutils.LogError(r.Context(), "Failed to fetch transformer script", err)
 			http.Redirect(w, r, "/web/transformers/new", http.StatusTemporaryRedirect)
@@ -63,7 +63,7 @@ func ProcessEditSaveAction(
 			goto response
 		}
 
-		if err := pipelinesManager.SaveTransformerScript(transformerName, transformerCode); err != nil {
+		if err := transformerSys.Write(transformerName, transformerCode); err != nil {
 			webutils.LogError(r.Context(), "Failed to save transformer script", err)
 			webutils.NotifyError(r.Context(), "Could not save transformer script")
 			goto response
@@ -72,7 +72,7 @@ func ProcessEditSaveAction(
 		webutils.NotifyInfo(r.Context(), "Transformer script saved")
 
 	response:
-		transformers, err := pipelinesManager.ListTransformers()
+		transformers, err := transformerSys.List()
 		if err != nil {
 			webutils.LogError(r.Context(), "Failed to fetch transformers", err)
 			webutils.NotifyError(r.Context(), "Could not fetch transformers")

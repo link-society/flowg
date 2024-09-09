@@ -13,15 +13,15 @@ import (
 
 	"link-society.com/flowg/internal/app"
 	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/data/config"
 	"link-society.com/flowg/internal/data/lognotify"
 	"link-society.com/flowg/internal/data/logstorage"
-	"link-society.com/flowg/internal/data/pipelines"
 )
 
 func NewHandler(
 	authDb *auth.Database,
 	logDb *logstorage.Storage,
-	pipelinesManager *pipelines.Manager,
+	configStorage *config.Storage,
 	logNotifier *lognotify.LogNotifier,
 ) http.Handler {
 	reflector := openapi31.NewReflector()
@@ -42,17 +42,17 @@ func NewHandler(
 	).Group(func(router chi.Router) {
 		r := &routerWrapper{Router: router}
 
-		r.Get("/api/v1/transformers", ListTransformersUsecase(authDb, pipelinesManager))
-		r.Get("/api/v1/transformers/{transformer}", GetTransformerUsecase(authDb, pipelinesManager))
-		r.Put("/api/v1/transformers/{transformer}", SaveTransformerUsecase(authDb, pipelinesManager))
-		r.Delete("/api/v1/transformers/{transformer}", DeleteTransformerUsecase(authDb, pipelinesManager))
-		r.Post("/api/v1/transformers/{transformer}/test", TestTransformerUsecase(authDb, pipelinesManager))
+		r.Get("/api/v1/transformers", ListTransformersUsecase(authDb, configStorage))
+		r.Get("/api/v1/transformers/{transformer}", GetTransformerUsecase(authDb, configStorage))
+		r.Put("/api/v1/transformers/{transformer}", SaveTransformerUsecase(authDb, configStorage))
+		r.Delete("/api/v1/transformers/{transformer}", DeleteTransformerUsecase(authDb, configStorage))
+		r.Post("/api/v1/transformers/{transformer}/test", TestTransformerUsecase(authDb, configStorage))
 
-		r.Get("/api/v1/pipelines", ListPipelinesUsecase(authDb, pipelinesManager))
-		r.Get("/api/v1/pipelines/{pipeline}", GetPipelineUsecase(authDb, pipelinesManager))
-		r.Put("/api/v1/pipelines/{pipeline}", SavePipelineUsecase(authDb, pipelinesManager))
-		r.Delete("/api/v1/pipelines/{pipeline}", DeletePipelineUsecase(authDb, pipelinesManager))
-		r.Post("/api/v1/pipelines/{pipeline}/logs", IngestLogUsecase(authDb, pipelinesManager))
+		r.Get("/api/v1/pipelines", ListPipelinesUsecase(authDb, configStorage))
+		r.Get("/api/v1/pipelines/{pipeline}", GetPipelineUsecase(authDb, configStorage))
+		r.Put("/api/v1/pipelines/{pipeline}", SavePipelineUsecase(authDb, configStorage))
+		r.Delete("/api/v1/pipelines/{pipeline}", DeletePipelineUsecase(authDb, configStorage))
+		r.Post("/api/v1/pipelines/{pipeline}/logs", IngestLogUsecase(authDb, configStorage, logDb, logNotifier))
 
 		r.Get("/api/v1/streams", ListStreamsUsecase(authDb, logDb))
 		r.Get("/api/v1/streams/{stream}", GetStreamUsecase(authDb, logDb))

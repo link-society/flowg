@@ -1,34 +1,27 @@
 package pipelines
 
-import "link-society.com/flowg/internal/ffi/filterdsl"
+import (
+	"context"
 
-type FlowGraph struct {
-	Nodes []*FlowNode `json:"nodes"`
-	Edges []*FlowEdge `json:"edges"`
+	"link-society.com/flowg/internal/app/metrics"
+	"link-society.com/flowg/internal/data/config"
+	"link-society.com/flowg/internal/data/logstorage"
+	"link-society.com/flowg/internal/ffi/filterdsl"
+)
+
+type Pipeline struct {
+	Name string
+	Root Node
 }
 
-type FlowNode struct {
-	ID       string            `json:"id"`
-	Type     string            `json:"type"`
-	Position FlowPosition      `json:"position"`
-	Data     map[string]string `json:"data"`
-}
+func Build(pipelineSys *config.PipelineSystem, name string) (*Pipeline, error) {
+	flowGraph, err := pipelineSys.Parse(name)
+	if err != nil {
+		return nil, err
+	}
 
-type FlowEdge struct {
-	ID           string `json:"id"`
-	Source       string `json:"source"`
-	SourceHandle string `json:"sourceHandle"`
-	Target       string `json:"target"`
-}
-
-type FlowPosition struct {
-	X float64 `json:"x"`
-	Y float64 `json:"y"`
-}
-
-func (flowGraph FlowGraph) BuildPipeline(name string) (*Pipeline, error) {
 	pipelineNodes := make(map[string]Node)
-	flowNodesByID := make(map[string]*FlowNode)
+	flowNodesByID := make(map[string]*config.FlowNode)
 
 	rootFlowNodeId := ""
 	var rootPipelineNode Node
@@ -149,4 +142,10 @@ func (flowGraph FlowGraph) BuildPipeline(name string) (*Pipeline, error) {
 		Name: name,
 		Root: rootPipelineNode,
 	}, nil
+}
+
+func (p *Pipeline) Process(ctx context.Context, entry *logstorage.LogEntry) error {
+	err := p.Root.Process(ctx, entry)
+	metrics.IncPipelineLogCounter(p.Name, err == nil)
+	return err
 }

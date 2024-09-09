@@ -8,7 +8,7 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/pipelines"
+	"link-society.com/flowg/internal/data/config"
 )
 
 type ListPipelinesRequest struct{}
@@ -19,8 +19,10 @@ type ListPipelinesResponse struct {
 
 func ListPipelinesUsecase(
 	authDb *auth.Database,
-	pipelinesManager *pipelines.Manager,
+	configStorage *config.Storage,
 ) usecase.Interactor {
+	pipelineSys := config.NewPipelineSystem(configStorage)
+
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
 			authDb,
@@ -30,7 +32,7 @@ func ListPipelinesUsecase(
 				req ListPipelinesRequest,
 				resp *ListPipelinesResponse,
 			) error {
-				pipelines, err := pipelinesManager.ListPipelines()
+				pipelines, err := pipelineSys.List()
 				if err != nil {
 					slog.ErrorContext(
 						ctx,

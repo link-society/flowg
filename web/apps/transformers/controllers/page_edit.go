@@ -6,7 +6,7 @@ import (
 	"github.com/a-h/templ"
 
 	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/pipelines"
+	"link-society.com/flowg/internal/data/config"
 	"link-society.com/flowg/internal/webutils"
 
 	"link-society.com/flowg/web/apps/transformers/templates/views"
@@ -14,7 +14,7 @@ import (
 
 func PageEdit(
 	userSys *auth.UserSystem,
-	pipelinesManager *pipelines.Manager,
+	transformerSys *config.TransformerSystem,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		r = r.WithContext(webutils.WithNotificationSystem(r.Context()))
@@ -26,14 +26,14 @@ func PageEdit(
 		}
 
 		transformerName := r.PathValue("name")
-		transformerCode, err := pipelinesManager.GetTransformerScript(transformerName)
+		transformerCode, err := transformerSys.Read(transformerName)
 		if err != nil {
 			webutils.LogError(r.Context(), "Failed to fetch transformer script", err)
 			http.Redirect(w, r, "/web/transformers/new", http.StatusTemporaryRedirect)
 			return
 		}
 
-		transformers, err := pipelinesManager.ListTransformers()
+		transformers, err := transformerSys.List()
 		if err != nil {
 			webutils.LogError(r.Context(), "Failed to fetch transformers", err)
 			webutils.NotifyError(r.Context(), "Could not fetch transformers")
