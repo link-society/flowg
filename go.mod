@@ -3,7 +3,7 @@ module link-society.com/flowg
 go 1.22.2
 
 require (
-	github.com/a-h/templ v0.2.771
+	github.com/a-h/templ v0.2.778
 	github.com/dgraph-io/badger/v3 v3.2103.5
 	github.com/go-chi/chi/v5 v5.1.0
 	github.com/google/uuid v1.6.0
