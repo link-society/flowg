@@ -8,17 +8,25 @@ import (
 	"link-society.com/flowg/internal/data/logstorage"
 )
 
-func Run(
-	pipeline *Pipeline,
+type Runner struct {
+	ctx context.Context
+}
+
+func NewRunner(
 	ctx context.Context,
 	configStorage *config.Storage,
 	logStorage *logstorage.Storage,
 	logNotifier *lognotify.LogNotifier,
-	entry *logstorage.LogEntry,
-) error {
+) *Runner {
 	ctx = context.WithValue(ctx, configStorageKey, configStorage)
 	ctx = context.WithValue(ctx, logStorageKey, logStorage)
 	ctx = context.WithValue(ctx, logNotifierKey, logNotifier)
 
-	return pipeline.Process(ctx, entry)
+	return &Runner{
+		ctx: ctx,
+	}
+}
+
+func (r *Runner) Run(pipeline *Pipeline, entry *logstorage.LogEntry) error {
+	return pipeline.Process(r.ctx, entry)
 }
