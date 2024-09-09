@@ -10,5 +10,5 @@ crate-type = ["staticlib"]
 cc = "1.1"
 
 [dependencies]
-vrl = "0.17.0"
+vrl = "0.18.0"
 anyhow = "1.0"
