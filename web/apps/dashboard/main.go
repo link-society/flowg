@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/data/config"
 	"link-society.com/flowg/internal/data/logstorage"
-	"link-society.com/flowg/internal/data/pipelines"
 
 	"link-society.com/flowg/web/apps/dashboard/controllers"
 )
@@ -13,16 +13,18 @@ import (
 func Application(
 	authDb *auth.Database,
 	logDb *logstorage.Storage,
-	pipelinesManager *pipelines.Manager,
+	configStorage *config.Storage,
 ) http.Handler {
 	mux := http.NewServeMux()
 
 	userSys := auth.NewUserSystem(authDb)
 	metaSys := logstorage.NewMetaSystem(logDb)
+	transformerSys := config.NewTransformerSystem(configStorage)
+	pipelineSys := config.NewPipelineSystem(configStorage)
 
 	mux.HandleFunc(
 		"GET /web/{$}",
-		controllers.Page(userSys, metaSys, pipelinesManager),
+		controllers.Page(userSys, metaSys, transformerSys, pipelineSys),
 	)
 
 	return mux

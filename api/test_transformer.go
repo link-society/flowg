@@ -8,7 +8,7 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/pipelines"
+	"link-society.com/flowg/internal/data/config"
 	"link-society.com/flowg/internal/ffi/vrl"
 )
 
@@ -24,8 +24,10 @@ type TestTransformerResponse struct {
 
 func TestTransformerUsecase(
 	authDb *auth.Database,
-	pipelinesManager *pipelines.Manager,
+	configStorage *config.Storage,
 ) usecase.Interactor {
+	transformerSys := config.NewTransformerSystem(configStorage)
+
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
 			authDb,
@@ -35,11 +37,11 @@ func TestTransformerUsecase(
 				req TestTransformerRequest,
 				resp *TestTransformerResponse,
 			) error {
-				script, err := pipelinesManager.GetTransformerScript(req.Transformer)
+				script, err := transformerSys.Read(req.Transformer)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
-						"Failed to get transformer script",
+						"Failed to get transformer",
 						"channel", "api",
 						"transformer", req.Transformer,
 						"error", err.Error(),
@@ -53,7 +55,7 @@ func TestTransformerUsecase(
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
-						"Failed to execute transformer script",
+						"Failed to execute transformer",
 						"channel", "api",
 						"transformer", req.Transformer,
 						"errorr", err.Error(),
@@ -71,8 +73,8 @@ func TestTransformerUsecase(
 	)
 
 	u.SetName("test_transformer")
-	u.SetTitle("Test Transformer Script")
-	u.SetDescription("Test Transformer Script")
+	u.SetTitle("Test Transformer")
+	u.SetDescription("Test Transformer")
 	u.SetTags("transformers")
 
 	u.SetExpectedErrors(status.PermissionDenied, status.NotFound, status.Internal)

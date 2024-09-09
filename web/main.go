@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/data/config"
 	"link-society.com/flowg/internal/data/logstorage"
-	pipelineStorage "link-society.com/flowg/internal/data/pipelines"
 
 	"link-society.com/flowg/web/apps/account"
 	"link-society.com/flowg/web/apps/admin"
@@ -29,7 +29,7 @@ var staticfiles embed.FS
 func NewHandler(
 	authDb *auth.Database,
 	logDb *logstorage.Storage,
-	pipelinesManager *pipelineStorage.Manager,
+	configStorage *config.Storage,
 ) http.Handler {
 	mux := http.NewServeMux()
 	mux.Handle("GET /static/", http.FileServer(http.FS(staticfiles)))
@@ -40,7 +40,7 @@ func NewHandler(
 
 	mux.Handle(
 		"/web/",
-		authMiddleware(dashboard.Application(authDb, logDb, pipelinesManager)),
+		authMiddleware(dashboard.Application(authDb, logDb, configStorage)),
 	)
 	mux.Handle(
 		"/web/streams/",
@@ -48,11 +48,11 @@ func NewHandler(
 	)
 	mux.Handle(
 		"/web/transformers/",
-		authMiddleware(transformers.Application(authDb, pipelinesManager)),
+		authMiddleware(transformers.Application(authDb, configStorage)),
 	)
 	mux.Handle(
 		"/web/pipelines/",
-		authMiddleware(pipelines.Application(authDb, pipelinesManager)),
+		authMiddleware(pipelines.Application(authDb, configStorage)),
 	)
 	mux.Handle(
 		"/web/storage/",

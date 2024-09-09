@@ -6,7 +6,7 @@ import (
 	"github.com/a-h/templ"
 
 	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/pipelines"
+	"link-society.com/flowg/internal/data/config"
 	"link-society.com/flowg/internal/webutils"
 
 	"link-society.com/flowg/web/apps/pipelines/templates/views"
@@ -14,7 +14,7 @@ import (
 
 func PageNew(
 	userSys *auth.UserSystem,
-	pipelinesManager *pipelines.Manager,
+	pipelineSys *config.PipelineSystem,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		r = r.WithContext(webutils.WithNotificationSystem(r.Context()))
@@ -25,7 +25,7 @@ func PageNew(
 			return
 		}
 
-		pipelines, err := pipelinesManager.ListPipelines()
+		pipelines, err := pipelineSys.List()
 		if err != nil {
 			webutils.LogError(r.Context(), "Failed to fetch pipelines", err)
 			webutils.NotifyError(r.Context(), "Could not fetch pipelines")

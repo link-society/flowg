@@ -10,12 +10,12 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/pipelines"
+	"link-society.com/flowg/internal/data/config"
 )
 
 type SavePipelineRequest struct {
-	Pipeline string              `path:"pipeline" minLength:"1"`
-	Flow     pipelines.FlowGraph `json:"flow"`
+	Pipeline string           `path:"pipeline" minLength:"1"`
+	Flow     config.FlowGraph `json:"flow"`
 }
 
 type SavePipelineResponse struct {
@@ -24,8 +24,10 @@ type SavePipelineResponse struct {
 
 func SavePipelineUsecase(
 	authDb *auth.Database,
-	pipelinesManager *pipelines.Manager,
+	configStorage *config.Storage,
 ) usecase.Interactor {
+	pipelineSys := config.NewPipelineSystem(configStorage)
+
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
 			authDb,
@@ -49,11 +51,11 @@ func SavePipelineUsecase(
 					return status.Wrap(err, status.InvalidArgument)
 				}
 
-				err = pipelinesManager.SavePipelineFlow(req.Pipeline, string(flowData))
+				err = pipelineSys.Write(req.Pipeline, string(flowData))
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
-						"Failed to save pipeline flow",
+						"Failed to save pipeline",
 						"channel", "api",
 						"pipeline", req.Pipeline,
 						"error", err.Error(),
@@ -71,8 +73,8 @@ func SavePipelineUsecase(
 	)
 
 	u.SetName("save_pipeline")
-	u.SetTitle("Save Pipeline Flow")
-	u.SetDescription("Save pipeline flow")
+	u.SetTitle("Save Pipeline")
+	u.SetDescription("Save pipeline")
 	u.SetTags("pipelines")
 
 	u.SetExpectedErrors(status.PermissionDenied, status.InvalidArgument, status.Internal)

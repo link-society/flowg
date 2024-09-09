@@ -8,7 +8,7 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/pipelines"
+	"link-society.com/flowg/internal/data/config"
 )
 
 type DeletePipelineRequest struct {
@@ -21,8 +21,10 @@ type DeletePipelineResponse struct {
 
 func DeletePipelineUsecase(
 	authDb *auth.Database,
-	pipelinesManager *pipelines.Manager,
+	configStorage *config.Storage,
 ) usecase.Interactor {
+	pipelineSys := config.NewPipelineSystem(configStorage)
+
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
 			authDb,
@@ -32,11 +34,11 @@ func DeletePipelineUsecase(
 				req DeletePipelineRequest,
 				resp *DeletePipelineResponse,
 			) error {
-				err := pipelinesManager.DeletePipelineFlow(req.Pipeline)
+				err := pipelineSys.Delete(req.Pipeline)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
-						"Failed to delete pipeline flow",
+						"Failed to delete pipeline",
 						"channel", "api",
 						"pipeline", req.Pipeline,
 						"error", err.Error(),
@@ -53,8 +55,8 @@ func DeletePipelineUsecase(
 	)
 
 	u.SetName("delete_pipeline")
-	u.SetTitle("Delete Pipeline Flow")
-	u.SetDescription("Delete pipeline flow")
+	u.SetTitle("Delete Pipeline")
+	u.SetDescription("Delete pipeline")
 	u.SetTags("pipelines")
 
 	u.SetExpectedErrors(status.PermissionDenied, status.Internal)

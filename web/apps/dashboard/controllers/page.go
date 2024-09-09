@@ -6,8 +6,8 @@ import (
 	"github.com/a-h/templ"
 
 	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/data/config"
 	"link-society.com/flowg/internal/data/logstorage"
-	"link-society.com/flowg/internal/data/pipelines"
 	"link-society.com/flowg/internal/webutils"
 
 	"link-society.com/flowg/web/apps/dashboard/templates/views"
@@ -16,7 +16,8 @@ import (
 func Page(
 	userSys *auth.UserSystem,
 	metaSys *logstorage.MetaSystem,
-	pipelinesManager *pipelines.Manager,
+	transformerSys *config.TransformerSystem,
+	pipelineSys *config.PipelineSystem,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		r = r.WithContext(webutils.WithNotificationSystem(r.Context()))
@@ -34,7 +35,7 @@ func Page(
 			webutils.NotifyError(r.Context(), "Could not fetch streams")
 		}
 
-		transformerList, err := pipelinesManager.ListTransformers()
+		transformerList, err := transformerSys.List()
 		if err == nil {
 			transformerCount = len(transformerList)
 		} else {
@@ -42,7 +43,7 @@ func Page(
 			webutils.NotifyError(r.Context(), "Could not fetch transformers")
 		}
 
-		pipelineList, err := pipelinesManager.ListPipelines()
+		pipelineList, err := pipelineSys.List()
 		if err == nil {
 			pipelineCount = len(pipelineList)
 		} else {

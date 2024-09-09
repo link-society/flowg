@@ -5,23 +5,24 @@ import (
 	"net/http"
 
 	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/pipelines"
+	"link-society.com/flowg/internal/data/config"
 
 	"link-society.com/flowg/web/apps/pipelines/controllers"
 )
 
 func Application(
 	authDb *auth.Database,
-	pipelinesManager *pipelines.Manager,
+	configStorage *config.Storage,
 ) http.Handler {
 	mux := http.NewServeMux()
 
 	userSys := auth.NewUserSystem(authDb)
+	pipelineSys := config.NewPipelineSystem(configStorage)
 
 	mux.HandleFunc(
 		"GET /web/pipelines/{$}",
 		func(w http.ResponseWriter, r *http.Request) {
-			switch pipelines, err := pipelinesManager.ListPipelines(); {
+			switch pipelines, err := pipelineSys.List(); {
 			case err == nil && len(pipelines) > 0:
 				url := "/web/pipelines/edit/" + pipelines[0] + "/"
 				http.Redirect(w, r, url, http.StatusSeeOther)
@@ -43,25 +44,25 @@ func Application(
 
 	mux.HandleFunc(
 		"GET /web/pipelines/new/{$}",
-		controllers.PageNew(userSys, pipelinesManager),
+		controllers.PageNew(userSys, pipelineSys),
 	)
 	mux.HandleFunc(
 		"POST /web/pipelines/new/{$}",
-		controllers.ProcessNewSaveAction(userSys, pipelinesManager),
+		controllers.ProcessNewSaveAction(userSys, pipelineSys),
 	)
 
 	mux.HandleFunc(
 		"GET /web/pipelines/edit/{name}/{$}",
-		controllers.PageEdit(userSys, pipelinesManager),
+		controllers.PageEdit(userSys, pipelineSys),
 	)
 	mux.HandleFunc(
 		"POST /web/pipelines/edit/{name}/{$}",
-		controllers.ProcessEditSaveAction(userSys, pipelinesManager),
+		controllers.ProcessEditSaveAction(userSys, pipelineSys),
 	)
 
 	mux.HandleFunc(
 		"GET /web/pipelines/delete/{name}/{$}",
-		controllers.ProcessDeleteAction(userSys, pipelinesManager),
+		controllers.ProcessDeleteAction(userSys, pipelineSys),
 	)
 
 	return mux

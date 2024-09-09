@@ -8,6 +8,8 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/data/config"
+	"link-society.com/flowg/internal/data/lognotify"
 	"link-society.com/flowg/internal/data/logstorage"
 	"link-society.com/flowg/internal/data/pipelines"
 )
@@ -22,8 +24,12 @@ type IngestLogResponse struct {
 
 func IngestLogUsecase(
 	authDb *auth.Database,
-	pipelinesManager *pipelines.Manager,
+	configStorage *config.Storage,
+	logStorage *logstorage.Storage,
+	logNotifier *lognotify.LogNotifier,
 ) usecase.Interactor {
+	pipelineSys := config.NewPipelineSystem(configStorage)
+
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
 			authDb,
@@ -33,7 +39,7 @@ func IngestLogUsecase(
 				req IngestLogRequest,
 				resp *IngestLogResponse,
 			) error {
-				pipeline, err := pipelinesManager.GetPipeline(req.Pipeline)
+				pipeline, err := pipelines.Build(pipelineSys, req.Pipeline)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
@@ -46,7 +52,14 @@ func IngestLogUsecase(
 				}
 
 				entry := logstorage.NewLogEntry(req.Record)
-				err = pipeline.Run(ctx, pipelinesManager, entry)
+				err = pipelines.Run(
+					pipeline,
+					ctx,
+					configStorage,
+					logStorage,
+					logNotifier,
+					entry,
+				)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,

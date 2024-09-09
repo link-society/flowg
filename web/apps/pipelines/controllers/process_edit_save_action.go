@@ -6,7 +6,7 @@ import (
 	"github.com/a-h/templ"
 
 	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/pipelines"
+	"link-society.com/flowg/internal/data/config"
 	"link-society.com/flowg/internal/webutils"
 
 	"link-society.com/flowg/web/apps/pipelines/templates/views"
@@ -14,7 +14,7 @@ import (
 
 func ProcessEditSaveAction(
 	userSys *auth.UserSystem,
-	pipelinesManager *pipelines.Manager,
+	pipelineSys *config.PipelineSystem,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		r = r.WithContext(webutils.WithNotificationSystem(r.Context()))
@@ -25,9 +25,9 @@ func ProcessEditSaveAction(
 			return
 		}
 
-		_, err := pipelinesManager.GetPipelineFlow(r.PathValue("name"))
+		_, err := pipelineSys.Read(r.PathValue("name"))
 		if err != nil {
-			webutils.LogError(r.Context(), "Failed to fetch pipeline flow", err)
+			webutils.LogError(r.Context(), "Failed to fetch pipeline", err)
 			http.Redirect(w, r, "/web/pipelines/new", http.StatusTemporaryRedirect)
 			return
 		}
@@ -63,7 +63,7 @@ func ProcessEditSaveAction(
 			goto response
 		}
 
-		if err = pipelinesManager.SavePipelineFlow(pipelineName, pipelineFlow); err != nil {
+		if err = pipelineSys.Write(pipelineName, pipelineFlow); err != nil {
 			webutils.LogError(r.Context(), "Failed to save pipeline flow", err)
 			webutils.NotifyError(r.Context(), "Could not save pipeline")
 			goto response
@@ -72,7 +72,7 @@ func ProcessEditSaveAction(
 		webutils.NotifyInfo(r.Context(), "Pipeline saved")
 
 	response:
-		pipelines, err := pipelinesManager.ListPipelines()
+		pipelines, err := pipelineSys.List()
 		if err != nil {
 			webutils.LogError(r.Context(), "Failed to fetch pipelines", err)
 			webutils.NotifyError(r.Context(), "Could not fetch pipelines")

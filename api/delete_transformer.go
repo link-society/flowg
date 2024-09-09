@@ -8,7 +8,7 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/pipelines"
+	"link-society.com/flowg/internal/data/config"
 )
 
 type DeleteTransformerRequest struct {
@@ -21,8 +21,10 @@ type DeleteTransformerResponse struct {
 
 func DeleteTransformerUsecase(
 	authDb *auth.Database,
-	pipelinesManager *pipelines.Manager,
+	configStorage *config.Storage,
 ) usecase.Interactor {
+	transformerSys := config.NewTransformerSystem(configStorage)
+
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
 			authDb,
@@ -32,11 +34,11 @@ func DeleteTransformerUsecase(
 				req DeleteTransformerRequest,
 				resp *DeleteTransformerResponse,
 			) error {
-				err := pipelinesManager.DeleteTransformerScript(req.Transformer)
+				err := transformerSys.Delete(req.Transformer)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
-						"Failed to delete transformer script",
+						"Failed to delete transformer",
 						"channel", "api",
 						"transformer", req.Transformer,
 						"error", err.Error(),
@@ -54,8 +56,8 @@ func DeleteTransformerUsecase(
 	)
 
 	u.SetName("delete_transformer")
-	u.SetTitle("Delete Transformer Script")
-	u.SetDescription("Delete Transformer Script")
+	u.SetTitle("Delete Transformer")
+	u.SetDescription("Delete Transformer")
 	u.SetTags("transformers")
 
 	u.SetExpectedErrors(status.PermissionDenied, status.Internal)

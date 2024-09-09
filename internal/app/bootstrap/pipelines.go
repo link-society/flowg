@@ -3,17 +3,19 @@ package bootstrap
 import (
 	"fmt"
 
-	"link-society.com/flowg/internal/data/pipelines"
+	"link-society.com/flowg/internal/data/config"
 )
 
-func DefaultPipeline(pipelinesManager *pipelines.Manager) error {
-	pipelines, err := pipelinesManager.ListPipelines()
+func DefaultPipeline(configStorage *config.Storage) error {
+	pipelineSys := config.NewPipelineSystem(configStorage)
+
+	pipelines, err := pipelineSys.List()
 	if err != nil {
 		return err
 	}
 
 	if len(pipelines) == 0 {
-		err := pipelinesManager.SavePipelineFlow(
+		err := pipelineSys.Write(
 			"default",
 			`{
 				"nodes":[
