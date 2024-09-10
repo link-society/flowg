@@ -115,7 +115,9 @@ RUN chmod 0700 /docker-entrypoint.sh
 RUN addgroup -S flowg && adduser -S -G flowg -h /app flowg
 WORKDIR /app
 
-ENV FLOWG_BIND_ADDRESS=":5080"
+ENV FLOWG_HTTP_BIND_ADDRESS=":5080"
+ENV FLOWG_SYSLOG_BIND_ADDRESS=":5514"
+
 ENV FLOWG_AUTH_DIR="/data/auth"
 ENV FLOWG_CONFIG_DIR="/data/config"
 ENV FLOWG_LOG_DIR="/data/logs"
