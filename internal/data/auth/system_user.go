@@ -251,6 +251,10 @@ func (sys *UserSystem) VerifyUserPermission(name string, scope Scope) (bool, err
 					hasPermission = true
 					return nil
 
+				case scope == SCOPE_READ_ALERTS && roleScope == SCOPE_WRITE_ALERTS:
+					hasPermission = true
+					return nil
+
 				case scope == SCOPE_READ_ACLS && roleScope == SCOPE_WRITE_ACLS:
 					hasPermission = true
 					return nil
@@ -313,6 +317,10 @@ func (sys *UserSystem) ListUserScopes(username string) ([]Scope, error) {
 				case SCOPE_WRITE_STREAMS:
 					scopeMap[SCOPE_READ_STREAMS] = struct{}{}
 					scopeMap[SCOPE_WRITE_STREAMS] = struct{}{}
+
+				case SCOPE_WRITE_ALERTS:
+					scopeMap[SCOPE_READ_ALERTS] = struct{}{}
+					scopeMap[SCOPE_WRITE_ALERTS] = struct{}{}
 
 				case SCOPE_WRITE_ACLS:
 					scopeMap[SCOPE_READ_ACLS] = struct{}{}

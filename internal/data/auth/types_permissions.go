@@ -11,6 +11,8 @@ const (
 	SCOPE_WRITE_TRANSFORMERS Scope = "write_transformers"
 	SCOPE_READ_STREAMS       Scope = "read_streams"
 	SCOPE_WRITE_STREAMS      Scope = "write_streams"
+	SCOPE_READ_ALERTS        Scope = "read_alerts"
+	SCOPE_WRITE_ALERTS       Scope = "write_alerts"
 	SCOPE_READ_ACLS          Scope = "read_acls"
 	SCOPE_WRITE_ACLS         Scope = "write_acls"
 	SCOPE_SEND_LOGS          Scope = "send_logs"
@@ -25,6 +27,9 @@ type Permissions struct {
 
 	CanViewStreams bool
 	CanEditStreams bool
+
+	CanViewAlerts bool
+	CanEditAlerts bool
 
 	CanViewACLs bool
 	CanEditACLs bool
@@ -46,6 +51,10 @@ func ParseScope(s string) (Scope, error) {
 		return SCOPE_READ_STREAMS, nil
 	case "write_streams":
 		return SCOPE_WRITE_STREAMS, nil
+	case "read_alerts":
+		return SCOPE_READ_ALERTS, nil
+	case "write_alerts":
+		return SCOPE_WRITE_ALERTS, nil
 	case "read_acls":
 		return SCOPE_READ_ACLS, nil
 	case "write_acls":
@@ -73,6 +82,10 @@ func PermissionsFromScopes(scopes []Scope) Permissions {
 			permissions.CanViewStreams = true
 		case SCOPE_WRITE_STREAMS:
 			permissions.CanEditStreams = true
+		case SCOPE_READ_ALERTS:
+			permissions.CanViewAlerts = true
+		case SCOPE_WRITE_ALERTS:
+			permissions.CanEditAlerts = true
 		case SCOPE_READ_ACLS:
 			permissions.CanViewACLs = true
 		case SCOPE_WRITE_ACLS:
