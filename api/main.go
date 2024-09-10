@@ -80,6 +80,12 @@ func NewHandler(
 		)
 		r.Get("/api/v1/streams/{stream}/logs/watch", WatchLogsUsecase(authDb, logNotifier))
 
+		r.Get("/api/v1/alerts", ListAlertsUsecase(authDb, configStorage))
+		r.Get("/api/v1/alerts/{alert}", GetAlertUsecase(authDb, configStorage))
+		r.Put("/api/v1/alerts/{alert}", SaveAlertUsecase(authDb, configStorage))
+		r.Delete("/api/v1/alerts/{alert}", DeleteAlertUsecase(authDb, configStorage))
+		r.Post("/api/v1/alerts/{alert}/test", TestAlertUsecase(authDb, configStorage))
+
 		r.Get("/api/v1/roles", ListRolesUsecase(authDb))
 		r.Put("/api/v1/roles/{role}", SaveRoleUsecase(authDb))
 		r.Delete("/api/v1/roles/{role}", DeleteRoleUsecase(authDb))
