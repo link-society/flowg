@@ -1,0 +1,12 @@
+package components
+
+import (
+	"link-society.com/flowg/internal/webutils"
+)
+
+templ Head() {
+  <script type="application/javascript" src="/static/webcomponents/code-editor.bundle.js"></script>
+  if webutils.Permissions(ctx).CanEditAlerts {
+    <script type="application/javascript" src="/static/js/flowg.alerts.form.js"></script>
+  }
+}

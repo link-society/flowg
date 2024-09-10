@@ -1,0 +1,62 @@
+package components
+
+import (
+  "fmt"
+  "time"
+
+  "link-society.com/flowg/internal/data/alerting"
+  "link-society.com/flowg/internal/webutils"
+)
+
+type EditorProps struct {
+  Webhook alerting.Webhook
+}
+
+templ Editor(props EditorProps) {
+  <div class="col s10 h-full flex flex-col">
+    <div
+      class="
+        card-panel white
+        p-3 mb-0 h-0
+        flex-grow flex-shrink
+        overflow-auto
+      "
+    >
+      <div class="row mb-0">
+        <div class="input-field col s12 mb-0">
+          <i class="material-icons prefix">link</i>
+          <input
+            id="data_webhook_url"
+            type="text"
+            value={props.Webhook.Url}
+            if !webutils.Permissions(ctx).CanEditAlerts {
+              readonly
+            }
+          />
+          <label for="data_webhook_url">Webhook URL</label>
+        </div>
+      </div>
+
+      <div id="data_webhook_headers">
+        for name, value := range props.Webhook.Headers {
+          @HeaderField(HeaderFieldProps{
+            ID:    fmt.Sprintf("%d", time.Now().UnixNano()),
+            Name:  name,
+            Value: value,
+          })
+        }
+      </div>
+
+      if webutils.Permissions(ctx).CanEditAlerts {
+        <template id="template_webhook_header">
+          @HeaderField(HeaderFieldProps{})
+        </template>
+
+        <button class="btn-small waves-effect waves-light" id="action_add_header">
+          <i class="material-icons left">add</i>
+          Add Header
+        </button>
+      }
+    </div>
+  </div>
+}

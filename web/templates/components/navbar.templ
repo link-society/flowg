@@ -76,6 +76,14 @@ templ Navbar(props NavbarProps) {
         Active: props.CurrentNav == "pipelines",
       })
     }
+    if webutils.Permissions(ctx).CanViewAlerts {
+      @navbarItem(navbarItemProps{
+        Icon:   "notifications_active",
+        Label:  "Alerts",
+        Link:   "/web/alerts",
+        Active: props.CurrentNav == "alerts",
+      })
+    }
     if webutils.Permissions(ctx).CanViewStreams {
       @navbarItem(navbarItemProps{
         Icon:   "sd_storage",
@@ -152,6 +160,12 @@ templ Navbar(props NavbarProps) {
         <a class="collection-item" href="/web/pipelines">
           <i class="left material-icons">settings</i>
           Pipelines
+        </a>
+      }
+      if webutils.Permissions(ctx).CanViewAlerts {
+        <a class="collection-item" href="/web/alerts">
+          <i class="left material-icons">notifications_active</i>
+          Alerts
         </a>
       }
       if webutils.Permissions(ctx).CanViewStreams {

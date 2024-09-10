@@ -1,0 +1,38 @@
+package views
+
+import (
+	"link-society.com/flowg/internal/data/alerting"
+
+  "link-society.com/flowg/web/apps/alerts/templates/components"
+  "link-society.com/flowg/web/templates/layouts"
+)
+
+type PageProps struct {
+  Alerts       []string
+  CurrentAlert string
+  Webhook      alerting.Webhook
+}
+
+templ Page(props PageProps) {
+  @layouts.App(layouts.AppProps{
+    Head:       components.Head(),
+    CurrentNav: "alerts",
+  }) {
+    <div class="w-full h-full flex flex-col">
+      <section class="row w-full mb-0">
+        @components.Toolbar(components.ToolbarProps{
+          CurrentAlert: props.CurrentAlert,
+        })
+      </section>
+      <section class="row w-full mb-0 flex-grow">
+        @components.SideMenu(components.SideMenuProps{
+          Alerts:       props.Alerts,
+          CurrentAlert: props.CurrentAlert,
+        })
+        @components.Editor(components.EditorProps{
+          Webhook: props.Webhook,
+        })
+      </section>
+    </div>
+  }
+}
