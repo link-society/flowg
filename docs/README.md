@@ -14,6 +14,7 @@ requiring predefined schemas and relies on
  - [Filtering Data](./guides/filtering.md)
  - [What Are Streams?](./guides/streams.md)
  - [What Is a Transformer?](./guides/transformers.md)
+ - [Alerting](./guides/alerting.md)
  - [How To Build a Pipeline?](./guides/pipelines.md)
 
 ## Design
