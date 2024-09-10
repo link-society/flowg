@@ -205,6 +205,17 @@ func Navbar(props NavbarProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
+		if webutils.Permissions(ctx).CanViewAlerts {
+			templ_7745c5c3_Err = navbarItem(navbarItemProps{
+				Icon:   "notifications_active",
+				Label:  "Alerts",
+				Link:   "/web/alerts",
+				Active: props.CurrentNav == "alerts",
+			}).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
 		if webutils.Permissions(ctx).CanViewStreams {
 			templ_7745c5c3_Err = navbarItem(navbarItemProps{
 				Icon:   "sd_storage",
@@ -238,7 +249,7 @@ func Navbar(props NavbarProps) templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(auth.GetContextUser(ctx).Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/navbar.templ`, Line: 129, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/components/navbar.templ`, Line: 137, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -262,6 +273,12 @@ func Navbar(props NavbarProps) templ.Component {
 		}
 		if webutils.Permissions(ctx).CanViewPipelines {
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"collection-item\" href=\"/web/pipelines\"><i class=\"left material-icons\">settings</i> Pipelines</a> ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		if webutils.Permissions(ctx).CanViewAlerts {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"collection-item\" href=\"/web/alerts\"><i class=\"left material-icons\">notifications_active</i> Alerts</a> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

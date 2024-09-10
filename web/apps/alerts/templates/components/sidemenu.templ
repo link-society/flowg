@@ -1,0 +1,59 @@
+package components
+
+import (
+  "link-society.com/flowg/internal/webutils"
+)
+
+
+type SideMenuProps struct {
+  Alerts       []string
+  CurrentAlert string
+}
+
+templ SideMenu(props SideMenuProps) {
+  <div class="col s2 h-full flex flex-col">
+    if webutils.Permissions(ctx).CanEditAlerts {
+      if props.CurrentAlert == "" {
+        <div class="card-panel white flex-shrink">
+          <div class="input-field m-0">
+            <input
+              id="data_alert_name"
+              type="text"
+            />
+            <label for="data_alert_name">Alert Name</label>
+          </div>
+        </div>
+      } else {
+        <input
+          type="hidden"
+          id="data_alert_name"
+          value={props.CurrentAlert}
+        />
+      }
+    }
+
+    <div
+      class="
+        card-panel white
+        p-0 mb-0 h-0
+        flex-grow flex-shrink
+        overflow-auto
+      "
+    >
+      <div class="collection m-0">
+        for _, alert := range props.Alerts {
+          if alert == props.CurrentAlert {
+            <a class="collection-item active" href="#">{alert}</a>
+          } else {
+            <a
+              class="collection-item"
+              href={templ.SafeURL("/web/alerts/edit/" + alert + "/")}
+            >
+              {alert}
+            </a>
+          }
+        }
+      </div>
+    </div>
+  </div>
+}
