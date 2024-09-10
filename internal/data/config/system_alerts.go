@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"path/filepath"
+	"strings"
 
 	"link-society.com/flowg/internal/data/alerting"
 )
@@ -29,7 +29,7 @@ func (sys *AlertSystem) List() ([]string, error) {
 	results := []string{}
 
 	for _, item := range items {
-		if filepath.Ext(item) == ".json.b64" {
+		if strings.HasSuffix(item, ".json.b64") {
 			results = append(results, item[:len(item)-9])
 		}
 	}
