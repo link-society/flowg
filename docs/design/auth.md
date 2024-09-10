@@ -11,6 +11,8 @@ assigns permissions to one or more of the following **scopes**:
 | `write_transformers` | Can create, read, update, or delete a transformer script |
 | `read_streams` | Can query a stream |
 | `write_streams` | Can purge a stream |
+| `read_alerts` | Can see alert webhooks |
+| `write_alerts` | Can create, read, update or delete alert webhooks |
 | `read_acls` | Can list users and roles, but cannot update them nor delete them |
 | `write_acls`| Can create, read, update or delete roles and users |
 | `send_logs` | Can send logs to a pipeline for processing (useful for log sources) |
@@ -51,7 +53,7 @@ For example:
 role:admin:write_streams
 role:admin:write_transformers
 role:admin:write_pipelines
-role:admin:create_users
+role:admin:write_acls
 ```
 
 For each user, there will be an index key with the following format:

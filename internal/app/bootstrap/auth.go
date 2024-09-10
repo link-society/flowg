@@ -24,6 +24,7 @@ func DefaultRolesAndUsers(authDb *auth.Database) error {
 				auth.SCOPE_WRITE_PIPELINES,
 				auth.SCOPE_WRITE_TRANSFORMERS,
 				auth.SCOPE_WRITE_STREAMS,
+				auth.SCOPE_WRITE_ALERTS,
 			},
 		}
 
