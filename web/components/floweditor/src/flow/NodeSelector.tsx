@@ -41,6 +41,15 @@ const NodeSelector: React.FC = () => {
           <i className="material-icons">settings</i>
         </button>
         <button
+          className="btn-small tooltipped green"
+          data-position="top"
+          data-tooltip="Alert Node"
+          draggable
+          onDragStart={(event) => onDragStart(event, 'alert')}
+        >
+          <i className="material-icons">notifications_active</i>
+        </button>
+        <button
           className="btn-small tooltipped purple"
           data-position="top"
           data-tooltip="Router Node"
