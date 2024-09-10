@@ -8,6 +8,7 @@ Usage:
 
 Available Commands:
   admin       Admin commands (please run while the server is down)
+  completion  Generate the autocompletion script for the specified shell
   help        Help about any command
   serve       Start FlowG standalone server
 
@@ -26,12 +27,13 @@ Usage:
   flowg serve [flags]
 
 Flags:
-      --auth-dir string     Path to the auth database directory (default "./data/auth")
-      --bind string         Address to bind the server to (default ":5080")
-      --config-dir string   Path to the config directory (default "./data/config")
-  -h, --help                help for serve
-      --log-dir string      Path to the log database directory (default "./data/logs")
-      --verbose             Enable verbose logging
+      --auth-dir string      Path to the auth database directory (default "./data/auth")
+      --config-dir string    Path to the config directory (default "./data/config")
+  -h, --help                 help for serve
+      --http-bind string     Address to bind the HTTP server to (default ":5080")
+      --log-dir string       Path to the log database directory (default "./data/logs")
+      --syslog-bind string   Address to bind the Syslog server to (default ":5514")
+      --verbose              Enable verbose logging
 ```
 
 ## 2. `flowg admin`

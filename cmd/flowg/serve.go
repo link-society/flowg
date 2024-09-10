@@ -30,11 +30,13 @@ import (
 )
 
 type serveCommandOpts struct {
-	bindAddress string
-	authDir     string
-	logDir      string
-	configDir   string
-	verbose     bool
+	httpBindAddress string
+	syslogBindAddr  string
+
+	authDir   string
+	logDir    string
+	configDir string
+	verbose   bool
 }
 
 func NewServeCommand() *cobra.Command {
@@ -149,7 +151,7 @@ func NewServeCommand() *cobra.Command {
 			)
 
 			server := &http.Server{
-				Addr:    opts.bindAddress,
+				Addr:    opts.httpBindAddress,
 				Handler: logging.NewMiddleware(rootHandler),
 			}
 
@@ -163,25 +165,25 @@ func NewServeCommand() *cobra.Command {
 
 				if err := server.Shutdown(ctx); err != nil {
 					slog.Error(
-						"Failed to shutdown server",
+						"Failed to shutdown HTTP server",
 						"channel", "main",
-						"bind", opts.bindAddress,
+						"http.bind", opts.httpBindAddress,
 						"error", err,
 					)
 				}
 			}()
 
 			slog.Info(
-				"Starting server",
+				"Starting HTTP server",
 				"channel", "main",
-				"bind", opts.bindAddress,
+				"http.bind", opts.httpBindAddress,
 			)
 			err = server.ListenAndServe()
 			if err != nil && err != http.ErrServerClosed {
 				slog.Error(
-					"Failed to start server",
+					"Failed to start HTTP server",
 					"channel", "main",
-					"bind", opts.bindAddress,
+					"http.bind", opts.httpBindAddress,
 					"error", err,
 				)
 				exitCode = 1
@@ -191,10 +193,17 @@ func NewServeCommand() *cobra.Command {
 	}
 
 	cmd.Flags().StringVar(
-		&opts.bindAddress,
-		"bind",
-		defaultBindAddress,
-		"Address to bind the server to",
+		&opts.httpBindAddress,
+		"http-bind",
+		defaultHttpBindAddress,
+		"Address to bind the HTTP server to",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.syslogBindAddr,
+		"syslog-bind",
+		defaultSyslogBindAddr,
+		"Address to bind the Syslog server to",
 	)
 
 	cmd.Flags().StringVar(

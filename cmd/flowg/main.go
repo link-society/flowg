@@ -14,10 +14,12 @@ import (
 var exitCode int = 0
 
 var (
-	defaultBindAddress = getEnv("FLOWG_BIND_ADDRESS", ":5080")
-	defaultAuthDir     = getEnv("FLOWG_AUTH_DIR", "./data/auth")
-	defaultConfigDir   = getEnv("FLOWG_CONFIG_DIR", "./data/config")
-	defaultLogDir      = getEnv("FLOWG_LOG_DIR", "./data/logs")
+	defaultHttpBindAddress = getEnv("FLOWG_HTTP_BIND_ADDRESS", ":5080")
+	defaultSyslogBindAddr  = getEnv("FLOWG_SYSLOG_BIND_ADDRESS", ":5514")
+
+	defaultAuthDir   = getEnv("FLOWG_AUTH_DIR", "./data/auth")
+	defaultConfigDir = getEnv("FLOWG_CONFIG_DIR", "./data/config")
+	defaultLogDir    = getEnv("FLOWG_LOG_DIR", "./data/logs")
 )
 
 func main() {
