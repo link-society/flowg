@@ -21,11 +21,10 @@ func Build(pipelineSys *config.PipelineSystem, name string) (*Pipeline, error) {
 	}
 
 	var (
-		pipelineNodes = make(map[string]Node)
-		flowNodesByID = make(map[string]*config.FlowNode)
-
-		entrypointNodeIds = make(map[string]string)
-		entrypointNodes   = make(map[string]Node)
+		pipelineNodes   = make(map[string]Node)
+		flowNodesByID   = make(map[string]*config.FlowNode)
+		sourceNodeTypes = make(map[string]string)
+		entrypointNodes = make(map[string]Node)
 	)
 
 	for _, flowNode := range flowGraph.Nodes {
@@ -113,7 +112,10 @@ func Build(pipelineSys *config.PipelineSystem, name string) (*Pipeline, error) {
 				sourceType = DIRECT_ENTRYPOINT
 			}
 
-			entrypointNodeIds[flowNode.ID] = sourceType
+			pipelineNode := &SourceNode{}
+			pipelineNodes[flowNode.ID] = pipelineNode
+			sourceNodeTypes[flowNode.ID] = sourceType
+			entrypointNodes[sourceType] = pipelineNode
 
 		default:
 			return nil, &InvalidFlowNodeTypeError{Type: flowNode.Type}
@@ -121,37 +123,28 @@ func Build(pipelineSys *config.PipelineSystem, name string) (*Pipeline, error) {
 	}
 
 	for _, flowEdge := range flowGraph.Edges {
-		if sourceType, exists := entrypointNodeIds[flowEdge.Source]; exists {
-			targetNode, targetExists := pipelineNodes[flowEdge.Target]
-			if !targetExists {
-				return nil, &InvalidFlowEdgeError{
-					Source: flowEdge.Source,
-					Target: flowEdge.Target,
-				}
+		sourceNode, sourceExists := pipelineNodes[flowEdge.Source]
+		targetNode, targetExists := pipelineNodes[flowEdge.Target]
+
+		if !sourceExists || !targetExists {
+			return nil, &InvalidFlowEdgeError{
+				Source: flowEdge.Source,
+				Target: flowEdge.Target,
 			}
+		}
 
-			entrypointNodes[sourceType] = targetNode
-		} else {
-			sourceNode, sourceExists := pipelineNodes[flowEdge.Source]
-			targetNode, targetExists := pipelineNodes[flowEdge.Target]
+		switch source := sourceNode.(type) {
+		case *SourceNode:
+			source.Next = append(source.Next, targetNode)
 
-			if !sourceExists || !targetExists {
-				return nil, &InvalidFlowEdgeError{
-					Source: flowEdge.Source,
-					Target: flowEdge.Target,
-				}
-			}
+		case *TransformNode:
+			source.Next = append(source.Next, targetNode)
 
-			switch source := sourceNode.(type) {
-			case *TransformNode:
-				source.Next = append(source.Next, targetNode)
+		case *SwitchNode:
+			source.Next = append(source.Next, targetNode)
 
-			case *SwitchNode:
-				source.Next = append(source.Next, targetNode)
-
-			default:
-				panic("unreachable")
-			}
+		default:
+			panic("unreachable")
 		}
 	}
 

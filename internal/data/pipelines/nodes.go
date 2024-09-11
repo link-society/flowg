@@ -14,6 +14,10 @@ type Node interface {
 	Process(ctx context.Context, entry *logstorage.LogEntry) error
 }
 
+type SourceNode struct {
+	Next []Node
+}
+
 type TransformNode struct {
 	TransformerName string
 	Next            []Node
@@ -34,6 +38,36 @@ type AlertNode struct {
 
 type RouterNode struct {
 	Stream string
+}
+
+func (n *SourceNode) Process(ctx context.Context, entry *logstorage.LogEntry) error {
+	errC := make(chan error, len(n.Next))
+	wg := sync.WaitGroup{}
+
+	for _, next := range n.Next {
+		wg.Add(1)
+		go func(next Node) {
+			defer wg.Done()
+			err := next.Process(ctx, entry)
+			if err != nil {
+				errC <- err
+			}
+		}(next)
+	}
+
+	wg.Wait()
+	close(errC)
+
+	var errs []error
+	for err := range errC {
+		errs = append(errs, err)
+	}
+
+	if len(errs) > 0 {
+		return errors.Join(errs...)
+	}
+
+	return nil
 }
 
 func (n *TransformNode) Process(ctx context.Context, entry *logstorage.LogEntry) error {
