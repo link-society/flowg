@@ -9,6 +9,7 @@ import (
 )
 
 const DIRECT_ENTRYPOINT = "direct"
+const SYSLOG_ENTRYPOINT = "syslog"
 
 type Runner struct {
 	ctx context.Context
