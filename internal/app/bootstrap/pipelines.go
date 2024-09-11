@@ -18,13 +18,23 @@ func DefaultPipeline(configStorage *config.Storage) error {
 		err := pipelineSys.Write(
 			"default",
 			`{
-				"nodes":[
+				"nodes": [
 					{
-						"id": "__builtin__source",
+						"id": "__builtin__source_direct",
 						"type": "source",
 						"position": {"x": 210, "y": 195},
 						"deletable": false,
-						"data": {},
+						"data": {"type": "direct"},
+						"measured": {"width": 136, "height": 38},
+						"selected": true,
+						"dragging": false
+					},
+					{
+						"id": "__builtin__source_syslog",
+						"type": "source",
+						"position": {"x": 210, "y": 250},
+						"deletable": false,
+						"data": {"type": "syslog"},
 						"measured": {"width": 136, "height": 38},
 						"selected": true,
 						"dragging": false
@@ -39,11 +49,18 @@ func DefaultPipeline(configStorage *config.Storage) error {
 						"dragging": false
 					}
 				],
-				"edges":[
+				"edges": [
 					{
-						"id": "xy-edge____builtin__source-node-1",
+						"id": "xy-edge____builtin__source_direct-node-1",
 						"type": "smoothstep",
-						"source": "__builtin__source",
+						"source": "__builtin__source_direct",
+						"target": "node-1",
+						"animated": true
+					},
+					{
+						"id": "xy-edge____builtin__source_syslog-node-1",
+						"type": "smoothstep",
+						"source": "__builtin__source_syslog",
 						"target": "node-1",
 						"animated": true
 					}
