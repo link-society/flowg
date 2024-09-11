@@ -150,4 +150,25 @@ fn flatten_array(array: &Vec<Value>) -> HashMap<String, String> {
   result
 }
 
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_process_record() {
+    let input = HashMap::new();
+    let script = String::from(r#"
+      .foo = "x"
+      .bar.baz = [1, 2, 3, "a"]
+      .
+    "#);
+
+    let output = process_record(input, script).unwrap();
+
+    assert_eq!(output.get("foo"), Some(&"x".to_string()));
+    assert_eq!(output.get("bar.baz.0"), Some(&"1".to_string()));
+    assert_eq!(output.get("bar.baz.1"), Some(&"2".to_string()));
+    assert_eq!(output.get("bar.baz.2"), Some(&"3".to_string()));
+    assert_eq!(output.get("bar.baz.3"), Some(&"a".to_string()));
+  }
 }
