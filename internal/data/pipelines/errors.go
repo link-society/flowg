@@ -28,8 +28,10 @@ func (e *InvalidFlowEdgeError) Error() string {
 	return fmt.Sprintf("invalid edge: %s -> %s", e.Source, e.Target)
 }
 
-type MissingFlowRootNodeError struct{}
+type InvalidEntrypointError struct {
+	Entrypoint string
+}
 
-func (e *MissingFlowRootNodeError) Error() string {
-	return "missing root node"
+func (e *InvalidEntrypointError) Error() string {
+	return fmt.Sprintf("invalid entrypoint: %s", e.Entrypoint)
 }

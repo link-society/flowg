@@ -53,7 +53,7 @@ func IngestLogUsecase(
 
 				entry := logstorage.NewLogEntry(req.Record)
 				runner := pipelines.NewRunner(ctx, configStorage, logStorage, logNotifier)
-				err = runner.Run(pipeline, entry)
+				err = runner.Run(pipeline, pipelines.DIRECT_ENTRYPOINT, entry)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,

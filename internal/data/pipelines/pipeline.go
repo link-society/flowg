@@ -10,8 +10,8 @@ import (
 )
 
 type Pipeline struct {
-	Name string
-	Root Node
+	Name        string
+	Entrypoints map[string]Node
 }
 
 func Build(pipelineSys *config.PipelineSystem, name string) (*Pipeline, error) {
@@ -20,11 +20,13 @@ func Build(pipelineSys *config.PipelineSystem, name string) (*Pipeline, error) {
 		return nil, err
 	}
 
-	pipelineNodes := make(map[string]Node)
-	flowNodesByID := make(map[string]*config.FlowNode)
+	var (
+		pipelineNodes = make(map[string]Node)
+		flowNodesByID = make(map[string]*config.FlowNode)
 
-	rootFlowNodeId := ""
-	var rootPipelineNode Node
+		entrypointNodeIds = make(map[string]string)
+		entrypointNodes   = make(map[string]Node)
+	)
 
 	for _, flowNode := range flowGraph.Nodes {
 		flowNodesByID[flowNode.ID] = flowNode
@@ -106,7 +108,12 @@ func Build(pipelineSys *config.PipelineSystem, name string) (*Pipeline, error) {
 			pipelineNodes[flowNode.ID] = pipelineNode
 
 		case "source":
-			rootFlowNodeId = flowNode.ID
+			sourceType, exists := flowNode.Data["type"]
+			if !exists {
+				sourceType = DIRECT_ENTRYPOINT
+			}
+
+			entrypointNodeIds[flowNode.ID] = sourceType
 
 		default:
 			return nil, &InvalidFlowNodeTypeError{Type: flowNode.Type}
@@ -114,7 +121,7 @@ func Build(pipelineSys *config.PipelineSystem, name string) (*Pipeline, error) {
 	}
 
 	for _, flowEdge := range flowGraph.Edges {
-		if flowEdge.Source == rootFlowNodeId {
+		if sourceType, exists := entrypointNodeIds[flowEdge.Source]; exists {
 			targetNode, targetExists := pipelineNodes[flowEdge.Target]
 			if !targetExists {
 				return nil, &InvalidFlowEdgeError{
@@ -123,7 +130,7 @@ func Build(pipelineSys *config.PipelineSystem, name string) (*Pipeline, error) {
 				}
 			}
 
-			rootPipelineNode = targetNode
+			entrypointNodes[sourceType] = targetNode
 		} else {
 			sourceNode, sourceExists := pipelineNodes[flowEdge.Source]
 			targetNode, targetExists := pipelineNodes[flowEdge.Target]
@@ -148,18 +155,23 @@ func Build(pipelineSys *config.PipelineSystem, name string) (*Pipeline, error) {
 		}
 	}
 
-	if rootPipelineNode == nil {
-		return nil, &MissingFlowRootNodeError{}
-	}
-
 	return &Pipeline{
-		Name: name,
-		Root: rootPipelineNode,
+		Name:        name,
+		Entrypoints: entrypointNodes,
 	}, nil
 }
 
-func (p *Pipeline) Process(ctx context.Context, entry *logstorage.LogEntry) error {
-	err := p.Root.Process(ctx, entry)
+func (p *Pipeline) Process(
+	ctx context.Context,
+	entrypoint string,
+	entry *logstorage.LogEntry,
+) error {
+	rootNode, exists := p.Entrypoints[entrypoint]
+	if !exists {
+		return &InvalidEntrypointError{Entrypoint: entrypoint}
+	}
+
+	err := rootNode.Process(ctx, entry)
 	metrics.IncPipelineLogCounter(p.Name, err == nil)
 	return err
 }
