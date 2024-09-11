@@ -11,6 +11,7 @@ ADD api /src/api
 ADD cmd /src/cmd
 ADD internal/app /src/internal/app
 ADD internal/data /src/internal/data
+ADD internal/integrations /src/internal/integrations
 ADD internal/webutils /src/internal/webutils
 ADD --exclude=internal/ffi/filterdsl/rust-crate internal/ffi/filterdsl /src/internal/ffi/filterdsl
 ADD --exclude=internal/ffi/vrl/rust-crate internal/ffi/vrl /src/internal/ffi/vrl
