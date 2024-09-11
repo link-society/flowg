@@ -25,6 +25,8 @@ import (
 	"link-society.com/flowg/internal/data/lognotify"
 	"link-society.com/flowg/internal/data/logstorage"
 
+	"link-society.com/flowg/internal/integrations/syslog"
+
 	"link-society.com/flowg/api"
 	"link-society.com/flowg/web"
 )
@@ -123,6 +125,15 @@ func NewServeCommand() *cobra.Command {
 				exitCode = 1
 				return
 			}
+
+			syslogServer := syslog.NewServer(
+				opts.syslogBindAddr,
+				configStorage,
+				logDb,
+				logNotifier,
+			)
+			syslogServer.Start()
+			defer syslogServer.Stop()
 
 			apiHandler := api.NewHandler(authDb, logDb, configStorage, logNotifier)
 			webHandler := web.NewHandler(authDb, logDb, configStorage)
