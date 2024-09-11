@@ -100,7 +100,7 @@ Now, you can access:
 
  - the WebUI at http://localhost:5080
  - the API documentation at http://localhost:5080/api/docs
- - the Syslog Server at [udp://localhost:5514]
+ - the Syslog Server at [udp://localhost:5514]()
 
 A default user `root` (password: `root`) and a default pipeline are bootsrapped
 if no configuration exists during startup.
