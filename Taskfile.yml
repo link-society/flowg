@@ -11,7 +11,8 @@ tasks:
   test:
     desc: "Run tests"
     cmds:
-      - go test -v ./...
+      - task: "test:go"
+      - task: "test:rust"
 
   doc:
     desc: "Generate documentation"
@@ -91,3 +92,26 @@ tasks:
     dir: ./web/components/code-editor
     cmds:
       - npm i
+
+  "test:go":
+    internal: true
+    cmds:
+      - go test ./...
+
+  "test:rust":
+    internal: true
+    cmds:
+      - task: "test:rust:filterdsl"
+      - task: "test:rust:vrl"
+
+  "test:rust:filterdsl":
+    internal: true
+    dir: ./internal/ffi/filterdsl/rust-crate
+    cmds:
+      - cargo test
+
+  "test:rust:vrl":
+    internal: true
+    dir: ./internal/ffi/vrl/rust-crate
+    cmds:
+      - cargo test
