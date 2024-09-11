@@ -50,6 +50,7 @@ COPY --from=sources-rust-filterdsl /src /workspace
 WORKDIR /workspace/internal/ffi/filterdsl/rust-crate
 
 RUN cargo build --release
+RUN cargo test
 
 ## VRL
 FROM rust:1.81-alpine3.20 AS builder-rust-vrl
@@ -59,6 +60,7 @@ COPY --from=sources-rust-vrl /src /workspace
 WORKDIR /workspace/internal/ffi/vrl/rust-crate
 
 RUN cargo build --release
+RUN cargo test
 
 ##############################
 ## BUILD JS DEPENDENCIES
