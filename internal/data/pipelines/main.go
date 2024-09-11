@@ -8,6 +8,8 @@ import (
 	"link-society.com/flowg/internal/data/logstorage"
 )
 
+const DIRECT_ENTRYPOINT = "direct"
+
 type Runner struct {
 	ctx context.Context
 }
@@ -27,6 +29,10 @@ func NewRunner(
 	}
 }
 
-func (r *Runner) Run(pipeline *Pipeline, entry *logstorage.LogEntry) error {
-	return pipeline.Process(r.ctx, entry)
+func (r *Runner) Run(
+	pipeline *Pipeline,
+	entrypoint string,
+	entry *logstorage.LogEntry,
+) error {
+	return pipeline.Process(r.ctx, entrypoint, entry)
 }

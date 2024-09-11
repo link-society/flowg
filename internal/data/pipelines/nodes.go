@@ -121,7 +121,7 @@ func (n *PipelineNode) Process(ctx context.Context, entry *logstorage.LogEntry) 
 		return err
 	}
 
-	return pipeline.Process(ctx, entry)
+	return pipeline.Process(ctx, DIRECT_ENTRYPOINT, entry)
 }
 
 func (n *AlertNode) Process(ctx context.Context, entry *logstorage.LogEntry) error {
