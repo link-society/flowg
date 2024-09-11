@@ -28,13 +28,22 @@ import AlertNode from './nodes/AlertNode'
 import RouterNode from './nodes/RouterNode'
 import { useDnD } from '../dnd/context'
 
-const defaultSourceNode: Node = {
-  id: '__builtin__source',
-  type: 'source',
-  position: { x: 0, y: 0 },
-  deletable: false,
-  data: {},
-}
+const defaultSourceNodes: Node[] = [
+  {
+    id: '__builtin__source_direct',
+    type: 'source',
+    position: { x: 0, y: 0 },
+    deletable: false,
+    data: {type: 'direct'},
+  },
+  {
+    id: '__builtin__source_syslog',
+    type: 'source',
+    position: { x: 0, y: 50 },
+    deletable: false,
+    data: {type: 'syslog'},
+  },
+]
 
 interface FlowEditorProps {
   flow: string
@@ -58,7 +67,7 @@ const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange }) => {
   )
 
   const flowData = JSON.parse(flow) ?? {}
-  const initialNodes = flowData.nodes ?? [defaultSourceNode]
+  const initialNodes = flowData.nodes ?? defaultSourceNodes
   const initialEdges = flowData.edges ?? []
 
   const [nodes, setNodes] = useState<Node[]>(initialNodes)
@@ -70,7 +79,7 @@ const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange }) => {
   useEffect(
     () => {
       const flowData = JSON.parse(flow) ?? {}
-      const initialNodes = flowData.nodes ?? [defaultSourceNode]
+      const initialNodes = flowData.nodes ?? defaultSourceNodes
       const initialEdges = flowData.edges ?? []
 
       setNodes((oldNodes) => {

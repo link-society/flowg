@@ -1,8 +1,11 @@
 import React from 'react'
-import { Handle, Position, NodeProps } from '@xyflow/react'
+import { Handle, Position, Node, NodeProps } from '@xyflow/react'
 
+export type SourceNode = Node<{
+  type: string
+}>
 
-const SourceNode: React.FC<NodeProps> = ({}) => {
+const SourceNode: React.FC<NodeProps<SourceNode>> = ({ data }) => {
   return (
     <>
       <div
@@ -20,7 +23,7 @@ const SourceNode: React.FC<NodeProps> = ({}) => {
           <i className="material-icons small">input</i>
         </div>
         <div className="px-3 py-1 flex flex-row items-center">
-          <span className="font-semibold">Log Source</span>
+          <span className="font-semibold">{ data.type.toUpperCase() }</span>
         </div>
       </div>
       <Handle
