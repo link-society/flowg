@@ -78,7 +78,9 @@ func NewServeCommand() *cobra.Command {
 				}
 			}()
 
-			logDb, err := logstorage.NewStorage(opts.logDir)
+			logDb, err := logstorage.NewStorage(
+				logstorage.DefaultStorageOpts().WithDir(opts.logDir),
+			)
 			if err != nil {
 				slog.Error(
 					"Failed to open logs database",
