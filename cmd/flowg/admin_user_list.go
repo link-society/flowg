@@ -22,7 +22,9 @@ func NewAdminUserListCommand() *cobra.Command {
 		Use:   "list",
 		Short: "List existing users",
 		Run: func(cmd *cobra.Command, args []string) {
-			authDb, err := auth.NewDatabase(opts.authDir)
+			authDb, err := auth.NewDatabase(
+				auth.DefaultDatabaseOpts().WithDir(opts.authDir),
+			)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to open auth database:", err)
 				exitCode = 1
