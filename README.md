@@ -116,7 +116,7 @@ This will build `linksociety/flowg:latest` locally.
 Then, start the server with:
 
 ```bash
-docker run -p 5080:5080 -p 5514:5514 -v flowg-data:/data linksociety/flowg:latest serve
+docker run -p 5080:5080/tcp -p 5514:5514/udp -v flowg-data:/data linksociety/flowg:latest serve
 ```
 
 ## :memo: License
