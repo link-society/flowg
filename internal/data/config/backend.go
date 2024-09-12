@@ -108,7 +108,7 @@ func (b *memBackend) ListFiles(dir string) ([]string, error) {
 	for path := range b.files {
 		path = filepath.Clean(path)
 		if filepath.Dir(path) == dir {
-			items = append(items, path)
+			items = append(items, filepath.Base(path))
 		}
 	}
 
