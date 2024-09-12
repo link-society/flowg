@@ -30,7 +30,7 @@ func HashPassword(password string) (string, error) {
 
 	salt := make([]byte, hp.saltLength)
 	if _, err := rand.Read(salt); err != nil {
-		return "", &HashError{Reason: fmt.Errorf("failed to generate hash: %w", err)}
+		return "", fmt.Errorf("failed to generate hash: %w", err)
 	}
 
 	key := argon2.IDKey(
@@ -74,16 +74,16 @@ func VerifyPassword(password, hash string) (bool, error) {
 func decodeHash(hash string) (*hashParams, []byte, []byte, error) {
 	parts := strings.Split(hash, "$")
 	if len(parts) != 6 {
-		return nil, nil, nil, &HashError{Reason: fmt.Errorf("invalid hash format")}
+		return nil, nil, nil, fmt.Errorf("invalid hash format")
 	}
 
 	var version int
 	_, err := fmt.Sscanf(parts[2], "v=%d", &version)
 	if err != nil {
-		return nil, nil, nil, &HashError{Reason: fmt.Errorf("failed to decode hash: %w", err)}
+		return nil, nil, nil, fmt.Errorf("failed to decode hash: %w", err)
 	}
 	if version != argon2.Version {
-		return nil, nil, nil, &HashError{Reason: fmt.Errorf("incompatible version")}
+		return nil, nil, nil, fmt.Errorf("incompatible version")
 	}
 
 	hp := &hashParams{}
@@ -95,18 +95,18 @@ func decodeHash(hash string) (*hashParams, []byte, []byte, error) {
 		&hp.parallelism,
 	)
 	if err != nil {
-		return nil, nil, nil, &HashError{Reason: fmt.Errorf("failed to decode hash: %w", err)}
+		return nil, nil, nil, fmt.Errorf("failed to decode hash: %w", err)
 	}
 
 	salt, err := base64.RawStdEncoding.DecodeString(string(parts[4]))
 	if err != nil {
-		return nil, nil, nil, &HashError{Reason: fmt.Errorf("failed to decode salt: %w", err)}
+		return nil, nil, nil, fmt.Errorf("failed to decode salt: %w", err)
 	}
 	hp.saltLength = uint32(len(salt))
 
 	key, err := base64.RawStdEncoding.DecodeString(string(parts[5]))
 	if err != nil {
-		return nil, nil, nil, &HashError{Reason: fmt.Errorf("failed to decode key: %w", err)}
+		return nil, nil, nil, fmt.Errorf("failed to decode key: %w", err)
 	}
 	hp.keyLength = uint32(len(key))
 
