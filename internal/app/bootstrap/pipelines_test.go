@@ -30,4 +30,9 @@ func TestDefaultPipeline(t *testing.T) {
 	if pipelines[0] != "default" {
 		t.Fatalf("expected pipeline name to be default, got %s", pipelines[0])
 	}
+
+	_, err = pipelineSys.Parse("default")
+	if err != nil {
+		t.Fatalf("failed to parse default pipeline: %v", err)
+	}
 }
