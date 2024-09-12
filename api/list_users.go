@@ -12,7 +12,7 @@ import (
 type ListUsersRequest struct{}
 type ListUsersResponse struct {
 	Success bool        `json:"success"`
-	Users   []auth.User `json:"Users"`
+	Users   []auth.User `json:"users"`
 }
 
 func ListUsersUsecase(authDb *auth.Database) usecase.Interactor {
