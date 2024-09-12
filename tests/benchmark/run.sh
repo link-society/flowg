@@ -2,6 +2,6 @@
 
 set -e
 
-. ../start_flowg.sh
+. ../flowg.sh
 
-python generate-logs.py --token $FLOWG_TOKEN
+python generate-logs.py --token $FLOWG_ADMIN_TOKEN
