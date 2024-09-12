@@ -34,8 +34,13 @@ type Database struct {
 }
 
 func NewDatabase(opts DatabaseOpts) (*Database, error) {
+	var dbDir string
+	if !opts.inMemory {
+		dbDir = opts.dir
+	}
+
 	dbOpts := badger.
-		DefaultOptions(opts.dir).
+		DefaultOptions(dbDir).
 		WithLogger(&logging.BadgerLogger{Channel: "authdb"}).
 		WithCompression(options.ZSTD).
 		WithInMemory(opts.inMemory)
