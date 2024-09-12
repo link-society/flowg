@@ -200,6 +200,10 @@ func getOrCreateStreamConfig(txn *badger.Txn, stream string) (StreamConfig, erro
 		}
 	}
 
+	if streamConfig.IndexedFields == nil {
+		streamConfig.IndexedFields = []string{}
+	}
+
 	return streamConfig, nil
 }
 
