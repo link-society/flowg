@@ -8,11 +8,22 @@ tasks:
       - task: "gen:js"
       - go build -o bin/ ./...
 
-  test:
-    desc: "Run tests"
+  run:
+    desc: "Run the project"
+    cmds:
+      - ./bin/flowg serve {{.CLI_ARGS}}
+
+  "test:unit":
+    desc: "Run unit tests"
     cmds:
       - task: "test:go"
       - task: "test:rust"
+
+  "test:e2e":
+    desc: "Run end-to-end tests"
+    dir: ./tests/e2e
+    cmds:
+      - sh run.sh
 
   doc:
     desc: "Generate documentation"
