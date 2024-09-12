@@ -12,7 +12,6 @@ type PipelineSystem struct {
 }
 
 func NewPipelineSystem(backend *Storage) *PipelineSystem {
-	backend.resolveStorageTypeDir(PIPELINES_STORAGE_TYPE)
 	return &PipelineSystem{backend: backend}
 }
 

@@ -108,7 +108,9 @@ func NewServeCommand() *cobra.Command {
 			logNotifier.Start()
 			defer logNotifier.Stop()
 
-			configStorage := config.NewStorage(opts.configDir)
+			configStorage := config.NewStorage(
+				config.DefaultStorageOpts().WithDir(opts.configDir),
+			)
 
 			if err := bootstrap.DefaultRolesAndUsers(authDb); err != nil {
 				slog.Error(

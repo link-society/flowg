@@ -16,7 +16,6 @@ type AlertSystem struct {
 }
 
 func NewAlertSystem(backend *Storage) *AlertSystem {
-	backend.resolveStorageTypeDir(ALERTS_STORAGE_TYPE)
 	return &AlertSystem{backend: backend}
 }
 
