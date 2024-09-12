@@ -63,15 +63,6 @@ Result:
  - **Total time:** 481.65s
  - **Average:** 2076.18 request/s
 
-## :warning: Disclaimer
-
-This project is in a very early stage of development, as such:
-
- - it has not been tested in production
- - not even an automated test suite
-
-Those points will be improved on given enough time.
-
 ## :construction: Build
 
 **Requirements:**
