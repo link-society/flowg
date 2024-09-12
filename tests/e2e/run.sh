@@ -2,6 +2,9 @@
 
 set -e
 
-. ../start_flowg.sh
+. ../flowg.sh
 
-hurl --variable token=${FLOWG_TOKEN} --test specs/
+hurl \
+  --variable admin_token=${FLOWG_ADMIN_TOKEN} \
+  --variable guest_token=${FLOWG_GUEST_TOKEN} \
+  --test specs/
