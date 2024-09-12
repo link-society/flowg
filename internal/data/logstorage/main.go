@@ -38,8 +38,13 @@ type Storage struct {
 }
 
 func NewStorage(opts StorageOpts) (*Storage, error) {
+	var dbDir string
+	if !opts.inMemory {
+		dbDir = opts.dir
+	}
+
 	dbOpts := badger.
-		DefaultOptions(opts.dir).
+		DefaultOptions(dbDir).
 		WithLogger(&logging.BadgerLogger{Channel: "logstorage"}).
 		WithCompression(options.ZSTD).
 		WithInMemory(opts.inMemory)
