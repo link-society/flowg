@@ -89,7 +89,7 @@ RUN npm run build
 FROM golang:1.23-alpine3.20 AS builder-go
 
 RUN apk add --no-cache gcc musl-dev
-RUN go install github.com/a-h/templ/cmd/templ@v0.2.771
+RUN go install github.com/a-h/templ/cmd/templ@v0.2.778
 
 COPY --from=sources-go /src /workspace
 COPY --from=builder-rust-filterdsl /workspace/internal/ffi/filterdsl/rust-crate/target/release/libflowg_filterdsl.a /workspace/internal/ffi/filterdsl/rust-crate/target/release/libflowg_filterdsl.a
