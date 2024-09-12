@@ -7,17 +7,40 @@ import (
 	"link-society.com/flowg/internal/app/logging"
 )
 
+type DatabaseOpts struct {
+	dir      string
+	inMemory bool
+}
+
+func DefaultDatabaseOpts() DatabaseOpts {
+	return DatabaseOpts{
+		dir:      "./data/auth",
+		inMemory: false,
+	}
+}
+
+func (d DatabaseOpts) WithDir(dir string) DatabaseOpts {
+	d.dir = dir
+	return d
+}
+
+func (d DatabaseOpts) WithInMemory(inMemory bool) DatabaseOpts {
+	d.inMemory = inMemory
+	return d
+}
+
 type Database struct {
 	db *badger.DB
 }
 
-func NewDatabase(dbPath string) (*Database, error) {
-	opts := badger.
-		DefaultOptions(dbPath).
+func NewDatabase(opts DatabaseOpts) (*Database, error) {
+	dbOpts := badger.
+		DefaultOptions(opts.dir).
 		WithLogger(&logging.BadgerLogger{Channel: "authdb"}).
-		WithCompression(options.ZSTD)
+		WithCompression(options.ZSTD).
+		WithInMemory(opts.inMemory)
 
-	db, err := badger.Open(opts)
+	db, err := badger.Open(dbOpts)
 	if err != nil {
 		return nil, err
 	}

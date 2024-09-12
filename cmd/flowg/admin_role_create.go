@@ -38,7 +38,9 @@ func NewAdminRoleCreateCommand() *cobra.Command {
 				role.Scopes[i] = scope
 			}
 
-			authDb, err := auth.NewDatabase(opts.authDir)
+			authDb, err := auth.NewDatabase(
+				auth.DefaultDatabaseOpts().WithDir(opts.authDir),
+			)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to open auth database:", err)
 				exitCode = 1

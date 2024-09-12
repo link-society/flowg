@@ -52,7 +52,9 @@ func NewServeCommand() *cobra.Command {
 			metrics.Setup()
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			authDb, err := auth.NewDatabase(opts.authDir)
+			authDb, err := auth.NewDatabase(
+				auth.DefaultDatabaseOpts().WithDir(opts.authDir),
+			)
 			if err != nil {
 				slog.Error(
 					"Failed to open auth database",
