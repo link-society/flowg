@@ -2,55 +2,59 @@ package config
 
 import (
 	"io"
-	"os"
 	"path/filepath"
 )
 
+type StorageOpts struct {
+	dir      string
+	inMemory bool
+}
+
+func DefaultStorageOpts() StorageOpts {
+	return StorageOpts{
+		dir:      "./data/config",
+		inMemory: false,
+	}
+}
+
+func (s StorageOpts) WithDir(dir string) StorageOpts {
+	s.dir = dir
+	return s
+}
+
+func (s StorageOpts) WithInMemory(inMemory bool) StorageOpts {
+	s.inMemory = inMemory
+	return s
+}
+
 type Storage struct {
-	Dir string
+	backend backend
 }
 
-func NewStorage(dir string) *Storage {
-	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		os.MkdirAll(dir, os.ModePerm)
+func NewStorage(opts StorageOpts) *Storage {
+	var b backend
+
+	if opts.inMemory {
+		b = newMemBackend()
+	} else {
+		b = newFsBackend(opts.dir)
 	}
 
-	return &Storage{Dir: dir}
-}
-
-func (s *Storage) resolveStorageTypeDir(storageType string) string {
-	storageDir := filepath.Join(s.Dir, storageType)
-	if _, err := os.Stat(storageDir); os.IsNotExist(err) {
-		os.Mkdir(storageDir, os.ModePerm)
+	if !b.PathExist("") {
+		b.MakePath("")
 	}
 
-	return storageDir
+	return &Storage{backend: b}
 }
 
 func (s *Storage) listStorageTypeItems(storageType string) ([]string, error) {
-	storageDir := s.resolveStorageTypeDir(storageType)
-
-	files, err := os.ReadDir(storageDir)
-	if err != nil {
-		return nil, err
-	}
-
-	items := []string{}
-
-	for _, file := range files {
-		if !file.IsDir() {
-			item := file.Name()
-			items = append(items, item)
-		}
-	}
-
-	return items, nil
+	s.backend.MakePath(storageType)
+	return s.backend.ListFiles(storageType)
 }
 
-func (s *Storage) openStorageTypeItem(storageType, name string) (*os.File, error) {
-	storageDir := s.resolveStorageTypeDir(storageType)
-	filePath := filepath.Join(storageDir, name)
-	return os.Open(filePath)
+func (s *Storage) openStorageTypeItem(storageType, name string) (io.ReadCloser, error) {
+	s.backend.MakePath(storageType)
+	return s.backend.OpenFile(filepath.Join(storageType, name))
 }
 
 func (s *Storage) readStorageTypeItem(storageType, name string) (string, error) {
@@ -69,13 +73,11 @@ func (s *Storage) readStorageTypeItem(storageType, name string) (string, error) 
 }
 
 func (s *Storage) writeStorageTypeItem(storageType, name, content string) error {
-	storageDir := s.resolveStorageTypeDir(storageType)
-	filePath := filepath.Join(storageDir, name)
-	return os.WriteFile(filePath, []byte(content), os.ModePerm)
+	s.backend.MakePath(storageType)
+	return s.backend.WriteFile(filepath.Join(storageType, name), []byte(content))
 }
 
 func (s *Storage) deleteStorageTypeItem(storageType, name string) error {
-	storageDir := s.resolveStorageTypeDir(storageType)
-	filePath := filepath.Join(storageDir, name)
-	return os.Remove(filePath)
+	s.backend.MakePath(storageType)
+	return s.backend.DeleteFile(filepath.Join(storageType, name))
 }

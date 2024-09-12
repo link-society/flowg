@@ -9,7 +9,6 @@ type TransformerSystem struct {
 }
 
 func NewTransformerSystem(backend *Storage) *TransformerSystem {
-	backend.resolveStorageTypeDir(TRANSFORMERS_STORAGE_TYPE)
 	return &TransformerSystem{backend: backend}
 }
 
