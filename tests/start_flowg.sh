@@ -3,8 +3,9 @@
 set -e
 
 FLOWG_CMD="docker run --rm -v ./data:/data -p 5080:5080/tcp -p 5514:5514/udp linksociety/flowg:latest"
+FLOWG_CMD_BG="docker run -d --rm -v ./data:/data -p 5080:5080/tcp -p 5514:5514/udp linksociety/flowg:latest"
 
-sudo rm -rf logs.txt data/logs data/auth
+sudo rm -rf data/logs data/auth
 
 ${FLOWG_CMD} admin role create --name admin \
   write_streams \
@@ -20,9 +21,8 @@ export FLOWG_TOKEN=$(
   ${FLOWG_CMD} admin token create --user root
 )
 
-${FLOWG_CMD} serve --verbose > logs.txt &
-pid=$!
-trap "kill $pid" EXIT
+DOCKER_CONTAINER_ID=$(${FLOWG_CMD_BG} serve)
+trap "docker kill ${DOCKER_CONTAINER_ID} >/dev/null" EXIT
 
 echo -n "Waiting for Flowg to start..."
 for _ in $(seq 1 10)
