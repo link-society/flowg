@@ -48,4 +48,10 @@ jobs:
         with:
           report_paths: "./tests/e2e/reports/junit.xml"
           include_passed: true
+          job_summary: true
+          detailed_summary: true
+          flaky_summary: true
+          comment: true
+          updateComment: true
+          annotate_notice: true
           fail_on_failure: true
