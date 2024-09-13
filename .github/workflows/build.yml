@@ -48,6 +48,7 @@ jobs:
         with:
           report_paths: "./tests/e2e/reports/junit.xml"
           include_passed: true
+          check_name: "End-To-End Test Report"
           job_summary: true
           detailed_summary: true
           flaky_summary: true
