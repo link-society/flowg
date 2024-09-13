@@ -21,16 +21,18 @@ func NewTokenSystem(backend *Database) *TokenSystem {
 	return &TokenSystem{backend: backend}
 }
 
-func (sys *TokenSystem) CreateToken(username string) (string, error) {
+func (sys *TokenSystem) CreateToken(username string) (string, string, error) {
 	token, err := newToken(32)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	tokenHash, err := hash.HashPassword(token)
 	if err != nil {
-		return "", fmt.Errorf("failed to hash token: %w", err)
+		return "", "", fmt.Errorf("failed to hash token: %w", err)
 	}
+
+	tokenUuid := uuid.New().String()
 
 	err = sys.backend.db.Update(func(txn *badger.Txn) error {
 		userKey := []byte(fmt.Sprintf("index:user:%s", username))
@@ -43,7 +45,7 @@ func (sys *TokenSystem) CreateToken(username string) (string, error) {
 			return fmt.Errorf("failed to check if user '%s' exists: %w", username, err)
 		}
 
-		tokenKey := []byte(fmt.Sprintf("pat:%s:%s", username, uuid.New().String()))
+		tokenKey := []byte(fmt.Sprintf("pat:%s:%s", username, tokenUuid))
 		err = txn.Set(tokenKey, []byte(tokenHash))
 		if err != nil {
 			return fmt.Errorf("failed to add token to user '%s': %w", username, err)
@@ -53,10 +55,10 @@ func (sys *TokenSystem) CreateToken(username string) (string, error) {
 	})
 
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	return token, nil
+	return token, tokenUuid, nil
 }
 
 func (sys *TokenSystem) VerifyToken(token string) (*User, error) {

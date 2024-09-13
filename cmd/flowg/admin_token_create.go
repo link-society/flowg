@@ -54,7 +54,7 @@ func NewAdminTokenCreateCommand() *cobra.Command {
 				return
 			}
 
-			token, err := tokenSys.CreateToken(user.Name)
+			token, _, err := tokenSys.CreateToken(user.Name)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to generate token:", err)
 				exitCode = 1
