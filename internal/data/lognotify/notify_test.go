@@ -2,8 +2,10 @@ package lognotify_test
 
 import (
 	"reflect"
-	"sync"
 	"testing"
+
+	"sync"
+	"time"
 
 	"link-society.com/flowg/internal/data/logstorage"
 
@@ -15,11 +17,12 @@ func TestLogNotifier(t *testing.T) {
 	notifier.Start()
 	defer notifier.Stop()
 
-	doneC := make(chan struct{})
-	logC := notifier.Subscribe("test", doneC)
+	logDoneC := make(chan struct{})
+	logC := notifier.Subscribe("test", logDoneC)
 
 	logEntry := logstorage.NewLogEntry(map[string]string{})
 
+	wgDoneC := make(chan struct{})
 	wg := sync.WaitGroup{}
 	wg.Add(2)
 
@@ -34,7 +37,17 @@ func TestLogNotifier(t *testing.T) {
 		result = <-logC
 	}()
 
-	wg.Wait()
+	go func() {
+		wg.Wait()
+		wgDoneC <- struct{}{}
+		close(wgDoneC)
+	}()
+
+	select {
+	case <-wgDoneC:
+	case <-time.After(5 * time.Second):
+		t.Fatalf("timed out waiting for log")
+	}
 
 	if result.Stream != "test" {
 		t.Fatalf("unexpected stream: %s", result.Stream)
@@ -48,6 +61,6 @@ func TestLogNotifier(t *testing.T) {
 		t.Fatalf("unexpected log entry: %v", result.LogEntry)
 	}
 
-	doneC <- struct{}{}
-	close(doneC)
+	logDoneC <- struct{}{}
+	close(logDoneC)
 }
