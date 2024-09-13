@@ -5,7 +5,7 @@ FLOWG_CMD_BG="docker run -d --rm -v ./data:/data -p 5080:5080/tcp -p 5514:5514/u
 
 flowg_cleanup_data() {
   echo -n "Cleaning up data..."
-  sudo rm -rf data/logs data/auth
+  sudo rm -rf ./data/
   echo " ok"
 }
 
@@ -36,7 +36,7 @@ flowg_start() {
   echo -n "Starting FlowG..."
 
   DOCKER_CONTAINER_ID=$(${FLOWG_CMD_BG} serve)
-  trap "docker kill ${DOCKER_CONTAINER_ID} >/dev/null" EXIT
+  trap "docker kill ${DOCKER_CONTAINER_ID} >/dev/null && flowg_cleanup_data" EXIT
 
   for _ in $(seq 1 10)
   do
