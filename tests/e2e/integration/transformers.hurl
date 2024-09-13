@@ -19,6 +19,14 @@ HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 
+GET http://localhost:5080/api/v1/transformers
+Authorization: Bearer {{admin_token}}
+HTTP 200
+[Asserts]
+jsonpath "$.success" == true
+jsonpath "$.transformers" count == 1
+jsonpath "$.transformers[0]" == "logfmt"
+
 GET http://localhost:5080/api/v1/transformers/logfmt
 Authorization: Bearer {{admin_token}}
 HTTP 200
