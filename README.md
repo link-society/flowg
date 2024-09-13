@@ -1,6 +1,7 @@
 # FlowG
 
-[![build](https://github.com/link-society/flowg/actions/workflows/build.yml/badge.svg)](https://github.com/link-society/flowg/actions/workflows/build.yml)
+[![Build Status](https://github.com/link-society/flowg/actions/workflows/build.yml/badge.svg)](https://github.com/link-society/flowg/actions/workflows/build.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=link-society_flowg&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=link-society_flowg)
 
 FlowG is a log management platform that lets you ingest, transform, and query
 logs using a visual pipeline builder. It handles structured logs without
