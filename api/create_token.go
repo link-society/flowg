@@ -13,8 +13,9 @@ import (
 type CreateTokenRequest struct{}
 
 type CreateTokenResponse struct {
-	Success bool   `json:"success"`
-	Token   string `json:"token"`
+	Success   bool   `json:"success"`
+	Token     string `json:"token"`
+	TokenUUID string `json:"token-uuid"`
 }
 
 func CreateTokenUsecase(authDb *auth.Database) usecase.Interactor {
@@ -28,7 +29,7 @@ func CreateTokenUsecase(authDb *auth.Database) usecase.Interactor {
 		) error {
 			user := auth.GetContextUser(ctx)
 
-			token, err := tokenSys.CreateToken(user.Name)
+			token, tokenUuid, err := tokenSys.CreateToken(user.Name)
 			if err != nil {
 				slog.ErrorContext(
 					ctx,
@@ -44,6 +45,7 @@ func CreateTokenUsecase(authDb *auth.Database) usecase.Interactor {
 
 			resp.Success = true
 			resp.Token = token
+			resp.TokenUUID = tokenUuid
 
 			return nil
 		},

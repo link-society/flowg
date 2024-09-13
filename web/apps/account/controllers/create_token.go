@@ -21,7 +21,7 @@ func CreateToken(
 		r = r.WithContext(webutils.WithNotificationSystem(r.Context()))
 
 		user := auth.GetContextUser(r.Context())
-		token, err := tokenSys.CreateToken(user.Name)
+		token, _, err := tokenSys.CreateToken(user.Name)
 		if err != nil {
 			webutils.LogError(r.Context(), "Failed to create token", err)
 			webutils.NotifyError(r.Context(), "Could not create token")
