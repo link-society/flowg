@@ -50,9 +50,6 @@ jobs:
           include_passed: true
           check_name: "End-To-End Test Report"
           job_summary: true
-          detailed_summary: true
-          flaky_summary: true
           comment: true
           updateComment: true
-          annotate_notice: true
           fail_on_failure: true
