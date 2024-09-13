@@ -41,3 +41,10 @@ jobs:
       - name: e2e@test
         working-directory: ./tests/e2e
         run: sh ./run.sh
+
+      - name: report@test
+        uses: mikepenz/action-junit-report@v4
+        if: ${{ github.event_name == 'pull_request' && (success() || failure()) }}
+        with:
+          report_paths: "./tests/e2e/reports/junit.xml"
+          fail_on_failure: true
