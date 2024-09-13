@@ -31,7 +31,7 @@ func SaveRoleUsecase(authDb *auth.Database) usecase.Interactor {
 				req SaveRoleRequest,
 				resp *SaveRoleResponse,
 			) error {
-				scopes := make([]auth.Scope, 0, len(req.Scopes))
+				scopes := make([]auth.Scope, len(req.Scopes))
 
 				for i, scopeName := range req.Scopes {
 					scope, err := auth.ParseScope(scopeName)
