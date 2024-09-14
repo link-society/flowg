@@ -6,6 +6,8 @@ tasks:
     dir: ./web/app
     cmds:
       - npm i
-      - npm run build
+      - npm run build:dev
       - mkdir -p ../public
       - cp -r ./dist/* ../public/
+    env:
+      NODE_ENV: dev

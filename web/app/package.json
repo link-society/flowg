@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "tsc -b && vite build",
+    "build:dev": "tsc -b && vite build --mode development",
     "lint": "eslint ."
   },
   "dependencies": {
