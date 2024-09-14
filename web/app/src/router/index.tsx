@@ -4,7 +4,7 @@ import BaseLayout from '@/layouts/base'
 
 export default createBrowserRouter([
   {
-    path: '/app/',
+    path: '/web/',
     element: <BaseLayout />,
     children: [
       {
