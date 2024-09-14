@@ -1,5 +1,5 @@
 GET http://localhost:5080/api/v1/pipelines
-Authorization: Bearer {{admin_token}}
+Authorization: Basic {{admin_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true
@@ -7,18 +7,18 @@ jsonpath "$.pipelines" count == 1
 jsonpath "$.pipelines[0]" == "default"
 
 GET http://localhost:5080/api/v1/pipelines/default
-Authorization: Bearer {{admin_token}}
+Authorization: Basic {{admin_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 jsonpath "$.flow" exists
 
 GET http://localhost:5080/api/v1/pipelines/test
-Authorization: Bearer {{admin_token}}
+Authorization: Basic {{admin_token}}
 HTTP 404
 
 PUT http://localhost:5080/api/v1/pipelines/test
-Authorization: Bearer {{admin_token}}
+Authorization: Basic {{admin_token}}
 Content-Type: application/json
 {
   "flow": {
@@ -76,7 +76,7 @@ HTTP 200
 jsonpath "$.success" == true
 
 GET http://localhost:5080/api/v1/pipelines
-Authorization: Bearer {{admin_token}}
+Authorization: Basic {{admin_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true
@@ -85,7 +85,7 @@ jsonpath "$.pipelines" includes "default"
 jsonpath "$.pipelines" includes "test"
 
 POST http://localhost:5080/api/v1/pipelines/test/logs
-Authorization: Bearer {{admin_token}}
+Authorization: Basic {{admin_token}}
 Content-Type: application/json
 {
   "record": {
@@ -96,7 +96,7 @@ Content-Type: application/json
 HTTP 200
 
 GET http://localhost:5080/api/v1/streams/test/logs
-Authorization: Bearer {{admin_token}}
+Authorization: Basic {{admin_token}}
 [QueryStringParams]
 from: {{timewindow_begin}}
 to: {{timewindow_end}}
@@ -109,23 +109,23 @@ jsonpath "$.records[0].fields.level" == "info"
 jsonpath "$.records[0].fields.message" == "test"
 
 DELETE http://localhost:5080/api/v1/streams/test
-Authorization: Bearer {{admin_token}}
+Authorization: Basic {{admin_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 
 DELETE http://localhost:5080/api/v1/pipelines/test
-Authorization: Bearer {{admin_token}}
+Authorization: Basic {{admin_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 
 GET http://localhost:5080/api/v1/pipelines/test
-Authorization: Bearer {{admin_token}}
+Authorization: Basic {{admin_token}}
 HTTP 404
 
 GET http://localhost:5080/api/v1/pipelines
-Authorization: Bearer {{admin_token}}
+Authorization: Basic {{admin_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true

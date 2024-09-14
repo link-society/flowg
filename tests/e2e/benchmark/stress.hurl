@@ -1,5 +1,5 @@
 POST http://localhost:5080/api/v1/pipelines/default/logs
-Authorization: Bearer {{admin_token}}
+Authorization: Basic {{admin_token}}
 Content-Type: application/json
 {
   "record": {

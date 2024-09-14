@@ -2,11 +2,11 @@ GET http://localhost:5080/api/v1/auth/whoami
 HTTP 401
 
 GET http://localhost:5080/api/v1/auth/whoami
-Authorization: Bearer {{admin_token}}
+Authorization: Basic {{admin_token}}
 HTTP 200
 
 GET http://localhost:5080/api/v1/auth/whoami
-Authorization: Bearer {{guest_token}}
+Authorization: Basic {{guest_token}}
 HTTP 200
 
 POST http://localhost:5080/api/v1/auth/login
@@ -17,13 +17,12 @@ Content-Type: application/json
 }
 HTTP 200
 [Captures]
-session_id: cookie "session_id"
+jwt: jsonpath "$.token"
 [Asserts]
 jsonpath "$.success" == true
 
 GET http://localhost:5080/api/v1/auth/whoami
-[Cookies]
-session_id: {{session_id}}
+Authorization: Bearer {{jwt}}
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true
