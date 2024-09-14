@@ -15,8 +15,6 @@ import (
 //go:embed public/index.html
 var staticfiles embed.FS
 
-//go:generate templ generate
-
 func NewHandler() http.Handler {
 	mux := http.NewServeMux()
 
