@@ -17,8 +17,8 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	Success   bool   `json:"success"`
-	SessionID string `cookie:"session_id,httponly,max-age=86400,path=/"`
+	Success bool   `json:"success"`
+	Token   string `json:"token"`
 }
 
 func LoginUsecase(authDb *auth.Database) usecase.Interactor {
@@ -48,8 +48,22 @@ func LoginUsecase(authDb *auth.Database) usecase.Interactor {
 				return status.Wrap(errors.New("invalid credentials"), status.Unauthenticated)
 
 			case valid:
+				token, err := auth.NewJWT(req.Username)
+				if err != nil {
+					slog.ErrorContext(
+						ctx,
+						"Failed to create JWT",
+						"channel", "api",
+						"username", req.Username,
+						"error", err.Error(),
+					)
+
+					resp.Success = false
+					return status.Wrap(err, status.Unauthenticated)
+				}
+
 				resp.Success = true
-				resp.SessionID = req.Username
+				resp.Token = token
 			}
 
 			return nil
