@@ -1,0 +1,22 @@
+version: '3'
+
+tasks:
+  build:
+    internal: true
+    cmds:
+      - task: "build:rust:vrl"
+      - task: "build:rust:filterdsl"
+      - go get ./...
+      - go build -o bin/ ./...
+
+  "build:rust:vrl":
+    internal: true
+    dir: ./internal/ffi/vrl/rust-crate
+    cmds:
+      - cargo build --release
+
+  "build:rust:filterdsl":
+    internal: true
+    dir: ./internal/ffi/filterdsl/rust-crate
+    cmds:
+      - cargo build --release

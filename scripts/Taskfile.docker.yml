@@ -1,0 +1,7 @@
+version: '3'
+
+tasks:
+  build:
+    desc: "Build the docker image"
+    cmds:
+      - docker build -t linksociety/flowg:latest -f docker/flowg.dockerfile .
