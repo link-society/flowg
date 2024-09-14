@@ -142,7 +142,7 @@ func NewServeCommand() *cobra.Command {
 			defer syslogServer.Stop()
 
 			apiHandler := api.NewHandler(authDb, logDb, configStorage, logNotifier)
-			webHandler := web.NewHandler(authDb, logDb, configStorage)
+			webHandler := web.NewHandler()
 			metricsHandler := promhttp.Handler()
 
 			rootHandler := http.NewServeMux()
@@ -154,11 +154,8 @@ func NewServeCommand() *cobra.Command {
 				},
 			)
 			rootHandler.Handle("/metrics", metricsHandler)
-
 			rootHandler.Handle("/api/", apiHandler)
-			rootHandler.Handle("/auth/", webHandler)
 			rootHandler.Handle("/web/", webHandler)
-			rootHandler.Handle("/static/", webHandler)
 
 			rootHandler.HandleFunc(
 				"GET /{$}",
