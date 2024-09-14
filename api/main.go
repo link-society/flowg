@@ -34,11 +34,16 @@ func NewHandler(
 	service.Post("/api/v1/auth/login", LoginUsecase(authDb))
 
 	service.With(
+		nethttp.HTTPBasicSecurityMiddleware(
+			service.OpenAPICollector,
+			"patAuth",
+			"Authentication using Personal Access Token",
+		),
 		nethttp.HTTPBearerSecurityMiddleware(
 			service.OpenAPICollector,
-			"tokenAuth",
-			"Authentication using Personal Access Token",
-			"PAT",
+			"jwtAuth",
+			"Authentication using JSON Web Token",
+			"JWT",
 		),
 		auth.ApiMiddleware(authDb),
 	).Group(func(router chi.Router) {
@@ -96,7 +101,6 @@ func NewHandler(
 		r.Put("/api/v1/users/{user}", SaveUserUsecase(authDb))
 		r.Delete("/api/v1/users/{user}", DeleteUserUsecase(authDb))
 
-		r.Post("/api/v1/auth/logout", LogoutUsecase(authDb))
 		r.Get("/api/v1/auth/whoami", WhoamiUsecase(authDb))
 
 		r.Get("/api/v1/tokens", ListTokensUsecase(authDb))
