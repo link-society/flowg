@@ -2,9 +2,9 @@
 /data/
 /internal/ffi/filterdsl/rust-crate/target/
 /internal/ffi/vrl/rust-crate/target/
-/web/static/webcomponents/
-/web/components/floweditor/node_modules/
-/web/components/code-editor/node_modules/
+/web/public/
+/web/app/node_modules/
+/web/app/dist/
 /docs/
 /scripts/
 /LICENSE.txt
@@ -12,3 +12,5 @@
 /CONTRIBUTING.md
 /SECURITY.md
 .git*
+*.tsbuildinfo
+*.log

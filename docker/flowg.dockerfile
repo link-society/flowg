@@ -15,18 +15,13 @@ ADD internal/integrations /src/internal/integrations
 ADD internal/webutils /src/internal/webutils
 ADD --exclude=internal/ffi/filterdsl/rust-crate internal/ffi/filterdsl /src/internal/ffi/filterdsl
 ADD --exclude=internal/ffi/vrl/rust-crate internal/ffi/vrl /src/internal/ffi/vrl
-ADD --exclude=web/components web /src/web
+ADD --exclude=web/app web /src/web
 ADD go.mod go.sum /src/
 
-## FlowEditor sources
-FROM scratch AS sources-js-floweditor
+## JS sources
+FROM scratch AS sources-js
 
-ADD web/components/floweditor /src/web/components/floweditor
-
-## CodeEditor sources
-FROM scratch AS sources-js-code-editor
-
-ADD web/components/code-editor /src/web/components/code-editor
+ADD web/app /src/web/app
 
 ## FilterDSL sources
 FROM scratch AS sources-rust-filterdsl
@@ -66,18 +61,9 @@ RUN cargo test
 ## BUILD JS DEPENDENCIES
 ##############################
 
-## FlowEditor
-FROM node:22-alpine3.20 AS builder-js-floweditor
-COPY --from=sources-js-floweditor /src /workspace
-WORKDIR /workspace/web/components/floweditor
-
-RUN npm i
-RUN npm run build
-
-## CodeEditor
-FROM node:22-alpine3.20 AS builder-js-code-editor
-COPY --from=sources-js-code-editor /src /workspace
-WORKDIR /workspace/web/components/code-editor
+FROM node:22-alpine3.20 AS builder-js
+COPY --from=sources-js /src /workspace
+WORKDIR /workspace/web/app
 
 RUN npm i
 RUN npm run build
@@ -94,11 +80,9 @@ RUN go install github.com/a-h/templ/cmd/templ@v0.2.778
 COPY --from=sources-go /src /workspace
 COPY --from=builder-rust-filterdsl /workspace/internal/ffi/filterdsl/rust-crate/target/release/libflowg_filterdsl.a /workspace/internal/ffi/filterdsl/rust-crate/target/release/libflowg_filterdsl.a
 COPY --from=builder-rust-vrl /workspace/internal/ffi/vrl/rust-crate/target/release/libflowg_vrl.a /workspace/internal/ffi/vrl/rust-crate/target/release/libflowg_vrl.a
-COPY --from=builder-js-floweditor /workspace/web/static /workspace/web/static
-COPY --from=builder-js-code-editor /workspace/web/static /workspace/web/static
+COPY --from=builder-js /workspace/web/app/dist /workspace/web/public
 WORKDIR /workspace
 
-RUN go generate ./...
 RUN go build -o bin/ ./...
 RUN go test -v ./...
 
