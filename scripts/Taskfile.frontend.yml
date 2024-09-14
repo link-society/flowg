@@ -1,0 +1,11 @@
+version: '3'
+
+tasks:
+  build:
+    internal: true
+    dir: ./web/app
+    cmds:
+      - npm i
+      - npm run build
+      - mkdir -p ../public
+      - cp -r ./dist/* ../public/

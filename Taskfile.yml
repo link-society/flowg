@@ -1,128 +1,24 @@
 version: '3'
 
+includes:
+  test: scripts/Taskfile.test.yml
+  backend: scripts/Taskfile.backend.yml
+  frontend: scripts/Taskfile.frontend.yml
+  docker: scripts/Taskfile.docker.yml
+
 tasks:
   build:
     desc: "Build the project"
     cmds:
-      - task: "gen:go"
-      - task: "gen:js"
-      - go build -o bin/ ./...
+      - task: "backend:build"
+      - task: "frontend:build"
 
   run:
     desc: "Run the project"
     cmds:
       - ./bin/flowg serve {{.CLI_ARGS}}
 
-  "test:unit":
-    desc: "Run unit tests"
-    cmds:
-      - task: "test:go"
-      - task: "test:rust"
-
-  "test:e2e":
-    desc: "Run end-to-end tests"
-    dir: ./tests/e2e
-    cmds:
-      - sh run.sh
-
   doc:
     desc: "Generate documentation"
     cmds:
       - sh scripts/gen_cli_doc.sh
-
-  "docker:build":
-    desc: "Build the docker image"
-    cmds:
-      - docker build -t linksociety/flowg:latest -f docker/flowg.dockerfile .
-
-  bench:
-    desc: "Run benchmark"
-    dir: ./tests/benchmark
-    cmds:
-      - sh run.sh
-
-  "gen:go":
-    internal: true
-    cmds:
-      - task: "deps:go"
-      - task: "gen:rust"
-      - go generate ./...
-
-  "gen:rust":
-    internal: true
-    cmds:
-      - task: "gen:rust:vrl"
-      - task: "gen:rust:filterdsl"
-
-  "gen:rust:vrl":
-    internal: true
-    dir: ./internal/ffi/vrl/rust-crate
-    cmds:
-      - cargo build --release
-
-  "gen:rust:filterdsl":
-    internal: true
-    dir: ./internal/ffi/filterdsl/rust-crate
-    cmds:
-      - cargo build --release
-
-  "gen:js":
-    internal: true
-    cmds:
-      - task: "gen:js:floweditor"
-      - task: "gen:js:code-editor"
-
-  "gen:js:floweditor":
-    internal: true
-    dir: ./web/components/floweditor
-    cmds:
-      - task: "deps:js:floweditor"
-      - npm run build
-
-  "gen:js:code-editor":
-    internal: true
-    dir: ./web/components/code-editor
-    cmds:
-      - task: "deps:js:code-editor"
-      - npm run build
-
-  "deps:go":
-    internal: true
-    cmds:
-      - go install github.com/a-h/templ/cmd/templ@v0.2.778
-      - go get ./...
-
-  "deps:js:floweditor":
-    internal: true
-    dir: ./web/components/floweditor
-    cmds:
-      - npm i
-
-  "deps:js:code-editor":
-    internal: true
-    dir: ./web/components/code-editor
-    cmds:
-      - npm i
-
-  "test:go":
-    internal: true
-    cmds:
-      - go test ./...
-
-  "test:rust":
-    internal: true
-    cmds:
-      - task: "test:rust:filterdsl"
-      - task: "test:rust:vrl"
-
-  "test:rust:filterdsl":
-    internal: true
-    dir: ./internal/ffi/filterdsl/rust-crate
-    cmds:
-      - cargo test
-
-  "test:rust:vrl":
-    internal: true
-    dir: ./internal/ffi/vrl/rust-crate
-    cmds:
-      - cargo test

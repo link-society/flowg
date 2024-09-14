@@ -1,0 +1,38 @@
+version: '3'
+
+tasks:
+  unit:
+    desc: "Run unit tests"
+    cmds:
+      - task: "test:unit:go"
+      - task: "test:unit:rust:filterdsl"
+      - task: "test:unit:rust:vrl"
+
+  e2e:
+    desc: "Run end-to-end tests"
+    dir: ./tests/e2e
+    cmds:
+      - sh run.sh
+
+  bench:
+    desc: "Run benchmark"
+    dir: ./tests/benchmark
+    cmds:
+      - sh run.sh
+
+  "test:unit:go":
+    internal: true
+    cmds:
+      - go test ./...
+
+  "test:unit:rust:filterdsl":
+    internal: true
+    dir: ./internal/ffi/filterdsl/rust-crate
+    cmds:
+      - cargo test
+
+  "test:unit:rust:vrl":
+    internal: true
+    dir: ./internal/ffi/vrl/rust-crate
+    cmds:
+      - cargo test
