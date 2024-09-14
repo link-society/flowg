@@ -1,6 +1,10 @@
 import { createBrowserRouter } from 'react-router-dom'
 
 import BaseLayout from '@/layouts/base'
+import AppLayout, { loader as AppLoader } from '@/layouts/app'
+
+import LoginView from '@/views/onboarding/login'
+import LogoutView, { loader as LogoutLoader } from '@/views/onboarding/logout'
 
 export default createBrowserRouter([
   {
@@ -9,16 +13,24 @@ export default createBrowserRouter([
     children: [
       {
         path: 'login',
-        element: <div>Login</div>
+        element: <LoginView />,
       },
       {
         path: 'logout',
-        element: <div>Logout</div>
+        element: <LogoutView />,
+        loader: LogoutLoader,
       },
       {
         path: '',
-        element: <div>Home</div>
-      }
-    ]
-  }
+        element: <AppLayout />,
+        loader: AppLoader,
+        children: [
+          {
+            path: '',
+            element: <div>Home</div>
+          },
+        ],
+      },
+    ],
+  },
 ])

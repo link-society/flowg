@@ -1,18 +1,38 @@
-import { useMemo } from 'react'
 import { RouterProvider } from 'react-router-dom'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { SnackbarProvider } from 'notistack'
+import { createTheme, ThemeProvider } from '@mui/material'
+import * as colors from '@mui/material/colors'
 
 import router from '@/router'
 
-export default function() {
-  const queryClient = useMemo(
-    () => new QueryClient(),
-    [],
-  )
+const theme = createTheme({
+  shape: {
+    borderRadius: 0,
+  },
+  palette: {
+    primary: {
+      main: colors.indigo[500],
+    },
+    secondary: {
+      main: colors.teal[400],
 
+    }
+  }
+})
+
+export default function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
+    <ThemeProvider theme={theme}>
+      <SnackbarProvider
+        maxSnack={3}
+        autoHideDuration={3000}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+      >
+        <RouterProvider router={router} />
+      </SnackbarProvider>
+    </ThemeProvider>
   )
 }
