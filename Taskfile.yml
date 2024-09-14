@@ -10,8 +10,8 @@ tasks:
   build:
     desc: "Build the project"
     cmds:
-      - task: "backend:build"
       - task: "frontend:build"
+      - task: "backend:build"
 
   run:
     desc: "Run the project"
