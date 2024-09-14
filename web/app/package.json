@@ -8,10 +8,13 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@fontsource/roboto": "^5.1.0",
     "@headlessui/react": "^2.1.8",
-    "@heroicons/react": "^2.1.5",
-    "@materializecss/materialize": "github:linkdd/materialize",
-    "@tanstack/react-query": "^5.56.2",
+    "@mui/icons-material": "^6.1.0",
+    "@mui/material": "^6.1.0",
+    "notistack": "^3.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.2"
