@@ -22,7 +22,7 @@ jsonpath "$.success" == true
 jsonpath "$.token-uuids" count == 2
 jsonpath "$.token-uuids" includes "{{new_admin_token_uuid}}"
 
-GET http://localhost:5080/api/v1/whoami
+GET http://localhost:5080/api/v1/auth/whoami
 Authorization: Bearer {{new_admin_token}}
 HTTP 200
 [Asserts]
@@ -35,6 +35,6 @@ HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 
-GET http://localhost:5080/api/v1/whoami
+GET http://localhost:5080/api/v1/auth/whoami
 Authorization: Bearer {{new_admin_token}}
 HTTP 401
