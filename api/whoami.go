@@ -31,7 +31,7 @@ func WhoamiUsecase(authDb *auth.Database) usecase.Interactor {
 	u.SetName("whoami")
 	u.SetTitle("Fetch current profile")
 	u.SetDescription("Fetch the profile of the currently authenticated user")
-	u.SetTags("acls")
+	u.SetTags("auth")
 
 	u.SetExpectedErrors(status.PermissionDenied)
 
