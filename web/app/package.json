@@ -2,6 +2,7 @@
   "name": "flowg",
   "version": "0.0.0-internal",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "tsc -b && vite build",
     "build:dev": "tsc -b && vite build --mode development",
