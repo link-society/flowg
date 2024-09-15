@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { Form, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useSnackbar } from 'notistack'
 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import LockIcon from '@mui/icons-material/Lock'
 import LoginIcon from '@mui/icons-material/Login'
 
+import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid2'
 import Card from '@mui/material/Card'
 import Box from '@mui/material/Box'
@@ -56,9 +57,9 @@ export const LoginView = () => {
       <Grid container>
         <Grid size={{ sm: 12, md: 6, lg: 4 }} offset={{ sm: 0, md: 3, lg: 4 }}>
           <Card className="p-3">
-            <Form
+            <form
               className="flex flex-col items-stretch gap-3"
-              onSubmit={e => {
+              onSubmit={(e) => {
                 e.preventDefault()
                 handleLogin()
               }}
@@ -67,7 +68,7 @@ export const LoginView = () => {
                 <h1 className="text-2xl text-center">Sign In with your account</h1>
               </header>
 
-              <hr />
+              <Divider />
 
               <section className="flex flex-col items-stretch gap-3">
                 <Box className="flex flex-row items-end">
@@ -79,6 +80,7 @@ export const LoginView = () => {
                     onChange={e => setUsername(e.target.value)}
                     variant="standard"
                     className="flex-grow"
+                    required
                   />
                 </Box>
 
@@ -91,11 +93,13 @@ export const LoginView = () => {
                     onChange={e => setPassword(e.target.value)}
                     variant="standard"
                     className="flex-grow"
+                    disabled={loading}
+                    required
                   />
                 </Box>
               </section>
 
-              <hr />
+              <Divider />
 
               <Button
                 variant="contained"
@@ -105,11 +109,11 @@ export const LoginView = () => {
                 startIcon={!loading && <LoginIcon />}
               >
                 {loading
-                  ? <CircularProgress color="inherit" />
+                  ? <CircularProgress color="inherit" size={24} />
                   : <>Sign In</>
                 }
               </Button>
-            </Form>
+            </form>
           </Card>
         </Grid>
       </Grid>
