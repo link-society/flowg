@@ -57,7 +57,7 @@ export const HomeView = () => {
   const { permissions } = useProfile()
 
   return (
-    <Grid container spacing={2} className="justify-center py-6">
+    <Grid container spacing={2} className="justify-center py-6 h-full overflow-auto">
       {permissions.can_view_streams && (
         <Grid size={{ sm: 12, md: 2 }}>
           <React.Suspense
