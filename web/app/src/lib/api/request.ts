@@ -1,3 +1,5 @@
+import * as errors from '@/lib/api/errors'
+
 type ApiMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'
 
 type ApiErrorResponse = {
@@ -9,9 +11,6 @@ type ApiRequestResult<R> = {
   body: R
   response: Response
 }
-
-export class ApiError extends Error {}
-export class UnauthenticatedError extends ApiError {}
 
 const request = async<B, R>(
   method: ApiMethod,
@@ -40,10 +39,13 @@ const request = async<B, R>(
 
     switch (content.status) {
       case 'UNAUTHENTICATED':
-        throw new UnauthenticatedError(content.error)
+        throw new errors.UnauthenticatedError(content.error)
+
+      case 'PERMISSION_DENIED':
+        throw new errors.PermissionDeniedError(content.error)
 
       default:
-        throw new ApiError(content.error)
+        throw new errors.ApiError(content.error)
     }
   }
 

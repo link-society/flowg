@@ -1,8 +1,8 @@
 import { Outlet } from 'react-router-dom'
 
-export default function BaseLayout() {
+export const BaseLayout = () => {
   return (
-    <div className="h-max flex flex-col overflow-hidden">
+    <div className="h-full flex flex-col overflow-hidden">
       <Outlet />
     </div>
   )
