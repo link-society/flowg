@@ -19,22 +19,22 @@ const (
 )
 
 type Permissions struct {
-	CanViewPipelines bool
-	CanEditPipelines bool
+	CanViewPipelines bool `json:"can_view_pipelines"`
+	CanEditPipelines bool `json:"can_edit_pipelines"`
 
-	CanViewTransformers bool
-	CanEditTransformers bool
+	CanViewTransformers bool `json:"can_view_transformers"`
+	CanEditTransformers bool `json:"can_edit_transformers"`
 
-	CanViewStreams bool
-	CanEditStreams bool
+	CanViewStreams bool `json:"can_view_streams"`
+	CanEditStreams bool `json:"can_edit_streams"`
 
-	CanViewAlerts bool
-	CanEditAlerts bool
+	CanViewAlerts bool `json:"can_view_alerts"`
+	CanEditAlerts bool `json:"can_edit_alerts"`
 
-	CanViewACLs bool
-	CanEditACLs bool
+	CanViewACLs bool `json:"can_view_acls"`
+	CanEditACLs bool `json:"can_edit_acls"`
 
-	CanSendLogs bool
+	CanSendLogs bool `json:"can_send_logs"`
 }
 
 func ParseScope(s string) (Scope, error) {
