@@ -30,6 +30,13 @@ export default createBrowserRouter([
         },
         children: [
           {
+            path: 'account',
+            lazy: async () => {
+              const { AccountView: Component, loader } = await import('@/views/app/account')
+              return { Component, loader }
+            },
+          },
+          {
             path: '',
             lazy: async () => {
               const { HomeView: Component } = await import('@/views/app/home')
