@@ -1,24 +1,14 @@
-import { Outlet, redirect, useLoaderData } from 'react-router-dom'
+import { Outlet, useLoaderData } from 'react-router-dom'
 
 import { NavBar } from '@/components/navbar'
 import { ProfileProvider } from '@/lib/context/profile'
 
-import { UnauthenticatedError } from '@/lib/api/errors'
 import * as authApi from '@/lib/api/operations/auth'
+import { loginRequired } from '@/lib/decorators/loaders'
 import { ProfileModel } from '@/lib/models'
 
 export const loader = async () => {
-  try {
-    return await authApi.whoami()
-  }
-  catch (error) {
-    if (error instanceof UnauthenticatedError) {
-      return redirect('/web/login')
-    }
-    else {
-      throw error
-    }
-  }
+  return await loginRequired(authApi.whoami)()
 }
 
 export const AppLayout = () => {
