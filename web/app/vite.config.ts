@@ -17,6 +17,9 @@ export default defineConfig({
       ],
     },
   },
+  build: {
+    chunkSizeWarningLimit: 1024,
+  },
   resolve: {
     alias: {
       '@materializecss/materialize/style': 'node_modules/@materializecss/materialize/dist/css/materialize.css',
