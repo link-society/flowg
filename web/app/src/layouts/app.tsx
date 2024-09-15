@@ -1,15 +1,18 @@
-import { Outlet, redirect } from 'react-router-dom'
+import { Outlet, redirect, useLoaderData } from 'react-router-dom'
 
-import * as api from '@/lib/api'
-import * as authApi from '@/lib/api/auth'
+import { NavBar } from '@/components/navbar'
+import { ProfileProvider } from '@/lib/context/profile'
+
+import { UnauthenticatedError } from '@/lib/api/errors'
+import * as authApi from '@/lib/api/operations/auth'
+import { ProfileModel } from '@/lib/models'
 
 export const loader = async () => {
   try {
-    const user = await authApi.whoami()
-    return user
+    return await authApi.whoami()
   }
   catch (error) {
-    if (error instanceof api.UnauthenticatedError) {
+    if (error instanceof UnauthenticatedError) {
       return redirect('/web/login')
     }
     else {
@@ -18,11 +21,24 @@ export const loader = async () => {
   }
 }
 
-export default function AppLayout() {
+export const AppLayout = () => {
+  const profile = useLoaderData() as ProfileModel
+
   return (
-    <>
-      <div>App</div>
-      <Outlet />
-    </>
+    <ProfileProvider value={profile}>
+      <div className="h-full flex flex-col overflow-hidden">
+        <NavBar />
+
+        <main className="flex-grow">
+          <Outlet />
+        </main>
+
+        <footer className="p-3 bg-gray-300">
+          <div className="text-center">
+            <p>Footer</p>
+          </div>
+        </footer>
+      </div>
+    </ProfileProvider>
   )
 }

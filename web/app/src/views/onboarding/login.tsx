@@ -2,21 +2,21 @@ import { useState } from 'react'
 import { Form, useNavigate } from 'react-router-dom'
 import { useSnackbar } from 'notistack'
 
-import { AccountCircle, Lock } from '@mui/icons-material'
+import AccountCircleIcon from '@mui/icons-material/AccountCircle'
+import LockIcon from '@mui/icons-material/Lock'
+import LoginIcon from '@mui/icons-material/Login'
 
-import {
-  Box,
-  Button,
-  Card,
-  CircularProgress,
-  Grid2,
-  TextField,
-} from '@mui/material'
+import Grid from '@mui/material/Grid2'
+import Card from '@mui/material/Card'
+import Box from '@mui/material/Box'
+import TextField from '@mui/material/TextField'
+import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
 
-import * as api from '@/lib/api'
-import * as authApi from '@/lib/api/auth'
+import { UnauthenticatedError } from '@/lib/api/errors'
+import * as authApi from '@/lib/api/operations/auth'
 
-export default function LoginView() {
+export const LoginView = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -32,7 +32,7 @@ export default function LoginView() {
       navigate('/web/')
     }
     catch (error) {
-      if (error instanceof api.UnauthenticatedError) {
+      if (error instanceof UnauthenticatedError) {
         enqueueSnackbar({
           message: 'Invalid credentials',
           variant: 'error'
@@ -53,8 +53,8 @@ export default function LoginView() {
 
   return (
     <div className="py-6">
-      <Grid2 container>
-        <Grid2 size={{ sm: 12, md: 6 }} offset={{ sm: 0, md: 3 }}>
+      <Grid container>
+        <Grid size={{ sm: 12, md: 6, lg: 4 }} offset={{ sm: 0, md: 3, lg: 4 }}>
           <Card className="p-3">
             <Form
               className="flex flex-col items-stretch gap-3"
@@ -71,7 +71,7 @@ export default function LoginView() {
 
               <section className="flex flex-col items-stretch gap-3">
                 <Box className="flex flex-row items-end">
-                  <AccountCircle sx={{ color: 'action.active', mr: 1, my: 0.5 }} />
+                  <AccountCircleIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />
                   <TextField
                     label="Username"
                     value={username}
@@ -83,7 +83,7 @@ export default function LoginView() {
                 </Box>
 
                 <Box className="flex flex-row items-end">
-                  <Lock sx={{ color: 'action.active', mr: 1, my: 0.5 }} />
+                  <LockIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />
                   <TextField
                     label="Password"
                     value={password}
@@ -102,6 +102,7 @@ export default function LoginView() {
                 color="secondary"
                 className="w-full"
                 type="submit"
+                startIcon={!loading && <LoginIcon />}
               >
                 {loading
                   ? <CircularProgress color="inherit" />
@@ -110,8 +111,8 @@ export default function LoginView() {
               </Button>
             </Form>
           </Card>
-        </Grid2>
-      </Grid2>
+        </Grid>
+      </Grid>
     </div>
   )
 }

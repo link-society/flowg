@@ -1,6 +1,6 @@
 import { RouterProvider } from 'react-router-dom'
 import { SnackbarProvider } from 'notistack'
-import { createTheme, ThemeProvider } from '@mui/material'
+import { createTheme, ThemeProvider } from '@mui/material/styles'
 import * as colors from '@mui/material/colors'
 
 import router from '@/router'
@@ -11,7 +11,7 @@ const theme = createTheme({
   },
   palette: {
     primary: {
-      main: colors.indigo[500],
+      main: colors.blue[800],
     },
     secondary: {
       main: colors.teal[400],

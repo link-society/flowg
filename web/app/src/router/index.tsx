@@ -1,33 +1,40 @@
 import { createBrowserRouter } from 'react-router-dom'
 
-import BaseLayout from '@/layouts/base'
-import AppLayout, { loader as AppLoader } from '@/layouts/app'
-
-import LoginView from '@/views/onboarding/login'
-import LogoutView, { loader as LogoutLoader } from '@/views/onboarding/logout'
-
 export default createBrowserRouter([
   {
     path: '/web/',
-    element: <BaseLayout />,
+    lazy: async () => {
+      const { BaseLayout: Component } = await import('@/layouts/base')
+      return { Component }
+    },
     children: [
       {
         path: 'login',
-        element: <LoginView />,
+        lazy: async () => {
+          const { LoginView: Component } = await import('@/views/onboarding/login')
+          return { Component }
+        },
       },
       {
         path: 'logout',
-        element: <LogoutView />,
-        loader: LogoutLoader,
+        lazy: async () => {
+          const { LogoutView: Component, loader } = await import('@/views/onboarding/logout')
+          return { Component, loader }
+        },
       },
       {
         path: '',
-        element: <AppLayout />,
-        loader: AppLoader,
+        lazy: async () => {
+          const { AppLayout: Component, loader } = await import('@/layouts/app')
+          return { Component, loader }
+        },
         children: [
           {
             path: '',
-            element: <div>Home</div>
+            lazy: async () => {
+              const { HomeView: Component } = await import('@/views/app/home')
+              return { Component }
+            },
           },
         ],
       },
