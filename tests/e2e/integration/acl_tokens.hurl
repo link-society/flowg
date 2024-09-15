@@ -3,7 +3,7 @@ Authorization: Basic {{admin_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true
-jsonpath "$.token-uuids" count == 1
+jsonpath "$.token_uuids" count == 1
 
 POST http://localhost:5080/api/v1/token
 Authorization: Basic {{admin_token}}
@@ -19,8 +19,8 @@ Authorization: Basic {{admin_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true
-jsonpath "$.token-uuids" count == 2
-jsonpath "$.token-uuids" includes "{{new_admin_token_uuid}}"
+jsonpath "$.token_uuids" count == 2
+jsonpath "$.token_uuids" includes "{{new_admin_token_uuid}}"
 
 GET http://localhost:5080/api/v1/auth/whoami
 Authorization: Basic {{new_admin_token}}

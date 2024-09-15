@@ -14,7 +14,7 @@ type ListTokensRequest struct{}
 
 type ListTokensResponse struct {
 	Success    bool     `json:"success"`
-	TokenUUIDs []string `json:"token-uuids"`
+	TokenUUIDs []string `json:"token_uuids"`
 }
 
 func ListTokensUsecase(authDb *auth.Database) usecase.Interactor {
