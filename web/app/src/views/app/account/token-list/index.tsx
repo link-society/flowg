@@ -12,12 +12,11 @@ import CardContent from '@mui/material/CardContent'
 import { AgGridReact } from 'ag-grid-react'
 import { ColDef } from 'ag-grid-community'
 
+import { Actions } from '@/components/table/actions'
+
 import { CreateTokenButton } from './create-btn'
 import { RowType } from './types'
 import { TokenCell } from './cell'
-import { TokenActions } from './actions'
-
-import './style.css'
 
 import { UnauthenticatedError } from '@/lib/api/errors'
 import * as tokenApi from '@/lib/api/operations/token'
@@ -48,16 +47,16 @@ export const TokenList = ({ tokens }: TokenListProps) => {
     },
     {
       headerName: 'Actions',
-      headerClass: 'flowg-pat-actions-header',
-      cellRenderer: TokenActions,
+      headerClass: 'flowg-actions-header',
+      cellRenderer: Actions,
       cellRendererParams: {
-        onDelete: async (token: string) => {
+        onDelete: async (data: RowType) => {
           setLoading(true)
 
           try {
-            await tokenApi.deleteToken(token)
+            await tokenApi.deleteToken(data.token)
 
-            const rowNode = gridRef.current.api.getRowNode(token)
+            const rowNode = gridRef.current.api.getRowNode(data.token)
             if (rowNode !== undefined) {
               gridRef.current.api.applyTransaction({
                 remove: [rowNode.data],
@@ -114,7 +113,7 @@ export const TokenList = ({ tokens }: TokenListProps) => {
           }
           className="bg-blue-400 text-white shadow-lg z-20"
         />
-        <CardContent className="!p-0 flex-grow flex-shrink h-0 ag-theme-material flowg-pat-table">
+        <CardContent className="!p-0 flex-grow flex-shrink h-0 ag-theme-material flowg-table">
           <AgGridReact<RowType>
             ref={gridRef}
             loading={loading}

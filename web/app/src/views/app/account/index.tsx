@@ -1,6 +1,5 @@
 import { useLoaderData } from 'react-router-dom'
 
-
 import Grid from '@mui/material/Grid2'
 
 import { ProfileInfo } from './profile-info'
