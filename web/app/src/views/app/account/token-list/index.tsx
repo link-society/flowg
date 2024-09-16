@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useSnackbar } from 'notistack'
+import { useNotifications } from '@toolpad/core'
+import { useConfig } from '@/lib/context/config'
 
 import KeyIcon from '@mui/icons-material/Key'
 import AddIcon from '@mui/icons-material/Add'
@@ -9,7 +10,6 @@ import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
 import Button from '@mui/material/Button'
-import Modal from '@mui/material/Modal'
 
 import { AgGridReact } from 'ag-grid-react'
 import { ColDef } from 'ag-grid-community'
@@ -29,7 +29,8 @@ type TokenListProps = {
 
 export const TokenList = ({ tokens }: TokenListProps) => {
   const navigate = useNavigate()
-  const { enqueueSnackbar } = useSnackbar()
+  const notifications = useNotifications()
+  const config = useConfig()
 
   const [loading, setLoading] = useState(false)
   const [rowData, setRowData] = useState<RowType[]>(
@@ -56,15 +57,24 @@ export const TokenList = ({ tokens }: TokenListProps) => {
             await tokenApi.deleteToken(token)
             setRowData(rowData.filter(row => row.token !== token))
 
-            enqueueSnackbar('Token deleted', { variant: 'success' })
+            notifications.show('Token deleted', {
+              severity: 'success',
+              autoHideDuration: config.notifications?.autoHideDuration,
+            })
           }
           catch (error) {
             if (error instanceof UnauthenticatedError) {
-              enqueueSnackbar('Session expired', { variant: 'error' })
+              notifications.show('Session expired', {
+                severity: 'error',
+                autoHideDuration: config.notifications?.autoHideDuration,
+              })
               navigate('/web/login')
             }
             else {
-              enqueueSnackbar('Unknown error', { variant: 'error' })
+              notifications.show('Unknown error', {
+                severity: 'error',
+                autoHideDuration: config.notifications?.autoHideDuration,
+              })
             }
 
             console.error(error)
@@ -107,8 +117,6 @@ export const TokenList = ({ tokens }: TokenListProps) => {
           />
         </CardContent>
       </Card>
-
-      <Modal></Modal>
     </>
   )
 }

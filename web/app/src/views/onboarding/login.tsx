@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useSnackbar } from 'notistack'
+import { useNotifications } from '@toolpad/core'
+import { useConfig } from '@/lib/context/config'
 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import LockIcon from '@mui/icons-material/Lock'
@@ -23,7 +24,8 @@ export const LoginView = () => {
   const [loading, setLoading] = useState(false)
 
   const navigate = useNavigate()
-  const { enqueueSnackbar } = useSnackbar()
+  const notifications = useNotifications()
+  const config = useConfig()
 
   const handleLogin = async () => {
     setLoading(true)
@@ -34,15 +36,15 @@ export const LoginView = () => {
     }
     catch (error) {
       if (error instanceof UnauthenticatedError) {
-        enqueueSnackbar({
-          message: 'Invalid credentials',
-          variant: 'error'
+        notifications.show('Invalid credentials', {
+          severity: 'error',
+          autoHideDuration: config.notifications?.autoHideDuration,
         })
       }
       else {
-        enqueueSnackbar({
-          message: 'Unknown error',
-          variant: 'error'
+        notifications.show('Unknown error', {
+          severity: 'error',
+          autoHideDuration: config.notifications?.autoHideDuration,
         })
       }
 
