@@ -8,7 +8,7 @@
     "watch": "node build.js --watch"
   },
   "dependencies": {
-    "@xyflow/react": "^12.2.1",
+    "@xyflow/react": "^12.3.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
