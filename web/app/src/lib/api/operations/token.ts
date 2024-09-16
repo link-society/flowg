@@ -18,7 +18,7 @@ export const createToken = async (): Promise<TokenModel> => {
     token_uuid: string
   }
 
-  const { body } = await request.POST<{}, CreateTokenResponse>('/api/v1/token', {})
+  const { body } = await request.POST<unknown, CreateTokenResponse>('/api/v1/token', {})
   return { token: body.token, token_uuid: body.token_uuid }
 }
 
