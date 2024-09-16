@@ -34,7 +34,7 @@ export const ShowNewTokenModal = ({ open, payload, onClose }: DialogProps<string
         />
       </Box>
 
-      <p>
+      <p className="mt-3">
         This token will be dislayed only once.
         Make sure to copy it before closing this dialog.
       </p>
