@@ -3,7 +3,8 @@ import { RouterProvider } from 'react-router-dom'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import * as colors from '@mui/material/colors'
 
-import { NotificationsProvider } from '@toolpad/core'
+import { DialogsProvider } from '@toolpad/core/useDialogs'
+import { NotificationsProvider } from '@toolpad/core/useNotifications'
 import { ConfigProvider } from '@/lib/context/config'
 
 import router from '@/router'
@@ -33,9 +34,11 @@ export default function App() {
       }}
     >
       <ThemeProvider theme={theme}>
-        <NotificationsProvider>
-          <RouterProvider router={router} />
-        </NotificationsProvider>
+        <DialogsProvider>
+          <NotificationsProvider>
+            <RouterProvider router={router} />
+          </NotificationsProvider>
+        </DialogsProvider>
       </ThemeProvider>
     </ConfigProvider>
   )

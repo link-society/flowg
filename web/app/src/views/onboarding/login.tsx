@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useNotifications } from '@toolpad/core'
+import { useNotifications } from '@toolpad/core/useNotifications'
 import { useConfig } from '@/lib/context/config'
 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'

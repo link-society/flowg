@@ -32,3 +32,8 @@ export type StreamConfigModel = {
   ttl: number
   size: number
 }
+
+export type TokenModel = {
+  token: string
+  token_uuid: string
+}
