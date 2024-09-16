@@ -10,7 +10,8 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 
-import { UnauthenticatedError } from '@/lib/api/errors'
+import { UnauthenticatedError, PermissionDeniedError } from '@/lib/api/errors'
+import * as authApi from '@/lib/api/operations/auth'
 
 export const PasswordChange = () => {
   const [oldPassword, setOldPassword] = useState('')
@@ -25,8 +26,7 @@ export const PasswordChange = () => {
     setLoading(true)
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      //await userApi.changePassword(oldPassword, newPassword)
+      await authApi.changePassword(oldPassword, newPassword)
       notifications.show('Password changed', {
         severity: 'success',
         autoHideDuration: config.notifications?.autoHideDuration,
@@ -40,6 +40,12 @@ export const PasswordChange = () => {
         })
         navigate('/web/login')
       }
+      else if (error instanceof PermissionDeniedError) {
+        notifications.show('Invalid credentials', {
+          severity: 'error',
+          autoHideDuration: config.notifications?.autoHideDuration,
+        })
+      }
       else {
         notifications.show('Unknown error', {
           severity: 'error',
@@ -50,6 +56,8 @@ export const PasswordChange = () => {
       console.error(error)
     }
 
+    setOldPassword('')
+    setNewPassword('')
     setLoading(false)
   }
 
