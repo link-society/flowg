@@ -1,0 +1,11 @@
+.flowg-pat-table .ag-header {
+  @apply bg-gray-200 z-10 shadow-sm;
+}
+
+.flowg-pat-table .ag-cell-wrapper {
+  @apply h-full;
+}
+
+.flowg-pat-actions-header .ag-header-cell-label {
+  @apply justify-center;
+}

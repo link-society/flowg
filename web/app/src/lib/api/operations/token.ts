@@ -8,3 +8,8 @@ export const listTokens = async (): Promise<string[]> => {
   const { body } = await request.GET<ListTokensResponse>('/api/v1/tokens')
   return body.token_uuids
 }
+
+export const deleteToken = async (tokenUuid: string): Promise<void> => {
+  await request.DELETE(`/api/v1/tokens/${tokenUuid}`)
+}
+
