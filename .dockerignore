@@ -1,5 +1,6 @@
 /bin/
 /data/
+/internal/app/gen_version.go
 /internal/ffi/filterdsl/rust-crate/target/
 /internal/ffi/vrl/rust-crate/target/
 /web/public/

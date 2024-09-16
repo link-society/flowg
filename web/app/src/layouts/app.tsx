@@ -1,6 +1,7 @@
 import { Outlet, useLoaderData } from 'react-router-dom'
 
 import { NavBar } from '@/components/navbar'
+import { Footer } from '@/components/footer'
 import { ProfileProvider } from '@/lib/context/profile'
 
 import * as authApi from '@/lib/api/operations/auth'
@@ -23,11 +24,7 @@ export const AppLayout = () => {
           <Outlet />
         </main>
 
-        <footer className="p-3 bg-gray-300">
-          <div className="text-center">
-            <p>Footer</p>
-          </div>
-        </footer>
+        <Footer />
       </div>
     </ProfileProvider>
   )

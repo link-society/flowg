@@ -7,6 +7,7 @@
 ## Golang sources
 FROM scratch AS sources-go
 
+ADD VERSION.txt /src/VERSION.txt
 ADD api /src/api
 ADD cmd /src/cmd
 ADD internal/app /src/internal/app
@@ -20,6 +21,7 @@ ADD go.mod go.sum /src/
 ## JS sources
 FROM scratch AS sources-js
 
+ADD VERSION.txt /src/VERSION.txt
 ADD web/app /src/web/app
 
 ## FilterDSL sources
@@ -82,6 +84,7 @@ COPY --from=builder-rust-vrl /workspace/internal/ffi/vrl/rust-crate/target/relea
 COPY --from=builder-js /workspace/web/app/dist /workspace/web/public
 WORKDIR /workspace
 
+RUN go generate ./...
 RUN go build -o bin/ ./...
 RUN go test -v ./...
 
