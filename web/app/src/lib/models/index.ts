@@ -27,6 +27,11 @@ export type PermissionsModel = {
   can_send_logs: boolean
 }
 
+export type RoleModel = {
+  name: string
+  scopes: string[]
+}
+
 export type StreamConfigModel = {
   indexed_fields: string[]
   ttl: number
