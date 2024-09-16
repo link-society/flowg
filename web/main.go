@@ -3,10 +3,9 @@ package web
 import (
 	"embed"
 
-	"strings"
-
 	"io"
 	"net/http"
+	"strings"
 )
 
 //go:embed public/**/*.css
@@ -15,11 +14,9 @@ import (
 var staticfiles embed.FS
 
 func NewHandler() http.Handler {
-	mux := http.NewServeMux()
-
-	mux.Handle(
+	return http.StripPrefix(
 		"/web/",
-		http.StripPrefix("/web/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if strings.HasPrefix(r.URL.Path, "assets/") {
 				r.URL.Path = "/public/" + r.URL.Path
 				http.FileServer(http.FS(staticfiles)).ServeHTTP(w, r)
@@ -32,8 +29,6 @@ func NewHandler() http.Handler {
 
 				io.Copy(w, html)
 			}
-		})),
+		}),
 	)
-
-	return mux
 }
