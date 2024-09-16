@@ -103,7 +103,7 @@ export const TokenList = ({ tokens }: TokenListProps) => {
 
   return (
     <>
-      <Card className="lg:h-full lg:flex lg:flex-col lg:items-stretch">
+      <Card className="max-lg:min-h-96 lg:h-full flex flex-col items-stretch">
         <CardHeader
           title={
             <div className="flex items-center gap-3">
@@ -114,7 +114,7 @@ export const TokenList = ({ tokens }: TokenListProps) => {
           }
           className="bg-blue-400 text-white shadow-lg z-20"
         />
-        <CardContent className="!p-0 lg:flex-grow ag-theme-material flowg-pat-table">
+        <CardContent className="!p-0 flex-grow flex-shrink h-0 ag-theme-material flowg-pat-table">
           <AgGridReact<RowType>
             ref={gridRef}
             loading={loading}
