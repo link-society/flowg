@@ -1,4 +1,5 @@
 import path from 'path'
+import fs from 'fs'
 
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
@@ -25,5 +26,8 @@ export default defineConfig({
       '@materializecss/materialize/style': 'node_modules/@materializecss/materialize/dist/css/materialize.css',
       '@': path.resolve(__dirname, './src'),
     },
+  },
+  define: {
+    'import.meta.env.FLOWG_VERSION': JSON.stringify(fs.readFileSync('../../VERSION.txt', 'utf8').trim()),
   },
 })
