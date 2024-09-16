@@ -1,19 +1,18 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useNotifications } from '@toolpad/core'
+import { useNotifications } from '@toolpad/core/useNotifications'
 import { useConfig } from '@/lib/context/config'
 
 import KeyIcon from '@mui/icons-material/Key'
-import AddIcon from '@mui/icons-material/Add'
 
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
-import Button from '@mui/material/Button'
 
 import { AgGridReact } from 'ag-grid-react'
 import { ColDef } from 'ag-grid-community'
 
+import { CreateTokenButton } from './create-btn'
 import { RowType } from './types'
 import { TokenCell } from './cell'
 import { TokenActions } from './actions'
@@ -33,7 +32,9 @@ export const TokenList = ({ tokens }: TokenListProps) => {
   const config = useConfig()
 
   const [loading, setLoading] = useState(false)
-  const [rowData, setRowData] = useState<RowType[]>(
+
+  const gridRef = useRef<AgGridReact<RowType>>(null!)
+  const [rowData] = useState<RowType[]>(
     tokens.map(token => ({ token })),
   )
   const [columnDefs] = useState<ColDef<RowType>[]>([
@@ -55,7 +56,13 @@ export const TokenList = ({ tokens }: TokenListProps) => {
 
           try {
             await tokenApi.deleteToken(token)
-            setRowData(rowData.filter(row => row.token !== token))
+
+            const rowNode = gridRef.current.api.getRowNode(token)
+            if (rowNode !== undefined) {
+              gridRef.current.api.applyTransaction({
+                remove: [rowNode.data],
+              })
+            }
 
             notifications.show('Token deleted', {
               severity: 'success',
@@ -88,6 +95,12 @@ export const TokenList = ({ tokens }: TokenListProps) => {
     },
   ])
 
+  const onNewToken = (token: string) => {
+    gridRef.current.api.applyTransaction({
+      add: [{ token }],
+    })
+  }
+
   return (
     <>
       <Card className="lg:h-full lg:flex lg:flex-col lg:items-stretch">
@@ -96,24 +109,19 @@ export const TokenList = ({ tokens }: TokenListProps) => {
             <div className="flex items-center gap-3">
               <KeyIcon />
               <span className="flex-grow">API Tokens</span>
-              <Button
-                variant="contained"
-                color="secondary"
-                size="small"
-                startIcon={<AddIcon />}
-              >
-                New Token
-              </Button>
+              <CreateTokenButton onTokenCreated={onNewToken} />
             </div>
           }
           className="bg-blue-400 text-white shadow-lg z-20"
         />
         <CardContent className="!p-0 lg:flex-grow ag-theme-material flowg-pat-table">
           <AgGridReact<RowType>
+            ref={gridRef}
             loading={loading}
             rowData={rowData}
             columnDefs={columnDefs}
             enableCellTextSelection
+            getRowId={({ data }) => data.token}
           />
         </CardContent>
       </Card>
