@@ -4,10 +4,16 @@ HTTP 401
 GET http://localhost:5080/api/v1/auth/whoami
 Authorization: Basic {{admin_token}}
 HTTP 200
+[Asserts]
+jsonpath "$.success" == true
+jsonpath "$.user.name" == "root"
 
 GET http://localhost:5080/api/v1/auth/whoami
 Authorization: Basic {{guest_token}}
 HTTP 200
+[Asserts]
+jsonpath "$.success" == true
+jsonpath "$.user.name" == "guest"
 
 POST http://localhost:5080/api/v1/auth/login
 Content-Type: application/json
@@ -26,3 +32,30 @@ Authorization: Bearer {{jwt}}
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true
+
+POST http://localhost:5080/api/v1/auth/change-password
+Authorization: Basic {{guest_token}}
+Content-Type: application/json
+{
+  "old_password": "guest",
+  "new_password": "guest123"
+}
+HTTP 200
+[Asserts]
+jsonpath "$.success" == true
+
+POST http://localhost:5080/api/v1/auth/login
+Content-Type: application/json
+{
+  "username": "guest",
+  "password": "guest"
+}
+HTTP 401
+
+POST http://localhost:5080/api/v1/auth/login
+Content-Type: application/json
+{
+  "username": "guest",
+  "password": "guest123"
+}
+HTTP 200

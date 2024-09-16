@@ -102,6 +102,7 @@ func NewHandler(
 		r.Delete("/api/v1/users/{user}", DeleteUserUsecase(authDb))
 
 		r.Get("/api/v1/auth/whoami", WhoamiUsecase(authDb))
+		r.Post("/api/v1/auth/change-password", ChangePasswordUsecase(authDb))
 
 		r.Get("/api/v1/tokens", ListTokensUsecase(authDb))
 		r.Post("/api/v1/token", CreateTokenUsecase(authDb))
