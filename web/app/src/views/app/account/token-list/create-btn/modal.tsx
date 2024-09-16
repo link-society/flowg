@@ -13,6 +13,7 @@ import { DialogProps } from '@toolpad/core/useDialogs'
 export const ShowNewTokenModal = ({ open, payload, onClose }: DialogProps<string, void>) => (
   <Dialog
     maxWidth="sm"
+    fullWidth
     open={open}
     onClose={() => onClose()}
   >
