@@ -15,7 +15,7 @@ type CreateTokenRequest struct{}
 type CreateTokenResponse struct {
 	Success   bool   `json:"success"`
 	Token     string `json:"token"`
-	TokenUUID string `json:"token-uuid"`
+	TokenUUID string `json:"token_uuid"`
 }
 
 func CreateTokenUsecase(authDb *auth.Database) usecase.Interactor {
