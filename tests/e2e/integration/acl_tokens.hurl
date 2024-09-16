@@ -10,7 +10,7 @@ Authorization: Basic {{admin_token}}
 HTTP 200
 [Captures]
 new_admin_token: jsonpath "$.token"
-new_admin_token_uuid: jsonpath "$.token-uuid"
+new_admin_token_uuid: jsonpath "$.token_uuid"
 [Asserts]
 jsonpath "$.success" == true
 
