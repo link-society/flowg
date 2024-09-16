@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useSnackbar } from 'notistack'
+import { useNotifications } from '@toolpad/core'
+import { useConfig } from '@/lib/context/config'
 
 import LockIcon from '@mui/icons-material/Lock'
 import SendIcon from '@mui/icons-material/Send'
@@ -17,7 +18,8 @@ export const PasswordChange = () => {
   const [loading, setLoading] = useState(false)
 
   const navigate = useNavigate()
-  const { enqueueSnackbar } = useSnackbar()
+  const notifications = useNotifications()
+  const config = useConfig()
 
   const onSubmit = async () => {
     setLoading(true)
@@ -25,23 +27,23 @@ export const PasswordChange = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000))
       //await userApi.changePassword(oldPassword, newPassword)
-      enqueueSnackbar({
-        message: 'Password changed',
-        variant: 'success'
+      notifications.show('Password changed', {
+        severity: 'success',
+        autoHideDuration: config.notifications?.autoHideDuration,
       })
     }
     catch (error) {
       if (error instanceof UnauthenticatedError) {
-        enqueueSnackbar({
-          message: 'Session expired',
-          variant: 'error'
+        notifications.show('Session expired', {
+          severity: 'error',
+          autoHideDuration: config.notifications?.autoHideDuration,
         })
         navigate('/web/login')
       }
       else {
-        enqueueSnackbar({
-          message: 'Unknown error',
-          variant: 'error'
+        notifications.show('Unknown error', {
+          severity: 'error',
+          autoHideDuration: config.notifications?.autoHideDuration,
         })
       }
 

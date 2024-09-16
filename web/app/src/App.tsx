@@ -1,7 +1,10 @@
 import { RouterProvider } from 'react-router-dom'
-import { SnackbarProvider } from 'notistack'
+
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import * as colors from '@mui/material/colors'
+
+import { NotificationsProvider } from '@toolpad/core'
+import { ConfigProvider } from '@/lib/context/config'
 
 import router from '@/router'
 
@@ -22,17 +25,18 @@ const theme = createTheme({
 
 export default function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <SnackbarProvider
-        maxSnack={3}
-        autoHideDuration={3000}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
-        }}
-      >
-        <RouterProvider router={router} />
-      </SnackbarProvider>
-    </ThemeProvider>
+    <ConfigProvider
+      value={{
+        notifications: {
+          autoHideDuration: 3000,
+        },
+      }}
+    >
+      <ThemeProvider theme={theme}>
+        <NotificationsProvider>
+          <RouterProvider router={router} />
+        </NotificationsProvider>
+      </ThemeProvider>
+    </ConfigProvider>
   )
 }
