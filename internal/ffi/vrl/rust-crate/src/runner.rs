@@ -36,10 +36,10 @@ pub fn process_record(
   let timezone = TimeZone::default();
   let mut ctx = vrl::compiler::Context::new(&mut target, &mut state, &timezone);
 
-  let vrl_result = compiled.program.resolve(&mut ctx)
+  compiled.program.resolve(&mut ctx)
     .context("Failed to execute VRL script")?;
 
-  let result = if let Value::Object(obj) = vrl_result {
+  let result = if let Value::Object(obj) = target.value {
     flatten_obj(&obj)
   } else {
     HashMap::new()
