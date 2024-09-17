@@ -53,6 +53,7 @@ pub extern "C" fn vrl_result_free(this: *mut vrl_result) {
   if !this.is_null() {
     unsafe {
       let result = Box::from_raw(this);
+
       match result.tag {
         vrl_result_tag::vrl_result_ok => {
           hmap_free(result.data.ok_data);
