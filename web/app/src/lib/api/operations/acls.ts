@@ -44,3 +44,24 @@ export const listRoles = async (): Promise<RoleModel[]> => {
   const { body } = await request.GET<ListRolesResponse>('/api/v1/roles')
   return body.roles
 }
+
+export const saveRole = async (role: RoleModel): Promise<void> => {
+  type SaveRoleRequest = {
+    scopes: string[]
+  }
+
+  type SaveRoleResponse = {
+    success: boolean
+  }
+
+  await request.PUT<SaveRoleRequest, SaveRoleResponse>(
+    `/api/v1/roles/${role.name}`,
+    {
+      scopes: role.scopes,
+    },
+  )
+}
+
+export const deleteRole = async (roleName: string): Promise<void> => {
+  await request.DELETE(`/api/v1/roles/${roleName}`)
+}
