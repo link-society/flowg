@@ -10,10 +10,11 @@ import tailwindcss from 'tailwindcss'
 export default defineConfig({
   base: './',
   plugins: [
-    compression({
-      deleteOriginalAssets: true,
-    }),
     react(),
+    compression({
+      filename: '[path][base]',
+      deleteOriginalAssets: true
+    }),
   ],
   css: {
     postcss: {

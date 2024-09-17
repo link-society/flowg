@@ -8,7 +8,9 @@ import (
 	"strings"
 )
 
-//go:embed all:public
+//go:embed public/**/*.css
+//go:embed public/**/*.js
+//go:embed public/index.html
 var staticfiles embed.FS
 
 func NewHandler() http.Handler {
@@ -17,6 +19,8 @@ func NewHandler() http.Handler {
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if strings.HasPrefix(r.URL.Path, "assets/") {
 				r.URL.Path = "/public/" + r.URL.Path
+
+				w.Header().Set("Content-Encoding", "gzip")
 				http.FileServer(http.FS(staticfiles)).ServeHTTP(w, r)
 			} else {
 				html, err := staticfiles.Open("public/index.html")
@@ -25,6 +29,8 @@ func NewHandler() http.Handler {
 					return
 				}
 
+				w.Header().Set("Content-Encoding", "gzip")
+				w.WriteHeader(http.StatusOK)
 				io.Copy(w, html)
 			}
 		}),
