@@ -12,7 +12,6 @@ func TestProcessRecord(t *testing.T) {
 	script := `
 		.foo = "bar"
 		.bar.baz = [1, 2, 3, "a"]
-		.
 	`
 
 	output, err := vrl.ProcessRecord(input, script)
@@ -29,5 +28,21 @@ func TestProcessRecord(t *testing.T) {
 	}
 	if !reflect.DeepEqual(output, expected) {
 		t.Errorf("ProcessRecord() = %v, want %v", output, expected)
+	}
+}
+
+func TestProcessRecord_EmptyScript(t *testing.T) {
+	input := map[string]string{
+		"foo": "bar",
+	}
+	script := ""
+
+	output, err := vrl.ProcessRecord(input, script)
+	if err != nil {
+		t.Errorf("ProcessRecord() failed: %v", err)
+	}
+
+	if !reflect.DeepEqual(output, input) {
+		t.Errorf("ProcessRecord() = %v, want %v", output, input)
 	}
 }
