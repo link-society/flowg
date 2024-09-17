@@ -39,7 +39,7 @@ func TestTransformerUsecase(
 						ctx,
 						"Failed to execute transformer",
 						"channel", "api",
-						"errorr", err.Error(),
+						"error", err.Error(),
 					)
 
 					resp.Success = false
