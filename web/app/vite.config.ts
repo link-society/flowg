@@ -2,6 +2,7 @@ import path from 'path'
 import fs from 'fs'
 
 import { defineConfig } from 'vite'
+import { compression } from 'vite-plugin-compression2'
 import react from '@vitejs/plugin-react'
 import tailwindcss from 'tailwindcss'
 
@@ -9,6 +10,9 @@ import tailwindcss from 'tailwindcss'
 export default defineConfig({
   base: './',
   plugins: [
+    compression({
+      deleteOriginalAssets: true,
+    }),
     react(),
   ],
   css: {
@@ -20,6 +24,11 @@ export default defineConfig({
   },
   build: {
     chunkSizeWarningLimit: 1024,
+    rollupOptions: {
+      output: {
+        manualChunks: () => 'bundle.js',
+      },
+    },
   },
   resolve: {
     alias: {
