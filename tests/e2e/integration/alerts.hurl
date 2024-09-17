@@ -38,7 +38,7 @@ HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 
-POST http://localhost:5080/api/v1/alerts/httpbin/test
+POST http://localhost:5080/api/v1/test/alerts/httpbin
 Authorization: Basic {{admin_token}}
 Content-Type: application/json
 {
@@ -75,7 +75,7 @@ HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 
-POST http://localhost:5080/api/v1/alerts/fail/test
+POST http://localhost:5080/api/v1/test/alerts/fail
 Authorization: Basic {{admin_token}}
 Content-Type: application/json
 {

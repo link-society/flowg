@@ -53,7 +53,6 @@ func NewHandler(
 		r.Get("/api/v1/transformers/{transformer}", GetTransformerUsecase(authDb, configStorage))
 		r.Put("/api/v1/transformers/{transformer}", SaveTransformerUsecase(authDb, configStorage))
 		r.Delete("/api/v1/transformers/{transformer}", DeleteTransformerUsecase(authDb, configStorage))
-		r.Post("/api/v1/transformers/{transformer}/test", TestTransformerUsecase(authDb, configStorage))
 
 		r.Get("/api/v1/pipelines", ListPipelinesUsecase(authDb, configStorage))
 		r.Get("/api/v1/pipelines/{pipeline}", GetPipelineUsecase(authDb, configStorage))
@@ -91,7 +90,6 @@ func NewHandler(
 		r.Get("/api/v1/alerts/{alert}", GetAlertUsecase(authDb, configStorage))
 		r.Put("/api/v1/alerts/{alert}", SaveAlertUsecase(authDb, configStorage))
 		r.Delete("/api/v1/alerts/{alert}", DeleteAlertUsecase(authDb, configStorage))
-		r.Post("/api/v1/alerts/{alert}/test", TestAlertUsecase(authDb, configStorage))
 
 		r.Get("/api/v1/roles", ListRolesUsecase(authDb))
 		r.Put("/api/v1/roles/{role}", SaveRoleUsecase(authDb))
@@ -107,6 +105,9 @@ func NewHandler(
 		r.Get("/api/v1/tokens", ListTokensUsecase(authDb))
 		r.Post("/api/v1/token", CreateTokenUsecase(authDb))
 		r.Delete("/api/v1/tokens/{token-uuid}", DeleteTokenUsecase(authDb))
+
+		r.Post("/api/v1/test/transformer", TestTransformerUsecase(authDb))
+		r.Post("/api/v1/test/alerts/{alert}", TestAlertUsecase(authDb, configStorage))
 	})
 
 	return service

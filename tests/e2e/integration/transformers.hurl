@@ -1,3 +1,18 @@
+POST http://localhost:5080/api/v1/test/transformer
+Authorization: Basic {{admin_token}}
+Content-Type: application/json
+{
+  "code": ". = parse_logfmt!(.message)",
+  "record": {
+    "message": "level=info message=\"foo bar\""
+  }
+}
+HTTP 200
+[Asserts]
+jsonpath "$.success" == true
+jsonpath "$.record.level" == "info"
+jsonpath "$.record.message" == "foo bar"
+
 GET http://localhost:5080/api/v1/transformers
 Authorization: Basic {{admin_token}}
 HTTP 200
@@ -32,20 +47,6 @@ Authorization: Basic {{admin_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true
-
-POST http://localhost:5080/api/v1/transformers/logfmt/test
-Authorization: Basic {{admin_token}}
-Content-Type: application/json
-{
-  "record": {
-    "message": "level=info message=\"foo bar\""
-  }
-}
-HTTP 200
-[Asserts]
-jsonpath "$.success" == true
-jsonpath "$.record.level" == "info"
-jsonpath "$.record.message" == "foo bar"
 
 DELETE http://localhost:5080/api/v1/transformers/logfmt
 Authorization: Basic {{admin_token}}
