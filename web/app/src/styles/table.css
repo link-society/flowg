@@ -6,6 +6,6 @@
   @apply h-full;
 }
 
-.flowg-actions-header .ag-header-cell-label {
+.flowg-table .flowg-actions-header .ag-header-cell-label {
   @apply justify-center;
 }

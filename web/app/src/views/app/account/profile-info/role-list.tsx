@@ -16,7 +16,7 @@ export const RoleList = () => {
       <Paper
         className="
           p-1
-          flex justify-center flex-wrap
+          flex flex-row justify-center flex-wrap
           list-none
         "
         variant="outlined"

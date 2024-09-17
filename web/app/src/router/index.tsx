@@ -37,6 +37,13 @@ export default createBrowserRouter([
             },
           },
           {
+            path: 'admin',
+            lazy: async () => {
+              const { AdminView: Component, loader } = await import('@/views/app/admin')
+              return { Component, loader }
+            },
+          },
+          {
             path: '',
             lazy: async () => {
               const { HomeView: Component } = await import('@/views/app/home')
