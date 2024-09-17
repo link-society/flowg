@@ -42,21 +42,27 @@ func ProcessRecord(
 	record map[string]string,
 	script string,
 ) (map[string]string, error) {
-	cEntries := C.malloc(C.size_t(len(record)) * C.size_t(unsafe.Sizeof(C.hmap_entry{})))
-	defer C.free(cEntries)
+	var (
+		cEntries    unsafe.Pointer
+		cEntrySlice []C.hmap_entry
+	)
 
-	cEntrySlice := (*[1 << 30]C.hmap_entry)(cEntries)[:len(record):len(record)]
-	i := 0
-	for key, value := range record {
-		cKey := C.CString(key)
-		cValue := C.CString(value)
-		cEntrySlice[i] = C.hmap_entry{key: cKey, value: cValue}
-		i++
+	recordLen := len(record)
+
+	if recordLen > 0 {
+		cEntries = C.malloc(C.size_t(len(record)) * C.size_t(unsafe.Sizeof(C.hmap_entry{})))
+
+		cEntrySlice = (*[1 << 30]C.hmap_entry)(cEntries)[:recordLen:recordLen]
+		i := 0
+		for key, value := range record {
+			cKey := C.CString(key)
+			cValue := C.CString(value)
+			cEntrySlice[i] = C.hmap_entry{key: cKey, value: cValue}
+			i++
+		}
 	}
 
 	cInput := (*C.hmap)(C.malloc(C.size_t(unsafe.Sizeof(C.hmap{}))))
-	defer C.free(unsafe.Pointer(cInput))
-
 	cInput.count = C.size_t(len(record))
 	cInput.entries = (*C.hmap_entry)(cEntries)
 
@@ -73,12 +79,20 @@ func ProcessRecord(
 
 	switch cResult.tag {
 	case C.vrl_result_ok:
-		cResultSlice := (*[1 << 30]C.hmap_entry)(unsafe.Pointer(cResult.data.ok_data.entries))[:cResult.data.ok_data.count:cResult.data.ok_data.count]
-		for _, entry := range cResultSlice {
-			key := C.GoString(entry.key)
-			value := C.GoString(entry.value)
-			result[key] = value
+		if cResult.data.ok_data != nil && cResult.data.ok_data.count > 0 {
+			outputCount := int(cResult.data.ok_data.count)
+			cResultEntries := unsafe.Pointer(cResult.data.ok_data.entries)
+
+			if cResultEntries != nil {
+				cResultSlice := (*[1 << 30]C.hmap_entry)(cResultEntries)[:outputCount:outputCount]
+				for _, entry := range cResultSlice {
+					key := C.GoString(entry.key)
+					value := C.GoString(entry.value)
+					result[key] = value
+				}
+			}
 		}
+
 		return result, nil
 
 	case C.vrl_result_err:

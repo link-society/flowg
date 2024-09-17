@@ -60,22 +60,25 @@ pub extern "C" fn hmap_free(this: *mut hmap) {
   if !this.is_null() {
     unsafe {
       let hmap = Box::from_raw(this);
-      let entries = std::slice::from_raw_parts_mut(hmap.entries, hmap.count);
 
-      for entry in entries.iter() {
-        if !entry.key.is_null() {
-          let _ = CString::from_raw(entry.key);
-          // dropped automatically
+      if hmap.count > 0 {
+        let entries = std::slice::from_raw_parts_mut(hmap.entries, hmap.count);
+
+        for entry in entries.iter() {
+          if !entry.key.is_null() {
+            let _ = CString::from_raw(entry.key);
+            // dropped automatically
+          }
+
+          if !entry.value.is_null() {
+            let _ = CString::from_raw(entry.value);
+            // dropped automatically
+          }
         }
 
-        if !entry.value.is_null() {
-          let _ = CString::from_raw(entry.value);
-          // dropped automatically
-        }
+        let _ = Box::from_raw(entries.as_mut_ptr());
+        // dropped automatically
       }
-
-      let _ = Box::from_raw(entries.as_mut_ptr());
-      // dropped automatically
     }
   }
 }
