@@ -75,7 +75,7 @@ func TestAlertUsecase(
 	u.SetName("test_alert")
 	u.SetTitle("Test Alert")
 	u.SetDescription("Test alert")
-	u.SetTags("alerts")
+	u.SetTags("tests")
 
 	u.SetExpectedErrors(status.PermissionDenied, status.NotFound, status.Internal)
 
