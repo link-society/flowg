@@ -44,6 +44,22 @@ export default createBrowserRouter([
             },
           },
           {
+            path: 'transformers',
+            lazy: async () => {
+              const { TransformerView: Component } = await import('@/views/app/transformers/section')
+              const { loader } = await import('@/views/app/transformers/loader')
+              return { Component, loader }
+            },
+          },
+          {
+            path: 'transformers/:transformer',
+            lazy: async () => {
+              const { TransformerView: Component } = await import('@/views/app/transformers/item')
+              const { loader } = await import('@/views/app/transformers/loader')
+              return { Component, loader }
+            },
+          },
+          {
             path: '',
             lazy: async () => {
               const { HomeView: Component } = await import('@/views/app/home')
