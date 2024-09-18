@@ -3,6 +3,7 @@ package web
 import (
 	"embed"
 
+	"encoding/base64"
 	"io"
 	"net/http"
 	"strings"
@@ -21,6 +22,9 @@ func NewHandler() http.Handler {
 				r.URL.Path = "/public/" + r.URL.Path
 
 				w.Header().Set("Content-Encoding", "gzip")
+				w.Header().Set("Cache-Control", "public, max-age=86400")
+				w.Header().Set("ETag", base64.StdEncoding.EncodeToString([]byte(r.URL.Path)))
+
 				http.FileServer(http.FS(staticfiles)).ServeHTTP(w, r)
 			} else {
 				html, err := staticfiles.Open("public/index.html")
