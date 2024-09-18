@@ -12,6 +12,41 @@ export const listTransformers = async (): Promise<string[]> => {
   return body.transformers
 }
 
+export const getTransformer = async (transformer: string): Promise<string> => {
+  type GetTransformerResponse = {
+    success: boolean
+    script: string
+  }
+
+  const { body } = await request.GET<GetTransformerResponse>(
+    `/api/v1/transformers/${transformer}`
+  )
+  return body.script
+}
+
+export const saveTransformer = async (transformer: string, script: string): Promise<void> => {
+  type SaveTransformerRequest = {
+    script: string
+  }
+
+  type SaveTransformerResponse = {
+    success: boolean
+  }
+
+  await request.PUT<SaveTransformerRequest, SaveTransformerResponse>(
+    `/api/v1/transformers/${transformer}`,
+    { script }
+  )
+}
+
+export const deleteTransformer = async (transformer: string): Promise<void> => {
+  type DeleteTransformerResponse = {
+    success: boolean
+  }
+
+  await request.DELETE<DeleteTransformerResponse>(`/api/v1/transformers/${transformer}`)
+}
+
 export const listStreams = async (): Promise<{ [stream: string]: StreamConfigModel }> => {
   type ListStreamsResponse = {
     success: boolean
