@@ -14,10 +14,14 @@ import (
 
 	"link-society.com/flowg/internal/data/auth"
 	"link-society.com/flowg/internal/data/lognotify"
+	"link-society.com/flowg/internal/data/logstorage"
+
+	"link-society.com/flowg/internal/ffi/filterdsl"
 )
 
 type WatchLogsRequest struct {
-	Stream string `path:"stream" minLength:"1"`
+	Stream string  `path:"stream" minLength:"1"`
+	Filter *string `query:"filter"`
 }
 
 type WatchLogsResponse struct {
@@ -37,6 +41,25 @@ func WatchLogsUsecase(
 				req WatchLogsRequest,
 				resp *WatchLogsResponse,
 			) error {
+				var filter logstorage.Filter
+
+				if req.Filter != nil {
+					var err error
+
+					filter, err = filterdsl.Compile(*req.Filter)
+					if err != nil {
+						slog.ErrorContext(
+							ctx,
+							"Failed to compile filter",
+							"channel", "api",
+							"error", err.Error(),
+							"filter", req.Filter,
+						)
+
+						return status.Wrap(err, status.InvalidArgument)
+					}
+				}
+
 				resp.Writer.(http.ResponseWriter).Header().Set("Access-Control-Allow-Origin", "*")
 				resp.Writer.(http.ResponseWriter).Header().Set("Access-Control-Expose-Headers", "Content-Type")
 
@@ -60,19 +83,21 @@ func WatchLogsUsecase(
 				logC := logNotifier.Subscribe(req.Stream, ctx.Done())
 
 				for log := range logC {
-					payload, err := json.Marshal(log.LogEntry)
-					if err != nil {
-						fmt.Fprintf(resp, "event: error\n")
-						fmt.Fprintf(resp, "data: %s\n\n", err.Error())
+					if filter == nil || filter.Evaluate(&log.LogEntry) {
+						payload, err := json.Marshal(log.LogEntry)
+						if err != nil {
+							fmt.Fprintf(resp, "event: error\n")
+							fmt.Fprintf(resp, "data: %s\n\n", err.Error())
+							resp.Writer.(http.Flusher).Flush()
+
+							return nil
+						}
+
+						fmt.Fprintf(resp, "id: %s\n", log.LogKey)
+						fmt.Fprintf(resp, "event: log\n")
+						fmt.Fprintf(resp, "data: %s\n\n", payload)
 						resp.Writer.(http.Flusher).Flush()
-
-						return nil
 					}
-
-					fmt.Fprintf(resp, "id: %s\n", log.LogKey)
-					fmt.Fprintf(resp, "event: log\n")
-					fmt.Fprintf(resp, "data: %s\n\n", payload)
-					resp.Writer.(http.Flusher).Flush()
 				}
 
 				return nil
