@@ -12,10 +12,15 @@ type ApiRequestResult<R> = {
   response: Response
 }
 
+type RequestOptions<B> = {
+  path: string
+  searchParams?: URLSearchParams,
+  body?: B
+}
+
 const request = async<B, R extends { success: boolean }>(
   method: ApiMethod,
-  path: string,
-  body?: B,
+  { path, searchParams, body }: RequestOptions<B>,
 ): Promise<ApiRequestResult<R>> => {
   let authHeader = ''
 
@@ -24,14 +29,17 @@ const request = async<B, R extends { success: boolean }>(
     authHeader = `Bearer ${token}`
   }
 
-  const response = await fetch(path, {
-    method,
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': authHeader,
+  const response = await fetch(
+    `path?${searchParams?.toString() ?? ''}`,
+    {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': authHeader,
+      },
+      body: JSON.stringify(body),
     },
-    body: JSON.stringify(body),
-  })
+  )
   const responseBody = await response.json()
 
   if (!response.ok) {
@@ -59,18 +67,26 @@ const request = async<B, R extends { success: boolean }>(
   }
 }
 
-export const GET = async<R extends { success: boolean }>(path: string): Promise<ApiRequestResult<R>> => {
-  return request('GET', path)
+export const GET = async<R extends { success: boolean }>(
+  options: RequestOptions<never>,
+): Promise<ApiRequestResult<R>> => {
+  return request('GET', options)
 }
 
-export const POST = async<B, R extends { success: boolean }>(path: string, body: B): Promise<ApiRequestResult<R>> => {
-  return request('POST', path, body)
+export const POST = async<B, R extends { success: boolean }>(
+  options: RequestOptions<B>,
+): Promise<ApiRequestResult<R>> => {
+  return request('POST', options)
 }
 
-export const PUT = async<B, R extends { success: boolean }>(path: string, body: B): Promise<ApiRequestResult<R>> => {
-  return request('PUT', path, body)
+export const PUT = async<B, R extends { success: boolean }>(
+  options: RequestOptions<B>,
+): Promise<ApiRequestResult<R>> => {
+  return request('PUT', options)
 }
 
-export const DELETE = async<R extends { success: boolean }>(path: string): Promise<ApiRequestResult<R>> => {
-  return request('DELETE', path)
+export const DELETE = async<R extends { success: boolean }>(
+  options: RequestOptions<never>,
+): Promise<ApiRequestResult<R>> => {
+  return request('DELETE', options)
 }

@@ -9,7 +9,9 @@ export const whoami = async (): Promise<ProfileModel> => {
     permissions: PermissionsModel
   }
 
-  const { body } = await request.GET<WhoamiResponse>('/api/v1/auth/whoami')
+  const { body } = await request.GET<WhoamiResponse>({
+    path: '/api/v1/auth/whoami',
+  })
   return { user: body.user, permissions: body.permissions }
 }
 
@@ -25,10 +27,10 @@ export const login = async (username: string, password: string): Promise<void> =
   }
 
   try {
-    const { body } = await request.POST<LoginRequest, LoginResponse>(
-      '/api/v1/auth/login',
-      { username, password },
-    )
+    const { body } = await request.POST<LoginRequest, LoginResponse>({
+      path: '/api/v1/auth/login',
+      body: { username, password },
+    })
     localStorage.setItem('token', body.token)
   }
   catch (error) {
@@ -51,11 +53,11 @@ export const changePassword = async (oldPassword: string, newPassword: string): 
     success: boolean
   }
 
-  await request.POST<ChangePasswordRequest, ChangePasswordResponse>(
-    '/api/v1/auth/change-password',
-    {
+  await request.POST<ChangePasswordRequest, ChangePasswordResponse>({
+    path: '/api/v1/auth/change-password',
+    body: {
       old_password: oldPassword,
       new_password: newPassword,
     },
-  )
+  })
 }
