@@ -5,15 +5,10 @@ import Grid from '@mui/material/Grid2'
 import { ProfileInfo } from './profile-info'
 import { TokenList } from './token-list'
 
-import * as tokenApi from '@/lib/api/operations/token'
-import { loginRequired } from '@/lib/decorators/loaders'
-
-export const loader = async () => {
-  return await loginRequired(tokenApi.listTokens)()
-}
+import { LoaderData } from './loader'
 
 export const AccountView = () => {
-  const tokens = useLoaderData() as string[]
+  const { tokens } = useLoaderData() as LoaderData
 
   return (
     <>

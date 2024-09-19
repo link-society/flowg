@@ -32,14 +32,16 @@ export default createBrowserRouter([
           {
             path: 'account',
             lazy: async () => {
-              const { AccountView: Component, loader } = await import('@/views/app/account')
+              const { AccountView: Component } = await import('@/views/app/account')
+              const { loader } = await import('@/views/app/account/loader')
               return { Component, loader }
             },
           },
           {
             path: 'admin',
             lazy: async () => {
-              const { AdminView: Component, loader } = await import('@/views/app/admin')
+              const { AdminView: Component } = await import('@/views/app/admin')
+              const { loader } = await import('@/views/app/admin/loader')
               return { Component, loader }
             },
           },
