@@ -49,3 +49,8 @@ export type PipelineModel = {
   nodes: ReactFlowJsonObject['nodes'],
   edges: ReactFlowJsonObject['edges'],
 }
+
+export type LogEntryModel = {
+  timestamp: Date
+  fields: Record<string, string>
+}
