@@ -8,7 +8,9 @@ export const listUsers = async (): Promise<UserModel[]> => {
     users: UserModel[]
   }
 
-  const { body } = await request.GET<ListUsersResponse>('/api/v1/users')
+  const { body } = await request.GET<ListUsersResponse>({
+    path: '/api/v1/users',
+  })
   return body.users
 }
 
@@ -22,17 +24,19 @@ export const saveUser = async (user: UserModel, password: string): Promise<void>
     success: boolean
   }
 
-  await request.PUT<SaveUserRequest, SaveUserResponse>(
-    `/api/v1/users/${user.name}`,
-    {
+  await request.PUT<SaveUserRequest, SaveUserResponse>({
+    path: `/api/v1/users/${user.name}`,
+    body: {
       password,
       roles: user.roles,
     },
-  )
+  })
 }
 
 export const deleteUser = async (username: string): Promise<void> => {
-  await request.DELETE(`/api/v1/users/${username}`)
+  await request.DELETE({
+    path: `/api/v1/users/${username}`,
+  })
 }
 
 export const listRoles = async (): Promise<RoleModel[]> => {
@@ -41,7 +45,9 @@ export const listRoles = async (): Promise<RoleModel[]> => {
     roles: RoleModel[]
   }
 
-  const { body } = await request.GET<ListRolesResponse>('/api/v1/roles')
+  const { body } = await request.GET<ListRolesResponse>({
+    path: '/api/v1/roles',
+  })
   return body.roles
 }
 
@@ -54,14 +60,16 @@ export const saveRole = async (role: RoleModel): Promise<void> => {
     success: boolean
   }
 
-  await request.PUT<SaveRoleRequest, SaveRoleResponse>(
-    `/api/v1/roles/${role.name}`,
-    {
+  await request.PUT<SaveRoleRequest, SaveRoleResponse>({
+    path: `/api/v1/roles/${role.name}`,
+    body: {
       scopes: role.scopes,
     },
-  )
+  })
 }
 
 export const deleteRole = async (roleName: string): Promise<void> => {
-  await request.DELETE(`/api/v1/roles/${roleName}`)
+  await request.DELETE({
+    path: `/api/v1/roles/${roleName}`,
+  })
 }

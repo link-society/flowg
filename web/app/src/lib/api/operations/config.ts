@@ -8,7 +8,9 @@ export const listTransformers = async (): Promise<string[]> => {
     transformers: string[]
   }
 
-  const { body } = await request.GET<ListTransformersResponse>('/api/v1/transformers')
+  const { body } = await request.GET<ListTransformersResponse>({
+    path: '/api/v1/transformers',
+  })
   return body.transformers
 }
 
@@ -18,9 +20,10 @@ export const getTransformer = async (transformer: string): Promise<string> => {
     script: string
   }
 
-  const { body } = await request.GET<GetTransformerResponse>(
-    `/api/v1/transformers/${transformer}`
-  )
+  const { body } = await request.GET<GetTransformerResponse>({
+    path: `/api/v1/transformers/${transformer}`,
+  })
+
   return body.script
 }
 
@@ -33,10 +36,10 @@ export const saveTransformer = async (transformer: string, script: string): Prom
     success: boolean
   }
 
-  await request.PUT<SaveTransformerRequest, SaveTransformerResponse>(
-    `/api/v1/transformers/${transformer}`,
-    { script }
-  )
+  await request.PUT<SaveTransformerRequest, SaveTransformerResponse>({
+    path: `/api/v1/transformers/${transformer}`,
+    body: { script },
+  })
 }
 
 export const deleteTransformer = async (transformer: string): Promise<void> => {
@@ -44,7 +47,9 @@ export const deleteTransformer = async (transformer: string): Promise<void> => {
     success: boolean
   }
 
-  await request.DELETE<DeleteTransformerResponse>(`/api/v1/transformers/${transformer}`)
+  await request.DELETE<DeleteTransformerResponse>({
+    path: `/api/v1/transformers/${transformer}`,
+  })
 }
 
 export const listStreams = async (): Promise<{ [stream: string]: StreamConfigModel }> => {
@@ -53,8 +58,23 @@ export const listStreams = async (): Promise<{ [stream: string]: StreamConfigMod
     streams: { [stream: string]: StreamConfigModel }
   }
 
-  const { body } = await request.GET<ListStreamsResponse>('/api/v1/streams')
+  const { body } = await request.GET<ListStreamsResponse>({
+    path: '/api/v1/streams',
+  })
   return body.streams
+}
+
+export const listStreamFields = async (stream: string): Promise<string[]> => {
+  type ListStreamFieldsResponse = {
+    success: boolean
+    fields: string[]
+  }
+
+  const { body } = await request.GET<ListStreamFieldsResponse>({
+    path: `/api/v1/streams/${stream}/fields`,
+  })
+
+  return body.fields
 }
 
 export const listAlerts = async (): Promise<string[]> => {
@@ -63,7 +83,9 @@ export const listAlerts = async (): Promise<string[]> => {
     alerts: string[]
   }
 
-  const { body } = await request.GET<ListAlertsResponse>('/api/v1/alerts')
+  const { body } = await request.GET<ListAlertsResponse>({
+    path: '/api/v1/alerts',
+  })
   return body.alerts
 }
 
@@ -73,7 +95,10 @@ export const listPipelines = async (): Promise<string[]> => {
     pipelines: string[]
   }
 
-  const { body } = await request.GET<ListPipelinesResponse>('/api/v1/pipelines')
+  const { body } = await request.GET<ListPipelinesResponse>({
+    path: '/api/v1/pipelines',
+  })
+
   return body.pipelines
 }
 
@@ -83,9 +108,9 @@ export const getPipeline = async (pipeline: string): Promise<PipelineModel> => {
     flow: PipelineModel
   }
 
-  const { body } = await request.GET<GetPipelineResponse>(
-    `/api/v1/pipelines/${pipeline}`
-  )
+  const { body } = await request.GET<GetPipelineResponse>({
+    path: `/api/v1/pipelines/${pipeline}`,
+  })
   return body.flow
 }
 
@@ -98,10 +123,10 @@ export const savePipeline = async (pipeline: string, flow: PipelineModel): Promi
     success: boolean
   }
 
-  await request.PUT<SavePipelineRequest, SavePipelineResponse>(
-    `/api/v1/pipelines/${pipeline}`,
-    { flow }
-  )
+  await request.PUT<SavePipelineRequest, SavePipelineResponse>({
+    path: `/api/v1/pipelines/${pipeline}`,
+    body: { flow },
+  })
 }
 
 export const deletePipeline = async (pipeline: string): Promise<void> => {
@@ -109,5 +134,7 @@ export const deletePipeline = async (pipeline: string): Promise<void> => {
     success: boolean
   }
 
-  await request.DELETE<DeletePipelineResponse>(`/api/v1/pipelines/${pipeline}`)
+  await request.DELETE<DeletePipelineResponse>({
+    path: `/api/v1/pipelines/${pipeline}`,
+  })
 }

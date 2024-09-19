@@ -14,12 +14,12 @@ export const testTransformer = async (
     record: Record<string, string>
   }
 
-  const { body } = await request.POST<TestTransformerRequest, TestTransformerResponse>(
-    '/api/v1/test/transformer',
-    {
+  const { body } = await request.POST<TestTransformerRequest, TestTransformerResponse>({
+    path: '/api/v1/test/transformer',
+    body: {
       code,
       record,
     },
-  )
+  })
   return body.record
 }

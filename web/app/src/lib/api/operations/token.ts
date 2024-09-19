@@ -7,7 +7,9 @@ export const listTokens = async (): Promise<string[]> => {
     success: boolean
     token_uuids: string[]
   }
-  const { body } = await request.GET<ListTokensResponse>('/api/v1/tokens')
+  const { body } = await request.GET<ListTokensResponse>({
+    path: '/api/v1/tokens',
+  })
   return body.token_uuids
 }
 
@@ -18,10 +20,15 @@ export const createToken = async (): Promise<TokenModel> => {
     token_uuid: string
   }
 
-  const { body } = await request.POST<unknown, CreateTokenResponse>('/api/v1/token', {})
+  const { body } = await request.POST<unknown, CreateTokenResponse>({
+    path: '/api/v1/token',
+    body: {},
+  })
   return { token: body.token, token_uuid: body.token_uuid }
 }
 
 export const deleteToken = async (tokenUuid: string): Promise<void> => {
-  await request.DELETE(`/api/v1/tokens/${tokenUuid}`)
+  await request.DELETE({
+    path: `/api/v1/tokens/${tokenUuid}`,
+  })
 }
