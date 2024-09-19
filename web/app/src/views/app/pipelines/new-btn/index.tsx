@@ -8,15 +8,15 @@ import AddIcon from '@mui/icons-material/Add'
 
 import Button from '@mui/material/Button'
 
-import { NewTransformerModal } from './modal'
+import { NewPipelineModal } from './modal'
 
 import { UnauthenticatedError, PermissionDeniedError } from '@/lib/api/errors'
 
-type NewTransformerButtonProps = {
-  onTransformerCreated: (name: string) => void
+type NewPipelineButtonProps = {
+  onPipelineCreated: (name: string) => void
 }
 
-export const NewTransformerButton = (props: NewTransformerButtonProps) => {
+export const NewPipelineButton = (props: NewPipelineButtonProps) => {
   const dialogs = useDialogs()
   const navigate = useNavigate()
   const notifications = useNotifications()
@@ -25,11 +25,11 @@ export const NewTransformerButton = (props: NewTransformerButtonProps) => {
   const handleClick = useCallback(
     async () => {
       try {
-        const transformerName = await dialogs.open(NewTransformerModal) as string | null
-        if (transformerName !== null) {
-          props.onTransformerCreated(transformerName)
+        const pipelineName = await dialogs.open(NewPipelineModal) as string | null
+        if (pipelineName !== null) {
+          props.onPipelineCreated(pipelineName)
 
-          notifications.show('Transformer created', {
+          notifications.show('Pipeline created', {
             severity: 'success',
             autoHideDuration: config.notifications?.autoHideDuration,
           })
@@ -59,7 +59,7 @@ export const NewTransformerButton = (props: NewTransformerButtonProps) => {
         console.error(error)
       }
     },
-    [props.onTransformerCreated],
+    [props.onPipelineCreated],
   )
 
   return (

@@ -1,6 +1,6 @@
 import * as request from '@/lib/api/request'
 
-import { StreamConfigModel } from '@/lib/models'
+import { PipelineModel, StreamConfigModel } from '@/lib/models'
 
 export const listTransformers = async (): Promise<string[]> => {
   type ListTransformersResponse = {
@@ -75,4 +75,39 @@ export const listPipelines = async (): Promise<string[]> => {
 
   const { body } = await request.GET<ListPipelinesResponse>('/api/v1/pipelines')
   return body.pipelines
+}
+
+export const getPipeline = async (pipeline: string): Promise<PipelineModel> => {
+  type GetPipelineResponse = {
+    success: boolean
+    flow: PipelineModel
+  }
+
+  const { body } = await request.GET<GetPipelineResponse>(
+    `/api/v1/pipelines/${pipeline}`
+  )
+  return body.flow
+}
+
+export const savePipeline = async (pipeline: string, flow: PipelineModel): Promise<void> => {
+  type SavePipelineRequest = {
+    flow: PipelineModel
+  }
+
+  type SavePipelineResponse = {
+    success: boolean
+  }
+
+  await request.PUT<SavePipelineRequest, SavePipelineResponse>(
+    `/api/v1/pipelines/${pipeline}`,
+    { flow }
+  )
+}
+
+export const deletePipeline = async (pipeline: string): Promise<void> => {
+  type DeletePipelineResponse = {
+    success: boolean
+  }
+
+  await request.DELETE<DeletePipelineResponse>(`/api/v1/pipelines/${pipeline}`)
 }

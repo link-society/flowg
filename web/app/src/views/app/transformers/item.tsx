@@ -37,12 +37,17 @@ export const TransformerView = () => {
     }
   }
 
-  console.log('TRANSFORMER:', currentTransformer)
   const [code, setCode] = useState(currentTransformer.script)
-  console.log('CODE:', code)
 
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [saveLoading, setSaveLoading] = useState(false)
+
+  const onCreate = useCallback(
+    (name: string) => {
+      window.location.pathname = `/web/transformers/${name}`
+    },
+    [],
+  )
 
   const onDelete = useCallback(
     async () => {
@@ -78,7 +83,7 @@ export const TransformerView = () => {
 
       setDeleteLoading(false)
     },
-    [currentTransformer, setDeleteLoading]
+    [currentTransformer, setDeleteLoading],
   )
 
   const onSave = useCallback(
@@ -118,7 +123,7 @@ export const TransformerView = () => {
 
       setSaveLoading(false)
     },
-    [code, currentTransformer, setSaveLoading]
+    [code, currentTransformer, setSaveLoading],
   )
 
   return (
@@ -144,9 +149,11 @@ export const TransformerView = () => {
           </Button>
         </div>
 
-        {permissions.can_view_transformers && (
+        {permissions.can_edit_transformers && (
           <div className="flex flex-row items-center gap-3">
-            <NewTransformerButton />
+            <NewTransformerButton
+              onTransformerCreated={onCreate}
+            />
 
             <Button
               variant="contained"
@@ -181,14 +188,24 @@ export const TransformerView = () => {
       <Grid container spacing={1} className="p-2 flex-grow">
         <Grid size={{ xs: 2 }}>
           <Paper className="h-full overflow-auto">
-            <List component="nav">
+            <List component="nav" className="!p-0">
               {transformers.map((transformer, index) => (
                 <ListItemButton
                   key={index}
-                  selected={transformer === currentTransformer.name}
                   component="a"
                   href={`/web/transformers/${transformer}`}
-                  color="secondary"
+                  sx={transformer !== currentTransformer.name
+                    ? {
+                      color: 'secondary.main',
+                    }
+                    : {
+                      backgroundColor: 'secondary.main',
+                      '&:hover': {
+                        backgroundColor: 'secondary.main',
+                      },
+                      color: 'white',
+                    }
+                  }
                 >
                   <ListItemText primary={transformer} />
                 </ListItemButton>
