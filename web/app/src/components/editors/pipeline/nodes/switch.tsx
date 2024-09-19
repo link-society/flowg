@@ -1,4 +1,4 @@
-import React, { useCallback, useContext } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { HooksContext } from '../hooks'
 
 import { Handle, Position, Node, NodeProps } from '@xyflow/react'
@@ -14,21 +14,28 @@ type SwitchNodeData = Node<{
 export const SwitchNode = ({ id, data }: NodeProps<SwitchNodeData>) => {
   const hooksCtx = useContext(HooksContext)
 
+  const [code, setCode] = useState(data.condition)
+
   const onChange: React.ChangeEventHandler<HTMLInputElement> = useCallback(
-    (evt) => {
+    (evt) => { setCode(evt.target.value) },
+    [setCode],
+  )
+
+  useEffect(
+    () => {
       hooksCtx.setNodes((prevNodes) => {
         const newNodes = [...prevNodes]
 
         for (const node of newNodes) {
           if (node.id === id) {
-            node.data.condition = evt.target!.value
+            node.data = {condition: code}
           }
         }
 
         return newNodes
       })
     },
-    [hooksCtx, id],
+    [hooksCtx, id, code],
   )
 
   return (
@@ -61,7 +68,7 @@ export const SwitchNode = ({ id, data }: NodeProps<SwitchNodeData>) => {
           <TextField
             label="Condition"
             type="text"
-            value={data.condition}
+            value={code}
             onChange={onChange}
             slotProps={{
               input: {
