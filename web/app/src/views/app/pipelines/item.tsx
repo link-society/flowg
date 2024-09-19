@@ -160,12 +160,15 @@ export const PipelineView = () => {
                   readOnly: true,
                   sx: {
                     color: 'white',
-                    backgroundColor: colors.blue[700]
+                    backgroundColor: colors.blue[700],
                   },
                 },
                 inputLabel: {
                   sx: {
                     color: 'white',
+                    '&.Mui-focused': {
+                      color: 'white',
+                    },
                   },
                 }
               }}

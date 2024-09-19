@@ -202,24 +202,40 @@ export const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange }) =>
         <Controls />
 
         <Panel position="top-left">
-          <Paper variant="outlined" className="p-2 flex flex-row items-center gap-2">
-            <span className="text-xs font-semibold">Special Nodes:</span>
+          <Paper variant="outlined" className="flex flex-row items-center gap-3 shadow-sm">
+            <div
+              className="
+                self-stretch flex flex-row items-center
+                text-xs font-semibold
+                bg-gray-100 border-r border-r-gray-200
+                p-2
+              "
+            >
+              <span>Other Nodes:</span>
+            </div>
 
-            <Chip
-              icon={<DeviceHubIcon />}
-              label="switch"
-              variant="outlined"
-              sx={{
-                backgroundColor: colors.red[50],
-                borderColor: colors.red[500],
-              }}
-              className="!rounded-none shadow-sm hover:shadow-lg !font-mono"
-              draggable
-              onDragStart={(evt) => {
-                evt.dataTransfer.setData('item-type', 'switch')
-                evt.dataTransfer.effectAllowed = 'move'
-              }}
-            />
+            <div
+              className="
+                flex flex-row items-center gap-2
+                p-2
+              "
+            >
+              <Chip
+                icon={<DeviceHubIcon />}
+                label="switch"
+                variant="outlined"
+                sx={{
+                  backgroundColor: colors.red[50],
+                  borderColor: colors.red[500],
+                }}
+                className="!rounded-none shadow-sm hover:shadow-lg !font-mono"
+                draggable
+                onDragStart={(evt) => {
+                  evt.dataTransfer.setData('item-type', 'switch')
+                  evt.dataTransfer.effectAllowed = 'move'
+                }}
+              />
+            </div>
           </Paper>
         </Panel>
       </ReactFlow>
