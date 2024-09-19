@@ -77,7 +77,7 @@ export const SettingsMenu = () => {
         {permissions.can_view_streams && (
           <MenuItem onClick={handleClose}>
             <Button
-              href="/web/streams"
+              href="/web/storage"
               color="secondary"
               startIcon={<SdStorageIcon />}
             >
