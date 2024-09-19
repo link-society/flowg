@@ -4,16 +4,16 @@ import { useLoaderData, useNavigate } from 'react-router-dom'
 import Backdrop from '@mui/material/Backdrop'
 import CircularProgress from '@mui/material/CircularProgress'
 
-import { NewTransformerButton } from './new-btn'
+import { NewPipelineButton } from './new-btn'
 
-export const TransformerView = () => {
-  const { transformers } = useLoaderData() as { transformers: string[] }
+export const PipelineView = () => {
+  const { pipelines } = useLoaderData() as { pipelines: string[] }
   const navigate = useNavigate()
 
   useEffect(
     () => {
-      if (transformers.length > 0) {
-        navigate(`/web/transformers/${transformers[0]}`)
+      if (pipelines.length > 0) {
+        navigate(`/web/pipelines/${pipelines[0]}`)
       }
     },
     [],
@@ -21,7 +21,7 @@ export const TransformerView = () => {
 
   return (
     <>
-      {transformers.length > 0
+      {pipelines.length > 0
         ? (
           <Backdrop open={true}>
             <CircularProgress color="inherit" />
@@ -29,11 +29,11 @@ export const TransformerView = () => {
         )
         : (
           <div className="w-full h-full flex flex-col items-center justify-center gap-5">
-            <h1 className="text-3xl font-semibold">No transformer found, create one</h1>
+            <h1 className="text-3xl font-semibold">No pipeline found, create one</h1>
 
-            <NewTransformerButton
-              onTransformerCreated={(name) => {
-                window.location.pathname = `/web/transformers/${name}`
+            <NewPipelineButton
+              onPipelineCreated={(name) => {
+                window.location.pathname = `/web/pipelines/${name}`
               }}
             />
           </div>

@@ -1,3 +1,5 @@
+import { ReactFlowJsonObject } from '@xyflow/react'
+
 export type ProfileModel = {
   user: UserModel
   permissions: PermissionsModel
@@ -41,4 +43,9 @@ export type StreamConfigModel = {
 export type TokenModel = {
   token: string
   token_uuid: string
+}
+
+export type PipelineModel = {
+  nodes: ReactFlowJsonObject['nodes'],
+  edges: ReactFlowJsonObject['edges'],
 }

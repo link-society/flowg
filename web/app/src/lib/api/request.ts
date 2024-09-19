@@ -12,7 +12,7 @@ type ApiRequestResult<R> = {
   response: Response
 }
 
-const request = async<B, R>(
+const request = async<B, R extends { success: boolean }>(
   method: ApiMethod,
   path: string,
   body?: B,
@@ -49,24 +49,28 @@ const request = async<B, R>(
     }
   }
 
+  if (!responseBody.success) {
+    throw new errors.ApiError('Request failed')
+  }
+
   return {
     body: responseBody as R,
     response,
   }
 }
 
-export const GET = async<R>(path: string): Promise<ApiRequestResult<R>> => {
+export const GET = async<R extends { success: boolean }>(path: string): Promise<ApiRequestResult<R>> => {
   return request('GET', path)
 }
 
-export const POST = async<B, R>(path: string, body: B): Promise<ApiRequestResult<R>> => {
+export const POST = async<B, R extends { success: boolean }>(path: string, body: B): Promise<ApiRequestResult<R>> => {
   return request('POST', path, body)
 }
 
-export const PUT = async<B, R>(path: string, body: B): Promise<ApiRequestResult<R>> => {
+export const PUT = async<B, R extends { success: boolean }>(path: string, body: B): Promise<ApiRequestResult<R>> => {
   return request('PUT', path, body)
 }
 
-export const DELETE = async<R>(path: string): Promise<ApiRequestResult<R>> => {
+export const DELETE = async<R extends { success: boolean }>(path: string): Promise<ApiRequestResult<R>> => {
   return request('DELETE', path)
 }
