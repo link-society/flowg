@@ -23,21 +23,16 @@ import { NewTransformerButton } from './new-btn'
 import { UnauthenticatedError, PermissionDeniedError } from '@/lib/api/errors'
 import * as configApi from '@/lib/api/operations/config'
 
+import { LoaderData } from './loader'
+
 export const TransformerView = () => {
   const navigate = useNavigate()
   const notifications = useNotifications()
   const config = useConfig()
   const { permissions } = useProfile()
+  const { transformers, currentTransformer } = useLoaderData() as LoaderData
 
-  const { transformers, currentTransformer } = useLoaderData() as {
-    transformers: string[]
-    currentTransformer: {
-      name: string
-      script: string
-    }
-  }
-
-  const [code, setCode] = useState(currentTransformer.script)
+  const [code, setCode] = useState(currentTransformer!.script)
 
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [saveLoading, setSaveLoading] = useState(false)
@@ -54,7 +49,7 @@ export const TransformerView = () => {
       setDeleteLoading(true)
 
       try {
-        await configApi.deleteTransformer(currentTransformer.name)
+        await configApi.deleteTransformer(currentTransformer!.name)
         navigate('/web/transformers')
       }
       catch (error) {
@@ -91,7 +86,7 @@ export const TransformerView = () => {
       setSaveLoading(true)
 
       try {
-        await configApi.saveTransformer(currentTransformer.name, code)
+        await configApi.saveTransformer(currentTransformer!.name, code)
         notifications.show('Transformer saved', {
           severity: 'success',
           autoHideDuration: config.notifications?.autoHideDuration,
@@ -194,7 +189,7 @@ export const TransformerView = () => {
                   key={index}
                   component="a"
                   href={`/web/transformers/${transformer}`}
-                  sx={transformer !== currentTransformer.name
+                  sx={transformer !== currentTransformer!.name
                     ? {
                       color: 'secondary.main',
                     }

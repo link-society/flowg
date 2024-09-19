@@ -5,22 +5,10 @@ import Grid from '@mui/material/Grid2'
 import { RoleList } from './role-list'
 import { UserList } from './user-list'
 
-import { loginRequired } from '@/lib/decorators/loaders'
-import * as aclApi from '@/lib/api/operations/acls'
-
-import { RoleModel, UserModel } from '@/lib/models'
-
-export const loader = async () => {
-  const [roles, users] = await Promise.all([
-    loginRequired(aclApi.listRoles)(),
-    loginRequired(aclApi.listUsers)(),
-  ])
-
-  return { roles, users }
-}
+import { LoaderData } from './loader'
 
 export const AdminView = () => {
-  const { roles, users } = useLoaderData() as { roles: RoleModel[], users: UserModel[] }
+  const { roles, users } = useLoaderData() as LoaderData
 
   return (
     <>

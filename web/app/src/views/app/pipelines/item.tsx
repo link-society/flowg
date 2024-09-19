@@ -29,21 +29,16 @@ import { UnauthenticatedError, PermissionDeniedError } from '@/lib/api/errors'
 import * as configApi from '@/lib/api/operations/config'
 import { PipelineModel } from '@/lib/models'
 
+import { LoaderData } from './loader'
+
 export const PipelineView = () => {
   const navigate = useNavigate()
   const notifications = useNotifications()
   const config = useConfig()
   const { permissions } = useProfile()
+  const { currentPipeline } = useLoaderData() as LoaderData
 
-  const { currentPipeline } = useLoaderData() as {
-    pipelines: string[]
-    currentPipeline: {
-      name: string
-      flow: PipelineModel
-    }
-  }
-
-  const [flow, setFlow] = useState(currentPipeline.flow)
+  const [flow, setFlow] = useState(currentPipeline!.flow)
 
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [saveLoading, setSaveLoading] = useState(false)
@@ -65,7 +60,7 @@ export const PipelineView = () => {
       setDeleteLoading(true)
 
       try {
-        await configApi.deletePipeline(currentPipeline.name)
+        await configApi.deletePipeline(currentPipeline!.name)
         navigate('/web/pipelines')
       }
       catch (error) {
@@ -102,7 +97,7 @@ export const PipelineView = () => {
       setSaveLoading(true)
 
       try {
-        await configApi.savePipeline(currentPipeline.name, flow)
+        await configApi.savePipeline(currentPipeline!.name, flow)
         notifications.show('Pipeline saved', {
           severity: 'success',
           autoHideDuration: config.notifications?.autoHideDuration,
@@ -151,7 +146,7 @@ export const PipelineView = () => {
           <div className="flex flex-grow flex-row items-center gap-3">
             <TextField
               label="Pipeline name"
-              value={currentPipeline.name}
+              value={currentPipeline!.name}
               type="text"
               variant="outlined"
               size="small"
