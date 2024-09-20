@@ -1,7 +1,6 @@
 import { useDialogs } from '@toolpad/core/useDialogs'
-import { useNotifications } from '@toolpad/core/useNotifications'
-import { useConfig } from '@/lib/context/config'
 import { useApiOperation } from '@/lib/hooks/api'
+import { useNotify } from '@/lib/hooks/notify'
 
 import AddIcon from '@mui/icons-material/Add'
 
@@ -17,18 +16,14 @@ type CreateRoleButtonProps = {
 
 export const CreateRoleButton = ({ onRoleCreated }: CreateRoleButtonProps) => {
   const dialogs = useDialogs()
-  const notifications = useNotifications()
-  const config = useConfig()
+  const notify = useNotify()
 
   const [handleClick] = useApiOperation(
     async () => {
       const role = await dialogs.open(RoleFormModal) as RoleModel | null
       if (role !== null) {
         onRoleCreated(role)
-        notifications.show('Role created', {
-          severity: 'success',
-          autoHideDuration: config.notifications?.autoHideDuration,
-        })
+        notify.success('Role created')
       }
     },
     [onRoleCreated],

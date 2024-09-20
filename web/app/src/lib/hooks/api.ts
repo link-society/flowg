@@ -1,7 +1,6 @@
 import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useNotifications } from '@toolpad/core/useNotifications'
-import { useConfig } from '@/lib/context/config'
+import { useNotify } from '@/lib/hooks/notify'
 
 import { UnauthenticatedError, PermissionDeniedError } from '@/lib/api/errors'
 
@@ -12,8 +11,7 @@ export function useApiOperation<Args extends unknown[]>(
   const [loading, setLoading] = useState(false)
 
   const navigate = useNavigate()
-  const notifications = useNotifications()
-  const config = useConfig()
+  const notify = useNotify()
 
   const cb = useCallback(
     async (...args: Args) => {
@@ -24,23 +22,14 @@ export function useApiOperation<Args extends unknown[]>(
       }
       catch (error) {
         if (error instanceof UnauthenticatedError) {
-          notifications.show('Session expired', {
-            severity: 'error',
-            autoHideDuration: config.notifications?.autoHideDuration,
-          })
+          notify.error('Session expired')
           navigate('/web/login')
         }
         else if (error instanceof PermissionDeniedError) {
-          notifications.show('Permission denied', {
-            severity: 'error',
-            autoHideDuration: config.notifications?.autoHideDuration,
-          })
+          notify.error('Permission denied')
         }
         else {
-          notifications.show('Unknown error', {
-            severity: 'error',
-            autoHideDuration: config.notifications?.autoHideDuration,
-          })
+          notify.error('Unknown error')
         }
 
         console.error(error)

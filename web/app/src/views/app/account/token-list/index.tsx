@@ -1,7 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
-import { useNotifications } from '@toolpad/core/useNotifications'
-import { useConfig } from '@/lib/context/config'
 import { useApiOperation } from '@/lib/hooks/api'
+import { useNotify } from '@/lib/hooks/notify'
 
 import KeyIcon from '@mui/icons-material/Key'
 
@@ -25,8 +24,7 @@ type TokenListProps = {
 }
 
 export const TokenList = ({ tokens }: TokenListProps) => {
-  const notifications = useNotifications()
-  const config = useConfig()
+  const notify = useNotify()
 
   const gridRef = useRef<AgGridReact<RowType>>(null!)
 
@@ -50,10 +48,7 @@ export const TokenList = ({ tokens }: TokenListProps) => {
         })
       }
 
-      notifications.show('Token deleted', {
-        severity: 'success',
-        autoHideDuration: config.notifications?.autoHideDuration,
-      })
+      notify.success('Token deleted')
     },
     [gridRef],
   )

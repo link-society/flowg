@@ -1,7 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
-import { useNotifications } from '@toolpad/core/useNotifications'
-import { useConfig } from '@/lib/context/config'
 import { useApiOperation } from '@/lib/hooks/api'
+import { useNotify } from '@/lib/hooks/notify'
 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 
@@ -25,8 +24,7 @@ type UserListProps = {
 }
 
 export const UserList = ({ roles, users }: UserListProps) => {
-  const notifications = useNotifications()
-  const config = useConfig()
+  const notify = useNotify()
 
   const gridRef = useRef<AgGridReact<UserModel>>(null!)
 
@@ -50,10 +48,7 @@ export const UserList = ({ roles, users }: UserListProps) => {
         })
       }
 
-      notifications.show('User deleted', {
-        severity: 'success',
-        autoHideDuration: config.notifications?.autoHideDuration,
-      })
+      notify.success('User deleted')
     },
     [gridRef],
   )

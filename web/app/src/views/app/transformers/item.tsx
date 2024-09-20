@@ -1,9 +1,8 @@
 import { useCallback, useState } from 'react'
 import { useLoaderData, useNavigate } from 'react-router-dom'
-import { useNotifications } from '@toolpad/core/useNotifications'
-import { useConfig } from '@/lib/context/config'
 import { useProfile } from '@/lib/context/profile'
 import { useApiOperation } from '@/lib/hooks/api'
+import { useNotify } from '@/lib/hooks/notify'
 
 import HelpIcon from '@mui/icons-material/Help'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -27,8 +26,8 @@ import { LoaderData } from './loader'
 
 export const TransformerView = () => {
   const navigate = useNavigate()
-  const notifications = useNotifications()
-  const config = useConfig()
+  const notify = useNotify()
+
   const { permissions } = useProfile()
   const { transformers, currentTransformer } = useLoaderData() as LoaderData
 
@@ -52,10 +51,7 @@ export const TransformerView = () => {
   const [onSave, saveLoading] = useApiOperation(
     async () => {
       await configApi.saveTransformer(currentTransformer!.name, code)
-      notifications.show('Transformer saved', {
-        severity: 'success',
-        autoHideDuration: config.notifications?.autoHideDuration,
-      })
+      notify.success('Transformer saved')
     },
     [code, currentTransformer],
   )

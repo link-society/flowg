@@ -1,7 +1,6 @@
 import { useDialogs } from '@toolpad/core/useDialogs'
-import { useNotifications } from '@toolpad/core/useNotifications'
-import { useConfig } from '@/lib/context/config'
 import { useApiOperation } from '@/lib/hooks/api'
+import { useNotify } from '@/lib/hooks/notify'
 
 import AddIcon from '@mui/icons-material/Add'
 
@@ -15,8 +14,7 @@ type NewPipelineButtonProps = {
 
 export const NewPipelineButton = (props: NewPipelineButtonProps) => {
   const dialogs = useDialogs()
-  const notifications = useNotifications()
-  const config = useConfig()
+  const notify = useNotify()
 
   const [handleClick] = useApiOperation(
     async () => {
@@ -24,10 +22,7 @@ export const NewPipelineButton = (props: NewPipelineButtonProps) => {
       if (pipelineName !== null) {
         props.onPipelineCreated(pipelineName)
 
-        notifications.show('Pipeline created', {
-          severity: 'success',
-          autoHideDuration: config.notifications?.autoHideDuration,
-        })
+        notify.success('Pipeline created')
       }
     },
     [props.onPipelineCreated],

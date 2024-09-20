@@ -1,7 +1,6 @@
 import { useDialogs } from '@toolpad/core/useDialogs'
-import { useNotifications } from '@toolpad/core/useNotifications'
-import { useConfig } from '@/lib/context/config'
 import { useApiOperation } from '@/lib/hooks/api'
+import { useNotify } from '@/lib/hooks/notify'
 
 import AddIcon from '@mui/icons-material/Add'
 
@@ -18,18 +17,14 @@ type CreateUserButtonProps = {
 
 export const CreateUserButton = ({ roles, onUserCreated }: CreateUserButtonProps) => {
   const dialogs = useDialogs()
-  const notifications = useNotifications()
-  const config = useConfig()
+  const notify = useNotify()
 
   const [handleClick] = useApiOperation(
     async () => {
       const user = await dialogs.open(UserFormModal, roles) as UserModel | null
       if (user !== null) {
         onUserCreated(user)
-        notifications.show('User created', {
-          severity: 'success',
-          autoHideDuration: config.notifications?.autoHideDuration,
-        })
+        notify.success('User created')
       }
     },
     [onUserCreated],

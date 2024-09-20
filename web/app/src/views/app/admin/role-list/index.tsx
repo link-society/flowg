@@ -1,7 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
-import { useNotifications } from '@toolpad/core/useNotifications'
-import { useConfig } from '@/lib/context/config'
 import { useApiOperation } from '@/lib/hooks/api'
+import { useNotify } from '@/lib/hooks/notify'
 
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
 
@@ -24,8 +23,7 @@ type RoleListProps = {
 }
 
 export const RoleList = ({ roles }: RoleListProps) => {
-  const notifications = useNotifications()
-  const config = useConfig()
+  const notify = useNotify()
 
   const gridRef = useRef<AgGridReact<RoleModel>>(null!)
 
@@ -49,10 +47,7 @@ export const RoleList = ({ roles }: RoleListProps) => {
         })
       }
 
-      notifications.show('Role deleted', {
-        severity: 'success',
-        autoHideDuration: config.notifications?.autoHideDuration,
-      })
+      notify.success('Role deleted')
     },
     [gridRef],
   )

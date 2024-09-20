@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { useNotifications } from '@toolpad/core/useNotifications'
 import { useApiOperation } from '@/lib/hooks/api'
+import { useNotify } from '@/lib/hooks/notify'
 
 import * as colors from '@mui/material/colors'
 
@@ -23,7 +23,6 @@ import { TransformerEditor } from '@/components/editors/transformer'
 import { AuthenticatedAwait } from '@/components/routing/await'
 
 import * as configApi from '@/lib/api/operations/config'
-import { useConfig } from '@/lib/context/config'
 
 
 const Transition = React.forwardRef(function Transition(
@@ -38,8 +37,7 @@ type OpenTransformerDialogProps = {
 }
 
 export const OpenTransformerDialog = ({ transformer }: OpenTransformerDialogProps) => {
-  const notifications = useNotifications()
-  const config = useConfig()
+  const notify = useNotify()
 
   const [open, setOpen] = useState(false)
 
@@ -64,11 +62,7 @@ export const OpenTransformerDialog = ({ transformer }: OpenTransformerDialogProp
   const [onSave, saveLoading] = useApiOperation(
     async () => {
       await configApi.saveTransformer(transformer, code)
-      notifications.show('Transformer saved', {
-        severity: 'success',
-        autoHideDuration: config.notifications?.autoHideDuration,
-      })
-
+      notify.success('Transformer saved')
       setTransformerPromise(onFetch(transformer))
     },
     [transformer, code, setTransformerPromise, onFetch],

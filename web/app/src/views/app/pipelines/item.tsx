@@ -1,9 +1,8 @@
 import { useCallback, useState } from 'react'
 import { useLoaderData, useNavigate } from 'react-router-dom'
-import { useNotifications } from '@toolpad/core/useNotifications'
-import { useConfig } from '@/lib/context/config'
 import { useProfile } from '@/lib/context/profile'
 import { useApiOperation } from '@/lib/hooks/api'
+import { useNotify } from '@/lib/hooks/notify'
 
 import * as colors from '@mui/material/colors'
 
@@ -33,8 +32,8 @@ import { LoaderData } from './loader'
 
 export const PipelineView = () => {
   const navigate = useNavigate()
-  const notifications = useNotifications()
-  const config = useConfig()
+  const notify = useNotify()
+
   const { permissions } = useProfile()
   const { currentPipeline } = useLoaderData() as LoaderData
 
@@ -63,10 +62,7 @@ export const PipelineView = () => {
   const [onSave, saveLoading] = useApiOperation(
     async () => {
       await configApi.savePipeline(currentPipeline!.name, flow)
-      notifications.show('Pipeline saved', {
-        severity: 'success',
-        autoHideDuration: config.notifications?.autoHideDuration,
-      })
+      notify.success('Pipeline saved')
     },
     [flow, currentPipeline],
   )

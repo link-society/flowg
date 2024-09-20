@@ -1,7 +1,6 @@
 import { useDialogs } from '@toolpad/core/useDialogs'
-import { useNotifications } from '@toolpad/core/useNotifications'
-import { useConfig } from '@/lib/context/config'
 import { useApiOperation } from '@/lib/hooks/api'
+import { useNotify } from '@/lib/hooks/notify'
 
 import AddIcon from '@mui/icons-material/Add'
 
@@ -18,18 +17,14 @@ type CreateTokenButtonProps = {
 
 export const CreateTokenButton = ({ onTokenCreated }: CreateTokenButtonProps) => {
   const dialogs = useDialogs()
-  const notifications = useNotifications()
-  const config = useConfig()
+  const notify = useNotify()
 
   const [handleClick, loading] = useApiOperation(
     async () => {
       const { token, token_uuid } = await tokenApi.createToken()
       await dialogs.open(ShowNewTokenModal, token)
       onTokenCreated(token_uuid)
-      notifications.show('Token created', {
-        severity: 'success',
-        autoHideDuration: config.notifications?.autoHideDuration,
-      })
+      notify.success('Token created')
     },
     [onTokenCreated],
   )
