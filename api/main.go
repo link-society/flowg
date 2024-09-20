@@ -34,10 +34,11 @@ func NewHandler(
 	service.Post("/api/v1/auth/login", LoginUsecase(authDb))
 
 	service.With(
-		nethttp.HTTPBasicSecurityMiddleware(
+		nethttp.HTTPBearerSecurityMiddleware(
 			service.OpenAPICollector,
 			"patAuth",
 			"Authentication using Personal Access Token",
+			"PAT",
 		),
 		nethttp.HTTPBearerSecurityMiddleware(
 			service.OpenAPICollector,

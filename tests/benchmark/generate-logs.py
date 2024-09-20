@@ -23,7 +23,7 @@ def send_log(token: str, log: str):
         data=payload,
         headers={
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {token}",
+            "Authorization": f"Bearer pat:{token}",
         },
     )
 

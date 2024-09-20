@@ -26,11 +26,11 @@ const request = async<B, R extends { success: boolean }>(
 
   const token = localStorage.getItem('token')
   if (token !== null) {
-    authHeader = `Bearer ${token}`
+    authHeader = `Bearer jwt:${token}`
   }
 
   const response = await fetch(
-    `path?${searchParams?.toString() ?? ''}`,
+    `${path}?${searchParams?.toString() ?? ''}`,
     {
       method,
       headers: {
