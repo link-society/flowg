@@ -3,6 +3,7 @@ import { useLoaderData, useNavigate } from 'react-router-dom'
 import { useNotifications } from '@toolpad/core/useNotifications'
 import { useConfig } from '@/lib/context/config'
 import { useProfile } from '@/lib/context/profile'
+import { useApiOperation } from '@/lib/hooks/api'
 
 import HelpIcon from '@mui/icons-material/Help'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -20,7 +21,6 @@ import CircularProgress from '@mui/material/CircularProgress'
 import { TransformerEditor } from '@/components/editors/transformer'
 import { NewTransformerButton } from './new-btn'
 
-import { UnauthenticatedError, PermissionDeniedError } from '@/lib/api/errors'
 import * as configApi from '@/lib/api/operations/config'
 
 import { LoaderData } from './loader'
@@ -34,9 +34,6 @@ export const TransformerView = () => {
 
   const [code, setCode] = useState(currentTransformer!.script)
 
-  const [deleteLoading, setDeleteLoading] = useState(false)
-  const [saveLoading, setSaveLoading] = useState(false)
-
   const onCreate = useCallback(
     (name: string) => {
       window.location.pathname = `/web/transformers/${name}`
@@ -44,81 +41,23 @@ export const TransformerView = () => {
     [],
   )
 
-  const onDelete = useCallback(
+  const [onDelete, deleteLoading] = useApiOperation(
     async () => {
-      setDeleteLoading(true)
-
-      try {
-        await configApi.deleteTransformer(currentTransformer!.name)
-        navigate('/web/transformers')
-      }
-      catch (error) {
-        if (error instanceof UnauthenticatedError) {
-          notifications.show('Session expired', {
-            severity: 'error',
-            autoHideDuration: config.notifications?.autoHideDuration,
-          })
-          navigate('/web/login')
-        }
-        else if (error instanceof PermissionDeniedError) {
-          notifications.show('Permission denied', {
-            severity: 'error',
-            autoHideDuration: config.notifications?.autoHideDuration,
-          })
-        }
-        else {
-          notifications.show('Unknown error', {
-            severity: 'error',
-            autoHideDuration: config.notifications?.autoHideDuration,
-          })
-        }
-
-        console.error(error)
-      }
-
-      setDeleteLoading(false)
+      await configApi.deleteTransformer(currentTransformer!.name)
+      navigate('/web/transformers')
     },
-    [currentTransformer, setDeleteLoading],
+    [currentTransformer],
   )
 
-  const onSave = useCallback(
+  const [onSave, saveLoading] = useApiOperation(
     async () => {
-      setSaveLoading(true)
-
-      try {
-        await configApi.saveTransformer(currentTransformer!.name, code)
-        notifications.show('Transformer saved', {
-          severity: 'success',
-          autoHideDuration: config.notifications?.autoHideDuration,
-        })
-      }
-      catch (error) {
-        if (error instanceof UnauthenticatedError) {
-          notifications.show('Session expired', {
-            severity: 'error',
-            autoHideDuration: config.notifications?.autoHideDuration,
-          })
-          navigate('/web/login')
-        }
-        else if (error instanceof PermissionDeniedError) {
-          notifications.show('Permission denied', {
-            severity: 'error',
-            autoHideDuration: config.notifications?.autoHideDuration,
-          })
-        }
-        else {
-          notifications.show('Unknown error', {
-            severity: 'error',
-            autoHideDuration: config.notifications?.autoHideDuration,
-          })
-        }
-
-        console.error(error)
-      }
-
-      setSaveLoading(false)
+      await configApi.saveTransformer(currentTransformer!.name, code)
+      notifications.show('Transformer saved', {
+        severity: 'success',
+        autoHideDuration: config.notifications?.autoHideDuration,
+      })
     },
-    [code, currentTransformer, setSaveLoading],
+    [code, currentTransformer],
   )
 
   return (

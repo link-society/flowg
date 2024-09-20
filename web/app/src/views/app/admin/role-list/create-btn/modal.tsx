@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
-import { useNotifications } from '@toolpad/core/useNotifications'
-import { useConfig } from '@/lib/context/config'
+import { useApiOperation } from '@/lib/hooks/api'
 
 import CancelIcon from '@mui/icons-material/Cancel'
 import SaveIcon from '@mui/icons-material/Save'
@@ -20,25 +19,16 @@ import { DialogProps } from '@toolpad/core/useDialogs'
 
 import { TransferList } from '@/components/form/transfer-list'
 
-import { UnauthenticatedError } from '@/lib/api/errors'
 import * as aclApi from '@/lib/api/operations/acls'
-
 import { SCOPES, SCOPE_LABELS } from '@/lib/models/permissions'
 import { RoleModel } from '@/lib/models'
 
 export const RoleFormModal = ({ open, onClose }: DialogProps<void, RoleModel | null>) => {
-  const notifications = useNotifications()
-  const config = useConfig()
-
-  const [loading, setLoading] = useState(false)
-
   const [name, setName] = useState('')
   const [scopes, setScopes] = useState<string[]>([])
 
-  const onSubmit = async () => {
-    setLoading(true)
-
-    try {
+  const [onSubmit, loading] = useApiOperation(
+    async () => {
       const role = {
         name,
         scopes,
@@ -46,23 +36,9 @@ export const RoleFormModal = ({ open, onClose }: DialogProps<void, RoleModel | n
 
       await aclApi.saveRole(role)
       onClose(role)
-    }
-    catch (error) {
-      if (error instanceof UnauthenticatedError) {
-        throw error
-      }
-      else {
-        notifications.show('Unknown error', {
-          severity: 'error',
-          autoHideDuration: config.notifications?.autoHideDuration,
-        })
-      }
-
-      console.error(error)
-    }
-
-    setLoading(false)
-  }
+    },
+    [name, scopes, onClose],
+  )
 
   return (
     <Dialog

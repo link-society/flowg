@@ -3,6 +3,7 @@ import { useLoaderData, useNavigate } from 'react-router-dom'
 import { useNotifications } from '@toolpad/core/useNotifications'
 import { useConfig } from '@/lib/context/config'
 import { useProfile } from '@/lib/context/profile'
+import { useApiOperation } from '@/lib/hooks/api'
 
 import * as colors from '@mui/material/colors'
 
@@ -25,7 +26,6 @@ import { AlertList } from './node-lists/alert-list'
 import { StreamList } from './node-lists/stream-list'
 import { PipelineList } from './node-lists/pipeline-list'
 
-import { UnauthenticatedError, PermissionDeniedError } from '@/lib/api/errors'
 import * as configApi from '@/lib/api/operations/config'
 import { PipelineModel } from '@/lib/models'
 
@@ -40,9 +40,6 @@ export const PipelineView = () => {
 
   const [flow, setFlow] = useState(currentPipeline!.flow)
 
-  const [deleteLoading, setDeleteLoading] = useState(false)
-  const [saveLoading, setSaveLoading] = useState(false)
-
   const onChange = useCallback(
     (newFlow: PipelineModel) => {
       const serializedOldFlow = JSON.stringify(flow)
@@ -55,81 +52,23 @@ export const PipelineView = () => {
     [flow],
   )
 
-  const onDelete = useCallback(
+  const [onDelete, deleteLoading] = useApiOperation(
     async () => {
-      setDeleteLoading(true)
-
-      try {
-        await configApi.deletePipeline(currentPipeline!.name)
-        navigate('/web/pipelines')
-      }
-      catch (error) {
-        if (error instanceof UnauthenticatedError) {
-          notifications.show('Session expired', {
-            severity: 'error',
-            autoHideDuration: config.notifications?.autoHideDuration,
-          })
-          navigate('/web/login')
-        }
-        else if (error instanceof PermissionDeniedError) {
-          notifications.show('Permission denied', {
-            severity: 'error',
-            autoHideDuration: config.notifications?.autoHideDuration,
-          })
-        }
-        else {
-          notifications.show('Unknown error', {
-            severity: 'error',
-            autoHideDuration: config.notifications?.autoHideDuration,
-          })
-        }
-
-        console.error(error)
-      }
-
-      setDeleteLoading(false)
+      await configApi.deletePipeline(currentPipeline!.name)
+      navigate('/web/pipelines')
     },
-    [currentPipeline,flow],
+    [currentPipeline],
   )
 
-  const onSave = useCallback(
+  const [onSave, saveLoading] = useApiOperation(
     async () => {
-      setSaveLoading(true)
-
-      try {
-        await configApi.savePipeline(currentPipeline!.name, flow)
-        notifications.show('Pipeline saved', {
-          severity: 'success',
-          autoHideDuration: config.notifications?.autoHideDuration,
-        })
-      }
-      catch (error) {
-        if (error instanceof UnauthenticatedError) {
-          notifications.show('Session expired', {
-            severity: 'error',
-            autoHideDuration: config.notifications?.autoHideDuration,
-          })
-          navigate('/web/login')
-        }
-        else if (error instanceof PermissionDeniedError) {
-          notifications.show('Permission denied', {
-            severity: 'error',
-            autoHideDuration: config.notifications?.autoHideDuration,
-          })
-        }
-        else {
-          notifications.show('Unknown error', {
-            severity: 'error',
-            autoHideDuration: config.notifications?.autoHideDuration,
-          })
-        }
-
-        console.error(error)
-      }
-
-      setSaveLoading(false)
+      await configApi.savePipeline(currentPipeline!.name, flow)
+      notifications.show('Pipeline saved', {
+        severity: 'success',
+        autoHideDuration: config.notifications?.autoHideDuration,
+      })
     },
-    [flow, currentPipeline, setSaveLoading],
+    [flow, currentPipeline],
   )
 
   return (

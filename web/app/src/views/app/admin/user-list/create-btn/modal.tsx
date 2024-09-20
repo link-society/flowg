@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
-import { useNotifications } from '@toolpad/core/useNotifications'
-import { useConfig } from '@/lib/context/config'
+import { useApiOperation } from '@/lib/hooks/api'
 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import LockIcon from '@mui/icons-material/Lock'
@@ -22,24 +21,16 @@ import { DialogProps } from '@toolpad/core/useDialogs'
 
 import { TransferList } from '@/components/form/transfer-list'
 
-import { UnauthenticatedError } from '@/lib/api/errors'
 import * as aclApi from '@/lib/api/operations/acls'
 import { UserModel } from '@/lib/models'
 
 export const UserFormModal = ({ open, payload, onClose }: DialogProps<string[], UserModel | null>) => {
-  const notifications = useNotifications()
-  const config = useConfig()
-
-  const [loading, setLoading] = useState(false)
-
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [roles, setRoles] = useState<string[]>([])
 
-  const onSubmit = async () => {
-    setLoading(true)
-
-    try {
+  const [onSubmit, loading] = useApiOperation(
+    async () => {
       const user = {
         name: username,
         roles,
@@ -47,23 +38,9 @@ export const UserFormModal = ({ open, payload, onClose }: DialogProps<string[], 
 
       await aclApi.saveUser(user, password)
       onClose(user)
-    }
-    catch (error) {
-      if (error instanceof UnauthenticatedError) {
-        throw error
-      }
-      else {
-        notifications.show('Unknown error', {
-          severity: 'error',
-          autoHideDuration: config.notifications?.autoHideDuration,
-        })
-      }
-
-      console.error(error)
-    }
-
-    setLoading(false)
-  }
+    },
+    [username, password, roles, onClose],
+  )
 
   return (
     <Dialog

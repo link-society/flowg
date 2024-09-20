@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useNotifications } from '@toolpad/core/useNotifications'
-import { useConfig } from '@/lib/context/config'
+import { useApiOperation } from '@/lib/hooks/api'
 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import LockIcon from '@mui/icons-material/Lock'
@@ -15,44 +14,21 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 
-import { UnauthenticatedError } from '@/lib/api/errors'
 import * as authApi from '@/lib/api/operations/auth'
 
 export const LoginView = () => {
+  const navigate = useNavigate()
+
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
 
-  const navigate = useNavigate()
-  const notifications = useNotifications()
-  const config = useConfig()
-
-  const handleLogin = async () => {
-    setLoading(true)
-
-    try {
+  const [handleLogin, loading] = useApiOperation(
+    async () => {
       await authApi.login(username, password)
       navigate('/web/')
-    }
-    catch (error) {
-      if (error instanceof UnauthenticatedError) {
-        notifications.show('Invalid credentials', {
-          severity: 'error',
-          autoHideDuration: config.notifications?.autoHideDuration,
-        })
-      }
-      else {
-        notifications.show('Unknown error', {
-          severity: 'error',
-          autoHideDuration: config.notifications?.autoHideDuration,
-        })
-      }
-
-      console.error(error)
-    }
-
-    setLoading(false)
-  }
+    },
+    [username, password],
+  )
 
   return (
     <div className="py-6">

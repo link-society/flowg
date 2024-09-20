@@ -1,7 +1,7 @@
-import { useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useCallback, useRef, useState } from 'react'
 import { useNotifications } from '@toolpad/core/useNotifications'
 import { useConfig } from '@/lib/context/config'
+import { useApiOperation } from '@/lib/hooks/api'
 
 import KeyIcon from '@mui/icons-material/Key'
 
@@ -18,7 +18,6 @@ import { CreateTokenButton } from './create-btn'
 import { RowType } from './types'
 import { TokenCell } from './cell'
 
-import { UnauthenticatedError } from '@/lib/api/errors'
 import * as tokenApi from '@/lib/api/operations/token'
 
 type TokenListProps = {
@@ -26,13 +25,39 @@ type TokenListProps = {
 }
 
 export const TokenList = ({ tokens }: TokenListProps) => {
-  const navigate = useNavigate()
   const notifications = useNotifications()
   const config = useConfig()
 
-  const [loading, setLoading] = useState(false)
-
   const gridRef = useRef<AgGridReact<RowType>>(null!)
+
+  const onNewToken = useCallback(
+    (token: string) => {
+      gridRef.current.api.applyTransaction({
+        add: [{ token }],
+      })
+    },
+    [gridRef],
+  )
+
+  const [onDelete, loading] = useApiOperation(
+    async (data: RowType) => {
+      await tokenApi.deleteToken(data.token)
+
+      const rowNode = gridRef.current.api.getRowNode(data.token)
+      if (rowNode !== undefined) {
+        gridRef.current.api.applyTransaction({
+          remove: [rowNode.data],
+        })
+      }
+
+      notifications.show('Token deleted', {
+        severity: 'success',
+        autoHideDuration: config.notifications?.autoHideDuration,
+      })
+    },
+    [gridRef],
+  )
+
   const [rowData] = useState<RowType[]>(
     tokens.map(token => ({ token })),
   )
@@ -50,55 +75,12 @@ export const TokenList = ({ tokens }: TokenListProps) => {
       headerClass: 'flowg-actions-header',
       cellRenderer: Actions,
       cellRendererParams: {
-        onDelete: async (data: RowType) => {
-          setLoading(true)
-
-          try {
-            await tokenApi.deleteToken(data.token)
-
-            const rowNode = gridRef.current.api.getRowNode(data.token)
-            if (rowNode !== undefined) {
-              gridRef.current.api.applyTransaction({
-                remove: [rowNode.data],
-              })
-            }
-
-            notifications.show('Token deleted', {
-              severity: 'success',
-              autoHideDuration: config.notifications?.autoHideDuration,
-            })
-          }
-          catch (error) {
-            if (error instanceof UnauthenticatedError) {
-              notifications.show('Session expired', {
-                severity: 'error',
-                autoHideDuration: config.notifications?.autoHideDuration,
-              })
-              navigate('/web/login')
-            }
-            else {
-              notifications.show('Unknown error', {
-                severity: 'error',
-                autoHideDuration: config.notifications?.autoHideDuration,
-              })
-            }
-
-            console.error(error)
-          }
-
-          setLoading(false)
-        },
+        onDelete,
       },
       suppressMovable: true,
       sortable: false,
     },
   ])
-
-  const onNewToken = (token: string) => {
-    gridRef.current.api.applyTransaction({
-      add: [{ token }],
-    })
-  }
 
   return (
     <>
