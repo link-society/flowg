@@ -1,7 +1,6 @@
 import { useDialogs } from '@toolpad/core/useDialogs'
-import { useNotifications } from '@toolpad/core/useNotifications'
-import { useConfig } from '@/lib/context/config'
 import { useApiOperation } from '@/lib/hooks/api'
+import { useNotify } from '@/lib/hooks/notify'
 
 import AddIcon from '@mui/icons-material/Add'
 
@@ -15,8 +14,7 @@ type NewTransformerButtonProps = {
 
 export const NewTransformerButton = (props: NewTransformerButtonProps) => {
   const dialogs = useDialogs()
-  const notifications = useNotifications()
-  const config = useConfig()
+  const notify = useNotify()
 
   const [handleClick] = useApiOperation(
     async () => {
@@ -24,10 +22,7 @@ export const NewTransformerButton = (props: NewTransformerButtonProps) => {
       if (transformerName !== null) {
         props.onTransformerCreated(transformerName)
 
-        notifications.show('Transformer created', {
-          severity: 'success',
-          autoHideDuration: config.notifications?.autoHideDuration,
-        })
+        notify.success('Transformer created')
       }
     },
     [props.onTransformerCreated],

@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import { useNotifications } from '@toolpad/core/useNotifications'
-import { useConfig } from '@/lib/context/config'
 import { useApiOperation } from '@/lib/hooks/api'
+import { useNotify } from '@/lib/hooks/notify'
 
 import LockIcon from '@mui/icons-material/Lock'
 import SendIcon from '@mui/icons-material/Send'
@@ -13,19 +12,15 @@ import CircularProgress from '@mui/material/CircularProgress'
 import * as authApi from '@/lib/api/operations/auth'
 
 export const PasswordChange = () => {
+  const notify = useNotify()
+
   const [oldPassword, setOldPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
-
-  const notifications = useNotifications()
-  const config = useConfig()
 
   const [onSubmit, loading] = useApiOperation(
     async () => {
       await authApi.changePassword(oldPassword, newPassword)
-      notifications.show('Password changed', {
-        severity: 'success',
-        autoHideDuration: config.notifications?.autoHideDuration,
-      })
+      notify.success('Password changed')
       setOldPassword('')
       setNewPassword('')
     },
