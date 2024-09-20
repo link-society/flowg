@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
 import { useNotifications } from '@toolpad/core/useNotifications'
+import { useApiOperation } from '@/lib/hooks/api'
 
 import * as colors from '@mui/material/colors'
 
@@ -22,7 +22,6 @@ import { TransitionProps } from '@mui/material/transitions'
 import { TransformerEditor } from '@/components/editors/transformer'
 import { AuthenticatedAwait } from '@/components/routing/await'
 
-import { UnauthenticatedError, PermissionDeniedError } from '@/lib/api/errors'
 import * as configApi from '@/lib/api/operations/config'
 import { useConfig } from '@/lib/context/config'
 
@@ -39,22 +38,20 @@ type OpenTransformerDialogProps = {
 }
 
 export const OpenTransformerDialog = ({ transformer }: OpenTransformerDialogProps) => {
-  const navigate = useNavigate()
   const notifications = useNotifications()
   const config = useConfig()
 
   const [open, setOpen] = useState(false)
 
-  const [saveLoading, setSaveLoading] = useState(false)
   const [code, setCode] = useState('')
   const [transformerPromise, setTransformerPromise] = useState<Promise<void> | null>(null)
 
-  const onFetch = useCallback(
+  const [onFetch] = useApiOperation(
     async (transformer: string) => {
       const script = await configApi.getTransformer(transformer)
       setCode(script)
     },
-    [setCode],
+    [transformer, setCode],
   )
 
   useEffect(
@@ -64,46 +61,17 @@ export const OpenTransformerDialog = ({ transformer }: OpenTransformerDialogProp
     [setTransformerPromise, onFetch, transformer],
   )
 
-  const onSave = useCallback(
+  const [onSave, saveLoading] = useApiOperation(
     async () => {
-      setSaveLoading(true)
+      await configApi.saveTransformer(transformer, code)
+      notifications.show('Transformer saved', {
+        severity: 'success',
+        autoHideDuration: config.notifications?.autoHideDuration,
+      })
 
-      try {
-        await configApi.saveTransformer(transformer, code)
-        notifications.show('Transformer saved', {
-          severity: 'success',
-          autoHideDuration: config.notifications?.autoHideDuration,
-        })
-
-        setTransformerPromise(onFetch(transformer))
-      }
-      catch (error) {
-        if (error instanceof UnauthenticatedError) {
-          notifications.show('Session expired', {
-            severity: 'error',
-            autoHideDuration: config.notifications?.autoHideDuration,
-          })
-          navigate('/web/login')
-        }
-        else if (error instanceof PermissionDeniedError) {
-          notifications.show('Permission denied', {
-            severity: 'error',
-            autoHideDuration: config.notifications?.autoHideDuration,
-          })
-        }
-        else {
-          notifications.show('Unknown error', {
-            severity: 'error',
-            autoHideDuration: config.notifications?.autoHideDuration,
-          })
-        }
-
-        console.error(error)
-      }
-
-      setSaveLoading(false)
+      setTransformerPromise(onFetch(transformer))
     },
-    [transformer, code, setSaveLoading, setTransformerPromise, onFetch],
+    [transformer, code, setTransformerPromise, onFetch],
   )
 
   return (

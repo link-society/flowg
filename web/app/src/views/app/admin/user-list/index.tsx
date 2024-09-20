@@ -1,7 +1,7 @@
-import { useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useCallback, useRef, useState } from 'react'
 import { useNotifications } from '@toolpad/core/useNotifications'
 import { useConfig } from '@/lib/context/config'
+import { useApiOperation } from '@/lib/hooks/api'
 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 
@@ -16,7 +16,6 @@ import { Actions } from '@/components/table/actions'
 import { CreateUserButton } from './create-btn'
 import { RolesCell } from './roles-cell'
 
-import { UnauthenticatedError } from '@/lib/api/errors'
 import * as aclApi from '@/lib/api/operations/acls'
 import { UserModel } from '@/lib/models'
 
@@ -26,13 +25,39 @@ type UserListProps = {
 }
 
 export const UserList = ({ roles, users }: UserListProps) => {
-  const navigate = useNavigate()
   const notifications = useNotifications()
   const config = useConfig()
 
-  const [loading, setLoading] = useState(false)
-
   const gridRef = useRef<AgGridReact<UserModel>>(null!)
+
+  const onNewUser = useCallback(
+    (user: UserModel) => {
+      gridRef.current.api.applyTransaction({
+        add: [user],
+      })
+    },
+    [gridRef],
+  )
+
+  const [onDelete, loading] = useApiOperation(
+    async (user: UserModel) => {
+      await aclApi.deleteUser(user.name)
+
+      const rowNode = gridRef.current.api.getRowNode(user.name)
+      if (rowNode !== undefined) {
+        gridRef.current.api.applyTransaction({
+          remove: [rowNode.data],
+        })
+      }
+
+      notifications.show('User deleted', {
+        severity: 'success',
+        autoHideDuration: config.notifications?.autoHideDuration,
+      })
+    },
+    [gridRef],
+  )
+
   const [rowData] = useState<UserModel[]>(users)
   const [columnDefs] = useState<ColDef<UserModel>[]>([
     {
@@ -40,44 +65,7 @@ export const UserList = ({ roles, users }: UserListProps) => {
       headerClass: 'flowg-actions-header',
       cellRenderer: Actions,
       cellRendererParams: {
-        onDelete: async (user: UserModel) => {
-          setLoading(true)
-
-          try {
-            await aclApi.deleteUser(user.name)
-
-            const rowNode = gridRef.current.api.getRowNode(user.name)
-            if (rowNode !== undefined) {
-              gridRef.current.api.applyTransaction({
-                remove: [rowNode.data],
-              })
-            }
-
-            notifications.show('User deleted', {
-              severity: 'success',
-              autoHideDuration: config.notifications?.autoHideDuration,
-            })
-          }
-          catch (error) {
-            if (error instanceof UnauthenticatedError) {
-              notifications.show('Session expired', {
-                severity: 'error',
-                autoHideDuration: config.notifications?.autoHideDuration,
-              })
-              navigate('/web/login')
-            }
-            else {
-              notifications.show('Unknown error', {
-                severity: 'error',
-                autoHideDuration: config.notifications?.autoHideDuration,
-              })
-            }
-
-            console.error(error)
-          }
-
-          setLoading(false)
-        },
+        onDelete,
       },
       suppressMovable: true,
       sortable: false,
@@ -97,12 +85,6 @@ export const UserList = ({ roles, users }: UserListProps) => {
       sortable: false,
     },
   ])
-
-  const onNewUser = (user: UserModel) => {
-    gridRef.current.api.applyTransaction({
-      add: [user],
-    })
-  }
 
   return (
     <>

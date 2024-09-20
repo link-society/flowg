@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useNotifications } from '@toolpad/core/useNotifications'
 import { useConfig } from '@/lib/context/config'
+import { useApiOperation } from '@/lib/hooks/api'
 
 import LockIcon from '@mui/icons-material/Lock'
 import SendIcon from '@mui/icons-material/Send'
@@ -10,56 +10,27 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 
-import { UnauthenticatedError, PermissionDeniedError } from '@/lib/api/errors'
 import * as authApi from '@/lib/api/operations/auth'
 
 export const PasswordChange = () => {
   const [oldPassword, setOldPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
-  const [loading, setLoading] = useState(false)
 
-  const navigate = useNavigate()
   const notifications = useNotifications()
   const config = useConfig()
 
-  const onSubmit = async () => {
-    setLoading(true)
-
-    try {
+  const [onSubmit, loading] = useApiOperation(
+    async () => {
       await authApi.changePassword(oldPassword, newPassword)
       notifications.show('Password changed', {
         severity: 'success',
         autoHideDuration: config.notifications?.autoHideDuration,
       })
-    }
-    catch (error) {
-      if (error instanceof UnauthenticatedError) {
-        notifications.show('Session expired', {
-          severity: 'error',
-          autoHideDuration: config.notifications?.autoHideDuration,
-        })
-        navigate('/web/login')
-      }
-      else if (error instanceof PermissionDeniedError) {
-        notifications.show('Invalid credentials', {
-          severity: 'error',
-          autoHideDuration: config.notifications?.autoHideDuration,
-        })
-      }
-      else {
-        notifications.show('Unknown error', {
-          severity: 'error',
-          autoHideDuration: config.notifications?.autoHideDuration,
-        })
-      }
-
-      console.error(error)
-    }
-
-    setOldPassword('')
-    setNewPassword('')
-    setLoading(false)
-  }
+      setOldPassword('')
+      setNewPassword('')
+    },
+    [oldPassword, newPassword, setOldPassword, setNewPassword],
+  )
 
   return (
     <div>

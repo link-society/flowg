@@ -1,7 +1,7 @@
-import { useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useCallback, useRef, useState } from 'react'
 import { useNotifications } from '@toolpad/core/useNotifications'
 import { useConfig } from '@/lib/context/config'
+import { useApiOperation } from '@/lib/hooks/api'
 
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
 
@@ -16,7 +16,6 @@ import { Actions } from '@/components/table/actions'
 import { CreateRoleButton } from './create-btn'
 import { ScopesCell } from './scopes-cell'
 
-import { UnauthenticatedError } from '@/lib/api/errors'
 import * as aclApi from '@/lib/api/operations/acls'
 import { RoleModel } from '@/lib/models'
 
@@ -25,59 +24,47 @@ type RoleListProps = {
 }
 
 export const RoleList = ({ roles }: RoleListProps) => {
-  const navigate = useNavigate()
   const notifications = useNotifications()
   const config = useConfig()
 
-  const [loading, setLoading] = useState(false)
-
   const gridRef = useRef<AgGridReact<RoleModel>>(null!)
+
+  const onNewRole = useCallback(
+    (role: RoleModel) => {
+      gridRef.current.api.applyTransaction({
+        add: [role],
+      })
+    },
+    [gridRef],
+  )
+
+  const [onDelete, loading] = useApiOperation(
+    async (role: RoleModel) => {
+      await aclApi.deleteRole(role.name)
+
+      const rowNode = gridRef.current.api.getRowNode(role.name)
+      if (rowNode !== undefined) {
+        gridRef.current.api.applyTransaction({
+          remove: [rowNode.data],
+        })
+      }
+
+      notifications.show('Role deleted', {
+        severity: 'success',
+        autoHideDuration: config.notifications?.autoHideDuration,
+      })
+    },
+    [gridRef],
+  )
+
   const [rowData] = useState<RoleModel[]>(roles)
   const [columnDefs] = useState<ColDef<RoleModel>[]>([
-
     {
       headerName: 'Actions',
       headerClass: 'flowg-actions-header',
       cellRenderer: Actions,
       cellRendererParams: {
-        onDelete: async (role: RoleModel) => {
-          setLoading(true)
-
-          try {
-            await aclApi.deleteRole(role.name)
-
-            const rowNode = gridRef.current.api.getRowNode(role.name)
-            if (rowNode !== undefined) {
-              gridRef.current.api.applyTransaction({
-                remove: [rowNode.data],
-              })
-            }
-
-            notifications.show('Role deleted', {
-              severity: 'success',
-              autoHideDuration: config.notifications?.autoHideDuration,
-            })
-          }
-          catch (error) {
-            if (error instanceof UnauthenticatedError) {
-              notifications.show('Session expired', {
-                severity: 'error',
-                autoHideDuration: config.notifications?.autoHideDuration,
-              })
-              navigate('/web/login')
-            }
-            else {
-              notifications.show('Unknown error', {
-                severity: 'error',
-                autoHideDuration: config.notifications?.autoHideDuration,
-              })
-            }
-
-            console.error(error)
-          }
-
-          setLoading(false)
-        },
+        onDelete,
       },
       suppressMovable: true,
       sortable: false,
@@ -97,12 +84,6 @@ export const RoleList = ({ roles }: RoleListProps) => {
       sortable: false,
     },
   ])
-
-  const onNewRole = (role: RoleModel) => {
-    gridRef.current.api.applyTransaction({
-      add: [role],
-    })
-  }
 
   return (
     <>

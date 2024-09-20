@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useNotifications } from '@toolpad/core/useNotifications'
-import { useConfig } from '@/lib/context/config'
+import { useApiOperation } from '@/lib/hooks/api'
 
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 
@@ -13,7 +11,6 @@ import CircularProgress from '@mui/material/CircularProgress'
 import { KeyValueEditor } from '@/components/form/kv-editor'
 import { CodeEditor } from './code-editor'
 
-import { UnauthenticatedError, PermissionDeniedError } from '@/lib/api/errors'
 import * as testApi from '@/lib/api/operations/tests'
 
 type TransformerEditorProps = {
@@ -24,53 +21,21 @@ type TransformerEditorProps = {
 export const TransformerEditor = (props: TransformerEditorProps) => {
   const [code, setCode] = useState(props.code)
   const [testRecord, setTestRecord] = useState<[string, string][]>([])
-
-  const [testLoading, setTestLoading] = useState(false)
   const [testResult, setTestResult] = useState<Record<string, string>>({})
-
-  const navigate = useNavigate()
-  const notifications = useNotifications()
-  const config = useConfig()
 
   useEffect(
     () => { props.onCodeChange(code) },
     [code],
   )
 
-  const onTest = async () => {
-    setTestLoading(true)
-
-    try {
+  const [onTest, testLoading] = useApiOperation(
+    async () => {
       const input = Object.fromEntries(testRecord)
       const output = await testApi.testTransformer(code, input)
       setTestResult(output)
-    }
-    catch (error) {
-      if (error instanceof UnauthenticatedError) {
-        notifications.show('Session expired', {
-          severity: 'error',
-          autoHideDuration: config.notifications?.autoHideDuration,
-        })
-        navigate('/web/login')
-      }
-      else if (error instanceof PermissionDeniedError) {
-        notifications.show('Permission denied', {
-          severity: 'error',
-          autoHideDuration: config.notifications?.autoHideDuration,
-        })
-      }
-      else {
-        notifications.show('Unknown error', {
-          severity: 'error',
-          autoHideDuration: config.notifications?.autoHideDuration,
-        })
-      }
-
-      console.error(error)
-    }
-
-    setTestLoading(false)
-  }
+    },
+    [code, testRecord, setTestResult],
+  )
 
   return (
     <Grid container spacing={1} className="w-full h-full">
