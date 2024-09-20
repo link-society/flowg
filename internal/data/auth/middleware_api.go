@@ -48,8 +48,8 @@ func ApiMiddleware(db *Database) func(http.Handler) http.Handler {
 			authHeader := r.Header.Get("Authorization")
 
 			switch {
-			case strings.HasPrefix(authHeader, "Basic "):
-				token := authHeader[len("Basic "):]
+			case strings.HasPrefix(strings.ToLower(authHeader), "bearer pat:"):
+				token := authHeader[len("bearer pat:"):]
 
 				user, err := tokenSys.VerifyToken(token)
 				switch {
@@ -63,8 +63,8 @@ func ApiMiddleware(db *Database) func(http.Handler) http.Handler {
 					serveNext(w, r, user)
 				}
 
-			case strings.HasPrefix(authHeader, "Bearer "):
-				token := authHeader[len("Bearer "):]
+			case strings.HasPrefix(strings.ToLower(authHeader), "bearer jwt:"):
+				token := authHeader[len("bearer jwt:"):]
 
 				username, err := VerifyJWT(token)
 				if err != nil {
