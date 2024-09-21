@@ -82,11 +82,10 @@ export type TimeWindowFactory = {
 }
 
 type TimeWindowSelectorProps = Readonly<{
-  loading: boolean,
   onTimeWindowChanged: (factory: TimeWindowFactory) => void
 }>
 
-export const TimeWindowSelector = ({ loading, onTimeWindowChanged }: TimeWindowSelectorProps) => {
+export const TimeWindowSelector = ({ onTimeWindowChanged }: TimeWindowSelectorProps) => {
   const now = useMemo(
     () => new Date(),
     [],
@@ -136,7 +135,6 @@ export const TimeWindowSelector = ({ loading, onTimeWindowChanged }: TimeWindowS
         onClick={(evt) => {
           setMenu(evt.currentTarget)
         }}
-        disabled={loading}
         className="w-full h-full"
         endIcon={<ArrowDropDownIcon />}
         sx={{
