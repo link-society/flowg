@@ -232,6 +232,10 @@ func fetchStreamConfigs(txn *badger.Txn) (map[string]StreamConfig, error) {
 			return nil, err
 		}
 
+		if streamConfig.IndexedFields == nil {
+			streamConfig.IndexedFields = []string{}
+		}
+
 		streams[stream] = streamConfig
 	}
 
