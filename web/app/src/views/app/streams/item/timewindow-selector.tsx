@@ -103,13 +103,14 @@ export const TimeWindowSelector = ({ onTimeWindowChanged }: TimeWindowSelectorPr
   const timeWindowFactory = useCallback(
     () => {
       switch (timeWindowType) {
-        case 'relative':
+        case 'relative': {
           const now = new Date()
           return {
             from: new Date(now.getTime() - relativeTimeWindow),
             to: now,
             live,
           }
+        }
 
         case 'absolute':
           return { from, to, live }
