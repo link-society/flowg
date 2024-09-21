@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import SearchIcon from '@mui/icons-material/Search'
 
@@ -7,7 +7,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 
-import { TimeWindowSelector, DEFAULT_TIMEWINDOW_VALUE } from './timewindow-selector'
+import { TimeWindowSelector, TimeWindowFactory } from './timewindow-selector'
 
 type QueryPanelProps = Readonly<{
   loading: boolean
@@ -15,26 +15,24 @@ type QueryPanelProps = Readonly<{
 }>
 
 export const QueryPanel = (props: QueryPanelProps) => {
-  const now = useMemo(
-    () => new Date(),
-    [],
-  )
-
   const [filter, setFilter] = useState('')
-  const [from, setFrom] = useState(new Date(now.getTime() - DEFAULT_TIMEWINDOW_VALUE))
-  const [to, setTo] = useState(now)
-  const [live, setLive] = useState(false)
+  const [timeWindowFactory, setTimeWindowFactory] = useState<TimeWindowFactory | null>(null)
 
   const requestFetch = useCallback(
     () => {
-      props.onFetchRequested(filter, from, to, live)
+      if (timeWindowFactory !== null) {
+        const { from, to, live } = timeWindowFactory.make()
+        props.onFetchRequested(filter, from, to, live)
+      }
     },
-    [props.onFetchRequested, filter, from, to, live],
+    [props.onFetchRequested, timeWindowFactory, filter],
   )
 
   useEffect(
-    () => { requestFetch() },
-    [],
+    () => {
+      requestFetch()
+    },
+    [timeWindowFactory],
   )
 
   return (
@@ -63,11 +61,7 @@ export const QueryPanel = (props: QueryPanelProps) => {
       <Grid size={{ xs: 4 }}>
         <TimeWindowSelector
           loading={props.loading}
-          onTimeWindowChanged={(from, to, live) => {
-            setFrom(from)
-            setTo(to)
-            setLive(live)
-          }}
+          onTimeWindowChanged={setTimeWindowFactory}
         />
       </Grid>
 
