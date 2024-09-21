@@ -84,6 +84,11 @@ export const StreamView = () => {
       if (watcher.enabled) {
         const bus = logApi.watchLogs(currentStream!, watcher.filter)
 
+        const incomingState = {
+          rowData: [] as LogEntryModel[],
+          columnDefs,
+        }
+
         bus.control.addEventListener('error', (event) => {
           const evt = event as CustomEvent
           handleLiveError(evt.detail)
@@ -100,7 +105,7 @@ export const StreamView = () => {
             timestamp: new Date(rawlogEntry.timestamp),
             fields: rawlogEntry.fields,
           }
-          setRowData((prev) => [...prev, logEntry])
+          incomingState.rowData.push(logEntry)
 
           const allFields = [...fields!]
 
@@ -112,10 +117,10 @@ export const StreamView = () => {
 
           allFields.sort()
 
-          setColumnDefs([
+          incomingState.columnDefs = [
             timestampColumnDef(),
             ...allFields.map(fieldToColumnDef),
-          ])
+          ]
         })
 
         bus.messages.addEventListener('exception', (event) => {
@@ -124,7 +129,20 @@ export const StreamView = () => {
           console.error(evt.detail.data)
         })
 
-        return () => bus.close()
+        const token = setInterval(
+          () => {
+            setRowData((prev) => {
+              return [...prev, ...incomingState.rowData]
+            })
+            setColumnDefs(incomingState.columnDefs)
+          },
+          1000,
+        )
+
+        return () => {
+          bus.close()
+          clearInterval(token)
+        }
       }
     },
     [currentStream, watcher],
