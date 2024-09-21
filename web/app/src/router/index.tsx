@@ -62,6 +62,22 @@ export default createBrowserRouter([
             },
           },
           {
+            path: 'storage',
+            lazy: async () => {
+              const { StreamView: Component } = await import('@/views/app/storage/section')
+              const { loader } = await import('@/views/app/storage/loader')
+              return { Component, loader }
+            },
+          },
+          {
+            path: 'storage/:stream',
+            lazy: async () => {
+              const { StreamView: Component } = await import('@/views/app/storage/item')
+              const { loader } = await import('@/views/app/storage/loader')
+              return { Component, loader }
+            },
+          },
+          {
             path: 'pipelines',
             lazy: async () => {
               const { PipelineView: Component } = await import('@/views/app/pipelines/section')

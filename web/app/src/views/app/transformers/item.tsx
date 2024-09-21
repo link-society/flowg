@@ -115,8 +115,8 @@ export const TransformerView = () => {
           </div>
         )}
       </Box>
-      <Grid container spacing={1} className="p-2 flex-grow">
-        <Grid size={{ xs: 2 }}>
+      <Grid container spacing={1} className="p-2 flex-grow flex-shrink h-0">
+        <Grid size={{ xs: 2 }} className="h-full">
           <Paper className="h-full overflow-auto">
             <List component="nav" className="!p-0">
               {transformers.map((transformer) => (
