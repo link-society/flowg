@@ -1,6 +1,10 @@
 package lognotify
 
-import "link-society.com/flowg/internal/data/logstorage"
+import (
+	"github.com/vladopajic/go-actor/actor"
+
+	"link-society.com/flowg/internal/data/logstorage"
+)
 
 type LogMessage struct {
 	Stream   string
@@ -10,6 +14,6 @@ type LogMessage struct {
 
 type SubscribeMessage struct {
 	Stream  string
-	SenderC chan<- LogMessage
+	SenderM actor.Mailbox[LogMessage]
 	DoneC   <-chan struct{}
 }

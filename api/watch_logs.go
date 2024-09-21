@@ -80,9 +80,9 @@ func WatchLogsUsecase(
 					"stream", req.Stream,
 				)
 
-				logC := logNotifier.Subscribe(req.Stream, ctx.Done())
+				logM := logNotifier.Subscribe(ctx, req.Stream)
 
-				for log := range logC {
+				for log := range logM.ReceiveC() {
 					if filter == nil || filter.Evaluate(&log.LogEntry) {
 						payload, err := json.Marshal(log.LogEntry)
 						if err != nil {

@@ -2,8 +2,10 @@ package lognotify
 
 import "github.com/vladopajic/go-actor/actor"
 
+type subscriberSet map[actor.MailboxSender[LogMessage]]struct{}
+
 type worker struct {
-	subscribers map[string]map[chan<- LogMessage]struct{}
+	subscribers map[string]subscriberSet
 	subMbox     actor.MailboxReceiver[SubscribeMessage]
 	logMbox     actor.MailboxReceiver[LogMessage]
 }
@@ -19,15 +21,15 @@ func (w *worker) DoWork(ctx actor.Context) actor.WorkerStatus {
 		}
 
 		if _, exists := w.subscribers[msg.Stream]; !exists {
-			w.subscribers[msg.Stream] = make(map[chan<- LogMessage]struct{})
+			w.subscribers[msg.Stream] = make(subscriberSet)
 		}
 
-		w.subscribers[msg.Stream][msg.SenderC] = struct{}{}
+		w.subscribers[msg.Stream][msg.SenderM] = struct{}{}
 
 		go func() {
 			<-msg.DoneC
-			delete(w.subscribers[msg.Stream], msg.SenderC)
-			close(msg.SenderC)
+			delete(w.subscribers[msg.Stream], msg.SenderM)
+			msg.SenderM.Stop()
 		}()
 
 		return actor.WorkerContinue
@@ -38,11 +40,11 @@ func (w *worker) DoWork(ctx actor.Context) actor.WorkerStatus {
 		}
 
 		if _, exists := w.subscribers[msg.Stream]; !exists {
-			w.subscribers[msg.Stream] = make(map[chan<- LogMessage]struct{})
+			w.subscribers[msg.Stream] = make(subscriberSet)
 		}
 
 		for sub := range w.subscribers[msg.Stream] {
-			sub <- msg
+			sub.Send(ctx, msg)
 		}
 
 		return actor.WorkerContinue
