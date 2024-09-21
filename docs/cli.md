@@ -11,6 +11,7 @@ Available Commands:
   completion  Generate the autocompletion script for the specified shell
   help        Help about any command
   serve       Start FlowG standalone server
+  version     Print version information
 
 Flags:
   -h, --help   help for flowg
