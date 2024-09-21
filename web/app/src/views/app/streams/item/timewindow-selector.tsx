@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 
@@ -71,9 +71,19 @@ const LabelRenderer = (props: LabelRendererProps) => (
   </Box>
 )
 
+type TimeWindow = {
+  from: Date,
+  to: Date,
+  live: boolean,
+}
+
+export type TimeWindowFactory = {
+  make: () => TimeWindow,
+}
+
 type TimeWindowSelectorProps = Readonly<{
   loading: boolean,
-  onTimeWindowChanged: (from: Date, to: Date, live: boolean) => void
+  onTimeWindowChanged: (factory: TimeWindowFactory) => void
 }>
 
 export const TimeWindowSelector = ({ loading, onTimeWindowChanged }: TimeWindowSelectorProps) => {
@@ -88,17 +98,35 @@ export const TimeWindowSelector = ({ loading, onTimeWindowChanged }: TimeWindowS
   const [to, setTo] = useState(now)
   const [live, setLive] = useState(false)
 
-  const [timewindowType, setTimewindowType] = useState<'relative' | 'absolute'>('relative')
-  const [relativeTimewindow, setRelativeTimewindow] = useState(DEFAULT_TIMEWINDOW_VALUE)
+  const [timeWindowType, setTimeWindowType] = useState<'relative' | 'absolute'>('relative')
+  const [relativeTimeWindow, setRelativeTimeWindow] = useState(DEFAULT_TIMEWINDOW_VALUE)
+
+  const timeWindowFactory = useCallback(
+    () => {
+      switch (timeWindowType) {
+        case 'relative':
+          const now = new Date()
+          return {
+            from: new Date(now.getTime() - relativeTimeWindow),
+            to: now,
+            live,
+          }
+
+        case 'absolute':
+          return { from, to, live }
+
+        default:
+          throw new Error('Invalid timewindow type')
+      }
+    },
+    [timeWindowType, relativeTimeWindow, from, to, live],
+  )
 
   useEffect(
     () => {
-      if (timewindowType === 'relative') {
-        setFrom(new Date(now.getTime() - relativeTimewindow))
-        setTo(now)
-      }
+      onTimeWindowChanged({ make: timeWindowFactory })
     },
-    [timewindowType, relativeTimewindow],
+    [],
   )
 
   return (
@@ -118,8 +146,8 @@ export const TimeWindowSelector = ({ loading, onTimeWindowChanged }: TimeWindowS
         }}
       >
         <LabelRenderer
-          timewindowType={timewindowType}
-          relativeTimewindow={relativeTimewindow}
+          timewindowType={timeWindowType}
+          relativeTimewindow={relativeTimeWindow}
           from={from}
           to={to}
           live={live}
@@ -130,7 +158,7 @@ export const TimeWindowSelector = ({ loading, onTimeWindowChanged }: TimeWindowS
         open={Boolean(menu)}
         onClose={() => {
           setMenu(null)
-          onTimeWindowChanged(from, to, live)
+          onTimeWindowChanged({make: timeWindowFactory})
         }}
         MenuListProps={{
           sx: { width: menu?.offsetWidth },
@@ -139,11 +167,11 @@ export const TimeWindowSelector = ({ loading, onTimeWindowChanged }: TimeWindowS
         <Box>
           <ToggleButtonGroup
             color="primary"
-            value={timewindowType}
+            value={timeWindowType}
             exclusive
             onChange={(_, value) => {
               if (value !== null) {
-                setTimewindowType(value)
+                setTimeWindowType(value)
               }
             }}
             className="p-3 w-full"
@@ -153,15 +181,15 @@ export const TimeWindowSelector = ({ loading, onTimeWindowChanged }: TimeWindowS
           </ToggleButtonGroup>
           <Divider />
 
-          {timewindowType === 'relative' && (
+          {timeWindowType === 'relative' && (
             <ToggleButtonGroup
               color="secondary"
               orientation="vertical"
               exclusive
-              value={relativeTimewindow}
+              value={relativeTimeWindow}
               onChange={(_, value) => {
                 if (value !== null) {
-                  setRelativeTimewindow(value)
+                  setRelativeTimeWindow(value)
                 }
               }}
               className="p-3 w-full"
@@ -176,7 +204,7 @@ export const TimeWindowSelector = ({ loading, onTimeWindowChanged }: TimeWindowS
               ))}
             </ToggleButtonGroup>
           )}
-          {timewindowType === 'absolute' && (
+          {timeWindowType === 'absolute' && (
             <Box className="p-3 w-full flex flex-col items-stretch gap-3">
               <DateTimePicker
                 label="From"
