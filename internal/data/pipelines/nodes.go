@@ -174,7 +174,7 @@ func (n *RouterNode) Process(ctx context.Context, entry *logstorage.LogEntry) er
 
 	key, err := collectorSys.Ingest(ctx, n.Stream, entry)
 	if err == nil {
-		logNotifier.Notify(n.Stream, string(key), *entry)
+		logNotifier.Notify(ctx, n.Stream, string(key), *entry)
 		metrics.IncStreamLogCounter(n.Stream)
 	}
 

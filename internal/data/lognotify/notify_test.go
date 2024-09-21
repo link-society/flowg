@@ -1,10 +1,10 @@
 package lognotify_test
 
 import (
+	"context"
 	"reflect"
 	"testing"
 
-	"sync"
 	"time"
 
 	"link-society.com/flowg/internal/data/logstorage"
@@ -17,37 +17,15 @@ func TestLogNotifier(t *testing.T) {
 	notifier.Start()
 	defer notifier.Stop()
 
-	logDoneC := make(chan struct{})
-	logC := notifier.Subscribe("test", logDoneC)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	logM := notifier.Subscribe(ctx, "test")
 
 	logEntry := logstorage.NewLogEntry(map[string]string{})
 
-	wgDoneC := make(chan struct{})
-	wg := sync.WaitGroup{}
-	wg.Add(2)
-
-	go func() {
-		defer wg.Done()
-		notifier.Notify("test", "key", *logEntry)
-	}()
-
-	var result lognotify.LogMessage
-	go func() {
-		defer wg.Done()
-		result = <-logC
-	}()
-
-	go func() {
-		wg.Wait()
-		wgDoneC <- struct{}{}
-		close(wgDoneC)
-	}()
-
-	select {
-	case <-wgDoneC:
-	case <-time.After(5 * time.Second):
-		t.Fatalf("timed out waiting for log")
-	}
+	notifier.Notify(ctx, "test", "key", *logEntry)
+	result := <-logM.ReceiveC()
 
 	if result.Stream != "test" {
 		t.Fatalf("unexpected stream: %s", result.Stream)
@@ -60,7 +38,4 @@ func TestLogNotifier(t *testing.T) {
 	if !reflect.DeepEqual(result.LogEntry, *logEntry) {
 		t.Fatalf("unexpected log entry: %v", result.LogEntry)
 	}
-
-	logDoneC <- struct{}{}
-	close(logDoneC)
 }

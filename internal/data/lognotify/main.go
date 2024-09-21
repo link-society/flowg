@@ -18,7 +18,7 @@ func NewLogNotifier() *LogNotifier {
 	subMbox := actor.NewMailbox[SubscribeMessage]()
 	logMbox := actor.NewMailbox[LogMessage]()
 	workerA := actor.New(&worker{
-		subscribers: make(map[string]map[chan<- LogMessage]struct{}),
+		subscribers: make(map[string]subscriberSet),
 		subMbox:     subMbox,
 		logMbox:     logMbox,
 	})
@@ -38,24 +38,26 @@ func (n *LogNotifier) Stop() {
 	n.rootA.Stop()
 }
 
-func (n *LogNotifier) Subscribe(stream string, doneC <-chan struct{}) <-chan LogMessage {
-	logC := make(chan LogMessage)
+func (n *LogNotifier) Subscribe(ctx context.Context, stream string) actor.MailboxReceiver[LogMessage] {
+	logM := actor.NewMailbox[LogMessage]()
+	logM.Start()
+
 	msg := SubscribeMessage{
 		Stream:  stream,
-		SenderC: logC,
-		DoneC:   doneC,
+		SenderM: logM,
+		DoneC:   ctx.Done(),
 	}
 
-	n.subMbox.Send(context.Background(), msg)
+	n.subMbox.Send(ctx, msg)
 
-	return logC
+	return logM
 }
 
-func (n *LogNotifier) Notify(stream string, logKey string, logEntry logstorage.LogEntry) {
+func (n *LogNotifier) Notify(ctx context.Context, stream string, logKey string, logEntry logstorage.LogEntry) {
 	msg := LogMessage{
 		Stream:   stream,
 		LogKey:   logKey,
 		LogEntry: logEntry,
 	}
-	n.logMbox.Send(context.Background(), msg)
+	n.logMbox.Send(ctx, msg)
 }
