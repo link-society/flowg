@@ -64,7 +64,7 @@ export const KeyValueEditor = (props: KeyValueEditorProps) => {
           />
 
           <Button
-            color="primary"
+            color="error"
             variant="contained"
             size="small"
             onClick={() => {
