@@ -77,6 +77,31 @@ export const listStreamFields = async (stream: string): Promise<string[]> => {
   return body.fields
 }
 
+export const configureStream = async (stream: string, config: StreamConfigModel): Promise<void> => {
+  type ConfigureStreamRequest = {
+    config: StreamConfigModel
+  }
+
+  type ConfigureStreamResponse = {
+    success: boolean
+  }
+
+  await request.PUT<ConfigureStreamRequest, ConfigureStreamResponse>({
+    path: `/api/v1/streams/${stream}`,
+    body: { config },
+  })
+}
+
+export const purgeStream = async (stream: string): Promise<void> => {
+  type PurgeStreamResponse = {
+    success: boolean
+  }
+
+  await request.DELETE<PurgeStreamResponse>({
+    path: `/api/v1/streams/${stream}`,
+  })
+}
+
 export const listAlerts = async (): Promise<string[]> => {
   type ListAlertsResponse = {
     success: boolean
