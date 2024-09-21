@@ -86,7 +86,7 @@ export const UserFormModal = ({ open, payload, onClose }: DialogProps<string[], 
           </Box>
 
           <Box className="flex flex-col items-stretch gap-2">
-            <label className="font-semibold">Roles:</label>
+            <span className="font-semibold">Roles:</span>
             <TransferList<string>
               choices={payload}
               getItemId={(v) => v}

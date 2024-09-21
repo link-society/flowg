@@ -90,7 +90,7 @@ export function TransferList<T>(props: TransferListProps<T>) {
           const labelId = `transfer-list-item-${idx}-label`
 
           return (
-            <ListItemButton key={idx} onClick={handleToggle(value)}>
+            <ListItemButton key={props.getItemId(value)} onClick={handleToggle(value)}>
               <ListItemIcon>
                 <Checkbox
                   checked={checked.find((v) => {

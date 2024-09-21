@@ -133,7 +133,7 @@ export const TimeWindowSelector = ({ loading, onTimeWindowChanged }: TimeWindowS
           onTimeWindowChanged(from, to, live)
         }}
         MenuListProps={{
-          sx: { width: menu && menu.offsetWidth },
+          sx: { width: menu?.offsetWidth },
         }}
       >
         <Box>

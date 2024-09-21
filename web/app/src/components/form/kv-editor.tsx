@@ -29,7 +29,10 @@ export const KeyValueEditor = (props: KeyValueEditorProps) => {
   return (
     <div className="flex flex-col items-stretch gap-2">
       {pairs.map(([key, value], index) => (
-        <div className="flex flex-row items-stretch gap-2">
+        <div
+          key={key}
+          className="flex flex-row items-stretch gap-2"
+        >
           <TextField
             label={props.keyLabel ?? 'Key'}
             value={key}

@@ -68,7 +68,7 @@ export const RoleFormModal = ({ open, onClose }: DialogProps<void, RoleModel | n
           />
 
           <Box className="flex flex-col items-stretch gap-2">
-            <label className="font-semibold">Permissions:</label>
+            <span className="font-semibold">Permissions:</span>
             <TransferList<string>
               choices={SCOPES}
               getItemId={(v) => v}
