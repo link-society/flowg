@@ -38,3 +38,10 @@ export const queryLogs = async (
     }),
   )
 }
+
+export const watchLogs = (stream: string, filter: string) => {
+  return request.SSE({
+    path: `/api/v1/streams/${stream}/logs/watch`,
+    searchParams: new URLSearchParams({ filter }),
+  })
+}
