@@ -160,7 +160,6 @@ export const TimeWindowSelector = ({ loading, onTimeWindowChanged }: TimeWindowS
               exclusive
               value={relativeTimewindow}
               onChange={(_, value) => {
-                console.log({ value })
                 if (value !== null) {
                   setRelativeTimewindow(value)
                 }
