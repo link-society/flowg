@@ -59,10 +59,7 @@ export const QueryPanel = (props: QueryPanelProps) => {
       </Grid>
 
       <Grid size={{ xs: 4 }}>
-        <TimeWindowSelector
-          loading={props.loading}
-          onTimeWindowChanged={setTimeWindowFactory}
-        />
+        <TimeWindowSelector onTimeWindowChanged={setTimeWindowFactory} />
       </Grid>
 
       <Grid size={{ xs: 2 }}>
