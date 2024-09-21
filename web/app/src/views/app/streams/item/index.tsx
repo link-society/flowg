@@ -44,7 +44,7 @@ export const StreamView = () => {
     cellClass: 'font-mono',
   })
 
-  const [watcher, setWatcher] = useState<{ enabled: Boolean, filter: string }>({
+  const [watcher, setWatcher] = useState<{ enabled: boolean, filter: string }>({
     enabled: false,
     filter: '',
   })
