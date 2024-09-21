@@ -4,10 +4,11 @@ import { useLoaderData, useNavigate } from 'react-router-dom'
 import Backdrop from '@mui/material/Backdrop'
 import CircularProgress from '@mui/material/CircularProgress'
 
+import { LoaderData } from './loader'
 import { NewTransformerButton } from './new-btn'
 
 export const TransformerView = () => {
-  const { transformers } = useLoaderData() as { transformers: string[] }
+  const { transformers } = useLoaderData() as LoaderData
   const navigate = useNavigate()
 
   useEffect(
