@@ -26,17 +26,17 @@ function intersection<T>(a: readonly T[], b: readonly T[], getItemId: (item: T) 
   ))
 }
 
-type TransferListProps<T> = {
-  choices: readonly T[]
+type TransferListProps<T> = Readonly<{
+  choices: T[]
   getItemId: (item: T) => any
   renderItem: (item: T) => ReactNode
   onChoiceUpdate: (choices: readonly T[]) => void
-}
+}>
 
 export function TransferList<T>(props: TransferListProps<T>) {
-  const [checked, setChecked] = useState<readonly T[]>([])
-  const [left, setLeft] = useState<readonly T[]>(props.choices)
-  const [right, setRight] = useState<readonly T[]>([])
+  const [checked, setChecked] = useState<T[]>([])
+  const [left, setLeft] = useState<T[]>(props.choices)
+  const [right, setRight] = useState<T[]>([])
 
   useEffect(
     () => props.onChoiceUpdate(right),

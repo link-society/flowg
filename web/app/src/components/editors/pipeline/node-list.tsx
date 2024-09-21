@@ -8,7 +8,7 @@ import Chip from '@mui/material/Chip'
 
 import * as colors from '@mui/material/colors'
 
-type NodeListProps = {
+type NodeListProps = Readonly<{
   title: ReactNode
   newButton: (createdCb: () => void) => ReactNode
   fetchItems: () => Promise<string[]>
@@ -17,7 +17,7 @@ type NodeListProps = {
   itemColor: keyof typeof colors
   onItemOpen: (item: string) => void
   className?: string
-}
+}>
 
 export function NodeList(props: NodeListProps) {
   const [dirty, setDirty] = useState(true)

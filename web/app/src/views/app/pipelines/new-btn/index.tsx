@@ -8,9 +8,9 @@ import Button from '@mui/material/Button'
 
 import { NewPipelineModal } from './modal'
 
-type NewPipelineButtonProps = {
+type NewPipelineButtonProps = Readonly<{
   onPipelineCreated: (name: string) => void
-}
+}>
 
 export const NewPipelineButton = (props: NewPipelineButtonProps) => {
   const dialogs = useDialogs()

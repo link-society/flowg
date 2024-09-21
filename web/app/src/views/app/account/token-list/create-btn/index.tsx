@@ -11,9 +11,9 @@ import * as tokenApi from '@/lib/api/operations/token'
 
 import { ShowNewTokenModal } from './modal'
 
-type CreateTokenButtonProps = {
+type CreateTokenButtonProps = Readonly<{
   onTokenCreated: (uuid: string) => void
-}
+}>
 
 export const CreateTokenButton = ({ onTokenCreated }: CreateTokenButtonProps) => {
   const dialogs = useDialogs()

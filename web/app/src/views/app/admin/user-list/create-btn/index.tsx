@@ -10,10 +10,10 @@ import { UserModel } from '@/lib/models'
 
 import { UserFormModal } from './modal'
 
-type CreateUserButtonProps = {
+type CreateUserButtonProps = Readonly<{
   roles: string[]
   onUserCreated: (user: UserModel) => void
-}
+}>
 
 export const CreateUserButton = ({ roles, onUserCreated }: CreateUserButtonProps) => {
   const dialogs = useDialogs()

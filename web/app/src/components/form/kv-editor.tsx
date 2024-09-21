@@ -8,12 +8,12 @@ import Button from '@mui/material/Button'
 
 type KeyValue = [string, string]
 
-type KeyValueEditorProps = {
+type KeyValueEditorProps = Readonly<{
   keyLabel?: string
   valueLabel?: string
   keyValues: KeyValue[]
   onChange: (kvs: KeyValue[]) => void
-}
+}>
 
 export const KeyValueEditor = (props: KeyValueEditorProps) => {
   const [pairs, setPairs] = useState(props.keyValues)

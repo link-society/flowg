@@ -10,9 +10,9 @@ import { RoleModel } from '@/lib/models'
 
 import { RoleFormModal } from './modal'
 
-type CreateRoleButtonProps = {
+type CreateRoleButtonProps = Readonly<{
   onRoleCreated: (role: RoleModel) => void
-}
+}>
 
 export const CreateRoleButton = ({ onRoleCreated }: CreateRoleButtonProps) => {
   const dialogs = useDialogs()

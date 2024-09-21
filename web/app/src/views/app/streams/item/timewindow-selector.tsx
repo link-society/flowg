@@ -34,13 +34,13 @@ const RELATIVE_TIMEWINDOW_LABELS_BY_VALUE = RELATIVE_TIMEWINDOW_OPTIONS.reduce(
 
 export const DEFAULT_TIMEWINDOW_VALUE = RELATIVE_TIMEWINDOW_OPTIONS[0].value
 
-type LabelRendererProps = {
+type LabelRendererProps = Readonly<{
   timewindowType: 'relative' | 'absolute'
   relativeTimewindow: number
   from: Date
   to: Date
   live: boolean
-}
+}>
 
 const LabelRenderer = (props: LabelRendererProps) => (
   <Box className="flex flex-row items-center justify-center gap-1">
@@ -71,10 +71,10 @@ const LabelRenderer = (props: LabelRendererProps) => (
   </Box>
 )
 
-type TimeWindowSelectorProps = {
+type TimeWindowSelectorProps = Readonly<{
   loading: boolean,
   onTimeWindowChanged: (from: Date, to: Date, live: boolean) => void
-}
+}>
 
 export const TimeWindowSelector = ({ loading, onTimeWindowChanged }: TimeWindowSelectorProps) => {
   const now = useMemo(

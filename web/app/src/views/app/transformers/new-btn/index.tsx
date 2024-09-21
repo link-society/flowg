@@ -8,9 +8,9 @@ import Button from '@mui/material/Button'
 
 import { NewTransformerModal } from './modal'
 
-type NewTransformerButtonProps = {
+type NewTransformerButtonProps = Readonly<{
   onTransformerCreated: (name: string) => void
-}
+}>
 
 export const NewTransformerButton = (props: NewTransformerButtonProps) => {
   const dialogs = useDialogs()

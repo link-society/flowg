@@ -3,10 +3,10 @@ import { useCallback, useEffect, useState } from 'react'
 import Editor, { useMonaco } from '@monaco-editor/react'
 import { vrlLanguageDefinition, vrlThemeDefinition } from '@/lib/vrl-highlighter'
 
-type CodeEditorProps = {
+type CodeEditorProps = Readonly<{
   code: string
   onCodeChange: (value: string) => void
-}
+}>
 
 export const CodeEditor = ({ code, onCodeChange }: CodeEditorProps) => {
   const [value, setValue] = useState(code)

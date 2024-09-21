@@ -18,9 +18,9 @@ import { ScopesCell } from './scopes-cell'
 import * as aclApi from '@/lib/api/operations/acls'
 import { RoleModel } from '@/lib/models'
 
-type RoleListProps = {
+type RoleListProps = Readonly<{
   roles: RoleModel[]
-}
+}>
 
 export const RoleList = ({ roles }: RoleListProps) => {
   const notify = useNotify()
