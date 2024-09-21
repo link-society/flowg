@@ -49,14 +49,14 @@ export const OpenTransformerDialog = ({ transformer }: OpenTransformerDialogProp
       const script = await configApi.getTransformer(transformer)
       setCode(script)
     },
-    [transformer, setCode],
+    [transformer],
   )
 
   useEffect(
     () => {
       setTransformerPromise(onFetch(transformer))
     },
-    [setTransformerPromise, onFetch, transformer],
+    [transformer],
   )
 
   const [onSave, saveLoading] = useApiOperation(
@@ -65,7 +65,7 @@ export const OpenTransformerDialog = ({ transformer }: OpenTransformerDialogProp
       notify.success('Transformer saved')
       setTransformerPromise(onFetch(transformer))
     },
-    [transformer, code, setTransformerPromise, onFetch],
+    [transformer, code],
   )
 
   return (
