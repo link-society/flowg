@@ -11,19 +11,17 @@ export const AccountView = () => {
   const { tokens } = useLoaderData() as LoaderData
 
   return (
-    <>
-      <Grid
-        container
-        spacing={2}
-        className="p-3 h-full max-lg:overflow-auto"
-      >
-        <Grid size={{ xs: 12, md: 6 }} className="lg:h-full">
-          <ProfileInfo />
-        </Grid>
-        <Grid size={{ xs: 12, md: 6 }} className="lg:h-full">
-          <TokenList tokens={tokens} />
-        </Grid>
+    <Grid
+      container
+      spacing={2}
+      className="p-3 h-full max-lg:overflow-auto"
+    >
+      <Grid size={{ xs: 12, md: 6 }} className="lg:h-full">
+        <ProfileInfo />
       </Grid>
-    </>
+      <Grid size={{ xs: 12, md: 6 }} className="lg:h-full">
+        <TokenList tokens={tokens} />
+      </Grid>
+    </Grid>
   )
 }
