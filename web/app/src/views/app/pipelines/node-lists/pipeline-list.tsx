@@ -3,7 +3,7 @@ import { useProfile } from '@/lib/context/profile'
 import AccountTreeIcon from '@mui/icons-material/AccountTree'
 
 import { NodeList } from '@/components/editors/pipeline/node-list'
-import { NewPipelineButton } from '../new-btn'
+import { NewPipelineButton } from '@/views/app/pipelines/new-btn'
 
 import * as configApi from '@/lib/api/operations/config'
 

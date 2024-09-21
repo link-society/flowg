@@ -3,6 +3,7 @@ import { useProfile } from '@/lib/context/profile'
 import StorageIcon from '@mui/icons-material/Storage'
 
 import { NodeList } from '@/components/editors/pipeline/node-list'
+import { NewStreamButton } from '@/views/app/storage/new-btn'
 
 import * as configApi from '@/lib/api/operations/config'
 
@@ -16,10 +17,10 @@ export const StreamList = ({ className }: StreamListProps) => {
   return (
     <NodeList
       title="Streams"
-      newButton={() => (
+      newButton={(createCb) => (
         <>
           {permissions.can_edit_streams && (
-            <>[new btn]</>
+            <NewStreamButton onStreamCreated={createCb} />
           )}
         </>
       )}
