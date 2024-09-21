@@ -20,11 +20,11 @@ import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 import TextField from '@mui/material/TextField'
 
-import { NewStreamButton } from '../new-btn'
+import { NewStreamButton } from './new-btn'
 
 import * as configApi from '@/lib/api/operations/config'
 
-import { LoaderData } from '../loader'
+import { LoaderData } from './loader'
 
 export const StreamView = () => {
   const navigate = useNavigate()
@@ -83,7 +83,7 @@ export const StreamView = () => {
           </Button>
         </div>
 
-        {permissions.can_edit_transformers && (
+        {permissions.can_edit_streams && (
           <div className="flex flex-row items-center gap-3">
             <NewStreamButton
               onStreamCreated={onCreate}
