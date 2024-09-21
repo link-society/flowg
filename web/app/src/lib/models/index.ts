@@ -40,6 +40,11 @@ export type StreamConfigModel = {
   size: number
 }
 
+export type WebhookModel = {
+  url: string
+  headers: Record<string, string>
+}
+
 export type TokenModel = {
   token: string
   token_uuid: string
