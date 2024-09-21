@@ -82,30 +82,28 @@ export const UserList = ({ roles, users }: UserListProps) => {
   ])
 
   return (
-    <>
-      <Card className="max-lg:min-h-96 lg:h-full flex flex-col items-stretch">
-        <CardHeader
-          title={
-            <div className="flex items-center gap-3">
-              <AccountCircleIcon />
-              <span className="flex-grow">Users</span>
-              <CreateUserButton roles={roles} onUserCreated={onNewUser} />
-            </div>
-          }
-          className="bg-blue-400 text-white shadow-lg z-20"
+    <Card className="max-lg:min-h-96 lg:h-full flex flex-col items-stretch">
+      <CardHeader
+        title={
+          <div className="flex items-center gap-3">
+            <AccountCircleIcon />
+            <span className="flex-grow">Users</span>
+            <CreateUserButton roles={roles} onUserCreated={onNewUser} />
+          </div>
+        }
+        className="bg-blue-400 text-white shadow-lg z-20"
+      />
+      <CardContent className="!p-0 flex-grow flex-shrink h-0 ag-theme-material flowg-table">
+        <AgGridReact<UserModel>
+          ref={gridRef}
+          loading={loading}
+          rowData={rowData}
+          columnDefs={columnDefs}
+          enableCellTextSelection
+          autoSizeStrategy={{type: 'fitCellContents'}}
+          getRowId={({ data }) => data.name}
         />
-        <CardContent className="!p-0 flex-grow flex-shrink h-0 ag-theme-material flowg-table">
-          <AgGridReact<UserModel>
-            ref={gridRef}
-            loading={loading}
-            rowData={rowData}
-            columnDefs={columnDefs}
-            enableCellTextSelection
-            autoSizeStrategy={{type: 'fitCellContents'}}
-            getRowId={({ data }) => data.name}
-          />
-        </CardContent>
-      </Card>
-    </>
+      </CardContent>
+    </Card>
   )
 }
