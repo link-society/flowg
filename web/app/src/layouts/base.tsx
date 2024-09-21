@@ -1,9 +1,21 @@
 import { Outlet } from 'react-router-dom'
 
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+
+import { DialogsProvider } from '@toolpad/core/useDialogs'
+import { NotificationsProvider } from '@toolpad/core/useNotifications'
+
 export const BaseLayout = () => {
   return (
     <div className="h-full flex flex-col overflow-hidden">
-      <Outlet />
+      <DialogsProvider>
+        <NotificationsProvider>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <Outlet />
+          </LocalizationProvider>
+        </NotificationsProvider>
+      </DialogsProvider>
     </div>
   )
 }
