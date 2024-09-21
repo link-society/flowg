@@ -6,9 +6,9 @@ import { NodeList } from '@/components/editors/pipeline/node-list'
 
 import * as configApi from '@/lib/api/operations/config'
 
-type AlertListProps = {
+type AlertListProps = Readonly<{
   className?: string
-}
+}>
 
 export const AlertList = ({ className }: AlertListProps) => {
   const { permissions } = useProfile()

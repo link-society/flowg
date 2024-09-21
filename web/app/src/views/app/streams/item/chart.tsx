@@ -8,11 +8,11 @@ import type { ApexOptions } from 'apexcharts'
 import { LogEntryModel } from '@/lib/models'
 import { aggregateLogs } from '@/lib/timeserie'
 
-type ChartProps = {
+type ChartProps = Readonly<{
   rowData: LogEntryModel[]
   from: Date,
   to: Date,
-}
+}>
 
 const CHART_OPTIONS: ApexOptions = {
   chart: {

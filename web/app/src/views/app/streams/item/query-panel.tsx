@@ -9,10 +9,10 @@ import TextField from '@mui/material/TextField'
 
 import { TimeWindowSelector, DEFAULT_TIMEWINDOW_VALUE } from './timewindow-selector'
 
-type QueryPanelProps = {
+type QueryPanelProps = Readonly<{
   loading: boolean
   onFetchRequested: (filter: string, from: Date, to: Date, live: boolean) => void
-}
+}>
 
 export const QueryPanel = (props: QueryPanelProps) => {
   const now = useMemo(

@@ -7,9 +7,9 @@ import { NewTransformerButton } from '@/views/app/transformers/new-btn'
 
 import * as configApi from '@/lib/api/operations/config'
 
-type TransformerListProps = {
+type TransformerListProps = Readonly<{
   className?: string
-}
+}>
 
 export const TransformerList = ({ className }: TransformerListProps) => {
   const { permissions } = useProfile()

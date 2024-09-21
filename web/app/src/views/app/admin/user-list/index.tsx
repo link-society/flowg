@@ -18,10 +18,10 @@ import { RolesCell } from './roles-cell'
 import * as aclApi from '@/lib/api/operations/acls'
 import { UserModel } from '@/lib/models'
 
-type UserListProps = {
+type UserListProps = Readonly<{
   roles: string[]
   users: UserModel[]
-}
+}>
 
 export const UserList = ({ roles, users }: UserListProps) => {
   const notify = useNotify()

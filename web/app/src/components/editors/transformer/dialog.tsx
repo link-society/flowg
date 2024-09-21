@@ -32,9 +32,9 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />
 })
 
-type OpenTransformerDialogProps = {
+type OpenTransformerDialogProps = Readonly<{
   transformer: string
-}
+}>
 
 export const OpenTransformerDialog = ({ transformer }: OpenTransformerDialogProps) => {
   const notify = useNotify()

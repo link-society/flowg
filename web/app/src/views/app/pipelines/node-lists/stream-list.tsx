@@ -6,9 +6,9 @@ import { NodeList } from '@/components/editors/pipeline/node-list'
 
 import * as configApi from '@/lib/api/operations/config'
 
-type StreamListProps = {
+type StreamListProps = Readonly<{
   className?: string
-}
+}>
 
 export const StreamList = ({ className }: StreamListProps) => {
   const { permissions } = useProfile()

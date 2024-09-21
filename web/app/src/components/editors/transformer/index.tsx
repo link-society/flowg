@@ -13,10 +13,10 @@ import { CodeEditor } from './code-editor'
 
 import * as testApi from '@/lib/api/operations/tests'
 
-type TransformerEditorProps = {
+type TransformerEditorProps = Readonly<{
   code: string
   onCodeChange: (value: string) => void
-}
+}>
 
 export const TransformerEditor = (props: TransformerEditorProps) => {
   const [code, setCode] = useState(props.code)

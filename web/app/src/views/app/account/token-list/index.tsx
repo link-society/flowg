@@ -19,9 +19,9 @@ import { TokenCell } from './cell'
 
 import * as tokenApi from '@/lib/api/operations/token'
 
-type TokenListProps = {
+type TokenListProps = Readonly<{
   tokens: string[]
-}
+}>
 
 export const TokenList = ({ tokens }: TokenListProps) => {
   const notify = useNotify()

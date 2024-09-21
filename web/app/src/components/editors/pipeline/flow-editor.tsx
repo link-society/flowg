@@ -41,10 +41,10 @@ import { RouterNode } from './nodes/router'
 
 import { PipelineModel } from '@/lib/models'
 
-type FlowEditorProps = {
+type FlowEditorProps = Readonly<{
   flow: PipelineModel
   onFlowChange: (flow: PipelineModel) => void
-}
+}>
 
 export const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange }) => {
   const { screenToFlowPosition } = useReactFlow()

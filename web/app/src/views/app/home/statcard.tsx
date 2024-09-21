@@ -7,12 +7,12 @@ import CardContent from '@mui/material/CardContent'
 import CardActions from '@mui/material/CardActions'
 import Button from '@mui/material/Button'
 
-type StatCardProps = {
+type StatCardProps = Readonly<{
   icon: ReactNode
   title: ReactNode
   value: ReactNode
   href: string
-}
+}>
 
 export const StatCard = ({ icon, title, value, href }: StatCardProps) => (
   <Card>

@@ -2,10 +2,10 @@ import List from '@mui/material/List'
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemText from '@mui/material/ListItemText'
 
-type StreamListProps = {
+type StreamListProps = Readonly<{
   streams: string[]
   currentStream: string
-}
+}>
 
 export const StreamList = (props: StreamListProps) => {
   return (

@@ -7,9 +7,9 @@ import { NewPipelineButton } from '../new-btn'
 
 import * as configApi from '@/lib/api/operations/config'
 
-type PipelineListProps = {
+type PipelineListProps = Readonly<{
   className?: string
-}
+}>
 
 export const PipelineList = ({ className }: PipelineListProps) => {
   const { permissions } = useProfile()

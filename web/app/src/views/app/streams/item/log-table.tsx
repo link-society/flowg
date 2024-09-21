@@ -8,10 +8,10 @@ import { ColDef } from 'ag-grid-community'
 
 import { LogEntryModel } from '@/lib/models'
 
-type LogTableProps = {
+type LogTableProps = Readonly<{
   rowData: LogEntryModel[]
   columnDefs: ColDef<LogEntryModel>[]
-}
+}>
 
 export const LogTable = (props: LogTableProps) => {
   const [selectedRow, setSelectedRow] = useState<LogEntryModel | undefined>(undefined)
