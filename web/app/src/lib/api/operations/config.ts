@@ -1,6 +1,6 @@
 import * as request from '@/lib/api/request'
 
-import { PipelineModel, StreamConfigModel } from '@/lib/models'
+import { PipelineModel, StreamConfigModel, WebhookModel } from '@/lib/models'
 
 export const listTransformers = async (): Promise<string[]> => {
   type ListTransformersResponse = {
@@ -112,6 +112,44 @@ export const listAlerts = async (): Promise<string[]> => {
     path: '/api/v1/alerts',
   })
   return body.alerts
+}
+
+export const getAlert = async (alert: string): Promise<WebhookModel> => {
+  type GetAlertResponse = {
+    success: boolean
+    webhook: WebhookModel
+  }
+
+  const { body } = await request.GET<GetAlertResponse>({
+    path: `/api/v1/alerts/${alert}`,
+  })
+
+  return body.webhook
+}
+
+export const saveAlert = async (alert: string, webhook: WebhookModel): Promise<void> => {
+  type SaveAlertRequest = {
+    webhook: WebhookModel
+  }
+
+  type SaveAlertResponse = {
+    success: boolean
+  }
+
+  await request.PUT<SaveAlertRequest, SaveAlertResponse>({
+    path: `/api/v1/alerts/${alert}`,
+    body: { webhook },
+  })
+}
+
+export const deleteAlert = async (alert: string): Promise<void> => {
+  type DeleteAlertResponse = {
+    success: boolean
+  }
+
+  await request.DELETE<DeleteAlertResponse>({
+    path: `/api/v1/alerts/${alert}`,
+  })
 }
 
 export const listPipelines = async (): Promise<string[]> => {
