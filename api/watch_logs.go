@@ -43,7 +43,7 @@ func WatchLogsUsecase(
 			) error {
 				var filter logstorage.Filter
 
-				if req.Filter != nil {
+				if req.Filter != nil && *req.Filter != "" {
 					var err error
 
 					filter, err = filterdsl.Compile(*req.Filter)
