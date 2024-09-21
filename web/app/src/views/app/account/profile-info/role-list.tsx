@@ -9,9 +9,9 @@ export const RoleList = () => {
 
   return (
     <div>
-      <label className="font-semibold mb-1">
+      <span className="font-semibold mb-1">
         Roles:
-      </label>
+      </span>
 
       <Paper
         className="
@@ -22,8 +22,8 @@ export const RoleList = () => {
         variant="outlined"
         component="ul"
       >
-        {user.roles.map((role, idx) => (
-          <ListItem key={idx}>
+        {user.roles.map((role) => (
+          <ListItem key={role}>
             <Chip label={role} size="small" />
           </ListItem>
         ))}

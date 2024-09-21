@@ -119,9 +119,9 @@ export const TransformerView = () => {
         <Grid size={{ xs: 2 }}>
           <Paper className="h-full overflow-auto">
             <List component="nav" className="!p-0">
-              {transformers.map((transformer, index) => (
+              {transformers.map((transformer) => (
                 <ListItemButton
-                  key={index}
+                  key={transformer}
                   component="a"
                   href={`/web/transformers/${transformer}`}
                   sx={transformer !== currentTransformer!.name

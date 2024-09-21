@@ -10,9 +10,9 @@ type StreamListProps = Readonly<{
 export const StreamList = (props: StreamListProps) => {
   return (
     <List component="nav" className="!p-0">
-      {props.streams.map((stream, index) => (
+      {props.streams.map((stream) => (
         <ListItemButton
-          key={index}
+          key={stream}
           component="a"
           href={`/web/streams/${stream}`}
           sx={stream !== props.currentStream

@@ -105,7 +105,7 @@ export const StreamView = () => {
           const allFields = [...fields!]
 
           for (const field of Object.keys(logEntry.fields)) {
-            if (!allFields!.includes(field)) {
+            if (!allFields.includes(field)) {
               allFields.push(field)
             }
           }

@@ -88,9 +88,9 @@ export function NodeList(props: NodeListProps) {
                 flex flex-col items-start gap-2 p-2
               "
             >
-              {items.map((item, idx) => (
+              {items.map((item) => (
                 <Chip
-                  key={idx}
+                  key={item}
                   icon={<>{props.itemIcon}</>}
                   label={item}
                   onDelete={() => props.onItemOpen(item)}

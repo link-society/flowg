@@ -2,13 +2,13 @@ import Chip from '@mui/material/Chip'
 
 import { CustomCellRendererProps } from 'ag-grid-react'
 
-type RolesCellProps = CustomCellRendererProps<string[]> & {}
+type RolesCellProps = CustomCellRendererProps<string[]>
 
 export const RolesCell = (props: RolesCellProps) => (
   <>
-    {(props.value as string[]).map((role, idx) => (
+    {(props.value as string[]).map((role) => (
       <Chip
-        key={idx}
+        key={role}
         label={role}
         size="small"
         className="mx-1"

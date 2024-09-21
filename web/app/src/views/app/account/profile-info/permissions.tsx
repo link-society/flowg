@@ -9,9 +9,9 @@ export const Permissions = () => {
 
   return (
     <div>
-      <label className="font-semibold mb-1">
+      <span className="font-semibold mb-1">
         Permissions:
-      </label>
+      </span>
 
       <div
         className="p-1 md:grid md:grid-cols-4 md:gap-1"
