@@ -42,15 +42,7 @@ updates:
     labels:
       - "deps: rust"
   - package-ecosystem: "npm"
-    directory: "/web/components/floweditor"
-    schedule:
-      interval: "weekly"
-    commit-message:
-      prefix: ":arrow_up: "
-    labels:
-      - "deps: javascript"
-  - package-ecosystem: "npm"
-    directory: "/web/components/code-editor"
+    directory: "/web/app"
     schedule:
       interval: "weekly"
     commit-message:
