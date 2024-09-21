@@ -3,6 +3,7 @@ import { useProfile } from '@/lib/context/profile'
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
 
 import { NodeList } from '@/components/editors/pipeline/node-list'
+import { NewAlertButton } from '@/views/app/alerts/new-btn'
 
 import * as configApi from '@/lib/api/operations/config'
 
@@ -16,10 +17,10 @@ export const AlertList = ({ className }: AlertListProps) => {
   return (
     <NodeList
       title="Alerts"
-      newButton={() => (
+      newButton={(createdCb) => (
         <>
           {permissions.can_edit_alerts && (
-            <>[new btn]</>
+            <NewAlertButton onAlertCreated={createdCb} />
           )}
         </>
       )}

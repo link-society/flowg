@@ -78,6 +78,22 @@ export default createBrowserRouter([
             },
           },
           {
+            path: 'alerts',
+            lazy: async () => {
+              const { AlertView: Component } = await import('@/views/app/alerts/section')
+              const { loader } = await import('@/views/app/alerts/loader')
+              return { Component, loader }
+            },
+          },
+          {
+            path: 'alerts/:alert',
+            lazy: async () => {
+              const { AlertView: Component } = await import('@/views/app/alerts/item')
+              const { loader } = await import('@/views/app/alerts/loader')
+              return { Component, loader }
+            },
+          },
+          {
             path: 'pipelines',
             lazy: async () => {
               const { PipelineView: Component } = await import('@/views/app/pipelines/section')
