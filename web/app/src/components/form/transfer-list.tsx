@@ -85,16 +85,12 @@ export function TransferList<T>(props: TransferListProps<T>) {
 
   const customList = (items: readonly T[]) => (
     <Paper variant="outlined" className="min-h-60 max-h-60 overflow-auto">
-      <List dense component="div" role="list">
+      <List dense component="div">
         {items.map((value: T, idx) => {
           const labelId = `transfer-list-item-${idx}-label`
 
           return (
-            <ListItemButton
-              key={idx}
-              role="listitem"
-              onClick={handleToggle(value)}
-            >
+            <ListItemButton key={idx} onClick={handleToggle(value)}>
               <ListItemIcon>
                 <Checkbox
                   checked={checked.find((v) => {
