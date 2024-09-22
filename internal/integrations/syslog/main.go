@@ -117,6 +117,13 @@ func (w *worker) DoWork(ctx actor.Context) actor.WorkerStatus {
 }
 
 func (w *worker) onStart(ctx actor.Context) {
+	slog.InfoContext(
+		ctx,
+		"Starting syslog server",
+		"channel", "syslog",
+		"udp.bind", w.bindAddress,
+	)
+
 	w.channel = make(gosyslog.LogPartsChannel)
 	w.handler = gosyslog.NewChannelHandler(w.channel)
 
