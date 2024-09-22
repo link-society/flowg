@@ -53,11 +53,25 @@ func WatchLogsUsecase(
 							"Failed to compile filter",
 							"channel", "api",
 							"error", err.Error(),
+							"stream", req.Stream,
 							"filter", req.Filter,
 						)
 
 						return status.Wrap(err, status.InvalidArgument)
 					}
+				}
+
+				logM, err := logNotifier.Subscribe(ctx, req.Stream)
+				if err != nil {
+					slog.ErrorContext(
+						ctx,
+						"Failed to subscribe to logs",
+						"channel", "api",
+						"error", err.Error(),
+						"stream", req.Stream,
+					)
+
+					return status.Wrap(err, status.Internal)
 				}
 
 				resp.Writer.(http.ResponseWriter).Header().Set("Access-Control-Allow-Origin", "*")
@@ -79,8 +93,6 @@ func WatchLogsUsecase(
 					"channel", "api",
 					"stream", req.Stream,
 				)
-
-				logM := logNotifier.Subscribe(ctx, req.Stream)
 
 				for log := range logM.ReceiveC() {
 					if filter == nil || filter.Evaluate(&log.LogEntry) {

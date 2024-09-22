@@ -15,5 +15,10 @@ type LogMessage struct {
 type SubscribeMessage struct {
 	Stream  string
 	SenderM actor.Mailbox[LogMessage]
+	ReadyC  chan<- ReadyResponse
 	DoneC   <-chan struct{}
+}
+
+type ReadyResponse struct {
+	Err error
 }

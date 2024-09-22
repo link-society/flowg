@@ -1,6 +1,11 @@
 package lognotify
 
-import "github.com/vladopajic/go-actor/actor"
+import (
+	"errors"
+	"log/slog"
+
+	"github.com/vladopajic/go-actor/actor"
+)
 
 type subscriberSet map[actor.MailboxSender[LogMessage]]struct{}
 
@@ -17,6 +22,10 @@ func (w *worker) DoWork(ctx actor.Context) actor.WorkerStatus {
 
 	case msg, ok := <-w.subMbox.ReceiveC():
 		if !ok {
+			go func() {
+				msg.ReadyC <- ReadyResponse{errors.New("mailbox closed")}
+				close(msg.ReadyC)
+			}()
 			return actor.WorkerEnd
 		}
 
@@ -32,6 +41,11 @@ func (w *worker) DoWork(ctx actor.Context) actor.WorkerStatus {
 			msg.SenderM.Stop()
 		}()
 
+		go func() {
+			msg.ReadyC <- ReadyResponse{nil}
+			close(msg.ReadyC)
+		}()
+
 		return actor.WorkerContinue
 
 	case msg, ok := <-w.logMbox.ReceiveC():
@@ -44,7 +58,15 @@ func (w *worker) DoWork(ctx actor.Context) actor.WorkerStatus {
 		}
 
 		for sub := range w.subscribers[msg.Stream] {
-			sub.Send(ctx, msg)
+			if err := sub.Send(ctx, msg); err != nil {
+				slog.ErrorContext(
+					ctx,
+					"failed to send log message",
+					"channel", "lognotify",
+					"stream", msg.Stream,
+					"error", err.Error(),
+				)
+			}
 		}
 
 		return actor.WorkerContinue

@@ -38,26 +38,38 @@ func (n *LogNotifier) Stop() {
 	n.rootA.Stop()
 }
 
-func (n *LogNotifier) Subscribe(ctx context.Context, stream string) actor.MailboxReceiver[LogMessage] {
+func (n *LogNotifier) Subscribe(ctx context.Context, stream string) (actor.MailboxReceiver[LogMessage], error) {
 	logM := actor.NewMailbox[LogMessage]()
 	logM.Start()
 
+	readyC := make(chan ReadyResponse, 1)
 	msg := SubscribeMessage{
 		Stream:  stream,
 		SenderM: logM,
+		ReadyC:  readyC,
 		DoneC:   ctx.Done(),
 	}
 
-	n.subMbox.Send(ctx, msg)
+	err := n.subMbox.Send(ctx, msg)
+	if err != nil {
+		logM.Stop()
+		return nil, err
+	}
 
-	return logM
+	resp := <-readyC
+	if resp.Err != nil {
+		logM.Stop()
+		return nil, resp.Err
+	}
+
+	return logM, nil
 }
 
-func (n *LogNotifier) Notify(ctx context.Context, stream string, logKey string, logEntry logstorage.LogEntry) {
+func (n *LogNotifier) Notify(ctx context.Context, stream string, logKey string, logEntry logstorage.LogEntry) error {
 	msg := LogMessage{
 		Stream:   stream,
 		LogKey:   logKey,
 		LogEntry: logEntry,
 	}
-	n.logMbox.Send(ctx, msg)
+	return n.logMbox.Send(ctx, msg)
 }
