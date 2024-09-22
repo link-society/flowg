@@ -2,6 +2,7 @@ package auth
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -10,9 +11,13 @@ import (
 var JWT_SIGNING_KEY []byte
 
 func init() {
-	key, err := newToken(32)
-	if err != nil {
-		panic(err)
+	key := os.Getenv("FLOWG_SECRET_KEY")
+	if key == "" {
+		var err error
+		key, err = newToken(32)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	JWT_SIGNING_KEY = []byte(key)
