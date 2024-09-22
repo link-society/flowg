@@ -41,7 +41,7 @@ export const RoleList = ({ roles }: RoleListProps) => {
       await aclApi.deleteRole(role.name)
 
       const rowNode = gridRef.current.api.getRowNode(role.name)
-      if (rowNode !== undefined) {
+      if (rowNode !== undefined && rowNode.data !== undefined) {
         gridRef.current.api.applyTransaction({
           remove: [rowNode.data],
         })

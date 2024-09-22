@@ -42,7 +42,7 @@ export const UserList = ({ roles, users }: UserListProps) => {
       await aclApi.deleteUser(user.name)
 
       const rowNode = gridRef.current.api.getRowNode(user.name)
-      if (rowNode !== undefined) {
+      if (rowNode !== undefined && rowNode.data !== undefined) {
         gridRef.current.api.applyTransaction({
           remove: [rowNode.data],
         })

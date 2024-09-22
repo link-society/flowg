@@ -42,7 +42,7 @@ export const TokenList = ({ tokens }: TokenListProps) => {
       await tokenApi.deleteToken(data.token)
 
       const rowNode = gridRef.current.api.getRowNode(data.token)
-      if (rowNode !== undefined) {
+      if (rowNode !== undefined && rowNode.data !== undefined) {
         gridRef.current.api.applyTransaction({
           remove: [rowNode.data],
         })
