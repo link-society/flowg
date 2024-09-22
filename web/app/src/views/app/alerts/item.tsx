@@ -11,15 +11,13 @@ import SaveIcon from '@mui/icons-material/Save'
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid2'
 import Paper from '@mui/material/Paper'
-import Divider from '@mui/material/Divider'
 import List from '@mui/material/List'
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemText from '@mui/material/ListItemText'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
-import TextField from '@mui/material/TextField'
 
-import { KeyValueEditor } from '@/components/form/kv-editor'
+import { AlertEditor } from '@/components/editors/alert'
 import { NewAlertButton } from './new-btn'
 
 import * as configApi from '@/lib/api/operations/config'
@@ -146,33 +144,8 @@ export const AlertView = () => {
           </Paper>
         </Grid>
         <Grid size={{ xs: 10 }} className="h-full">
-          <Paper className="h-full overflow-auto p-3 flex flex-col items-stretch gap-3">
-            <TextField
-              label="Webhook URL"
-              variant="outlined"
-              type="text"
-              value={webhook.url}
-              onChange={(e) => {
-                setWebhook((prev) => ({
-                  ...prev,
-                  url: e.target.value,
-                }))
-              }}
-            />
-
-            <Divider />
-
-            <KeyValueEditor
-              keyLabel="HTTP Header"
-              valueLabel="Value"
-              keyValues={Object.entries(webhook.headers)}
-              onChange={(pairs) => {
-                setWebhook((prev) => ({
-                  ...prev,
-                  headers: Object.fromEntries(pairs),
-                }))
-              }}
-            />
+          <Paper className="h-full overflow-auto p-3">
+            <AlertEditor webhook={webhook} onWebhookChange={setWebhook} />
           </Paper>
         </Grid>
       </Grid>
