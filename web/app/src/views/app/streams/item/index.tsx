@@ -50,7 +50,7 @@ export const StreamView = () => {
   })
 
   const [timeWindow, setTimeWindow] = useState<{ from: Date, to: Date }>({
-    from: new Date(Date.now() - 15 * 60 * 1000),
+    from: new Date(),
     to: new Date(),
   })
 
@@ -135,6 +135,11 @@ export const StreamView = () => {
               return [...prev, ...incomingState.rowData]
             })
             setColumnDefs(incomingState.columnDefs)
+            setTimeWindow((prev) => ({
+              from: prev.from,
+              to: new Date(),
+            }))
+            incomingState.rowData = []
           },
           1000,
         )
