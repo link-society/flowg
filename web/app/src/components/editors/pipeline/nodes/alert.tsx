@@ -4,6 +4,8 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
 
 import TextField from '@mui/material/TextField'
 
+import { OpenAlertDialog } from '@/components/editors/alert/dialog'
+
 type AlertNodeData = Node<{
   alert: string
 }>
@@ -12,7 +14,7 @@ export const AlertNode = ({ data, selected }: NodeProps<AlertNodeData>) => (
   <>
     {selected && (
       <NodeToolbar>
-        [edit]
+        <OpenAlertDialog alert={data.alert} />
       </NodeToolbar>
     )}
 
