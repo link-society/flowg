@@ -20,12 +20,22 @@ func TestLogNotifier(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	logM := notifier.Subscribe(ctx, "test")
+	logM, err := notifier.Subscribe(ctx, "test")
+	if err != nil {
+		t.Fatalf("unexpected error while subscribing: %v", err)
+	}
 
 	logEntry := logstorage.NewLogEntry(map[string]string{})
 
-	notifier.Notify(ctx, "test", "key", *logEntry)
-	result := <-logM.ReceiveC()
+	err = notifier.Notify(ctx, "test", "key", *logEntry)
+	if err != nil {
+		t.Fatalf("unexpected error while notifying: %v", err)
+	}
+
+	result, ok := <-logM.ReceiveC()
+	if !ok {
+		t.Fatalf("unexpected closed channel")
+	}
 
 	if result.Stream != "test" {
 		t.Fatalf("unexpected stream: %s", result.Stream)
