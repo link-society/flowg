@@ -13,13 +13,4 @@ hurl \
   --report-html reports/html \
   --report-junit reports/junit.xml \
   --jobs 1 \
-  --test integration/
-
-if [ -z "$NOBENCHMARK" ]
-then
-  hurl \
-    --variable admin_token=${FLOWG_ADMIN_TOKEN} \
-    --variable guest_token=${FLOWG_GUEST_TOKEN} \
-    --repeat 1000 \
-    --test benchmark/
-fi
+  --test spec/
