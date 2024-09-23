@@ -4,6 +4,8 @@ import StorageIcon from '@mui/icons-material/Storage'
 
 import TextField from '@mui/material/TextField'
 
+import { OpenStreamDialog } from '@/components/editors/stream/dialog'
+
 type RouterNodeData = Node<{
   stream: string
 }>
@@ -12,7 +14,7 @@ export const RouterNode = ({ data, selected }: NodeProps<RouterNodeData>) => (
   <>
     {selected && (
       <NodeToolbar>
-        [edit]
+        <OpenStreamDialog stream={data.stream} />
       </NodeToolbar>
     )}
 
