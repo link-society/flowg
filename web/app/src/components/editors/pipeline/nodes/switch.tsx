@@ -1,17 +1,19 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { HooksContext } from '../hooks'
 
-import { Handle, Position, Node, NodeProps } from '@xyflow/react'
+import { Handle, Position, Node, NodeProps, NodeToolbar } from '@xyflow/react'
 
 import DeviceHubIcon from '@mui/icons-material/DeviceHub'
 
 import TextField from '@mui/material/TextField'
 
+import { DeleteNodeButton } from '../delete-btn'
+
 type SwitchNodeData = Node<{
   condition: string
 }>
 
-export const SwitchNode = ({ id, data }: NodeProps<SwitchNodeData>) => {
+export const SwitchNode = ({ id, data, selected }: NodeProps<SwitchNodeData>) => {
   const hooksCtx = useContext(HooksContext)
 
   const [code, setCode] = useState(data.condition)
@@ -40,6 +42,12 @@ export const SwitchNode = ({ id, data }: NodeProps<SwitchNodeData>) => {
 
   return (
     <>
+      {selected && (
+        <NodeToolbar className="flex flex-row items-center gap-2">
+          <DeleteNodeButton nodeId={id} />
+        </NodeToolbar>
+      )}
+
       <Handle
         type="target"
         position={Position.Left}

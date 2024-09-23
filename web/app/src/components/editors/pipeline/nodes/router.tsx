@@ -5,16 +5,18 @@ import StorageIcon from '@mui/icons-material/Storage'
 import TextField from '@mui/material/TextField'
 
 import { OpenStreamDialog } from '@/components/editors/stream/dialog'
+import { DeleteNodeButton } from '../delete-btn'
 
 type RouterNodeData = Node<{
   stream: string
 }>
 
-export const RouterNode = ({ data, selected }: NodeProps<RouterNodeData>) => (
+export const RouterNode = ({ id, data, selected }: NodeProps<RouterNodeData>) => (
   <>
     {selected && (
-      <NodeToolbar>
+      <NodeToolbar className="flex flex-row items-center gap-2">
         <OpenStreamDialog stream={data.stream} />
+        <DeleteNodeButton nodeId={id} />
       </NodeToolbar>
     )}
 

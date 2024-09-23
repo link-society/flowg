@@ -7,19 +7,21 @@ import FilterAltIcon from '@mui/icons-material/FilterAlt'
 import TextField from '@mui/material/TextField'
 
 import { OpenTransformerDialog } from '@/components/editors/transformer/dialog'
+import { DeleteNodeButton } from '../delete-btn'
 
 type TransformNodeData = Node<{
   transformer: string
 }>
 
-export const TransformNode = ({ data, selected }: NodeProps<TransformNodeData>) => {
+export const TransformNode = ({ id, data, selected }: NodeProps<TransformNodeData>) => {
   const { permissions } = useProfile()
 
   return (
     <>
       {selected && permissions.can_edit_transformers && (
-        <NodeToolbar>
+        <NodeToolbar className="flex flex-row items-center gap-2">
           <OpenTransformerDialog transformer={data.transformer} />
+          <DeleteNodeButton nodeId={id} />
         </NodeToolbar>
       )}
 
