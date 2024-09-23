@@ -140,7 +140,7 @@ export const OpenAlertDialog = ({ alert }: OpenAlertDialogProps) => {
             </Button>
           </Toolbar>
         </AppBar>
-        <div className="flex-grow bg-slate-200 p-6">
+        <div className="flex-grow p-6 overflow-auto">
           <React.Suspense
             fallback={
               <div className="w-full h-full flex flex-col items-center justify-center">
