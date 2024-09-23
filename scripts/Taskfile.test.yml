@@ -23,7 +23,7 @@ tasks:
   "test:unit:go":
     internal: true
     cmds:
-      - go test ./...
+      - go test -bench=. ./...
 
   "test:unit:rust:filterdsl":
     internal: true
