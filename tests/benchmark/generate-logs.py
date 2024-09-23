@@ -1,14 +1,16 @@
-#!/usr/bin/env python3
-
 from argparse import ArgumentParser
 import tomllib
+import os
 
 from datetime import datetime
-from time import time
+from time import perf_counter_ns
+import multiprocessing
 import random
 
-from urllib.request import Request, urlopen
+import requests
 import json
+
+from tqdm import tqdm
 
 
 def format_syslog(hostname: str, appname: str, message: str) -> str:
@@ -18,7 +20,7 @@ def format_syslog(hostname: str, appname: str, message: str) -> str:
 
 def send_log(token: str, log: str):
     payload = json.dumps({"record": {"message": log}}).encode("utf-8")
-    req = Request(
+    resp = requests.post(
         "http://localhost:5080/api/v1/pipelines/test/logs",
         data=payload,
         headers={
@@ -26,55 +28,63 @@ def send_log(token: str, log: str):
             "Authorization": f"Bearer pat:{token}",
         },
     )
+    resp.raise_for_status()
 
-    with urlopen(req) as resp:
-        assert resp.status == 200
+
+def iteration(args: tuple[str, dict]):
+    token, data = args
+
+    hostname = random.choice(data["hosts"])
+    app = random.choice(data["apps"])
+    message = random.choice(app["messages"])
+
+    send_log(token, format_syslog(hostname, app["name"], message))
 
 
 def main():
     parser = ArgumentParser()
     parser.add_argument("--token", required=True)
-    parser.add_argument("--conftest", default="conftest.toml")
-    parser.add_argument("--req-count", type=int, default=1_000_000)
+    parser.add_argument("--conftest", default="testdata.toml")
+
+    parser.add_argument(
+        "--repeat",
+        type=int,
+        default=int(os.getenv("BENCHMARK_ITERATIONS", 1_000_000)),
+    )
+    parser.add_argument(
+        "--jobs",
+        type=int,
+        default=int(os.getenv("BENCHMARK_JOBS", multiprocessing.cpu_count())),
+    )
+
     args = parser.parse_args()
 
     with open(args.conftest, "rb") as f:
         data = tomllib.load(f)
 
-    req_count = args.req_count
-    total_sent = 0
-    total_time = 0
+    start_time = perf_counter_ns()
 
-    while req_count > 0:
-        start = time()
+    with multiprocessing.Pool(args.jobs) as pool:
+        params = [(args.token, data) for _ in range(args.repeat)]
+        iterable = tqdm(
+            pool.imap_unordered(iteration, params),
+            total=args.repeat,
+            desc="Sending logs",
+            unit="req",
+        )
 
-        batch_count = 0
-        while time() - start < 1:
-            hostname = random.choice(data["hosts"])
-            app = random.choice(data["apps"])
-            message = random.choice(app["messages"])
+        for _ in iterable:
+            pass
 
-            send_log(
-                args.token,
-                format_syslog(hostname, app["name"], message),
-            )
+    end_time = perf_counter_ns()
 
-            batch_count += 1
-            req_count -= 1
+    total_time_ns = end_time - start_time
+    total_time_s = total_time_ns / 1_000_000_000
+    rate = args.repeat / total_time_s
 
-            if req_count <= 0:
-                break
-
-        end = time()
-        elapsed = end - start
-        total_time += elapsed
-        total_sent += batch_count
-
-        perc = (args.req_count - req_count) / args.req_count * 100
-        print(f"progress={perc:.2f}% batch_count={batch_count} elapsed={elapsed:.2f}s")
-
-    print(f"total_sent={total_sent} total_time={total_time:.2f}s")
-    print(f"avg_rate=\"{total_sent / total_time:.2f} req/s\"")
+    print(f"Requests sent: {args.repeat}")
+    print(f"Total time:    {total_time_s:.2f}s")
+    print(f"Rate:          {rate:.2f} req/s")
 
 
 if __name__ == "__main__":
