@@ -77,6 +77,19 @@ export const listStreamFields = async (stream: string): Promise<string[]> => {
   return body.fields
 }
 
+export const getStreamConfig = async (stream: string): Promise<StreamConfigModel> => {
+  type GetStreamConfigResponse = {
+    success: boolean
+    config: StreamConfigModel
+  }
+
+  const { body } = await request.GET<GetStreamConfigResponse>({
+    path: `/api/v1/streams/${stream}`,
+  })
+
+  return body.config
+}
+
 export const configureStream = async (stream: string, config: StreamConfigModel): Promise<void> => {
   type ConfigureStreamRequest = {
     config: StreamConfigModel
