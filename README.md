@@ -47,9 +47,10 @@ dynamically structured logs, as well as log compression.
 
 Run with (see *Build* section bellow):
 
-```
-$ task build
-$ task bench
+```bash
+export BENCHMARK_ITERATIONS="1000000"
+export BENCHMARK_JOBS="24"  # usually, number of CPUs
+task docker:build test:bench
 ```
 
 System:
@@ -59,9 +60,11 @@ System:
 
 Result:
 
- - **Total requests sent:** 1,000,000
- - **Total time:** 481.65s
- - **Average:** 2076.18 request/s
+```
+Requests sent: 1000000
+Total time:    266.75s
+Rate:          3748.76 req/s
+```
 
 ## :construction: Build
 
