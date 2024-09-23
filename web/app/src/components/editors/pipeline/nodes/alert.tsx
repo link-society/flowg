@@ -5,16 +5,18 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
 import TextField from '@mui/material/TextField'
 
 import { OpenAlertDialog } from '@/components/editors/alert/dialog'
+import { DeleteNodeButton } from '../delete-btn'
 
 type AlertNodeData = Node<{
   alert: string
 }>
 
-export const AlertNode = ({ data, selected }: NodeProps<AlertNodeData>) => (
+export const AlertNode = ({ id, data, selected }: NodeProps<AlertNodeData>) => (
   <>
     {selected && (
-      <NodeToolbar>
+      <NodeToolbar className="flex flex-row items-center gap-2">
         <OpenAlertDialog alert={data.alert} />
+        <DeleteNodeButton nodeId={id} />
       </NodeToolbar>
     )}
 
