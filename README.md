@@ -100,18 +100,24 @@ Now, you can access:
 A default user `root` (password: `root`) and a default pipeline are bootsrapped
 if no configuration exists during startup.
 
-## :whale: Build the Docker Image
+To build the Docker image `linksociety/flowg:latest` locally:
 
 ```bash
 task docker:build
 ```
 
-This will build `linksociety/flowg:latest` locally.
+## :rocket: Deploy
 
-Then, start the server with:
+Using Docker:
 
 ```bash
 docker run -p 5080:5080/tcp -p 5514:5514/udp -v flowg-data:/data linksociety/flowg:latest serve
+```
+
+Using Kubernetes (and Helm):
+
+```bash
+helm install flowg ./k8s/chart -n flowg-system --create-namespace
 ```
 
 ## :memo: License
