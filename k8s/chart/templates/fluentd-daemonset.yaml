@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "fluentd.fullname" . }}
+  labels:
+    {{- include "fluentd.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "fluentd.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "fluentd.labels" . | nindent 8 }}
+    spec:
+      {{- with .Values.fluentd.image.pullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "fluentd.serviceAccountName" . }}
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          effect: NoSchedule
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
+      containers:
+        - name: fluentd
+          image: "{{ .Values.fluentd.image.repository }}:{{ .Values.fluentd.image.tag }}"
+          env:
+            - name: K8S_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: SYSLOG_HOST
+              value: {{ include "flowg.fqdn" . }}
+            - name: SYSLOG_PORT
+              value: "5514"
+            - name: SYSLOG_PROTOCOL
+              value: "udp"
+            - name: FLUENT_CONTAINER_TAIL_PARSER_TYPE
+              value: "cri"
+          resources:
+            {{- toYaml .Values.flowg.resources | nindent 12 }}
+          volumeMounts:
+            - name: varlog
+              mountPath: /var/log
+            - name: containerlogdir
+              mountPath: {{ .Values.fluentd.logdir }}
+              readOnly: true
+      volumes:
+        - name: varlog
+          hostPath:
+            path: /var/log
+        - name: containerlogdir
+          hostPath:
+            path: {{ .Values.fluentd.logdir }}
