@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "flowg.fullname" . }}
+  labels:
+    {{- include "flowg.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "flowg.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "flowg.labels" . | nindent 8 }}
+    spec:
+      {{- with .Values.flowg.image.pullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "flowg.serviceAccountName" . }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - {{ include "flowg.nodeName" . }}
+      containers:
+        - name: flowg
+          image: "{{ .Values.flowg.image.repository }}:{{ .Values.flowg.image.tag | default .Chart.AppVersion }}"
+          args:
+            - serve
+          ports:
+            - containerPort: 5080
+              hostPort: 5080
+              protocol: TCP
+            - containerPort: 5514
+              hostPort: 5514
+              protocol: UDP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5080
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5080
+          resources:
+            {{- toYaml .Values.flowg.resources | nindent 12 }}
+          volumeMounts:
+            - name: flowg-data
+              mountPath: /data
+      volumes:
+        - name: flowg-data
+          persistentVolumeClaim:
+            claimName: {{ include "flowg.fullname" . }}-data-pvc

@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ include "flowg.fullname" . }}-data-pv
+  labels:
+    {{- include "flowg.labels" . | nindent 4 }}
+spec:
+  storageClass: {{ include "flowg.fullname" . }}-storage
+  capacity:
+    storage: {{ .Values.flowg.storage.size }}
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: {{ .Values.flowg.storage.hostPath }}
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - {{ include "flowg.nodeName" . }}
