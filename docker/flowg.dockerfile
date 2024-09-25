@@ -13,6 +13,7 @@ ADD cmd /src/cmd
 ADD internal/app /src/internal/app
 ADD internal/data /src/internal/data
 ADD internal/integrations /src/internal/integrations
+ADD internal/server /src/internal/server
 ADD --exclude=internal/ffi/filterdsl/rust-crate internal/ffi/filterdsl /src/internal/ffi/filterdsl
 ADD --exclude=internal/ffi/vrl/rust-crate internal/ffi/vrl /src/internal/ffi/vrl
 ADD --exclude=web/app web /src/web
