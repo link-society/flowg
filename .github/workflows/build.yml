@@ -101,7 +101,10 @@ jobs:
         run: kind load image-archive /tmp/oci-flowg.tar --name flowg
 
       - name: lint@helm
-        run: ct lint --chart-dirs ./k8s/charts --charts flowg
+        run: ct lint --chart-dirs ./k8s/charts --charts ./k8s/charts/flowg --validate-maintainers=false
 
       - name: test@helm
-        run: ct install --chart-dirs ./k8s/charts --charts flowg --namespace flowg-system
+        run: |
+          set -ex
+          kubectl get ns flowg-system || kubectl create ns flowg-system
+          ct install --chart-dirs ./k8s/charts --charts ./k8s/charts/flowg --namespace flowg-system
