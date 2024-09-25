@@ -98,7 +98,7 @@ jobs:
         uses: ./.github/actions/setup-k8s
 
       - name: load@k8s
-        run: kind load image-archive /tmp/oci-flowg.tar
+        run: kind load image-archive /tmp/oci-flowg.tar --name flowg
 
       - name: lint@helm
         run: ct lint --chart-dirs ./k8s/charts --charts flowg
