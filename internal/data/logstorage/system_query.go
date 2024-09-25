@@ -44,7 +44,7 @@ func (sys *QuerySystem) FetchLogs(
 			slog.DebugContext(
 				ctx,
 				"Fetching log entry",
-				"channel", "storage",
+				"channel", "logstorage",
 				"stream", stream,
 				"key", key,
 			)

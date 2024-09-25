@@ -13,7 +13,8 @@ func TestDefaultRolesAndUsers(t *testing.T) {
 	logging.Discard()
 
 	opts := auth.DefaultDatabaseOpts().WithInMemory(true)
-	authDb, err := auth.NewDatabase(opts)
+	authDb := auth.NewDatabase(opts)
+	err := authDb.Open()
 	if err != nil {
 		t.Fatalf("failed to create auth database: %v", err)
 	}

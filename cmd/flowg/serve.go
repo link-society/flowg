@@ -1,34 +1,11 @@
 package main
 
 import (
-	"log/slog"
-
-	"context"
-	"time"
-
-	"os"
-	"os/signal"
-	"syscall"
-
-	"net/http"
-
 	"github.com/spf13/cobra"
 
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-
-	"link-society.com/flowg/internal/app/bootstrap"
 	"link-society.com/flowg/internal/app/logging"
 	"link-society.com/flowg/internal/app/metrics"
-
-	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/config"
-	"link-society.com/flowg/internal/data/lognotify"
-	"link-society.com/flowg/internal/data/logstorage"
-
-	"link-society.com/flowg/internal/integrations/syslog"
-
-	"link-society.com/flowg/api"
-	"link-society.com/flowg/web"
+	"link-society.com/flowg/internal/server"
 )
 
 type serveCommandOpts struct {
@@ -52,156 +29,21 @@ func NewServeCommand() *cobra.Command {
 			metrics.Setup()
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			authDb, err := auth.NewDatabase(
-				auth.DefaultDatabaseOpts().WithDir(opts.authDir),
-			)
-			if err != nil {
-				slog.Error(
-					"Failed to open auth database",
-					"channel", "main",
-					"path", opts.authDir,
-					"error", err,
-				)
-				exitCode = 1
-				return
-			}
-			defer func() {
-				err := authDb.Close()
-				if err != nil {
-					slog.Error(
-						"Failed to close auth database",
-						"channel", "main",
-						"path", opts.authDir,
-						"error", err,
-					)
-					exitCode = 1
-				}
-			}()
+			errC := make(chan struct{})
+			go server.Run(
+				server.Options{
+					HttpBindAddress:   opts.httpBindAddress,
+					SyslogBindAddress: opts.syslogBindAddr,
 
-			logDb, err := logstorage.NewStorage(
-				logstorage.DefaultStorageOpts().WithDir(opts.logDir),
-			)
-			if err != nil {
-				slog.Error(
-					"Failed to open logs database",
-					"channel", "main",
-					"path", opts.logDir,
-					"error", err,
-				)
-				exitCode = 1
-				return
-			}
-			defer func() {
-				err := logDb.Close()
-				if err != nil {
-					slog.Error(
-						"Failed to close logs database",
-						"channel", "main",
-						"path", opts.logDir,
-						"error", err,
-					)
-					exitCode = 1
-				}
-			}()
-
-			logNotifier := lognotify.NewLogNotifier()
-			logNotifier.Start()
-			defer logNotifier.Stop()
-
-			configStorage := config.NewStorage(
-				config.DefaultStorageOpts().WithDir(opts.configDir),
-			)
-
-			if err := bootstrap.DefaultRolesAndUsers(authDb); err != nil {
-				slog.Error(
-					"Failed to bootstrap default roles and users",
-					"channel", "main",
-					"error", err,
-				)
-				exitCode = 1
-				return
-			}
-
-			if err := bootstrap.DefaultPipeline(configStorage); err != nil {
-				slog.Error(
-					"Failed to bootstrap default pipeline",
-					"channel", "main",
-					"error", err,
-				)
-				exitCode = 1
-				return
-			}
-
-			syslogServer := syslog.NewServer(
-				opts.syslogBindAddr,
-				configStorage,
-				logDb,
-				logNotifier,
-			)
-			syslogServer.Start()
-			defer syslogServer.Stop()
-
-			apiHandler := api.NewHandler(authDb, logDb, configStorage, logNotifier)
-			webHandler := web.NewHandler()
-			metricsHandler := promhttp.Handler()
-
-			rootHandler := http.NewServeMux()
-			rootHandler.HandleFunc(
-				"/health",
-				func(w http.ResponseWriter, r *http.Request) {
-					w.WriteHeader(http.StatusOK)
-					w.Write([]byte("OK\r\n"))
+					ConfigStorageDir: opts.configDir,
+					AuthStorageDir:   opts.authDir,
+					LogStorageDir:    opts.logDir,
 				},
-			)
-			rootHandler.Handle("/metrics", metricsHandler)
-			rootHandler.Handle("/api/", apiHandler)
-			rootHandler.Handle("/web/", webHandler)
-
-			rootHandler.HandleFunc(
-				"GET /{$}",
-				func(w http.ResponseWriter, r *http.Request) {
-					http.Redirect(w, r, "/web/", http.StatusPermanentRedirect)
-				},
+				errC,
 			)
 
-			server := &http.Server{
-				Addr:    opts.httpBindAddress,
-				Handler: logging.NewMiddleware(rootHandler),
-			}
-
-			go func() {
-				sigC := make(chan os.Signal, 1)
-				signal.Notify(sigC, syscall.SIGINT, syscall.SIGTERM)
-				<-sigC
-
-				ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-				defer cancel()
-
-				if err := server.Shutdown(ctx); err != nil {
-					slog.Error(
-						"Failed to shutdown HTTP server",
-						"channel", "main",
-						"http.bind", opts.httpBindAddress,
-						"error", err,
-					)
-				}
-			}()
-
-			slog.Info(
-				"Starting HTTP server",
-				"channel", "main",
-				"http.bind", opts.httpBindAddress,
-			)
-			err = server.ListenAndServe()
-			if err != nil && err != http.ErrServerClosed {
-				slog.Error(
-					"Failed to start HTTP server",
-					"channel", "main",
-					"http.bind", opts.httpBindAddress,
-					"error", err,
-				)
+			for range errC {
 				exitCode = 1
-				return
 			}
 		},
 	}

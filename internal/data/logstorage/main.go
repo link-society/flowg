@@ -32,12 +32,13 @@ func (s StorageOpts) WithInMemory(inMemory bool) StorageOpts {
 }
 
 type Storage struct {
+	opts    badger.Options
 	db      *badger.DB
 	gc      *garbageCollector
 	indexer *indexer
 }
 
-func NewStorage(opts StorageOpts) (*Storage, error) {
+func NewStorage(opts StorageOpts) *Storage {
 	var dbDir string
 	if !opts.inMemory {
 		dbDir = opts.dir
@@ -49,21 +50,35 @@ func NewStorage(opts StorageOpts) (*Storage, error) {
 		WithCompression(options.ZSTD).
 		WithInMemory(opts.inMemory)
 
-	db, err := badger.Open(dbOpts)
+	return &Storage{
+		opts:    dbOpts,
+		db:      nil,
+		gc:      nil,
+		indexer: nil,
+	}
+}
+
+func (s *Storage) Open() error {
+	var err error
+	s.db, err = badger.Open(s.opts)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	gc := newGarbageCollector(db, 5*time.Minute)
-	gc.Start()
+	s.gc = newGarbageCollector(s.db, 5*time.Minute)
+	s.indexer = newIndexer(s.db)
 
-	indexer := newIndexer(db)
-	indexer.Start()
+	s.gc.Start()
+	s.indexer.Start()
 
-	return &Storage{db: db, gc: gc, indexer: indexer}, nil
+	return nil
 }
 
 func (s *Storage) Close() error {
+	if s.db == nil {
+		return nil
+	}
+
 	s.indexer.Stop()
 	s.gc.Stop()
 	return s.db.Close()

@@ -140,7 +140,7 @@ func (sys *MetaSystem) DeleteStream(ctx context.Context, stream string) error {
 				slog.DebugContext(
 					ctx,
 					"Purging key from BadgerDB",
-					"channel", "storage",
+					"channel", "logstorage",
 					"stream", stream,
 					"key", key,
 				)

@@ -31,7 +31,7 @@ func (sys *CollectorSystem) Ingest(
 			slog.DebugContext(
 				ctx,
 				"Could not marshal log entry",
-				"channel", "storage",
+				"channel", "logstorage",
 				"stream", stream,
 				"error", err.Error(),
 			)
@@ -42,7 +42,7 @@ func (sys *CollectorSystem) Ingest(
 			slog.DebugContext(
 				ctx,
 				"Fetch stream configuration",
-				"channel", "storage",
+				"channel", "logstorage",
 				"stream", stream,
 			)
 
@@ -54,7 +54,7 @@ func (sys *CollectorSystem) Ingest(
 			slog.DebugContext(
 				ctx,
 				"Save log entry in BadgerDB",
-				"channel", "storage",
+				"channel", "logstorage",
 				"stream", stream,
 				"key", key,
 			)
@@ -84,7 +84,7 @@ func (sys *CollectorSystem) Ingest(
 					slog.DebugContext(
 						ctx,
 						"Save field index in BadgerDB",
-						"channel", "storage",
+						"channel", "logstorage",
 						"stream", stream,
 						"key", key,
 						"field", field,
@@ -111,7 +111,7 @@ func (sys *CollectorSystem) Ingest(
 			slog.DebugContext(
 				ctx,
 				"Retry log entry ingestion",
-				"channel", "storage",
+				"channel", "logstorage",
 				"stream", stream,
 				"key", key,
 			)

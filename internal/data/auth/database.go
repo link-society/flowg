@@ -30,10 +30,11 @@ func (d DatabaseOpts) WithInMemory(inMemory bool) DatabaseOpts {
 }
 
 type Database struct {
-	db *badger.DB
+	opts badger.Options
+	db   *badger.DB
 }
 
-func NewDatabase(opts DatabaseOpts) (*Database, error) {
+func NewDatabase(opts DatabaseOpts) *Database {
 	var dbDir string
 	if !opts.inMemory {
 		dbDir = opts.dir
@@ -45,14 +46,19 @@ func NewDatabase(opts DatabaseOpts) (*Database, error) {
 		WithCompression(options.ZSTD).
 		WithInMemory(opts.inMemory)
 
-	db, err := badger.Open(dbOpts)
-	if err != nil {
-		return nil, err
-	}
+	return &Database{opts: dbOpts, db: nil}
+}
 
-	return &Database{db: db}, nil
+func (d *Database) Open() error {
+	var err error
+	d.db, err = badger.Open(d.opts)
+	return err
 }
 
 func (d *Database) Close() error {
+	if d.db == nil {
+		return nil
+	}
+
 	return d.db.Close()
 }
