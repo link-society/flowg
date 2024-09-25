@@ -1,0 +1,23 @@
+---
+apiVersion: v2
+name: flowg
+version: "v0.15.0"
+type: application
+appVersion: "v0.15.0"
+kubeVersion: ">=1.30.0-0"
+description: Flowg is a low-code log processing platform.
+home: https://github.com/link-society/flowg
+sources:
+  - https://github.com/link-society/flowg
+keywords:
+  - monitoring
+  - logging
+  - observability
+annotations:
+  artifacthub.io/category: monitoring-logging
+  artifacthub.io/license: MIT
+  artifacthub.io/screenshots: |
+    - title: Pipeline Editor
+      url: https://raw.githubusercontent.com/link-society/flowg/main/docs/screenshots/pipelines.png
+    - title: Stream View
+      url: https://raw.githubusercontent.com/link-society/flowg/main/docs/screenshots/streams.png

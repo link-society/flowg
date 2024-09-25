@@ -117,7 +117,7 @@ docker run -p 5080:5080/tcp -p 5514:5514/udp -v flowg-data:/data linksociety/flo
 Using Kubernetes (and Helm):
 
 ```bash
-helm install flowg ./k8s/chart -n flowg-system --create-namespace
+helm install flowg ./k8s/charts/flowg -n flowg-system --create-namespace
 ```
 
 ## :memo: License
