@@ -1,0 +1,20 @@
+---
+name: Setup Kubernetes tooling
+description: Installs KinD, Helm, and Chart Testing tools and create a cluster
+runs:
+  using: composite
+  steps:
+    - name: setup@helm
+      uses: azure/setup-helm@v4
+
+    - name: setup@python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+        check-latest: true
+
+    - name: setup@ct
+      uses: helm/chart-testing-action@v2
+
+    - name: setup@kind
+      uses: helm/kind-action@v1
