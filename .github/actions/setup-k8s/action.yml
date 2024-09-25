@@ -18,3 +18,5 @@ runs:
 
     - name: setup@kind
       uses: helm/kind-action@v1
+      with:
+        cluster_name: flowg
