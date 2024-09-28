@@ -7,8 +7,11 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/config"
+	apiUtils "link-society.com/flowg/internal/utils/api"
+
+	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage/config"
 )
 
 type ListTransformersRequest struct{}
@@ -18,27 +21,25 @@ type ListTransformersResponse struct {
 }
 
 func ListTransformersUsecase(
-	authDb *auth.Database,
+	authStorage *auth.Storage,
 	configStorage *config.Storage,
 ) usecase.Interactor {
-	transformerSys := config.NewTransformerSystem(configStorage)
-
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiDecorator(
-			authDb,
-			auth.SCOPE_READ_TRANSFORMERS,
+		apiUtils.RequireScopeApiDecorator(
+			authStorage,
+			models.SCOPE_READ_TRANSFORMERS,
 			func(
 				ctx context.Context,
 				req ListTransformersRequest,
 				resp *ListTransformersResponse,
 			) error {
-				transformers, err := transformerSys.List()
+				transformers, err := configStorage.ListTransformers(ctx)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
 						"Failed to list transformers",
-						"channel", "api",
-						"error", err.Error(),
+						slog.String("channel", "api"),
+						slog.String("error", err.Error()),
 					)
 
 					resp.Success = false

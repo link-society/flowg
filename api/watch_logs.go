@@ -12,11 +12,13 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/lognotify"
-	"link-society.com/flowg/internal/data/logstorage"
+	apiUtils "link-society.com/flowg/internal/utils/api"
+	"link-society.com/flowg/internal/utils/ffi/filterdsl"
 
-	"link-society.com/flowg/internal/ffi/filterdsl"
+	"link-society.com/flowg/internal/models"
+
+	"link-society.com/flowg/internal/engines/lognotify"
+	"link-society.com/flowg/internal/storage/auth"
 )
 
 type WatchLogsRequest struct {
@@ -29,19 +31,19 @@ type WatchLogsResponse struct {
 }
 
 func WatchLogsUsecase(
-	authDb *auth.Database,
+	authStorage *auth.Storage,
 	logNotifier *lognotify.LogNotifier,
 ) usecase.Interactor {
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiDecorator(
-			authDb,
-			auth.SCOPE_READ_STREAMS,
+		apiUtils.RequireScopeApiDecorator(
+			authStorage,
+			models.SCOPE_READ_STREAMS,
 			func(
 				ctx context.Context,
 				req WatchLogsRequest,
 				resp *WatchLogsResponse,
 			) error {
-				var filter logstorage.Filter
+				var filter filterdsl.Filter
 
 				if req.Filter != nil && *req.Filter != "" {
 					var err error
@@ -51,10 +53,10 @@ func WatchLogsUsecase(
 						slog.ErrorContext(
 							ctx,
 							"Failed to compile filter",
-							"channel", "api",
-							"error", err.Error(),
-							"stream", req.Stream,
-							"filter", req.Filter,
+							slog.String("channel", "api"),
+							slog.String("error", err.Error()),
+							slog.String("stream", req.Stream),
+							slog.String("filter", *req.Filter),
 						)
 
 						return status.Wrap(err, status.InvalidArgument)
@@ -66,9 +68,9 @@ func WatchLogsUsecase(
 					slog.ErrorContext(
 						ctx,
 						"Failed to subscribe to logs",
-						"channel", "api",
-						"error", err.Error(),
-						"stream", req.Stream,
+						slog.String("channel", "api"),
+						slog.String("error", err.Error()),
+						slog.String("stream", req.Stream),
 					)
 
 					return status.Wrap(err, status.Internal)
@@ -84,19 +86,19 @@ func WatchLogsUsecase(
 				slog.InfoContext(
 					ctx,
 					"watch logs",
-					"channel", "api",
-					"stream", req.Stream,
+					slog.String("channel", "api"),
+					slog.String("stream", req.Stream),
 				)
 				defer slog.InfoContext(
 					ctx,
 					"done watching logs",
-					"channel", "api",
-					"stream", req.Stream,
+					slog.String("channel", "api"),
+					slog.String("stream", req.Stream),
 				)
 
 				for log := range logM.ReceiveC() {
-					if filter == nil || filter.Evaluate(&log.LogEntry) {
-						payload, err := json.Marshal(log.LogEntry)
+					if filter == nil || filter.Evaluate(&log.LogRecord) {
+						payload, err := json.Marshal(log.LogRecord)
 						if err != nil {
 							fmt.Fprintf(resp, "event: error\n")
 							fmt.Fprintf(resp, "data: %s\n\n", err.Error())

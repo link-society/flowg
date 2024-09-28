@@ -1,24 +1,32 @@
 package bootstrap_test
 
 import (
+	"context"
 	"testing"
 
-	"link-society.com/flowg/internal/data/config"
+	"link-society.com/flowg/internal/storage/config"
 
 	"link-society.com/flowg/internal/app/bootstrap"
 )
 
 func TestDefaultPipeline(t *testing.T) {
-	opts := config.DefaultStorageOpts().WithInMemory(true)
-	configStorage := config.NewStorage(opts)
+	ctx := context.Background()
 
-	err := bootstrap.DefaultPipeline(configStorage)
+	configStorage := config.NewStorage(config.OptInMemory(true))
+	configStorage.Start()
+	defer configStorage.Stop()
+
+	err := configStorage.WaitStarted()
 	if err != nil {
-		t.Fatalf("failed to create default pipeline: %v", err)
+		t.Fatalf("unexpected error at startup: %v", err)
 	}
 
-	pipelineSys := config.NewPipelineSystem(configStorage)
-	pipelines, err := pipelineSys.List()
+	err = bootstrap.DefaultPipeline(ctx, configStorage)
+	if err != nil {
+		t.Fatalf("failed to bootstrap default pipeline: %v", err)
+	}
+
+	pipelines, err := configStorage.ListPipelines(ctx)
 	if err != nil {
 		t.Fatalf("failed to list pipelines: %v", err)
 	}
@@ -31,7 +39,7 @@ func TestDefaultPipeline(t *testing.T) {
 		t.Fatalf("expected pipeline name to be default, got %s", pipelines[0])
 	}
 
-	_, err = pipelineSys.Parse("default")
+	_, err = configStorage.ReadPipeline(ctx, "default")
 	if err != nil {
 		t.Fatalf("failed to parse default pipeline: %v", err)
 	}

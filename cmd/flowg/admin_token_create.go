@@ -1,13 +1,14 @@
 package main
 
 import (
+	"context"
 	"os"
 
 	"fmt"
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/storage/auth"
 )
 
 type adminTokenCreateOpts struct {
@@ -22,27 +23,27 @@ func NewAdminTokenCreateCommand() *cobra.Command {
 		Use:   "create",
 		Short: "Create a new Personal Access Token",
 		Run: func(cmd *cobra.Command, args []string) {
-			authDb := auth.NewDatabase(
-				auth.DefaultDatabaseOpts().WithDir(opts.authDir),
+			authStorage := auth.NewStorage(
+				auth.OptDirectory(opts.authDir),
 			)
-			err := authDb.Open()
+			authStorage.Start()
+			err := authStorage.WaitStarted()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to open auth database:", err)
 				exitCode = 1
 				return
 			}
 			defer func() {
-				err := authDb.Close()
+				authStorage.Stop()
+				err := authStorage.WaitStopped()
 				if err != nil {
 					fmt.Fprintln(os.Stderr, "ERROR: Failed to close auth database:", err)
 					exitCode = 1
 				}
 			}()
 
-			userSys := auth.NewUserSystem(authDb)
-			tokenSys := auth.NewTokenSystem(authDb)
-
-			user, err := userSys.GetUser(opts.user)
+			ctx := context.Background()
+			user, err := authStorage.FetchUser(ctx, opts.user)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to get user:", err)
 				exitCode = 1
@@ -55,7 +56,7 @@ func NewAdminTokenCreateCommand() *cobra.Command {
 				return
 			}
 
-			token, _, err := tokenSys.CreateToken(user.Name)
+			token, _, err := authStorage.CreateToken(ctx, user.Name)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to generate token:", err)
 				exitCode = 1

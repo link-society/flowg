@@ -7,8 +7,11 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/ffi/vrl"
+	apiUtils "link-society.com/flowg/internal/utils/api"
+
+	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/utils/ffi/vrl"
 )
 
 type TestTransformerRequest struct {
@@ -21,13 +24,11 @@ type TestTransformerResponse struct {
 	Record  map[string]string `json:"record"`
 }
 
-func TestTransformerUsecase(
-	authDb *auth.Database,
-) usecase.Interactor {
+func TestTransformerUsecase(authStorage *auth.Storage) usecase.Interactor {
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiDecorator(
-			authDb,
-			auth.SCOPE_READ_TRANSFORMERS,
+		apiUtils.RequireScopeApiDecorator(
+			authStorage,
+			models.SCOPE_READ_TRANSFORMERS,
 			func(
 				ctx context.Context,
 				req TestTransformerRequest,
@@ -38,8 +39,8 @@ func TestTransformerUsecase(
 					slog.ErrorContext(
 						ctx,
 						"Failed to execute transformer",
-						"channel", "api",
-						"error", err.Error(),
+						slog.String("channel", "api"),
+						slog.String("error", err.Error()),
 					)
 
 					resp.Success = false

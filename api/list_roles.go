@@ -6,34 +6,36 @@ import (
 
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
-	"link-society.com/flowg/internal/data/auth"
+
+	apiUtils "link-society.com/flowg/internal/utils/api"
+
+	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/storage/auth"
 )
 
 type ListRolesRequest struct{}
 type ListRolesResponse struct {
-	Success bool        `json:"success"`
-	Roles   []auth.Role `json:"roles"`
+	Success bool          `json:"success"`
+	Roles   []models.Role `json:"roles"`
 }
 
-func ListRolesUsecase(authDb *auth.Database) usecase.Interactor {
-	roleSys := auth.NewRoleSystem(authDb)
-
+func ListRolesUsecase(authStorage *auth.Storage) usecase.Interactor {
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiDecorator(
-			authDb,
-			auth.SCOPE_READ_ACLS,
+		apiUtils.RequireScopeApiDecorator(
+			authStorage,
+			models.SCOPE_READ_ACLS,
 			func(
 				ctx context.Context,
 				req ListRolesRequest,
 				resp *ListRolesResponse,
 			) error {
-				roles, err := roleSys.ListRoles()
+				roles, err := authStorage.ListRoles(ctx)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
 						"Failed to list roles",
-						"channel", "api",
-						"error", err.Error(),
+						slog.String("channel", "api"),
+						slog.String("error", err.Error()),
 					)
 
 					resp.Success = false

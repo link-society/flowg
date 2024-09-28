@@ -7,8 +7,11 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/logstorage"
+	apiUtils "link-society.com/flowg/internal/utils/api"
+
+	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage/log"
 )
 
 type GetStreamRequest struct {
@@ -16,37 +19,35 @@ type GetStreamRequest struct {
 }
 
 type GetStreamResponse struct {
-	Success bool                    `json:"success"`
-	Config  logstorage.StreamConfig `json:"config"`
+	Success bool                `json:"success"`
+	Config  models.StreamConfig `json:"config"`
 }
 
 func GetStreamUsecase(
-	authDb *auth.Database,
-	logDb *logstorage.Storage,
+	authStorage *auth.Storage,
+	logStorage *log.Storage,
 ) usecase.Interactor {
-	metaSys := logstorage.NewMetaSystem(logDb)
-
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiDecorator(
-			authDb,
-			auth.SCOPE_READ_PIPELINES,
+		apiUtils.RequireScopeApiDecorator(
+			authStorage,
+			models.SCOPE_READ_STREAMS,
 			func(
 				ctx context.Context,
 				req GetStreamRequest,
 				resp *GetStreamResponse,
 			) error {
-				config, err := metaSys.GetStreamConfig(req.Stream)
+				config, err := logStorage.GetOrCreateStreamConfig(ctx, req.Stream)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
 						"Failed to get stream config",
-						"channel", "api",
-						"stream", req.Stream,
-						"error", err.Error(),
+						slog.String("channel", "api"),
+						slog.String("stream", req.Stream),
+						slog.String("error", err.Error()),
 					)
 
 					resp.Success = false
-					return status.Wrap(err, status.NotFound)
+					return status.Wrap(err, status.Internal)
 				}
 
 				resp.Success = true
@@ -59,10 +60,10 @@ func GetStreamUsecase(
 
 	u.SetName("get_stream")
 	u.SetTitle("Get Stream Configuration")
-	u.SetDescription("Get Stream configuration")
+	u.SetDescription("Get or Create Stream configuration")
 	u.SetTags("streams")
 
-	u.SetExpectedErrors(status.PermissionDenied, status.NotFound, status.Internal)
+	u.SetExpectedErrors(status.PermissionDenied, status.Internal)
 
 	return u
 }

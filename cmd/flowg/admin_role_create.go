@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"os"
 
 	"fmt"
@@ -8,7 +9,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/storage/auth"
 )
 
 type adminRoleCreateOpts struct {
@@ -23,13 +25,13 @@ func NewAdminRoleCreateCommand() *cobra.Command {
 		Use:   "create [flags] [...scopes]",
 		Short: "Create a new role",
 		Run: func(cmd *cobra.Command, args []string) {
-			role := auth.Role{
+			role := models.Role{
 				Name:   opts.name,
-				Scopes: make([]auth.Scope, len(args)),
+				Scopes: make([]models.Scope, len(args)),
 			}
 
 			for i, scopeName := range args {
-				scope, err := auth.ParseScope(scopeName)
+				scope, err := models.ParseScope(scopeName)
 				if err != nil {
 					fmt.Fprintln(os.Stderr, "ERROR: Failed to parse scope:", err)
 					exitCode = 1
@@ -38,25 +40,27 @@ func NewAdminRoleCreateCommand() *cobra.Command {
 				role.Scopes[i] = scope
 			}
 
-			authDb := auth.NewDatabase(
-				auth.DefaultDatabaseOpts().WithDir(opts.authDir),
+			authStorage := auth.NewStorage(
+				auth.OptDirectory(opts.authDir),
 			)
-			err := authDb.Open()
+			authStorage.Start()
+			err := authStorage.WaitStarted()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to open auth database:", err)
 				exitCode = 1
 				return
 			}
 			defer func() {
-				err := authDb.Close()
+				authStorage.Stop()
+				err := authStorage.WaitStopped()
 				if err != nil {
 					fmt.Fprintln(os.Stderr, "ERROR: Failed to close auth database:", err)
 					exitCode = 1
 				}
 			}()
 
-			roleSys := auth.NewRoleSystem(authDb)
-			err = roleSys.SaveRole(role)
+			ctx := context.Background()
+			err = authStorage.SaveRole(ctx, role)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to save role:", err)
 				exitCode = 1

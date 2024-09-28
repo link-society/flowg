@@ -7,7 +7,9 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	"link-society.com/flowg/internal/data/auth"
+	apiUtils "link-society.com/flowg/internal/utils/api"
+
+	"link-society.com/flowg/internal/storage/auth"
 )
 
 type CreateTokenRequest struct{}
@@ -18,25 +20,23 @@ type CreateTokenResponse struct {
 	TokenUUID string `json:"token_uuid"`
 }
 
-func CreateTokenUsecase(authDb *auth.Database) usecase.Interactor {
-	tokenSys := auth.NewTokenSystem(authDb)
-
+func CreateTokenUsecase(authStorage *auth.Storage) usecase.Interactor {
 	u := usecase.NewInteractor(
 		func(
 			ctx context.Context,
 			req CreateTokenRequest,
 			resp *CreateTokenResponse,
 		) error {
-			user := auth.GetContextUser(ctx)
+			user := apiUtils.GetContextUser(ctx)
 
-			token, tokenUuid, err := tokenSys.CreateToken(user.Name)
+			token, tokenUuid, err := authStorage.CreateToken(ctx, user.Name)
 			if err != nil {
 				slog.ErrorContext(
 					ctx,
 					"Failed to create token",
-					"channel", "api",
-					"user", user.Name,
-					"error", err.Error(),
+					slog.String("channel", "api"),
+					slog.String("user", user.Name),
+					slog.String("error", err.Error()),
 				)
 
 				resp.Success = false

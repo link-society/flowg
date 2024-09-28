@@ -1,12 +1,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/storage/auth"
 )
 
 type adminUserDeleteOpts struct {
@@ -21,25 +22,27 @@ func NewAdminUserDeleteCommand() *cobra.Command {
 		Use:   "delete",
 		Short: "Delete an existing user",
 		Run: func(cmd *cobra.Command, args []string) {
-			authDb := auth.NewDatabase(
-				auth.DefaultDatabaseOpts().WithDir(opts.authDir),
+			authStorage := auth.NewStorage(
+				auth.OptDirectory(opts.authDir),
 			)
-			err := authDb.Open()
+			authStorage.Start()
+			err := authStorage.WaitStarted()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to open auth database:", err)
 				exitCode = 1
 				return
 			}
 			defer func() {
-				err := authDb.Close()
+				authStorage.Stop()
+				err := authStorage.WaitStopped()
 				if err != nil {
 					fmt.Fprintln(os.Stderr, "ERROR: Failed to close auth database:", err)
 					exitCode = 1
 				}
 			}()
 
-			userSys := auth.NewUserSystem(authDb)
-			err = userSys.DeleteUser(opts.name)
+			ctx := context.Background()
+			err = authStorage.DeleteUser(ctx, opts.name)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to delete user:", err)
 				exitCode = 1

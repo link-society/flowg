@@ -7,11 +7,12 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/config"
-	"link-society.com/flowg/internal/data/lognotify"
-	"link-society.com/flowg/internal/data/logstorage"
-	"link-society.com/flowg/internal/data/pipelines"
+	apiUtils "link-society.com/flowg/internal/utils/api"
+
+	"link-society.com/flowg/internal/models"
+
+	"link-society.com/flowg/internal/engines/pipelines"
+	"link-society.com/flowg/internal/storage/auth"
 )
 
 type IngestLogRequest struct {
@@ -23,44 +24,32 @@ type IngestLogResponse struct {
 }
 
 func IngestLogUsecase(
-	authDb *auth.Database,
-	configStorage *config.Storage,
-	logStorage *logstorage.Storage,
-	logNotifier *lognotify.LogNotifier,
+	authStorage *auth.Storage,
+	pipelineRunner *pipelines.Runner,
 ) usecase.Interactor {
-	pipelineSys := config.NewPipelineSystem(configStorage)
-
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiDecorator(
-			authDb,
-			auth.SCOPE_SEND_LOGS,
+		apiUtils.RequireScopeApiDecorator(
+			authStorage,
+			models.SCOPE_SEND_LOGS,
 			func(
 				ctx context.Context,
 				req IngestLogRequest,
 				resp *IngestLogResponse,
 			) error {
-				pipeline, err := pipelines.Build(pipelineSys, req.Pipeline)
-				if err != nil {
-					slog.ErrorContext(
-						ctx,
-						"Failed to get pipeline",
-						"channel", "api",
-						"pipeline", req.Pipeline,
-						"error", err.Error(),
-					)
-					return status.Wrap(err, status.NotFound)
-				}
-
-				entry := logstorage.NewLogEntry(req.Record)
-				runner := pipelines.NewRunner(ctx, configStorage, logStorage, logNotifier)
-				err = runner.Run(pipeline, pipelines.DIRECT_ENTRYPOINT, entry)
+				record := models.NewLogRecord(req.Record)
+				err := pipelineRunner.Run(
+					ctx,
+					req.Pipeline,
+					pipelines.DIRECT_ENTRYPOINT,
+					record,
+				)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
 						"Failed to process log entry",
-						"channel", "api",
-						"pipeline", req.Pipeline,
-						"error", err.Error(),
+						slog.String("channel", "api"),
+						slog.String("pipeline", req.Pipeline),
+						slog.String("error", err.Error()),
 					)
 
 					resp.Success = false
@@ -85,7 +74,7 @@ func IngestLogUsecase(
 	u.SetDescription("Run log record through a pipeline")
 	u.SetTags("pipelines")
 
-	u.SetExpectedErrors(status.PermissionDenied, status.NotFound, status.Internal)
+	u.SetExpectedErrors(status.PermissionDenied, status.Internal)
 
 	return u
 }

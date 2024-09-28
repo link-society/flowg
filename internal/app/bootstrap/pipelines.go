@@ -1,21 +1,21 @@
 package bootstrap
 
 import (
+	"context"
 	"fmt"
 
-	"link-society.com/flowg/internal/data/config"
+	"link-society.com/flowg/internal/storage/config"
 )
 
-func DefaultPipeline(configStorage *config.Storage) error {
-	pipelineSys := config.NewPipelineSystem(configStorage)
-
-	pipelines, err := pipelineSys.List()
+func DefaultPipeline(ctx context.Context, configStorage *config.Storage) error {
+	pipelines, err := configStorage.ListPipelines(ctx)
 	if err != nil {
 		return err
 	}
 
 	if len(pipelines) == 0 {
-		err := pipelineSys.Write(
+		err := configStorage.WriteRawPipeline(
+			ctx,
 			"default",
 			`{
 				"nodes": [

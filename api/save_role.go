@@ -7,7 +7,10 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	"link-society.com/flowg/internal/data/auth"
+	apiUtils "link-society.com/flowg/internal/utils/api"
+
+	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/storage/auth"
 )
 
 type SaveRoleRequest struct {
@@ -19,29 +22,27 @@ type SaveRoleResponse struct {
 	Success bool `json:"success"`
 }
 
-func SaveRoleUsecase(authDb *auth.Database) usecase.Interactor {
-	roleSys := auth.NewRoleSystem(authDb)
-
+func SaveRoleUsecase(authStorage *auth.Storage) usecase.Interactor {
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiDecorator(
-			authDb,
-			auth.SCOPE_WRITE_ACLS,
+		apiUtils.RequireScopeApiDecorator(
+			authStorage,
+			models.SCOPE_WRITE_ACLS,
 			func(
 				ctx context.Context,
 				req SaveRoleRequest,
 				resp *SaveRoleResponse,
 			) error {
-				scopes := make([]auth.Scope, len(req.Scopes))
+				scopes := make([]models.Scope, len(req.Scopes))
 
 				for i, scopeName := range req.Scopes {
-					scope, err := auth.ParseScope(scopeName)
+					scope, err := models.ParseScope(scopeName)
 					if err != nil {
 						slog.ErrorContext(
 							ctx,
 							"Failed to parse scope",
-							"channel", "api",
-							"scope", scopeName,
-							"error", err.Error(),
+							slog.String("channel", "api"),
+							slog.String("scope", scopeName),
+							slog.String("error", err.Error()),
 						)
 
 						resp.Success = false
@@ -51,19 +52,19 @@ func SaveRoleUsecase(authDb *auth.Database) usecase.Interactor {
 					scopes[i] = scope
 				}
 
-				role := auth.Role{
+				role := models.Role{
 					Name:   req.Role,
 					Scopes: scopes,
 				}
 
-				err := roleSys.SaveRole(role)
+				err := authStorage.SaveRole(ctx, role)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
 						"Failed to save role",
-						"channel", "api",
-						"role", req.Role,
-						"error", err.Error(),
+						slog.String("channel", "api"),
+						slog.String("role", req.Role),
+						slog.String("error", err.Error()),
 					)
 
 					resp.Success = false

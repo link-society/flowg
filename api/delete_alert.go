@@ -7,8 +7,11 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/config"
+	apiUtils "link-society.com/flowg/internal/utils/api"
+
+	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage/config"
 )
 
 type DeleteAlertRequest struct {
@@ -20,28 +23,26 @@ type DeleteAlertResponse struct {
 }
 
 func DeleteAlertUsecase(
-	authDb *auth.Database,
+	authStorage *auth.Storage,
 	configStorage *config.Storage,
 ) usecase.Interactor {
-	alertSys := config.NewAlertSystem(configStorage)
-
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiDecorator(
-			authDb,
-			auth.SCOPE_WRITE_ALERTS,
+		apiUtils.RequireScopeApiDecorator(
+			authStorage,
+			models.SCOPE_WRITE_ALERTS,
 			func(
 				ctx context.Context,
 				req DeleteAlertRequest,
 				resp *DeleteAlertResponse,
 			) error {
-				err := alertSys.Delete(req.Alert)
+				err := configStorage.DeleteAlert(ctx, req.Alert)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
 						"Failed to delete alert",
-						"channel", "api",
-						"alert", req.Alert,
-						"error", err.Error(),
+						slog.String("channel", "api"),
+						slog.String("alert", req.Alert),
+						slog.String("error", err.Error()),
 					)
 
 					resp.Success = false

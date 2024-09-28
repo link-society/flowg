@@ -23,16 +23,16 @@ tasks:
   "test:unit:go":
     internal: true
     cmds:
-      - go test -bench=. ./...
+      - go test -timeout 500ms -v -bench=. ./...
 
   "test:unit:rust:filterdsl":
     internal: true
-    dir: ./internal/ffi/filterdsl/rust-crate
+    dir: ./internal/utils/ffi/filterdsl/rust-crate
     cmds:
       - cargo test
 
   "test:unit:rust:vrl":
     internal: true
-    dir: ./internal/ffi/vrl/rust-crate
+    dir: ./internal/utils/ffi/vrl/rust-crate
     cmds:
       - cargo test

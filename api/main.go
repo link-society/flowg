@@ -12,17 +12,23 @@ import (
 	"github.com/swaggest/usecase"
 
 	"link-society.com/flowg/internal/app"
-	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/config"
-	"link-society.com/flowg/internal/data/lognotify"
-	"link-society.com/flowg/internal/data/logstorage"
+
+	apiUtils "link-society.com/flowg/internal/utils/api"
+
+	"link-society.com/flowg/internal/engines/lognotify"
+	"link-society.com/flowg/internal/engines/pipelines"
+
+	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage/config"
+	"link-society.com/flowg/internal/storage/log"
 )
 
 func NewHandler(
-	authDb *auth.Database,
-	logDb *logstorage.Storage,
+	authStorage *auth.Storage,
+	logStorage *log.Storage,
 	configStorage *config.Storage,
 	logNotifier *lognotify.LogNotifier,
+	pipelineRunner *pipelines.Runner,
 ) http.Handler {
 	reflector := openapi31.NewReflector()
 	service := web.NewService(reflector)
@@ -31,7 +37,7 @@ func NewHandler(
 	service.OpenAPISchema().SetVersion(app.FLOWG_VERSION)
 	service.Docs("/api/docs", v5emb.New)
 
-	service.Post("/api/v1/auth/login", LoginUsecase(authDb))
+	service.Post("/api/v1/auth/login", LoginUsecase(authStorage))
 
 	service.With(
 		nethttp.HTTPBearerSecurityMiddleware(
@@ -46,27 +52,27 @@ func NewHandler(
 			"Authentication using JSON Web Token",
 			"JWT",
 		),
-		auth.ApiMiddleware(authDb),
+		apiUtils.ApiMiddleware(authStorage),
 	).Group(func(router chi.Router) {
 		r := &routerWrapper{Router: router}
 
-		r.Get("/api/v1/transformers", ListTransformersUsecase(authDb, configStorage))
-		r.Get("/api/v1/transformers/{transformer}", GetTransformerUsecase(authDb, configStorage))
-		r.Put("/api/v1/transformers/{transformer}", SaveTransformerUsecase(authDb, configStorage))
-		r.Delete("/api/v1/transformers/{transformer}", DeleteTransformerUsecase(authDb, configStorage))
+		r.Get("/api/v1/transformers", ListTransformersUsecase(authStorage, configStorage))
+		r.Get("/api/v1/transformers/{transformer}", GetTransformerUsecase(authStorage, configStorage))
+		r.Put("/api/v1/transformers/{transformer}", SaveTransformerUsecase(authStorage, configStorage))
+		r.Delete("/api/v1/transformers/{transformer}", DeleteTransformerUsecase(authStorage, configStorage))
 
-		r.Get("/api/v1/pipelines", ListPipelinesUsecase(authDb, configStorage))
-		r.Get("/api/v1/pipelines/{pipeline}", GetPipelineUsecase(authDb, configStorage))
-		r.Put("/api/v1/pipelines/{pipeline}", SavePipelineUsecase(authDb, configStorage))
-		r.Delete("/api/v1/pipelines/{pipeline}", DeletePipelineUsecase(authDb, configStorage))
-		r.Post("/api/v1/pipelines/{pipeline}/logs", IngestLogUsecase(authDb, configStorage, logDb, logNotifier))
+		r.Get("/api/v1/pipelines", ListPipelinesUsecase(authStorage, configStorage))
+		r.Get("/api/v1/pipelines/{pipeline}", GetPipelineUsecase(authStorage, configStorage))
+		r.Put("/api/v1/pipelines/{pipeline}", SavePipelineUsecase(authStorage, configStorage))
+		r.Delete("/api/v1/pipelines/{pipeline}", DeletePipelineUsecase(authStorage, configStorage))
+		r.Post("/api/v1/pipelines/{pipeline}/logs", IngestLogUsecase(authStorage, pipelineRunner))
 
-		r.Get("/api/v1/streams", ListStreamsUsecase(authDb, logDb))
-		r.Get("/api/v1/streams/{stream}", GetStreamUsecase(authDb, logDb))
-		r.Put("/api/v1/streams/{stream}", ConfigureStreamUsecase(authDb, logDb))
-		r.Get("/api/v1/streams/{stream}/logs", QueryStreamUsecase(authDb, logDb))
-		r.Get("/api/v1/streams/{stream}/fields", ListStreamFieldsUsecase(authDb, logDb))
-		r.Delete("/api/v1/streams/{stream}", PurgeStreamUsecase(authDb, logDb))
+		r.Get("/api/v1/streams", ListStreamsUsecase(authStorage, logStorage))
+		r.Get("/api/v1/streams/{stream}", GetStreamUsecase(authStorage, logStorage))
+		r.Put("/api/v1/streams/{stream}", ConfigureStreamUsecase(authStorage, logStorage))
+		r.Get("/api/v1/streams/{stream}/logs", QueryStreamUsecase(authStorage, logStorage))
+		r.Get("/api/v1/streams/{stream}/fields", ListStreamFieldsUsecase(authStorage, logStorage))
+		r.Delete("/api/v1/streams/{stream}", PurgeStreamUsecase(authStorage, logStorage))
 
 		service.OpenAPICollector.AnnotateOperation(
 			"GET", "/api/v1/streams/{stream}/logs/watch",
@@ -85,30 +91,30 @@ func NewHandler(
 				return nil
 			},
 		)
-		r.Get("/api/v1/streams/{stream}/logs/watch", WatchLogsUsecase(authDb, logNotifier))
+		r.Get("/api/v1/streams/{stream}/logs/watch", WatchLogsUsecase(authStorage, logNotifier))
 
-		r.Get("/api/v1/alerts", ListAlertsUsecase(authDb, configStorage))
-		r.Get("/api/v1/alerts/{alert}", GetAlertUsecase(authDb, configStorage))
-		r.Put("/api/v1/alerts/{alert}", SaveAlertUsecase(authDb, configStorage))
-		r.Delete("/api/v1/alerts/{alert}", DeleteAlertUsecase(authDb, configStorage))
+		r.Get("/api/v1/alerts", ListAlertsUsecase(authStorage, configStorage))
+		r.Get("/api/v1/alerts/{alert}", GetAlertUsecase(authStorage, configStorage))
+		r.Put("/api/v1/alerts/{alert}", SaveAlertUsecase(authStorage, configStorage))
+		r.Delete("/api/v1/alerts/{alert}", DeleteAlertUsecase(authStorage, configStorage))
 
-		r.Get("/api/v1/roles", ListRolesUsecase(authDb))
-		r.Put("/api/v1/roles/{role}", SaveRoleUsecase(authDb))
-		r.Delete("/api/v1/roles/{role}", DeleteRoleUsecase(authDb))
+		r.Get("/api/v1/roles", ListRolesUsecase(authStorage))
+		r.Put("/api/v1/roles/{role}", SaveRoleUsecase(authStorage))
+		r.Delete("/api/v1/roles/{role}", DeleteRoleUsecase(authStorage))
 
-		r.Get("/api/v1/users", ListUsersUsecase(authDb))
-		r.Put("/api/v1/users/{user}", SaveUserUsecase(authDb))
-		r.Delete("/api/v1/users/{user}", DeleteUserUsecase(authDb))
+		r.Get("/api/v1/users", ListUsersUsecase(authStorage))
+		r.Put("/api/v1/users/{user}", SaveUserUsecase(authStorage))
+		r.Delete("/api/v1/users/{user}", DeleteUserUsecase(authStorage))
 
-		r.Get("/api/v1/auth/whoami", WhoamiUsecase(authDb))
-		r.Post("/api/v1/auth/change-password", ChangePasswordUsecase(authDb))
+		r.Get("/api/v1/auth/whoami", WhoamiUsecase(authStorage))
+		r.Post("/api/v1/auth/change-password", ChangePasswordUsecase(authStorage))
 
-		r.Get("/api/v1/tokens", ListTokensUsecase(authDb))
-		r.Post("/api/v1/token", CreateTokenUsecase(authDb))
-		r.Delete("/api/v1/tokens/{token-uuid}", DeleteTokenUsecase(authDb))
+		r.Get("/api/v1/tokens", ListTokensUsecase(authStorage))
+		r.Post("/api/v1/token", CreateTokenUsecase(authStorage))
+		r.Delete("/api/v1/tokens/{token-uuid}", DeleteTokenUsecase(authStorage))
 
-		r.Post("/api/v1/test/transformer", TestTransformerUsecase(authDb))
-		r.Post("/api/v1/test/alerts/{alert}", TestAlertUsecase(authDb, configStorage))
+		r.Post("/api/v1/test/transformer", TestTransformerUsecase(authStorage))
+		r.Post("/api/v1/test/alerts/{alert}", TestAlertUsecase(authStorage, configStorage))
 	})
 
 	return service

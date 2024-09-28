@@ -6,38 +6,40 @@ import (
 
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
-	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/logstorage"
+
+	apiUtils "link-society.com/flowg/internal/utils/api"
+
+	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage/log"
 )
 
 type ListStreamsRequest struct{}
 type ListStreamsResponse struct {
-	Success bool                               `json:"success"`
-	Streams map[string]logstorage.StreamConfig `json:"streams"`
+	Success bool                           `json:"success"`
+	Streams map[string]models.StreamConfig `json:"streams"`
 }
 
 func ListStreamsUsecase(
-	authDb *auth.Database,
-	logDb *logstorage.Storage,
+	authStorage *auth.Storage,
+	logStorage *log.Storage,
 ) usecase.Interactor {
-	metaSys := logstorage.NewMetaSystem(logDb)
-
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiDecorator(
-			authDb,
-			auth.SCOPE_READ_STREAMS,
+		apiUtils.RequireScopeApiDecorator(
+			authStorage,
+			models.SCOPE_READ_STREAMS,
 			func(
 				ctx context.Context,
 				req ListStreamsRequest,
 				resp *ListStreamsResponse,
 			) error {
-				streams, err := metaSys.ListStreams()
+				streams, err := logStorage.ListStreamConfigs(ctx)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
 						"Failed to list streams",
-						"channel", "api",
-						"error", err.Error(),
+						slog.String("channel", "api"),
+						slog.String("error", err.Error()),
 					)
 
 					resp.Success = false

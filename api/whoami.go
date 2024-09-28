@@ -7,40 +7,41 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	"link-society.com/flowg/internal/data/auth"
+	apiUtils "link-society.com/flowg/internal/utils/api"
+
+	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/storage/auth"
 )
 
 type WhoamiRequest struct{}
 type WhoamiResponse struct {
-	Success     bool             `json:"success"`
-	User        *auth.User       `json:"user"`
-	Permissions auth.Permissions `json:"permissions"`
+	Success     bool               `json:"success"`
+	User        *models.User       `json:"user"`
+	Permissions models.Permissions `json:"permissions"`
 }
 
-func WhoamiUsecase(authDb *auth.Database) usecase.Interactor {
-	userSys := auth.NewUserSystem(authDb)
-
+func WhoamiUsecase(authStorage *auth.Storage) usecase.Interactor {
 	u := usecase.NewInteractor(
 		func(
 			ctx context.Context,
 			req WhoamiRequest,
 			resp *WhoamiResponse,
 		) error {
-			resp.User = auth.GetContextUser(ctx)
+			resp.User = apiUtils.GetContextUser(ctx)
 
-			scopes, err := userSys.ListUserScopes(resp.User.Name)
+			scopes, err := authStorage.ListUserScopes(ctx, resp.User.Name)
 			if err != nil {
 				slog.ErrorContext(
 					ctx,
 					"Failed to fetch user scopes",
-					"channel", "api",
-					"error", err.Error(),
+					slog.String("channel", "api"),
+					slog.String("error", err.Error()),
 				)
 				return status.Wrap(err, status.Internal)
 			}
 
 			resp.Success = true
-			resp.Permissions = auth.PermissionsFromScopes(scopes)
+			resp.Permissions = models.PermissionsFromScopes(scopes)
 			return nil
 		},
 	)

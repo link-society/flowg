@@ -7,7 +7,10 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	"link-society.com/flowg/internal/data/auth"
+	apiUtils "link-society.com/flowg/internal/utils/api"
+
+	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/storage/auth"
 )
 
 type SaveUserRequest struct {
@@ -20,31 +23,29 @@ type SaveUserResponse struct {
 	Success bool `json:"success"`
 }
 
-func SaveUserUsecase(authDb *auth.Database) usecase.Interactor {
-	userSys := auth.NewUserSystem(authDb)
-
+func SaveUserUsecase(authStorage *auth.Storage) usecase.Interactor {
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiDecorator(
-			authDb,
-			auth.SCOPE_WRITE_ACLS,
+		apiUtils.RequireScopeApiDecorator(
+			authStorage,
+			models.SCOPE_WRITE_ACLS,
 			func(
 				ctx context.Context,
 				req SaveUserRequest,
 				resp *SaveUserResponse,
 			) error {
-				user := auth.User{
+				user := models.User{
 					Name:  req.User,
 					Roles: req.Roles,
 				}
 
-				err := userSys.SaveUser(user, req.Password)
+				err := authStorage.SaveUser(ctx, user, req.Password)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
 						"Failed to save user",
-						"channel", "api",
-						"user", req.User,
-						"error", err.Error(),
+						slog.String("channel", "api"),
+						slog.String("user", req.User),
+						slog.String("error", err.Error()),
 					)
 
 					resp.Success = false

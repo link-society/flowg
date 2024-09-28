@@ -10,13 +10,16 @@ FROM scratch AS sources-go
 ADD VERSION.txt /src/VERSION.txt
 ADD api /src/api
 ADD cmd /src/cmd
-ADD internal/app /src/internal/app
-ADD internal/data /src/internal/data
-ADD internal/integrations /src/internal/integrations
-ADD internal/server /src/internal/server
-ADD --exclude=internal/ffi/filterdsl/rust-crate internal/ffi/filterdsl /src/internal/ffi/filterdsl
-ADD --exclude=internal/ffi/vrl/rust-crate internal/ffi/vrl /src/internal/ffi/vrl
-ADD --exclude=web/app web /src/web
+
+ADD \
+  --exclude=internal/utils/ffi/filterdsl/rust-crate \
+  --exclude=internal/utils/ffi/vrl/rust-crate \
+  internal/ /src/internal/
+
+ADD \
+  --exclude=web/app \
+  web /src/web
+
 ADD go.mod go.sum /src/
 
 ## JS sources
@@ -28,12 +31,12 @@ ADD web/app /src/web/app
 ## FilterDSL sources
 FROM scratch AS sources-rust-filterdsl
 
-ADD internal/ffi/filterdsl/rust-crate /src/internal/ffi/filterdsl/rust-crate
+ADD internal/utils/ffi/filterdsl/rust-crate /src/internal/utils/ffi/filterdsl/rust-crate
 
 ## VRL sources
 FROM scratch AS sources-rust-vrl
 
-ADD internal/ffi/vrl/rust-crate /src/internal/ffi/vrl/rust-crate
+ADD internal/utils/ffi/vrl/rust-crate /src/internal/utils/ffi/vrl/rust-crate
 
 ##############################
 ## BUILD RUST DEPENDENCIES
@@ -44,7 +47,7 @@ FROM rust:1.81-alpine3.20 AS builder-rust-filterdsl
 RUN apk add --no-cache musl-dev
 
 COPY --from=sources-rust-filterdsl /src /workspace
-WORKDIR /workspace/internal/ffi/filterdsl/rust-crate
+WORKDIR /workspace/internal/utils/ffi/filterdsl/rust-crate
 
 RUN cargo build --release
 RUN cargo test
@@ -54,7 +57,7 @@ FROM rust:1.81-alpine3.20 AS builder-rust-vrl
 RUN apk add --no-cache musl-dev
 
 COPY --from=sources-rust-vrl /src /workspace
-WORKDIR /workspace/internal/ffi/vrl/rust-crate
+WORKDIR /workspace/internal/utils/ffi/vrl/rust-crate
 
 RUN cargo build --release
 RUN cargo test
@@ -80,14 +83,14 @@ RUN apk add --no-cache gcc musl-dev
 RUN go install github.com/a-h/templ/cmd/templ@v0.2.778
 
 COPY --from=sources-go /src /workspace
-COPY --from=builder-rust-filterdsl /workspace/internal/ffi/filterdsl/rust-crate/target/release/libflowg_filterdsl.a /workspace/internal/ffi/filterdsl/rust-crate/target/release/libflowg_filterdsl.a
-COPY --from=builder-rust-vrl /workspace/internal/ffi/vrl/rust-crate/target/release/libflowg_vrl.a /workspace/internal/ffi/vrl/rust-crate/target/release/libflowg_vrl.a
+COPY --from=builder-rust-filterdsl /workspace/internal/utils/ffi/filterdsl/rust-crate/target/release/libflowg_filterdsl.a /workspace/internal/utils/ffi/filterdsl/rust-crate/target/release/libflowg_filterdsl.a
+COPY --from=builder-rust-vrl /workspace/internal/utils/ffi/vrl/rust-crate/target/release/libflowg_vrl.a /workspace/internal/utils/ffi/vrl/rust-crate/target/release/libflowg_vrl.a
 COPY --from=builder-js /workspace/web/app/dist /workspace/web/public
 WORKDIR /workspace
 
 RUN go generate ./...
 RUN go build -o bin/ ./...
-RUN go test -v ./...
+RUN go test -timeout 500ms -v ./...
 
 ##############################
 ## FINAL ARTIFACT

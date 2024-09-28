@@ -9,9 +9,12 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/logstorage"
-	"link-society.com/flowg/internal/ffi/filterdsl"
+	apiUtils "link-society.com/flowg/internal/utils/api"
+
+	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage/log"
+	"link-society.com/flowg/internal/utils/ffi/filterdsl"
 )
 
 type QueryStreamRequest struct {
@@ -22,26 +25,24 @@ type QueryStreamRequest struct {
 }
 
 type QueryStreamResponse struct {
-	Success bool                  `json:"success"`
-	Records []logstorage.LogEntry `json:"records"`
+	Success bool               `json:"success"`
+	Records []models.LogRecord `json:"records"`
 }
 
 func QueryStreamUsecase(
-	authDb *auth.Database,
-	logDb *logstorage.Storage,
+	authStorage *auth.Storage,
+	logStorage *log.Storage,
 ) usecase.Interactor {
-	querySys := logstorage.NewQuerySystem(logDb)
-
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiDecorator(
-			authDb,
-			auth.SCOPE_READ_STREAMS,
+		apiUtils.RequireScopeApiDecorator(
+			authStorage,
+			models.SCOPE_READ_STREAMS,
 			func(
 				ctx context.Context,
 				req QueryStreamRequest,
 				resp *QueryStreamResponse,
 			) error {
-				var filter logstorage.Filter
+				var filter filterdsl.Filter
 
 				if req.Filter != nil {
 					var err error
@@ -50,9 +51,9 @@ func QueryStreamUsecase(
 						slog.ErrorContext(
 							ctx,
 							"Failed to compile filter",
-							"channel", "api",
-							"stream", req.Stream,
-							"error", err.Error(),
+							slog.String("channel", "api"),
+							slog.String("stream", req.Stream),
+							slog.String("error", err.Error()),
 						)
 
 						resp.Success = false
@@ -63,13 +64,13 @@ func QueryStreamUsecase(
 					filter = nil
 				}
 
-				records, err := querySys.FetchLogs(ctx, req.Stream, req.From, req.To, filter)
+				records, err := logStorage.FetchLogs(ctx, req.Stream, req.From, req.To, filter)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
 						"Failed to query logs",
-						"stream", req.Stream,
-						"error", err.Error(),
+						slog.String("stream", req.Stream),
+						slog.String("error", err.Error()),
 					)
 					return status.Wrap(err, status.Internal)
 				}

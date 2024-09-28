@@ -7,13 +7,16 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/logstorage"
+	apiUtils "link-society.com/flowg/internal/utils/api"
+
+	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage/log"
 )
 
 type ConfigureStreamRequest struct {
-	Stream string                  `path:"stream" minLength:"1"`
-	Config logstorage.StreamConfig `json:"config"`
+	Stream string              `path:"stream" minLength:"1"`
+	Config models.StreamConfig `json:"config"`
 }
 
 type ConfigureStreamResponse struct {
@@ -21,27 +24,25 @@ type ConfigureStreamResponse struct {
 }
 
 func ConfigureStreamUsecase(
-	authDb *auth.Database,
-	logDb *logstorage.Storage,
+	authStorage *auth.Storage,
+	logStorage *log.Storage,
 ) usecase.Interactor {
-	metaSys := logstorage.NewMetaSystem(logDb)
-
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiDecorator(
-			authDb,
-			auth.SCOPE_WRITE_STREAMS,
+		apiUtils.RequireScopeApiDecorator(
+			authStorage,
+			models.SCOPE_WRITE_STREAMS,
 			func(
 				ctx context.Context,
 				req ConfigureStreamRequest,
 				resp *ConfigureStreamResponse,
 			) error {
-				err := metaSys.ConfigureStream(req.Stream, req.Config)
+				err := logStorage.ConfigureStream(ctx, req.Stream, req.Config)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
 						"Failed to configure stream",
-						"stream", req.Stream,
-						"error", err.Error(),
+						slog.String("stream", req.Stream),
+						slog.String("error", err.Error()),
 					)
 
 					return status.Wrap(err, status.Internal)

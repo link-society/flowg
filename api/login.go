@@ -8,7 +8,9 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	"link-society.com/flowg/internal/data/auth"
+	authUtils "link-society.com/flowg/internal/utils/auth"
+
+	"link-society.com/flowg/internal/storage/auth"
 )
 
 type LoginRequest struct {
@@ -21,23 +23,21 @@ type LoginResponse struct {
 	Token   string `json:"token"`
 }
 
-func LoginUsecase(authDb *auth.Database) usecase.Interactor {
-	userSys := auth.NewUserSystem(authDb)
-
+func LoginUsecase(authStorage *auth.Storage) usecase.Interactor {
 	u := usecase.NewInteractor(
 		func(
 			ctx context.Context,
 			req LoginRequest,
 			resp *LoginResponse,
 		) error {
-			switch valid, err := userSys.VerifyUserPassword(req.Username, req.Password); {
+			switch valid, err := authStorage.VerifyUserPassword(ctx, req.Username, req.Password); {
 			case err != nil:
 				slog.ErrorContext(
 					ctx,
 					"Failed to verify user password",
-					"channel", "api",
-					"username", req.Username,
-					"error", err.Error(),
+					slog.String("channel", "api"),
+					slog.String("username", req.Username),
+					slog.String("error", err.Error()),
 				)
 
 				resp.Success = false
@@ -48,14 +48,14 @@ func LoginUsecase(authDb *auth.Database) usecase.Interactor {
 				return status.Wrap(errors.New("invalid credentials"), status.Unauthenticated)
 
 			case valid:
-				token, err := auth.NewJWT(req.Username)
+				token, err := authUtils.NewJWT(req.Username)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
 						"Failed to create JWT",
-						"channel", "api",
-						"username", req.Username,
-						"error", err.Error(),
+						slog.String("channel", "api"),
+						slog.String("username", req.Username),
+						slog.String("error", err.Error()),
 					)
 
 					resp.Success = false

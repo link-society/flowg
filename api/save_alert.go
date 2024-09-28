@@ -7,14 +7,16 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	"link-society.com/flowg/internal/data/alerting"
-	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/config"
+	apiUtils "link-society.com/flowg/internal/utils/api"
+
+	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage/config"
 )
 
 type SaveAlertRequest struct {
-	Alert   string           `path:"alert" minLength:"1"`
-	Webhook alerting.Webhook `json:"webhook"`
+	Alert   string         `path:"alert" minLength:"1"`
+	Webhook models.Webhook `json:"webhook"`
 }
 
 type SaveAlertResponse struct {
@@ -22,28 +24,26 @@ type SaveAlertResponse struct {
 }
 
 func SaveAlertUsecase(
-	authDb *auth.Database,
+	authStorage *auth.Storage,
 	configStorage *config.Storage,
 ) usecase.Interactor {
-	alertSys := config.NewAlertSystem(configStorage)
-
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiDecorator(
-			authDb,
-			auth.SCOPE_WRITE_ALERTS,
+		apiUtils.RequireScopeApiDecorator(
+			authStorage,
+			models.SCOPE_WRITE_ALERTS,
 			func(
 				ctx context.Context,
 				req SaveAlertRequest,
 				resp *SaveAlertResponse,
 			) error {
-				err := alertSys.Write(req.Alert, &req.Webhook)
+				err := configStorage.WriteAlert(ctx, req.Alert, &req.Webhook)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
 						"Failed to save alert",
-						"channel", "api",
-						"alert", req.Alert,
-						"error", err.Error(),
+						slog.String("channel", "api"),
+						slog.String("alert", req.Alert),
+						slog.String("error", err.Error()),
 					)
 
 					resp.Success = false

@@ -7,8 +7,11 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/logstorage"
+	apiUtils "link-society.com/flowg/internal/utils/api"
+
+	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage/log"
 )
 
 type PurgeStreamRequest struct {
@@ -19,28 +22,26 @@ type PurgeStreamResponse struct {
 }
 
 func PurgeStreamUsecase(
-	authDb *auth.Database,
-	logDb *logstorage.Storage,
+	authStorage *auth.Storage,
+	logStorage *log.Storage,
 ) usecase.Interactor {
-	metaSys := logstorage.NewMetaSystem(logDb)
-
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiDecorator(
-			authDb,
-			auth.SCOPE_WRITE_STREAMS,
+		apiUtils.RequireScopeApiDecorator(
+			authStorage,
+			models.SCOPE_WRITE_STREAMS,
 			func(
 				ctx context.Context,
 				req PurgeStreamRequest,
 				resp *PurgeStreamResponse,
 			) error {
-				err := metaSys.DeleteStream(ctx, req.Stream)
+				err := logStorage.DeleteStream(ctx, req.Stream)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
 						"Failed to purge stream",
-						"channel", "api",
-						"stream", req.Stream,
-						"error", err.Error(),
+						slog.String("channel", "api"),
+						slog.String("stream", req.Stream),
+						slog.String("error", err.Error()),
 					)
 
 					resp.Success = false
@@ -50,8 +51,8 @@ func PurgeStreamUsecase(
 				slog.InfoContext(
 					ctx,
 					"Log stream purged",
-					"channel", "api",
-					"stream", req.Stream,
+					slog.String("channel", "api"),
+					slog.String("stream", req.Stream),
 				)
 				resp.Success = true
 

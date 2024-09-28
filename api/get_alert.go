@@ -7,9 +7,11 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	"link-society.com/flowg/internal/data/alerting"
-	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/config"
+	apiUtils "link-society.com/flowg/internal/utils/api"
+
+	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage/config"
 )
 
 type GetAlertRequest struct {
@@ -17,33 +19,31 @@ type GetAlertRequest struct {
 }
 
 type GetAlertResponse struct {
-	Success bool              `json:"success"`
-	Webhook *alerting.Webhook `json:"webhook"`
+	Success bool            `json:"success"`
+	Webhook *models.Webhook `json:"webhook"`
 }
 
 func GetAlertUsecase(
-	authDb *auth.Database,
+	authStorage *auth.Storage,
 	configStorage *config.Storage,
 ) usecase.Interactor {
-	alertSys := config.NewAlertSystem(configStorage)
-
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiDecorator(
-			authDb,
-			auth.SCOPE_READ_ALERTS,
+		apiUtils.RequireScopeApiDecorator(
+			authStorage,
+			models.SCOPE_READ_ALERTS,
 			func(
 				ctx context.Context,
 				req GetAlertRequest,
 				resp *GetAlertResponse,
 			) error {
-				webhook, err := alertSys.Read(req.Alert)
+				webhook, err := configStorage.ReadAlert(ctx, req.Alert)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
 						"Failed to get alert",
-						"channel", "api",
-						"alert", req.Alert,
-						"error", err.Error(),
+						slog.String("channel", "api"),
+						slog.String("alert", req.Alert),
+						slog.String("error", err.Error()),
 					)
 
 					resp.Success = false
