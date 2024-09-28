@@ -1,51 +1,51 @@
 package bootstrap
 
 import (
+	"context"
 	"fmt"
 
-	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/models"
+
+	"link-society.com/flowg/internal/storage/auth"
 )
 
-func DefaultRolesAndUsers(authDb *auth.Database) error {
-	roleSys := auth.NewRoleSystem(authDb)
-	userSys := auth.NewUserSystem(authDb)
-
-	roles, err := roleSys.ListRoles()
+func DefaultRolesAndUsers(ctx context.Context, authStorage *auth.Storage) error {
+	roles, err := authStorage.ListRoles(ctx)
 	if err != nil {
 		return err
 	}
 
 	if len(roles) == 0 {
-		adminRole := auth.Role{
+		adminRole := models.Role{
 			Name: "admin",
-			Scopes: []auth.Scope{
-				auth.SCOPE_SEND_LOGS,
-				auth.SCOPE_WRITE_ACLS,
-				auth.SCOPE_WRITE_PIPELINES,
-				auth.SCOPE_WRITE_TRANSFORMERS,
-				auth.SCOPE_WRITE_STREAMS,
-				auth.SCOPE_WRITE_ALERTS,
+			Scopes: []models.Scope{
+				models.SCOPE_SEND_LOGS,
+				models.SCOPE_WRITE_ACLS,
+				models.SCOPE_WRITE_PIPELINES,
+				models.SCOPE_WRITE_TRANSFORMERS,
+				models.SCOPE_WRITE_STREAMS,
+				models.SCOPE_WRITE_ALERTS,
 			},
 		}
 
-		err := roleSys.SaveRole(adminRole)
+		err := authStorage.SaveRole(ctx, adminRole)
 		if err != nil {
 			return fmt.Errorf("failed to bootstrap admin role: %w", err)
 		}
 	}
 
-	users, err := userSys.ListUsers()
+	users, err := authStorage.ListUsers(ctx)
 	if err != nil {
 		return err
 	}
 
 	if len(users) == 0 {
-		rootUser := auth.User{
+		rootUser := models.User{
 			Name:  "root",
 			Roles: []string{"admin"},
 		}
 
-		err := userSys.SaveUser(rootUser, "root")
+		err := authStorage.SaveUser(ctx, rootUser, "root")
 		if err != nil {
 			return fmt.Errorf("failed to bootstrap root user: %w", err)
 		}

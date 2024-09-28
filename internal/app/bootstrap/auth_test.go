@@ -1,9 +1,12 @@
 package bootstrap_test
 
 import (
+	"context"
 	"testing"
 
-	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/models"
+
+	"link-society.com/flowg/internal/storage/auth"
 
 	"link-society.com/flowg/internal/app/bootstrap"
 	"link-society.com/flowg/internal/app/logging"
@@ -12,22 +15,23 @@ import (
 func TestDefaultRolesAndUsers(t *testing.T) {
 	logging.Discard()
 
-	opts := auth.DefaultDatabaseOpts().WithInMemory(true)
-	authDb := auth.NewDatabase(opts)
-	err := authDb.Open()
-	if err != nil {
-		t.Fatalf("failed to create auth database: %v", err)
-	}
-	defer authDb.Close()
+	ctx := context.Background()
 
-	err = bootstrap.DefaultRolesAndUsers(authDb)
+	authStorage := auth.NewStorage(auth.OptInMemory(true))
+	authStorage.Start()
+	defer authStorage.Stop()
+
+	err := authStorage.WaitStarted()
+	if err != nil {
+		t.Fatalf("unexpected error at startup: %v", err)
+	}
+
+	err = bootstrap.DefaultRolesAndUsers(ctx, authStorage)
 	if err != nil {
 		t.Fatalf("failed to bootstrap roles and users: %v", err)
 	}
 
-	roleSys := auth.NewRoleSystem(authDb)
-
-	roles, err := roleSys.ListRoles()
+	roles, err := authStorage.ListRoles(ctx)
 	if err != nil {
 		t.Fatalf("failed to list roles: %v", err)
 	}
@@ -40,13 +44,13 @@ func TestDefaultRolesAndUsers(t *testing.T) {
 		t.Fatalf("expected role name to be admin, got %s", roles[0].Name)
 	}
 
-	expected := []auth.Scope{
-		auth.SCOPE_SEND_LOGS,
-		auth.SCOPE_WRITE_ACLS,
-		auth.SCOPE_WRITE_PIPELINES,
-		auth.SCOPE_WRITE_TRANSFORMERS,
-		auth.SCOPE_WRITE_STREAMS,
-		auth.SCOPE_WRITE_ALERTS,
+	expected := []models.Scope{
+		models.SCOPE_SEND_LOGS,
+		models.SCOPE_WRITE_ACLS,
+		models.SCOPE_WRITE_PIPELINES,
+		models.SCOPE_WRITE_TRANSFORMERS,
+		models.SCOPE_WRITE_STREAMS,
+		models.SCOPE_WRITE_ALERTS,
 	}
 
 	for _, scope := range expected {

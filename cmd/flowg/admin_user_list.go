@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"os"
 
 	"fmt"
@@ -8,7 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/storage/auth"
 )
 
 type adminUserListOpts struct {
@@ -22,25 +23,27 @@ func NewAdminUserListCommand() *cobra.Command {
 		Use:   "list",
 		Short: "List existing users",
 		Run: func(cmd *cobra.Command, args []string) {
-			authDb := auth.NewDatabase(
-				auth.DefaultDatabaseOpts().WithDir(opts.authDir),
+			authStorage := auth.NewStorage(
+				auth.OptDirectory(opts.authDir),
 			)
-			err := authDb.Open()
+			authStorage.Start()
+			err := authStorage.WaitStarted()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to open auth database:", err)
 				exitCode = 1
 				return
 			}
 			defer func() {
-				err := authDb.Close()
+				authStorage.Stop()
+				err := authStorage.WaitStopped()
 				if err != nil {
 					fmt.Fprintln(os.Stderr, "ERROR: Failed to close auth database:", err)
 					exitCode = 1
 				}
 			}()
 
-			userSys := auth.NewUserSystem(authDb)
-			users, err := userSys.ListUsers()
+			ctx := context.Background()
+			users, err := authStorage.ListUsers(ctx)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to list users:", err)
 				exitCode = 1

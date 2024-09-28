@@ -6,8 +6,12 @@ import (
 
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
-	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/logstorage"
+
+	apiUtils "link-society.com/flowg/internal/utils/api"
+
+	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage/log"
 )
 
 type ListStreamFieldsRequest struct {
@@ -19,28 +23,26 @@ type ListStreamFieldsResponse struct {
 }
 
 func ListStreamFieldsUsecase(
-	authDb *auth.Database,
-	logDb *logstorage.Storage,
+	authStorage *auth.Storage,
+	logStorage *log.Storage,
 ) usecase.Interactor {
-	metaSys := logstorage.NewMetaSystem(logDb)
-
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiDecorator(
-			authDb,
-			auth.SCOPE_READ_STREAMS,
+		apiUtils.RequireScopeApiDecorator(
+			authStorage,
+			models.SCOPE_READ_STREAMS,
 			func(
 				ctx context.Context,
 				req ListStreamFieldsRequest,
 				resp *ListStreamFieldsResponse,
 			) error {
-				fields, err := metaSys.ListStreamFields(req.Stream)
+				fields, err := logStorage.ListStreamFields(ctx, req.Stream)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
 						"Failed to list stream fields",
-						"channel", "api",
-						"stream", req.Stream,
-						"error", err.Error(),
+						slog.String("channel", "api"),
+						slog.String("stream", req.Stream),
+						slog.String("error", err.Error()),
 					)
 
 					resp.Success = false

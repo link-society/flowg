@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"os"
 
 	"fmt"
@@ -8,7 +9,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/storage/auth"
 )
 
 type adminUserCreateOpts struct {
@@ -24,22 +26,24 @@ func NewAdminUserCreateCommand() *cobra.Command {
 		Use:   "create [flags] [...roles]",
 		Short: "Create a new user",
 		Run: func(cmd *cobra.Command, args []string) {
-			user := auth.User{
+			user := models.User{
 				Name:  opts.name,
 				Roles: make([]string, len(args)),
 			}
 
-			authDb := auth.NewDatabase(
-				auth.DefaultDatabaseOpts().WithDir(opts.authDir),
+			authStorage := auth.NewStorage(
+				auth.OptDirectory(opts.authDir),
 			)
-			err := authDb.Open()
+			authStorage.Start()
+			err := authStorage.WaitStarted()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to open auth database:", err)
 				exitCode = 1
 				return
 			}
 			defer func() {
-				err := authDb.Close()
+				authStorage.Stop()
+				err := authStorage.WaitStopped()
 				if err != nil {
 					fmt.Fprintln(os.Stderr, "ERROR: Failed to close auth database:", err)
 					exitCode = 1
@@ -48,8 +52,8 @@ func NewAdminUserCreateCommand() *cobra.Command {
 
 			copy(user.Roles, args)
 
-			userSys := auth.NewUserSystem(authDb)
-			err = userSys.SaveUser(user, opts.password)
+			ctx := context.Background()
+			err = authStorage.SaveUser(ctx, user, opts.password)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to save user:", err)
 				exitCode = 1

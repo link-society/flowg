@@ -1,12 +1,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/storage/auth"
 )
 
 type adminRoleDeleteOpts struct {
@@ -21,25 +22,27 @@ func NewAdminRoleDeleteCommand() *cobra.Command {
 		Use:   "delete",
 		Short: "Delete an existing role",
 		Run: func(cmd *cobra.Command, args []string) {
-			authDb := auth.NewDatabase(
-				auth.DefaultDatabaseOpts().WithDir(opts.authDir),
+			authStorage := auth.NewStorage(
+				auth.OptDirectory(opts.authDir),
 			)
-			err := authDb.Open()
+			authStorage.Start()
+			err := authStorage.WaitStarted()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to open auth database:", err)
 				exitCode = 1
 				return
 			}
 			defer func() {
-				err := authDb.Close()
+				authStorage.Stop()
+				err := authStorage.WaitStopped()
 				if err != nil {
 					fmt.Fprintln(os.Stderr, "ERROR: Failed to close auth database:", err)
 					exitCode = 1
 				}
 			}()
 
-			roleSys := auth.NewRoleSystem(authDb)
-			err = roleSys.DeleteRole(opts.name)
+			ctx := context.Background()
+			err = authStorage.DeleteRole(ctx, opts.name)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to delete role:", err)
 				exitCode = 1

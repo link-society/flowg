@@ -7,9 +7,12 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/config"
-	"link-society.com/flowg/internal/data/logstorage"
+	apiUtils "link-society.com/flowg/internal/utils/api"
+
+	"link-society.com/flowg/internal/models"
+
+	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage/config"
 )
 
 type TestAlertRequest struct {
@@ -22,43 +25,41 @@ type TestAlertResponse struct {
 }
 
 func TestAlertUsecase(
-	authDb *auth.Database,
+	authStorage *auth.Storage,
 	configStorage *config.Storage,
 ) usecase.Interactor {
-	alertSys := config.NewAlertSystem(configStorage)
-
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiDecorator(
-			authDb,
-			auth.SCOPE_WRITE_ALERTS,
+		apiUtils.RequireScopeApiDecorator(
+			authStorage,
+			models.SCOPE_WRITE_ALERTS,
 			func(
 				ctx context.Context,
 				req TestAlertRequest,
 				resp *TestAlertResponse,
 			) error {
-				webhook, err := alertSys.Read(req.Alert)
+				webhook, err := configStorage.ReadAlert(ctx, req.Alert)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
 						"Failed to get alert",
-						"channel", "api",
-						"alert", req.Alert,
-						"error", err.Error(),
+						slog.String("channel", "api"),
+						slog.String("alert", req.Alert),
+						slog.String("error", err.Error()),
 					)
 
 					resp.Success = false
 					return status.Wrap(err, status.NotFound)
 				}
 
-				logentry := logstorage.NewLogEntry(req.Record)
-				err = webhook.Call(ctx, logentry)
+				logRecord := models.NewLogRecord(req.Record)
+				err = webhook.Call(ctx, logRecord)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
 						"Failed to call alert webhook",
-						"channel", "api",
-						"alert", req.Alert,
-						"error", err.Error(),
+						slog.String("channel", "api"),
+						slog.String("alert", req.Alert),
+						slog.String("error", err.Error()),
 					)
 
 					resp.Success = false

@@ -7,8 +7,11 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/config"
+	apiUtils "link-society.com/flowg/internal/utils/api"
+
+	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage/config"
 )
 
 type ListAlertsRequest struct{}
@@ -18,27 +21,25 @@ type ListAlertsResponse struct {
 }
 
 func ListAlertsUsecase(
-	authDb *auth.Database,
+	authStorage *auth.Storage,
 	configStorage *config.Storage,
 ) usecase.Interactor {
-	alertSys := config.NewAlertSystem(configStorage)
-
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiDecorator(
-			authDb,
-			auth.SCOPE_READ_ALERTS,
+		apiUtils.RequireScopeApiDecorator(
+			authStorage,
+			models.SCOPE_READ_ALERTS,
 			func(
 				ctx context.Context,
 				req ListAlertsRequest,
 				resp *ListAlertsResponse,
 			) error {
-				alerts, err := alertSys.List()
+				alerts, err := configStorage.ListAlerts(ctx)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
 						"Failed to list alerts",
-						"channel", "api",
-						"error", err.Error(),
+						slog.String("channel", "api"),
+						slog.String("error", err.Error()),
 					)
 
 					resp.Success = false

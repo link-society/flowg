@@ -1,11 +1,15 @@
 package main
 
 import (
+	"os"
+	"os/signal"
+	"syscall"
+
 	"github.com/spf13/cobra"
 
 	"link-society.com/flowg/internal/app/logging"
 	"link-society.com/flowg/internal/app/metrics"
-	"link-society.com/flowg/internal/server"
+	"link-society.com/flowg/internal/app/server"
 )
 
 type serveCommandOpts struct {
@@ -29,21 +33,32 @@ func NewServeCommand() *cobra.Command {
 			metrics.Setup()
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			errC := make(chan struct{})
-			go server.Run(
-				server.Options{
-					HttpBindAddress:   opts.httpBindAddress,
-					SyslogBindAddress: opts.syslogBindAddr,
+			srv := server.NewServer(server.Options{
+				HttpBindAddress:   opts.httpBindAddress,
+				SyslogBindAddress: opts.syslogBindAddr,
 
-					ConfigStorageDir: opts.configDir,
-					AuthStorageDir:   opts.authDir,
-					LogStorageDir:    opts.logDir,
-				},
-				errC,
-			)
+				ConfigStorageDir: opts.configDir,
+				AuthStorageDir:   opts.authDir,
+				LogStorageDir:    opts.logDir,
+			})
 
-			for range errC {
-				exitCode = 1
+			srv.Start()
+
+			sigC := make(chan os.Signal, 1)
+			signal.Notify(sigC, syscall.SIGINT, syscall.SIGTERM)
+
+			select {
+			case <-sigC:
+				srv.Stop()
+				failure := <-srv.DoneC()
+				if failure {
+					exitCode = 1
+				}
+
+			case failure := <-srv.DoneC():
+				if failure {
+					exitCode = 1
+				}
 			}
 		},
 	}

@@ -7,8 +7,11 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/config"
+	apiUtils "link-society.com/flowg/internal/utils/api"
+
+	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage/config"
 )
 
 type GetPipelineRequest struct {
@@ -17,32 +20,30 @@ type GetPipelineRequest struct {
 
 type GetPipelineResponse struct {
 	Success bool              `json:"success"`
-	Flow    *config.FlowGraph `json:"flow"`
+	Flow    *models.FlowGraph `json:"flow"`
 }
 
 func GetPipelineUsecase(
-	authDb *auth.Database,
+	authStorage *auth.Storage,
 	configStorage *config.Storage,
 ) usecase.Interactor {
-	pipelineSys := config.NewPipelineSystem(configStorage)
-
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiDecorator(
-			authDb,
-			auth.SCOPE_READ_PIPELINES,
+		apiUtils.RequireScopeApiDecorator(
+			authStorage,
+			models.SCOPE_READ_PIPELINES,
 			func(
 				ctx context.Context,
 				req GetPipelineRequest,
 				resp *GetPipelineResponse,
 			) error {
-				flowGraph, err := pipelineSys.Parse(req.Pipeline)
+				flowGraph, err := configStorage.ReadPipeline(ctx, req.Pipeline)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
 						"Failed to get pipeline",
-						"channel", "api",
-						"pipeline", req.Pipeline,
-						"error", err.Error(),
+						slog.String("channel", "api"),
+						slog.String("pipeline", req.Pipeline),
+						slog.String("error", err.Error()),
 					)
 
 					resp.Success = false

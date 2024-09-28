@@ -7,7 +7,10 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	"link-society.com/flowg/internal/data/auth"
+	apiUtils "link-society.com/flowg/internal/utils/api"
+
+	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/storage/auth"
 )
 
 type DeleteRoleRequest struct {
@@ -18,26 +21,24 @@ type DeleteRoleResponse struct {
 	Success bool `json:"success"`
 }
 
-func DeleteRoleUsecase(authDb *auth.Database) usecase.Interactor {
-	roleSys := auth.NewRoleSystem(authDb)
-
+func DeleteRoleUsecase(authStorage *auth.Storage) usecase.Interactor {
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiDecorator(
-			authDb,
-			auth.SCOPE_WRITE_ACLS,
+		apiUtils.RequireScopeApiDecorator(
+			authStorage,
+			models.SCOPE_WRITE_ACLS,
 			func(
 				ctx context.Context,
 				req DeleteRoleRequest,
 				resp *DeleteRoleResponse,
 			) error {
-				err := roleSys.DeleteRole(req.Role)
+				err := authStorage.DeleteRole(ctx, req.Role)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
 						"Failed to delete role",
-						"channel", "api",
-						"role", req.Role,
-						"error", err.Error(),
+						slog.String("channel", "api"),
+						slog.String("role", req.Role),
+						slog.String("error", err.Error()),
 					)
 
 					resp.Success = false

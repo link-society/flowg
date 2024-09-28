@@ -28,10 +28,16 @@ func (m *middleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	slog.InfoContext(
 		req.Context(),
 		"http request",
-		"channel", "accesslog",
-		"method", req.Method,
-		"url", req.URL.Path,
-		"status", resp.statusCode,
+		slog.String("channel", "accesslog"),
+		slog.Group("http",
+			slog.Group("req",
+				slog.String("method", req.Method),
+				slog.String("url", req.URL.Path),
+			),
+			slog.Group("resp",
+				slog.Int("status", resp.statusCode),
+			),
+		),
 	)
 }
 

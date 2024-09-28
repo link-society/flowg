@@ -12,12 +12,12 @@ tasks:
 
   "build:rust:vrl":
     internal: true
-    dir: ./internal/ffi/vrl/rust-crate
+    dir: ./internal/utils/ffi/vrl/rust-crate
     cmds:
       - cargo build --release
 
   "build:rust:filterdsl":
     internal: true
-    dir: ./internal/ffi/filterdsl/rust-crate
+    dir: ./internal/utils/ffi/filterdsl/rust-crate
     cmds:
       - cargo build --release

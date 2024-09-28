@@ -4,18 +4,19 @@ import (
 	"context"
 	"log/slog"
 
-	"encoding/json"
-
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	"link-society.com/flowg/internal/data/auth"
-	"link-society.com/flowg/internal/data/config"
+	apiUtils "link-society.com/flowg/internal/utils/api"
+
+	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage/config"
 )
 
 type SavePipelineRequest struct {
 	Pipeline string           `path:"pipeline" minLength:"1"`
-	Flow     config.FlowGraph `json:"flow"`
+	Flow     models.FlowGraph `json:"flow"`
 }
 
 type SavePipelineResponse struct {
@@ -23,42 +24,26 @@ type SavePipelineResponse struct {
 }
 
 func SavePipelineUsecase(
-	authDb *auth.Database,
+	authStorage *auth.Storage,
 	configStorage *config.Storage,
 ) usecase.Interactor {
-	pipelineSys := config.NewPipelineSystem(configStorage)
-
 	u := usecase.NewInteractor(
-		auth.RequireScopeApiDecorator(
-			authDb,
-			auth.SCOPE_WRITE_PIPELINES,
+		apiUtils.RequireScopeApiDecorator(
+			authStorage,
+			models.SCOPE_WRITE_PIPELINES,
 			func(
 				ctx context.Context,
 				req SavePipelineRequest,
 				resp *SavePipelineResponse,
 			) error {
-				flowData, err := json.Marshal(req.Flow)
-				if err != nil {
-					slog.ErrorContext(
-						ctx,
-						"Failed to marshal pipeline flow",
-						"channel", "api",
-						"pipeline", req.Pipeline,
-						"error", err.Error(),
-					)
-
-					resp.Success = false
-					return status.Wrap(err, status.InvalidArgument)
-				}
-
-				err = pipelineSys.Write(req.Pipeline, string(flowData))
+				err := configStorage.WritePipeline(ctx, req.Pipeline, &req.Flow)
 				if err != nil {
 					slog.ErrorContext(
 						ctx,
 						"Failed to save pipeline",
-						"channel", "api",
-						"pipeline", req.Pipeline,
-						"error", err.Error(),
+						slog.String("channel", "api"),
+						slog.String("pipeline", req.Pipeline),
+						slog.String("error", err.Error()),
 					)
 
 					resp.Success = false
@@ -77,7 +62,7 @@ func SavePipelineUsecase(
 	u.SetDescription("Save pipeline")
 	u.SetTags("pipelines")
 
-	u.SetExpectedErrors(status.PermissionDenied, status.InvalidArgument, status.Internal)
+	u.SetExpectedErrors(status.PermissionDenied, status.Internal)
 
 	return u
 }

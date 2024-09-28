@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"os"
 
 	"fmt"
@@ -8,7 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/internal/data/auth"
+	"link-society.com/flowg/internal/storage/auth"
 )
 
 type adminRoleListOpts struct {
@@ -22,25 +23,27 @@ func NewAdminRoleListCommand() *cobra.Command {
 		Use:   "list",
 		Short: "List existing roles",
 		Run: func(cmd *cobra.Command, args []string) {
-			authDb := auth.NewDatabase(
-				auth.DefaultDatabaseOpts().WithDir(opts.authDir),
+			authStorage := auth.NewStorage(
+				auth.OptDirectory(opts.authDir),
 			)
-			err := authDb.Open()
+			authStorage.Start()
+			err := authStorage.WaitStarted()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to open auth database:", err)
 				exitCode = 1
 				return
 			}
 			defer func() {
-				err := authDb.Close()
+				authStorage.Stop()
+				err := authStorage.WaitStopped()
 				if err != nil {
 					fmt.Fprintln(os.Stderr, "ERROR: Failed to close auth database:", err)
 					exitCode = 1
 				}
 			}()
 
-			roleSys := auth.NewRoleSystem(authDb)
-			roles, err := roleSys.ListRoles()
+			ctx := context.Background()
+			roles, err := authStorage.ListRoles(ctx)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to list roles:", err)
 				exitCode = 1
