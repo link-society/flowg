@@ -60,7 +60,11 @@ const config: Config = {
     },
     footer: {
       style: 'light',
-      copyright: `Website content is distributed under the terms of the CC-BY-SA 4.0 license.`,
+      copyright: `
+        Website content is distributed under the terms of the
+        <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC-BY-SA 4.0</a>
+        license.
+      `,
     },
     prism: {
       theme: prismThemes.github,
