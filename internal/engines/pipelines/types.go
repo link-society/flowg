@@ -23,7 +23,7 @@ func Build(ctx context.Context, configStorage *config.Storage, name string) (*Pi
 
 	var (
 		pipelineNodes   = make(map[string]Node)
-		flowNodesByID   = make(map[string]*models.FlowNode)
+		flowNodesByID   = make(map[string]*models.FlowNodeV1)
 		sourceNodeTypes = make(map[string]string)
 		entrypointNodes = make(map[string]Node)
 	)
