@@ -8,7 +8,8 @@ logs using a visual pipeline builder. It handles structured logs without
 requiring predefined schemas and relies on
 [BadgerDB](https://dgraph.io/docs/badger/) as its storage backend.
 
-For more informations, consult the [documentation](./docs/README.md).
+For more informations, consult the
+[documentation](https://link-society.github.com/flowg/docs/getting-started).
 
 You wish to contribute? Please read our [guidelines](./CONTRIBUTING.md) first.
 
