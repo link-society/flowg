@@ -19,8 +19,8 @@ type GetPipelineRequest struct {
 }
 
 type GetPipelineResponse struct {
-	Success bool              `json:"success"`
-	Flow    *models.FlowGraph `json:"flow"`
+	Success bool                `json:"success"`
+	Flow    *models.FlowGraphV1 `json:"flow"`
 }
 
 func GetPipelineUsecase(

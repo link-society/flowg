@@ -157,21 +157,27 @@ func (s *Storage) ListPipelines(ctx context.Context) ([]string, error) {
 	return s.pipelineStore.ListFiles(ctx)
 }
 
-func (s *Storage) ReadPipeline(ctx context.Context, name string) (*models.FlowGraph, error) {
+func (s *Storage) ReadPipeline(ctx context.Context, name string) (*models.FlowGraphV1, error) {
 	content, err := s.pipelineStore.ReadFile(ctx, name)
 	if err != nil {
 		return nil, err
 	}
 
-	var flowGraph *models.FlowGraph
-	if err := json.Unmarshal(content, &flowGraph); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal flow: %w", err)
+	flowGraph, changed, err := models.ConvertFlowGraph(content)
+	if err != nil {
+		return nil, err
+	}
+
+	if changed {
+		if err := s.WritePipeline(ctx, name, flowGraph); err != nil {
+			return nil, fmt.Errorf("failed to write updated flow graph: %w", err)
+		}
 	}
 
 	return flowGraph, nil
 }
 
-func (s *Storage) WritePipeline(ctx context.Context, name string, flow *models.FlowGraph) error {
+func (s *Storage) WritePipeline(ctx context.Context, name string, flow *models.FlowGraphV1) error {
 	content, err := json.Marshal(flow)
 	if err != nil {
 		return fmt.Errorf("failed to marshal flow: %w", err)
