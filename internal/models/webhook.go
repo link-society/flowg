@@ -9,12 +9,13 @@ import (
 	"net/http"
 )
 
-type Webhook struct {
+type WebhookV1 struct {
+	Version int               `json:"version"`
 	Url     string            `json:"url"`
 	Headers map[string]string `json:"headers"`
 }
 
-func (w *Webhook) Call(ctx context.Context, record *LogRecord) error {
+func (w *WebhookV1) Call(ctx context.Context, record *LogRecord) error {
 	payload, err := json.Marshal(record)
 	if err != nil {
 		return fmt.Errorf("failed to marshal log record: %w", err)

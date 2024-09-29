@@ -19,8 +19,8 @@ type GetAlertRequest struct {
 }
 
 type GetAlertResponse struct {
-	Success bool            `json:"success"`
-	Webhook *models.Webhook `json:"webhook"`
+	Success bool              `json:"success"`
+	Webhook *models.WebhookV1 `json:"webhook"`
 }
 
 func GetAlertUsecase(
