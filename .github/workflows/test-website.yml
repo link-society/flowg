@@ -23,7 +23,9 @@ jobs:
           node-version: '20'
 
       - name: install@node
+        working-directory: ./website
         run: npm install
 
       - name: build@node
+        working-directory: ./website
         run: npm run build
