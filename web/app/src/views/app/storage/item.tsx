@@ -72,7 +72,7 @@ export const StreamView = () => {
             variant="contained"
             color="primary"
             size="small"
-            href={`https://github.com/link-society/flowg/tree/${import.meta.env.FLOWG_VERSION}/docs`}
+            href="https://link-society.github.io/flowg/docs/getting-started"
             target="_blank"
             startIcon={<HelpIcon />}
           >
