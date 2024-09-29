@@ -18,7 +18,7 @@
     "@mui/x-date-pickers": "^7.18.0",
     "@toolpad/core": "^0.7.0",
     "@xyflow/react": "^12.3.1",
-    "ag-grid-react": "^32.2.0",
+    "ag-grid-react": "^32.2.1",
     "apexcharts": "^3.53.0",
     "dayjs": "^1.11.13",
     "event-source-plus": "^0.1.4",
