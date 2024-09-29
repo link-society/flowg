@@ -1,0 +1,31 @@
+---
+name: test-website
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+    paths:
+      - 'website/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout@scm
+        uses: actions/checkout@v4
+
+      - name: setup@node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: install@node
+        run: npm install
+
+      - name: build@node
+        run: npm run build

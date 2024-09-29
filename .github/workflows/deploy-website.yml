@@ -1,0 +1,51 @@
+---
+name: deploy-website
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'website/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout@scm
+        uses: actions/checkout@v4
+
+      - name: setup@node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: install@node
+        working-directory: ./website
+        run: npm install
+
+      - name: build@node
+        working-directory: ./website
+        run: npm run build
+
+      - name: upload@artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./website/build
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: deploy@pages
+        id: deployment
+        uses: actions/deploy-pages@v4
