@@ -8,16 +8,3 @@ requiring predefined schemas and relies on
 ## Reference
 
   - [Command Line Interface](./cli.md)
-
-## Guides
-
- - [Filtering Data](./guides/filtering.md)
- - [What Are Streams?](./guides/streams.md)
- - [What Is a Transformer?](./guides/transformers.md)
- - [Alerting](./guides/alerting.md)
- - [How To Build a Pipeline?](./guides/pipelines.md)
-
-## Design
-
- - [How Logs Are Stored?](./design/storage.md)
- - [How Authentication Works?](./design/auth.md)
