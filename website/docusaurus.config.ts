@@ -4,11 +4,11 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
   title: 'FlowG',
-  tagline: 'Low-Code log processing solution',
+  tagline: 'Free and Open-Source Low-Code log processing solution',
   favicon: 'img/favicon.ico',
 
-  url: 'https://flowg.link-society.com',
-  baseUrl: '/',
+  url: 'https://link-society.github.io/',
+  baseUrl: '/flowg/',
 
   organizationName: 'link-society',
   projectName: 'flowg',
