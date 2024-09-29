@@ -6,9 +6,6 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
 import Layout from '@theme/Layout'
 import Heading from '@theme/Heading'
 
-import HomepageFeatures from '@site/src/components/HomepageFeatures'
-import HomepageScreenshots from '@site/src/components/HomepageScreenshots'
-
 import styles from './index.module.css'
 
 function HomepageHeader() {
@@ -42,9 +39,60 @@ export default function Home(): JSX.Element {
       description={siteConfig.tagline}>
       <HomepageHeader />
       <main>
-        <HomepageFeatures />
-        <HomepageScreenshots />
+        <section className="container">
+          <div className={clsx('row', styles.feature)}>
+            <div className="col col--4">
+              <Heading as="h2">&#x2699; Pipelines</Heading>
+              <p>
+                Build and manage log processing pipelines visually, with support
+                for transformations with VRL scripts and conditional routing to
+                dedicated streams.
+              </p>
+
+              <hr />
+
+              <Heading as="h2">&#x1F9E9; Interoperability</Heading>
+              <p>
+                Configuration and log ingestion can entirely be done via the
+                REST API. Pipelines are able to connect with any third-party
+                services via Webhooks.
+              </p>
+            </div>
+            <div className="col col--8">
+              <img
+                className={styles.screenshot}
+                src="/img/screenshots/pipelines.png"
+                alt="Pipeline Editor screenshot"
+              />
+            </div>
+          </div>
+
+          <div className={clsx('row', styles.feature)}>
+            <div className="col col--8">
+              <img
+                className={styles.screenshot}
+                src="/img/screenshots/streams.png"
+                alt="Log View screenshot"
+              />
+            </div>
+            <div className="col col--4">
+              <Heading as="h2">&#x1F5C3; Dynamic Logs</Heading>
+              <p>
+                Manage logs with varying structures without needing predefined
+                schemas.
+              </p>
+
+              <hr />
+
+              <Heading as="h2">&#x1F50D; Observability</Heading>
+              <p>
+                Query and visualize logs in real-time in the integrated Web
+                interface.
+              </p>
+            </div>
+          </div>
+        </section>
       </main>
     </Layout>
-  );
+  )
 }
