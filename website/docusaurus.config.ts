@@ -9,6 +9,7 @@ const config: Config = {
 
   url: 'https://link-society.github.io/',
   baseUrl: '/flowg/',
+  trailingSlash: false,
 
   organizationName: 'link-society',
   projectName: 'flowg',
