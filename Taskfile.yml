@@ -24,3 +24,10 @@ tasks:
     desc: "Generate documentation"
     cmds:
       - sh scripts/gen_cli_doc.sh
+
+  www:
+    desc: "Serve website"
+    dir: ./website
+    cmds:
+      - npm i
+      - npm start
