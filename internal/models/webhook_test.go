@@ -21,7 +21,7 @@ func TestWebhook_Call(t *testing.T) {
 	}))
 	defer testServer.Close()
 
-	webhook := &models.Webhook{
+	webhook := &models.WebhookV1{
 		Url: testServer.URL,
 		Headers: map[string]string{
 			"Foo": "Bar",
@@ -41,7 +41,7 @@ func TestWebhook_Call_Failure(t *testing.T) {
 	}))
 	defer testServer.Close()
 
-	webhook := &models.Webhook{
+	webhook := &models.WebhookV1{
 		Url:     testServer.URL,
 		Headers: map[string]string{},
 	}

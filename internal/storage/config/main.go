@@ -198,7 +198,7 @@ func (s *Storage) ListAlerts(ctx context.Context) ([]string, error) {
 	return s.alertStore.ListFiles(ctx)
 }
 
-func (s *Storage) ReadAlert(ctx context.Context, name string) (*models.Webhook, error) {
+func (s *Storage) ReadAlert(ctx context.Context, name string) (*models.WebhookV1, error) {
 	b64content, err := s.alertStore.ReadFile(ctx, name)
 	if err != nil {
 		return nil, err
@@ -210,15 +210,21 @@ func (s *Storage) ReadAlert(ctx context.Context, name string) (*models.Webhook, 
 		return nil, fmt.Errorf("failed to decode webhook %s: %w", name, err)
 	}
 
-	var webhook *models.Webhook
-	if err := json.Unmarshal(content[:n], &webhook); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal webhook: %w", err)
+	webhook, changed, err := models.ConvertWebhook(content[:n])
+	if err != nil {
+		return nil, err
+	}
+
+	if changed {
+		if err := s.WriteAlert(ctx, name, webhook); err != nil {
+			return nil, fmt.Errorf("failed to write updated webhook: %w", err)
+		}
 	}
 
 	return webhook, nil
 }
 
-func (s *Storage) WriteAlert(ctx context.Context, name string, webhook *models.Webhook) error {
+func (s *Storage) WriteAlert(ctx context.Context, name string, webhook *models.WebhookV1) error {
 	content, err := json.Marshal(webhook)
 	if err != nil {
 		return fmt.Errorf("failed to marshal webhook: %w", err)

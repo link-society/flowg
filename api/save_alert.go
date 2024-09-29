@@ -15,8 +15,8 @@ import (
 )
 
 type SaveAlertRequest struct {
-	Alert   string         `path:"alert" minLength:"1"`
-	Webhook models.Webhook `json:"webhook"`
+	Alert   string           `path:"alert" minLength:"1"`
+	Webhook models.WebhookV1 `json:"webhook"`
 }
 
 type SaveAlertResponse struct {
