@@ -108,7 +108,7 @@ entry:<stream name>:<to timestamp>:
 
 Because of the internal structure of *BadgerDB*, this operation is fast.
 
-Then, if a [filter](../guides/filtering.md) is given:
+Then, if a [filter](/docs/guides/filtering) is given:
 
 For `foo = "bar"` filters, we fetch all keys within the time-window with the
 following prefix:

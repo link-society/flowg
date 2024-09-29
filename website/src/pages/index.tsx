@@ -6,6 +6,9 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
 import Layout from '@theme/Layout'
 import Heading from '@theme/Heading'
 
+import PipelineScreenshotUrl from '@site/static/img/screenshots/pipelines.png'
+import StreamsScreenshotUrl from '@site/static/img/screenshots/streams.png'
+
 import styles from './index.module.css'
 
 function HomepageHeader() {
@@ -61,7 +64,7 @@ export default function Home(): JSX.Element {
             <div className="col col--8">
               <img
                 className={styles.screenshot}
-                src="/img/screenshots/pipelines.png"
+                src={PipelineScreenshotUrl}
                 alt="Pipeline Editor screenshot"
               />
             </div>
@@ -71,7 +74,7 @@ export default function Home(): JSX.Element {
             <div className="col col--8">
               <img
                 className={styles.screenshot}
-                src="/img/screenshots/streams.png"
+                src={StreamsScreenshotUrl}
                 alt="Log View screenshot"
               />
             </div>
