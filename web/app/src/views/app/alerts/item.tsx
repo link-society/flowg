@@ -71,7 +71,7 @@ export const AlertView = () => {
             variant="contained"
             color="primary"
             size="small"
-            href="https://link-society.github.io/flowg/docs/getting-started"
+            href="https://link-society.github.io/flowg/docs/"
             target="_blank"
             startIcon={<HelpIcon />}
           >
