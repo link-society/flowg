@@ -26,21 +26,3 @@ From those nodes, you are able to add the following type of nodes:
 
 Using those nodes, a pipeline is able to parse, split, refine, enrich and route
 log records to the database.
-
-## About Syslog
-
-*FlowG* provides an UDP endpoint capable of receiving Syslog events. Here is an
-example of `syslog-ng` destination to forward logs to *FlowG*:
-
-```
-destination d_flowg {
-  udp("127.0.0.1" port(5514) template("mypipeline: $MSG\n"))
-}
-```
-
-The event will be sent to all pipelines, it is up to the user to filter out the
-events from the `SYSLOG` source node. In the example above, the event's message
-is prefixed with `mypipeline: `. Such prefixes can be used to refine the log
-entry in a transformer, and filter out the messages:
-
-![pipeline screenshot](/img/screenshots/pipelines.png)
