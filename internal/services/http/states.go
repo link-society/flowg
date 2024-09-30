@@ -6,6 +6,7 @@ import (
 	"context"
 	"time"
 
+	"crypto/tls"
 	"net"
 	gohttp "net/http"
 
@@ -25,6 +26,7 @@ type workerState interface {
 
 type workerStarting struct {
 	bindAddress string
+	tlsConfig   *tls.Config
 }
 
 type workerRunning struct {
@@ -66,8 +68,9 @@ func (s *workerStarting) DoWork(ctx actor.Context, worker *worker) workerState {
 	)
 
 	server := &gohttp.Server{
-		Addr:    s.bindAddress,
-		Handler: logging.NewMiddleware(rootHandler),
+		Addr:      s.bindAddress,
+		Handler:   logging.NewMiddleware(rootHandler),
+		TLSConfig: s.tlsConfig,
 	}
 
 	worker.logger.InfoContext(
@@ -93,7 +96,11 @@ func (s *workerStarting) DoWork(ctx actor.Context, worker *worker) workerState {
 		return nil
 	}
 
-	go server.Serve(l)
+	if s.tlsConfig != nil {
+		go server.ServeTLS(l, "", "")
+	} else {
+		go server.Serve(l)
+	}
 
 	worker.startCond.Broadcast(nil)
 	return &workerRunning{server: server}

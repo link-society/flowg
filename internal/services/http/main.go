@@ -3,6 +3,8 @@ package http
 import (
 	"log/slog"
 
+	"crypto/tls"
+
 	"github.com/vladopajic/go-actor/actor"
 
 	"link-society.com/flowg/internal/engines/lognotify"
@@ -21,6 +23,7 @@ type Server struct {
 
 func NewServer(
 	bindAddress string,
+	tlsConfig *tls.Config,
 	authStorage *auth.Storage,
 	configStorage *config.Storage,
 	logStorage *log.Storage,
@@ -37,7 +40,11 @@ func NewServer(
 		logNotifier:    logNotifier,
 		pipelineRunner: pipelineRunner,
 
-		state:     &workerStarting{bindAddress: bindAddress},
+		state: &workerStarting{
+			bindAddress: bindAddress,
+			tlsConfig:   tlsConfig,
+		},
+
 		startCond: sync.NewCondValue[error](),
 		stopCond:  sync.NewCondValue[error](),
 	}

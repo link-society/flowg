@@ -1,9 +1,13 @@
 package main
 
 import (
+	"fmt"
+
 	"os"
 	"os/signal"
 	"syscall"
+
+	"crypto/tls"
 
 	"github.com/spf13/cobra"
 
@@ -14,7 +18,11 @@ import (
 
 type serveCommandOpts struct {
 	httpBindAddress string
-	syslogBindAddr  string
+	httpTlsEnabled  bool
+	httpTlsCert     string
+	httpTlsCertKey  string
+
+	syslogBindAddr string
 
 	authDir   string
 	logDir    string
@@ -33,8 +41,25 @@ func NewServeCommand() *cobra.Command {
 			metrics.Setup()
 		},
 		Run: func(cmd *cobra.Command, args []string) {
+			var httpTlsConfig *tls.Config
+
+			if opts.httpTlsEnabled {
+				cert, err := tls.LoadX509KeyPair(opts.httpTlsCert, opts.httpTlsCertKey)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Failed to load TLS certificate: %v", err)
+					exitCode = 1
+					return
+				}
+
+				httpTlsConfig = &tls.Config{
+					Certificates: []tls.Certificate{cert},
+				}
+			}
+
 			srv := server.NewServer(server.Options{
-				HttpBindAddress:   opts.httpBindAddress,
+				HttpBindAddress: opts.httpBindAddress,
+				HttpTlsConfig:   httpTlsConfig,
+
 				SyslogBindAddress: opts.syslogBindAddr,
 
 				ConfigStorageDir: opts.configDir,
@@ -68,6 +93,27 @@ func NewServeCommand() *cobra.Command {
 		"http-bind",
 		defaultHttpBindAddress,
 		"Address to bind the HTTP server to",
+	)
+
+	cmd.Flags().BoolVar(
+		&opts.httpTlsEnabled,
+		"http-tls",
+		false,
+		"Enable TLS for the HTTP server",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.httpTlsCert,
+		"http-tls-cert",
+		"",
+		"Path to the certificate file for the HTTPS server",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.httpTlsCertKey,
+		"http-tls-key",
+		"",
+		"Path to the certificate key file for the HTTPS server",
 	)
 
 	cmd.Flags().StringVar(

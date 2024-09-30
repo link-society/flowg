@@ -3,11 +3,15 @@ package server
 import (
 	"log/slog"
 
+	"crypto/tls"
+
 	"github.com/vladopajic/go-actor/actor"
 )
 
 type Options struct {
-	HttpBindAddress   string
+	HttpBindAddress string
+	HttpTlsConfig   *tls.Config
+
 	SyslogBindAddress string
 
 	AuthStorageDir   string
@@ -31,7 +35,10 @@ func NewServer(opts Options) *Server {
 	)
 	serviceLayer := newServiceLayer(
 		opts.HttpBindAddress,
+		opts.HttpTlsConfig,
+
 		opts.SyslogBindAddress,
+
 		storageLayer,
 		engineLayer,
 	)
