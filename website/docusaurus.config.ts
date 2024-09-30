@@ -54,6 +54,18 @@ const config: Config = {
         },
         {
           href: 'https://github.com/link-society/flowg',
+          html: `
+            <div style="display: flex; align-items: center;">
+              <img
+                alt="GitHub Release"
+                src="https://img.shields.io/github/v/release/link-society/flowg?style=social"
+              />
+            </div>
+          `,
+          position: 'right',
+        },
+        {
+          href: 'https://github.com/link-society/flowg',
           label: 'GitHub',
           position: 'right',
         },
