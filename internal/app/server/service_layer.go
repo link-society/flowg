@@ -3,7 +3,10 @@ package server
 import (
 	"errors"
 
+	"crypto/tls"
+
 	"github.com/vladopajic/go-actor/actor"
+
 	"link-society.com/flowg/internal/services/http"
 	"link-society.com/flowg/internal/services/syslog"
 )
@@ -17,6 +20,8 @@ type serviceLayer struct {
 
 func newServiceLayer(
 	httpBindAddress string,
+	httpTlsConfig *tls.Config,
+
 	syslogBindAddress string,
 
 	storageLayer *storageLayer,
@@ -24,6 +29,7 @@ func newServiceLayer(
 ) *serviceLayer {
 	httpServer := http.NewServer(
 		httpBindAddress,
+		httpTlsConfig,
 		storageLayer.authStorage,
 		storageLayer.configStorage,
 		storageLayer.logStorage,
