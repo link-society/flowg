@@ -1,6 +1,6 @@
-import {themes as prismThemes} from 'prism-react-renderer';
-import type {Config} from '@docusaurus/types';
-import type * as Preset from '@docusaurus/preset-classic';
+import prismMonokaiTheme from './prism.theme.monokai'
+import type {Config} from '@docusaurus/types'
+import type * as Preset from '@docusaurus/preset-classic'
 
 const config: Config = {
   title: 'FlowG',
@@ -80,10 +80,11 @@ const config: Config = {
       `,
     },
     prism: {
-      theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      theme: prismMonokaiTheme as any,
+      darkTheme: prismMonokaiTheme as any,
+      additionalLanguages: ['bash', 'ini', 'apacheconf', 'nginx'],
     },
   } satisfies Preset.ThemeConfig,
-};
+}
 
-export default config;
+export default config
