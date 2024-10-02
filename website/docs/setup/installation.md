@@ -25,15 +25,16 @@ Then run the build system:
 ```bash
 go install github.com/go-task/task/v3/cmd/task@latest
 task build
+sudo install -m 755 ./bin/flowg /usr/local/bin/flowg
 ```
 
 Then, start the server with:
 
 ```bash
-./bin/flowg serve \
-  --auth-dir ./data/auth \
-  --log-dir ./data/logs \
-  --config-dir ./data/config \
+flowg serve \
+  --auth-dir /var/lib/flowg/data/auth \
+  --log-dir /var/lib/flowg/logs \
+  --config-dir /var/lib/flowg/config \
   --http-bind 127.0.0.1:5080 \
   --syslog-bind 127.0.0.1:5514
 ```
