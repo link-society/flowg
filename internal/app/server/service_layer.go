@@ -22,7 +22,9 @@ func newServiceLayer(
 	httpBindAddress string,
 	httpTlsConfig *tls.Config,
 
+	syslogTCP bool,
 	syslogBindAddress string,
+	syslogTlsConfig *tls.Config,
 
 	storageLayer *storageLayer,
 	engineLayer *engineLayer,
@@ -38,7 +40,10 @@ func newServiceLayer(
 	)
 
 	syslogServer := syslog.NewServer(
+		syslogTCP,
 		syslogBindAddress,
+		syslogTlsConfig,
+
 		storageLayer.configStorage,
 		engineLayer.pipelineRunner,
 	)
