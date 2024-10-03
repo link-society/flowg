@@ -2,6 +2,8 @@ package syslog
 
 import (
 	"log/slog"
+
+	"crypto/tls"
 	"sync"
 
 	"github.com/vladopajic/go-actor/actor"
@@ -16,7 +18,9 @@ type workerState interface {
 }
 
 type workerStarting struct {
+	isTCP       bool
 	bindAddress string
+	tlsConfig   *tls.Config
 }
 
 type workerRunning struct {
@@ -37,33 +41,79 @@ func (s *workerStarting) DoWork(ctx actor.Context, worker *worker) workerState {
 	server.SetFormat(gosyslog.Automatic)
 	server.SetHandler(handler)
 
+	proto := "udp"
+	if s.isTCP {
+		proto = "tcp"
+	}
+
 	worker.logger.InfoContext(
 		ctx,
 		"Starting Syslog server",
-		slog.Group("udp",
+		slog.Group("syslog",
+			slog.String("proto", proto),
 			slog.String("bind", s.bindAddress),
+			slog.Bool("tls", s.tlsConfig != nil),
 		),
 	)
 
-	if err := server.ListenUDP(s.bindAddress); err != nil {
-		worker.logger.ErrorContext(
-			ctx,
-			"Failed to listen on UDP",
-			slog.Group("udp",
-				slog.String("bind", s.bindAddress),
-			),
-			slog.String("error", err.Error()),
-		)
-		worker.startCond.Broadcast(err)
-		return nil
+	switch {
+	case s.isTCP && s.tlsConfig != nil:
+		if err := server.ListenTCPTLS(s.bindAddress, s.tlsConfig); err != nil {
+			worker.logger.ErrorContext(
+				ctx,
+				"Failed to listen on TCP+TLS",
+				slog.Group("syslog",
+					slog.String("proto", proto),
+					slog.String("bind", s.bindAddress),
+					slog.Bool("tls", s.tlsConfig != nil),
+				),
+				slog.String("error", err.Error()),
+			)
+			worker.startCond.Broadcast(err)
+			return nil
+		}
+
+	case s.isTCP && s.tlsConfig == nil:
+		if err := server.ListenTCP(s.bindAddress); err != nil {
+			worker.logger.ErrorContext(
+				ctx,
+				"Failed to listen on TCP",
+				slog.Group("syslog",
+					slog.String("proto", proto),
+					slog.String("bind", s.bindAddress),
+					slog.Bool("tls", s.tlsConfig != nil),
+				),
+				slog.String("error", err.Error()),
+			)
+			worker.startCond.Broadcast(err)
+			return nil
+		}
+
+	case !s.isTCP:
+		if err := server.ListenUDP(s.bindAddress); err != nil {
+			worker.logger.ErrorContext(
+				ctx,
+				"Failed to listen on UDP",
+				slog.Group("syslog",
+					slog.String("proto", proto),
+					slog.String("bind", s.bindAddress),
+					slog.Bool("tls", s.tlsConfig != nil),
+				),
+				slog.String("error", err.Error()),
+			)
+			worker.startCond.Broadcast(err)
+			return nil
+		}
 	}
 
 	if err := server.Boot(); err != nil {
 		worker.logger.ErrorContext(
 			ctx,
 			"Failed to boot server",
-			slog.Group("udp",
+			slog.Group("syslog",
+				slog.String("proto", proto),
 				slog.String("bind", s.bindAddress),
+				slog.Bool("tls", s.tlsConfig != nil),
 			),
 			slog.String("error", err.Error()),
 		)

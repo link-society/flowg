@@ -22,7 +22,12 @@ type serveCommandOpts struct {
 	httpTlsCert     string
 	httpTlsCertKey  string
 
-	syslogBindAddr string
+	syslogProtocol       string
+	syslogBindAddr       string
+	syslogTlsEnabled     bool
+	syslogTlsCert        string
+	syslogTlsCertKey     string
+	syslogTlsAuthEnabled bool
 
 	authDir   string
 	logDir    string
@@ -41,12 +46,15 @@ func NewServeCommand() *cobra.Command {
 			metrics.Setup()
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			var httpTlsConfig *tls.Config
+			var (
+				httpTlsConfig   *tls.Config
+				syslogTlsConfig *tls.Config
+			)
 
 			if opts.httpTlsEnabled {
 				cert, err := tls.LoadX509KeyPair(opts.httpTlsCert, opts.httpTlsCertKey)
 				if err != nil {
-					fmt.Fprintf(os.Stderr, "Failed to load TLS certificate: %v", err)
+					fmt.Fprintf(os.Stderr, "Failed to load TLS certificate: %v\n", err)
 					exitCode = 1
 					return
 				}
@@ -56,11 +64,46 @@ func NewServeCommand() *cobra.Command {
 				}
 			}
 
+			if opts.syslogProtocol != "tcp" && opts.syslogProtocol != "udp" {
+				cmd.Usage()
+				fmt.Fprintf(os.Stderr, "\nERROR: Invalid syslog protocol: %s\n", opts.syslogProtocol)
+				exitCode = 1
+				return
+			}
+
+			if opts.syslogTlsEnabled && opts.syslogProtocol == "udp" {
+				cmd.Usage()
+				fmt.Fprintf(os.Stderr, "\nERROR: TLS is not supported for Syslog UDP protocol\n")
+				exitCode = 1
+				return
+			}
+
+			if opts.syslogTlsEnabled {
+				cert, err := tls.LoadX509KeyPair(opts.syslogTlsCert, opts.syslogTlsCertKey)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Failed to load Syslog TLS certificate: %v\n", err)
+					exitCode = 1
+					return
+				}
+
+				clientAuth := tls.VerifyClientCertIfGiven
+				if opts.syslogTlsAuthEnabled {
+					clientAuth = tls.RequireAndVerifyClientCert
+				}
+
+				syslogTlsConfig = &tls.Config{
+					Certificates: []tls.Certificate{cert},
+					ClientAuth:   clientAuth,
+				}
+			}
+
 			srv := server.NewServer(server.Options{
 				HttpBindAddress: opts.httpBindAddress,
 				HttpTlsConfig:   httpTlsConfig,
 
+				SyslogTCP:         opts.syslogProtocol == "tcp",
 				SyslogBindAddress: opts.syslogBindAddr,
+				SyslogTlsConfig:   syslogTlsConfig,
 
 				ConfigStorageDir: opts.configDir,
 				AuthStorageDir:   opts.authDir,
@@ -117,10 +160,45 @@ func NewServeCommand() *cobra.Command {
 	)
 
 	cmd.Flags().StringVar(
+		&opts.syslogProtocol,
+		"syslog-proto",
+		defaultSyslogProtocol,
+		"Protocol to use for the Syslog server (one of \"tcp\" or \"udp\")",
+	)
+
+	cmd.Flags().StringVar(
 		&opts.syslogBindAddr,
 		"syslog-bind",
 		defaultSyslogBindAddr,
 		"Address to bind the Syslog server to",
+	)
+
+	cmd.Flags().BoolVar(
+		&opts.syslogTlsEnabled,
+		"syslog-tls",
+		false,
+		"Enable TLS for the Syslog server (requires protocol to be \"tcp\")",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.syslogTlsCert,
+		"syslog-tls-cert",
+		"",
+		"Path to the certificate file for the Syslog server",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.syslogTlsCertKey,
+		"syslog-tls-key",
+		"",
+		"Path to the certificate key file for the Syslog server",
+	)
+
+	cmd.Flags().BoolVar(
+		&opts.syslogTlsAuthEnabled,
+		"syslog-tls-auth",
+		false,
+		"Require clients to authenticate against the Syslog server with a client certificate",
 	)
 
 	cmd.Flags().StringVar(

@@ -3,6 +3,8 @@ package syslog
 import (
 	"log/slog"
 
+	"crypto/tls"
+
 	"github.com/vladopajic/go-actor/actor"
 
 	"link-society.com/flowg/internal/utils/sync"
@@ -17,7 +19,10 @@ type Server struct {
 }
 
 func NewServer(
+	isTCP bool,
 	bindAddress string,
+	tlsConfig *tls.Config,
+
 	configStorage *config.Storage,
 	pipelineRunner *pipelines.Runner,
 ) *Server {
@@ -27,7 +32,11 @@ func NewServer(
 		configStorage:  configStorage,
 		pipelineRunner: pipelineRunner,
 
-		state: &workerStarting{bindAddress: bindAddress},
+		state: &workerStarting{
+			isTCP:       isTCP,
+			bindAddress: bindAddress,
+			tlsConfig:   tlsConfig,
+		},
 
 		startCond: sync.NewCondValue[error](),
 		stopCond:  sync.NewCondValue[error](),
