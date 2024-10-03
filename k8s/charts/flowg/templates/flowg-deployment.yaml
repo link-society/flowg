@@ -33,6 +33,11 @@ spec:
           image: "{{ .Values.flowg.image.repository }}:{{ .Values.flowg.image.tag | default .Chart.AppVersion }}"
           args:
             - serve
+          {{- if .Values.flowg.https.enabled }}
+            - --http-tls
+            - --http-tls-cert=/data/ssl/tls.crt
+            - --http-tls-key=/data/ssl/tls.key
+          {{- end }}
           ports:
             - containerPort: 5080
               hostPort: 5080
@@ -53,7 +58,30 @@ spec:
           volumeMounts:
             - name: flowg-data
               mountPath: /data
+          {{- if and .Values.flowg.https.enabled (or .Values.flowg.https.certificateFrom.certmanager .Values.flowg.https.certificateFrom.secretRef) }}
+            - name: flowg-tls
+              mountPath: /data/ssl
+          {{- end }}
       volumes:
         - name: flowg-data
           persistentVolumeClaim:
             claimName: {{ include "flowg.fullname" . }}-data-pvc
+      {{- if and .Values.flowg.https.enabled .Values.flowg.https.certificateFrom.certmanager }}
+        - name: flowg-tls
+          secret:
+            secretName: {{ include "flowg.fullname" . }}-tls
+            items:
+              - key: tls.crt
+                path: tls.crt
+              - key: tls.key
+                path: tls.key
+      {{- else if and .Values.flowg.https.enabled .Values.flowg.https.certificateFrom.secretRef }}
+        - name: flowg-tls
+          secret:
+            secretName: {{ .Values.flowg.https.certificateFrom.secretRef.name }}
+            items:
+              - key: tls.crt
+                path: tls.crt
+              - key: tls.key
+                path: tls.key
+      {{- end }}
