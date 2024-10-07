@@ -117,3 +117,4 @@ ENV FLOWG_CONFIG_DIR="/data/config"
 ENV FLOWG_LOG_DIR="/data/logs"
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["serve"]
