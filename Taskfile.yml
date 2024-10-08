@@ -31,3 +31,10 @@ tasks:
     cmds:
       - npm i
       - npm start
+
+  release:
+    desc: "Update version number"
+    cmds:
+      - echo {{.CLI_ARGS}} > VERSION.txt
+      - yq eval '.version = "{{.CLI_ARGS}}"' -i k8s/charts/flowg/Chart.yaml
+      - yq eval '.appVersion = "{{.CLI_ARGS}}"' -i k8s/charts/flowg/Chart.yaml
