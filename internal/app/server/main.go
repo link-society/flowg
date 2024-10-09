@@ -12,9 +12,10 @@ type Options struct {
 	HttpBindAddress string
 	HttpTlsConfig   *tls.Config
 
-	SyslogTCP         bool
-	SyslogBindAddress string
-	SyslogTlsConfig   *tls.Config
+	SyslogTCP          bool
+	SyslogBindAddress  string
+	SyslogTlsConfig    *tls.Config
+	SyslogAllowOrigins []string
 
 	AuthStorageDir   string
 	ConfigStorageDir string
@@ -42,6 +43,7 @@ func NewServer(opts Options) *Server {
 		opts.SyslogTCP,
 		opts.SyslogBindAddress,
 		opts.SyslogTlsConfig,
+		opts.SyslogAllowOrigins,
 
 		storageLayer,
 		engineLayer,

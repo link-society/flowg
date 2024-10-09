@@ -2,6 +2,7 @@ package syslog
 
 import (
 	"log/slog"
+	"net"
 
 	"crypto/tls"
 	"sync"
@@ -18,15 +19,17 @@ type workerState interface {
 }
 
 type workerStarting struct {
-	isTCP       bool
-	bindAddress string
-	tlsConfig   *tls.Config
+	isTCP        bool
+	bindAddress  string
+	tlsConfig    *tls.Config
+	allowOrigins []string
 }
 
 type workerRunning struct {
-	channel gosyslog.LogPartsChannel
-	handler *gosyslog.ChannelHandler
-	server  *gosyslog.Server
+	channel      gosyslog.LogPartsChannel
+	handler      *gosyslog.ChannelHandler
+	server       *gosyslog.Server
+	allowOrigins []string
 }
 
 type workerStopping struct {
@@ -138,6 +141,39 @@ func (s *workerRunning) DoWork(ctx actor.Context, worker *worker) workerState {
 	case logParts, ok := <-s.channel:
 		if !ok {
 			return &workerStopping{server: s.server}
+		}
+
+		if s.allowOrigins != nil {
+			// no logging here to avoid potential performance issues
+
+			client := logParts["client"].(string)
+			clientIp, _, err := net.SplitHostPort(client)
+			if err != nil {
+				return s
+			}
+
+			allowed := false
+
+			for _, origin := range s.allowOrigins {
+				if origin == clientIp {
+					allowed = true
+					break
+				}
+
+				_, ipNet, err := net.ParseCIDR(origin)
+				if err != nil {
+					continue
+				}
+
+				if ipNet.Contains(net.ParseIP(clientIp)) {
+					allowed = true
+					break
+				}
+			}
+
+			if !allowed {
+				return s
+			}
 		}
 
 		pipelineNames, err := worker.configStorage.ListPipelines(ctx)

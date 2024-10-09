@@ -22,6 +22,7 @@ func NewServer(
 	isTCP bool,
 	bindAddress string,
 	tlsConfig *tls.Config,
+	allowOrigins []string,
 
 	configStorage *config.Storage,
 	pipelineRunner *pipelines.Runner,
@@ -33,9 +34,10 @@ func NewServer(
 		pipelineRunner: pipelineRunner,
 
 		state: &workerStarting{
-			isTCP:       isTCP,
-			bindAddress: bindAddress,
-			tlsConfig:   tlsConfig,
+			isTCP:        isTCP,
+			bindAddress:  bindAddress,
+			tlsConfig:    tlsConfig,
+			allowOrigins: allowOrigins,
 		},
 
 		startCond: sync.NewCondValue[error](),
