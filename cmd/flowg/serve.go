@@ -2,12 +2,14 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"os"
 	"os/signal"
 	"syscall"
 
 	"crypto/tls"
+	"net"
 
 	"github.com/spf13/cobra"
 
@@ -28,6 +30,7 @@ type serveCommandOpts struct {
 	syslogTlsCert        string
 	syslogTlsCertKey     string
 	syslogTlsAuthEnabled bool
+	syslogAllowOrigins   []string
 
 	authDir   string
 	logDir    string
@@ -97,13 +100,35 @@ func NewServeCommand() *cobra.Command {
 				}
 			}
 
+			if opts.syslogAllowOrigins != nil {
+				for _, origin := range opts.syslogAllowOrigins {
+					if strings.Contains(origin, "/") {
+						_, _, err := net.ParseCIDR(origin)
+						if err != nil {
+							cmd.Usage()
+							fmt.Fprintf(os.Stderr, "\nERROR: Invalid syslog allow origin: %s\n", origin)
+							exitCode = 1
+							return
+						}
+					} else {
+						if net.ParseIP(origin) == nil {
+							cmd.Usage()
+							fmt.Fprintf(os.Stderr, "\nERROR: Invalid syslog allow origin: %s\n", origin)
+							exitCode = 1
+							return
+						}
+					}
+				}
+			}
+
 			srv := server.NewServer(server.Options{
 				HttpBindAddress: opts.httpBindAddress,
 				HttpTlsConfig:   httpTlsConfig,
 
-				SyslogTCP:         opts.syslogProtocol == "tcp",
-				SyslogBindAddress: opts.syslogBindAddr,
-				SyslogTlsConfig:   syslogTlsConfig,
+				SyslogTCP:          opts.syslogProtocol == "tcp",
+				SyslogBindAddress:  opts.syslogBindAddr,
+				SyslogTlsConfig:    syslogTlsConfig,
+				SyslogAllowOrigins: opts.syslogAllowOrigins,
 
 				ConfigStorageDir: opts.configDir,
 				AuthStorageDir:   opts.authDir,
@@ -199,6 +224,13 @@ func NewServeCommand() *cobra.Command {
 		"syslog-tls-auth",
 		false,
 		"Require clients to authenticate against the Syslog server with a client certificate",
+	)
+
+	cmd.Flags().StringArrayVar(
+		&opts.syslogAllowOrigins,
+		"syslog-allow-origin",
+		nil,
+		"Allowed origin (IP address or CIDR range) for Syslog server (default: all)",
 	)
 
 	cmd.Flags().StringVar(

@@ -25,6 +25,7 @@ func newServiceLayer(
 	syslogTCP bool,
 	syslogBindAddress string,
 	syslogTlsConfig *tls.Config,
+	syslogAllowOrigins []string,
 
 	storageLayer *storageLayer,
 	engineLayer *engineLayer,
@@ -43,6 +44,7 @@ func newServiceLayer(
 		syslogTCP,
 		syslogBindAddress,
 		syslogTlsConfig,
+		syslogAllowOrigins,
 
 		storageLayer.configStorage,
 		engineLayer.pipelineRunner,
