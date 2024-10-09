@@ -81,6 +81,42 @@ Once deployed, you can forward the port of the WebUI and API to your localhost:
 kubectl port-forward svc/flowg 5080:5080 --namespace flowg-system
 ```
 
+## Security considerations
+
+By default, the Syslog endpoint is open to everyone. If that behavior is
+undesirable, you can:
+
+### Configure Client certificate authentication
+
+By using the Syslog protocol `tcp+tls` instead of `udp` (the default), you can
+require Client certificate authentication:
+
+```bash
+flowg serve \
+  --syslog-proto="tcp" \
+  --syslog-tls \
+  --syslog-tls-cert="/path/to/cert.pem" \
+  --syslog-tls-key="/path/to/cert.key" \
+  --syslog-tls-auth
+```
+
+### Configure allowed origins
+
+Otherwise, you can restrict which IP address (or range) will be allowed:
+
+```bash
+flowg serve \
+  --syslog-allow-origin="127.0.0.1" \
+  --syslog-allow-origin="192.168.1.0/24"
+```
+
+Or via an environment variable:
+
+```bash
+export FLOWG_SYSLOG_ALLOW_ORIGINS="127.0.0.1,192.168.1.0/24"
+flowg serve
+```
+
 ## Next Steps
 
 Once deployed, **FlowG** creates a default pipeline and a default account with
