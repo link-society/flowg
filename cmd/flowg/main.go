@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"os"
 	"syscall"
@@ -16,8 +17,16 @@ var exitCode int = 0
 var (
 	defaultHttpBindAddress = getEnv("FLOWG_HTTP_BIND_ADDRESS", ":5080")
 
-	defaultSyslogProtocol = getEnv("FLOWG_SYSLOG_PROTOCOL", "udp")
-	defaultSyslogBindAddr = getEnv("FLOWG_SYSLOG_BIND_ADDRESS", ":5514")
+	defaultSyslogProtocol     = getEnv("FLOWG_SYSLOG_PROTOCOL", "udp")
+	defaultSyslogBindAddr     = getEnv("FLOWG_SYSLOG_BIND_ADDRESS", ":5514")
+	defaultSyslogAllowOrigins = (func() []string {
+		origins := getEnv("FLOWG_SYSLOG_ALLOW_ORIGINS", "")
+		if origins == "" {
+			return nil
+		} else {
+			return strings.Split(origins, ",")
+		}
+	})()
 
 	defaultAuthDir   = getEnv("FLOWG_AUTH_DIR", "./data/auth")
 	defaultConfigDir = getEnv("FLOWG_CONFIG_DIR", "./data/config")
