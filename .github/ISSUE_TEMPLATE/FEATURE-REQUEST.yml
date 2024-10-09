@@ -15,8 +15,10 @@ body:
       description: What part of the project is this feature related to?
       options:
         - docker
+        - kubernetes
         - webui
         - api
+        - syslog
         - pipelines
         - transformers
         - streams
