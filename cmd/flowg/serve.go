@@ -229,7 +229,7 @@ func NewServeCommand() *cobra.Command {
 	cmd.Flags().StringArrayVar(
 		&opts.syslogAllowOrigins,
 		"syslog-allow-origin",
-		nil,
+		defaultSyslogAllowOrigins,
 		"Allowed origin (IP address or CIDR range) for Syslog server (default: all)",
 	)
 
