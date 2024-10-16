@@ -9,7 +9,7 @@ requiring predefined schemas and relies on
 [BadgerDB](https://dgraph.io/docs/badger/) as its storage backend.
 
 For more informations, consult the
-[documentation](https://link-society.github.com/flowg/docs/getting-started).
+[documentation](https://link-society.github.io/flowg/docs/).
 
 You wish to contribute? Please read our [guidelines](./CONTRIBUTING.md) first.
 
