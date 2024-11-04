@@ -70,7 +70,7 @@ jobs:
         run: sh ./run.sh
 
       - name: report@test
-        uses: mikepenz/action-junit-report@v5.0.0-a03
+        uses: mikepenz/action-junit-report@v5
         if: ${{ github.event_name == 'pull_request' && (success() || failure()) }}
         with:
           report_paths: "./tests/e2e/reports/junit.xml"
