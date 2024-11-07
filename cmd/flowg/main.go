@@ -15,6 +15,7 @@ import (
 var exitCode int = 0
 
 var (
+	defaultVerbose = getEnv("FLOWG_VERBOSE", false)
 	defaultHttpBindAddress = getEnv("FLOWG_HTTP_BIND_ADDRESS", ":5080")
 
 	defaultSyslogProtocol     = getEnv("FLOWG_SYSLOG_PROTOCOL", "udp")
@@ -27,6 +28,17 @@ var (
 			return strings.Split(origins, ",")
 		}
 	})()
+
+	
+
+	defaultHttpTlsEnabled = getEnv("FLOWG_HTTP_TLS_ENABLED", false)
+	defaultHttpTlsCert = getEnv("FLOWG_HTTP_TLS_CERT", "")
+	defaultHttpTlsCertKey = getEnv("FLOWG_HTTP_TLS_KEY", "")
+
+	defaultSyslogTlsEnabled     = getEnv("FLOWG_SYSLOG_TLS_ENABLED", false)
+	defaultSyslogTlsCert		= getEnv("FLOWG_SYSLOG_TLS_CERT", "")
+	defaultSyslogTlsCertKey		= getEnv("FLOWG_SYSLOG_TLS_KEY", "")
+	defaultSyslogTlsAuthEnabled	= getEnv("FLOWG_SYSLOG_TLS_AUTH", false)
 
 	defaultAuthDir   = getEnv("FLOWG_AUTH_DIR", "./data/auth")
 	defaultConfigDir = getEnv("FLOWG_CONFIG_DIR", "./data/config")

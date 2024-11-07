@@ -166,21 +166,21 @@ func NewServeCommand() *cobra.Command {
 	cmd.Flags().BoolVar(
 		&opts.httpTlsEnabled,
 		"http-tls",
-		false,
+		defaultHttpTlsEnabled,
 		"Enable TLS for the HTTP server",
 	)
 
 	cmd.Flags().StringVar(
 		&opts.httpTlsCert,
 		"http-tls-cert",
-		"",
+		defaultHttpTlsCert,
 		"Path to the certificate file for the HTTPS server",
 	)
 
 	cmd.Flags().StringVar(
 		&opts.httpTlsCertKey,
 		"http-tls-key",
-		"",
+		defaultHttpTlsCertKey,
 		"Path to the certificate key file for the HTTPS server",
 	)
 
@@ -201,28 +201,28 @@ func NewServeCommand() *cobra.Command {
 	cmd.Flags().BoolVar(
 		&opts.syslogTlsEnabled,
 		"syslog-tls",
-		false,
+		defaultSyslogTlsEnabled,
 		"Enable TLS for the Syslog server (requires protocol to be \"tcp\")",
 	)
 
 	cmd.Flags().StringVar(
 		&opts.syslogTlsCert,
 		"syslog-tls-cert",
-		"",
+		defaultSyslogTlsCert,
 		"Path to the certificate file for the Syslog server",
 	)
 
 	cmd.Flags().StringVar(
 		&opts.syslogTlsCertKey,
 		"syslog-tls-key",
-		"",
+		defaultSyslogTlsCertKey,
 		"Path to the certificate key file for the Syslog server",
 	)
 
 	cmd.Flags().BoolVar(
 		&opts.syslogTlsAuthEnabled,
 		"syslog-tls-auth",
-		false,
+		defaultSyslogTlsAuthEnabled,
 		"Require clients to authenticate against the Syslog server with a client certificate",
 	)
 
@@ -259,7 +259,7 @@ func NewServeCommand() *cobra.Command {
 	cmd.Flags().BoolVar(
 		&opts.verbose,
 		"verbose",
-		false,
+		defaultVerbose,
 		"Enable verbose logging",
 	)
 
