@@ -6,6 +6,7 @@ import (
 
 	"os"
 	"syscall"
+	"strconv"
 
 	"github.com/spf13/cobra"
 
@@ -15,13 +16,13 @@ import (
 var exitCode int = 0
 
 var (
-	defaultVerbose = getEnv("FLOWG_VERBOSE", false)
-	defaultHttpBindAddress = getEnv("FLOWG_HTTP_BIND_ADDRESS", ":5080")
+	defaultVerbose = getEnvBool("FLOWG_VERBOSE", false)
+	defaultHttpBindAddress = getEnvString("FLOWG_HTTP_BIND_ADDRESS", ":5080")
 
-	defaultSyslogProtocol     = getEnv("FLOWG_SYSLOG_PROTOCOL", "udp")
-	defaultSyslogBindAddr     = getEnv("FLOWG_SYSLOG_BIND_ADDRESS", ":5514")
+	defaultSyslogProtocol     = getEnvString("FLOWG_SYSLOG_PROTOCOL", "udp")
+	defaultSyslogBindAddr     = getEnvString("FLOWG_SYSLOG_BIND_ADDRESS", ":5514")
 	defaultSyslogAllowOrigins = (func() []string {
-		origins := getEnv("FLOWG_SYSLOG_ALLOW_ORIGINS", "")
+		origins := getEnvString("FLOWG_SYSLOG_ALLOW_ORIGINS", "")
 		if origins == "" {
 			return nil
 		} else {
@@ -29,20 +30,18 @@ var (
 		}
 	})()
 
-	
+	defaultHttpTlsEnabled = getEnvBool("FLOWG_HTTP_TLS_ENABLED", false)
+	defaultHttpTlsCert = getEnvString("FLOWG_HTTP_TLS_CERT", "")
+	defaultHttpTlsCertKey = getEnvString("FLOWG_HTTP_TLS_KEY", "")
 
-	defaultHttpTlsEnabled = getEnv("FLOWG_HTTP_TLS_ENABLED", false)
-	defaultHttpTlsCert = getEnv("FLOWG_HTTP_TLS_CERT", "")
-	defaultHttpTlsCertKey = getEnv("FLOWG_HTTP_TLS_KEY", "")
+	defaultSyslogTlsEnabled     = getEnvBool("FLOWG_SYSLOG_TLS_ENABLED", false)
+	defaultSyslogTlsCert		= getEnvString("FLOWG_SYSLOG_TLS_CERT", "")
+	defaultSyslogTlsCertKey		= getEnvString("FLOWG_SYSLOG_TLS_KEY", "")
+	defaultSyslogTlsAuthEnabled	= getEnvBool("FLOWG_SYSLOG_TLS_AUTH", false)
 
-	defaultSyslogTlsEnabled     = getEnv("FLOWG_SYSLOG_TLS_ENABLED", false)
-	defaultSyslogTlsCert		= getEnv("FLOWG_SYSLOG_TLS_CERT", "")
-	defaultSyslogTlsCertKey		= getEnv("FLOWG_SYSLOG_TLS_KEY", "")
-	defaultSyslogTlsAuthEnabled	= getEnv("FLOWG_SYSLOG_TLS_AUTH", false)
-
-	defaultAuthDir   = getEnv("FLOWG_AUTH_DIR", "./data/auth")
-	defaultConfigDir = getEnv("FLOWG_CONFIG_DIR", "./data/config")
-	defaultLogDir    = getEnv("FLOWG_LOG_DIR", "./data/logs")
+	defaultAuthDir   = getEnvString("FLOWG_AUTH_DIR", "./data/auth")
+	defaultConfigDir = getEnvString("FLOWG_CONFIG_DIR", "./data/config")
+	defaultLogDir    = getEnvString("FLOWG_LOG_DIR", "./data/logs")
 )
 
 func main() {
@@ -69,10 +68,22 @@ func main() {
 	os.Exit(exitCode)
 }
 
-func getEnv(key, defaultValue string) string {
+func getEnvString(key string, defaultValue string) string {
 	value := os.Getenv(key)
 	if value == "" {
 		return defaultValue
 	}
 	return value
+}
+
+func getEnvBool(key string, defaultValue bool) bool {
+	stringVal := os.Getenv(key)
+	if stringVal == "" {
+		return defaultValue
+	}
+	value, err := strconv.ParseBool(stringVal)
+	if err == nil { 
+		return value
+	}
+	return false
 }

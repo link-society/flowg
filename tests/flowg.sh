@@ -3,6 +3,8 @@
 FLOWG_CMD_FG="docker run    --rm -v ./data:/data -p 5080:5080/tcp -p 5514:5514/udp linksociety/flowg:latest"
 FLOWG_CMD_BG="docker run -d --rm -v ./data:/data -p 5080:5080/tcp -p 5514:5514/udp linksociety/flowg:latest"
 
+FLOWG_CMD_FAILED="docker run -d --rm -e FLOWG_SYSLOG_TLS_ENABLED=true -v ./data:/data -p 5080:5080/tcp -p 5514:5514/udp linksociety/flowg:latest"
+
 flowg_cleanup_data() {
   echo -n "Cleaning up data..."
   sudo rm -rf ./data/
@@ -33,6 +35,11 @@ flowg_acl_guest() {
 }
 
 flowg_start() {
+  echo -n "Test Flowg env"
+
+  DOCKER_CONTAINER_ID=$(${FLOWG_CMD_FAILED} serve)
+  sleep 3
+
   echo -n "Starting FlowG..."
 
   DOCKER_CONTAINER_ID=$(${FLOWG_CMD_BG} serve)
