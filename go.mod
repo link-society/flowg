@@ -10,7 +10,7 @@ require (
 	github.com/prometheus/client_golang v1.20.5
 	github.com/spf13/cobra v1.8.1
 	github.com/swaggest/openapi-go v0.2.54
-	github.com/swaggest/rest v0.2.68
+	github.com/swaggest/rest v0.2.69
 	github.com/swaggest/swgui v1.8.2
 	github.com/swaggest/usecase v1.3.1
 	github.com/vladopajic/go-actor v0.9.0
