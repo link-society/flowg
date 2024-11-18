@@ -23,7 +23,7 @@
     "dayjs": "^1.11.13",
     "event-source-plus": "^0.1.7",
     "react": "^18.3.1",
-    "react-apexcharts": "^1.4.1",
+    "react-apexcharts": "^1.5.0",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.2"
   },
