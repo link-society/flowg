@@ -1,6 +1,7 @@
 module link-society.com/flowg
 
 go 1.22.2
+toolchain go1.23.3
 
 require (
 	github.com/dgraph-io/badger/v3 v3.2103.5
@@ -13,7 +14,7 @@ require (
 	github.com/swaggest/rest v0.2.69
 	github.com/swaggest/swgui v1.8.2
 	github.com/swaggest/usecase v1.3.1
-	github.com/vladopajic/go-actor v0.9.0
+	github.com/vladopajic/go-actor v0.9.1
 	golang.org/x/crypto v0.29.0
 	gopkg.in/mcuadros/go-syslog.v2 v2.3.0
 )
