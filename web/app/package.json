@@ -16,7 +16,7 @@
     "@mui/icons-material": "^6.1.7",
     "@mui/material": "^6.1.0",
     "@mui/x-date-pickers": "^7.22.3",
-    "@toolpad/core": "^0.9.0",
+    "@toolpad/core": "^0.10.0",
     "@xyflow/react": "^12.3.5",
     "ag-grid-react": "^32.3.0",
     "apexcharts": "^3.54.1",
