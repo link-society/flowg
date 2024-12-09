@@ -96,7 +96,7 @@ RUN go test -timeout 500ms -v ./...
 ## FINAL ARTIFACT
 ##############################
 
-FROM alpine:3.20 AS runner
+FROM alpine:3.21 AS runner
 
 RUN apk add --no-cache libgcc su-exec
 
