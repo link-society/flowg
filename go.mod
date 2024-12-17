@@ -16,7 +16,7 @@ require (
 	github.com/swaggest/swgui v1.8.2
 	github.com/swaggest/usecase v1.3.1
 	github.com/vladopajic/go-actor v0.9.1
-	golang.org/x/crypto v0.30.0
+	golang.org/x/crypto v0.31.0
 	gopkg.in/mcuadros/go-syslog.v2 v2.3.0
 )
 
