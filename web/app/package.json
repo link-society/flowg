@@ -14,7 +14,7 @@
     "@fontsource/roboto": "^5.1.0",
     "@monaco-editor/react": "^4.6.0",
     "@mui/icons-material": "^6.1.7",
-    "@mui/material": "^6.1.0",
+    "@mui/material": "^6.2.0",
     "@mui/x-date-pickers": "^7.23.0",
     "@toolpad/core": "^0.10.0",
     "@xyflow/react": "^12.3.5",
