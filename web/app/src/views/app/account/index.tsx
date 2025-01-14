@@ -1,4 +1,4 @@
-import { useLoaderData } from 'react-router-dom'
+import { useLoaderData } from 'react-router'
 
 import Grid from '@mui/material/Grid2'
 

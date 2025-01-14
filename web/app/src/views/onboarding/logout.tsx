@@ -1,4 +1,4 @@
-import { redirect } from 'react-router-dom'
+import { redirect } from 'react-router'
 
 import * as authApi from '@/lib/api/operations/auth'
 

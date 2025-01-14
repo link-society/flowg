@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useLoaderData, useParams } from 'react-router-dom'
+import { useLoaderData, useParams } from 'react-router'
 import { useApiOperation } from '@/lib/hooks/api'
 import { useNotify } from '@/lib/hooks/notify'
 
