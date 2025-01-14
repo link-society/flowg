@@ -14,11 +14,13 @@ const CatchUnauthenticatedError = (props: { fallback: React.ReactNode }) => {
   }
 }
 
-export const AuthenticatedAwait = (props: AwaitProps) => (
-  <Await
-    resolve={props.resolve}
-    errorElement={<CatchUnauthenticatedError fallback={props.errorElement} />}
-  >
-    {props.children}
-  </Await>
-)
+export function AuthenticatedAwait<T>(props: AwaitProps<T>) {
+  return (
+    <Await
+      resolve={props.resolve}
+      errorElement={<CatchUnauthenticatedError fallback={props.errorElement} />}
+    >
+      {props.children}
+    </Await>
+  )
+}
