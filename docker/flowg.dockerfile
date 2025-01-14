@@ -43,7 +43,7 @@ ADD internal/utils/ffi/vrl/rust-crate /src/internal/utils/ffi/vrl/rust-crate
 ##############################
 
 ## FilterDSL
-FROM rust:1.84-alpine3.20 AS builder-rust-filterdsl
+FROM rust:1.84-alpine3.21 AS builder-rust-filterdsl
 RUN apk add --no-cache musl-dev
 
 COPY --from=sources-rust-filterdsl /src /workspace
@@ -53,7 +53,7 @@ RUN cargo build --release
 RUN cargo test
 
 ## VRL
-FROM rust:1.84-alpine3.20 AS builder-rust-vrl
+FROM rust:1.84-alpine3.21 AS builder-rust-vrl
 RUN apk add --no-cache musl-dev
 
 COPY --from=sources-rust-vrl /src /workspace
@@ -66,7 +66,7 @@ RUN cargo test
 ## BUILD JS DEPENDENCIES
 ##############################
 
-FROM node:23-alpine3.20 AS builder-js
+FROM node:23-alpine3.21 AS builder-js
 COPY --from=sources-js /src /workspace
 WORKDIR /workspace/web/app
 
@@ -77,7 +77,7 @@ RUN NODE_ENV="production" npm run build
 ## BUILD GO CODE
 ##############################
 
-FROM golang:1.23-alpine3.20 AS builder-go
+FROM golang:1.23-alpine3.21 AS builder-go
 
 RUN apk add --no-cache gcc musl-dev
 RUN go install github.com/a-h/templ/cmd/templ@v0.2.778
