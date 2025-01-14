@@ -1,7 +1,7 @@
 package vrl
 
 /*
-#cgo LDFLAGS: -L./rust-crate/target/release -lflowg_vrl
+#cgo LDFLAGS: -L./rust-crate/target/release -lflowg_vrl -lm
 #include <stdlib.h>
 
 typedef struct {
