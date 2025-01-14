@@ -1,4 +1,4 @@
-import { Outlet, useLoaderData } from 'react-router-dom'
+import { Outlet, useLoaderData } from 'react-router'
 
 import { NavBar } from '@/components/navbar'
 import { Footer } from '@/components/footer'

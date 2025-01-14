@@ -1,4 +1,4 @@
-import { Await, AwaitProps, Navigate, useAsyncError } from 'react-router-dom'
+import { Await, AwaitProps, Navigate, useAsyncError } from 'react-router'
 
 import { UnauthenticatedError } from '@/lib/api/errors'
 

@@ -1,4 +1,4 @@
-import { LoaderFunction } from 'react-router-dom'
+import { LoaderFunction } from 'react-router'
 
 import * as tokenApi from '@/lib/api/operations/token'
 import { loginRequired } from '@/lib/decorators/loaders'

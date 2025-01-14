@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { useNotify } from '@/lib/hooks/notify'
 
 import { UnauthenticatedError, PermissionDeniedError } from '@/lib/api/errors'

@@ -1,4 +1,4 @@
-import { LoaderFunction } from 'react-router-dom'
+import { LoaderFunction } from 'react-router'
 
 import { loginRequired } from '@/lib/decorators/loaders'
 import * as configApi from '@/lib/api/operations/config'
