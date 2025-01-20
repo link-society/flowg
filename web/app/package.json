@@ -17,7 +17,7 @@
     "@mui/material": "^6.3.1",
     "@mui/x-date-pickers": "^7.23.6",
     "@toolpad/core": "^0.12.0",
-    "@xyflow/react": "^12.3.6",
+    "@xyflow/react": "^12.4.1",
     "ag-grid-react": "^33.0.3",
     "dayjs": "^1.11.13",
     "event-source-plus": "^0.1.8",
