@@ -77,7 +77,7 @@ export const TransformerEditor = (props: TransformerEditorProps) => {
               <Paper
                 variant="outlined"
                 className="
-                  p-2 flex-grow flex-shrink h-0 overflow-auto
+                  p-2 grow shrink h-0 overflow-auto
                   font-mono !bg-gray-100
                 "
                 component="pre"

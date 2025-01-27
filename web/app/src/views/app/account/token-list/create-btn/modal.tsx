@@ -26,7 +26,7 @@ export const ShowNewTokenModal = ({ open, payload, onClose }: DialogProps<string
           value={payload}
           type="text"
           variant="standard"
-          className="flex-grow"
+          className="grow"
           slotProps={{
             input: {
               readOnly: true,

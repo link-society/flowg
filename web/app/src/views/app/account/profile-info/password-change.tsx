@@ -40,7 +40,7 @@ export const PasswordChange = () => {
           onSubmit()
         }}
       >
-        <div className="flex-grow-0"><LockIcon /></div>
+        <div className="grow-0"><LockIcon /></div>
 
         <TextField
           label="Old Password"
@@ -48,7 +48,7 @@ export const PasswordChange = () => {
           type="password"
           onChange={e => setOldPassword(e.target.value)}
           variant="outlined"
-          className="flex-grow"
+          className="grow"
           required
         />
 
@@ -58,14 +58,14 @@ export const PasswordChange = () => {
           type="password"
           onChange={e => setNewPassword(e.target.value)}
           variant="outlined"
-          className="flex-grow"
+          className="grow"
           required
         />
 
         <Button
           variant="contained"
           color="secondary"
-          className="flex-grow-0 self-stretch"
+          className="grow-0 self-stretch"
           type="submit"
           disabled={loading}
         >

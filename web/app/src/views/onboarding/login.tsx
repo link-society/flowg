@@ -57,7 +57,7 @@ export const LoginView = () => {
                     type="text"
                     onChange={e => setUsername(e.target.value)}
                     variant="standard"
-                    className="flex-grow"
+                    className="grow"
                     required
                   />
                 </Box>
@@ -70,7 +70,7 @@ export const LoginView = () => {
                     type="password"
                     onChange={e => setPassword(e.target.value)}
                     variant="standard"
-                    className="flex-grow"
+                    className="grow"
                     disabled={loading}
                     required
                   />

@@ -202,7 +202,7 @@ export const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange }) =>
         <Controls />
 
         <Panel position="top-left">
-          <Paper variant="outlined" className="flex flex-row items-center gap-3 shadow-sm">
+          <Paper variant="outlined" className="flex flex-row items-center gap-3 shadow-xs">
             <div
               className="
                 self-stretch flex flex-row items-center
@@ -228,7 +228,7 @@ export const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange }) =>
                   backgroundColor: colors.red[50],
                   borderColor: colors.red[500],
                 }}
-                className="!rounded-none shadow-sm hover:shadow-lg !font-mono"
+                className="rounded-none! shadow-xs hover:shadow-lg font-mono!"
                 draggable
                 onDragStart={(evt) => {
                   evt.dataTransfer.setData('item-type', 'switch')

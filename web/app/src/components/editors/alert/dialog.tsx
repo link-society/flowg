@@ -98,7 +98,7 @@ export const OpenAlertDialog = ({ alert }: OpenAlertDialogProps) => {
               <CloseIcon />
             </IconButton>
 
-            <div className="flex-grow">
+            <div className="grow">
               <TextField
                 label="Alert name"
                 value={alert}
@@ -140,7 +140,7 @@ export const OpenAlertDialog = ({ alert }: OpenAlertDialogProps) => {
             </Button>
           </Toolbar>
         </AppBar>
-        <div className="flex-grow p-6 overflow-auto">
+        <div className="grow p-6 overflow-auto">
           <React.Suspense
             fallback={
               <div className="w-full h-full flex flex-col items-center justify-center">

@@ -20,7 +20,7 @@ export const AppLayout = () => {
       <div className="h-full flex flex-col overflow-hidden">
         <NavBar />
 
-        <main className="flex-grow flex-shrink h-0">
+        <main className="grow shrink h-0">
           <Outlet />
         </main>
 

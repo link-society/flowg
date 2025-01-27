@@ -67,7 +67,7 @@ export const UserFormModal = ({ open, payload, onClose }: DialogProps<string[], 
               onChange={(e) => setUsername(e.target.value)}
               type="text"
               variant="standard"
-              className="flex-grow"
+              className="grow"
               required
             />
           </Box>
@@ -80,7 +80,7 @@ export const UserFormModal = ({ open, payload, onClose }: DialogProps<string[], 
               onChange={(e) => setPassword(e.target.value)}
               type="password"
               variant="standard"
-              className="flex-grow"
+              className="grow"
               required
             />
           </Box>

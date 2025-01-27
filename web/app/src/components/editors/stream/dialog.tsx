@@ -99,7 +99,7 @@ export const OpenStreamDialog = ({ stream }: OpenStreamDialogProps) => {
               <CloseIcon />
             </IconButton>
 
-            <div className="flex-grow">
+            <div className="grow">
               <TextField
                 label="Stream name"
                 value={stream}
@@ -141,7 +141,7 @@ export const OpenStreamDialog = ({ stream }: OpenStreamDialogProps) => {
             </Button>
           </Toolbar>
         </AppBar>
-        <div className="flex-grow bg-slate-200 p-6 overflow-auto">
+        <div className="grow bg-slate-200 p-6 overflow-auto">
           <React.Suspense
             fallback={
               <div className="w-full h-full flex flex-col items-center justify-center">

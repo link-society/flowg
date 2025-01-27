@@ -78,7 +78,7 @@ export const PipelineView = () => {
             z-10 shadow-md
           "
         >
-          <div className="flex flex-grow flex-row items-center gap-3">
+          <div className="flex grow flex-row items-center gap-3">
             <TextField
               label="Pipeline name"
               value={currentPipeline!.name}
@@ -148,7 +148,7 @@ export const PipelineView = () => {
             </div>
           )}
         </Box>
-        <Grid container spacing={1} className="flex-grow p-2">
+        <Grid container spacing={1} className="grow p-2">
           <Grid size={{ xs: 2 }} className="h-full">
             <PipelineList className="w-full h-full" />
           </Grid>
@@ -156,9 +156,9 @@ export const PipelineView = () => {
             <FlowEditor flow={flow} onFlowChange={onChange} />
           </Grid>
           <Grid size={{ xs: 2 }} className="h-full flex flex-col items-stretch gap-2">
-            <TransformerList className="flex-grow flex-shrink h-0" />
-            <AlertList className="flex-grow flex-shrink h-0" />
-            <StreamList className="flex-grow flex-shrink h-0" />
+            <TransformerList className="grow shrink h-0" />
+            <AlertList className="grow shrink h-0" />
+            <StreamList className="grow shrink h-0" />
           </Grid>
         </Grid>
       </Box>

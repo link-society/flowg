@@ -20,7 +20,7 @@ export const NavBar = () => {
     <AppBar position="static">
       <Toolbar>
         <Typography variant="h6" sx={{ mr: 2 }}>FlowG</Typography>
-        <section className="h-full flex flex-row items-stretch gap-3 flex-grow">
+        <section className="h-full flex flex-row items-stretch gap-3 grow">
           <Button
             href="https://github.com/link-society/flowg"
             target="_blank"

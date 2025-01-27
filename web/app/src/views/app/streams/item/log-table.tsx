@@ -17,7 +17,7 @@ export const LogTable = (props: LogTableProps) => {
   const [selectedRow, setSelectedRow] = useState<LogEntryModel | undefined>(undefined)
 
   return (
-    <Paper className="flex-grow ag-theme-balham">
+    <Paper className="grow ag-theme-balham">
       <AgGridReact<LogEntryModel>
         rowData={props.rowData}
         columnDefs={props.columnDefs}

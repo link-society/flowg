@@ -9,7 +9,7 @@ type StreamListProps = Readonly<{
 
 export const StreamList = (props: StreamListProps) => {
   return (
-    <List component="nav" className="!p-0">
+    <List component="nav" className="p-0!">
       {props.streams.map((stream) => (
         <ListItemButton
           key={stream}

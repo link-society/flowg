@@ -95,7 +95,7 @@ export const OpenTransformerDialog = ({ transformer }: OpenTransformerDialogProp
               <CloseIcon />
             </IconButton>
 
-            <div className="flex-grow">
+            <div className="grow">
               <TextField
                 label="Transformer name"
                 value={transformer}
@@ -137,7 +137,7 @@ export const OpenTransformerDialog = ({ transformer }: OpenTransformerDialogProp
             </Button>
           </Toolbar>
         </AppBar>
-        <div className="flex-grow bg-slate-200 p-2">
+        <div className="grow bg-slate-200 p-2">
           <React.Suspense
             fallback={
               <div className="w-full h-full flex flex-col items-center justify-center">

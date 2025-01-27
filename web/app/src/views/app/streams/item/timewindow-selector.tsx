@@ -175,8 +175,8 @@ export const TimeWindowSelector = ({ onTimeWindowChanged }: TimeWindowSelectorPr
             }}
             className="p-3 w-full"
           >
-            <ToggleButton value="relative" className="flex-grow">Relative</ToggleButton>
-            <ToggleButton value="absolute" className="flex-grow">Absolute</ToggleButton>
+            <ToggleButton value="relative" className="grow">Relative</ToggleButton>
+            <ToggleButton value="absolute" className="grow">Absolute</ToggleButton>
           </ToggleButtonGroup>
           <Divider />
 
