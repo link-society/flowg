@@ -15,7 +15,7 @@ require (
 	github.com/swaggest/rest v0.2.71
 	github.com/swaggest/swgui v1.8.2
 	github.com/swaggest/usecase v1.3.1
-	github.com/vladopajic/go-actor v0.9.1
+	github.com/vladopajic/go-actor v0.9.2
 	golang.org/x/crypto v0.32.0
 	gopkg.in/mcuadros/go-syslog.v2 v2.3.0
 )
@@ -28,7 +28,7 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
-	github.com/gammazero/deque v0.2.1 // indirect
+	github.com/gammazero/deque v1.0.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
 	github.com/golang/groupcache v0.0.0-20190702054246-869f871628b6 // indirect
