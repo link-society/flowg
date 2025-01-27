@@ -1,5 +1,7 @@
+@import 'tailwindcss';
+
 .flowg-table .ag-header {
-  @apply bg-gray-200 z-10 shadow-sm;
+  @apply bg-gray-200 z-10 shadow-xs;
 }
 
 .flowg-table .ag-cell-wrapper {
