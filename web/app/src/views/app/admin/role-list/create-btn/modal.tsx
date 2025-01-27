@@ -63,7 +63,7 @@ export const RoleFormModal = ({ open, onClose }: DialogProps<void, RoleModel | n
             onChange={(e) => setName(e.target.value)}
             type="text"
             variant="outlined"
-            className="!mt-2"
+            className="mt-2!"
             required
           />
 

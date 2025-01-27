@@ -83,13 +83,13 @@ export const TokenList = ({ tokens }: TokenListProps) => {
         title={
           <div className="flex items-center gap-3">
             <KeyIcon />
-            <span className="flex-grow">API Tokens</span>
+            <span className="grow">API Tokens</span>
             <CreateTokenButton onTokenCreated={onNewToken} />
           </div>
         }
         className="bg-blue-400 text-white shadow-lg z-20"
       />
-      <CardContent className="!p-0 flex-grow flex-shrink h-0 ag-theme-material flowg-table">
+      <CardContent className="p-0! grow shrink h-0 ag-theme-material flowg-table">
         <AgGridReact<RowType>
           ref={gridRef}
           loading={loading}

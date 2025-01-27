@@ -86,13 +86,13 @@ export const RoleList = ({ roles }: RoleListProps) => {
         title={
           <div className="flex items-center gap-3">
             <AdminPanelSettingsIcon />
-            <span className="flex-grow">Roles</span>
+            <span className="grow">Roles</span>
             <CreateRoleButton onRoleCreated={onNewRole} />
           </div>
         }
         className="bg-blue-400 text-white shadow-lg z-20"
       />
-      <CardContent className="!p-0 flex-grow flex-shrink h-0 ag-theme-material flowg-table">
+      <CardContent className="p-0! grow shrink h-0 ag-theme-material flowg-table">
         <AgGridReact<RoleModel>
           ref={gridRef}
           loading={loading}

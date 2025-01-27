@@ -26,7 +26,7 @@ export const StreamEditor = ({ streamConfig, onStreamConfigChange }: StreamEdito
 
         <div
           className="
-            p-3 flex-grow flex-shrink h-0 overflow-auto
+            p-3 grow shrink h-0 overflow-auto
             flex flex-col items-stretch gap-3
           "
         >
@@ -66,7 +66,7 @@ export const StreamEditor = ({ streamConfig, onStreamConfigChange }: StreamEdito
 
         <div
           className="
-            p-3 flex-grow flex-shrink h-0 overflow-auto
+            p-3 grow shrink h-0 overflow-auto
             flex flex-col items-stretch gap-3
           "
         >
@@ -85,7 +85,7 @@ export const StreamEditor = ({ streamConfig, onStreamConfigChange }: StreamEdito
                     ),
                   })
                 }}
-                className="flex-grow"
+                className="grow"
               />
 
               <Button
@@ -115,7 +115,7 @@ export const StreamEditor = ({ streamConfig, onStreamConfigChange }: StreamEdito
               onChange={(e) => {
                 setNewField(e.target.value)
               }}
-              className="flex-grow"
+              className="grow"
             />
 
             <Button

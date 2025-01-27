@@ -45,7 +45,7 @@ export const KeyValueEditor = (props: KeyValueEditorProps) => {
             }}
             variant="outlined"
             size="small"
-            className="flex-grow"
+            className="grow"
           />
 
           <TextField
@@ -60,7 +60,7 @@ export const KeyValueEditor = (props: KeyValueEditorProps) => {
             }}
             variant="outlined"
             size="small"
-            className="flex-grow"
+            className="grow"
           />
 
           <Button
@@ -101,7 +101,7 @@ export const KeyValueEditor = (props: KeyValueEditorProps) => {
           }}
           variant="outlined"
           size="small"
-          className="flex-grow"
+          className="grow"
           required
         />
 
@@ -113,7 +113,7 @@ export const KeyValueEditor = (props: KeyValueEditorProps) => {
           }}
           variant="outlined"
           size="small"
-          className="flex-grow"
+          className="grow"
           required
         />
 

@@ -66,7 +66,7 @@ export const TransformerView = () => {
           z-10 shadow-md
         "
       >
-        <div className="flex flex-grow flex-row items-center gap-3">
+        <div className="flex grow flex-row items-center gap-3">
           <Button
             variant="contained"
             color="primary"
@@ -115,10 +115,10 @@ export const TransformerView = () => {
           </div>
         )}
       </Box>
-      <Grid container spacing={1} className="p-2 flex-grow flex-shrink h-0">
+      <Grid container spacing={1} className="p-2 grow shrink h-0">
         <Grid size={{ xs: 2 }} className="h-full">
           <Paper className="h-full overflow-auto">
-            <List component="nav" className="!p-0">
+            <List component="nav" className="p-0!">
               {transformers.map((transformer) => (
                 <ListItemButton
                   key={transformer}

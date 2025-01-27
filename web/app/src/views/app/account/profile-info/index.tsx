@@ -23,7 +23,7 @@ export const ProfileInfo = () => (
     />
     <CardContent
       className="
-        lg:flex-grow lg:flex-shrink lg:h-0 lg:overflow-auto
+        lg:grow lg:shrink lg:h-0 lg:overflow-auto
         flex flex-col gap-3 items-stretch
       "
     >

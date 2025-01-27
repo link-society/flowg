@@ -67,14 +67,14 @@ export function NodeList(props: NodeListProps) {
     <Paper className={props.className}>
       <div className="h-full flex flex-col items-stretch">
         <div className="p-2 flex flex-row items-center bg-gray-100 shadow-md">
-          <div className="flex-grow text-semibold">{props.title}</div>
+          <div className="grow text-semibold">{props.title}</div>
           {props.newButton(() => setDirty(true))}
         </div>
         {loading
           ? (
             <div
               className="
-                flex-grow flex-shrink h-0
+                grow shrink h-0
                 flex flex-col items-center justify-center
               "
             >
@@ -84,7 +84,7 @@ export function NodeList(props: NodeListProps) {
           : (
             <div
               className="
-                flex-grow flex-shrink h-0 overflow-auto
+                grow shrink h-0 overflow-auto
                 flex flex-col items-start gap-2 p-2
               "
             >
@@ -100,7 +100,7 @@ export function NodeList(props: NodeListProps) {
                     backgroundColor,
                     borderColor,
                   }}
-                  className="!rounded-none shadow-sm hover:shadow-lg !font-mono"
+                  className="rounded-none! shadow-xs hover:shadow-lg font-mono!"
                   draggable
                   onDragStart={(evt) => {
                     evt.dataTransfer.setData('item-type', props.itemType)

@@ -87,13 +87,13 @@ export const UserList = ({ roles, users }: UserListProps) => {
         title={
           <div className="flex items-center gap-3">
             <AccountCircleIcon />
-            <span className="flex-grow">Users</span>
+            <span className="grow">Users</span>
             <CreateUserButton roles={roles} onUserCreated={onNewUser} />
           </div>
         }
         className="bg-blue-400 text-white shadow-lg z-20"
       />
-      <CardContent className="!p-0 flex-grow flex-shrink h-0 ag-theme-material flowg-table">
+      <CardContent className="p-0! grow shrink h-0 ag-theme-material flowg-table">
         <AgGridReact<UserModel>
           ref={gridRef}
           loading={loading}

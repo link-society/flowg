@@ -29,7 +29,7 @@ export const StatCard = ({ icon, title, value, href }: StatCardProps) => (
         </div>
       }
     />
-    <CardContent className="!p-0 text-center text-3xl font-bold">
+    <CardContent className="p-0! text-center text-3xl font-bold">
       <div className="mb-3">{value}</div>
       <Divider />
     </CardContent>
