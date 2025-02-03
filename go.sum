@@ -148,8 +148,8 @@ github.com/swaggest/usecase v1.3.1/go.mod h1:cae3lDd5VDmM36OQcOOOdAlEDg40TiQYIp9
 github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8/go.mod h1:VFNgLljTbGfSG7qAOspJ7OScBnGdDN/yBr0sguwnwf0=
 github.com/vearutop/statigz v1.4.0 h1:RQL0KG3j/uyA/PFpHeZ/L6l2ta920/MxlOAIGEOuwmU=
 github.com/vearutop/statigz v1.4.0/go.mod h1:LYTolBLiz9oJISwiVKnOQoIwhO1LWX1A7OECawGS8XE=
-github.com/vladopajic/go-actor v0.9.2 h1:gOSwvTJS8Ozqs76uVAEa3nbDc76ITMhoTw+Z3QctyuY=
-github.com/vladopajic/go-actor v0.9.2/go.mod h1:weHL4vx8U6qa68vqdWXwu4mCPFDGXhfJ48LSkQ6PUKY=
+github.com/vladopajic/go-actor v0.9.3 h1:zBsQ4ZdftvZJptcH73Mxftq6Ljny0UrJHWsrQwREp7E=
+github.com/vladopajic/go-actor v0.9.3/go.mod h1:weHL4vx8U6qa68vqdWXwu4mCPFDGXhfJ48LSkQ6PUKY=
 github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77/go.mod h1:aYKd//L2LvnjZzWKhF00oedf4jCCReLcmhLdhm1A27Q=
 github.com/yudai/gojsondiff v1.0.0 h1:27cbfqXLVEJ1o8I6v3y9lg8Ydm53EKqHXAOMxEGlCOA=
 github.com/yudai/gojsondiff v1.0.0/go.mod h1:AY32+k2cwILAkW1fbgxQ5mUmMiZFgLIV+FBNExI05xg=
