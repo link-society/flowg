@@ -78,4 +78,17 @@ $(./bin/flowg admin token --help)
 \`\`\`
 $(./bin/flowg admin token create --help)
 \`\`\`
+
+### 2.4. \`flowg admin backup\`
+
+\`\`\`
+$(./bin/flowg admin backup --help)
+\`\`\`
+
+### 2.5. \`flowg admin restore\`
+
+\`\`\`
+$(./bin/flowg admin restore --help)
+\`\`\`
+
 EOF

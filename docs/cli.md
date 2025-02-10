@@ -55,6 +55,8 @@ Usage:
   flowg admin [command]
 
 Available Commands:
+  backup      Backup the database and configuration
+  restore     Restore the database and configuration from a backup
   role        Role related admin commands (please run while the server is down)
   token       Personal Access Token related admin commands (please run while the server is down)
   user        User related admin commands (please run while the server is down)
@@ -216,3 +218,36 @@ Flags:
   -h, --help              help for create
       --user string       Name of the user
 ```
+
+### 2.4. `flowg admin backup`
+
+```
+Backup the database and configuration
+
+Usage:
+  flowg admin backup [flags]
+
+Flags:
+      --auth-dir string     Path to the auth database directory (default "./data/auth")
+      --backup-dir string   Path to the backup directory (default "./backup")
+      --config-dir string   Path to the config directory (default "./data/config")
+  -h, --help                help for backup
+      --log-dir string      Path to the log database directory (default "./data/logs")
+```
+
+### 2.5. `flowg admin restore`
+
+```
+Restore the database and configuration from a backup
+
+Usage:
+  flowg admin restore [flags]
+
+Flags:
+      --auth-dir string     Path to the auth database directory (default "./data/auth")
+      --backup-dir string   Path to the backup directory (default "./backup")
+      --config-dir string   Path to the config directory (default "./data/config")
+  -h, --help                help for restore
+      --log-dir string      Path to the log database directory (default "./data/logs")
+```
+
