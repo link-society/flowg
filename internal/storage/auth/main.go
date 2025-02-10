@@ -3,7 +3,7 @@ package auth
 import (
 	"context"
 
-	"github.com/dgraph-io/badger/v3"
+	"github.com/dgraph-io/badger/v4"
 
 	"link-society.com/flowg/internal/models"
 

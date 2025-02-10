@@ -3,7 +3,7 @@ package transactions
 import (
 	"fmt"
 
-	"github.com/dgraph-io/badger/v3"
+	"github.com/dgraph-io/badger/v4"
 )
 
 func CollectGarbage(txn *badger.Txn) error {

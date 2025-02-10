@@ -5,8 +5,8 @@ import (
 
 	"github.com/vladopajic/go-actor/actor"
 
-	"github.com/dgraph-io/badger/v3"
-	badgerOptions "github.com/dgraph-io/badger/v3/options"
+	"github.com/dgraph-io/badger/v4"
+	badgerOptions "github.com/dgraph-io/badger/v4/options"
 
 	"link-society.com/flowg/internal/app/logging"
 
