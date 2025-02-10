@@ -6,7 +6,7 @@ toolchain go1.23.3
 
 require (
 	github.com/dgraph-io/badger/v4 v4.5.1
-	github.com/go-chi/chi/v5 v5.2.0
+	github.com/go-chi/chi/v5 v5.2.1
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/google/uuid v1.6.0
 	github.com/prometheus/client_golang v1.20.5
