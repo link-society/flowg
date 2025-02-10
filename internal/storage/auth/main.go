@@ -15,6 +15,7 @@ import (
 type options struct {
 	dir      string
 	inMemory bool
+	readOnly bool
 }
 
 func OptDirectory(dir string) func(*options) {
@@ -29,6 +30,12 @@ func OptInMemory(inMemory bool) func(*options) {
 	}
 }
 
+func OptReadOnly(readOnly bool) func(*options) {
+	return func(o *options) {
+		o.readOnly = readOnly
+	}
+}
+
 type Storage struct {
 	kvStore *kvstore.Storage
 }
@@ -37,6 +44,7 @@ func NewStorage(opts ...func(*options)) *Storage {
 	options := options{
 		dir:      "",
 		inMemory: false,
+		readOnly: false,
 	}
 	for _, opt := range opts {
 		opt(&options)
@@ -46,6 +54,7 @@ func NewStorage(opts ...func(*options)) *Storage {
 		kvstore.OptLogChannel("authstorage"),
 		kvstore.OptDirectory(options.dir),
 		kvstore.OptInMemory(options.inMemory),
+		kvstore.OptReadOnly(options.readOnly),
 	)
 
 	return &Storage{kvStore: kvStore}
