@@ -20,6 +20,7 @@ import (
 type options struct {
 	dir        string
 	inMemory   bool
+	readOnly   bool
 	gcInterval time.Duration
 }
 
@@ -32,6 +33,12 @@ func OptDirectory(dir string) func(*options) {
 func OptInMemory(inMemory bool) func(*options) {
 	return func(o *options) {
 		o.inMemory = inMemory
+	}
+}
+
+func OptReadOnly(readOnly bool) func(*options) {
+	return func(o *options) {
+		o.readOnly = readOnly
 	}
 }
 
@@ -50,6 +57,7 @@ func NewStorage(opts ...func(*options)) *Storage {
 	options := options{
 		dir:        "",
 		inMemory:   false,
+		readOnly:   false,
 		gcInterval: 5 * time.Minute,
 	}
 	for _, opt := range opts {
@@ -60,6 +68,7 @@ func NewStorage(opts ...func(*options)) *Storage {
 		kvstore.OptLogChannel("logstorage"),
 		kvstore.OptDirectory(options.dir),
 		kvstore.OptInMemory(options.inMemory),
+		kvstore.OptReadOnly(options.readOnly),
 	)
 	gc := actor.New(&gcWorker{
 		kvStore:    kvStore,

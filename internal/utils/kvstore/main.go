@@ -17,6 +17,7 @@ type options struct {
 	logChannel string
 	dir        string
 	inMemory   bool
+	readOnly   bool
 }
 
 func OptLogChannel(channel string) func(*options) {
@@ -37,6 +38,12 @@ func OptInMemory(inMemory bool) func(*options) {
 	}
 }
 
+func OptReadOnly(readOnly bool) func(*options) {
+	return func(o *options) {
+		o.readOnly = readOnly
+	}
+}
+
 type Storage struct {
 	mbox   actor.Mailbox[message]
 	worker *worker
@@ -49,6 +56,7 @@ func NewStorage(opts ...func(*options)) *Storage {
 		logChannel: "kv",
 		dir:        "",
 		inMemory:   false,
+		readOnly:   false,
 	}
 
 	for _, opt := range opts {
@@ -64,7 +72,8 @@ func NewStorage(opts ...func(*options)) *Storage {
 		DefaultOptions(dbDir).
 		WithLogger(&logging.BadgerLogger{Channel: options.logChannel}).
 		WithCompression(badgerOptions.ZSTD).
-		WithInMemory(options.inMemory)
+		WithInMemory(options.inMemory).
+		WithReadOnly(options.readOnly)
 
 	mbox := actor.NewMailbox[message]()
 	worker := &worker{
