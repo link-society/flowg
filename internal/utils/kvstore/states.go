@@ -3,7 +3,7 @@ package kvstore
 import (
 	"github.com/vladopajic/go-actor/actor"
 
-	"github.com/dgraph-io/badger/v3"
+	"github.com/dgraph-io/badger/v4"
 )
 
 type workerState interface {
