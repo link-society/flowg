@@ -2,6 +2,7 @@ package kvstore
 
 import (
 	"context"
+	"io"
 
 	"github.com/vladopajic/go-actor/actor"
 
@@ -108,6 +109,26 @@ func (kv *Storage) Stop() {
 
 func (kv *Storage) WaitStopped() error {
 	return kv.worker.stopCond.Wait()
+}
+
+func (kv *Storage) Backup(
+	ctx context.Context,
+	w io.Writer,
+) error {
+	replyTo := make(chan error, 1)
+
+	err := kv.mbox.Send(
+		ctx,
+		message{
+			replyTo:   replyTo,
+			operation: &backupOperation{w: w},
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	return <-replyTo
 }
 
 func (kv *Storage) View(
