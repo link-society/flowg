@@ -15,7 +15,7 @@
     "@monaco-editor/react": "^4.6.0",
     "@mui/icons-material": "^6.4.3",
     "@mui/material": "^6.4.2",
-    "@mui/x-date-pickers": "^7.25.0",
+    "@mui/x-date-pickers": "^7.26.0",
     "@toolpad/core": "^0.12.0",
     "@xyflow/react": "^12.4.2",
     "ag-grid-react": "^33.0.4",
