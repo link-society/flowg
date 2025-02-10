@@ -131,6 +131,26 @@ func (kv *Storage) Backup(
 	return <-replyTo
 }
 
+func (kv *Storage) Restore(
+	ctx context.Context,
+	r io.Reader,
+) error {
+	replyTo := make(chan error, 1)
+
+	err := kv.mbox.Send(
+		ctx,
+		message{
+			replyTo:   replyTo,
+			operation: &restoreOperation{r: r},
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	return <-replyTo
+}
+
 func (kv *Storage) View(
 	ctx context.Context,
 	txnFn func(txn *badger.Txn) error,

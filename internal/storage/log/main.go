@@ -104,6 +104,10 @@ func (s *Storage) Backup(ctx context.Context, w io.Writer) error {
 	return s.kvStore.Backup(ctx, w)
 }
 
+func (s *Storage) Restore(ctx context.Context, r io.Reader) error {
+	return s.kvStore.Restore(ctx, r)
+}
+
 func (s *Storage) ListStreamConfigs(ctx context.Context) (map[string]models.StreamConfig, error) {
 	var streams map[string]models.StreamConfig
 
