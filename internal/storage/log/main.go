@@ -2,6 +2,7 @@ package log
 
 import (
 	"context"
+	"io"
 
 	"time"
 
@@ -97,6 +98,10 @@ func (s *Storage) Stop() {
 
 func (s *Storage) WaitStopped() error {
 	return s.kvStore.WaitStopped()
+}
+
+func (s *Storage) Backup(ctx context.Context, w io.Writer) error {
+	return s.kvStore.Backup(ctx, w)
 }
 
 func (s *Storage) ListStreamConfigs(ctx context.Context) (map[string]models.StreamConfig, error) {
