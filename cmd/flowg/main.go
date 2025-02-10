@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"os"
-	"syscall"
 	"strconv"
+	"syscall"
 
 	"github.com/spf13/cobra"
 
@@ -16,7 +16,7 @@ import (
 var exitCode int = 0
 
 var (
-	defaultVerbose = getEnvBool("FLOWG_VERBOSE", false)
+	defaultVerbose         = getEnvBool("FLOWG_VERBOSE", false)
 	defaultHttpBindAddress = getEnvString("FLOWG_HTTP_BIND_ADDRESS", ":5080")
 
 	defaultSyslogProtocol     = getEnvString("FLOWG_SYSLOG_PROTOCOL", "udp")
@@ -31,17 +31,19 @@ var (
 	})()
 
 	defaultHttpTlsEnabled = getEnvBool("FLOWG_HTTP_TLS_ENABLED", false)
-	defaultHttpTlsCert = getEnvString("FLOWG_HTTP_TLS_CERT", "")
+	defaultHttpTlsCert    = getEnvString("FLOWG_HTTP_TLS_CERT", "")
 	defaultHttpTlsCertKey = getEnvString("FLOWG_HTTP_TLS_KEY", "")
 
 	defaultSyslogTlsEnabled     = getEnvBool("FLOWG_SYSLOG_TLS_ENABLED", false)
-	defaultSyslogTlsCert		= getEnvString("FLOWG_SYSLOG_TLS_CERT", "")
-	defaultSyslogTlsCertKey		= getEnvString("FLOWG_SYSLOG_TLS_KEY", "")
-	defaultSyslogTlsAuthEnabled	= getEnvBool("FLOWG_SYSLOG_TLS_AUTH", false)
+	defaultSyslogTlsCert        = getEnvString("FLOWG_SYSLOG_TLS_CERT", "")
+	defaultSyslogTlsCertKey     = getEnvString("FLOWG_SYSLOG_TLS_KEY", "")
+	defaultSyslogTlsAuthEnabled = getEnvBool("FLOWG_SYSLOG_TLS_AUTH", false)
 
 	defaultAuthDir   = getEnvString("FLOWG_AUTH_DIR", "./data/auth")
 	defaultConfigDir = getEnvString("FLOWG_CONFIG_DIR", "./data/config")
 	defaultLogDir    = getEnvString("FLOWG_LOG_DIR", "./data/logs")
+
+	defaultBackupDir = getEnvString("FLOWG_BACKUP_DIR", "./backup")
 )
 
 func main() {
@@ -82,7 +84,7 @@ func getEnvBool(key string, defaultValue bool) bool {
 		return defaultValue
 	}
 	value, err := strconv.ParseBool(stringVal)
-	if err == nil { 
+	if err == nil {
 		return value
 	}
 	return false
