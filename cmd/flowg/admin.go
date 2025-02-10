@@ -13,6 +13,7 @@ func NewAdminCommand() *cobra.Command {
 		NewAdminUserCommand(),
 		NewAdminTokenCommand(),
 		NewAdminBackupCommand(),
+		NewAdminRestoreCommand(),
 	)
 
 	return cmd
