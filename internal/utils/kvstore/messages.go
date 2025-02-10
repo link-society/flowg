@@ -37,7 +37,7 @@ func (m *backupOperation) Handle(db *badger.DB) error {
 }
 
 func (m *restoreOperation) Handle(db *badger.DB) error {
-	return db.Load(m.r, 0)
+	return db.Load(m.r, 1)
 }
 
 func (m *viewOperation) Handle(db *badger.DB) error {
