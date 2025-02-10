@@ -19,6 +19,10 @@ type backupOperation struct {
 	w io.Writer
 }
 
+type restoreOperation struct {
+	r io.Reader
+}
+
 type viewOperation struct {
 	txnFn func(txn *badger.Txn) error
 }
@@ -30,6 +34,10 @@ type updateOperation struct {
 func (m *backupOperation) Handle(db *badger.DB) error {
 	_, err := db.Backup(m.w, 0)
 	return err
+}
+
+func (m *restoreOperation) Handle(db *badger.DB) error {
+	return db.Load(m.r, 0)
 }
 
 func (m *viewOperation) Handle(db *badger.DB) error {
