@@ -17,6 +17,10 @@ export const HomeView = () => {
 
   return (
     <Grid container spacing={2} className="justify-center p-6 h-full overflow-auto">
+      <Grid size={{ xs: 12 }}>
+        <h1 className="text-3xl text-center">Welcome to FlowG</h1>
+      </Grid>
+
       {permissions.can_view_streams && (
         <Grid size={{ xs: 12, md: 2 }}>
           <DynamicStatCard
