@@ -1,6 +1,3 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-
 import './styles/main.css'
 import '@xyflow/react/dist/style.css'
 import 'ag-grid-community/styles/ag-grid.css'
@@ -16,4 +13,3 @@ import {
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 provideGlobalGridOptions({ theme: "legacy"});
-
