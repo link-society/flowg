@@ -10,6 +10,15 @@ import './styles/table.css'
 
 import App from '@/App'
 
+import {
+  AllCommunityModule,
+  ModuleRegistry,
+  provideGlobalGridOptions
+} from 'ag-grid-community'
+
+ModuleRegistry.registerModules([AllCommunityModule]);
+provideGlobalGridOptions({ theme: "legacy"});
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
