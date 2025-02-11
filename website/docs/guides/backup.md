@@ -28,7 +28,7 @@ No write is ever done on the original databases.
 ## Performing an offline restore
 
 ```bash
-flow admin restore \
+flowg admin restore \
   --auth-dir ./data/auth \
   --config-dir ./data/config \
   --log-dir ./data/logs \
@@ -55,7 +55,7 @@ up), you need to remove the old database first:
 
 ```bash
 rm -rf ./data
-flow admin restore \
+flowg admin restore \
   --auth-dir ./data/auth \
   --config-dir ./data/config \
   --log-dir ./data/logs \
