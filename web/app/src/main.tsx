@@ -8,10 +8,12 @@ import 'ag-grid-community/styles/ag-theme-material.css'
 import 'ag-grid-community/styles/ag-theme-balham.css'
 import './styles/table.css'
 
-import App from '@/App'
+import {
+  AllCommunityModule,
+  ModuleRegistry,
+  provideGlobalGridOptions
+} from 'ag-grid-community'
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>
-)
+ModuleRegistry.registerModules([AllCommunityModule]);
+provideGlobalGridOptions({ theme: "legacy"});
+
