@@ -57,3 +57,11 @@ updates:
       prefix: ":arrow_up: "
     labels:
       - "deps: javascript"
+  - package-ecosystem: "pip"
+    directory: "/tests/e2e/web"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: ":arrow_up: :white_check_mark: "
+    labels:
+      - "deps: tests"
