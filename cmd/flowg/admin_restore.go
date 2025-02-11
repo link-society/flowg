@@ -28,6 +28,7 @@ func NewAdminRestoreCommand() *cobra.Command {
 		Use:   "restore",
 		Short: "Restore the database and configuration from a backup",
 		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("Opening auth database...")
 			authStorage := auth.NewStorage(auth.OptDirectory(opts.authDir))
 			authStorage.Start()
 			err := authStorage.WaitStarted()
@@ -38,6 +39,7 @@ func NewAdminRestoreCommand() *cobra.Command {
 			}
 
 			defer func() {
+				fmt.Println("Closing auth database...")
 				authStorage.Stop()
 				err := authStorage.WaitStopped()
 				if err != nil {
@@ -46,6 +48,7 @@ func NewAdminRestoreCommand() *cobra.Command {
 				}
 			}()
 
+			fmt.Println("Opening log database...")
 			logStorage := log.NewStorage(log.OptDirectory(opts.logDir))
 			logStorage.Start()
 			err = logStorage.WaitStarted()
@@ -56,6 +59,7 @@ func NewAdminRestoreCommand() *cobra.Command {
 			}
 
 			defer func() {
+				fmt.Println("Closing log database...")
 				logStorage.Stop()
 				err := logStorage.WaitStopped()
 				if err != nil {
@@ -64,43 +68,27 @@ func NewAdminRestoreCommand() *cobra.Command {
 				}
 			}()
 
-			backupConfigStorageDir := filepath.Join(opts.backupDir, "config")
-			backupConfigStorage := config.NewStorage(config.OptDirectory(backupConfigStorageDir))
-			backupConfigStorage.Start()
-			err = backupConfigStorage.WaitStarted()
-			if err != nil {
-				fmt.Fprintln(os.Stderr, "ERROR: Failed to open backup config directory:", err)
-				exitCode = 1
-				return
-			}
-
-			defer func() {
-				backupConfigStorage.Stop()
-				err := backupConfigStorage.WaitStopped()
-				if err != nil {
-					fmt.Fprintln(os.Stderr, "ERROR: Failed to close backup config directory:", err)
-					exitCode = 1
-				}
-			}()
-
+			fmt.Println("Opening config database...")
 			configStorage := config.NewStorage(config.OptDirectory(opts.configDir))
 			configStorage.Start()
 			err = configStorage.WaitStarted()
 			if err != nil {
-				fmt.Fprintln(os.Stderr, "ERROR: Failed to open config directory:", err)
+				fmt.Fprintln(os.Stderr, "ERROR: Failed to open config database:", err)
 				exitCode = 1
 				return
 			}
 
 			defer func() {
+				fmt.Println("Closing config database...")
 				configStorage.Stop()
 				err := configStorage.WaitStopped()
 				if err != nil {
-					fmt.Fprintln(os.Stderr, "ERROR: Failed to close config directory:", err)
+					fmt.Fprintln(os.Stderr, "ERROR: Failed to close config database:", err)
 					exitCode = 1
 				}
 			}()
 
+			fmt.Println("Restoring auth database...")
 			authBackupPath := filepath.Join(opts.backupDir, "auth.db")
 			authBackupIn, err := os.Open(authBackupPath)
 			if err != nil {
@@ -117,7 +105,6 @@ func NewAdminRestoreCommand() *cobra.Command {
 				}
 			}()
 
-			fmt.Println("Restoring auth database...")
 			err = authStorage.Restore(context.Background(), authBackupIn)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to restore auth database:", err)
@@ -125,6 +112,7 @@ func NewAdminRestoreCommand() *cobra.Command {
 				return
 			}
 
+			fmt.Println("Restoring log database...")
 			logBackupPath := filepath.Join(opts.backupDir, "log.db")
 			logBackupIn, err := os.Open(logBackupPath)
 			if err != nil {
@@ -141,7 +129,6 @@ func NewAdminRestoreCommand() *cobra.Command {
 				}
 			}()
 
-			fmt.Println("Restoring log database...")
 			err = logStorage.Restore(context.Background(), logBackupIn)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to restore log database:", err)
@@ -149,75 +136,31 @@ func NewAdminRestoreCommand() *cobra.Command {
 				return
 			}
 
-			fmt.Println("Restoring configuration...")
-			transformers, err := backupConfigStorage.ListTransformers(context.Background())
+			fmt.Println("Restoring config database...")
+			configBackupPath := filepath.Join(opts.backupDir, "config.db")
+			configBackupIn, err := os.Open(configBackupPath)
 			if err != nil {
-				fmt.Fprintln(os.Stderr, "ERROR: Failed to list backup transformers:", err)
+				fmt.Fprintln(os.Stderr, "ERROR: Failed to open backup file:", err)
 				exitCode = 1
 				return
 			}
 
-			pipelines, err := backupConfigStorage.ListPipelines(context.Background())
+			defer func() {
+				err := configBackupIn.Close()
+				if err != nil {
+					fmt.Fprintln(os.Stderr, "ERROR: Failed to close backup file:", err)
+					exitCode = 1
+				}
+			}()
+
+			err = configStorage.Restore(context.Background(), configBackupIn)
 			if err != nil {
-				fmt.Fprintln(os.Stderr, "ERROR: Failed to list backup pipelines:", err)
+				fmt.Fprintln(os.Stderr, "ERROR: Failed to restore config database:", err)
 				exitCode = 1
 				return
 			}
 
-			alerts, err := backupConfigStorage.ListAlerts(context.Background())
-			if err != nil {
-				fmt.Fprintln(os.Stderr, "ERROR: Failed to list backup alerts:", err)
-				exitCode = 1
-				return
-			}
-
-			for _, transformerName := range transformers {
-				transformerContent, err := backupConfigStorage.ReadTransformer(context.Background(), transformerName)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "ERROR: Failed to read backup transformer %s: %v\n", transformerName, err)
-					exitCode = 1
-					return
-				}
-
-				err = configStorage.WriteTransformer(context.Background(), transformerName, transformerContent)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "ERROR: Failed to restore transformer %s: %v\n", transformerName, err)
-					exitCode = 1
-					return
-				}
-			}
-
-			for _, pipelineName := range pipelines {
-				pipelineContent, err := backupConfigStorage.ReadPipeline(context.Background(), pipelineName)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "ERROR: Failed to read backup pipeline %s: %v\n", pipelineName, err)
-					exitCode = 1
-					return
-				}
-
-				err = configStorage.WritePipeline(context.Background(), pipelineName, pipelineContent)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "ERROR: Failed to restore pipeline %s: %v\n", pipelineName, err)
-					exitCode = 1
-					return
-				}
-			}
-
-			for _, alertName := range alerts {
-				alertContent, err := backupConfigStorage.ReadAlert(context.Background(), alertName)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "ERROR: Failed to read backup alert %s: %v\n", alertName, err)
-					exitCode = 1
-					return
-				}
-
-				err = configStorage.WriteAlert(context.Background(), alertName, alertContent)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "ERROR: Failed to restore alert %s: %v\n", alertName, err)
-					exitCode = 1
-					return
-				}
-			}
+			fmt.Println("Restore complete.")
 		},
 	}
 
