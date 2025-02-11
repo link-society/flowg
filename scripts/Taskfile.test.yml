@@ -8,9 +8,15 @@ tasks:
       - task: "test:unit:rust:filterdsl"
       - task: "test:unit:rust:vrl"
 
-  e2e:
-    desc: "Run end-to-end tests"
-    dir: ./tests/e2e
+  "e2e:api":
+    desc: "Run API end-to-end tests"
+    dir: ./tests/e2e/api
+    cmds:
+      - sh run.sh
+
+  "e2e:web":
+    desc: "Run Web end-to-end tests"
+    dir: ./tests/e2e/web
     cmds:
       - sh run.sh
 
