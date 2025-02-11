@@ -113,14 +113,24 @@ jobs:
           gh_access_token: ${{ secrets.GITHUB_TOKEN }}
           report_path: "./tests/e2e/web/reports/"
 
-      - name: report@status
+      - name: report-success@status
         uses: mapbox/create-status-check@v1
-        if: ${{ github.event_name == 'pull_request' && (success() || failure()) }}
+        if: ${{ github.event_name == 'pull_request' && success() }}
         with:
           authToken: ${{secrets.GITHUB_TOKEN}}
           context: 'Web End-To-End Test Report'
-          description: ${{ success() && 'Passed' || 'Failed' }}
-          state: ${{ success() && 'success' || 'failure' }}
+          description: 'Passed'
+          state: 'success'
+          sha: ${{github.event.pull_request.head.sha }}
+
+      - name: report-failure@status
+        uses: mapbox/create-status-check@v1
+        if: ${{ github.event_name == 'pull_request' && failure() }}
+        with:
+          authToken: ${{secrets.GITHUB_TOKEN}}
+          context: 'Web End-To-End Test Report'
+          description: 'Failure'
+          state: 'failure'
           sha: ${{github.event.pull_request.head.sha }}
 
       - name: report@fail
