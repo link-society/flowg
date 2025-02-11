@@ -107,16 +107,25 @@ jobs:
         run: sh ./run.sh
 
       - name: report@test
-        uses: mikepenz/action-junit-report@v5
+        uses: joonvena/robotframework-reporter-action@v2.5
         if: ${{ github.event_name == 'pull_request' && (success() || failure()) }}
         with:
-          report_paths: "./tests/e2e/web/reports/junit.xml"
-          include_passed: true
-          check_name: "Web End-To-End Test Report"
-          job_summary: true
-          comment: true
-          updateComment: true
-          fail_on_failure: true
+          gh_access_token: ${{ secrets.GITHUB_TOKEN }}
+          report_path: "./tests/e2e/web/reports/"
+
+      - name: report@status
+        uses: mapbox/create-status-check@v1
+        if: ${{ github.event_name == 'pull_request' && (success() || failure()) }}
+        with:
+          authToken: ${{secrets.GITHUB_TOKEN}}
+          context: 'Web End-To-End Test Report'
+          description: ${{ success() && 'Passed' || 'Failed' }}
+          state: ${{ success() && 'success' || 'failure' }}
+          sha: ${{github.event.pull_request.head.sha }}
+
+      - name: report@fail
+        if: ${{ github.event_name == 'pull_request' && failure() }}
+        run: exit 1
 
   test-k8s:
     runs-on: ubuntu-latest
