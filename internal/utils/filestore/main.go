@@ -3,6 +3,8 @@ package filestore
 import (
 	"context"
 
+	"io/fs"
+
 	"github.com/vladopajic/go-actor/actor"
 
 	"link-society.com/flowg/internal/utils/sync"
@@ -155,4 +157,26 @@ func (fs *Storage) DeleteFile(ctx context.Context, key string) error {
 
 	_, err = msg.replyTo.Receive()
 	return err
+}
+
+func (fs *Storage) StatFile(ctx context.Context, key string) (fs.FileInfo, error) {
+	msg := &statItem{
+		replyTo: replyTo[statItemResponse]{
+			okC:  make(chan statItemResponse),
+			errC: make(chan error),
+		},
+		key: key,
+	}
+
+	err := fs.mbox.Send(ctx, msg)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := msg.replyTo.Receive()
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.info, nil
 }

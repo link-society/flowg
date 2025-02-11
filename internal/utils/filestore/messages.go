@@ -1,6 +1,9 @@
 package filestore
 
-import "strings"
+import (
+	"io/fs"
+	"strings"
+)
 
 type message interface {
 	Handle(*workerRunning)
@@ -50,6 +53,15 @@ type writeItem struct {
 
 type deleteItem struct {
 	replyTo replyTo[bool]
+	key     string
+}
+
+type statItemResponse struct {
+	info fs.FileInfo
+}
+
+type statItem struct {
+	replyTo replyTo[statItemResponse]
 	key     string
 }
 
@@ -118,5 +130,19 @@ func (msg *deleteItem) Handle(workerState *workerRunning) {
 	} else {
 		workerState.cache.Delete(filename)
 		msg.replyTo.SendOk(true)
+	}
+}
+
+func (msg *statItem) Handle(workerState *workerRunning) {
+	filename := msg.key + workerState.extension
+
+	workerState.mu.Lock()
+	info, err := workerState.backend.StatFile(filename)
+	workerState.mu.Unlock()
+
+	if err != nil {
+		msg.replyTo.SendErr(err)
+	} else {
+		msg.replyTo.SendOk(statItemResponse{info: info})
 	}
 }

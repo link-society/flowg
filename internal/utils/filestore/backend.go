@@ -1,8 +1,10 @@
 package filestore
 
 import (
+	"io/fs"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 type backend interface {
@@ -10,6 +12,7 @@ type backend interface {
 	ReadFile(path string) ([]byte, error)
 	WriteFile(path string, content []byte) error
 	DeleteFile(path string) error
+	StatFile(path string) (fs.FileInfo, error)
 }
 
 type fsBackend struct {
@@ -58,8 +61,20 @@ func (b *fsBackend) DeleteFile(path string) error {
 	return os.Remove(filePath)
 }
 
+func (b *fsBackend) StatFile(path string) (fs.FileInfo, error) {
+	filePath := filepath.Join(b.baseDir, path)
+	return os.Stat(filePath)
+}
+
 type memBackend struct {
 	files map[string][]byte
+}
+
+type memFileInfo struct {
+	name    string
+	size    int64
+	mode    os.FileMode
+	modTime time.Time
 }
 
 func newMemBackend() *memBackend {
@@ -94,5 +109,43 @@ func (b *memBackend) WriteFile(path string, content []byte) error {
 
 func (b *memBackend) DeleteFile(path string) error {
 	delete(b.files, path)
+	return nil
+}
+
+func (b *memBackend) StatFile(path string) (fs.FileInfo, error) {
+	content, err := b.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	return &memFileInfo{
+		name:    path,
+		size:    int64(len(content)),
+		mode:    os.ModePerm,
+		modTime: time.Now(),
+	}, nil
+}
+
+func (f *memFileInfo) Name() string {
+	return f.name
+}
+
+func (f *memFileInfo) Size() int64 {
+	return f.size
+}
+
+func (f *memFileInfo) Mode() os.FileMode {
+	return f.mode
+}
+
+func (f *memFileInfo) ModTime() time.Time {
+	return f.modTime
+}
+
+func (f *memFileInfo) IsDir() bool {
+	return false
+}
+
+func (f *memFileInfo) Sys() any {
 	return nil
 }
