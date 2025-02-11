@@ -21,7 +21,7 @@ This command will create the following files and directories:
 
  - `./backup/auth.db`: containing the full snapshot of the authentication database
  - `./backup/log.db`: containing the full snapshot of the logs database
- - `./backup/config/`: containing a copy of the configuration folder
+ - `./backup/config.db`: containing the full snapshot of the config database
 
 No write is ever done on the original databases.
 
@@ -35,11 +35,11 @@ flowg admin restore \
   --backup-dir ./backup
 ```
 
-This command will expect the following files and directories to exist:
+This command will expect the following files to exist:
 
  - `./backup/auth.db`: containing the full snapshot of the authentication database
  - `./backup/log.db`: containing the full snapshot of the logs database
- - `./backup/config/`: containing a copy of the configuration folder
+ - `./backup/config.db`: containing the full snapshot of the config database
 
 The content of the `auth.db` file will be inserted in the authentication database,
 overwriting pre-existing keys, but not deleting new ones.
@@ -47,8 +47,8 @@ overwriting pre-existing keys, but not deleting new ones.
 The content of the `log.db` file will be inserted in the logs database,
 overwriting pre-existing keys, but not deleting new ones.
 
-The content of the `config/` folder will be copied in the configuration folder,
-pre-existing files will be overwritten, but new ones won't be deleted.
+The content of the `config.db` file will be inserted in the config database,
+overwriting pre-existing items, but not deleting new ones.
 
 If you want a *destructive* restore (aka: remove new items that were not backed
 up), you need to remove the old database first:
