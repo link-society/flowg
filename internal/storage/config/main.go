@@ -5,6 +5,10 @@ import (
 	"errors"
 	"fmt"
 
+	"archive/tar"
+	"compress/gzip"
+	"io"
+
 	"encoding/base64"
 	"encoding/json"
 	"path/filepath"
@@ -14,6 +18,12 @@ import (
 	"link-society.com/flowg/internal/models"
 
 	"link-society.com/flowg/internal/utils/filestore"
+)
+
+const (
+	transformerExt = ".vrl"
+	pipelineExt    = ".json"
+	alertExt       = ".json.b64"
 )
 
 type options struct {
@@ -54,17 +64,17 @@ func NewStorage(opts ...func(*options)) *Storage {
 	transformerStore := filestore.NewStorage(
 		filestore.OptDirectory(filepath.Join(options.dir, "transformers")),
 		filestore.OptInMemory(options.inMemory),
-		filestore.OptExtension(".vrl"),
+		filestore.OptExtension(transformerExt),
 	)
 	pipelineStore := filestore.NewStorage(
 		filestore.OptDirectory(filepath.Join(options.dir, "pipelines")),
 		filestore.OptInMemory(options.inMemory),
-		filestore.OptExtension(".json"),
+		filestore.OptExtension(pipelineExt),
 	)
 	alertStore := filestore.NewStorage(
 		filestore.OptDirectory(filepath.Join(options.dir, "alerts")),
 		filestore.OptInMemory(options.inMemory),
-		filestore.OptExtension(".json.b64"),
+		filestore.OptExtension(alertExt),
 	)
 
 	actor := actor.Combine(transformerStore, pipelineStore, alertStore).
@@ -127,6 +137,139 @@ func (s *Storage) WaitStopped() error {
 
 	if len(errs) > 0 {
 		return errors.Join(errs...)
+	}
+
+	return nil
+}
+
+func (s *Storage) Backup(ctx context.Context, w io.Writer) error {
+	gw := gzip.NewWriter(w)
+	defer gw.Close()
+
+	tw := tar.NewWriter(gw)
+	defer tw.Close()
+
+	stores := []struct {
+		storage *filestore.Storage
+		kind    string
+	}{
+		{storage: s.transformerStore, kind: "transformer"},
+		{storage: s.pipelineStore, kind: "pipeline"},
+		{storage: s.alertStore, kind: "alert"},
+	}
+
+	for _, store := range stores {
+		items, err := store.storage.ListFiles(ctx)
+		if err != nil {
+			return fmt.Errorf("failed to list %ss: %w", store.kind, err)
+		}
+
+		for _, name := range items {
+			info, err := store.storage.StatFile(ctx, name)
+			if err != nil {
+				return fmt.Errorf("failed to stat %s %s: %w", store.kind, name, err)
+			}
+
+			content, err := store.storage.ReadFile(ctx, name)
+			if err != nil {
+				return fmt.Errorf("failed to read %s %s: %w", store.kind, name, err)
+			}
+
+			hdr, err := tar.FileInfoHeader(info, info.Name())
+			if err != nil {
+				return fmt.Errorf(
+					"failed to create TAR header for %s %s: %w",
+					store.kind,
+					name,
+					err,
+				)
+			}
+			hdr.Name = filepath.Join(fmt.Sprintf("%ss", store.kind), info.Name())
+
+			err = tw.WriteHeader(hdr)
+			if err != nil {
+				return fmt.Errorf(
+					"failed to write TAR header for %s %s: %w",
+					store.kind,
+					name,
+					err,
+				)
+			}
+
+			_, err = tw.Write(content)
+			if err != nil {
+				return fmt.Errorf(
+					"failed to write TAR content for %s %s: %w",
+					store.kind,
+					name,
+					err,
+				)
+			}
+		}
+	}
+
+	return nil
+}
+
+func (s *Storage) Restore(ctx context.Context, r io.Reader) error {
+	gr, err := gzip.NewReader(r)
+	if err != nil {
+		return fmt.Errorf("failed to create GZIP reader: %w", err)
+	}
+
+	defer gr.Close()
+
+	tr := tar.NewReader(gr)
+
+	for {
+		hdr, err := tr.Next()
+		if errors.Is(err, io.EOF) {
+			break
+		}
+
+		if err != nil {
+			return fmt.Errorf("failed to read TAR header: %w", err)
+		}
+
+		switch hdr.Typeflag {
+		case tar.TypeReg:
+			kind := filepath.Base(filepath.Dir(hdr.Name))
+
+			var (
+				storage *filestore.Storage
+				ext     string
+			)
+			switch kind {
+			case "transformers":
+				storage = s.transformerStore
+				ext = transformerExt
+
+			case "pipelines":
+				storage = s.pipelineStore
+				ext = pipelineExt
+
+			case "alerts":
+				storage = s.alertStore
+				ext = alertExt
+
+			default:
+				return fmt.Errorf("unknown configuration item kind %s", kind)
+			}
+
+			data := make([]byte, hdr.Size)
+			_, err := io.ReadFull(tr, data)
+			if err != nil {
+				return fmt.Errorf("failed to read TAR content: %w", err)
+			}
+
+			name := filepath.Base(hdr.Name)
+			name = name[:len(name)-len(ext)]
+
+			err = storage.WriteFile(ctx, name, data)
+			if err != nil {
+				return fmt.Errorf("failed to write %s %s: %w", kind, name, err)
+			}
+		}
 	}
 
 	return nil
