@@ -46,7 +46,7 @@ jobs:
           name: oci-flowg
           path: /tmp/oci-flowg.tar
 
-  test-e2e:
+  test-e2e-api:
     runs-on: ubuntu-latest
     needs: build
     steps:
@@ -65,17 +65,54 @@ jobs:
       - name: setup@test
         uses: gacts/install-hurl@v1
 
-      - name: e2e@test
-        working-directory: ./tests/e2e
+      - name: run@test
+        working-directory: ./tests/e2e/api
         run: sh ./run.sh
 
       - name: report@test
         uses: mikepenz/action-junit-report@v5
         if: ${{ github.event_name == 'pull_request' && (success() || failure()) }}
         with:
-          report_paths: "./tests/e2e/reports/junit.xml"
+          report_paths: "./tests/e2e/api/reports/junit.xml"
           include_passed: true
-          check_name: "End-To-End Test Report"
+          check_name: "API End-To-End Test Report"
+          job_summary: true
+          comment: true
+          updateComment: true
+          fail_on_failure: true
+
+  test-e2e-web:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: checkout@scm
+        uses: actions/checkout@v4
+
+      - name: download@artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: oci-flowg
+          path: /tmp
+
+      - name: load@docker
+        run: docker load --input /tmp/oci-flowg.tar
+
+      - name: setup@test
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: run@test
+        working-directory: ./tests/e2e/web
+        run: sh ./run.sh
+
+      - name: report@test
+        uses: mikepenz/action-junit-report@v5
+        if: ${{ github.event_name == 'pull_request' && (success() || failure()) }}
+        with:
+          report_paths: "./tests/e2e/web/reports/junit.xml"
+          include_passed: true
+          check_name: "Web End-To-End Test Report"
           job_summary: true
           comment: true
           updateComment: true
