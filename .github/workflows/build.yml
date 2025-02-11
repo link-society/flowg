@@ -114,7 +114,7 @@ jobs:
           report_path: "./tests/e2e/web/reports/"
 
       - name: report-success@status
-        uses: mapbox/create-status-check@v1
+        uses: guibranco/github-status-action-v2@v1
         if: ${{ github.event_name == 'pull_request' && success() }}
         with:
           authToken: ${{secrets.GITHUB_TOKEN}}
@@ -124,7 +124,7 @@ jobs:
           sha: ${{github.event.pull_request.head.sha }}
 
       - name: report-failure@status
-        uses: mapbox/create-status-check@v1
+        uses: guibranco/github-status-action-v2@v1
         if: ${{ github.event_name == 'pull_request' && failure() }}
         with:
           authToken: ${{secrets.GITHUB_TOKEN}}
