@@ -48,3 +48,21 @@ func RequireScopeApiDecorator[Req any, Resp any](
 		return next(ctx, req, resp)
 	}
 }
+
+func RequireScopesApiDecorator[Req any, Resp any](
+	authStorage *auth.Storage,
+	scopes []models.Scope,
+	next func(context.Context, Req, *Resp) error,
+) func(context.Context, Req, *Resp) error {
+	if len(scopes) == 0 {
+		return next
+	} else if len(scopes) == 1 {
+		return RequireScopeApiDecorator(authStorage, scopes[0], next)
+	} else {
+		return RequireScopesApiDecorator(
+			authStorage,
+			scopes[1:],
+			RequireScopeApiDecorator(authStorage, scopes[0], next),
+		)
+	}
+}
