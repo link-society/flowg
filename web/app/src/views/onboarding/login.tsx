@@ -67,7 +67,7 @@ export const LoginView = () => {
                 <Box className="flex flex-row items-end">
                   <AccountCircleIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />
                   <TextField
-                    id="username"
+                    id="input:login.username"
                     label="Username"
                     value={username}
                     type="text"
@@ -81,7 +81,7 @@ export const LoginView = () => {
                 <Box className="flex flex-row items-end">
                   <LockIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />
                   <TextField
-                    id="password"
+                    id="input:login.password"
                     label="Password"
                     value={password}
                     type="password"
@@ -97,7 +97,7 @@ export const LoginView = () => {
               <Divider />
 
               <Button
-                id="submit"
+                id="btn:login.submit"
                 variant="contained"
                 color="secondary"
                 className="w-full"
