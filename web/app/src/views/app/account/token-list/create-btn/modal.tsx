@@ -1,4 +1,5 @@
 import KeyIcon from '@mui/icons-material/Key'
+import LabelIcon from '@mui/icons-material/Label'
 
 import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
@@ -10,7 +11,14 @@ import Button from '@mui/material/Button'
 
 import { DialogProps } from '@toolpad/core/useDialogs'
 
-export const ShowNewTokenModal = ({ open, payload, onClose }: DialogProps<string, void>) => (
+export const ShowNewTokenModal = ({
+  open,
+  payload,
+  onClose,
+}: DialogProps<{
+  token: string,
+  token_uuid: string,
+}, void>) => (
   <Dialog
     maxWidth="sm"
     fullWidth
@@ -19,11 +27,29 @@ export const ShowNewTokenModal = ({ open, payload, onClose }: DialogProps<string
   >
     <DialogTitle>Your Personal Access Token</DialogTitle>
     <DialogContent>
-      <Box className="flex flex-row items-end">
+      <Box className="flex flex-row items-end mb-3">
+        <LabelIcon sx={{ mr: 1, my: 0.5 }} />
+        <TextField
+          id="input:account.tokens.modal.token_uuid"
+          label="Token UUID"
+          type="text"
+          value={payload.token_uuid}
+          variant="standard"
+          className="grow"
+          slotProps={{
+            input: {
+              readOnly: true,
+            },
+          }}
+        />
+      </Box>
+
+      <Box className="flex flex-row items-end mb-3">
         <KeyIcon sx={{ mr: 1, my: 0.5 }} />
         <TextField
+          id="input:account.tokens.modal.token"
           label="Token"
-          value={payload}
+          value={payload.token}
           type="text"
           variant="standard"
           className="grow"
@@ -35,13 +61,14 @@ export const ShowNewTokenModal = ({ open, payload, onClose }: DialogProps<string
         />
       </Box>
 
-      <p className="mt-3">
+      <p>
         This token will be dislayed only once.
         Make sure to copy it before closing this dialog.
       </p>
     </DialogContent>
     <DialogActions>
       <Button
+        id="btn:account.tokens.modal.done"
         variant="contained"
         color="secondary"
         onClick={() => onClose()}
