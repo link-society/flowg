@@ -27,6 +27,7 @@ export const SettingsMenu = () => {
   return (
     <>
       <Button
+        id="menu:navbar.settings"
         color="inherit"
         onClick={handleOpen}
         startIcon={<SettingsIcon />}
@@ -53,6 +54,7 @@ export const SettingsMenu = () => {
         {permissions.can_view_transformers && (
           <MenuItem onClick={handleClose}>
             <Button
+              id="link:navbar.settings.transformers"
               href="/web/transformers"
               color="secondary"
               startIcon={<FilterAltIcon />}
@@ -65,6 +67,7 @@ export const SettingsMenu = () => {
         {permissions.can_view_alerts && (
           <MenuItem onClick={handleClose}>
             <Button
+              id="link:navbar.settings.alerts"
               href="/web/alerts"
               color="secondary"
               startIcon={<NotificationsActiveIcon />}
@@ -77,6 +80,7 @@ export const SettingsMenu = () => {
         {permissions.can_view_streams && (
           <MenuItem onClick={handleClose}>
             <Button
+              id="link:navbar.settings.storage"
               href="/web/storage"
               color="secondary"
               startIcon={<SdStorageIcon />}
@@ -89,6 +93,7 @@ export const SettingsMenu = () => {
         {permissions.can_view_pipelines && (
           <MenuItem onClick={handleClose}>
             <Button
+              id="link:navbar.settings.pipelines"
               href="/web/pipelines"
               color="secondary"
               startIcon={<AccountTreeIcon />}

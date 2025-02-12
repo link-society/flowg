@@ -46,6 +46,7 @@ export const NavBar = () => {
           <SettingsMenu />
           {permissions.can_view_streams && (
             <Button
+              id="link:navbar.streams"
               href="/web/streams"
               color="inherit"
               startIcon={<StorageIcon />}

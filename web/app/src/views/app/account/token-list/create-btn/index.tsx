@@ -21,9 +21,9 @@ export const CreateTokenButton = ({ onTokenCreated }: CreateTokenButtonProps) =>
 
   const [handleClick, loading] = useApiOperation(
     async () => {
-      const { token, token_uuid } = await tokenApi.createToken()
-      await dialogs.open(ShowNewTokenModal, token)
-      onTokenCreated(token_uuid)
+      const resp = await tokenApi.createToken()
+      await dialogs.open(ShowNewTokenModal, resp)
+      onTokenCreated(resp.token_uuid)
       notify.success('Token created')
     },
     [onTokenCreated],
@@ -31,6 +31,7 @@ export const CreateTokenButton = ({ onTokenCreated }: CreateTokenButtonProps) =>
 
   return (
     <Button
+      id="btn:account.tokens.create"
       variant="contained"
       color="secondary"
       size="small"
