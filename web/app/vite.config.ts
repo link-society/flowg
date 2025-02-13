@@ -13,11 +13,13 @@ export default defineConfig({
     react(),
     tailwindcss(),
     compression({
+      include: /\.(html|css|js|map)$/,
       filename: '[path][base]',
       deleteOriginalAssets: true
     }),
   ],
   build: {
+    sourcemap: true,
     chunkSizeWarningLimit: 1024,
     rollupOptions: {
       output: {
@@ -27,7 +29,6 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@materializecss/materialize/style': 'node_modules/@materializecss/materialize/dist/css/materialize.css',
       '@': path.resolve(__dirname, './src'),
     },
   },
