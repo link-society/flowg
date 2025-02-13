@@ -14,6 +14,10 @@ Log as
     Click Element             id=btn:login.submit
     Wait Until Page Contains  Welcome                  timeout=5s
 
+Logout
+    Click Navbar Menu Item    id=menu:navbar.profile  id=link:navbar.profile.logout
+    Wait Until Page Contains  Sign In  timeout=5s
+
 Click Navbar Menu Item
     [Arguments]                    ${menu_locator}  ${item_locator}
     Click Element                  ${menu_locator}
