@@ -22,10 +22,10 @@ Create and Delete Personal Access Token
     Wait Until Page Contains         ${token_uuid}  timeout=5s
     &{headers}=   Create Dictionary  Authorization=Bearer pat:${token}
     ${response}=  GET                ${BASE_URL}/api/v1/auth/whoami  headers=&{headers}  expected_status=200
-    Element Should Be Visible        xpath=//div[@role='row'][@row-id='${token_uuid}']
-    Click Element                    xpath=//div[@role='row'][@row-id='${token_uuid}']//button[@data-ref='btn:generic.tablerow.actions.delete']
+    Element Should Be Visible        xpath=//div[@id='table:account.tokens']//div[@role='row'][@row-id='${token_uuid}']
+    Click Element                    xpath=//div[@id='table:account.tokens']//div[@role='row'][@row-id='${token_uuid}']//button[@data-ref='btn:generic.tablerow.actions.delete']
     Wait Until Page Contains         Token deleted  timeout=5s
-    Element Should Not Be Visible    xpath=//div[@role='row'][@row-id='${token_uuid}']
+    Element Should Not Be Visible    xpath=//div[@id='table:account.tokens']//div[@role='row'][@row-id='${token_uuid}']
     &{headers}=   Create Dictionary  Authorization=Bearer pat:${token}
     ${response}=  GET                ${BASE_URL}/api/v1/auth/whoami  headers=&{headers}  expected_status=401
     Close Browser
