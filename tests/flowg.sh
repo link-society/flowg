@@ -35,10 +35,12 @@ flowg_acl_guest() {
 }
 
 flowg_start() {
-  echo -n "Test Flowg env"
+  echo -n "Check FlowG Docker image exists..."
 
   DOCKER_CONTAINER_ID=$(${FLOWG_CMD_FAILED} serve)
   sleep 3
+
+  echo " ok"
 
   echo -n "Starting FlowG..."
 

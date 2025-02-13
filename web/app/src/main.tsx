@@ -16,8 +16,8 @@ import {
   provideGlobalGridOptions
 } from 'ag-grid-community'
 
-ModuleRegistry.registerModules([AllCommunityModule]);
-provideGlobalGridOptions({ theme: "legacy"});
+ModuleRegistry.registerModules([AllCommunityModule])
+provideGlobalGridOptions({ theme: "legacy"})
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

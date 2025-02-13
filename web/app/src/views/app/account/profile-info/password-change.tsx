@@ -43,6 +43,7 @@ export const PasswordChange = () => {
         <div className="grow-0"><LockIcon /></div>
 
         <TextField
+          id="input:account.settings.change-password.old"
           label="Old Password"
           value={oldPassword}
           type="password"
@@ -53,6 +54,7 @@ export const PasswordChange = () => {
         />
 
         <TextField
+          id="input:account.settings.change-password.new"
           label="New Password"
           value={newPassword}
           type="password"
@@ -63,6 +65,7 @@ export const PasswordChange = () => {
         />
 
         <Button
+          id="btn:account.settings.change-password.submit"
           variant="contained"
           color="secondary"
           className="grow-0 self-stretch"
