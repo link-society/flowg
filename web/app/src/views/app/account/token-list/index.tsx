@@ -89,7 +89,10 @@ export const TokenList = ({ tokens }: TokenListProps) => {
         }
         className="bg-blue-400 text-white shadow-lg z-20"
       />
-      <CardContent className="p-0! grow shrink h-0 ag-theme-material flowg-table">
+      <CardContent
+        id="table:account.tokens"
+        className="p-0! grow shrink h-0 ag-theme-material flowg-table"
+      >
         <AgGridReact<RowType>
           ref={gridRef}
           loading={loading}
