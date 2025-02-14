@@ -36,12 +36,14 @@ export const NewAlertModal = ({ open, onClose }: DialogProps<void, string | null
       fullWidth
       open={open}
       onClose={() => onClose(null)}
-      PaperProps={{
-        component: 'form',
-        onSubmit: (e: React.FormEvent<HTMLFormElement>) => {
-          e.preventDefault()
-          onSubmit()
-        }
+      slotProps={{
+        paper: {
+          component: 'form',
+          onSubmit: (e: React.FormEvent<HTMLFormElement>) => {
+            e.preventDefault()
+            onSubmit()
+          },
+        },
       }}
     >
       <DialogTitle>Create new alert</DialogTitle>
