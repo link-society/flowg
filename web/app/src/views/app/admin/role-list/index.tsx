@@ -92,7 +92,10 @@ export const RoleList = ({ roles }: RoleListProps) => {
         }
         className="bg-blue-400 text-white shadow-lg z-20"
       />
-      <CardContent className="p-0! grow shrink h-0 ag-theme-material flowg-table">
+      <CardContent
+        id="table:admin.roles"
+        className="p-0! grow shrink h-0 ag-theme-material flowg-table"
+      >
         <AgGridReact<RoleModel>
           ref={gridRef}
           loading={loading}
