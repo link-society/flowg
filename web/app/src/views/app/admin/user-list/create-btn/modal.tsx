@@ -48,12 +48,14 @@ export const UserFormModal = ({ open, payload, onClose }: DialogProps<string[], 
       fullWidth
       open={open}
       onClose={() => onClose(null)}
-      PaperProps={{
-        component: 'form',
-        onSubmit: (e: React.FormEvent<HTMLFormElement>) => {
-          e.preventDefault()
-          onSubmit()
-        }
+      slotProps={{
+        paper: {
+          component: 'form',
+          onSubmit: (e: React.FormEvent<HTMLFormElement>) => {
+            e.preventDefault()
+            onSubmit()
+          },
+        },
       }}
     >
       <DialogTitle>Create a new user</DialogTitle>
