@@ -58,6 +58,7 @@ export const RoleFormModal = ({ open, onClose }: DialogProps<void, RoleModel | n
       <DialogContent>
         <Box className="flex flex-col items-stretch gap-3">
           <TextField
+            id="input:admin.roles.modal.name"
             label="Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -67,7 +68,10 @@ export const RoleFormModal = ({ open, onClose }: DialogProps<void, RoleModel | n
             required
           />
 
-          <Box className="flex flex-col items-stretch gap-2">
+          <Box
+            id="field:admin.roles.modal.scopes"
+            className="flex flex-col items-stretch gap-2"
+          >
             <span className="font-semibold">Permissions:</span>
             <TransferList<string>
               choices={SCOPES}
@@ -90,6 +94,7 @@ export const RoleFormModal = ({ open, onClose }: DialogProps<void, RoleModel | n
       </DialogContent>
       <DialogActions>
         <Button
+          id="btn:admin.roles.modal.cancel"
           variant="contained"
           startIcon={<CancelIcon />}
           onClick={() => onClose(null)}
@@ -98,6 +103,7 @@ export const RoleFormModal = ({ open, onClose }: DialogProps<void, RoleModel | n
           Cancel
         </Button>
         <Button
+          id="btn:admin.roles.modal.submit"
           variant="contained"
           color="secondary"
           startIcon={!loading && <SaveIcon />}

@@ -31,6 +31,7 @@ export const CreateRoleButton = ({ onRoleCreated }: CreateRoleButtonProps) => {
 
   return (
     <Button
+      id="btn:admin.roles.create"
       variant="contained"
       color="secondary"
       size="small"
