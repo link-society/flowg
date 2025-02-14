@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { useLoaderData, useNavigate } from 'react-router'
 import { useProfile } from '@/lib/context/profile'
 import { useApiOperation } from '@/lib/hooks/api'
@@ -33,12 +33,9 @@ export const AlertView = () => {
 
   const [webhook, setWebhook] = useState(currentAlert!.webhook)
 
-  const onCreate = useCallback(
-    (name: string) => {
-      navigate(`/web/alerts/${name}`)
-    },
-    [],
-  )
+  const onCreate = (name: string) => {
+    navigate(`/web/alerts/${name}`)
+  }
 
   const [onDelete, deleteLoading] = useApiOperation(
     async () => {

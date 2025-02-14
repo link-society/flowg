@@ -25,7 +25,7 @@ export const QueryPanel = (props: QueryPanelProps) => {
         props.onFetchRequested(filter, from, to, live)
       }
     },
-    [props.onFetchRequested, timeWindowFactory, filter],
+    [timeWindowFactory, filter],
   )
 
   useEffect(

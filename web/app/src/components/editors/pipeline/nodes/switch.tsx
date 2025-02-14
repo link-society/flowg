@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { HooksContext } from '../hooks'
 
 import { Handle, Position, Node, NodeProps, NodeToolbar } from '@xyflow/react'
@@ -18,10 +18,9 @@ export const SwitchNode = ({ id, data, selected }: NodeProps<SwitchNodeData>) =>
 
   const [code, setCode] = useState(data.condition)
 
-  const onChange: React.ChangeEventHandler<HTMLInputElement> = useCallback(
-    (evt) => { setCode(evt.target.value) },
-    [setCode],
-  )
+  const onChange: React.ChangeEventHandler<HTMLInputElement> = (evt) => {
+    setCode(evt.target.value)
+  }
 
   useEffect(
     () => {

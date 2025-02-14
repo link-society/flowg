@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { useLoaderData, useNavigate } from 'react-router'
 import { useProfile } from '@/lib/context/profile'
 import { useApiOperation } from '@/lib/hooks/api'
@@ -33,12 +33,9 @@ export const TransformerView = () => {
 
   const [code, setCode] = useState(currentTransformer!.script)
 
-  const onCreate = useCallback(
-    (name: string) => {
-      window.location.pathname = `/web/transformers/${name}`
-    },
-    [],
-  )
+  const onCreate = (name: string) => {
+    navigate(`/web/transformers/${name}`)
+  }
 
   const [onDelete, deleteLoading] = useApiOperation(
     async () => {
