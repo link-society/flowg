@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { useLoaderData, useNavigate } from 'react-router'
 import { useProfile } from '@/lib/context/profile'
 import { useApiOperation } from '@/lib/hooks/api'
@@ -34,12 +34,9 @@ export const StreamView = () => {
 
   const [streamConfig, setStreamConfig] = useState(streams[currentStream!]!)
 
-  const onCreate = useCallback(
-    (name: string) => {
-      window.location.pathname = `/web/storage/${name}`
-    },
-    [],
-  )
+  const onCreate = (name: string) => {
+    navigate(`/web/storage/${name}`)
+  }
 
   const [onDelete, deleteLoading] = useApiOperation(
     async () => {

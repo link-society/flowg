@@ -34,7 +34,7 @@ export const TransformerEditor = (props: TransformerEditorProps) => {
       const output = await testApi.testTransformer(code, input)
       setTestResult(output)
     },
-    [code, testRecord, setTestResult],
+    [code, testRecord],
   )
 
   return (
