@@ -64,6 +64,7 @@ export const UserFormModal = ({ open, payload, onClose }: DialogProps<string[], 
           <Box className="flex flex-row items-end">
             <AccountCircleIcon sx={{ mr: 1, my: 0.5 }} />
             <TextField
+              id="input:admin.users.modal.username"
               label="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -77,6 +78,7 @@ export const UserFormModal = ({ open, payload, onClose }: DialogProps<string[], 
           <Box className="flex flex-row items-end">
             <LockIcon sx={{ mr: 1, my: 0.5 }} />
             <TextField
+              id="input:admin.users.modal.password"
               label="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -87,7 +89,10 @@ export const UserFormModal = ({ open, payload, onClose }: DialogProps<string[], 
             />
           </Box>
 
-          <Box className="flex flex-col items-stretch gap-2">
+          <Box
+            id="field:admin.users.modal.roles"
+            className="flex flex-col items-stretch gap-2"
+          >
             <span className="font-semibold">Roles:</span>
             <TransferList<string>
               choices={payload}
@@ -104,6 +109,7 @@ export const UserFormModal = ({ open, payload, onClose }: DialogProps<string[], 
       </DialogContent>
       <DialogActions>
         <Button
+          id="btn:admin.users.modal.cancel"
           variant="contained"
           startIcon={<CancelIcon />}
           onClick={() => onClose(null)}
@@ -112,6 +118,7 @@ export const UserFormModal = ({ open, payload, onClose }: DialogProps<string[], 
           Cancel
         </Button>
         <Button
+          id="btn:admin.users.modal.submit"
           variant="contained"
           color="secondary"
           startIcon={!loading && <SaveIcon />}
