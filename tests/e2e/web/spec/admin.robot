@@ -13,14 +13,10 @@ Create test role
     Click Element                  id=btn:admin.roles.create
     Wait Until Element Is Visible  id=input:admin.roles.modal.name
     Input Text                     id=input:admin.roles.modal.name  test
-    Element Should Be Visible      xpath=//div[@id='field:admin.roles.modal.scopes']//div[@data-ref='container:generic.transfer-list.items-left']//div[@id='label:generic.transfer-list.read_pipelines']
-    Click Element                  xpath=//div[@id='field:admin.roles.modal.scopes']//input[@id='checkbox:generic.transfer-list.read_pipelines']
-    Click Element                  xpath=//div[@id='field:admin.roles.modal.scopes']//button[@id='btn:generic.transfer-list.selected-right']
-    Wait Until Element Is Visible  xpath=//div[@id='field:admin.roles.modal.scopes']//div[@data-ref='container:generic.transfer-list.items-right']//div[@id='label:generic.transfer-list.read_pipelines']  timeout=5s
-    Element Should Not Be Visible  xpath=//div[@id='field:admin.roles.modal.scopes']//div[@data-ref='container:generic.transfer-list.items-left']//div[@id='label:generic.transfer-list.read_pipelines']
+    Select From List               list=field:admin.roles.modal.scopes  item=read_pipelines
     Click Element                  id=btn:admin.roles.modal.submit
     Wait Until Page Contains       Role created  timeout=5s
-    Wait Until Element Is Visible  xpath=//div[@id='table:admin.roles']//div[@role='row'][@row-id='test']  timeout=5s
+    Wait Until Row Is Visible      table=table:admin.roles  row=test
     Close Browser
 
 Create test user
@@ -33,14 +29,10 @@ Create test user
     Wait Until Element Is Visible  id=input:admin.users.modal.username
     Input Text                     id=input:admin.users.modal.username  test
     Input Text                     id=input:admin.users.modal.password  test
-    Element Should Be Visible      xpath=//div[@id='field:admin.users.modal.roles']//div[@data-ref='container:generic.transfer-list.items-left']//div[@id='label:generic.transfer-list.test']
-    Click Element                  xpath=//div[@id='field:admin.users.modal.roles']//input[@id='checkbox:generic.transfer-list.test']
-    Click Element                  xpath=//div[@id='field:admin.users.modal.roles']//button[@id='btn:generic.transfer-list.selected-right']
-    Wait Until Element Is Visible  xpath=//div[@id='field:admin.users.modal.roles']//div[@data-ref='container:generic.transfer-list.items-right']//div[@id='label:generic.transfer-list.test']  timeout=5s
-    Element Should Not Be Visible  xpath=//div[@id='field:admin.users.modal.roles']//div[@data-ref='container:generic.transfer-list.items-left']//div[@id='label:generic.transfer-list.test']
+    Select From List               list=field:admin.users.modal.roles  item=test
     Click Element                  id=btn:admin.users.modal.submit
     Wait Until Page Contains       User created  timeout=5s
-    Wait Until Element Is Visible  xpath=//div[@id='table:admin.users']//div[@role='row'][@row-id='test']  timeout=5s
+    Wait Until Row Is Visible      table=table:admin.users  row=test
     Close Browser
 
 Log as test user
