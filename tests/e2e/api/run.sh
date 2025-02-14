@@ -2,7 +2,7 @@
 
 set -e
 
-. ../flowg.sh
+. ../../flowg.sh
 
 hurl \
   --variable admin_token=${FLOWG_ADMIN_TOKEN} \

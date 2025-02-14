@@ -17,6 +17,7 @@ export function Actions<T>({ data, onDelete }: ActionsProps<T>) {
           size="small"
           color="error"
           onClick={() => onDelete(data!)}
+          data-ref="btn:generic.tablerow.actions.delete"
         >
           <DeleteIcon />
         </Button>

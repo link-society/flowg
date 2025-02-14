@@ -93,7 +93,10 @@ export const UserList = ({ roles, users }: UserListProps) => {
         }
         className="bg-blue-400 text-white shadow-lg z-20"
       />
-      <CardContent className="p-0! grow shrink h-0 ag-theme-material flowg-table">
+      <CardContent
+        id="table:admin.users"
+        className="p-0! grow shrink h-0 ag-theme-material flowg-table"
+      >
         <AgGridReact<UserModel>
           ref={gridRef}
           loading={loading}

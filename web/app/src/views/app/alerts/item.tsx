@@ -35,7 +35,7 @@ export const AlertView = () => {
 
   const onCreate = useCallback(
     (name: string) => {
-      window.location.pathname = `/web/alerts/${name}`
+      navigate(`/web/alerts/${name}`)
     },
     [],
   )
@@ -43,6 +43,7 @@ export const AlertView = () => {
   const [onDelete, deleteLoading] = useApiOperation(
     async () => {
       await configApi.deleteAlert(currentAlert!.name)
+      notify.success('Alert deleted')
       navigate('/web/alerts')
     },
     [currentAlert],
@@ -86,6 +87,7 @@ export const AlertView = () => {
             />
 
             <Button
+              id="btn:alerts.delete"
               variant="contained"
               color="error"
               size="small"
@@ -100,6 +102,7 @@ export const AlertView = () => {
             </Button>
 
             <Button
+              id="btn:alerts.save"
               variant="contained"
               color="secondary"
               size="small"
@@ -137,7 +140,10 @@ export const AlertView = () => {
                     }
                   }
                 >
-                  <ListItemText primary={alert} />
+                  <ListItemText
+                    id={`label:alerts.list-item.${alert}`}
+                    primary={alert}
+                  />
                 </ListItemButton>
               ))}
             </List>

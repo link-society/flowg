@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useApiOperation } from '@/lib/hooks/api'
+import { useNotify } from '@/lib/hooks/notify'
 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import LockIcon from '@mui/icons-material/Lock'
@@ -15,16 +16,30 @@ import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 
 import * as authApi from '@/lib/api/operations/auth'
+import { UnauthenticatedError } from '@/lib/api/errors'
 
 export const LoginView = () => {
   const navigate = useNavigate()
+  const notify = useNotify()
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
   const [handleLogin, loading] = useApiOperation(
     async () => {
-      await authApi.login(username, password)
+      try {
+        await authApi.login(username, password)
+      }
+      catch (error) {
+        if (error instanceof UnauthenticatedError) {
+          notify.error('Invalid credentials')
+          return
+        }
+        else {
+          throw error
+        }
+      }
+
       navigate('/web/')
     },
     [username, password],
@@ -52,6 +67,7 @@ export const LoginView = () => {
                 <Box className="flex flex-row items-end">
                   <AccountCircleIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />
                   <TextField
+                    id="input:login.username"
                     label="Username"
                     value={username}
                     type="text"
@@ -65,6 +81,7 @@ export const LoginView = () => {
                 <Box className="flex flex-row items-end">
                   <LockIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />
                   <TextField
+                    id="input:login.password"
                     label="Password"
                     value={password}
                     type="password"
@@ -80,6 +97,7 @@ export const LoginView = () => {
               <Divider />
 
               <Button
+                id="btn:login.submit"
                 variant="contained"
                 color="secondary"
                 className="w-full"

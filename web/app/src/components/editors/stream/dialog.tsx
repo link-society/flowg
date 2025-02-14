@@ -87,7 +87,9 @@ export const OpenStreamDialog = ({ stream }: OpenStreamDialogProps) => {
         fullScreen
         open={open}
         onClose={() => setOpen(false)}
-        TransitionComponent={Transition}
+        slots={{
+          transition: Transition,
+        }}
       >
         <AppBar sx={{ position: 'relative' }}>
           <Toolbar className="gap-3">

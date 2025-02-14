@@ -36,18 +36,21 @@ export const NewAlertModal = ({ open, onClose }: DialogProps<void, string | null
       fullWidth
       open={open}
       onClose={() => onClose(null)}
-      PaperProps={{
-        component: 'form',
-        onSubmit: (e: React.FormEvent<HTMLFormElement>) => {
-          e.preventDefault()
-          onSubmit()
-        }
+      slotProps={{
+        paper: {
+          component: 'form',
+          onSubmit: (e: React.FormEvent<HTMLFormElement>) => {
+            e.preventDefault()
+            onSubmit()
+          },
+        },
       }}
     >
       <DialogTitle>Create new alert</DialogTitle>
       <DialogContent>
         <div className="pt-3 w-full">
           <TextField
+            id="input:alerts.modal.name"
             label="Alert name"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -60,6 +63,7 @@ export const NewAlertModal = ({ open, onClose }: DialogProps<void, string | null
       </DialogContent>
       <DialogActions>
         <Button
+          id="btn:alerts.modal.cancel"
           variant="contained"
           startIcon={<CancelIcon />}
           onClick={() => onClose(null)}
@@ -68,6 +72,7 @@ export const NewAlertModal = ({ open, onClose }: DialogProps<void, string | null
           Cancel
         </Button>
         <Button
+          id="btn:alerts.modal.save"
           variant="contained"
           color="secondary"
           startIcon={!loading && <SaveIcon />}

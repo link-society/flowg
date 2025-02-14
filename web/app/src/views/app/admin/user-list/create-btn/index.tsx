@@ -32,6 +32,7 @@ export const CreateUserButton = ({ roles, onUserCreated }: CreateUserButtonProps
 
   return (
     <Button
+      id="btn:admin.users.create"
       variant="contained"
       color="secondary"
       size="small"
