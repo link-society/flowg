@@ -41,6 +41,10 @@ Create test user
     Click Element                  id=btn:admin.users.modal.submit
     Wait Until Page Contains       User created  timeout=5s
     Wait Until Element Is Visible  xpath=//div[@id='table:admin.users']//div[@role='row'][@row-id='test']  timeout=5s
-    Logout
-    Log as                         username=test  password=test
+    Close Browser
+
+Log as test user
+    Depends On Test  Create test user
+    Open Browser     ${BASE_URL}  ${BROWSER}
+    Log as           username=test  password=test
     Close Browser
