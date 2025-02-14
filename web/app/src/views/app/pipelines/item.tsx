@@ -36,8 +36,9 @@ export const PipelineView = () => {
 
   const { permissions } = useProfile()
   const { currentPipeline } = useLoaderData() as LoaderData
+  const initialFlow = currentPipeline!.flow
 
-  const [flow, setFlow] = useState(currentPipeline!.flow)
+  const [flow, setFlow] = useState(initialFlow)
 
   const onChange = useCallback(
     (newFlow: PipelineModel) => {
@@ -153,7 +154,7 @@ export const PipelineView = () => {
             <PipelineList className="w-full h-full" />
           </Grid>
           <Grid size={{ xs: 8 }} className="h-full">
-            <FlowEditor flow={flow} onFlowChange={onChange} />
+            <FlowEditor flow={initialFlow} onFlowChange={onChange} />
           </Grid>
           <Grid size={{ xs: 2 }} className="h-full flex flex-col items-stretch gap-2">
             <TransformerList className="grow shrink h-0" />
