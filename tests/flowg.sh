@@ -6,6 +6,10 @@ FLOWG_CMD_BG="docker run -d --rm -v ./data:/data -p 5080:5080/tcp -p 5514:5514/u
 FLOWG_CMD_FAILED="docker run -d --rm -e FLOWG_SYSLOG_TLS_ENABLED=true -v ./data:/data -p 5080:5080/tcp -p 5514:5514/udp linksociety/flowg:latest"
 
 flowg_cleanup_data() {
+  echo -n "Kill dangling processes..."
+  killall firefox-bin geckodriver 2>/dev/null || true
+  echo " ok"
+
   echo -n "Cleaning up data..."
   sudo rm -rf ./data/
   echo " ok"
@@ -35,7 +39,7 @@ flowg_acl_guest() {
 }
 
 flowg_start() {
-  echo -n "Check FlowG Docker image exists..."
+  echo -n "Check if FlowG Docker image exists..."
 
   DOCKER_CONTAINER_ID=$(${FLOWG_CMD_FAILED} serve)
   sleep 3
