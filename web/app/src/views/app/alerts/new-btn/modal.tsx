@@ -50,6 +50,7 @@ export const NewAlertModal = ({ open, onClose }: DialogProps<void, string | null
       <DialogContent>
         <div className="pt-3 w-full">
           <TextField
+            id="input:alerts.modal.name"
             label="Alert name"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -62,6 +63,7 @@ export const NewAlertModal = ({ open, onClose }: DialogProps<void, string | null
       </DialogContent>
       <DialogActions>
         <Button
+          id="btn:alerts.modal.cancel"
           variant="contained"
           startIcon={<CancelIcon />}
           onClick={() => onClose(null)}
@@ -70,6 +72,7 @@ export const NewAlertModal = ({ open, onClose }: DialogProps<void, string | null
           Cancel
         </Button>
         <Button
+          id="btn:alerts.modal.save"
           variant="contained"
           color="secondary"
           startIcon={!loading && <SaveIcon />}

@@ -11,8 +11,12 @@ type AlertEditorProps = {
 
 export const AlertEditor = ({ webhook, onWebhookChange }: AlertEditorProps) => {
   return (
-    <div className="flex flex-col items-stretch gap-3">
+    <div
+      id="container:editor.alerts"
+      className="flex flex-col items-stretch gap-3"
+    >
       <TextField
+        id="input:editor.alerts.webhook_url"
         label="Webhook URL"
         variant="outlined"
         type="text"
@@ -28,6 +32,7 @@ export const AlertEditor = ({ webhook, onWebhookChange }: AlertEditorProps) => {
       <Divider />
 
       <KeyValueEditor
+        id="field:editor.alerts.headers"
         keyLabel="HTTP Header"
         valueLabel="Value"
         keyValues={Object.entries(webhook.headers)}

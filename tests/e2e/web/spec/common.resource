@@ -13,6 +13,7 @@ API GET
     ${response}=  GET                ${BASE_URL}${path}  headers=&{headers}  expected_status=${expected_status}
     RETURN                           ${response}
 
+
 Log as
     [Arguments]               ${username}  ${password}
     Go To                     url=${BASE_URL}/web/login
@@ -21,9 +22,11 @@ Log as
     Click Element             id=btn:login.submit
     Wait Until Page Contains  Welcome                  timeout=5s
 
+
 Logout
     Click Navbar Menu Item    id=menu:navbar.profile  id=link:navbar.profile.logout
     Wait Until Page Contains  Sign In  timeout=5s
+
 
 Click Navbar Menu Item
     [Arguments]                    ${menu_locator}  ${item_locator}
@@ -55,3 +58,22 @@ Remove Row
 Row Should Not Be Visible
     [Arguments]                    ${table}  ${row}
     Element Should Not Be Visible  xpath=//div[@id='${table}']//div[@role='row'][@row-id='${row}']
+
+
+Input Key/Value Pair
+    [Arguments]   ${editor}  ${key}  ${value}
+    Input Text    xpath=//div[@id='${editor}']//div[@data-ref='input:generic.kv-editor.new.key']//input  ${key}
+    Input Text    xpath=//div[@id='${editor}']//div[@data-ref='input:generic.kv-editor.new.value']//input  ${value}
+    Click Button  xpath=//div[@id='${editor}']//button[@data-ref='btn:generic.kv-editor.new.submit']
+
+
+Remove Key/Value Pair
+    [Arguments]                        ${editor}  ${item}
+    Element Should Be Visible          xpath=//div[@id='${editor}']//div[@data-ref='entry:generic.kv-editor.item.${item}']
+    Click Button                       xpath=//div[@id='${editor}']//div[@data-ref='entry:generic.kv-editor.item.${item}']//button[@data-ref='btn:generic.kv-editor.item.delete']
+    Wait Until Element Is Not Visible  xpath=//div[@id='${editor}']//div[@data-ref='entry:generic.kv-editor.item.${item}']
+
+
+Wait Until Key/Value Pair Is Visible
+    [Arguments]                    ${editor}  ${item}
+    Wait Until Element Is Visible  xpath=//div[@id='${editor}']//div[@data-ref='entry:generic.kv-editor.item.${item}']  timeout=5s
