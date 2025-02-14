@@ -9,6 +9,7 @@ import Button from '@mui/material/Button'
 type KeyValue = [string, string]
 
 type KeyValueEditorProps = Readonly<{
+  id?: string
   keyLabel?: string
   valueLabel?: string
   keyValues: KeyValue[]
@@ -27,13 +28,18 @@ export const KeyValueEditor = (props: KeyValueEditorProps) => {
   )
 
   return (
-    <div className="flex flex-col items-stretch gap-2">
+    <div
+      id={props.id ?? 'field:generic.kv-editor'}
+      className="flex flex-col items-stretch gap-2"
+    >
       {pairs.map(([key, value], index) => (
         <div
+          data-ref={`entry:generic.kv-editor.item.${key.toLowerCase().replace(/\s+/g, '-')}`}
           key={key}
           className="flex flex-row items-stretch gap-2"
         >
           <TextField
+            data-ref="input:generic.kv-editor.item.key"
             label={props.keyLabel ?? 'Key'}
             value={key}
             onChange={(e) => {
@@ -49,6 +55,7 @@ export const KeyValueEditor = (props: KeyValueEditorProps) => {
           />
 
           <TextField
+            data-ref="input:generic.kv-editor.item.value"
             label={props.valueLabel ?? 'Value'}
             value={value}
             onChange={(e) => {
@@ -64,6 +71,7 @@ export const KeyValueEditor = (props: KeyValueEditorProps) => {
           />
 
           <Button
+            data-ref="btn:generic.kv-editor.item.delete"
             color="error"
             variant="contained"
             size="small"
@@ -94,6 +102,7 @@ export const KeyValueEditor = (props: KeyValueEditorProps) => {
         }}
       >
         <TextField
+          data-ref="input:generic.kv-editor.new.key"
           label={props.keyLabel ?? 'Key'}
           value={newKey}
           onChange={(e) => {
@@ -106,6 +115,7 @@ export const KeyValueEditor = (props: KeyValueEditorProps) => {
         />
 
         <TextField
+          data-ref="input:generic.kv-editor.new.value"
           label={props.valueLabel ?? 'Value'}
           value={newValue}
           onChange={(e) => {
@@ -118,6 +128,7 @@ export const KeyValueEditor = (props: KeyValueEditorProps) => {
         />
 
         <Button
+          data-ref="btn:generic.kv-editor.new.submit"
           color="primary"
           variant="contained"
           size="small"
