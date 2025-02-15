@@ -77,3 +77,9 @@ Remove Key/Value Pair
 Wait Until Key/Value Pair Is Visible
     [Arguments]                    ${editor}  ${item}
     Wait Until Element Is Visible  xpath=//div[@id='${editor}']//div[@data-ref='entry:generic.kv-editor.item.${item}']  timeout=5s
+
+
+Input Code
+    [Arguments]                       ${editor}  ${code}
+    Wait Until Page Contains Element  css=div.monaco-editor  timeout=5s
+    Execute Javascript                ${CURDIR}/monaco-input.js  ARGUMENTS  ${editor}  ${code}

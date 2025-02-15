@@ -40,6 +40,7 @@ export const TransformerView = () => {
   const [onDelete, deleteLoading] = useApiOperation(
     async () => {
       await configApi.deleteTransformer(currentTransformer!.name)
+      notify.success('Transformer deleted')
       navigate('/web/transformers')
     },
     [currentTransformer],
@@ -83,6 +84,7 @@ export const TransformerView = () => {
             />
 
             <Button
+              id="btn:transformers.delete"
               variant="contained"
               color="error"
               size="small"
@@ -97,6 +99,7 @@ export const TransformerView = () => {
             </Button>
 
             <Button
+              id="btn:transformers.save"
               variant="contained"
               color="secondary"
               size="small"
@@ -134,7 +137,10 @@ export const TransformerView = () => {
                     }
                   }
                 >
-                  <ListItemText primary={transformer} />
+                  <ListItemText
+                    id={`label:transformers.list-item.${transformer}`}
+                    primary={transformer}
+                  />
                 </ListItemButton>
               ))}
             </List>
