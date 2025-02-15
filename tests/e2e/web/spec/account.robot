@@ -1,7 +1,13 @@
 *** Settings ***
-Library   DependencyLibrary
-Library   SeleniumLibrary
-Resource  common.resource
+Library    DependencyLibrary
+Library    SeleniumLibrary
+
+Variables  ../resources/vars.py
+
+Resource   ../resources/auth.resource
+Resource   ../resources/nav.resource
+Resource   ../resources/api.resource
+Resource   ../resources/components/table.resource
 
 *** Test Cases ***
 Create and Delete Personal Access Token
