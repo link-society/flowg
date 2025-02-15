@@ -1,8 +1,13 @@
 *** Settings ***
-Library   DependencyLibrary
-Library   SeleniumLibrary
-Library   RequestsLibrary
-Resource  common.resource
+Library    DependencyLibrary
+Library    SeleniumLibrary
+
+Variables  ../resources/vars.py
+
+Resource   ../resources/auth.resource
+Resource   ../resources/nav.resource
+Resource   ../resources/components/forms/transfer-list.resource
+Resource   ../resources/components/table.resource
 
 *** Test Cases ***
 Create test role
