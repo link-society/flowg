@@ -26,6 +26,7 @@ export const ProfileMenu = () => {
   return (
     <>
       <Button
+        id="menu:navbar.profile"
         color="inherit"
         onClick={handleOpen}
         startIcon={<AccountCircleIcon />}
@@ -51,6 +52,7 @@ export const ProfileMenu = () => {
       >
         <MenuItem onClick={handleClose}>
           <Button
+            id="link:navbar.profile.account"
             href="/web/account"
             color="secondary"
             startIcon={<AccountCircleIcon />}
@@ -62,6 +64,7 @@ export const ProfileMenu = () => {
         {permissions.can_view_acls && (
           <MenuItem onClick={handleClose}>
             <Button
+              id="link:navbar.profile.admin"
               href="/web/admin"
               color="secondary"
               startIcon={<DashboardIcon />}
@@ -75,6 +78,7 @@ export const ProfileMenu = () => {
 
         <MenuItem onClick={handleClose}>
           <Button
+            id="link:navbar.profile.logout"
             href="/web/logout"
             color="secondary"
             startIcon={<LogoutIcon />}

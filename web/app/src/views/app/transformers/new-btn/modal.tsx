@@ -33,18 +33,21 @@ export const NewTransformerModal = ({ open, onClose }: DialogProps<void, string 
       fullWidth
       open={open}
       onClose={() => onClose(null)}
-      PaperProps={{
-        component: 'form',
-        onSubmit: (e: React.FormEvent<HTMLFormElement>) => {
-          e.preventDefault()
-          onSubmit()
-        }
+      slotProps={{
+        paper: {
+          component: 'form',
+          onSubmit: (e: React.FormEvent<HTMLFormElement>) => {
+            e.preventDefault()
+            onSubmit()
+          },
+        },
       }}
     >
       <DialogTitle>Create new transformer</DialogTitle>
       <DialogContent>
         <div className="pt-3 w-full">
           <TextField
+            id="input:transformers.modal.name"
             label="Transformer name"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -57,6 +60,7 @@ export const NewTransformerModal = ({ open, onClose }: DialogProps<void, string 
       </DialogContent>
       <DialogActions>
         <Button
+          id="btn:transformers.modal.cancel"
           variant="contained"
           startIcon={<CancelIcon />}
           onClick={() => onClose(null)}
@@ -65,6 +69,7 @@ export const NewTransformerModal = ({ open, onClose }: DialogProps<void, string 
           Cancel
         </Button>
         <Button
+          id="btn:transformers.modal.save"
           variant="contained"
           color="secondary"
           startIcon={!loading && <SaveIcon />}

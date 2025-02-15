@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { useLoaderData, useNavigate } from 'react-router'
 import { useProfile } from '@/lib/context/profile'
 import { useApiOperation } from '@/lib/hooks/api'
@@ -33,16 +33,14 @@ export const TransformerView = () => {
 
   const [code, setCode] = useState(currentTransformer!.script)
 
-  const onCreate = useCallback(
-    (name: string) => {
-      window.location.pathname = `/web/transformers/${name}`
-    },
-    [],
-  )
+  const onCreate = (name: string) => {
+    navigate(`/web/transformers/${name}`)
+  }
 
   const [onDelete, deleteLoading] = useApiOperation(
     async () => {
       await configApi.deleteTransformer(currentTransformer!.name)
+      notify.success('Transformer deleted')
       navigate('/web/transformers')
     },
     [currentTransformer],
@@ -86,6 +84,7 @@ export const TransformerView = () => {
             />
 
             <Button
+              id="btn:transformers.delete"
               variant="contained"
               color="error"
               size="small"
@@ -100,6 +99,7 @@ export const TransformerView = () => {
             </Button>
 
             <Button
+              id="btn:transformers.save"
               variant="contained"
               color="secondary"
               size="small"
@@ -137,7 +137,10 @@ export const TransformerView = () => {
                     }
                   }
                 >
-                  <ListItemText primary={transformer} />
+                  <ListItemText
+                    id={`label:transformers.list-item.${transformer}`}
+                    primary={transformer}
+                  />
                 </ListItemButton>
               ))}
             </List>

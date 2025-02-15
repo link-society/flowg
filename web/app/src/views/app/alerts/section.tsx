@@ -34,7 +34,7 @@ export const AlertView = () => {
 
             <NewAlertButton
               onAlertCreated={(name) => {
-                window.location.pathname = `/web/alerts/${name}`
+                navigate(`/web/alerts/${name}`)
               }}
             />
           </div>

@@ -30,6 +30,7 @@ export const NewAlertButton = (props: NewAlertButtonProps) => {
 
   return (
     <Button
+      id="btn:alerts.create"
       variant="contained"
       color="primary"
       size="small"

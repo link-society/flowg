@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, ReactNode } from 'react'
+import { useEffect, useState, ReactNode } from 'react'
 
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 
@@ -26,22 +26,19 @@ export function NodeList(props: NodeListProps) {
 
   const [items, setItems] = useState<string[]>([])
 
-  const refresh = useCallback(
-    async () => {
-      setLoading(true)
-      try {
-        const items = await props.fetchItems()
-        setItems(items)
-        setDirty(false)
-      }
-      catch (err) {
-        setError(err as Error)
-      }
+  const refresh = async () => {
+    setLoading(true)
+    try {
+      const items = await props.fetchItems()
+      setItems(items)
+      setDirty(false)
+    }
+    catch (err) {
+      setError(err as Error)
+    }
 
-      setLoading(false)
-    },
-    [props.fetchItems],
-  )
+    setLoading(false)
+  }
 
   useEffect(
     () => { refresh() },

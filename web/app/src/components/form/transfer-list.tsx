@@ -28,7 +28,7 @@ function intersection<T>(a: readonly T[], b: readonly T[], getItemId: (item: T) 
 
 type TransferListProps<T> = Readonly<{
   choices: T[]
-  getItemId: (item: T) => any
+  getItemId: (item: T) => string
   renderItem: (item: T) => ReactNode
   onChoiceUpdate: (choices: readonly T[]) => void
 }>
@@ -40,7 +40,7 @@ export function TransferList<T>(props: TransferListProps<T>) {
 
   useEffect(
     () => props.onChoiceUpdate(right),
-    [right, props.onChoiceUpdate]
+    [right]
   )
 
   const leftChecked = intersection(checked, left, props.getItemId)
@@ -86,13 +86,16 @@ export function TransferList<T>(props: TransferListProps<T>) {
   const customList = (items: readonly T[]) => (
     <Paper variant="outlined" className="min-h-60 max-h-60 overflow-auto">
       <List dense component="div">
-        {items.map((value: T, idx) => {
-          const labelId = `transfer-list-item-${idx}-label`
+        {items.map((value: T) => {
+          const itemId = props.getItemId(value)
+          const inputId = `checkbox:generic.transfer-list.${itemId}`
+          const labelId = `label:generic.transfer-list.${itemId}`
 
           return (
-            <ListItemButton key={props.getItemId(value)} onClick={handleToggle(value)}>
+            <ListItemButton key={itemId} onClick={handleToggle(value)}>
               <ListItemIcon>
                 <Checkbox
+                  id={inputId}
                   checked={checked.find((v) => {
                     return props.getItemId(v) === props.getItemId(value)
                   }) !== undefined}
@@ -117,10 +120,16 @@ export function TransferList<T>(props: TransferListProps<T>) {
       spacing={2}
       className="justify-center items-center"
     >
-      <Grid size="grow">{customList(left)}</Grid>
+      <Grid
+        data-ref="container:generic.transfer-list.items-left"
+        size="grow"
+      >
+        {customList(left)}
+      </Grid>
       <Grid>
         <Grid container direction="column" sx={{ alignItems: 'center' }}>
           <Button
+            id="btn:generic.transfer-list.all-right"
             sx={{ my: 0.5 }}
             variant="outlined"
             size="small"
@@ -131,6 +140,7 @@ export function TransferList<T>(props: TransferListProps<T>) {
             <KeyboardDoubleArrowRightIcon />
           </Button>
           <Button
+            id="btn:generic.transfer-list.selected-right"
             sx={{ my: 0.5 }}
             variant="outlined"
             size="small"
@@ -141,6 +151,7 @@ export function TransferList<T>(props: TransferListProps<T>) {
             <KeyboardArrowRightIcon />
           </Button>
           <Button
+            id="btn:generic.transfer-list.selected-left"
             sx={{ my: 0.5 }}
             variant="outlined"
             size="small"
@@ -151,6 +162,7 @@ export function TransferList<T>(props: TransferListProps<T>) {
             <KeyboardArrowLeftIcon />
           </Button>
           <Button
+            id="btn:generic.transfer-list.all-left"
             sx={{ my: 0.5 }}
             variant="outlined"
             size="small"
@@ -162,7 +174,12 @@ export function TransferList<T>(props: TransferListProps<T>) {
           </Button>
         </Grid>
       </Grid>
-      <Grid size="grow">{customList(right)}</Grid>
+      <Grid
+        data-ref="container:generic.transfer-list.items-right"
+        size="grow"
+      >
+        {customList(right)}
+      </Grid>
     </Grid>
   )
 }

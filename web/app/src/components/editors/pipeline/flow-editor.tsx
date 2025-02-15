@@ -101,31 +101,22 @@ export const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange }) =>
 
   useEffect(
     () => { onFlowChange({ nodes, edges }) },
-    [nodes, edges, onFlowChange],
+    [nodes, edges],
   )
 
-  const onNodesChange: OnNodesChange = useCallback(
-    (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
-    [setNodes],
-  )
+  const onNodesChange: OnNodesChange = (changes) =>
+    setNodes((nds) => applyNodeChanges(changes, nds))
 
-  const onEdgesChange: OnEdgesChange = useCallback(
-    (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
-    [setEdges],
-  )
+  const onEdgesChange: OnEdgesChange = (changes) =>
+    setEdges((eds) => applyEdgeChanges(changes, eds))
 
-  const onConnect: OnConnect = useCallback(
-    (conn) => setEdges((eds) => addEdge(conn, eds)),
-    [setEdges],
-  )
+  const onConnect: OnConnect = (conn) =>
+    setEdges((eds) => addEdge(conn, eds))
 
-  const onDragOver: DragEventHandler<HTMLDivElement> = useCallback(
-    (event) => {
-      event.preventDefault()
-      event.dataTransfer.dropEffect = 'move'
-    },
-    [],
-  )
+  const onDragOver: DragEventHandler<HTMLDivElement> = (event) => {
+    event.preventDefault()
+    event.dataTransfer.dropEffect = 'move'
+  }
 
   const onDrop: DragEventHandler<HTMLDivElement> = useCallback(
     (event) => {
@@ -180,7 +171,7 @@ export const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange }) =>
         return [...nds, newNode]
       })
     },
-    [screenToFlowPosition, setNodes],
+    [screenToFlowPosition],
   )
 
   return (

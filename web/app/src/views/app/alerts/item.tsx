@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { useLoaderData, useNavigate } from 'react-router'
 import { useProfile } from '@/lib/context/profile'
 import { useApiOperation } from '@/lib/hooks/api'
@@ -33,16 +33,14 @@ export const AlertView = () => {
 
   const [webhook, setWebhook] = useState(currentAlert!.webhook)
 
-  const onCreate = useCallback(
-    (name: string) => {
-      window.location.pathname = `/web/alerts/${name}`
-    },
-    [],
-  )
+  const onCreate = (name: string) => {
+    navigate(`/web/alerts/${name}`)
+  }
 
   const [onDelete, deleteLoading] = useApiOperation(
     async () => {
       await configApi.deleteAlert(currentAlert!.name)
+      notify.success('Alert deleted')
       navigate('/web/alerts')
     },
     [currentAlert],
@@ -86,6 +84,7 @@ export const AlertView = () => {
             />
 
             <Button
+              id="btn:alerts.delete"
               variant="contained"
               color="error"
               size="small"
@@ -100,6 +99,7 @@ export const AlertView = () => {
             </Button>
 
             <Button
+              id="btn:alerts.save"
               variant="contained"
               color="secondary"
               size="small"
@@ -137,7 +137,10 @@ export const AlertView = () => {
                     }
                   }
                 >
-                  <ListItemText primary={alert} />
+                  <ListItemText
+                    id={`label:alerts.list-item.${alert}`}
+                    primary={alert}
+                  />
                 </ListItemButton>
               ))}
             </List>
