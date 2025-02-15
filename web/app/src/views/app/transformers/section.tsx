@@ -34,7 +34,7 @@ export const TransformerView = () => {
 
             <NewTransformerButton
               onTransformerCreated={(name) => {
-                window.location.pathname = `/web/transformers/${name}`
+                navigate(`/web/transformers/${name}`)
               }}
             />
           </div>

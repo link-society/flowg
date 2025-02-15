@@ -30,6 +30,7 @@ export const NewTransformerButton = (props: NewTransformerButtonProps) => {
 
   return (
     <Button
+      id="btn:transformers.create"
       variant="contained"
       color="primary"
       size="small"

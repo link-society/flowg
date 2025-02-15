@@ -4,11 +4,12 @@ import Editor, { useMonaco } from '@monaco-editor/react'
 import { vrlLanguageDefinition, vrlThemeDefinition } from '@/lib/vrl-highlighter'
 
 type CodeEditorProps = Readonly<{
+  id?: string
   code: string
   onCodeChange: (value: string) => void
 }>
 
-export const CodeEditor = ({ code, onCodeChange }: CodeEditorProps) => {
+export const CodeEditor = ({ id, code, onCodeChange }: CodeEditorProps) => {
   const [value, setValue] = useState(code)
   const monaco = useMonaco()
 
@@ -37,6 +38,7 @@ export const CodeEditor = ({ code, onCodeChange }: CodeEditorProps) => {
 
   return (
     <Editor
+      wrapperProps={{id: id ?? ''}}
       defaultValue={value}
       defaultLanguage='vrl'
       theme='vrl-theme'
