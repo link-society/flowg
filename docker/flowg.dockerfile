@@ -77,7 +77,7 @@ RUN NODE_ENV="production" npm run build
 ## BUILD GO CODE
 ##############################
 
-FROM golang:1.23-alpine3.21 AS builder-go
+FROM golang:1.24-alpine3.21 AS builder-go
 
 RUN apk add --no-cache gcc musl-dev
 
