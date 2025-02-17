@@ -49,7 +49,7 @@ View logs sent via Syslog (RFC 3164)
 
 Watch logs
     Send log via Syslog (RFC 3164)     hello world
-    Open Browser                       ${BASE_URL}  Firefox
+    Open Browser                       ${BASE_URL}  ${BROWSER}
     Log as                             username=root  password=root
     Click Element                      id=link:navbar.streams
     Wait Until Page Contains           hello world  timeout=5s
