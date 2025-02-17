@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
+import CheckIcon from '@mui/icons-material/Check'
 
 import Box from '@mui/material/Box'
 import Divider from '@mui/material/Divider'
@@ -13,15 +14,16 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
 import dayjs from 'dayjs'
 
 type RelTimeWindowOption = {
+  key: string
   label: string
   value: number
 }
 
 const RELATIVE_TIMEWINDOW_OPTIONS: RelTimeWindowOption[] = [
-  { label: 'Last 15 Minutes', value: 15 * 60 * 1000 },
-  { label: 'Last Hour', value: 60 * 60 * 1000 },
-  { label: 'Last Day', value: 24 * 60 * 60 * 1000 },
-  { label: 'Last Week', value: 7 * 24 * 60 * 60 * 1000 },
+  { key: 'last-15min', label: 'Last 15 Minutes', value: 15 * 60 * 1000 },
+  { key: 'last-1h', label: 'Last Hour', value: 60 * 60 * 1000 },
+  { key: 'last-day', label: 'Last Day', value: 24 * 60 * 60 * 1000 },
+  { key: 'last-week', label: 'Last Week', value: 7 * 24 * 60 * 60 * 1000 },
 ]
 
 const RELATIVE_TIMEWINDOW_LABELS_BY_VALUE = RELATIVE_TIMEWINDOW_OPTIONS.reduce(
@@ -92,6 +94,7 @@ export const TimeWindowSelector = ({ onTimeWindowChanged }: TimeWindowSelectorPr
   )
 
   const [menu, setMenu] = useState<HTMLElement | null>(null)
+  const open = Boolean(menu)
 
   const [from, setFrom] = useState(new Date(now.getTime() - DEFAULT_TIMEWINDOW_VALUE))
   const [to, setTo] = useState(now)
@@ -122,6 +125,11 @@ export const TimeWindowSelector = ({ onTimeWindowChanged }: TimeWindowSelectorPr
     [timeWindowType, relativeTimeWindow, from, to, live],
   )
 
+  const handleClose = () => {
+    setMenu(null)
+    onTimeWindowChanged({ make: timeWindowFactory })
+  }
+
   useEffect(
     () => {
       onTimeWindowChanged({ make: timeWindowFactory })
@@ -132,6 +140,7 @@ export const TimeWindowSelector = ({ onTimeWindowChanged }: TimeWindowSelectorPr
   return (
     <>
       <Button
+        id="btn:streams.timewindow-selector.open"
         variant="outlined"
         onClick={(evt) => {
           setMenu(evt.currentTarget)
@@ -153,12 +162,10 @@ export const TimeWindowSelector = ({ onTimeWindowChanged }: TimeWindowSelectorPr
         />
       </Button>
       <Menu
+        id="menu:streams.timewindow-selector"
         anchorEl={menu}
-        open={Boolean(menu)}
-        onClose={() => {
-          setMenu(null)
-          onTimeWindowChanged({make: timeWindowFactory})
-        }}
+        open={open}
+        onClose={handleClose}
         MenuListProps={{
           sx: { width: menu?.offsetWidth },
         }}
@@ -175,8 +182,20 @@ export const TimeWindowSelector = ({ onTimeWindowChanged }: TimeWindowSelectorPr
             }}
             className="p-3 w-full"
           >
-            <ToggleButton value="relative" className="grow">Relative</ToggleButton>
-            <ToggleButton value="absolute" className="grow">Absolute</ToggleButton>
+            <ToggleButton
+              id="btn:streams.timewindow-selector.type.relative"
+              value="relative"
+              className="grow"
+            >
+              Relative
+            </ToggleButton>
+            <ToggleButton
+              id="btn:streams.timewindow-selector.type.absolute"
+              value="absolute"
+              className="grow"
+            >
+              Absolute
+            </ToggleButton>
           </ToggleButtonGroup>
           <Divider />
 
@@ -195,7 +214,8 @@ export const TimeWindowSelector = ({ onTimeWindowChanged }: TimeWindowSelectorPr
             >
               {RELATIVE_TIMEWINDOW_OPTIONS.map((option) => (
                 <ToggleButton
-                  key={option.value}
+                  id={`btn:streams.timewindow-selector.relative.${option.key}`}
+                  key={option.key}
                   value={option.value}
                 >
                   {option.label}
@@ -239,10 +259,28 @@ export const TimeWindowSelector = ({ onTimeWindowChanged }: TimeWindowSelectorPr
             }}
             className="p-3 w-full"
           >
-            <ToggleButton value={true}>
+            <ToggleButton
+              id="btn:streams.timewindow-selector.live"
+              value={true}
+            >
               Watch Logs
             </ToggleButton>
           </ToggleButtonGroup>
+
+          <Divider />
+
+          <div className="p-3 w-full">
+            <Button
+              id="btn:streams.timewindow-selector.apply"
+              variant="contained"
+              color="primary"
+              className="w-full"
+              endIcon={<CheckIcon />}
+              onClick={handleClose}
+            >
+              Apply
+            </Button>
+          </div>
         </Box>
       </Menu>
     </>
