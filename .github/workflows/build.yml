@@ -46,6 +46,7 @@ jobs:
         with:
           name: oci-flowg
           path: /tmp/oci-flowg.tar
+          retention-days: 1
 
   test-e2e-api:
     runs-on: ubuntu-latest
@@ -133,6 +134,14 @@ jobs:
           description: 'Failure'
           state: 'failure'
           sha: ${{github.event.pull_request.head.sha }}
+
+      - name: upload-logs@artifact
+        if: ${{ github.event_name == 'pull_request' && failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-e2e-reports
+          path: "./tests/e2e/web/reports/"
+          retention-days: 1
 
       - name: report@fail
         if: ${{ github.event_name == 'pull_request' && failure() }}
