@@ -115,6 +115,63 @@ func NewHandler(
 
 		r.Post("/api/v1/test/transformer", TestTransformerUsecase(authStorage))
 		r.Post("/api/v1/test/alerts/{alert}", TestAlertUsecase(authStorage, configStorage))
+
+		service.OpenAPICollector.AnnotateOperation(
+			"GET", "/api/v1/backup/auth",
+			func(oc openapi.OperationContext) error {
+				contentUnits := oc.Response()
+				for i, cu := range contentUnits {
+					if cu.HTTPStatus == 200 {
+						cu.ContentType = "application/octet-stream"
+						cu.Description = "Binary file"
+						cu.Format = "Binary file"
+					}
+
+					contentUnits[i] = cu
+				}
+
+				return nil
+			},
+		)
+		r.Get("/api/v1/backup/auth", BackupAuthUsecase(authStorage))
+
+		service.OpenAPICollector.AnnotateOperation(
+			"GET", "/api/v1/backup/logs",
+			func(oc openapi.OperationContext) error {
+				contentUnits := oc.Response()
+				for i, cu := range contentUnits {
+					if cu.HTTPStatus == 200 {
+						cu.ContentType = "application/octet-stream"
+						cu.Description = "Binary file"
+						cu.Format = "Binary file"
+					}
+
+					contentUnits[i] = cu
+				}
+
+				return nil
+			},
+		)
+		r.Get("/api/v1/backup/logs", BackupLogsUsecase(authStorage, logStorage))
+
+		service.OpenAPICollector.AnnotateOperation(
+			"GET", "/api/v1/backup/config",
+			func(oc openapi.OperationContext) error {
+				contentUnits := oc.Response()
+				for i, cu := range contentUnits {
+					if cu.HTTPStatus == 200 {
+						cu.ContentType = "application/octet-stream"
+						cu.Description = "Binary file"
+						cu.Format = "Binary file"
+					}
+
+					contentUnits[i] = cu
+				}
+
+				return nil
+			},
+		)
+		r.Get("/api/v1/backup/config", BackupConfigUsecase(authStorage, configStorage))
 	})
 
 	return service
