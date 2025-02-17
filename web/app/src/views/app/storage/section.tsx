@@ -36,7 +36,7 @@ export const StreamView = () => {
 
             <NewStreamButton
               onStreamCreated={(name) => {
-                window.location.pathname = `/web/storage/${name}`
+                navigate(`/web/storage/${name}`)
               }}
             />
           </div>
