@@ -111,7 +111,7 @@ export const SSE = (
 
   const cancelScope = eventSource.listen({
     onRequestError({ error }) {
-      cancelScope.abort()
+      cancelScope.abort(`${error}`)
       control.dispatchEvent(new CustomEvent('error', { detail: error }))
     },
     async onResponseError({ response }) {
@@ -131,7 +131,7 @@ export const SSE = (
         }
       }
       catch (error) {
-        cancelScope.abort()
+        cancelScope.abort(`${error}`)
         control.dispatchEvent(new CustomEvent('error', { detail: error }))
       }
     },
@@ -150,7 +150,7 @@ export const SSE = (
     messages,
     control,
     close() {
-      cancelScope.abort()
+      cancelScope.abort('normal')
     }
   }
 }
