@@ -46,6 +46,7 @@ export const QueryPanel = (props: QueryPanelProps) => {
         }}
       >
         <TextField
+          id="input:streams.filter"
           label="Filter"
           variant="outlined"
           size="small"
@@ -64,6 +65,7 @@ export const QueryPanel = (props: QueryPanelProps) => {
 
       <Grid size={{ xs: 2 }}>
         <Button
+          id="btn:streams.query"
           className="w-full"
           variant="contained"
           size="small"
