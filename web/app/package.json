@@ -13,7 +13,7 @@
     "@emotion/styled": "^11.14.0",
     "@fontsource/roboto": "^5.1.1",
     "@monaco-editor/react": "^4.7.0",
-    "@mui/icons-material": "^6.4.3",
+    "@mui/icons-material": "^6.4.4",
     "@mui/material": "^6.4.4",
     "@mui/x-date-pickers": "^7.26.0",
     "@toolpad/core": "^0.12.0",
