@@ -30,6 +30,7 @@ export const NewStreamButton = (props: NewStreamButtonProps) => {
 
   return (
     <Button
+      id="btn:streams.create"
       variant="contained"
       color="primary"
       size="small"

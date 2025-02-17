@@ -31,6 +31,7 @@ export const StreamEditor = ({ streamConfig, onStreamConfigChange }: StreamEdito
           "
         >
           <TextField
+            id="input:editor.streams.retention-size"
             label="Retention size (in MB)"
             variant="outlined"
             type="number"
@@ -44,6 +45,7 @@ export const StreamEditor = ({ streamConfig, onStreamConfigChange }: StreamEdito
           />
 
           <TextField
+            id="input:editor.streams.retention-ttl"
             label="Retention time (in seconds)"
             variant="outlined"
             type="number"
@@ -73,6 +75,7 @@ export const StreamEditor = ({ streamConfig, onStreamConfigChange }: StreamEdito
           {streamConfig.indexed_fields.map((field) => (
             <div key={field} className="flex flex-row items-stretch gap-3">
               <TextField
+                id={`input:editor.streams.indexed-field.item.${field}.name`}
                 label="Field"
                 variant="outlined"
                 type="text"
@@ -89,6 +92,7 @@ export const StreamEditor = ({ streamConfig, onStreamConfigChange }: StreamEdito
               />
 
               <Button
+                id={`btn:editor.streams.indexed-field.item.${field}.delete`}
                 variant="contained"
                 color="error"
                 size="small"
@@ -108,6 +112,7 @@ export const StreamEditor = ({ streamConfig, onStreamConfigChange }: StreamEdito
 
           <div className="flex flex-row items-stretch gap-3">
             <TextField
+              id="input:editor.streams.indexed-field.new.name"
               label="Field"
               variant="outlined"
               type="text"
@@ -119,6 +124,7 @@ export const StreamEditor = ({ streamConfig, onStreamConfigChange }: StreamEdito
             />
 
             <Button
+              id="btn:editor.streams.indexed-field.new.add"
               variant="contained"
               color="primary"
               size="small"

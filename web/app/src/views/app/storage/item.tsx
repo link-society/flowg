@@ -41,6 +41,7 @@ export const StreamView = () => {
   const [onDelete, deleteLoading] = useApiOperation(
     async () => {
       await configApi.purgeStream(currentStream!)
+      notify.success('Stream deleted')
       navigate('/web/storage')
     },
     [currentStream],
@@ -84,6 +85,7 @@ export const StreamView = () => {
             />
 
             <Button
+              id="btn:streams.delete"
               variant="contained"
               color="error"
               size="small"
@@ -98,6 +100,7 @@ export const StreamView = () => {
             </Button>
 
             <Button
+              id="btn:streams.save"
               variant="contained"
               color="secondary"
               size="small"
@@ -135,7 +138,10 @@ export const StreamView = () => {
                     }
                   }
                 >
-                  <ListItemText primary={stream} />
+                  <ListItemText
+                    id={`label:streams.list-item.${stream}`}
+                    primary={stream}
+                  />
                 </ListItemButton>
               ))}
             </List>

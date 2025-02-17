@@ -51,6 +51,7 @@ export const NewStreamModal = ({ open, onClose }: DialogProps<void, string | nul
       <DialogContent>
         <div className="pt-3 w-full">
           <TextField
+            id="input:streams.modal.name"
             label="Stream name"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -63,6 +64,7 @@ export const NewStreamModal = ({ open, onClose }: DialogProps<void, string | nul
       </DialogContent>
       <DialogActions>
         <Button
+          id="btn:streams.modal.cancel"
           variant="contained"
           startIcon={<CancelIcon />}
           onClick={() => onClose(null)}
@@ -71,6 +73,7 @@ export const NewStreamModal = ({ open, onClose }: DialogProps<void, string | nul
           Cancel
         </Button>
         <Button
+          id="btn:streams.modal.save"
           variant="contained"
           color="secondary"
           startIcon={!loading && <SaveIcon />}
