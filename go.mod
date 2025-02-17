@@ -11,7 +11,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/prometheus/client_golang v1.20.5
 	github.com/spf13/cobra v1.9.1
-	github.com/swaggest/openapi-go v0.2.54
+	github.com/swaggest/openapi-go v0.2.55
 	github.com/swaggest/rest v0.2.71
 	github.com/swaggest/swgui v1.8.2
 	github.com/swaggest/usecase v1.3.1
