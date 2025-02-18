@@ -172,6 +172,10 @@ func NewHandler(
 			},
 		)
 		r.Get("/api/v1/backup/config", BackupConfigUsecase(authStorage, configStorage))
+
+		r.Post("/api/v1/restore/auth", RestoreAuthUsecase(authStorage))
+		r.Post("/api/v1/restore/logs", RestoreLogsUsecase(authStorage, logStorage))
+		r.Post("/api/v1/restore/config", RestoreConfigUsecase(authStorage, configStorage))
 	})
 
 	return service
