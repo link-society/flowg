@@ -13,6 +13,10 @@ spec:
       port: 5080
       targetPort: 5080
       protocol: TCP
+    - name: mgmt
+      port: 9113
+      targetPort: 9113
+      protocol: TCP
     - name: syslog
       port: 5514
       targetPort: 5514

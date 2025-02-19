@@ -38,9 +38,17 @@ spec:
             - --http-tls-cert=/data/ssl/tls.crt
             - --http-tls-key=/data/ssl/tls.key
           {{- end }}
+          {{- if .Values.flowg.https.mgmt.enabled }}
+            - --http-tls
+            - --http-tls-cert=/data/ssl/mgmt/tls.crt
+            - --http-tls-key=/data/ssl/mgmt/tls.key
+          {{- end }}
           ports:
             - containerPort: 5080
               hostPort: 5080
+              protocol: TCP
+            - containerPort: 9113
+              hostPort: 9113
               protocol: TCP
             - containerPort: 5514
               hostPort: 5514
@@ -48,11 +56,11 @@ spec:
           livenessProbe:
             httpGet:
               path: /health
-              port: 5080
+              port: 9113
           readinessProbe:
             httpGet:
               path: /health
-              port: 5080
+              port: 9113
           resources:
             {{- toYaml .Values.flowg.resources | nindent 12 }}
           volumeMounts:
@@ -61,6 +69,10 @@ spec:
           {{- if and .Values.flowg.https.enabled (or .Values.flowg.https.certificateFrom.certmanager .Values.flowg.https.certificateFrom.secretRef) }}
             - name: flowg-tls
               mountPath: /data/ssl
+          {{- end }}
+          {{- if and .Values.flowg.https.mgmt.enabled (or .Values.flowg.https.mgmt.certificateFrom.certmanager .Values.flowg.https.mgmt.certificateFrom.secretRef) }}
+            - name: flowg-tls-mgmt
+              mountPath: /data/ssl/mgmt
           {{- end }}
       volumes:
         - name: flowg-data
@@ -79,6 +91,25 @@ spec:
         - name: flowg-tls
           secret:
             secretName: {{ .Values.flowg.https.certificateFrom.secretRef.name }}
+            items:
+              - key: tls.crt
+                path: tls.crt
+              - key: tls.key
+                path: tls.key
+      {{- end }}
+      {{- if and .Values.flowg.https.mgmt.enabled .Values.flowg.https.mgmt.certificateFrom.certmanager }}
+        - name: flowg-tls-mgmt
+          secret:
+            secretName: {{ include "flowg.fullname" . }}-tls
+            items:
+              - key: tls.crt
+                path: tls.crt
+              - key: tls.key
+                path: tls.key
+      {{- else if and .Values.flowg.https.mgmt.enabled .Values.flowg.https.mgmt.certificateFrom.secretRef }}
+        - name: flowg-tls-mgmt
+          secret:
+            secretName: {{ .Values.flowg.https.mgmt.certificateFrom.secretRef.name }}
             items:
               - key: tls.crt
                 path: tls.crt
