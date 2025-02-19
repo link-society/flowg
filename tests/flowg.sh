@@ -1,9 +1,9 @@
 #!/bin/sh
 
-FLOWG_CMD_FG="docker run    --rm -v ./data:/data -p 5080:5080/tcp -p 5514:5514/udp linksociety/flowg:latest"
-FLOWG_CMD_BG="docker run -d --rm -v ./data:/data -p 5080:5080/tcp -p 5514:5514/udp linksociety/flowg:latest"
+FLOWG_CMD_FG="docker run    --rm -v ./data:/data -p 5080:5080/tcp -p 9113:9113/tcp -p 5514:5514/udp linksociety/flowg:latest"
+FLOWG_CMD_BG="docker run -d --rm -v ./data:/data -p 5080:5080/tcp -p 9113:9113/tcp -p 5514:5514/udp linksociety/flowg:latest"
 
-FLOWG_CMD_FAILED="docker run -d --rm -e FLOWG_SYSLOG_TLS_ENABLED=true -v ./data:/data -p 5080:5080/tcp -p 5514:5514/udp linksociety/flowg:latest"
+FLOWG_CMD_FAILED="docker run -d --rm -e FLOWG_SYSLOG_TLS_ENABLED=true -v ./data:/data -p 5080:5080/tcp -p 9113:9113/tcp -p 5514:5514/udp linksociety/flowg:latest"
 
 flowg_cleanup_data() {
   echo -n "Kill dangling processes..."
@@ -55,10 +55,10 @@ flowg_start() {
   do
     echo -n "."
     sleep 0.25
-    nc -z localhost 5080 2>/dev/null && echo " ok" && break
+    nc -z localhost 9113 2>/dev/null && echo " ok" && break
   done
 
-  nc -z localhost 5080 2>/dev/null || (echo " timeout" && exit 1)
+  nc -z localhost 9113 2>/dev/null || (echo " timeout" && exit 1)
 }
 
 
