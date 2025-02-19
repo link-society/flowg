@@ -8,11 +8,13 @@ import (
 	"github.com/vladopajic/go-actor/actor"
 
 	"link-society.com/flowg/internal/services/http"
+	"link-society.com/flowg/internal/services/mgmt"
 	"link-society.com/flowg/internal/services/syslog"
 )
 
 type serviceLayer struct {
 	httpServer   *http.Server
+	mgmtServer   *mgmt.Server
 	syslogServer *syslog.Server
 
 	actor actor.Actor
@@ -21,6 +23,9 @@ type serviceLayer struct {
 func newServiceLayer(
 	httpBindAddress string,
 	httpTlsConfig *tls.Config,
+
+	mgmtBindAddress string,
+	mgmtTlsConfig *tls.Config,
 
 	syslogTCP bool,
 	syslogBindAddress string,
@@ -40,6 +45,11 @@ func newServiceLayer(
 		engineLayer.pipelineRunner,
 	)
 
+	mgmtServer := mgmt.NewServer(
+		mgmtBindAddress,
+		mgmtTlsConfig,
+	)
+
 	syslogServer := syslog.NewServer(
 		syslogTCP,
 		syslogBindAddress,
@@ -50,12 +60,13 @@ func newServiceLayer(
 		engineLayer.pipelineRunner,
 	)
 
-	rootA := actor.Combine(httpServer, syslogServer).
+	rootA := actor.Combine(httpServer, mgmtServer, syslogServer).
 		WithOptions(actor.OptStopTogether()).
 		Build()
 
 	return &serviceLayer{
 		httpServer:   httpServer,
+		mgmtServer:   mgmtServer,
 		syslogServer: syslogServer,
 
 		actor: rootA,
@@ -70,6 +81,10 @@ func (s *serviceLayer) WaitStarted() error {
 	errs := []error{}
 
 	if err := s.httpServer.WaitStarted(); err != nil {
+		errs = append(errs, err)
+	}
+
+	if err := s.mgmtServer.WaitStarted(); err != nil {
 		errs = append(errs, err)
 	}
 
@@ -92,6 +107,10 @@ func (s *serviceLayer) WaitStopped() error {
 	errs := []error{}
 
 	if err := s.syslogServer.WaitStopped(); err != nil {
+		errs = append(errs, err)
+	}
+
+	if err := s.mgmtServer.WaitStopped(); err != nil {
 		errs = append(errs, err)
 	}
 

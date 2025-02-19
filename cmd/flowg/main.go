@@ -16,8 +16,17 @@ import (
 var exitCode int = 0
 
 var (
-	defaultVerbose         = getEnvBool("FLOWG_VERBOSE", false)
+	defaultVerbose = getEnvBool("FLOWG_VERBOSE", false)
+
 	defaultHttpBindAddress = getEnvString("FLOWG_HTTP_BIND_ADDRESS", ":5080")
+	defaultHttpTlsEnabled  = getEnvBool("FLOWG_HTTP_TLS_ENABLED", false)
+	defaultHttpTlsCert     = getEnvString("FLOWG_HTTP_TLS_CERT", "")
+	defaultHttpTlsCertKey  = getEnvString("FLOWG_HTTP_TLS_KEY", "")
+
+	defaultMgmtBindAddress = getEnvString("FLOWG_MGMT_BIND_ADDRESS", ":9113")
+	defaultMgmtTlsEnabled  = getEnvBool("FLOWG_MGMT_TLS_ENABLED", false)
+	defaultMgmtTlsCert     = getEnvString("FLOWG_MGMT_TLS_CERT", "")
+	defaultMgmtTlsCertKey  = getEnvString("FLOWG_MGMT_TLS_KEY", "")
 
 	defaultSyslogProtocol     = getEnvString("FLOWG_SYSLOG_PROTOCOL", "udp")
 	defaultSyslogBindAddr     = getEnvString("FLOWG_SYSLOG_BIND_ADDRESS", ":5514")
@@ -29,10 +38,6 @@ var (
 			return strings.Split(origins, ",")
 		}
 	})()
-
-	defaultHttpTlsEnabled = getEnvBool("FLOWG_HTTP_TLS_ENABLED", false)
-	defaultHttpTlsCert    = getEnvString("FLOWG_HTTP_TLS_CERT", "")
-	defaultHttpTlsCertKey = getEnvString("FLOWG_HTTP_TLS_KEY", "")
 
 	defaultSyslogTlsEnabled     = getEnvBool("FLOWG_SYSLOG_TLS_ENABLED", false)
 	defaultSyslogTlsCert        = getEnvString("FLOWG_SYSLOG_TLS_CERT", "")

@@ -24,6 +24,11 @@ type serveCommandOpts struct {
 	httpTlsCert     string
 	httpTlsCertKey  string
 
+	mgmtBindAddress string
+	mgmtTlsEnabled  bool
+	mgmtTlsCert     string
+	mgmtTlsCertKey  string
+
 	syslogProtocol       string
 	syslogBindAddr       string
 	syslogTlsEnabled     bool
@@ -51,6 +56,7 @@ func NewServeCommand() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			var (
 				httpTlsConfig   *tls.Config
+				mgmtTlsConfig   *tls.Config
 				syslogTlsConfig *tls.Config
 			)
 
@@ -63,6 +69,19 @@ func NewServeCommand() *cobra.Command {
 				}
 
 				httpTlsConfig = &tls.Config{
+					Certificates: []tls.Certificate{cert},
+				}
+			}
+
+			if opts.mgmtTlsEnabled {
+				cert, err := tls.LoadX509KeyPair(opts.mgmtTlsCert, opts.mgmtTlsCertKey)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Failed to load Management TLS certificate: %v\n", err)
+					exitCode = 1
+					return
+				}
+
+				mgmtTlsConfig = &tls.Config{
 					Certificates: []tls.Certificate{cert},
 				}
 			}
@@ -125,6 +144,9 @@ func NewServeCommand() *cobra.Command {
 				HttpBindAddress: opts.httpBindAddress,
 				HttpTlsConfig:   httpTlsConfig,
 
+				MgmtBindAddress: opts.mgmtBindAddress,
+				MgmtTlsConfig:   mgmtTlsConfig,
+
 				SyslogTCP:          opts.syslogProtocol == "tcp",
 				SyslogBindAddress:  opts.syslogBindAddr,
 				SyslogTlsConfig:    syslogTlsConfig,
@@ -182,6 +204,34 @@ func NewServeCommand() *cobra.Command {
 		"http-tls-key",
 		defaultHttpTlsCertKey,
 		"Path to the certificate key file for the HTTPS server",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.mgmtBindAddress,
+		"mgmt-bind",
+		defaultMgmtBindAddress,
+		"Address to bind the Management HTTP server to",
+	)
+
+	cmd.Flags().BoolVar(
+		&opts.mgmtTlsEnabled,
+		"mgmt-tls",
+		defaultMgmtTlsEnabled,
+		"Enable TLS for the Management HTTP server",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.mgmtTlsCert,
+		"mgmt-tls-cert",
+		defaultMgmtTlsCert,
+		"Path to the certificate file for the Management HTTPS server",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.mgmtTlsCertKey,
+		"mgmt-tls-key",
+		defaultMgmtTlsCertKey,
+		"Path to the certificate key file for the Management HTTPS server",
 	)
 
 	cmd.Flags().StringVar(

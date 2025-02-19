@@ -12,6 +12,9 @@ type Options struct {
 	HttpBindAddress string
 	HttpTlsConfig   *tls.Config
 
+	MgmtBindAddress string
+	MgmtTlsConfig   *tls.Config
+
 	SyslogTCP          bool
 	SyslogBindAddress  string
 	SyslogTlsConfig    *tls.Config
@@ -39,6 +42,9 @@ func NewServer(opts Options) *Server {
 	serviceLayer := newServiceLayer(
 		opts.HttpBindAddress,
 		opts.HttpTlsConfig,
+
+		opts.MgmtBindAddress,
+		opts.MgmtTlsConfig,
 
 		opts.SyslogTCP,
 		opts.SyslogBindAddress,
