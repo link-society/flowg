@@ -4,7 +4,11 @@ set -e
 
 . ../../flowg.sh
 
+rm -rf backup
+mkdir -p backup
+
 hurl \
+  --file-root=$(pwd) \
   --variable admin_token=${FLOWG_ADMIN_TOKEN} \
   --variable guest_token=${FLOWG_GUEST_TOKEN} \
   --variable timewindow_begin=$(date -d "5 minutes ago" -u +"%Y-%m-%dT%H:%M:%SZ") \
