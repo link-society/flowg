@@ -89,6 +89,7 @@ Then, start the server with:
   --log-dir ./data/logs \
   --config-dir ./data/config \
   --http-bind 127.0.0.1:5080 \
+  --mgmt-bind 127.0.0.1:9113 \
   --syslog-bind 127.0.0.1:5514
 ```
 
@@ -97,6 +98,9 @@ Now, you can access:
  - the WebUI at http://localhost:5080
  - the API documentation at http://localhost:5080/api/docs
  - the Syslog Server at [udp://localhost:5514]()
+ - the Management API at [http://localhost:9113](http://localhost:9113):
+    - `/health`: health check, always return `200 OK`
+    - `/metrics`: Prometheus Exporter
 
 A default user `root` (password: `root`) and a default pipeline are bootsrapped
 if no configuration exists during startup.
@@ -112,7 +116,12 @@ task docker:build
 Using Docker:
 
 ```bash
-docker run -p 5080:5080/tcp -p 5514:5514/udp -v flowg-data:/data linksociety/flowg:latest serve
+docker run \
+  -p 5080:5080/tcp \
+  -p 9113:9113/tcp \
+  -p 5514:5514/udp \
+  -v flowg-data:/data \
+  linksociety/flowg:latest serve
 ```
 
 Using Kubernetes (and Helm):

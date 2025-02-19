@@ -36,6 +36,10 @@ Flags:
       --http-tls-cert string              Path to the certificate file for the HTTPS server
       --http-tls-key string               Path to the certificate key file for the HTTPS server
       --log-dir string                    Path to the log database directory (default "./data/logs")
+      --mgmt-bind string                  Address to bind the Management HTTP server to (default ":9113")
+      --mgmt-tls                          Enable TLS for the Management HTTP server
+      --mgmt-tls-cert string              Path to the certificate file for the Management HTTPS server
+      --mgmt-tls-key string               Path to the certificate key file for the Management HTTPS server
       --syslog-allow-origin stringArray   Allowed origin (IP address or CIDR range) for Syslog server (default: all)
       --syslog-bind string                Address to bind the Syslog server to (default ":5514")
       --syslog-proto string               Protocol to use for the Syslog server (one of "tcp" or "udp") (default "udp")
