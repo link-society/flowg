@@ -160,17 +160,17 @@ export FLOWG_TOKEN=$(
 )
 
 curl \
-  -H "Authorization: Bearer pat:${FLOWG_TOKEN}" \
+  -H "Authorization: Bearer jwt:${FLOWG_TOKEN}" \
   http://localhost:5080/api/v1/restore/auth \
   -X POST --form backup=auth.db
 
 curl \
-  -H "Authorization: Bearer pat:${FLOWG_TOKEN}" \
+  -H "Authorization: Bearer jwt:${FLOWG_TOKEN}" \
   http://localhost:5080/api/v1/restore/config \
   -X POST --form backup=config.db
 
 curl \
-  -H "Authorization: Bearer pat:${FLOWG_TOKEN}" \
+  -H "Authorization: Bearer jwt:${FLOWG_TOKEN}" \
   http://localhost:5080/api/v1/restore/logs \
   -X POST --form backup=logs.db
 ```
