@@ -36,6 +36,7 @@ flowg serve \
   --log-dir /var/lib/flowg/logs \
   --config-dir /var/lib/flowg/config \
   --http-bind 127.0.0.1:5080 \
+  --mgmt-bind 127.0.0.1:9113 \
   --syslog-bind 127.0.0.1:5514
 ```
 
@@ -49,6 +50,7 @@ For more informations about the command line interface, please consult
 ```bash
 docker run \
   -p 5080:5080/tcp \
+  -p 9113:9113/tcp \
   -p 5514:5514/udp \
   -v flowg-data:/data \
   linksociety/flowg:latest serve
@@ -79,6 +81,10 @@ Once deployed, you can forward the port of the WebUI and API to your localhost:
 
 ```bash
 kubectl port-forward svc/flowg 5080:5080 --namespace flowg-system
+```
+
+```bash
+kubectl port-forward svc/flowg 9113:9113 --namespace flowg-system
 ```
 
 ## Security considerations
@@ -127,3 +133,6 @@ You now have access to:
  - The WebUI at [http://localhost:5080](http://localhost:5080)
  - The API documentation at [http://localhost:5080/api/docs](https://localhost:5080/api/docs)
  - The Syslog endpoint at [udp://localhost:5514](udp://localhost:5514)
+ - The Management API at [http://localhost:9113](http://localhost:9113):
+    - `/health`: health check, always return `200 OK`
+    - `/metrics`: Prometheus Exporter
