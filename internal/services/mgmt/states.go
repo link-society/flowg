@@ -1,4 +1,4 @@
-package http
+package mgmt
 
 import (
 	"log/slog"
@@ -8,14 +8,13 @@ import (
 
 	"crypto/tls"
 	"net"
-	gohttp "net/http"
+	"net/http"
 
 	"github.com/vladopajic/go-actor/actor"
 
-	"link-society.com/flowg/internal/app/logging"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	"link-society.com/flowg/api"
-	"link-society.com/flowg/web"
+	"link-society.com/flowg/internal/app/logging"
 )
 
 type workerState interface {
@@ -28,35 +27,26 @@ type workerStarting struct {
 }
 
 type workerRunning struct {
-	server *gohttp.Server
+	server *http.Server
 }
 
 type workerStopping struct {
-	server *gohttp.Server
+	server *http.Server
 }
 
 func (s *workerStarting) DoWork(ctx actor.Context, worker *worker) workerState {
-	apiHandler := api.NewHandler(
-		worker.authStorage,
-		worker.logStorage,
-		worker.configStorage,
-		worker.logNotifier,
-		worker.pipelineRunner,
-	)
-	webHandler := web.NewHandler()
+	metricsHandler := promhttp.Handler()
 
-	rootHandler := gohttp.NewServeMux()
-	rootHandler.Handle("/api/", apiHandler)
-	rootHandler.Handle("/web/", webHandler)
-
+	rootHandler := http.NewServeMux()
 	rootHandler.HandleFunc(
-		"GET /{$}",
-		func(w gohttp.ResponseWriter, r *gohttp.Request) {
-			gohttp.Redirect(w, r, "/web/", gohttp.StatusPermanentRedirect)
+		"/health",
+		func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("OK\r\n"))
 		},
 	)
-
-	server := &gohttp.Server{
+	rootHandler.Handle("/metrics", metricsHandler)
+	server := &http.Server{
 		Addr:      s.bindAddress,
 		Handler:   logging.NewMiddleware(rootHandler),
 		TLSConfig: s.tlsConfig,
@@ -64,8 +54,8 @@ func (s *workerStarting) DoWork(ctx actor.Context, worker *worker) workerState {
 
 	worker.logger.InfoContext(
 		ctx,
-		"Starting HTTP server",
-		slog.Group("http",
+		"Starting Management HTTP server",
+		slog.Group("mgmt",
 			slog.String("bind", s.bindAddress),
 		),
 	)
@@ -74,8 +64,8 @@ func (s *workerStarting) DoWork(ctx actor.Context, worker *worker) workerState {
 	if err != nil {
 		worker.logger.ErrorContext(
 			ctx,
-			"Failed to start HTTP server",
-			slog.Group("http",
+			"Failed to start Management HTTP server",
+			slog.Group("mgmt",
 				slog.String("bind", s.bindAddress),
 			),
 			slog.String("error", err.Error()),
@@ -103,8 +93,8 @@ func (s *workerRunning) DoWork(ctx actor.Context, worker *worker) workerState {
 func (s *workerStopping) DoWork(ctx actor.Context, worker *worker) workerState {
 	worker.logger.InfoContext(
 		ctx,
-		"Stopping HTTP server",
-		slog.Group("http",
+		"Stopping Management HTTP server",
+		slog.Group("mgmt",
 			slog.String("bind", s.server.Addr),
 		),
 	)
@@ -118,8 +108,8 @@ func (s *workerStopping) DoWork(ctx actor.Context, worker *worker) workerState {
 	if err != nil {
 		worker.logger.ErrorContext(
 			ctx,
-			"Failed to shutdown HTTP server",
-			slog.Group("http",
+			"Failed to shutdown Management HTTP server",
+			slog.Group("mgmt",
 				slog.String("bind", s.server.Addr),
 			),
 			slog.String("error", err.Error()),
