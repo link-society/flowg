@@ -39,9 +39,9 @@ spec:
             - --http-tls-key=/data/ssl/tls.key
           {{- end }}
           {{- if .Values.flowg.https.mgmt.enabled }}
-            - --http-tls
-            - --http-tls-cert=/data/ssl/mgmt/tls.crt
-            - --http-tls-key=/data/ssl/mgmt/tls.key
+            - --mgmt-tls
+            - --mgmt-tls-cert=/data/ssl/mgmt/tls.crt
+            - --mgmt-tls-key=/data/ssl/mgmt/tls.key
           {{- end }}
           ports:
             - containerPort: 5080
