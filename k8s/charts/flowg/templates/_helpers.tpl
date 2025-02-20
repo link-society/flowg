@@ -70,20 +70,11 @@ Create the name of the service account to use for FlowG
 Lookup the Kubernetes node for the FlowG deployment
 */}}
 {{- define "flowg.nodeName" -}}
-  {{- $nodes := lookup "v1" "Node" "" "" -}}
-  {{- range $node := $nodes.items -}}
-    {{- $taints := index $node.spec "taints" | default list -}}
-    {{- $noSchedule := false -}}
-    {{- range $taint := $taints -}}
-      {{- if eq $taint.effect "NoSchedule" -}}
-        {{- $noSchedule = true -}}
-      {{- end -}}
-    {{- end -}}
-    {{- if not $noSchedule -}}
-      {{- $node.metadata.name -}}
-      {{- break -}}
-    {{- end -}}
-  {{- end -}}
+{{- if or (not .Values.flowg.nodeName) (eq .Values.flowg.nodeName "") -}}
+{{- fail "Missing value 'flowg.nodeName', it is required because FlowG does not support clustering yet" -}}
+{{- else -}}
+{{- .Values.flowg.nodeName -}}
+{{- end -}}
 {{- end -}}
 
 {{/*
