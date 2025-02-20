@@ -39,6 +39,8 @@ spec:
               value: "udp"
             - name: FLUENT_CONTAINER_TAIL_PARSER_TYPE
               value: "cri"
+            - name: FLUENTD_SYSTEMD_CONF
+              value: "disable"
           resources:
             {{- toYaml .Values.flowg.resources | nindent 12 }}
           volumeMounts:
