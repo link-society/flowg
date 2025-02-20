@@ -5,6 +5,7 @@ includes:
   backend: scripts/Taskfile.backend.yml
   frontend: scripts/Taskfile.frontend.yml
   docker: scripts/Taskfile.docker.yml
+  k8s: scripts/Taskfile.k8s.yml
 
 tasks:
   build:
