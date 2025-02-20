@@ -31,6 +31,7 @@ spec:
       containers:
         - name: flowg
           image: "{{ .Values.flowg.image.repository }}:{{ .Values.flowg.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: "{{ .Values.flowg.image.pullPolicy }}"
           args:
             - serve
           {{- if .Values.flowg.https.enabled }}

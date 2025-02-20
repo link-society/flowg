@@ -26,6 +26,7 @@ spec:
       containers:
         - name: fluentd
           image: "{{ .Values.fluentd.image.repository }}:{{ .Values.fluentd.image.tag }}"
+          imagePullPolicy: "{{ .Values.fluentd.image.pullPolicy }}"
           env:
             - name: K8S_NODE_NAME
               valueFrom:
