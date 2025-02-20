@@ -71,8 +71,14 @@ Then deploy the Helm chart:
 helm install flowg ./k8s/charts/flowg \
   --create-namespace \
   --namespace flowg-system \
+  --set flowg.nodeName="<the k8s node>" \
   --wait
 ```
+
+> **NB:** FlowG does not support yet clustering. Therefore it **MUST** run on a
+> single Kubernetes node. This must be configured via the `flowg.nodeName`
+> value. An empty/undefined/incorrect node name will result in a failure to
+> start FlowG.
 
 This will automatically deploy [Fluentd](https://www.fluentd.org) alongside
 **FlowG** in order to collect logs from all pods.
