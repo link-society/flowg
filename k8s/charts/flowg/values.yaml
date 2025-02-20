@@ -65,7 +65,7 @@ flowg:
 fluentd:
   image:
     repository: fluent/fluentd-kubernetes-daemonset
-    tag: v1.16-debian-syslog-2
+    tag: v1-debian-syslog
     pullPolicy: IfNotPresent
     pullSecrets: []
 
