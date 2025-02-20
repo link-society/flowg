@@ -1,0 +1,20 @@
+version: '3'
+
+tasks:
+  reset:
+    desc: "Recreate FlowG KinD cluster"
+    cmds:
+      - kind delete cluster --name flowg
+      - kind create cluster --name flowg
+      - kind load docker-image linksociety/flowg:latest --name flowg
+      - kubectl create ns flowg-system
+
+  deploy:
+    desc: "Install Helm chart in KinD cluster"
+    cmds:
+      - |
+        ct install \
+          --chart-dirs ./k8s/charts \
+          --charts ./k8s/charts/flowg \
+          --namespace flowg-system \
+          --helm-extra-set-args '--set=flowg.image.tag=latest --set=flowg.image.pullPolicy=Never --set=flowg.nodeName=flowg-control-plane'
