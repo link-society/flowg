@@ -11,11 +11,16 @@ import (
 )
 
 type bootstrapProcHandler struct {
-	logger       *slog.Logger
-	storageLayer *storageLayer
+	logger        *slog.Logger
+	storageLayer  *storageLayer
+	isInitialNode bool
 }
 
 func (h *bootstrapProcHandler) Init(ctx actor.Context) proctree.ProcessResult {
+	if !h.isInitialNode {
+		return proctree.Continue()
+	}
+
 	err := bootstrap.DefaultRolesAndUsers(ctx, h.storageLayer.authStorage)
 	if err != nil {
 		h.logger.ErrorContext(

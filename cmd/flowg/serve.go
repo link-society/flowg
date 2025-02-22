@@ -154,6 +154,10 @@ func NewServeCommand() *cobra.Command {
 				MgmtBindAddress: opts.mgmtBindAddress,
 				MgmtTlsConfig:   mgmtTlsConfig,
 
+				ClusterStateDir: opts.clusterStateDir,
+				ClusterNodeID:   opts.clusterNodeID,
+				ClusterJoinAddr: opts.clusterJoinAddr,
+
 				SyslogTCP:          opts.syslogProtocol == "tcp",
 				SyslogBindAddress:  opts.syslogBindAddr,
 				SyslogTlsConfig:    syslogTlsConfig,
