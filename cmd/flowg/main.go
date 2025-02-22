@@ -28,6 +28,10 @@ var (
 	defaultMgmtTlsCert     = getEnvString("FLOWG_MGMT_TLS_CERT", "")
 	defaultMgmtTlsCertKey  = getEnvString("FLOWG_MGMT_TLS_KEY", "")
 
+	defaultClusterStateDir = getEnvString("FLOWG_CLUSTER_STATE_DIR", "./data/cluster")
+	defaultClusterNodeID   = getEnvString("FLOWG_CLUSTER_NODE_ID", "flowg0")
+	defaultClusterJoinAddr = getEnvString("FLOWG_CLUSTER_JOIN_ADDRESS", "")
+
 	defaultSyslogProtocol     = getEnvString("FLOWG_SYSLOG_PROTOCOL", "udp")
 	defaultSyslogBindAddr     = getEnvString("FLOWG_SYSLOG_BIND_ADDRESS", ":5514")
 	defaultSyslogAllowOrigins = (func() []string {
