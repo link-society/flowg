@@ -32,6 +32,10 @@ type serveCommandOpts struct {
 	mgmtTlsCert     string
 	mgmtTlsCertKey  string
 
+	clusterStateDir string
+	clusterNodeID   string
+	clusterJoinAddr string
+
 	syslogProtocol       string
 	syslogBindAddr       string
 	syslogTlsEnabled     bool
@@ -257,6 +261,28 @@ func NewServeCommand() *cobra.Command {
 		"mgmt-tls-key",
 		defaultMgmtTlsCertKey,
 		"Path to the certificate key file for the Management HTTPS server",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.clusterStateDir,
+		"cluster-state-dir",
+		defaultClusterStateDir,
+		"Path to the cluster state directory for replication",
+	)
+	cmd.MarkFlagDirname("cluster-state-dir")
+
+	cmd.Flags().StringVar(
+		&opts.clusterNodeID,
+		"cluster-node-id",
+		defaultClusterNodeID,
+		"Unique identifier for the node in the cluster",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.clusterJoinAddr,
+		"cluster-join-addr",
+		defaultClusterJoinAddr,
+		"Address of another node in the cluster to join",
 	)
 
 	cmd.Flags().StringVar(
