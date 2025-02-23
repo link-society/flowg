@@ -16,7 +16,7 @@ func TestDefaultPipeline(t *testing.T) {
 	configStorage.Start()
 	defer configStorage.Stop()
 
-	err := configStorage.WaitStarted()
+	err := configStorage.WaitReady(ctx)
 	if err != nil {
 		t.Fatalf("unexpected error at startup: %v", err)
 	}

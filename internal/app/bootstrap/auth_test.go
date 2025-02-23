@@ -21,7 +21,7 @@ func TestDefaultRolesAndUsers(t *testing.T) {
 	authStorage.Start()
 	defer authStorage.Stop()
 
-	err := authStorage.WaitStarted()
+	err := authStorage.WaitReady(ctx)
 	if err != nil {
 		t.Fatalf("unexpected error at startup: %v", err)
 	}

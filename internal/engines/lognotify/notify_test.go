@@ -1,7 +1,6 @@
 package lognotify_test
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 
@@ -14,12 +13,27 @@ import (
 )
 
 func TestLogNotifier(t *testing.T) {
-	fmt.Printf("lognotify: starting log notifier")
 	notifier := lognotify.NewLogNotifier()
 	notifier.Start()
-	defer notifier.Stop()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	err := notifier.WaitReady(ctx)
+	defer cancel()
+	if err != nil {
+		t.Fatalf("could not start log notifier: %v", err)
+	}
+
+	defer func() {
+		notifier.Stop()
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		err := notifier.Join(ctx)
+		if err != nil {
+			t.Fatalf("could not stop log notifier: %v", err)
+		}
+	}()
+
+	ctx, cancel = context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	logM, err := notifier.Subscribe(ctx, "test")
