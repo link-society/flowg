@@ -6,7 +6,7 @@ import (
 )
 
 type message interface {
-	Handle(*workerRunning)
+	Handle(*procHandler)
 }
 
 type replyTo[T any] struct {
@@ -65,14 +65,14 @@ type statItem struct {
 	key     string
 }
 
-func (msg *listItems) Handle(workerState *workerRunning) {
+func (msg *listItems) Handle(handler *procHandler) {
 	keys := []string{}
 
-	workerState.cache.Range(func(key, _ interface{}) bool {
+	handler.cache.Range(func(key, _ interface{}) bool {
 		filename := key.(string)
 
-		if workerState.extension == "" || strings.HasSuffix(filename, workerState.extension) {
-			suffixLen := len(workerState.extension)
+		if handler.extension == "" || strings.HasSuffix(filename, handler.extension) {
+			suffixLen := len(handler.extension)
 			itemName := filename[:len(filename)-suffixLen]
 			keys = append(keys, itemName)
 		}
@@ -83,19 +83,19 @@ func (msg *listItems) Handle(workerState *workerRunning) {
 	msg.replyTo.SendOk(keys)
 }
 
-func (msg *readItem) Handle(workerState *workerRunning) {
-	filename := msg.key + workerState.extension
+func (msg *readItem) Handle(handler *procHandler) {
+	filename := msg.key + handler.extension
 
-	value, ok := workerState.cache.Load(filename)
+	value, ok := handler.cache.Load(filename)
 	if !ok {
-		workerState.mu.Lock()
-		content, err := workerState.backend.ReadFile(filename)
-		workerState.mu.Unlock()
+		handler.mu.Lock()
+		content, err := handler.backend.ReadFile(filename)
+		handler.mu.Unlock()
 
 		if err != nil {
 			msg.replyTo.SendErr(err)
 		} else {
-			workerState.cache.Store(filename, content)
+			handler.cache.Store(filename, content)
 			msg.replyTo.SendOk(content)
 		}
 	} else {
@@ -103,42 +103,42 @@ func (msg *readItem) Handle(workerState *workerRunning) {
 	}
 }
 
-func (msg *writeItem) Handle(workerState *workerRunning) {
-	filename := msg.key + workerState.extension
+func (msg *writeItem) Handle(handler *procHandler) {
+	filename := msg.key + handler.extension
 
-	workerState.mu.Lock()
-	err := workerState.backend.WriteFile(filename, msg.content)
-	workerState.mu.Unlock()
-
-	if err != nil {
-		msg.replyTo.SendErr(err)
-	} else {
-		workerState.cache.Store(filename, msg.content)
-		msg.replyTo.SendOk(true)
-	}
-}
-
-func (msg *deleteItem) Handle(workerState *workerRunning) {
-	filename := msg.key + workerState.extension
-
-	workerState.mu.Lock()
-	err := workerState.backend.DeleteFile(filename)
-	workerState.mu.Unlock()
+	handler.mu.Lock()
+	err := handler.backend.WriteFile(filename, msg.content)
+	handler.mu.Unlock()
 
 	if err != nil {
 		msg.replyTo.SendErr(err)
 	} else {
-		workerState.cache.Delete(filename)
+		handler.cache.Store(filename, msg.content)
 		msg.replyTo.SendOk(true)
 	}
 }
 
-func (msg *statItem) Handle(workerState *workerRunning) {
-	filename := msg.key + workerState.extension
+func (msg *deleteItem) Handle(handler *procHandler) {
+	filename := msg.key + handler.extension
 
-	workerState.mu.Lock()
-	info, err := workerState.backend.StatFile(filename)
-	workerState.mu.Unlock()
+	handler.mu.Lock()
+	err := handler.backend.DeleteFile(filename)
+	handler.mu.Unlock()
+
+	if err != nil {
+		msg.replyTo.SendErr(err)
+	} else {
+		handler.cache.Delete(filename)
+		msg.replyTo.SendOk(true)
+	}
+}
+
+func (msg *statItem) Handle(handler *procHandler) {
+	filename := msg.key + handler.extension
+
+	handler.mu.Lock()
+	info, err := handler.backend.StatFile(filename)
+	handler.mu.Unlock()
 
 	if err != nil {
 		msg.replyTo.SendErr(err)

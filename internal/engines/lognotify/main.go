@@ -5,41 +5,54 @@ import (
 
 	"github.com/vladopajic/go-actor/actor"
 
+	"link-society.com/flowg/internal/utils/proctree"
+
 	"link-society.com/flowg/internal/models"
 )
 
 type LogNotifier struct {
 	subMbox actor.MailboxSender[SubscribeMessage]
 	logMbox actor.MailboxSender[LogMessage]
-	rootA   actor.Actor
+	process proctree.Process
 }
 
 func NewLogNotifier() *LogNotifier {
 	subMbox := actor.NewMailbox[SubscribeMessage]()
 	logMbox := actor.NewMailbox[LogMessage]()
-	workerA := actor.New(&worker{
+	handler := &procHandler{
 		subscribers: make(map[string]subscriberSet),
 		subMbox:     subMbox,
 		logMbox:     logMbox,
-	})
+	}
 
-	rootA := actor.Combine(subMbox, logMbox, workerA).
-		WithOptions(actor.OptStopTogether()).
-		Build()
+	process := proctree.NewProcessGroup(
+		proctree.DefaultProcessGroupOptions(),
+		proctree.NewActorProcess(subMbox),
+		proctree.NewActorProcess(logMbox),
+		proctree.NewProcess(handler),
+	)
 
 	return &LogNotifier{
 		subMbox: subMbox,
 		logMbox: logMbox,
-		rootA:   rootA,
+		process: process,
 	}
 }
 
 func (n *LogNotifier) Start() {
-	n.rootA.Start()
+	n.process.Start()
 }
 
 func (n *LogNotifier) Stop() {
-	n.rootA.Stop()
+	n.process.Stop()
+}
+
+func (n *LogNotifier) WaitReady(ctx context.Context) error {
+	return n.process.WaitReady(ctx)
+}
+
+func (n *LogNotifier) Join(ctx context.Context) error {
+	return n.process.Join(ctx)
 }
 
 func (n *LogNotifier) Subscribe(ctx context.Context, stream string) (actor.MailboxReceiver[LogMessage], error) {

@@ -5,33 +5,37 @@ import (
 
 	"crypto/tls"
 
-	"github.com/vladopajic/go-actor/actor"
-
-	"link-society.com/flowg/internal/engines/lognotify"
-	"link-society.com/flowg/internal/engines/pipelines"
-	"link-society.com/flowg/internal/utils/sync"
+	"link-society.com/flowg/internal/utils/proctree"
 
 	"link-society.com/flowg/internal/storage/auth"
 	"link-society.com/flowg/internal/storage/config"
 	"link-society.com/flowg/internal/storage/log"
-)
 
-type Server struct {
-	worker *worker
-	actor  actor.Actor
-}
+	"link-society.com/flowg/internal/engines/lognotify"
+	"link-society.com/flowg/internal/engines/pipelines"
+)
 
 func NewServer(
 	bindAddress string,
 	tlsConfig *tls.Config,
+
 	authStorage *auth.Storage,
 	configStorage *config.Storage,
 	logStorage *log.Storage,
+
 	logNotifier *lognotify.LogNotifier,
 	pipelineRunner *pipelines.Runner,
-) *Server {
-	worker := &worker{
-		logger: slog.Default().With(slog.String("channel", "http")),
+) proctree.Process {
+	return proctree.NewProcess(&procHandler{
+		logger: slog.Default().With(
+			slog.String("channel", "http"),
+			slog.Group("http",
+				slog.String("bind", bindAddress),
+			),
+		),
+
+		bindAddress: bindAddress,
+		tlsConfig:   tlsConfig,
 
 		authStorage:   authStorage,
 		configStorage: configStorage,
@@ -39,33 +43,5 @@ func NewServer(
 
 		logNotifier:    logNotifier,
 		pipelineRunner: pipelineRunner,
-
-		state: &workerStarting{
-			bindAddress: bindAddress,
-			tlsConfig:   tlsConfig,
-		},
-
-		startCond: sync.NewCondValue[error](),
-		stopCond:  sync.NewCondValue[error](),
-	}
-
-	actor := actor.New(worker)
-
-	return &Server{worker, actor}
-}
-
-func (s *Server) Start() {
-	s.actor.Start()
-}
-
-func (s *Server) WaitStarted() error {
-	return s.worker.startCond.Wait()
-}
-
-func (s *Server) Stop() {
-	s.actor.Stop()
-}
-
-func (s *Server) WaitStopped() error {
-	return s.worker.stopCond.Wait()
+	})
 }

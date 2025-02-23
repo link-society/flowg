@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"time"
+
 	"os"
 
 	"fmt"
@@ -23,27 +25,31 @@ func NewAdminTokenCreateCommand() *cobra.Command {
 		Use:   "create",
 		Short: "Create a new Personal Access Token",
 		Run: func(cmd *cobra.Command, args []string) {
-			authStorage := auth.NewStorage(
-				auth.OptDirectory(opts.authDir),
-			)
+			authStorage := auth.NewStorage(auth.OptDirectory(opts.authDir))
 			authStorage.Start()
-			err := authStorage.WaitStarted()
+
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
+			err := authStorage.WaitReady(ctx)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to open auth database:", err)
 				exitCode = 1
 				return
 			}
+
 			defer func() {
 				authStorage.Stop()
-				err := authStorage.WaitStopped()
+
+				ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+				defer cancel()
+				err := authStorage.Join(ctx)
 				if err != nil {
 					fmt.Fprintln(os.Stderr, "ERROR: Failed to close auth database:", err)
 					exitCode = 1
 				}
 			}()
 
-			ctx := context.Background()
-			user, err := authStorage.FetchUser(ctx, opts.user)
+			user, err := authStorage.FetchUser(context.Background(), opts.user)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to get user:", err)
 				exitCode = 1
@@ -56,7 +62,7 @@ func NewAdminTokenCreateCommand() *cobra.Command {
 				return
 			}
 
-			token, _, err := authStorage.CreateToken(ctx, user.Name)
+			token, _, err := authStorage.CreateToken(context.Background(), user.Name)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to generate token:", err)
 				exitCode = 1

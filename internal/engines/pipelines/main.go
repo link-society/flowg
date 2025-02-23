@@ -5,17 +5,19 @@ import (
 
 	"github.com/vladopajic/go-actor/actor"
 
+	"link-society.com/flowg/internal/utils/proctree"
+
 	"link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/internal/engines/lognotify"
 	"link-society.com/flowg/internal/storage/config"
 	"link-society.com/flowg/internal/storage/log"
+
+	"link-society.com/flowg/internal/engines/lognotify"
 )
 
 type Runner struct {
-	mbox actor.MailboxSender[message]
-
-	rootA actor.Actor
+	mbox    actor.MailboxSender[message]
+	process proctree.Process
 }
 
 func NewRunner(
@@ -24,30 +26,40 @@ func NewRunner(
 	logNotifier *lognotify.LogNotifier,
 ) *Runner {
 	mbox := actor.NewMailbox[message]()
-	workerA := actor.New(&worker{
+	handler := &procHandler{
 		mbox: mbox,
 
 		configStorage: configStorage,
 		logStorage:    logStorage,
 		logNotifier:   logNotifier,
-	})
+	}
 
-	rootA := actor.Combine(mbox, workerA).
-		WithOptions(actor.OptStopTogether()).
-		Build()
+	process := proctree.NewProcessGroup(
+		proctree.DefaultProcessGroupOptions(),
+		proctree.NewActorProcess(mbox),
+		proctree.NewProcess(handler),
+	)
 
 	return &Runner{
-		mbox:  mbox,
-		rootA: rootA,
+		mbox:    mbox,
+		process: process,
 	}
 }
 
 func (r *Runner) Start() {
-	r.rootA.Start()
+	r.process.Start()
 }
 
 func (r *Runner) Stop() {
-	r.rootA.Stop()
+	r.process.Stop()
+}
+
+func (r *Runner) WaitReady(ctx context.Context) error {
+	return r.process.WaitReady(ctx)
+}
+
+func (r *Runner) Join(ctx context.Context) error {
+	return r.process.Join(ctx)
 }
 
 func (r *Runner) Run(

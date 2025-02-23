@@ -1,7 +1,9 @@
 package server
 
 import (
-	"github.com/vladopajic/go-actor/actor"
+	"context"
+
+	"link-society.com/flowg/internal/utils/proctree"
 
 	"link-society.com/flowg/internal/engines/lognotify"
 	"link-society.com/flowg/internal/engines/pipelines"
@@ -11,7 +13,7 @@ type engineLayer struct {
 	logNotifier    *lognotify.LogNotifier
 	pipelineRunner *pipelines.Runner
 
-	actor actor.Actor
+	process proctree.Process
 }
 
 func newEngineLayer(storageLayer *storageLayer) *engineLayer {
@@ -22,22 +24,32 @@ func newEngineLayer(storageLayer *storageLayer) *engineLayer {
 		logNotifier,
 	)
 
-	rootA := actor.Combine(logNotifier, pipelineRunner).
-		WithOptions(actor.OptStopTogether()).
-		Build()
+	process := proctree.NewProcessGroup(
+		proctree.DefaultProcessGroupOptions(),
+		logNotifier,
+		pipelineRunner,
+	)
 
 	return &engineLayer{
 		logNotifier:    logNotifier,
 		pipelineRunner: pipelineRunner,
 
-		actor: rootA,
+		process: process,
 	}
 }
 
 func (e *engineLayer) Start() {
-	e.actor.Start()
+	e.process.Start()
 }
 
 func (e *engineLayer) Stop() {
-	e.actor.Stop()
+	e.process.Stop()
+}
+
+func (e *engineLayer) WaitReady(ctx context.Context) error {
+	return e.process.WaitReady(ctx)
+}
+
+func (e *engineLayer) Join(ctx context.Context) error {
+	return e.process.Join(ctx)
 }

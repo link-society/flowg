@@ -1,12 +1,17 @@
 package main
 
 import (
-	"context"
 	"fmt"
+
+	"context"
+	"time"
+
 	"os"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
+
+	"link-society.com/flowg/internal/utils/proctree"
 
 	"link-society.com/flowg/internal/storage/auth"
 	"link-society.com/flowg/internal/storage/config"
@@ -28,70 +33,44 @@ func NewAdminBackupCommand() *cobra.Command {
 		Use:   "backup",
 		Short: "Backup the database and configuration",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("Opening auth database...")
 			authStorage := auth.NewStorage(
 				auth.OptDirectory(opts.authDir),
 				auth.OptReadOnly(true),
 			)
-			authStorage.Start()
-			err := authStorage.WaitStarted()
-			if err != nil {
-				fmt.Fprintln(os.Stderr, "ERROR: Failed to open auth database:", err)
-				exitCode = 1
-				return
-			}
-
-			defer func() {
-				fmt.Println("Closing auth database...")
-				authStorage.Stop()
-				err := authStorage.WaitStopped()
-				if err != nil {
-					fmt.Fprintln(os.Stderr, "ERROR: Failed to close auth database:", err)
-					exitCode = 1
-				}
-			}()
-
-			fmt.Println("Opening log database...")
 			logStorage := log.NewStorage(
 				log.OptDirectory(opts.logDir),
 				log.OptReadOnly(true),
 			)
-			logStorage.Start()
-			err = logStorage.WaitStarted()
-			if err != nil {
-				fmt.Fprintln(os.Stderr, "ERROR: Failed to open log database:", err)
-				exitCode = 1
-				return
-			}
-
-			defer func() {
-				fmt.Println("Closing log database...")
-				logStorage.Stop()
-				err := logStorage.WaitStopped()
-				if err != nil {
-					fmt.Fprintln(os.Stderr, "ERROR: Failed to close log database:", err)
-					exitCode = 1
-				}
-			}()
-
-			fmt.Println("Opening config database...")
 			configStorage := config.NewStorage(
 				config.OptDirectory(opts.configDir),
 			)
-			configStorage.Start()
-			err = configStorage.WaitStarted()
+
+			p := proctree.NewProcessGroup(
+				proctree.DefaultProcessGroupOptions(),
+				authStorage,
+				logStorage,
+				configStorage,
+			)
+
+			fmt.Fprintln(os.Stderr, "INFO: Opening databases...")
+			p.Start()
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
+			err := p.WaitReady(ctx)
 			if err != nil {
-				fmt.Fprintln(os.Stderr, "ERROR: Failed to open config database:", err)
+				fmt.Fprintln(os.Stderr, "ERROR: Failed to open databases:", err)
 				exitCode = 1
 				return
 			}
 
 			defer func() {
-				fmt.Println("Closing config database...")
-				configStorage.Stop()
-				err := configStorage.WaitStopped()
+				fmt.Fprintln(os.Stderr, "INFO: Closing databases...")
+				p.Stop()
+				ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+				defer cancel()
+				err := p.Join(ctx)
 				if err != nil {
-					fmt.Fprintln(os.Stderr, "ERROR: Failed to close config database:", err)
+					fmt.Fprintln(os.Stderr, "ERROR: Failed to close databases:", err)
 					exitCode = 1
 				}
 			}()
