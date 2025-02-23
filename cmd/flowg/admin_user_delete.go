@@ -1,8 +1,11 @@
 package main
 
 import (
-	"context"
 	"fmt"
+
+	"context"
+	"time"
+
 	"os"
 
 	"github.com/spf13/cobra"
@@ -22,27 +25,31 @@ func NewAdminUserDeleteCommand() *cobra.Command {
 		Use:   "delete",
 		Short: "Delete an existing user",
 		Run: func(cmd *cobra.Command, args []string) {
-			authStorage := auth.NewStorage(
-				auth.OptDirectory(opts.authDir),
-			)
+			authStorage := auth.NewStorage(auth.OptDirectory(opts.authDir))
 			authStorage.Start()
-			err := authStorage.WaitStarted()
+
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
+			err := authStorage.WaitReady(ctx)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to open auth database:", err)
 				exitCode = 1
 				return
 			}
+
 			defer func() {
 				authStorage.Stop()
-				err := authStorage.WaitStopped()
+
+				ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+				defer cancel()
+				err := authStorage.Join(ctx)
 				if err != nil {
 					fmt.Fprintln(os.Stderr, "ERROR: Failed to close auth database:", err)
 					exitCode = 1
 				}
 			}()
 
-			ctx := context.Background()
-			err = authStorage.DeleteUser(ctx, opts.name)
+			err = authStorage.DeleteUser(context.Background(), opts.name)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to delete user:", err)
 				exitCode = 1

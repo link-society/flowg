@@ -13,11 +13,10 @@ import (
 	"encoding/json"
 	"path/filepath"
 
-	"github.com/vladopajic/go-actor/actor"
-
 	"link-society.com/flowg/internal/models"
 
 	"link-society.com/flowg/internal/utils/filestore"
+	"link-society.com/flowg/internal/utils/proctree"
 )
 
 const (
@@ -48,7 +47,7 @@ type Storage struct {
 	pipelineStore    *filestore.Storage
 	alertStore       *filestore.Storage
 
-	actor actor.Actor
+	process proctree.Process
 }
 
 func NewStorage(opts ...func(*options)) *Storage {
@@ -77,69 +76,36 @@ func NewStorage(opts ...func(*options)) *Storage {
 		filestore.OptExtension(alertExt),
 	)
 
-	actor := actor.Combine(transformerStore, pipelineStore, alertStore).
-		WithOptions(actor.OptStopTogether()).
-		Build()
+	process := proctree.NewProcessGroup(
+		proctree.DefaultProcessGroupOptions(),
+		transformerStore,
+		pipelineStore,
+		alertStore,
+	)
 
 	return &Storage{
 		transformerStore: transformerStore,
 		pipelineStore:    pipelineStore,
 		alertStore:       alertStore,
 
-		actor: actor,
+		process: process,
 	}
 }
 
 func (s *Storage) Start() {
-	s.actor.Start()
-}
-
-func (s *Storage) WaitStarted() error {
-	errs := []error{}
-
-	if err := s.transformerStore.WaitStarted(); err != nil {
-		errs = append(errs, fmt.Errorf("failed to start transformer store: %w", err))
-	}
-
-	if err := s.pipelineStore.WaitStarted(); err != nil {
-		errs = append(errs, fmt.Errorf("failed to start pipeline store: %w", err))
-	}
-
-	if err := s.alertStore.WaitStarted(); err != nil {
-		errs = append(errs, fmt.Errorf("failed to start alert store: %w", err))
-	}
-
-	if len(errs) > 0 {
-		return errors.Join(errs...)
-	}
-
-	return nil
+	s.process.Start()
 }
 
 func (s *Storage) Stop() {
-	s.actor.Stop()
+	s.process.Stop()
 }
 
-func (s *Storage) WaitStopped() error {
-	errs := []error{}
+func (s *Storage) WaitReady(ctx context.Context) error {
+	return s.process.WaitReady(ctx)
+}
 
-	if err := s.alertStore.WaitStopped(); err != nil {
-		errs = append(errs, fmt.Errorf("failed to stop alert store: %w", err))
-	}
-
-	if err := s.pipelineStore.WaitStopped(); err != nil {
-		errs = append(errs, fmt.Errorf("failed to stop pipeline store: %w", err))
-	}
-
-	if err := s.transformerStore.WaitStopped(); err != nil {
-		errs = append(errs, fmt.Errorf("failed to stop transformer store: %w", err))
-	}
-
-	if len(errs) > 0 {
-		return errors.Join(errs...)
-	}
-
-	return nil
+func (s *Storage) Join(ctx context.Context) error {
+	return s.process.Join(ctx)
 }
 
 func (s *Storage) Backup(ctx context.Context, w io.Writer) error {

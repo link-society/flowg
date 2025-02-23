@@ -1,6 +1,9 @@
 package main
 
 import (
+	"context"
+	"time"
+
 	"fmt"
 	"strings"
 
@@ -63,7 +66,7 @@ func NewServeCommand() *cobra.Command {
 			if opts.httpTlsEnabled {
 				cert, err := tls.LoadX509KeyPair(opts.httpTlsCert, opts.httpTlsCertKey)
 				if err != nil {
-					fmt.Fprintf(os.Stderr, "Failed to load TLS certificate: %v\n", err)
+					fmt.Fprintf(os.Stderr, "ERROR: Failed to load TLS certificate: %v\n", err)
 					exitCode = 1
 					return
 				}
@@ -76,7 +79,7 @@ func NewServeCommand() *cobra.Command {
 			if opts.mgmtTlsEnabled {
 				cert, err := tls.LoadX509KeyPair(opts.mgmtTlsCert, opts.mgmtTlsCertKey)
 				if err != nil {
-					fmt.Fprintf(os.Stderr, "Failed to load Management TLS certificate: %v\n", err)
+					fmt.Fprintf(os.Stderr, "ERROR: Failed to load Management TLS certificate: %v\n", err)
 					exitCode = 1
 					return
 				}
@@ -103,7 +106,7 @@ func NewServeCommand() *cobra.Command {
 			if opts.syslogTlsEnabled {
 				cert, err := tls.LoadX509KeyPair(opts.syslogTlsCert, opts.syslogTlsCertKey)
 				if err != nil {
-					fmt.Fprintf(os.Stderr, "Failed to load Syslog TLS certificate: %v\n", err)
+					fmt.Fprintf(os.Stderr, "ERROR: Failed to load Syslog TLS certificate: %v\n", err)
 					exitCode = 1
 					return
 				}
@@ -158,21 +161,43 @@ func NewServeCommand() *cobra.Command {
 			})
 
 			srv.Start()
+			err := srv.WaitReady(context.Background())
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "ERROR: Failed to start server: %v\n", err)
+				exitCode = 1
+				return
+			}
+
+			monitorCtx, monitorCancel := context.WithCancel(context.Background())
+			doneC := make(chan error, 1)
+			go func() {
+				err := srv.Join(monitorCtx)
+				doneC <- err
+			}()
 
 			sigC := make(chan os.Signal, 1)
 			signal.Notify(sigC, syscall.SIGINT, syscall.SIGTERM)
 
 			select {
 			case <-sigC:
+				monitorCancel()
 				srv.Stop()
-				failure := <-srv.DoneC()
-				if failure {
+
+				ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+				defer cancel()
+				err := srv.Join(ctx)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "ERROR: Failed to stop server: %v\n", err)
 					exitCode = 1
+					return
 				}
 
-			case failure := <-srv.DoneC():
-				if failure {
+			case err := <-doneC:
+				monitorCancel()
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "ERROR: Server stopped unexpectedly: %v\n", err)
 					exitCode = 1
+					return
 				}
 			}
 		},

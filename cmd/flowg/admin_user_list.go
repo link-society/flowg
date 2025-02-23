@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"time"
+
 	"os"
 
 	"fmt"
@@ -23,27 +25,31 @@ func NewAdminUserListCommand() *cobra.Command {
 		Use:   "list",
 		Short: "List existing users",
 		Run: func(cmd *cobra.Command, args []string) {
-			authStorage := auth.NewStorage(
-				auth.OptDirectory(opts.authDir),
-			)
+			authStorage := auth.NewStorage(auth.OptDirectory(opts.authDir))
 			authStorage.Start()
-			err := authStorage.WaitStarted()
+
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
+			err := authStorage.WaitReady(ctx)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to open auth database:", err)
 				exitCode = 1
 				return
 			}
+
 			defer func() {
 				authStorage.Stop()
-				err := authStorage.WaitStopped()
+
+				ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+				defer cancel()
+				err := authStorage.Join(ctx)
 				if err != nil {
 					fmt.Fprintln(os.Stderr, "ERROR: Failed to close auth database:", err)
 					exitCode = 1
 				}
 			}()
 
-			ctx := context.Background()
-			users, err := authStorage.ListUsers(ctx)
+			users, err := authStorage.ListUsers(context.Background())
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to list users:", err)
 				exitCode = 1

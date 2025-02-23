@@ -1,13 +1,13 @@
 package server
 
 import (
-	"errors"
-
-	"github.com/vladopajic/go-actor/actor"
+	"context"
 
 	"link-society.com/flowg/internal/storage/auth"
 	"link-society.com/flowg/internal/storage/config"
 	"link-society.com/flowg/internal/storage/log"
+
+	"link-society.com/flowg/internal/utils/proctree"
 )
 
 type storageLayer struct {
@@ -15,7 +15,7 @@ type storageLayer struct {
 	configStorage *config.Storage
 	logStorage    *log.Storage
 
-	actor actor.Actor
+	process proctree.Process
 }
 
 func newStorageLayer(
@@ -29,67 +29,34 @@ func newStorageLayer(
 		logStorage    = log.NewStorage(log.OptDirectory(logDir))
 	)
 
-	rootA := actor.Combine(authStorage, configStorage, logStorage).
-		WithOptions(actor.OptStopTogether()).
-		Build()
+	process := proctree.NewProcessGroup(
+		proctree.DefaultProcessGroupOptions(),
+		authStorage,
+		configStorage,
+		logStorage,
+	)
 
 	return &storageLayer{
 		authStorage:   authStorage,
 		configStorage: configStorage,
 		logStorage:    logStorage,
 
-		actor: rootA,
+		process: process,
 	}
 }
 
-func (a *storageLayer) Start() {
-	a.actor.Start()
+func (l *storageLayer) Start() {
+	l.process.Start()
 }
 
-func (a *storageLayer) WaitStarted() error {
-	errs := []error{}
-
-	if err := a.authStorage.WaitStarted(); err != nil {
-		errs = append(errs, err)
-	}
-
-	if err := a.configStorage.WaitStarted(); err != nil {
-		errs = append(errs, err)
-	}
-
-	if err := a.logStorage.WaitStarted(); err != nil {
-		errs = append(errs, err)
-	}
-
-	if len(errs) > 0 {
-		return errors.Join(errs...)
-	}
-
-	return nil
+func (l *storageLayer) Stop() {
+	l.process.Stop()
 }
 
-func (a *storageLayer) Stop() {
-	a.actor.Stop()
+func (l *storageLayer) WaitReady(ctx context.Context) error {
+	return l.process.WaitReady(ctx)
 }
 
-func (a *storageLayer) WaitStopped() error {
-	errs := []error{}
-
-	if err := a.logStorage.WaitStopped(); err != nil {
-		errs = append(errs, err)
-	}
-
-	if err := a.configStorage.WaitStopped(); err != nil {
-		errs = append(errs, err)
-	}
-
-	if err := a.authStorage.WaitStopped(); err != nil {
-		errs = append(errs, err)
-	}
-
-	if len(errs) > 0 {
-		return errors.Join(errs...)
-	}
-
-	return nil
+func (l *storageLayer) Join(ctx context.Context) error {
+	return l.process.Join(ctx)
 }

@@ -14,6 +14,7 @@ import (
 
 	"link-society.com/flowg/internal/utils/ffi/filterdsl"
 	"link-society.com/flowg/internal/utils/kvstore"
+	"link-society.com/flowg/internal/utils/proctree"
 
 	"link-society.com/flowg/internal/storage/log/transactions"
 )
@@ -51,7 +52,7 @@ func OptGCInterval(interval time.Duration) func(*options) {
 
 type Storage struct {
 	kvStore *kvstore.Storage
-	actor   actor.Actor
+	process proctree.Process
 }
 
 func NewStorage(opts ...func(*options)) *Storage {
@@ -76,28 +77,32 @@ func NewStorage(opts ...func(*options)) *Storage {
 		gcInterval: options.gcInterval,
 	})
 
-	actor := actor.Combine(kvStore, gc).WithOptions(actor.OptStopTogether()).Build()
+	process := proctree.NewProcessGroup(
+		proctree.DefaultProcessGroupOptions(),
+		kvStore,
+		proctree.NewActorProcess(gc),
+	)
 
 	return &Storage{
 		kvStore: kvStore,
-		actor:   actor,
+		process: process,
 	}
 }
 
 func (s *Storage) Start() {
-	s.actor.Start()
-}
-
-func (s *Storage) WaitStarted() error {
-	return s.kvStore.WaitStarted()
+	s.process.Start()
 }
 
 func (s *Storage) Stop() {
-	s.actor.Stop()
+	s.process.Stop()
 }
 
-func (s *Storage) WaitStopped() error {
-	return s.kvStore.WaitStopped()
+func (s *Storage) WaitReady(ctx context.Context) error {
+	return s.process.WaitReady(ctx)
+}
+
+func (s *Storage) Join(ctx context.Context) error {
+	return s.process.Join(ctx)
 }
 
 func (s *Storage) Backup(ctx context.Context, w io.Writer) error {

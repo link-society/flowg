@@ -65,16 +65,16 @@ func (s *Storage) Start() {
 	s.kvStore.Start()
 }
 
-func (s *Storage) WaitStarted() error {
-	return s.kvStore.WaitStarted()
-}
-
 func (s *Storage) Stop() {
 	s.kvStore.Stop()
 }
 
-func (s *Storage) WaitStopped() error {
-	return s.kvStore.WaitStopped()
+func (s *Storage) WaitReady(ctx context.Context) error {
+	return s.kvStore.WaitReady(ctx)
+}
+
+func (s *Storage) Join(ctx context.Context) error {
+	return s.kvStore.Join(ctx)
 }
 
 func (s *Storage) Backup(ctx context.Context, w io.Writer) error {

@@ -7,7 +7,7 @@ import (
 
 	"github.com/vladopajic/go-actor/actor"
 
-	"link-society.com/flowg/internal/utils/sync"
+	"link-society.com/flowg/internal/utils/proctree"
 )
 
 type options struct {
@@ -35,9 +35,8 @@ func OptExtension(filterExt string) func(*options) {
 }
 
 type Storage struct {
-	mbox   actor.Mailbox[message]
-	worker *worker
-	actor  actor.Actor
+	mbox    actor.MailboxSender[message]
+	process proctree.Process
 }
 
 func NewStorage(opts ...func(*options)) *Storage {
@@ -52,41 +51,40 @@ func NewStorage(opts ...func(*options)) *Storage {
 	}
 
 	mbox := actor.NewMailbox[message]()
-	worker := &worker{
-		state: &workerStarting{
-			baseDir:   options.dir,
-			inMemory:  options.inMemory,
-			extension: options.extension,
-		},
-		mbox: mbox,
+	handler := &procHandler{
+		baseDir:   options.dir,
+		inMemory:  options.inMemory,
+		extension: options.extension,
 
-		startCond: sync.NewCondValue[error](),
-		stopCond:  sync.NewCondValue[error](),
+		mbox: mbox,
 	}
-	workerA := actor.New(worker)
-	actor := actor.Combine(mbox, workerA).WithOptions(actor.OptStopTogether()).Build()
+
+	process := proctree.NewProcessGroup(
+		proctree.DefaultProcessGroupOptions(),
+		proctree.NewActorProcess(mbox),
+		proctree.NewProcess(handler),
+	)
 
 	return &Storage{
-		mbox:   mbox,
-		worker: worker,
-		actor:  actor,
+		mbox:    mbox,
+		process: process,
 	}
 }
 
 func (fs *Storage) Start() {
-	fs.actor.Start()
-}
-
-func (fs *Storage) WaitStarted() error {
-	return fs.worker.startCond.Wait()
+	fs.process.Start()
 }
 
 func (fs *Storage) Stop() {
-	fs.actor.Stop()
+	fs.process.Stop()
 }
 
-func (fs *Storage) WaitStopped() error {
-	return fs.worker.stopCond.Wait()
+func (fs *Storage) WaitReady(ctx context.Context) error {
+	return fs.process.WaitReady(ctx)
+}
+
+func (fs *Storage) Join(ctx context.Context) error {
+	return fs.process.Join(ctx)
 }
 
 func (fs *Storage) ListFiles(ctx context.Context) ([]string, error) {

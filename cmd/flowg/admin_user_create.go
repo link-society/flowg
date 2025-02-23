@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"time"
+
 	"os"
 
 	"fmt"
@@ -31,19 +33,24 @@ func NewAdminUserCreateCommand() *cobra.Command {
 				Roles: make([]string, len(args)),
 			}
 
-			authStorage := auth.NewStorage(
-				auth.OptDirectory(opts.authDir),
-			)
+			authStorage := auth.NewStorage(auth.OptDirectory(opts.authDir))
 			authStorage.Start()
-			err := authStorage.WaitStarted()
+
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
+			err := authStorage.WaitReady(ctx)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to open auth database:", err)
 				exitCode = 1
 				return
 			}
+
 			defer func() {
 				authStorage.Stop()
-				err := authStorage.WaitStopped()
+
+				ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+				defer cancel()
+				err := authStorage.Join(ctx)
 				if err != nil {
 					fmt.Fprintln(os.Stderr, "ERROR: Failed to close auth database:", err)
 					exitCode = 1
@@ -52,8 +59,7 @@ func NewAdminUserCreateCommand() *cobra.Command {
 
 			copy(user.Roles, args)
 
-			ctx := context.Background()
-			err = authStorage.SaveUser(ctx, user, opts.password)
+			err = authStorage.SaveUser(context.Background(), user, opts.password)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to save user:", err)
 				exitCode = 1

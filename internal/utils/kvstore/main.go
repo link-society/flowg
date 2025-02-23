@@ -11,7 +11,7 @@ import (
 
 	"link-society.com/flowg/internal/app/logging"
 
-	"link-society.com/flowg/internal/utils/sync"
+	"link-society.com/flowg/internal/utils/proctree"
 )
 
 type options struct {
@@ -46,10 +46,8 @@ func OptReadOnly(readOnly bool) func(*options) {
 }
 
 type Storage struct {
-	mbox   actor.Mailbox[message]
-	worker *worker
-	actor  actor.Actor
-	dbOpts badger.Options
+	mbox    actor.Mailbox[message]
+	process proctree.Process
 }
 
 func NewStorage(opts ...func(*options)) *Storage {
@@ -77,38 +75,36 @@ func NewStorage(opts ...func(*options)) *Storage {
 		WithReadOnly(options.readOnly)
 
 	mbox := actor.NewMailbox[message]()
-	worker := &worker{
-		state: &workerStarting{dbOpts: dbOpts},
-		mbox:  mbox,
-
-		startCond: sync.NewCondValue[error](),
-		stopCond:  sync.NewCondValue[error](),
+	handler := &procHandler{
+		dbOpts: dbOpts,
+		mbox:   mbox,
 	}
-	workerA := actor.New(worker)
-	actor := actor.Combine(mbox, workerA).WithOptions(actor.OptStopTogether()).Build()
+	process := proctree.NewProcessGroup(
+		proctree.DefaultProcessGroupOptions(),
+		proctree.NewActorProcess(mbox),
+		proctree.NewProcess(handler),
+	)
 
 	return &Storage{
-		mbox:   mbox,
-		worker: worker,
-		actor:  actor,
-		dbOpts: dbOpts,
+		mbox:    mbox,
+		process: process,
 	}
 }
 
 func (kv *Storage) Start() {
-	kv.actor.Start()
-}
-
-func (kv *Storage) WaitStarted() error {
-	return kv.worker.startCond.Wait()
+	kv.process.Start()
 }
 
 func (kv *Storage) Stop() {
-	kv.actor.Stop()
+	kv.process.Stop()
 }
 
-func (kv *Storage) WaitStopped() error {
-	return kv.worker.stopCond.Wait()
+func (kv *Storage) WaitReady(ctx context.Context) error {
+	return kv.process.WaitReady(ctx)
+}
+
+func (kv *Storage) Join(ctx context.Context) error {
+	return kv.process.Join(ctx)
 }
 
 func (kv *Storage) Backup(

@@ -5,7 +5,7 @@ import (
 
 	"crypto/tls"
 
-	"github.com/vladopajic/go-actor/actor"
+	"link-society.com/flowg/internal/utils/proctree"
 )
 
 type Options struct {
@@ -25,12 +25,7 @@ type Options struct {
 	LogStorageDir    string
 }
 
-type Server struct {
-	actor actor.Actor
-	doneC chan bool
-}
-
-func NewServer(opts Options) *Server {
+func NewServer(opts Options) proctree.Process {
 	storageLayer := newStorageLayer(
 		opts.AuthStorageDir,
 		opts.ConfigStorageDir,
@@ -55,39 +50,16 @@ func NewServer(opts Options) *Server {
 		engineLayer,
 	)
 
-	doneC := make(chan bool, 1)
-
-	worker := &worker{
-		state:  &workerStartingStorageLayer{},
-		logger: slog.Default().With("channel", "server"),
-
+	bootstrap := proctree.NewProcess(&bootstrapProcHandler{
+		logger:       slog.Default().With("channel", "server"),
 		storageLayer: storageLayer,
-		engineLayer:  engineLayer,
-		serviceLayer: serviceLayer,
-	}
+	})
 
-	rootA := actor.New(
-		worker,
-		actor.OptOnStop(func() {
-			doneC <- worker.failure
-			close(doneC)
-		}),
+	return proctree.NewProcessGroup(
+		proctree.DefaultProcessGroupOptions(),
+		storageLayer,
+		engineLayer,
+		serviceLayer,
+		bootstrap,
 	)
-
-	return &Server{
-		actor: rootA,
-		doneC: doneC,
-	}
-}
-
-func (s *Server) Start() {
-	s.actor.Start()
-}
-
-func (s *Server) Stop() {
-	s.actor.Stop()
-}
-
-func (s *Server) DoneC() <-chan bool {
-	return s.doneC
 }

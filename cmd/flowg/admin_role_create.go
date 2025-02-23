@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"time"
+
 	"os"
 
 	"fmt"
@@ -40,27 +42,31 @@ func NewAdminRoleCreateCommand() *cobra.Command {
 				role.Scopes[i] = scope
 			}
 
-			authStorage := auth.NewStorage(
-				auth.OptDirectory(opts.authDir),
-			)
+			authStorage := auth.NewStorage(auth.OptDirectory(opts.authDir))
 			authStorage.Start()
-			err := authStorage.WaitStarted()
+
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
+			err := authStorage.WaitReady(ctx)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to open auth database:", err)
 				exitCode = 1
 				return
 			}
+
 			defer func() {
 				authStorage.Stop()
-				err := authStorage.WaitStopped()
+
+				ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+				defer cancel()
+				err := authStorage.Join(ctx)
 				if err != nil {
 					fmt.Fprintln(os.Stderr, "ERROR: Failed to close auth database:", err)
 					exitCode = 1
 				}
 			}()
 
-			ctx := context.Background()
-			err = authStorage.SaveRole(ctx, role)
+			err = authStorage.SaveRole(context.Background(), role)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ERROR: Failed to save role:", err)
 				exitCode = 1
