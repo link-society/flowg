@@ -1,6 +1,8 @@
 package server
 
 import (
+	"time"
+
 	"crypto/tls"
 
 	"link-society.com/flowg/internal/utils/proctree"
@@ -10,44 +12,60 @@ import (
 	"link-society.com/flowg/internal/services/syslog"
 )
 
-func newServiceLayer(
-	httpBindAddress string,
-	httpTlsConfig *tls.Config,
+type serviceLayerOpts struct {
+	httpBindAddress string
+	httpTlsConfig   *tls.Config
 
-	mgmtBindAddress string,
-	mgmtTlsConfig *tls.Config,
+	mgmtBindAddress string
+	mgmtTlsConfig   *tls.Config
 
-	syslogTCP bool,
-	syslogBindAddress string,
-	syslogTlsConfig *tls.Config,
-	syslogAllowOrigins []string,
+	clusterStateDir string
+	clusterNodeID   string
+	clusterJoinAddr string
+	clusterTimeout  time.Duration
 
-	storageLayer *storageLayer,
-	engineLayer *engineLayer,
-) proctree.Process {
+	syslogTCP          bool
+	syslogBindAddress  string
+	syslogTlsConfig    *tls.Config
+	syslogAllowOrigins []string
+
+	storageLayer *storageLayer
+	engineLayer  *engineLayer
+}
+
+func newServiceLayer(opts serviceLayerOpts) proctree.Process {
 	httpServer := http.NewServer(
-		httpBindAddress,
-		httpTlsConfig,
-		storageLayer.authStorage,
-		storageLayer.configStorage,
-		storageLayer.logStorage,
-		engineLayer.logNotifier,
-		engineLayer.pipelineRunner,
+		opts.httpBindAddress,
+		opts.httpTlsConfig,
+		opts.storageLayer.authStorage,
+		opts.storageLayer.configStorage,
+		opts.storageLayer.logStorage,
+		opts.engineLayer.logNotifier,
+		opts.engineLayer.pipelineRunner,
 	)
 
-	mgmtServer := mgmt.NewServer(
-		mgmtBindAddress,
-		mgmtTlsConfig,
-	)
+	mgmtServer := mgmt.NewServer(mgmt.ServerOptions{
+		BindAddress: opts.mgmtBindAddress,
+		TlsConfig:   opts.mgmtTlsConfig,
+
+		ClusterStateDir: opts.clusterStateDir,
+		ClusterNodeID:   opts.clusterNodeID,
+		ClusterJoinAddr: opts.clusterJoinAddr,
+		ClusterTimeout:  opts.clusterTimeout,
+
+		AuthStorage:   opts.storageLayer.authStorage,
+		ConfigStorage: opts.storageLayer.configStorage,
+		LogStorage:    opts.storageLayer.logStorage,
+	})
 
 	syslogServer := syslog.NewServer(
-		syslogTCP,
-		syslogBindAddress,
-		syslogTlsConfig,
-		syslogAllowOrigins,
+		opts.syslogTCP,
+		opts.syslogBindAddress,
+		opts.syslogTlsConfig,
+		opts.syslogAllowOrigins,
 
-		storageLayer.configStorage,
-		engineLayer.pipelineRunner,
+		opts.storageLayer.configStorage,
+		opts.engineLayer.pipelineRunner,
 	)
 
 	return proctree.NewProcessGroup(

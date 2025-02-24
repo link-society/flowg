@@ -3,6 +3,8 @@ package server
 import (
 	"log/slog"
 
+	"time"
+
 	"crypto/tls"
 
 	"link-society.com/flowg/internal/utils/proctree"
@@ -14,6 +16,10 @@ type Options struct {
 
 	MgmtBindAddress string
 	MgmtTlsConfig   *tls.Config
+
+	ClusterStateDir string
+	ClusterNodeID   string
+	ClusterJoinAddr string
 
 	SyslogTCP          bool
 	SyslogBindAddress  string
@@ -34,25 +40,31 @@ func NewServer(opts Options) proctree.Process {
 	engineLayer := newEngineLayer(
 		storageLayer,
 	)
-	serviceLayer := newServiceLayer(
-		opts.HttpBindAddress,
-		opts.HttpTlsConfig,
+	serviceLayer := newServiceLayer(serviceLayerOpts{
+		httpBindAddress: opts.HttpBindAddress,
+		httpTlsConfig:   opts.HttpTlsConfig,
 
-		opts.MgmtBindAddress,
-		opts.MgmtTlsConfig,
+		mgmtBindAddress: opts.MgmtBindAddress,
+		mgmtTlsConfig:   opts.MgmtTlsConfig,
 
-		opts.SyslogTCP,
-		opts.SyslogBindAddress,
-		opts.SyslogTlsConfig,
-		opts.SyslogAllowOrigins,
+		clusterStateDir: opts.ClusterStateDir,
+		clusterNodeID:   opts.ClusterNodeID,
+		clusterJoinAddr: opts.ClusterJoinAddr,
+		clusterTimeout:  5 * time.Second,
 
-		storageLayer,
-		engineLayer,
-	)
+		syslogTCP:          opts.SyslogTCP,
+		syslogBindAddress:  opts.SyslogBindAddress,
+		syslogTlsConfig:    opts.SyslogTlsConfig,
+		syslogAllowOrigins: opts.SyslogAllowOrigins,
+
+		storageLayer: storageLayer,
+		engineLayer:  engineLayer,
+	})
 
 	bootstrap := proctree.NewProcess(&bootstrapProcHandler{
-		logger:       slog.Default().With("channel", "server"),
-		storageLayer: storageLayer,
+		logger:        slog.Default().With("channel", "server"),
+		storageLayer:  storageLayer,
+		isInitialNode: opts.ClusterJoinAddr == "",
 	})
 
 	return proctree.NewProcessGroup(
