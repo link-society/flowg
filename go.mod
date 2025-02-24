@@ -11,7 +11,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/prometheus/client_golang v1.20.5
 	github.com/spf13/cobra v1.9.1
-	github.com/swaggest/openapi-go v0.2.55
+	github.com/swaggest/openapi-go v0.2.57
 	github.com/swaggest/rest v0.2.72
 	github.com/swaggest/swgui v1.8.2
 	github.com/swaggest/usecase v1.3.1
@@ -43,7 +43,7 @@ require (
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/swaggest/form/v5 v5.1.1 // indirect
 	github.com/swaggest/jsonschema-go v0.3.73 // indirect
-	github.com/swaggest/refl v1.3.0 // indirect
+	github.com/swaggest/refl v1.3.1 // indirect
 	github.com/vearutop/statigz v1.4.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/net v0.34.0 // indirect
