@@ -1,7 +1,6 @@
 module link-society.com/flowg
 
 go 1.23
-
 toolchain go1.23.3
 
 require (
@@ -16,7 +15,7 @@ require (
 	github.com/swaggest/swgui v1.8.2
 	github.com/swaggest/usecase v1.3.1
 	github.com/vladopajic/go-actor v0.9.5
-	golang.org/x/crypto v0.33.0
+	golang.org/x/crypto v0.34.0
 	gopkg.in/mcuadros/go-syslog.v2 v2.3.0
 )
 
