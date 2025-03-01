@@ -16,8 +16,9 @@ import (
 )
 
 type Runner struct {
-	mbox    actor.MailboxSender[message]
-	process proctree.Process
+	proctree.Process
+
+	mbox actor.MailboxSender[message]
 }
 
 func NewRunner(
@@ -41,25 +42,9 @@ func NewRunner(
 	)
 
 	return &Runner{
+		Process: process,
 		mbox:    mbox,
-		process: process,
 	}
-}
-
-func (r *Runner) Start() {
-	r.process.Start()
-}
-
-func (r *Runner) Stop() {
-	r.process.Stop()
-}
-
-func (r *Runner) WaitReady(ctx context.Context) error {
-	return r.process.WaitReady(ctx)
-}
-
-func (r *Runner) Join(ctx context.Context) error {
-	return r.process.Join(ctx)
 }
 
 func (r *Runner) Run(

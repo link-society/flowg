@@ -46,8 +46,9 @@ func OptReadOnly(readOnly bool) func(*options) {
 }
 
 type Storage struct {
-	mbox    actor.Mailbox[message]
-	process proctree.Process
+	proctree.Process
+
+	mbox actor.Mailbox[message]
 }
 
 func NewStorage(opts ...func(*options)) *Storage {
@@ -86,25 +87,10 @@ func NewStorage(opts ...func(*options)) *Storage {
 	)
 
 	return &Storage{
-		mbox:    mbox,
-		process: process,
+		Process: process,
+
+		mbox: mbox,
 	}
-}
-
-func (kv *Storage) Start() {
-	kv.process.Start()
-}
-
-func (kv *Storage) Stop() {
-	kv.process.Stop()
-}
-
-func (kv *Storage) WaitReady(ctx context.Context) error {
-	return kv.process.WaitReady(ctx)
-}
-
-func (kv *Storage) Join(ctx context.Context) error {
-	return kv.process.Join(ctx)
 }
 
 func (kv *Storage) Backup(

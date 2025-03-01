@@ -9,6 +9,7 @@ import (
 	"link-society.com/flowg/internal/models"
 
 	"link-society.com/flowg/internal/utils/kvstore"
+	"link-society.com/flowg/internal/utils/proctree"
 
 	"link-society.com/flowg/internal/storage/auth/transactions"
 )
@@ -38,6 +39,8 @@ func OptReadOnly(readOnly bool) func(*options) {
 }
 
 type Storage struct {
+	proctree.Process
+
 	kvStore *kvstore.Storage
 }
 
@@ -58,23 +61,10 @@ func NewStorage(opts ...func(*options)) *Storage {
 		kvstore.OptReadOnly(options.readOnly),
 	)
 
-	return &Storage{kvStore: kvStore}
-}
-
-func (s *Storage) Start() {
-	s.kvStore.Start()
-}
-
-func (s *Storage) Stop() {
-	s.kvStore.Stop()
-}
-
-func (s *Storage) WaitReady(ctx context.Context) error {
-	return s.kvStore.WaitReady(ctx)
-}
-
-func (s *Storage) Join(ctx context.Context) error {
-	return s.kvStore.Join(ctx)
+	return &Storage{
+		Process: kvStore,
+		kvStore: kvStore,
+	}
 }
 
 func (s *Storage) Backup(ctx context.Context, w io.Writer) error {

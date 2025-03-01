@@ -51,8 +51,9 @@ func OptGCInterval(interval time.Duration) func(*options) {
 }
 
 type Storage struct {
+	proctree.Process
+
 	kvStore *kvstore.Storage
-	process proctree.Process
 }
 
 func NewStorage(opts ...func(*options)) *Storage {
@@ -84,25 +85,9 @@ func NewStorage(opts ...func(*options)) *Storage {
 	)
 
 	return &Storage{
+		Process: process,
 		kvStore: kvStore,
-		process: process,
 	}
-}
-
-func (s *Storage) Start() {
-	s.process.Start()
-}
-
-func (s *Storage) Stop() {
-	s.process.Stop()
-}
-
-func (s *Storage) WaitReady(ctx context.Context) error {
-	return s.process.WaitReady(ctx)
-}
-
-func (s *Storage) Join(ctx context.Context) error {
-	return s.process.Join(ctx)
 }
 
 func (s *Storage) Backup(ctx context.Context, w io.Writer) error {

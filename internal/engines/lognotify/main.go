@@ -11,9 +11,10 @@ import (
 )
 
 type LogNotifier struct {
+	proctree.Process
+
 	subMbox actor.MailboxSender[SubscribeMessage]
 	logMbox actor.MailboxSender[LogMessage]
-	process proctree.Process
 }
 
 func NewLogNotifier() *LogNotifier {
@@ -33,26 +34,11 @@ func NewLogNotifier() *LogNotifier {
 	)
 
 	return &LogNotifier{
+		Process: process,
+
 		subMbox: subMbox,
 		logMbox: logMbox,
-		process: process,
 	}
-}
-
-func (n *LogNotifier) Start() {
-	n.process.Start()
-}
-
-func (n *LogNotifier) Stop() {
-	n.process.Stop()
-}
-
-func (n *LogNotifier) WaitReady(ctx context.Context) error {
-	return n.process.WaitReady(ctx)
-}
-
-func (n *LogNotifier) Join(ctx context.Context) error {
-	return n.process.Join(ctx)
 }
 
 func (n *LogNotifier) Subscribe(ctx context.Context, stream string) (actor.MailboxReceiver[LogMessage], error) {

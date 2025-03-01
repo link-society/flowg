@@ -35,8 +35,9 @@ func OptExtension(filterExt string) func(*options) {
 }
 
 type Storage struct {
-	mbox    actor.MailboxSender[message]
-	process proctree.Process
+	proctree.Process
+
+	mbox actor.MailboxSender[message]
 }
 
 func NewStorage(opts ...func(*options)) *Storage {
@@ -66,25 +67,10 @@ func NewStorage(opts ...func(*options)) *Storage {
 	)
 
 	return &Storage{
-		mbox:    mbox,
-		process: process,
+		Process: process,
+
+		mbox: mbox,
 	}
-}
-
-func (fs *Storage) Start() {
-	fs.process.Start()
-}
-
-func (fs *Storage) Stop() {
-	fs.process.Stop()
-}
-
-func (fs *Storage) WaitReady(ctx context.Context) error {
-	return fs.process.WaitReady(ctx)
-}
-
-func (fs *Storage) Join(ctx context.Context) error {
-	return fs.process.Join(ctx)
 }
 
 func (fs *Storage) ListFiles(ctx context.Context) ([]string, error) {

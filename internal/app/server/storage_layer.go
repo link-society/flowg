@@ -1,8 +1,6 @@
 package server
 
 import (
-	"context"
-
 	"link-society.com/flowg/internal/storage/auth"
 	"link-society.com/flowg/internal/storage/config"
 	"link-society.com/flowg/internal/storage/log"
@@ -11,11 +9,11 @@ import (
 )
 
 type storageLayer struct {
+	proctree.Process
+
 	authStorage   *auth.Storage
 	configStorage *config.Storage
 	logStorage    *log.Storage
-
-	process proctree.Process
 }
 
 func newStorageLayer(
@@ -37,26 +35,10 @@ func newStorageLayer(
 	)
 
 	return &storageLayer{
+		Process: process,
+
 		authStorage:   authStorage,
 		configStorage: configStorage,
 		logStorage:    logStorage,
-
-		process: process,
 	}
-}
-
-func (l *storageLayer) Start() {
-	l.process.Start()
-}
-
-func (l *storageLayer) Stop() {
-	l.process.Stop()
-}
-
-func (l *storageLayer) WaitReady(ctx context.Context) error {
-	return l.process.WaitReady(ctx)
-}
-
-func (l *storageLayer) Join(ctx context.Context) error {
-	return l.process.Join(ctx)
 }
