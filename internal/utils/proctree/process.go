@@ -19,82 +19,39 @@ type ProcessHandler interface {
 	Terminate(ctx actor.Context, err error) error
 }
 
-type ProcessResult interface {
-	Error() error
-	Done() bool
-}
-
 func NewProcess(handler ProcessHandler) Process {
 	worker := &procWorker{
 		handler:   handler,
 		state:     &procWorkerInit{},
-		readyCond: newCondValue[struct{}](),
+		readyCond: newCondValue[error](),
 		joinCond:  newCondValue[error](),
 	}
 
 	return &proc{
+		Actor:  actor.New(worker),
 		worker: worker,
-		actor:  actor.New(worker),
 	}
 }
 
-func Continue() ProcessResult {
-	return &continueR{}
-}
-
-func Terminate(err error) ProcessResult {
-	return &terminateR{err: err}
-}
-
-type continueR struct{}
-
-func (r *continueR) Error() error {
-	return nil
-}
-
-func (r *continueR) Done() bool {
-	return false
-}
-
-type terminateR struct {
-	err error
-}
-
-func (r *terminateR) Error() error {
-	return r.err
-}
-
-func (r *terminateR) Done() bool {
-	return true
-}
-
 type proc struct {
-	actor  actor.Actor
+	actor.Actor
 	worker *procWorker
 }
 
-func (p *proc) Start() {
-	p.actor.Start()
-}
-
-func (p *proc) Stop() {
-	p.actor.Stop()
-}
-
 func (p *proc) WaitReady(ctx context.Context) error {
-	readyC := make(chan struct{}, 1)
+	readyC := make(chan error, 1)
 
 	go func() {
-		p.worker.readyCond.Wait()
-		readyC <- struct{}{}
+		err := p.worker.readyCond.Wait()
+		readyC <- err
 	}()
 
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
 
-	case <-readyC:
-		return nil
+	case err := <-readyC:
+		return err
 	}
 }
 
@@ -118,7 +75,7 @@ func (p *proc) Join(ctx context.Context) error {
 type procWorker struct {
 	handler   ProcessHandler
 	state     procWorkerState
-	readyCond *condValue[struct{}]
+	readyCond *condValue[error]
 	joinCond  *condValue[error]
 }
 
@@ -139,12 +96,12 @@ type procWorkerState interface {
 type procWorkerInit struct{}
 
 func (s *procWorkerInit) DoWork(ctx actor.Context, worker *procWorker) procWorkerState {
-	defer worker.readyCond.Broadcast(struct{}{})
-
 	if result := worker.handler.Init(ctx); result.Done() {
+		worker.readyCond.Broadcast(result.Error())
 		return &procWorkerTerminate{err: result.Error()}
 	}
 
+	worker.readyCond.Broadcast(nil)
 	return &procWorkerRunning{}
 }
 
