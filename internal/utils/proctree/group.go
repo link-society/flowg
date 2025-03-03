@@ -5,8 +5,6 @@ import (
 	"errors"
 
 	"time"
-
-	"github.com/vladopajic/go-actor/actor"
 )
 
 type ProcessGroupOptions struct {
@@ -26,7 +24,7 @@ func NewProcessGroup(opts ProcessGroupOptions, children ...Process) Process {
 		opts:     opts,
 		children: children,
 
-		readyCond: newCondValue[struct{}](),
+		readyCond: newCondValue[error](),
 		joinCond:  newCondValue[error](),
 		shutdownC: make(chan struct{}, 1),
 	}
@@ -36,7 +34,7 @@ type group struct {
 	opts     ProcessGroupOptions
 	children []Process
 
-	readyCond *condValue[struct{}]
+	readyCond *condValue[error]
 	joinCond  *condValue[error]
 	shutdownC chan struct{}
 }
@@ -50,19 +48,19 @@ func (g *group) Stop() {
 }
 
 func (g *group) WaitReady(ctx context.Context) error {
-	readyC := make(chan struct{}, 1)
+	readyC := make(chan error, 1)
 
 	go func() {
-		g.readyCond.Wait()
-		readyC <- struct{}{}
+		err := g.readyCond.Wait()
+		readyC <- err
 	}()
 
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
 
-	case <-readyC:
-		return nil
+	case err := <-readyC:
+		return err
 	}
 }
 
@@ -95,6 +93,7 @@ func (g *group) run() {
 			errs := g.stopChildren(i)
 			errs = append([]error{err}, errs...)
 			err = errors.Join(errs...)
+			g.readyCond.Broadcast(err)
 			g.joinCond.Broadcast(err)
 			return
 		}
@@ -110,7 +109,7 @@ func (g *group) run() {
 		}(child)
 	}
 
-	g.readyCond.Broadcast(struct{}{})
+	g.readyCond.Broadcast(nil)
 
 	select {
 	case <-g.shutdownC:
@@ -135,7 +134,7 @@ func (g *group) stopChildren(last int) []error {
 		err := child.Join(ctx)
 		cancel()
 
-		if err != nil && err != actor.ErrStopped && err != context.Canceled {
+		if err != nil {
 			errs = append(errs, err)
 		}
 	}

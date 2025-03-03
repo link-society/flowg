@@ -30,25 +30,17 @@ func NewActorProcess(parent actor.Actor) Process {
 		Build()
 
 	return &actorProcess{
-		rootA:     rootA,
+		Actor:     rootA,
 		readyCond: readyCond,
 		doneCond:  doneCond,
 	}
 }
 
 type actorProcess struct {
-	rootA actor.Actor
+	actor.Actor
 
 	readyCond *condValue[struct{}]
 	doneCond  *condValue[error]
-}
-
-func (p *actorProcess) Start() {
-	p.rootA.Start()
-}
-
-func (p *actorProcess) Stop() {
-	p.rootA.Stop()
 }
 
 func (p *actorProcess) WaitReady(ctx context.Context) error {
