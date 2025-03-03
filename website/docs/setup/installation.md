@@ -25,13 +25,13 @@ Then run the build system:
 ```bash
 go install github.com/go-task/task/v3/cmd/task@latest
 task build
-sudo install -m 755 ./bin/flowg /usr/local/bin/flowg
+sudo install -m 755 ./bin/flowg-server /usr/local/bin/flowg-server
 ```
 
 Then, start the server with:
 
 ```bash
-flowg serve \
+flowg-server \
   --auth-dir /var/lib/flowg/data/auth \
   --log-dir /var/lib/flowg/logs \
   --config-dir /var/lib/flowg/config \
@@ -53,7 +53,7 @@ docker run \
   -p 9113:9113/tcp \
   -p 5514:5514/udp \
   -v flowg-data:/data \
-  linksociety/flowg:latest serve
+  linksociety/flowg:latest
 ```
 
 ### Using Kubernetes
@@ -104,7 +104,7 @@ By using the Syslog protocol `tcp+tls` instead of `udp` (the default), you can
 require Client certificate authentication:
 
 ```bash
-flowg serve \
+flowg-server \
   --syslog-proto="tcp" \
   --syslog-tls \
   --syslog-tls-cert="/path/to/cert.pem" \
@@ -117,7 +117,7 @@ flowg serve \
 Otherwise, you can restrict which IP address (or range) will be allowed:
 
 ```bash
-flowg serve \
+flowg-server \
   --syslog-allow-origin="127.0.0.1" \
   --syslog-allow-origin="192.168.1.0/24"
 ```
@@ -126,7 +126,7 @@ Or via an environment variable:
 
 ```bash
 export FLOWG_SYSLOG_ALLOW_ORIGINS="127.0.0.1,192.168.1.0/24"
-flowg serve
+flowg-server
 ```
 
 ## Next Steps

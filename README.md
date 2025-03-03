@@ -84,7 +84,7 @@ task build
 Then, start the server with:
 
 ```bash
-./bin/flowg serve \
+./bin/flowg-server \
   --auth-dir ./data/auth \
   --log-dir ./data/logs \
   --config-dir ./data/config \
@@ -121,7 +121,7 @@ docker run \
   -p 9113:9113/tcp \
   -p 5514:5514/udp \
   -v flowg-data:/data \
-  linksociety/flowg:latest serve
+  linksociety/flowg:latest
 ```
 
 Using Kubernetes (and Helm):
