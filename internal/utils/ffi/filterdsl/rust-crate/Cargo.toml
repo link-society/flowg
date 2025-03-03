@@ -12,6 +12,6 @@ cc = "1.2"
 [dependencies]
 anyhow = "1.0"
 logos = "0.15.0"
-peg = "0.8.4"
+peg = "0.8.5"
 serde_json = "1.0.139"
 snailquote = "0.3.1"
