@@ -17,7 +17,7 @@ tasks:
   run:
     desc: "Run the project"
     cmds:
-      - ./bin/flowg serve {{.CLI_ARGS}}
+      - ./bin/flowg-server {{.CLI_ARGS}}
     env:
       FLOWG_SECRET_KEY: "s3cr3!"
 
