@@ -1,8 +1,8 @@
-#!/bin/sh
-
-set -e
+#!/bin/bash
 
 . ../../flowg.sh
+
+set -e
 
 rm -rf backup
 mkdir -p backup
