@@ -1,19 +1,10 @@
 package main
 
 import (
-	"fmt"
-	"strings"
-
 	"os"
 	"strconv"
-	"syscall"
-
-	"github.com/spf13/cobra"
-
-	"link-society.com/flowg/internal/app/logging"
+	"strings"
 )
-
-var exitCode int = 0
 
 var (
 	defaultVerbose = getEnvBool("FLOWG_VERBOSE", false)
@@ -47,33 +38,7 @@ var (
 	defaultAuthDir   = getEnvString("FLOWG_AUTH_DIR", "./data/auth")
 	defaultConfigDir = getEnvString("FLOWG_CONFIG_DIR", "./data/config")
 	defaultLogDir    = getEnvString("FLOWG_LOG_DIR", "./data/logs")
-
-	defaultBackupDir = getEnvString("FLOWG_BACKUP_DIR", "./backup")
 )
-
-func main() {
-	rootCmd := &cobra.Command{
-		Use:   "flowg",
-		Short: "Low-Code log management solution",
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			logging.Discard()
-			syscall.Umask(0077)
-		},
-	}
-
-	rootCmd.AddCommand(
-		NewVersionCommand(),
-		NewAdminCommand(),
-		NewServeCommand(),
-	)
-
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		exitCode = 1
-	}
-
-	os.Exit(exitCode)
-}
 
 func getEnvString(key string, defaultValue string) string {
 	value := os.Getenv(key)
