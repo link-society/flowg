@@ -13,6 +13,10 @@ type options struct {
 	mgmtTlsCert     string
 	mgmtTlsCertKey  string
 
+	clusterNodeID       string
+	clusterJoinNodeID   string
+	clusterJoinEndpoint string
+
 	syslogProtocol       string
 	syslogBindAddr       string
 	syslogTlsEnabled     bool
@@ -82,6 +86,27 @@ func (opts *options) defineCliOptions(cmd *cobra.Command) {
 		"mgmt-tls-key",
 		defaultMgmtTlsCertKey,
 		"Path to the certificate key file for the Management HTTPS server",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.clusterNodeID,
+		"cluster-node-id",
+		defaultClusterNodeID,
+		"Unique identifier for this node in the cluster",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.clusterJoinNodeID,
+		"cluster-join-node-id",
+		defaultClusterJoinNodeID,
+		"Unique identifier of the node to join in the cluster",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.clusterJoinEndpoint,
+		"cluster-join-endpoint",
+		defaultClusterJoinEndpoint,
+		"Management endpoint of the node to join the cluster",
 	)
 
 	cmd.Flags().StringVar(

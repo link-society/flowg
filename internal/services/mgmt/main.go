@@ -4,6 +4,7 @@ import (
 	"log/slog"
 
 	"crypto/tls"
+	"net/url"
 
 	"link-society.com/flowg/internal/utils/proctree"
 )
@@ -11,10 +12,14 @@ import (
 type ServerOptions struct {
 	BindAddress string
 	TlsConfig   *tls.Config
+
+	ClusterNodeID       string
+	ClusterJoinNodeID   string
+	ClusterJoinEndpoint *url.URL
 }
 
 func NewServer(opts *ServerOptions) proctree.Process {
-	return proctree.NewProcess(&procHandler{
+	state := &state{
 		logger: slog.Default().With(
 			slog.String("channel", "mgmt"),
 			slog.Group("mgmt",
@@ -23,5 +28,12 @@ func NewServer(opts *ServerOptions) proctree.Process {
 		),
 
 		opts: opts,
-	})
+	}
+
+	return proctree.NewProcessGroup(
+		proctree.DefaultProcessGroupOptions(),
+		proctree.NewProcess(&listenerHandler{state: state}),
+		proctree.NewProcess(&clusterHandler{state: state}),
+		proctree.NewProcess(&serverHandler{state: state}),
+	)
 }
