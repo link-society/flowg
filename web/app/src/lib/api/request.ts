@@ -42,7 +42,20 @@ const request = async<B, R extends { success: boolean }>(
       body: JSON.stringify(body),
     },
   )
-  const responseBody = await response.json()
+
+  let responseBody: unknown
+
+  try {
+    responseBody = await response.json()
+
+  } catch (error) {
+    throw new errors.InvalidResponseError(
+      'Invalid response from the server',
+      await response.text(),
+      response.status,
+      response.ok,
+    )
+  }
 
   if (!response.ok) {
     const content = responseBody as ApiErrorResponse
@@ -59,7 +72,8 @@ const request = async<B, R extends { success: boolean }>(
     }
   }
 
-  if (!responseBody.success) {
+  const content = responseBody as { success: boolean }
+  if (!content.success) {
     throw new errors.ApiError('Request failed')
   }
 
