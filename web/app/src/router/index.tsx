@@ -1,11 +1,20 @@
 import { createBrowserRouter } from 'react-router'
 
+import LinearProgress from '@mui/material/LinearProgress'
+
+import { ErrorBoundary } from '@/components/routing/error'
+
+
 export default createBrowserRouter([
   {
     path: '/web/',
     lazy: async () => {
       const { BaseLayout: Component } = await import('@/layouts/base')
-      return { Component }
+      return {
+        Component,
+        HydrateFallback: () => <LinearProgress />,
+        ErrorBoundary: () => <ErrorBoundary />,
+      }
     },
     children: [
       {
