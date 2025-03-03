@@ -7,6 +7,7 @@ import (
 
 	"crypto/tls"
 	"net"
+	"net/url"
 
 	"link-society.com/flowg/internal/app/server"
 )
@@ -37,6 +38,19 @@ func newServerConfig(opts *options) (server.Options, error) {
 
 		mgmtTlsConfig = &tls.Config{
 			Certificates: []tls.Certificate{cert},
+		}
+	}
+
+	var clusterJoinEndpointUrl *url.URL
+	if opts.clusterJoinNodeID != "" {
+		if opts.clusterJoinEndpoint == "" {
+			return server.Options{}, fmt.Errorf("cluster join endpoint is required when joining a cluster")
+		}
+
+		var err error
+		clusterJoinEndpointUrl, err = url.Parse(opts.clusterJoinEndpoint)
+		if err != nil {
+			return server.Options{}, fmt.Errorf("invalid cluster join endpoint: %w", err)
 		}
 	}
 
@@ -86,6 +100,10 @@ func newServerConfig(opts *options) (server.Options, error) {
 
 		MgmtBindAddress: opts.mgmtBindAddress,
 		MgmtTlsConfig:   mgmtTlsConfig,
+
+		ClusterNodeID:       opts.clusterNodeID,
+		ClusterJoinNodeID:   opts.clusterJoinNodeID,
+		ClusterJoinEndpoint: clusterJoinEndpointUrl,
 
 		SyslogTcpMode:      opts.syslogProtocol == "tcp",
 		SyslogBindAddress:  opts.syslogBindAddr,

@@ -2,6 +2,7 @@ package server
 
 import (
 	"log/slog"
+	"net/url"
 
 	"crypto/tls"
 
@@ -25,6 +26,10 @@ type Options struct {
 
 	MgmtBindAddress string
 	MgmtTlsConfig   *tls.Config
+
+	ClusterNodeID       string
+	ClusterJoinNodeID   string
+	ClusterJoinEndpoint *url.URL
 
 	SyslogTcpMode      bool
 	SyslogBindAddress  string
@@ -66,6 +71,10 @@ func NewServer(opts Options) proctree.Process {
 		mgmtServer = mgmt.NewServer(&mgmt.ServerOptions{
 			BindAddress: opts.MgmtBindAddress,
 			TlsConfig:   opts.MgmtTlsConfig,
+
+			ClusterNodeID:       opts.ClusterNodeID,
+			ClusterJoinNodeID:   opts.ClusterJoinNodeID,
+			ClusterJoinEndpoint: opts.ClusterJoinEndpoint,
 		})
 		syslogServer = syslog.NewServer(&syslog.ServerOptions{
 			TcpMode:      opts.SyslogTcpMode,
