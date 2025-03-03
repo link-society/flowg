@@ -9,7 +9,7 @@ sidebar_position: 3
 Run **FlowG** with:
 
 ```bash
-flowg serve \
+flowg-server \
   --auth-dir /var/lib/flowg/data/auth \
   --log-dir /var/lib/flowg/logs \
   --config-dir /var/lib/flowg/config \
@@ -27,7 +27,7 @@ flowg serve \
 Or if using Certbot:
 
 ```bash
-flowg serve \
+flowg-server \
   --auth-dir /var/lib/flowg/data/auth \
   --log-dir /var/lib/flowg/logs \
   --config-dir /var/lib/flowg/config \
