@@ -12,19 +12,19 @@ tasks:
     desc: "Run API end-to-end tests"
     dir: ./tests/e2e/api
     cmds:
-      - sh run.sh
+      - bash run.sh
 
   "e2e:web":
     desc: "Run Web end-to-end tests"
     dir: ./tests/e2e/web
     cmds:
-      - sh run.sh
+      - bash run.sh
 
   bench:
     desc: "Run benchmark"
     dir: ./tests/benchmark
     cmds:
-      - sh run.sh
+      - bash run.sh
 
   "test:unit:go":
     internal: true

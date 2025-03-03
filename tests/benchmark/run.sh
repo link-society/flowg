@@ -1,8 +1,8 @@
-#!/bin/sh
-
-set -e
+#!/bin/bash
 
 . ../flowg.sh
+
+set -e
 
 sudo cp -r config/* data/config/
 

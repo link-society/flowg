@@ -1,8 +1,8 @@
-#!/bin/sh
-
-set -e
+#!/bin/bash
 
 . ../../flowg.sh
+
+set -e
 
 if [ ! -d "venv" ]; then
   python3 -m venv venv
