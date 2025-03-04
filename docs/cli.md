@@ -8,6 +8,9 @@ Usage:
 
 Flags:
       --auth-dir string                   Path to the auth database directory (default "./data/auth")
+      --cluster-join-endpoint string      Management endpoint of the node to join the cluster
+      --cluster-join-node-id string       Unique identifier of the node to join in the cluster
+      --cluster-node-id string            Unique identifier for this node in the cluster (default "flowg-node0")
       --config-dir string                 Path to the config directory (default "./data/config")
   -h, --help                              help for flowg-server
       --http-bind string                  Address to bind the HTTP server to (default ":5080")
