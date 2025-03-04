@@ -12,25 +12,25 @@ import (
 	"github.com/hashicorp/memberlist"
 )
 
+type ManagerOptions struct {
+	NodeID           string
+	JoinNodeID       string
+	JoinNodeEndpoint *url.URL
+
+	LocalEndpointResolver func() *url.URL
+}
+
 type Manager struct {
 	proctree.Process
 
 	handler *procHandler
 }
 
-func NewManager(
-	nodeID string,
-	localEndpoint *url.URL,
-	joinNodeID string,
-	joinNodeEndpoint *url.URL,
-) *Manager {
+func NewManager(opts *ManagerOptions) *Manager {
 	connM := actor.NewMailbox[net.Conn]()
 	packetM := actor.NewMailbox[*memberlist.Packet]()
 	handler := &procHandler{
-		nodeID:           nodeID,
-		localEndpoint:    localEndpoint,
-		joinNodeID:       joinNodeID,
-		joinNodeEndpoint: joinNodeEndpoint,
+		opts: opts,
 
 		connM:   connM,
 		packetM: packetM,

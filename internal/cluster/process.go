@@ -19,11 +19,7 @@ import (
 )
 
 type procHandler struct {
-	nodeID        string
-	localEndpoint *url.URL
-
-	joinNodeID       string
-	joinNodeEndpoint *url.URL
+	opts *ManagerOptions
 
 	connM   actor.Mailbox[net.Conn]
 	packetM actor.Mailbox[*memberlist.Packet]
@@ -37,21 +33,23 @@ type procHandler struct {
 func (p *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 	var err error
 
+	localEndpoint := p.opts.LocalEndpointResolver()
+
 	logger := slog.Default().With(
 		slog.String("channel", "cluster.gossip"),
-		slog.String("cluster.local.node", p.nodeID),
-		slog.String("cluster.local.endpoint", p.localEndpoint.String()),
+		slog.String("cluster.local.node", p.opts.NodeID),
+		slog.String("cluster.local.endpoint", localEndpoint.String()),
 	)
 
 	d := &delegate{
 		logger: logger,
 
-		localEndpoint: p.localEndpoint,
+		localEndpoint: localEndpoint,
 		endpoints:     make(map[string]*url.URL),
 	}
 
-	if p.joinNodeID != "" && p.joinNodeEndpoint != nil {
-		d.endpoints[p.joinNodeID] = p.joinNodeEndpoint
+	if p.opts.JoinNodeID != "" && p.opts.JoinNodeEndpoint != nil {
+		d.endpoints[p.opts.JoinNodeID] = p.opts.JoinNodeEndpoint
 	}
 
 	transport := &httpTransport{
@@ -61,7 +59,7 @@ func (p *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 	}
 
 	p.mlistConfig = memberlist.DefaultLocalConfig()
-	p.mlistConfig.Name = p.nodeID
+	p.mlistConfig.Name = p.opts.NodeID
 	p.mlistConfig.RequireNodeNames = true
 	p.mlistConfig.Transport = transport
 	p.mlistConfig.Delegate = d
@@ -73,8 +71,8 @@ func (p *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 		return proctree.Terminate(err)
 	}
 
-	if p.joinNodeID != "" && p.joinNodeEndpoint != nil {
-		joinAddr := fmt.Sprintf("%s/%s", p.joinNodeID, p.joinNodeEndpoint.Host)
+	if p.opts.JoinNodeID != "" && p.opts.JoinNodeEndpoint != nil {
+		joinAddr := fmt.Sprintf("%s/%s", p.opts.JoinNodeID, p.opts.JoinNodeEndpoint.Host)
 		_, err = p.mlist.Join([]string{joinAddr})
 		if err != nil {
 			return proctree.Terminate(err)

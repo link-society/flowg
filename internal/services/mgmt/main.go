@@ -6,6 +6,7 @@ import (
 	"crypto/tls"
 	"net/url"
 
+	"link-society.com/flowg/internal/cluster"
 	"link-society.com/flowg/internal/utils/proctree"
 )
 
@@ -19,21 +20,51 @@ type ServerOptions struct {
 }
 
 func NewServer(opts *ServerOptions) proctree.Process {
-	state := &state{
-		logger: slog.Default().With(
-			slog.String("channel", "mgmt"),
-			slog.Group("mgmt",
-				slog.String("bind", opts.BindAddress),
-			),
+	logger := slog.Default().With(
+		slog.String("channel", "mgmt"),
+		slog.Group("mgmt",
+			slog.String("bind", opts.BindAddress),
 		),
+	)
 
-		opts: opts,
+	listenerH := &listenerHandler{
+		logger:      logger,
+		bindAddress: opts.BindAddress,
+	}
+
+	clusterManager := cluster.NewManager(&cluster.ManagerOptions{
+		NodeID:           opts.ClusterNodeID,
+		JoinNodeID:       opts.ClusterJoinNodeID,
+		JoinNodeEndpoint: opts.ClusterJoinEndpoint,
+
+		LocalEndpointResolver: func() *url.URL {
+			localEndpoint := &url.URL{
+				Scheme: "http",
+				Host:   listenerH.listener.Addr().String(),
+			}
+
+			if opts.TlsConfig != nil {
+				localEndpoint.Scheme = "https"
+			}
+
+			return localEndpoint
+		},
+	})
+
+	serverH := &serverHandler{
+		logger: logger,
+
+		bindAddress: opts.BindAddress,
+		tlsConfig:   opts.TlsConfig,
+
+		listenerH:      listenerH,
+		clusterManager: clusterManager,
 	}
 
 	return proctree.NewProcessGroup(
 		proctree.DefaultProcessGroupOptions(),
-		proctree.NewProcess(&listenerHandler{state: state}),
-		proctree.NewProcess(&clusterHandler{state: state}),
-		proctree.NewProcess(&serverHandler{state: state}),
+		proctree.NewProcess(listenerH),
+		clusterManager,
+		proctree.NewProcess(serverH),
 	)
 }
