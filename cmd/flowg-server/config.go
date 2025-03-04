@@ -104,6 +104,7 @@ func newServerConfig(opts *options) (server.Options, error) {
 		ClusterNodeID:       opts.clusterNodeID,
 		ClusterJoinNodeID:   opts.clusterJoinNodeID,
 		ClusterJoinEndpoint: clusterJoinEndpointUrl,
+		ClusterCookie:       opts.clusterCookie,
 
 		SyslogTcpMode:      opts.syslogProtocol == "tcp",
 		SyslogBindAddress:  opts.syslogBindAddr,
