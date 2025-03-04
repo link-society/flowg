@@ -16,9 +16,6 @@ import (
 	"link-society.com/flowg/internal/utils/ffi/filterdsl"
 
 	"link-society.com/flowg/internal/models"
-
-	"link-society.com/flowg/internal/engines/lognotify"
-	"link-society.com/flowg/internal/storage/auth"
 )
 
 type WatchLogsRequest struct {
@@ -30,13 +27,10 @@ type WatchLogsResponse struct {
 	usecase.OutputWithEmbeddedWriter
 }
 
-func WatchLogsUsecase(
-	authStorage *auth.Storage,
-	logNotifier *lognotify.LogNotifier,
-) usecase.Interactor {
+func (ctrl *controller) WatchLogsUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
-			authStorage,
+			ctrl.deps.AuthStorage,
 			models.SCOPE_READ_STREAMS,
 			func(
 				ctx context.Context,
@@ -50,10 +44,9 @@ func WatchLogsUsecase(
 
 					filter, err = filterdsl.Compile(*req.Filter)
 					if err != nil {
-						slog.ErrorContext(
+						ctrl.logger.ErrorContext(
 							ctx,
 							"Failed to compile filter",
-							slog.String("channel", "api"),
 							slog.String("error", err.Error()),
 							slog.String("stream", req.Stream),
 							slog.String("filter", *req.Filter),
@@ -63,12 +56,11 @@ func WatchLogsUsecase(
 					}
 				}
 
-				logM, err := logNotifier.Subscribe(ctx, req.Stream)
+				logM, err := ctrl.deps.LogNotifier.Subscribe(ctx, req.Stream)
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to subscribe to logs",
-						slog.String("channel", "api"),
 						slog.String("error", err.Error()),
 						slog.String("stream", req.Stream),
 					)
@@ -83,16 +75,14 @@ func WatchLogsUsecase(
 				resp.Writer.(http.ResponseWriter).Header().Set("Cache-Control", "no-cache")
 				resp.Writer.(http.ResponseWriter).Header().Set("Connection", "keep-alive")
 
-				slog.InfoContext(
+				ctrl.logger.InfoContext(
 					ctx,
 					"watch logs",
-					slog.String("channel", "api"),
 					slog.String("stream", req.Stream),
 				)
-				defer slog.InfoContext(
+				defer ctrl.logger.InfoContext(
 					ctx,
 					"done watching logs",
-					slog.String("channel", "api"),
 					slog.String("stream", req.Stream),
 				)
 

@@ -10,8 +10,6 @@ import (
 	apiUtils "link-society.com/flowg/internal/utils/api"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/log"
 )
 
 type ConfigureStreamRequest struct {
@@ -23,22 +21,19 @@ type ConfigureStreamResponse struct {
 	Success bool `json:"success"`
 }
 
-func ConfigureStreamUsecase(
-	authStorage *auth.Storage,
-	logStorage *log.Storage,
-) usecase.Interactor {
+func (ctrl *controller) ConfigureStreamUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
-			authStorage,
+			ctrl.deps.AuthStorage,
 			models.SCOPE_WRITE_STREAMS,
 			func(
 				ctx context.Context,
 				req ConfigureStreamRequest,
 				resp *ConfigureStreamResponse,
 			) error {
-				err := logStorage.ConfigureStream(ctx, req.Stream, req.Config)
+				err := ctrl.deps.LogStorage.ConfigureStream(ctx, req.Stream, req.Config)
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to configure stream",
 						slog.String("stream", req.Stream),

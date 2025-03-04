@@ -10,7 +10,6 @@ import (
 	apiUtils "link-society.com/flowg/internal/utils/api"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/auth"
 )
 
 type WhoamiRequest struct{}
@@ -20,7 +19,7 @@ type WhoamiResponse struct {
 	Permissions models.Permissions `json:"permissions"`
 }
 
-func WhoamiUsecase(authStorage *auth.Storage) usecase.Interactor {
+func (ctrl *controller) WhoamiUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		func(
 			ctx context.Context,
@@ -29,9 +28,9 @@ func WhoamiUsecase(authStorage *auth.Storage) usecase.Interactor {
 		) error {
 			resp.User = apiUtils.GetContextUser(ctx)
 
-			scopes, err := authStorage.ListUserScopes(ctx, resp.User.Name)
+			scopes, err := ctrl.deps.AuthStorage.ListUserScopes(ctx, resp.User.Name)
 			if err != nil {
-				slog.ErrorContext(
+				ctrl.logger.ErrorContext(
 					ctx,
 					"Failed to fetch user scopes",
 					slog.String("channel", "api"),

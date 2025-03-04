@@ -10,8 +10,6 @@ import (
 	apiUtils "link-society.com/flowg/internal/utils/api"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
 )
 
 type ListAlertsRequest struct{}
@@ -20,25 +18,21 @@ type ListAlertsResponse struct {
 	Alerts  []string `json:"alerts"`
 }
 
-func ListAlertsUsecase(
-	authStorage *auth.Storage,
-	configStorage *config.Storage,
-) usecase.Interactor {
+func (ctrl *controller) ListAlertsUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
-			authStorage,
+			ctrl.deps.AuthStorage,
 			models.SCOPE_READ_ALERTS,
 			func(
 				ctx context.Context,
 				req ListAlertsRequest,
 				resp *ListAlertsResponse,
 			) error {
-				alerts, err := configStorage.ListAlerts(ctx)
+				alerts, err := ctrl.deps.ConfigStorage.ListAlerts(ctx)
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to list alerts",
-						slog.String("channel", "api"),
 						slog.String("error", err.Error()),
 					)
 

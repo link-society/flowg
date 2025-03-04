@@ -10,8 +10,6 @@ import (
 	apiUtils "link-society.com/flowg/internal/utils/api"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
 )
 
 type DeletePipelineRequest struct {
@@ -22,25 +20,21 @@ type DeletePipelineResponse struct {
 	Success bool `json:"success"`
 }
 
-func DeletePipelineUsecase(
-	authStorage *auth.Storage,
-	configStorage *config.Storage,
-) usecase.Interactor {
+func (ctrl *controller) DeletePipelineUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
-			authStorage,
+			ctrl.deps.AuthStorage,
 			models.SCOPE_WRITE_PIPELINES,
 			func(
 				ctx context.Context,
 				req DeletePipelineRequest,
 				resp *DeletePipelineResponse,
 			) error {
-				err := configStorage.DeletePipeline(ctx, req.Pipeline)
+				err := ctrl.deps.ConfigStorage.DeletePipeline(ctx, req.Pipeline)
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to delete pipeline",
-						slog.String("channel", "api"),
 						slog.String("pipeline", req.Pipeline),
 						slog.String("error", err.Error()),
 					)

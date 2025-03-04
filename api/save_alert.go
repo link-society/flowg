@@ -10,8 +10,6 @@ import (
 	apiUtils "link-society.com/flowg/internal/utils/api"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
 )
 
 type SaveAlertRequest struct {
@@ -23,25 +21,21 @@ type SaveAlertResponse struct {
 	Success bool `json:"success"`
 }
 
-func SaveAlertUsecase(
-	authStorage *auth.Storage,
-	configStorage *config.Storage,
-) usecase.Interactor {
+func (ctrl *controller) SaveAlertUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
-			authStorage,
+			ctrl.deps.AuthStorage,
 			models.SCOPE_WRITE_ALERTS,
 			func(
 				ctx context.Context,
 				req SaveAlertRequest,
 				resp *SaveAlertResponse,
 			) error {
-				err := configStorage.WriteAlert(ctx, req.Alert, &req.Webhook)
+				err := ctrl.deps.ConfigStorage.WriteAlert(ctx, req.Alert, &req.Webhook)
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to save alert",
-						slog.String("channel", "api"),
 						slog.String("alert", req.Alert),
 						slog.String("error", err.Error()),
 					)

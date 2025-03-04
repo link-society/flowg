@@ -10,8 +10,6 @@ import (
 	apiUtils "link-society.com/flowg/internal/utils/api"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
 )
 
 type SavePipelineRequest struct {
@@ -23,25 +21,21 @@ type SavePipelineResponse struct {
 	Success bool `json:"success"`
 }
 
-func SavePipelineUsecase(
-	authStorage *auth.Storage,
-	configStorage *config.Storage,
-) usecase.Interactor {
+func (ctrl *controller) SavePipelineUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
-			authStorage,
+			ctrl.deps.AuthStorage,
 			models.SCOPE_WRITE_PIPELINES,
 			func(
 				ctx context.Context,
 				req SavePipelineRequest,
 				resp *SavePipelineResponse,
 			) error {
-				err := configStorage.WritePipeline(ctx, req.Pipeline, &req.Flow)
+				err := ctrl.deps.ConfigStorage.WritePipeline(ctx, req.Pipeline, &req.Flow)
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to save pipeline",
-						slog.String("channel", "api"),
 						slog.String("pipeline", req.Pipeline),
 						slog.String("error", err.Error()),
 					)

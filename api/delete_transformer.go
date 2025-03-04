@@ -10,8 +10,6 @@ import (
 	apiUtils "link-society.com/flowg/internal/utils/api"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
 )
 
 type DeleteTransformerRequest struct {
@@ -22,25 +20,21 @@ type DeleteTransformerResponse struct {
 	Success bool `json:"success"`
 }
 
-func DeleteTransformerUsecase(
-	authStorage *auth.Storage,
-	configStorage *config.Storage,
-) usecase.Interactor {
+func (ctrl *controller) DeleteTransformerUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
-			authStorage,
+			ctrl.deps.AuthStorage,
 			models.SCOPE_WRITE_TRANSFORMERS,
 			func(
 				ctx context.Context,
 				req DeleteTransformerRequest,
 				resp *DeleteTransformerResponse,
 			) error {
-				err := configStorage.DeleteTransformer(ctx, req.Transformer)
+				err := ctrl.deps.ConfigStorage.DeleteTransformer(ctx, req.Transformer)
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to delete transformer",
-						slog.String("channel", "api"),
 						slog.String("transformer", req.Transformer),
 						slog.String("error", err.Error()),
 					)

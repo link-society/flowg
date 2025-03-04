@@ -10,9 +10,6 @@ import (
 	apiUtils "link-society.com/flowg/internal/utils/api"
 
 	"link-society.com/flowg/internal/models"
-
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
 )
 
 type TestAlertRequest struct {
@@ -24,25 +21,21 @@ type TestAlertResponse struct {
 	Success bool `json:"success"`
 }
 
-func TestAlertUsecase(
-	authStorage *auth.Storage,
-	configStorage *config.Storage,
-) usecase.Interactor {
+func (ctrl *controller) TestAlertUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
-			authStorage,
+			ctrl.deps.AuthStorage,
 			models.SCOPE_WRITE_ALERTS,
 			func(
 				ctx context.Context,
 				req TestAlertRequest,
 				resp *TestAlertResponse,
 			) error {
-				webhook, err := configStorage.ReadAlert(ctx, req.Alert)
+				webhook, err := ctrl.deps.ConfigStorage.ReadAlert(ctx, req.Alert)
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to get alert",
-						slog.String("channel", "api"),
 						slog.String("alert", req.Alert),
 						slog.String("error", err.Error()),
 					)
@@ -54,10 +47,9 @@ func TestAlertUsecase(
 				logRecord := models.NewLogRecord(req.Record)
 				err = webhook.Call(ctx, logRecord)
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to call alert webhook",
-						slog.String("channel", "api"),
 						slog.String("alert", req.Alert),
 						slog.String("error", err.Error()),
 					)

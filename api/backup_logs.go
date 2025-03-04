@@ -11,9 +11,6 @@ import (
 
 	"link-society.com/flowg/internal/models"
 	apiUtils "link-society.com/flowg/internal/utils/api"
-
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/log"
 )
 
 type BackupLogsRequest struct{}
@@ -22,13 +19,10 @@ type BackupLogsResponse struct {
 	usecase.OutputWithEmbeddedWriter
 }
 
-func BackupLogsUsecase(
-	authStorage *auth.Storage,
-	logStorage *log.Storage,
-) usecase.Interactor {
+func (ctrl *controller) BackupLogsUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
-			authStorage,
+			ctrl.deps.AuthStorage,
 			models.SCOPE_READ_STREAMS,
 			func(
 				ctx context.Context,
@@ -39,13 +33,12 @@ func BackupLogsUsecase(
 				resp.Writer.(http.ResponseWriter).Header().Set("Content-Disposition", "attachment; filename=logs.db")
 				resp.Writer.(http.ResponseWriter).Header().Set("Cache-Control", "no-cache")
 
-				err := logStorage.Backup(ctx, resp.Writer)
+				err := ctrl.deps.LogStorage.Backup(ctx, resp.Writer)
 				resp.Writer.(http.Flusher).Flush()
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to backup logs database",
-						slog.String("channel", "api"),
 						slog.String("error", err.Error()),
 					)
 

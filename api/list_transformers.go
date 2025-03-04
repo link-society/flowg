@@ -10,8 +10,6 @@ import (
 	apiUtils "link-society.com/flowg/internal/utils/api"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
 )
 
 type ListTransformersRequest struct{}
@@ -20,25 +18,21 @@ type ListTransformersResponse struct {
 	Transformers []string `json:"transformers"`
 }
 
-func ListTransformersUsecase(
-	authStorage *auth.Storage,
-	configStorage *config.Storage,
-) usecase.Interactor {
+func (ctrl *controller) ListTransformersUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
-			authStorage,
+			ctrl.deps.AuthStorage,
 			models.SCOPE_READ_TRANSFORMERS,
 			func(
 				ctx context.Context,
 				req ListTransformersRequest,
 				resp *ListTransformersResponse,
 			) error {
-				transformers, err := configStorage.ListTransformers(ctx)
+				transformers, err := ctrl.deps.ConfigStorage.ListTransformers(ctx)
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to list transformers",
-						slog.String("channel", "api"),
 						slog.String("error", err.Error()),
 					)
 

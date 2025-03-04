@@ -8,8 +8,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	apiUtils "link-society.com/flowg/internal/utils/api"
-
-	"link-society.com/flowg/internal/storage/auth"
 )
 
 type DeleteTokenRequest struct {
@@ -20,7 +18,7 @@ type DeleteTokenResponse struct {
 	Success bool `json:"success"`
 }
 
-func DeleteTokenUsecase(authStorage *auth.Storage) usecase.Interactor {
+func (ctrl *controller) DeleteTokenUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		func(
 			ctx context.Context,
@@ -29,12 +27,11 @@ func DeleteTokenUsecase(authStorage *auth.Storage) usecase.Interactor {
 		) error {
 			user := apiUtils.GetContextUser(ctx)
 
-			err := authStorage.DeleteToken(ctx, user.Name, req.TokenUUID)
+			err := ctrl.deps.AuthStorage.DeleteToken(ctx, user.Name, req.TokenUUID)
 			if err != nil {
-				slog.ErrorContext(
+				ctrl.logger.ErrorContext(
 					ctx,
 					"Failed to delete token",
-					slog.String("channel", "api"),
 					slog.String("user", user.Name),
 					slog.String("token-uuid", req.TokenUUID),
 					slog.String("error", err.Error()),

@@ -10,8 +10,6 @@ import (
 	apiUtils "link-society.com/flowg/internal/utils/api"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/log"
 )
 
 type PurgeStreamRequest struct {
@@ -21,25 +19,21 @@ type PurgeStreamResponse struct {
 	Success bool `json:"success"`
 }
 
-func PurgeStreamUsecase(
-	authStorage *auth.Storage,
-	logStorage *log.Storage,
-) usecase.Interactor {
+func (ctrl *controller) PurgeStreamUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
-			authStorage,
+			ctrl.deps.AuthStorage,
 			models.SCOPE_WRITE_STREAMS,
 			func(
 				ctx context.Context,
 				req PurgeStreamRequest,
 				resp *PurgeStreamResponse,
 			) error {
-				err := logStorage.DeleteStream(ctx, req.Stream)
+				err := ctrl.deps.LogStorage.DeleteStream(ctx, req.Stream)
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to purge stream",
-						slog.String("channel", "api"),
 						slog.String("stream", req.Stream),
 						slog.String("error", err.Error()),
 					)
@@ -48,10 +42,9 @@ func PurgeStreamUsecase(
 					return status.Wrap(err, status.Internal)
 				}
 
-				slog.InfoContext(
+				ctrl.logger.InfoContext(
 					ctx,
 					"Log stream purged",
-					slog.String("channel", "api"),
 					slog.String("stream", req.Stream),
 				)
 				resp.Success = true

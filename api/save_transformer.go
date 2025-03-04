@@ -10,8 +10,6 @@ import (
 	apiUtils "link-society.com/flowg/internal/utils/api"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
 )
 
 type SaveTransformerRequest struct {
@@ -23,25 +21,21 @@ type SaveTransformerResponse struct {
 	Success bool `json:"success"`
 }
 
-func SaveTransformerUsecase(
-	authStorage *auth.Storage,
-	configStorage *config.Storage,
-) usecase.Interactor {
+func (ctrl *controller) SaveTransformerUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
-			authStorage,
+			ctrl.deps.AuthStorage,
 			models.SCOPE_WRITE_TRANSFORMERS,
 			func(
 				ctx context.Context,
 				req SaveTransformerRequest,
 				resp *SaveTransformerResponse,
 			) error {
-				err := configStorage.WriteTransformer(ctx, req.Transformer, req.Script)
+				err := ctrl.deps.ConfigStorage.WriteTransformer(ctx, req.Transformer, req.Script)
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to save transformer",
-						slog.String("channel", "api"),
 						slog.String("transformer", req.Transformer),
 						slog.String("error", err.Error()),
 					)

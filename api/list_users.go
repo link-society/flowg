@@ -10,7 +10,6 @@ import (
 	apiUtils "link-society.com/flowg/internal/utils/api"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/auth"
 )
 
 type ListUsersRequest struct{}
@@ -19,22 +18,21 @@ type ListUsersResponse struct {
 	Users   []models.User `json:"users"`
 }
 
-func ListUsersUsecase(authStorage *auth.Storage) usecase.Interactor {
+func (ctrl *controller) ListUsersUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
-			authStorage,
+			ctrl.deps.AuthStorage,
 			models.SCOPE_READ_ACLS,
 			func(
 				ctx context.Context,
 				req ListUsersRequest,
 				resp *ListUsersResponse,
 			) error {
-				users, err := authStorage.ListUsers(ctx)
+				users, err := ctrl.deps.AuthStorage.ListUsers(ctx)
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to list users",
-						slog.String("channel", "api"),
 						slog.String("error", err.Error()),
 					)
 

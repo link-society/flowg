@@ -7,7 +7,6 @@ import (
 	"context"
 	"time"
 
-	"crypto/tls"
 	"net"
 	"net/http"
 
@@ -22,9 +21,8 @@ import (
 type procHandler struct {
 	logger *slog.Logger
 
-	bindAddress string
-	tlsConfig   *tls.Config
-	server      *http.Server
+	opts   *ServerOptions
+	server *http.Server
 }
 
 func (h *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
@@ -40,14 +38,14 @@ func (h *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 	)
 	rootHandler.Handle("/metrics", metricsHandler)
 	h.server = &http.Server{
-		Addr:      h.bindAddress,
+		Addr:      h.opts.BindAddress,
 		Handler:   logging.NewMiddleware(rootHandler),
-		TLSConfig: h.tlsConfig,
+		TLSConfig: h.opts.TlsConfig,
 	}
 
 	h.logger.InfoContext(ctx, "Starting Management HTTP server")
 
-	l, err := net.Listen("tcp", h.bindAddress)
+	l, err := net.Listen("tcp", h.opts.BindAddress)
 	if err != nil {
 		h.logger.ErrorContext(
 			ctx,
@@ -58,7 +56,7 @@ func (h *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 		return proctree.Terminate(err)
 	}
 
-	if h.tlsConfig != nil {
+	if h.opts.TlsConfig != nil {
 		go h.server.ServeTLS(l, "", "")
 	} else {
 		go h.server.Serve(l)

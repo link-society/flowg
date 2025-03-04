@@ -11,9 +11,6 @@ import (
 
 	"link-society.com/flowg/internal/models"
 	apiUtils "link-society.com/flowg/internal/utils/api"
-
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/log"
 )
 
 type RestoreLogsRequest struct {
@@ -24,13 +21,10 @@ type RestoreLogsResponse struct {
 	Success bool `json:"success"`
 }
 
-func RestoreLogsUsecase(
-	authStorage *auth.Storage,
-	logStorage *log.Storage,
-) usecase.Interactor {
+func (ctrl *controller) RestoreLogsUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
-			authStorage,
+			ctrl.deps.AuthStorage,
 			models.SCOPE_WRITE_STREAMS,
 			func(
 				ctx context.Context,
@@ -39,12 +33,11 @@ func RestoreLogsUsecase(
 			) error {
 				defer req.Backup.Close()
 
-				err := logStorage.Restore(ctx, req.Backup)
+				err := ctrl.deps.LogStorage.Restore(ctx, req.Backup)
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to restore logs database",
-						slog.String("channel", "api"),
 						slog.String("error", err.Error()),
 					)
 

@@ -10,7 +10,6 @@ import (
 	apiUtils "link-society.com/flowg/internal/utils/api"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/auth"
 )
 
 type SaveRoleRequest struct {
@@ -22,10 +21,10 @@ type SaveRoleResponse struct {
 	Success bool `json:"success"`
 }
 
-func SaveRoleUsecase(authStorage *auth.Storage) usecase.Interactor {
+func (ctrl *controller) SaveRoleUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
-			authStorage,
+			ctrl.deps.AuthStorage,
 			models.SCOPE_WRITE_ACLS,
 			func(
 				ctx context.Context,
@@ -37,10 +36,9 @@ func SaveRoleUsecase(authStorage *auth.Storage) usecase.Interactor {
 				for i, scopeName := range req.Scopes {
 					scope, err := models.ParseScope(scopeName)
 					if err != nil {
-						slog.ErrorContext(
+						ctrl.logger.ErrorContext(
 							ctx,
 							"Failed to parse scope",
-							slog.String("channel", "api"),
 							slog.String("scope", scopeName),
 							slog.String("error", err.Error()),
 						)
@@ -57,12 +55,11 @@ func SaveRoleUsecase(authStorage *auth.Storage) usecase.Interactor {
 					Scopes: scopes,
 				}
 
-				err := authStorage.SaveRole(ctx, role)
+				err := ctrl.deps.AuthStorage.SaveRole(ctx, role)
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to save role",
-						slog.String("channel", "api"),
 						slog.String("role", req.Role),
 						slog.String("error", err.Error()),
 					)

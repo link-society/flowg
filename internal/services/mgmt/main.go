@@ -8,16 +8,20 @@ import (
 	"link-society.com/flowg/internal/utils/proctree"
 )
 
-func NewServer(bindAddress string, tlsConfig *tls.Config) proctree.Process {
+type ServerOptions struct {
+	BindAddress string
+	TlsConfig   *tls.Config
+}
+
+func NewServer(opts *ServerOptions) proctree.Process {
 	return proctree.NewProcess(&procHandler{
 		logger: slog.Default().With(
 			slog.String("channel", "mgmt"),
 			slog.Group("mgmt",
-				slog.String("bind", bindAddress),
+				slog.String("bind", opts.BindAddress),
 			),
 		),
 
-		bindAddress: bindAddress,
-		tlsConfig:   tlsConfig,
+		opts: opts,
 	})
 }

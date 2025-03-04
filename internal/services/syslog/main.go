@@ -12,17 +12,19 @@ import (
 	"link-society.com/flowg/internal/engines/pipelines"
 )
 
-func NewServer(
-	isTCP bool,
-	bindAddress string,
-	tlsConfig *tls.Config,
-	allowOrigins []string,
+type ServerOptions struct {
+	TcpMode      bool
+	BindAddress  string
+	TlsConfig    *tls.Config
+	AllowOrigins []string
 
-	configStorage *config.Storage,
-	pipelineRunner *pipelines.Runner,
-) proctree.Process {
+	ConfigStorage  *config.Storage
+	PipelineRunner *pipelines.Runner
+}
+
+func NewServer(opts *ServerOptions) proctree.Process {
 	proto := "udp"
-	if isTCP {
+	if opts.TcpMode {
 		proto = "tcp"
 	}
 
@@ -31,17 +33,11 @@ func NewServer(
 			slog.String("channel", "syslog"),
 			slog.Group("syslog",
 				slog.String("proto", proto),
-				slog.String("bind", bindAddress),
-				slog.Bool("tls", tlsConfig != nil),
+				slog.String("bind", opts.BindAddress),
+				slog.Bool("tls", opts.TlsConfig != nil),
 			),
 		),
 
-		isTCP:        isTCP,
-		bindAddress:  bindAddress,
-		tlsConfig:    tlsConfig,
-		allowOrigins: allowOrigins,
-
-		configStorage:  configStorage,
-		pipelineRunner: pipelineRunner,
+		opts: opts,
 	})
 }

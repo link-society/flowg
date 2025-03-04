@@ -11,9 +11,6 @@ import (
 
 	"link-society.com/flowg/internal/models"
 	apiUtils "link-society.com/flowg/internal/utils/api"
-
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
 )
 
 type BackupConfigRequest struct{}
@@ -22,13 +19,10 @@ type BackupConfigResponse struct {
 	usecase.OutputWithEmbeddedWriter
 }
 
-func BackupConfigUsecase(
-	authStorage *auth.Storage,
-	configStorage *config.Storage,
-) usecase.Interactor {
+func (ctrl *controller) BackupConfigUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopesApiDecorator(
-			authStorage,
+			ctrl.deps.AuthStorage,
 			[]models.Scope{
 				models.SCOPE_READ_PIPELINES,
 				models.SCOPE_READ_TRANSFORMERS,
@@ -43,13 +37,12 @@ func BackupConfigUsecase(
 				resp.Writer.(http.ResponseWriter).Header().Set("Content-Disposition", "attachment; filename=config.db")
 				resp.Writer.(http.ResponseWriter).Header().Set("Cache-Control", "no-cache")
 
-				err := configStorage.Backup(ctx, resp.Writer)
+				err := ctrl.deps.ConfigStorage.Backup(ctx, resp.Writer)
 				resp.Writer.(http.Flusher).Flush()
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to backup configuration database",
-						slog.String("channel", "api"),
 						slog.String("error", err.Error()),
 					)
 

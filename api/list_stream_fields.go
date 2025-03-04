@@ -10,8 +10,6 @@ import (
 	apiUtils "link-society.com/flowg/internal/utils/api"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/log"
 )
 
 type ListStreamFieldsRequest struct {
@@ -22,25 +20,21 @@ type ListStreamFieldsResponse struct {
 	Fields  []string `json:"fields"`
 }
 
-func ListStreamFieldsUsecase(
-	authStorage *auth.Storage,
-	logStorage *log.Storage,
-) usecase.Interactor {
+func (ctrl *controller) ListStreamFieldsUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
-			authStorage,
+			ctrl.deps.AuthStorage,
 			models.SCOPE_READ_STREAMS,
 			func(
 				ctx context.Context,
 				req ListStreamFieldsRequest,
 				resp *ListStreamFieldsResponse,
 			) error {
-				fields, err := logStorage.ListStreamFields(ctx, req.Stream)
+				fields, err := ctrl.deps.LogStorage.ListStreamFields(ctx, req.Stream)
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to list stream fields",
-						slog.String("channel", "api"),
 						slog.String("stream", req.Stream),
 						slog.String("error", err.Error()),
 					)

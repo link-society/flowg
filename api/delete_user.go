@@ -10,7 +10,6 @@ import (
 	apiUtils "link-society.com/flowg/internal/utils/api"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/auth"
 )
 
 type DeleteUserRequest struct {
@@ -21,22 +20,21 @@ type DeleteUserResponse struct {
 	Success bool `json:"success"`
 }
 
-func DeleteUserUsecase(authStorage *auth.Storage) usecase.Interactor {
+func (ctrl *controller) DeleteUserUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
-			authStorage,
+			ctrl.deps.AuthStorage,
 			models.SCOPE_WRITE_ACLS,
 			func(
 				ctx context.Context,
 				req DeleteUserRequest,
 				resp *DeleteUserResponse,
 			) error {
-				err := authStorage.DeleteUser(ctx, req.User)
+				err := ctrl.deps.AuthStorage.DeleteUser(ctx, req.User)
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to delete user",
-						slog.String("channel", "api"),
 						slog.String("user", req.User),
 						slog.String("error", err.Error()),
 					)

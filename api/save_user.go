@@ -10,7 +10,6 @@ import (
 	apiUtils "link-society.com/flowg/internal/utils/api"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/auth"
 )
 
 type SaveUserRequest struct {
@@ -23,10 +22,10 @@ type SaveUserResponse struct {
 	Success bool `json:"success"`
 }
 
-func SaveUserUsecase(authStorage *auth.Storage) usecase.Interactor {
+func (ctrl *controller) SaveUserUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
-			authStorage,
+			ctrl.deps.AuthStorage,
 			models.SCOPE_WRITE_ACLS,
 			func(
 				ctx context.Context,
@@ -38,12 +37,11 @@ func SaveUserUsecase(authStorage *auth.Storage) usecase.Interactor {
 					Roles: req.Roles,
 				}
 
-				err := authStorage.SaveUser(ctx, user, req.Password)
+				err := ctrl.deps.AuthStorage.SaveUser(ctx, user, req.Password)
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to save user",
-						slog.String("channel", "api"),
 						slog.String("user", req.User),
 						slog.String("error", err.Error()),
 					)

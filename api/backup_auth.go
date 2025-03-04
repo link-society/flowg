@@ -11,8 +11,6 @@ import (
 
 	"link-society.com/flowg/internal/models"
 	apiUtils "link-society.com/flowg/internal/utils/api"
-
-	"link-society.com/flowg/internal/storage/auth"
 )
 
 type BackupAuthRequest struct{}
@@ -21,10 +19,10 @@ type BackupAuthResponse struct {
 	usecase.OutputWithEmbeddedWriter
 }
 
-func BackupAuthUsecase(authStorage *auth.Storage) usecase.Interactor {
+func (ctrl *controller) BackupAuthUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
-			authStorage,
+			ctrl.deps.AuthStorage,
 			models.SCOPE_READ_ACLS,
 			func(
 				ctx context.Context,
@@ -35,13 +33,12 @@ func BackupAuthUsecase(authStorage *auth.Storage) usecase.Interactor {
 				resp.Writer.(http.ResponseWriter).Header().Set("Content-Disposition", "attachment; filename=auth.db")
 				resp.Writer.(http.ResponseWriter).Header().Set("Cache-Control", "no-cache")
 
-				err := authStorage.Backup(ctx, resp.Writer)
+				err := ctrl.deps.AuthStorage.Backup(ctx, resp.Writer)
 				resp.Writer.(http.Flusher).Flush()
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to backup authentication database",
-						slog.String("channel", "api"),
 						slog.String("error", err.Error()),
 					)
 

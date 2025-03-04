@@ -12,7 +12,6 @@ import (
 	"link-society.com/flowg/internal/models"
 
 	"link-society.com/flowg/internal/engines/pipelines"
-	"link-society.com/flowg/internal/storage/auth"
 )
 
 type IngestLogRequest struct {
@@ -23,13 +22,10 @@ type IngestLogResponse struct {
 	Success bool `json:"success"`
 }
 
-func IngestLogUsecase(
-	authStorage *auth.Storage,
-	pipelineRunner *pipelines.Runner,
-) usecase.Interactor {
+func (ctrl *controller) IngestLogUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
-			authStorage,
+			ctrl.deps.AuthStorage,
 			models.SCOPE_SEND_LOGS,
 			func(
 				ctx context.Context,
@@ -37,17 +33,16 @@ func IngestLogUsecase(
 				resp *IngestLogResponse,
 			) error {
 				record := models.NewLogRecord(req.Record)
-				err := pipelineRunner.Run(
+				err := ctrl.deps.PipelineRunner.Run(
 					ctx,
 					req.Pipeline,
 					pipelines.DIRECT_ENTRYPOINT,
 					record,
 				)
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to process log entry",
-						slog.String("channel", "api"),
 						slog.String("pipeline", req.Pipeline),
 						slog.String("error", err.Error()),
 					)
@@ -56,11 +51,10 @@ func IngestLogUsecase(
 					return status.Wrap(err, status.Internal)
 				}
 
-				slog.InfoContext(
+				ctrl.logger.InfoContext(
 					ctx,
 					"Log entry processed",
-					"channel", "api",
-					"pipeline", req.Pipeline,
+					slog.String("pipeline", req.Pipeline),
 				)
 				resp.Success = true
 

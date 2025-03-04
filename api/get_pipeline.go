@@ -10,8 +10,6 @@ import (
 	apiUtils "link-society.com/flowg/internal/utils/api"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
 )
 
 type GetPipelineRequest struct {
@@ -23,25 +21,21 @@ type GetPipelineResponse struct {
 	Flow    *models.FlowGraphV1 `json:"flow"`
 }
 
-func GetPipelineUsecase(
-	authStorage *auth.Storage,
-	configStorage *config.Storage,
-) usecase.Interactor {
+func (ctrl *controller) GetPipelineUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
-			authStorage,
+			ctrl.deps.AuthStorage,
 			models.SCOPE_READ_PIPELINES,
 			func(
 				ctx context.Context,
 				req GetPipelineRequest,
 				resp *GetPipelineResponse,
 			) error {
-				flowGraph, err := configStorage.ReadPipeline(ctx, req.Pipeline)
+				flowGraph, err := ctrl.deps.ConfigStorage.ReadPipeline(ctx, req.Pipeline)
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to get pipeline",
-						slog.String("channel", "api"),
 						slog.String("pipeline", req.Pipeline),
 						slog.String("error", err.Error()),
 					)

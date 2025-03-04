@@ -12,8 +12,6 @@ import (
 	apiUtils "link-society.com/flowg/internal/utils/api"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/log"
 	"link-society.com/flowg/internal/utils/ffi/filterdsl"
 )
 
@@ -29,13 +27,10 @@ type QueryStreamResponse struct {
 	Records []models.LogRecord `json:"records"`
 }
 
-func QueryStreamUsecase(
-	authStorage *auth.Storage,
-	logStorage *log.Storage,
-) usecase.Interactor {
+func (ctrl *controller) QueryStreamUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
-			authStorage,
+			ctrl.deps.AuthStorage,
 			models.SCOPE_READ_STREAMS,
 			func(
 				ctx context.Context,
@@ -48,10 +43,9 @@ func QueryStreamUsecase(
 					var err error
 					filter, err = filterdsl.Compile(*req.Filter)
 					if err != nil {
-						slog.ErrorContext(
+						ctrl.logger.ErrorContext(
 							ctx,
 							"Failed to compile filter",
-							slog.String("channel", "api"),
 							slog.String("stream", req.Stream),
 							slog.String("error", err.Error()),
 						)
@@ -64,9 +58,9 @@ func QueryStreamUsecase(
 					filter = nil
 				}
 
-				records, err := logStorage.FetchLogs(ctx, req.Stream, req.From, req.To, filter)
+				records, err := ctrl.deps.LogStorage.FetchLogs(ctx, req.Stream, req.From, req.To, filter)
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to query logs",
 						slog.String("stream", req.Stream),

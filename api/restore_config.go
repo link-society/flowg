@@ -11,9 +11,6 @@ import (
 
 	"link-society.com/flowg/internal/models"
 	apiUtils "link-society.com/flowg/internal/utils/api"
-
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
 )
 
 type RestoreConfigRequest struct {
@@ -24,13 +21,10 @@ type RestoreConfigResponse struct {
 	Success bool `json:"success"`
 }
 
-func RestoreConfigUsecase(
-	authStorage *auth.Storage,
-	configStorage *config.Storage,
-) usecase.Interactor {
+func (ctrl *controller) RestoreConfigUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopesApiDecorator(
-			authStorage,
+			ctrl.deps.AuthStorage,
 			[]models.Scope{
 				models.SCOPE_WRITE_PIPELINES,
 				models.SCOPE_WRITE_TRANSFORMERS,
@@ -43,12 +37,11 @@ func RestoreConfigUsecase(
 			) error {
 				defer req.Backup.Close()
 
-				err := configStorage.Restore(ctx, req.Backup)
+				err := ctrl.deps.ConfigStorage.Restore(ctx, req.Backup)
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to restore configuration database",
-						slog.String("channel", "api"),
 						slog.String("error", err.Error()),
 					)
 

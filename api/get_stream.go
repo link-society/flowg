@@ -10,8 +10,6 @@ import (
 	apiUtils "link-society.com/flowg/internal/utils/api"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/log"
 )
 
 type GetStreamRequest struct {
@@ -23,25 +21,21 @@ type GetStreamResponse struct {
 	Config  models.StreamConfig `json:"config"`
 }
 
-func GetStreamUsecase(
-	authStorage *auth.Storage,
-	logStorage *log.Storage,
-) usecase.Interactor {
+func (ctrl *controller) GetStreamUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
-			authStorage,
+			ctrl.deps.AuthStorage,
 			models.SCOPE_READ_STREAMS,
 			func(
 				ctx context.Context,
 				req GetStreamRequest,
 				resp *GetStreamResponse,
 			) error {
-				config, err := logStorage.GetOrCreateStreamConfig(ctx, req.Stream)
+				config, err := ctrl.deps.LogStorage.GetOrCreateStreamConfig(ctx, req.Stream)
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to get stream config",
-						slog.String("channel", "api"),
 						slog.String("stream", req.Stream),
 						slog.String("error", err.Error()),
 					)

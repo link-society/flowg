@@ -9,8 +9,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	apiUtils "link-society.com/flowg/internal/utils/api"
-
-	"link-society.com/flowg/internal/storage/auth"
 )
 
 type ChangePasswordRequest struct {
@@ -22,7 +20,7 @@ type ChangePasswordResponse struct {
 	Success bool `json:"success"`
 }
 
-func ChangePasswordUsecase(authStorage *auth.Storage) usecase.Interactor {
+func (ctrl *controller) ChangePasswordUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		func(
 			ctx context.Context,
@@ -31,12 +29,11 @@ func ChangePasswordUsecase(authStorage *auth.Storage) usecase.Interactor {
 		) error {
 			user := apiUtils.GetContextUser(ctx)
 
-			switch valid, err := authStorage.VerifyUserPassword(ctx, user.Name, req.OldPassword); {
+			switch valid, err := ctrl.deps.AuthStorage.VerifyUserPassword(ctx, user.Name, req.OldPassword); {
 			case err != nil:
-				slog.ErrorContext(
+				ctrl.logger.ErrorContext(
 					ctx,
 					"Failed to verify user password",
-					slog.String("channel", "api"),
 					slog.String("username", user.Name),
 					slog.String("error", err.Error()),
 				)
@@ -49,11 +46,10 @@ func ChangePasswordUsecase(authStorage *auth.Storage) usecase.Interactor {
 				return status.Wrap(errors.New("invalid credentials"), status.PermissionDenied)
 			}
 
-			if err := authStorage.SaveUser(ctx, *user, req.NewPassword); err != nil {
-				slog.ErrorContext(
+			if err := ctrl.deps.AuthStorage.SaveUser(ctx, *user, req.NewPassword); err != nil {
+				ctrl.logger.ErrorContext(
 					ctx,
 					"Failed to update user password",
-					slog.String("channel", "api"),
 					slog.String("username", user.Name),
 					slog.String("error", err.Error()),
 				)

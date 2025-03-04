@@ -6,7 +6,6 @@ import (
 
 	"sync"
 
-	"crypto/tls"
 	"net"
 
 	gosyslog "gopkg.in/mcuadros/go-syslog.v2"
@@ -15,25 +14,17 @@ import (
 
 	"link-society.com/flowg/internal/utils/proctree"
 
-	"link-society.com/flowg/internal/storage/config"
-
 	"link-society.com/flowg/internal/engines/pipelines"
 )
 
 type procHandler struct {
 	logger *slog.Logger
 
-	isTCP        bool
-	bindAddress  string
-	tlsConfig    *tls.Config
-	allowOrigins []string
+	opts *ServerOptions
 
 	channel gosyslog.LogPartsChannel
 	handler *gosyslog.ChannelHandler
 	server  *gosyslog.Server
-
-	configStorage  *config.Storage
-	pipelineRunner *pipelines.Runner
 }
 
 func (h *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
@@ -47,8 +38,8 @@ func (h *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 	h.logger.InfoContext(ctx, "Starting Syslog server")
 
 	switch {
-	case h.isTCP && h.tlsConfig != nil:
-		if err := h.server.ListenTCPTLS(h.bindAddress, h.tlsConfig); err != nil {
+	case h.opts.TcpMode && h.opts.TlsConfig != nil:
+		if err := h.server.ListenTCPTLS(h.opts.BindAddress, h.opts.TlsConfig); err != nil {
 			h.logger.ErrorContext(
 				ctx,
 				"Failed to listen on TCP+TLS",
@@ -57,8 +48,8 @@ func (h *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 			return proctree.Terminate(err)
 		}
 
-	case h.isTCP && h.tlsConfig == nil:
-		if err := h.server.ListenTCP(h.bindAddress); err != nil {
+	case h.opts.TcpMode && h.opts.TlsConfig == nil:
+		if err := h.server.ListenTCP(h.opts.BindAddress); err != nil {
 			h.logger.ErrorContext(
 				ctx,
 				"Failed to listen on TCP",
@@ -67,8 +58,8 @@ func (h *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 			return proctree.Terminate(err)
 		}
 
-	case !h.isTCP:
-		if err := h.server.ListenUDP(h.bindAddress); err != nil {
+	case !h.opts.TcpMode:
+		if err := h.server.ListenUDP(h.opts.BindAddress); err != nil {
 			h.logger.ErrorContext(
 				ctx,
 				"Failed to listen on UDP",
@@ -100,7 +91,7 @@ func (h *procHandler) DoWork(ctx actor.Context) proctree.ProcessResult {
 			return proctree.Terminate(nil)
 		}
 
-		if h.allowOrigins != nil {
+		if h.opts.AllowOrigins != nil {
 			// no logging here to avoid potential performance issues
 
 			client := logParts["client"].(string)
@@ -111,7 +102,7 @@ func (h *procHandler) DoWork(ctx actor.Context) proctree.ProcessResult {
 
 			allowed := false
 
-			for _, origin := range h.allowOrigins {
+			for _, origin := range h.opts.AllowOrigins {
 				if origin == clientIp {
 					allowed = true
 					break
@@ -133,9 +124,9 @@ func (h *procHandler) DoWork(ctx actor.Context) proctree.ProcessResult {
 			}
 		}
 
-		pipelineNames, err := h.configStorage.ListPipelines(ctx)
+		pipelineNames, err := h.opts.ConfigStorage.ListPipelines(ctx)
 		if err != nil {
-			slog.ErrorContext(
+			h.logger.ErrorContext(
 				ctx,
 				"Failed to list pipelines",
 				slog.String("error", err.Error()),
@@ -152,14 +143,14 @@ func (h *procHandler) DoWork(ctx actor.Context) proctree.ProcessResult {
 
 				record := parseLogParts(logParts)
 
-				err := h.pipelineRunner.Run(
+				err := h.opts.PipelineRunner.Run(
 					ctx,
 					pipelineName,
 					pipelines.SYSLOG_ENTRYPOINT,
 					record,
 				)
 				if err != nil {
-					slog.ErrorContext(
+					h.logger.ErrorContext(
 						ctx,
 						"Failed to process log entry",
 						slog.String("pipeline", pipelineName),
@@ -176,10 +167,10 @@ func (h *procHandler) DoWork(ctx actor.Context) proctree.ProcessResult {
 }
 
 func (h *procHandler) Terminate(ctx actor.Context, err error) error {
-	slog.InfoContext(ctx, "Stopping Syslog server")
+	h.logger.InfoContext(ctx, "Stopping Syslog server")
 
 	if newErr := h.server.Kill(); newErr != nil {
-		slog.ErrorContext(
+		h.logger.ErrorContext(
 			ctx,
 			"Failed to kill server",
 			slog.String("error", newErr.Error()),

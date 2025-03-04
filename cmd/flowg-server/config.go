@@ -87,7 +87,7 @@ func newServerConfig(opts *options) (server.Options, error) {
 		MgmtBindAddress: opts.mgmtBindAddress,
 		MgmtTlsConfig:   mgmtTlsConfig,
 
-		SyslogTCP:          opts.syslogProtocol == "tcp",
+		SyslogTcpMode:      opts.syslogProtocol == "tcp",
 		SyslogBindAddress:  opts.syslogBindAddr,
 		SyslogTlsConfig:    syslogTlsConfig,
 		SyslogAllowOrigins: opts.syslogAllowOrigins,

@@ -11,8 +11,6 @@ import (
 
 	"link-society.com/flowg/internal/models"
 	apiUtils "link-society.com/flowg/internal/utils/api"
-
-	"link-society.com/flowg/internal/storage/auth"
 )
 
 type RestoreAuthRequest struct {
@@ -23,10 +21,10 @@ type RestoreAuthResponse struct {
 	Success bool `json:"success"`
 }
 
-func RestoreAuthUsecase(authStorage *auth.Storage) usecase.Interactor {
+func (ctrl *controller) RestoreAuthUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
-			authStorage,
+			ctrl.deps.AuthStorage,
 			models.SCOPE_WRITE_ACLS,
 			func(
 				ctx context.Context,
@@ -35,12 +33,11 @@ func RestoreAuthUsecase(authStorage *auth.Storage) usecase.Interactor {
 			) error {
 				defer req.Backup.Close()
 
-				err := authStorage.Restore(ctx, req.Backup)
+				err := ctrl.deps.AuthStorage.Restore(ctx, req.Backup)
 				if err != nil {
-					slog.ErrorContext(
+					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to restore authentication database",
-						slog.String("channel", "api"),
 						slog.String("error", err.Error()),
 					)
 

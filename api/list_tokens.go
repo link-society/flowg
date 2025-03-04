@@ -8,8 +8,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	apiUtils "link-society.com/flowg/internal/utils/api"
-
-	"link-society.com/flowg/internal/storage/auth"
 )
 
 type ListTokensRequest struct{}
@@ -19,7 +17,7 @@ type ListTokensResponse struct {
 	TokenUUIDs []string `json:"token_uuids"`
 }
 
-func ListTokensUsecase(authStorage *auth.Storage) usecase.Interactor {
+func (ctrl *controller) ListTokensUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		func(
 			ctx context.Context,
@@ -28,12 +26,11 @@ func ListTokensUsecase(authStorage *auth.Storage) usecase.Interactor {
 		) error {
 			user := apiUtils.GetContextUser(ctx)
 
-			tokenUUIDs, err := authStorage.ListTokens(ctx, user.Name)
+			tokenUUIDs, err := ctrl.deps.AuthStorage.ListTokens(ctx, user.Name)
 			if err != nil {
-				slog.ErrorContext(
+				ctrl.logger.ErrorContext(
 					ctx,
 					"Failed to list tokens",
-					slog.String("channel", "api"),
 					slog.String("user", user.Name),
 					slog.String("error", err.Error()),
 				)

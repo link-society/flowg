@@ -7,16 +7,21 @@ import (
 
 	"link-society.com/flowg/internal/utils/proctree"
 
+	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage/config"
+
 	"link-society.com/flowg/internal/app/bootstrap"
 )
 
 type bootstrapProcHandler struct {
-	logger       *slog.Logger
-	storageLayer *storageLayer
+	logger *slog.Logger
+
+	authStorage   *auth.Storage
+	configStorage *config.Storage
 }
 
 func (h *bootstrapProcHandler) Init(ctx actor.Context) proctree.ProcessResult {
-	err := bootstrap.DefaultRolesAndUsers(ctx, h.storageLayer.authStorage)
+	err := bootstrap.DefaultRolesAndUsers(ctx, h.authStorage)
 	if err != nil {
 		h.logger.ErrorContext(
 			ctx,
@@ -26,7 +31,7 @@ func (h *bootstrapProcHandler) Init(ctx actor.Context) proctree.ProcessResult {
 		return proctree.Terminate(err)
 	}
 
-	err = bootstrap.DefaultPipeline(ctx, h.storageLayer.configStorage)
+	err = bootstrap.DefaultPipeline(ctx, h.configStorage)
 	if err != nil {
 		h.logger.ErrorContext(
 			ctx,

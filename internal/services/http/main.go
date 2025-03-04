@@ -15,33 +15,27 @@ import (
 	"link-society.com/flowg/internal/engines/pipelines"
 )
 
-func NewServer(
-	bindAddress string,
-	tlsConfig *tls.Config,
+type ServerOptions struct {
+	BindAddress string
+	TlsConfig   *tls.Config
 
-	authStorage *auth.Storage,
-	configStorage *config.Storage,
-	logStorage *log.Storage,
+	AuthStorage   *auth.Storage
+	ConfigStorage *config.Storage
+	LogStorage    *log.Storage
 
-	logNotifier *lognotify.LogNotifier,
-	pipelineRunner *pipelines.Runner,
-) proctree.Process {
+	LogNotifier    *lognotify.LogNotifier
+	PipelineRunner *pipelines.Runner
+}
+
+func NewServer(opts *ServerOptions) proctree.Process {
 	return proctree.NewProcess(&procHandler{
 		logger: slog.Default().With(
 			slog.String("channel", "http"),
 			slog.Group("http",
-				slog.String("bind", bindAddress),
+				slog.String("bind", opts.BindAddress),
 			),
 		),
 
-		bindAddress: bindAddress,
-		tlsConfig:   tlsConfig,
-
-		authStorage:   authStorage,
-		configStorage: configStorage,
-		logStorage:    logStorage,
-
-		logNotifier:    logNotifier,
-		pipelineRunner: pipelineRunner,
+		opts: opts,
 	})
 }

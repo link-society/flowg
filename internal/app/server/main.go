@@ -5,6 +5,17 @@ import (
 
 	"crypto/tls"
 
+	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage/config"
+	"link-society.com/flowg/internal/storage/log"
+
+	"link-society.com/flowg/internal/engines/lognotify"
+	"link-society.com/flowg/internal/engines/pipelines"
+
+	"link-society.com/flowg/internal/services/http"
+	"link-society.com/flowg/internal/services/mgmt"
+	"link-society.com/flowg/internal/services/syslog"
+
 	"link-society.com/flowg/internal/utils/proctree"
 )
 
@@ -15,7 +26,7 @@ type Options struct {
 	MgmtBindAddress string
 	MgmtTlsConfig   *tls.Config
 
-	SyslogTCP          bool
+	SyslogTcpMode      bool
 	SyslogBindAddress  string
 	SyslogTlsConfig    *tls.Config
 	SyslogAllowOrigins []string
@@ -26,40 +37,73 @@ type Options struct {
 }
 
 func NewServer(opts Options) proctree.Process {
-	storageLayer := newStorageLayer(
-		opts.AuthStorageDir,
-		opts.ConfigStorageDir,
-		opts.LogStorageDir,
+	// Storage Layer
+	var (
+		authStorage   = auth.NewStorage(auth.OptDirectory(opts.AuthStorageDir))
+		configStorage = config.NewStorage(config.OptDirectory(opts.ConfigStorageDir))
+		logStorage    = log.NewStorage(log.OptDirectory(opts.LogStorageDir))
 	)
-	engineLayer := newEngineLayer(
-		storageLayer,
+
+	// Engine Layer
+	var (
+		logNotifier    = lognotify.NewLogNotifier()
+		pipelineRunner = pipelines.NewRunner(configStorage, logStorage, logNotifier)
 	)
-	serviceLayer := newServiceLayer(
-		opts.HttpBindAddress,
-		opts.HttpTlsConfig,
 
-		opts.MgmtBindAddress,
-		opts.MgmtTlsConfig,
+	// Service Layer
+	var (
+		httpServer = http.NewServer(&http.ServerOptions{
+			BindAddress: opts.HttpBindAddress,
+			TlsConfig:   opts.HttpTlsConfig,
 
-		opts.SyslogTCP,
-		opts.SyslogBindAddress,
-		opts.SyslogTlsConfig,
-		opts.SyslogAllowOrigins,
+			AuthStorage:   authStorage,
+			ConfigStorage: configStorage,
+			LogStorage:    logStorage,
 
-		storageLayer,
-		engineLayer,
+			LogNotifier:    logNotifier,
+			PipelineRunner: pipelineRunner,
+		})
+		mgmtServer = mgmt.NewServer(&mgmt.ServerOptions{
+			BindAddress: opts.MgmtBindAddress,
+			TlsConfig:   opts.MgmtTlsConfig,
+		})
+		syslogServer = syslog.NewServer(&syslog.ServerOptions{
+			TcpMode:      opts.SyslogTcpMode,
+			BindAddress:  opts.SyslogBindAddress,
+			TlsConfig:    opts.SyslogTlsConfig,
+			AllowOrigins: opts.SyslogAllowOrigins,
+
+			ConfigStorage:  configStorage,
+			PipelineRunner: pipelineRunner,
+		})
 	)
 
 	bootstrap := proctree.NewProcess(&bootstrapProcHandler{
-		logger:       slog.Default().With("channel", "server"),
-		storageLayer: storageLayer,
+		logger: slog.Default().With("channel", "server"),
+
+		authStorage:   authStorage,
+		configStorage: configStorage,
 	})
 
 	return proctree.NewProcessGroup(
 		proctree.DefaultProcessGroupOptions(),
-		storageLayer,
-		engineLayer,
-		serviceLayer,
+		proctree.NewProcessGroup(
+			proctree.DefaultProcessGroupOptions(),
+			authStorage,
+			configStorage,
+			logStorage,
+		),
+		proctree.NewProcessGroup(
+			proctree.DefaultProcessGroupOptions(),
+			logNotifier,
+			pipelineRunner,
+		),
+		proctree.NewProcessGroup(
+			proctree.DefaultProcessGroupOptions(),
+			httpServer,
+			mgmtServer,
+			syslogServer,
+		),
 		bootstrap,
 	)
 }
