@@ -54,8 +54,10 @@ func (p *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 
 	transport := &httpTransport{
 		delegate: d,
-		connM:    p.connM,
-		packetM:  p.packetM,
+		cookie:   p.opts.Cookie,
+
+		connM:   p.connM,
+		packetM: p.packetM,
 	}
 
 	p.mlistConfig = memberlist.DefaultLocalConfig()

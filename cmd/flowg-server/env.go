@@ -22,6 +22,7 @@ var (
 	defaultClusterNodeID       = getEnvString("FLOWG_CLUSTER_NODE_ID", "flowg-node0")
 	defaultClusterJoinNodeID   = getEnvString("FLOWG_CLUSTER_JOIN_NODE_ID", "")
 	defaultClusterJoinEndpoint = getEnvString("FLOWG_CLUSTER_JOIN_ENDPOINT", "")
+	defaultClusterCookie       = getEnvString("FLOWG_CLUSTER_COOKIE", "")
 
 	defaultSyslogProtocol     = getEnvString("FLOWG_SYSLOG_PROTOCOL", "udp")
 	defaultSyslogBindAddr     = getEnvString("FLOWG_SYSLOG_BIND_ADDRESS", ":5514")

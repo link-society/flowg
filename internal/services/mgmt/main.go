@@ -17,6 +17,7 @@ type ServerOptions struct {
 	ClusterNodeID       string
 	ClusterJoinNodeID   string
 	ClusterJoinEndpoint *url.URL
+	ClusterCookie       string
 }
 
 func NewServer(opts *ServerOptions) proctree.Process {
@@ -36,6 +37,7 @@ func NewServer(opts *ServerOptions) proctree.Process {
 		NodeID:           opts.ClusterNodeID,
 		JoinNodeID:       opts.ClusterJoinNodeID,
 		JoinNodeEndpoint: opts.ClusterJoinEndpoint,
+		Cookie:           opts.ClusterCookie,
 
 		LocalEndpointResolver: func() *url.URL {
 			localEndpoint := &url.URL{

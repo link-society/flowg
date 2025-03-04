@@ -22,8 +22,11 @@ import (
 	"github.com/hashicorp/memberlist"
 )
 
+const COOKIE_HEADER_NAME = "X-FlowG-ClusterKey"
+
 type httpTransport struct {
 	delegate *delegate
+	cookie   string
 
 	connM   actor.Mailbox[net.Conn]
 	packetM actor.Mailbox[*memberlist.Packet]
@@ -91,6 +94,10 @@ func (t *httpTransport) WriteToAddress(b []byte, addr memberlist.Address) (time.
 	req.Header.Set("Content-Type", "application/octet-stream")
 	req.Header.Set("Origin", t.delegate.localEndpoint.String())
 
+	if t.cookie != "" {
+		req.Header.Set(COOKIE_HEADER_NAME, t.cookie)
+	}
+
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return time.Time{}, err
@@ -151,6 +158,10 @@ func (t *httpTransport) DialAddressTimeout(addr memberlist.Address, timeout time
 		Host:       endpoint.Host,
 	}
 	req.Header.Set("Upgrade", "flowg")
+
+	if t.cookie != "" {
+		req.Header.Set(COOKIE_HEADER_NAME, t.cookie)
+	}
 
 	if err := req.Write(conn); err != nil {
 		conn.Close()
@@ -226,6 +237,11 @@ func (t *httpTransport) handleGossip(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *httpTransport) handleGossipStream(w http.ResponseWriter, r *http.Request) {
+	if t.cookie != "" && r.Header.Get(COOKIE_HEADER_NAME) != t.cookie {
+		http.Error(w, "invalid cluster key", http.StatusUnauthorized)
+		return
+	}
+
 	hijacker, ok := w.(http.Hijacker)
 	if !ok {
 		http.Error(w, "hijacking not supported", http.StatusNotImplemented)
@@ -264,6 +280,11 @@ func (t *httpTransport) handleGossipStream(w http.ResponseWriter, r *http.Reques
 
 func (t *httpTransport) handleGossipPacket(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
+
+	if t.cookie != "" && r.Header.Get(COOKIE_HEADER_NAME) != t.cookie {
+		http.Error(w, "invalid cluster key", http.StatusUnauthorized)
+		return
+	}
 
 	origin := r.Header.Get("Origin")
 	if origin == "" {

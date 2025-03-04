@@ -16,6 +16,7 @@ type ManagerOptions struct {
 	NodeID           string
 	JoinNodeID       string
 	JoinNodeEndpoint *url.URL
+	Cookie           string
 
 	LocalEndpointResolver func() *url.URL
 }
