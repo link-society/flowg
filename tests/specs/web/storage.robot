@@ -2,10 +2,10 @@
 Library    DependencyLibrary
 Library    SeleniumLibrary
 
-Variables  ../resources/vars.py
+Variables  resources/vars.py
 
-Resource   ../resources/auth.resource
-Resource   ../resources/nav.resource
+Resource   resources/auth.resource
+Resource   resources/nav.resource
 
 *** Test Cases ***
 Create new stream

@@ -1,7 +1,7 @@
 *** Settings ***
 Library    SeleniumLibrary
-Variables  ../resources/vars.py
-Resource   ../resources/auth.resource
+Variables  resources/vars.py
+Resource   resources/auth.resource
 
 *** Test Cases ***
 Login With Valid Credentials

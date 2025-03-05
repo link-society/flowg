@@ -1,0 +1,28 @@
+[project]
+name = "flowg-test-runner"
+version = "0.0.0"
+dependencies = [
+    "docker>=7.1.0",
+    "requests>=2.32.3",
+    "tenacity>=9.0.0",
+    "tqdm>=4.67.1",
+    "robotframework>=7.2.2",
+    "robotframework-dependencylibrary>=4.0.1",
+    "robotframework-requests>=0.9.7",
+    "robotframework-seleniumlibrary>=6.3.0",
+    "pytest>=8.3.5",
+]
+requires-python = "==3.13.*"
+
+[tool.pdm]
+distribution = false
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "-e file:///${PROJECT_ROOT}/#egg=flowg-test-runner",
+]
+
+[tool.pytest.ini_options]
+addopts = "-s -qq --tb=no"
+console_output_style = "count"
+testpaths = "src"

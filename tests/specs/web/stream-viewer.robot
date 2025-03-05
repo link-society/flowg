@@ -1,11 +1,11 @@
 *** Settings ***
 Library    SeleniumLibrary
 
-Variables  ../resources/vars.py
+Variables  resources/vars.py
 
-Resource   ../resources/auth.resource
-Resource   ../resources/nav.resource
-Resource   ../resources/logging.resource
+Resource   resources/auth.resource
+Resource   resources/nav.resource
+Resource   resources/logging.resource
 
 *** Test Cases ***
 View logs sent on default pipeline

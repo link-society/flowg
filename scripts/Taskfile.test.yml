@@ -10,21 +10,31 @@ tasks:
 
   "e2e:api":
     desc: "Run API end-to-end tests"
-    dir: ./tests/e2e/api
+    dir: ./tests
     cmds:
-      - bash run.sh
+      - pdm install
+      - pdm run pytest
+    env:
+      FLOWG_TEST_SUITES: api
 
   "e2e:web":
     desc: "Run Web end-to-end tests"
-    dir: ./tests/e2e/web
+    dir: ./tests
     cmds:
-      - bash run.sh
+      - sudo apt install libasound2t64  # required for Firefox webdriver
+      - pdm install
+      - pdm run pytest
+    env:
+      FLOWG_TEST_SUITES: web
 
   bench:
     desc: "Run benchmark"
-    dir: ./tests/benchmark
+    dir: ./tests
     cmds:
-      - bash run.sh
+      - pdm install
+      - pdm run pytest
+    env:
+      FLOWG_TEST_SUITES: bench
 
   "test:unit:go":
     internal: true
