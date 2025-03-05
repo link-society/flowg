@@ -64,12 +64,23 @@ jobs:
       - name: load@docker
         run: docker load --input /tmp/oci-flowg.tar
 
-      - name: setup@test
+      - name: setup@pdm
+        uses: pdm-project/setup-pdm@v4
+        with:
+          python-version: '3.13'
+
+      - name: setup@sys-deps
         uses: gacts/install-hurl@v1
 
+      - name: setup@env
+        working-directory: ./tests
+        run: pdm install
+
       - name: run@test
-        working-directory: ./tests/e2e/api
-        run: bash ./run.sh
+        working-directory: ./tests
+        run: pdm run pytest
+        env:
+          FLOWG_TEST_SUITES: api
 
       - name: report@test
         uses: mikepenz/action-junit-report@v5
@@ -99,14 +110,23 @@ jobs:
       - name: load@docker
         run: docker load --input /tmp/oci-flowg.tar
 
-      - name: setup@test
-        uses: actions/setup-python@v5
+      - name: setup@pdm
+        uses: pdm-project/setup-pdm@v4
         with:
           python-version: '3.13'
 
+      - name: setup@sys-deps
+        run: sudo apt install libasound2t64  # required for Firefox webdriver
+
+      - name: setup@env
+        working-directory: ./tests
+        run: pdm install
+
       - name: run@test
-        working-directory: ./tests/e2e/web
-        run: bash ./run.sh
+        working-directory: ./tests
+        run: pdm run pytest
+        env:
+          FLOWG_TEST_SUITES: web
 
       - name: report@test
         uses: joonvena/robotframework-reporter-action@v2.5

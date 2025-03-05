@@ -2,12 +2,12 @@
 Library    DependencyLibrary
 Library    SeleniumLibrary
 
-Variables  ../resources/vars.py
+Variables  resources/vars.py
 
-Resource   ../resources/auth.resource
-Resource   ../resources/nav.resource
-Resource   ../resources/components/forms/kv-editor.resource
-Resource   ../resources/components/forms/code-editor.resource
+Resource   resources/auth.resource
+Resource   resources/nav.resource
+Resource   resources/components/forms/kv-editor.resource
+Resource   resources/components/forms/code-editor.resource
 
 *** Test Cases ***
 Create new transformer
