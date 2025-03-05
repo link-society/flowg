@@ -8,4 +8,5 @@ from ..settings import has_test_suite
 def test_robot(flowg_cluster, spec_dir, report_dir):
     print("Running Robot Framework:\n")
 
-    robot.run(spec_dir, outputdir=report_dir)
+    rc = robot.run(spec_dir, outputdir=report_dir)
+    assert rc == 0
