@@ -117,7 +117,7 @@ def flowg_node0_container(
         ports={
             "5080/tcp": 5080,
             "9113/tcp": 9113,
-            "5514/tcp": 5514,
+            "5514/udp": 5514,
         },
         volumes={
             flowg_node0_volume.name: {"bind": "/data", "mode": "rw"}
@@ -170,7 +170,7 @@ def flowg_node1_container(
         ports={
             "5081/tcp": 5081,
             "9114/tcp": 9114,
-            "5515/tcp": 5515,
+            "5515/udp": 5515,
         },
         volumes={
             flowg_node1_volume.name: {"bind": "/data", "mode": "rw"}
@@ -223,7 +223,7 @@ def flowg_node2_container(
         ports={
             "5082/tcp": 5082,
             "9115/tcp": 9115,
-            "5516/tcp": 5516,
+            "5516/udp": 5516,
         },
         volumes={
             flowg_node2_volume.name: {"bind": "/data", "mode": "rw"}
