@@ -33,7 +33,10 @@ type procHandler struct {
 func (p *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 	var err error
 
-	localEndpoint := p.opts.LocalEndpointResolver()
+	localEndpoint, err := p.opts.LocalEndpointResolver()
+	if err != nil {
+		return proctree.Terminate(err)
+	}
 
 	logger := slog.Default().With(
 		slog.String("channel", "cluster.gossip"),
