@@ -8,6 +8,7 @@ Usage:
 
 Flags:
       --auth-dir string                   Path to the auth database directory (default "./data/auth")
+      --cluster-cookie string             Cookie to use for cluster communication (leave empty to disable)
       --cluster-join-endpoint string      Management endpoint of the node to join the cluster
       --cluster-join-node-id string       Unique identifier of the node to join in the cluster
       --cluster-node-id string            Unique identifier for this node in the cluster (default "flowg-node0")
