@@ -1,3 +1,7 @@
+---
+sidebar_position: 2
+---
+
 # How Authentication Works?
 
 FlowG uses a *Role Based Access Control* design (RBAC for short). Each role
