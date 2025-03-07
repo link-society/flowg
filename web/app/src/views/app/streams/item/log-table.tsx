@@ -21,6 +21,7 @@ export const LogTable = (props: LogTableProps) => {
       <AgGridReact<LogEntryModel>
         rowData={props.rowData}
         columnDefs={props.columnDefs}
+        suppressFieldDotNotation
         enableCellTextSelection
         autoSizeStrategy={{type: 'fitCellContents'}}
         onRowDoubleClicked={(e) => {

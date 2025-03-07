@@ -42,6 +42,7 @@ export const StreamView = () => {
     field: `fields.${field}`,
     sortable: false,
     cellClass: 'font-mono',
+    valueGetter: ({ data }) => data?.fields[field],
   })
 
   const [watcher, setWatcher] = useState<{ enabled: boolean, filter: string }>({
