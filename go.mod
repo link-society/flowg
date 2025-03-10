@@ -12,7 +12,7 @@ require (
 	github.com/hashicorp/go-sockaddr v1.0.0
 	github.com/hashicorp/memberlist v0.5.3
 	github.com/jarcoal/httpmock v1.3.1
-	github.com/prometheus/client_golang v1.21.0
+	github.com/prometheus/client_golang v1.21.1
 	github.com/spf13/cobra v1.9.1
 	github.com/swaggest/openapi-go v0.2.57
 	github.com/swaggest/rest v0.2.73
