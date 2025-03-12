@@ -4,6 +4,37 @@ sidebar_position: 1
 
 # Installation
 
+### From Prebuilt Binaries
+
+Go to the [latest release](https://github.com/link-society/flowg/releases/latest)
+page and download the archive corresponding to your Operating System and
+architecture, then:
+
+```bash
+tar xvf flowg-${VERSION}-${OS}-${ARCH}.tar.gz
+sudo install -m 755 ./bin/flowg-server /usr/local/bin/flowg-server
+```
+
+> **NB:** Adjust the `VERSION`, `OS` and `ARCH` variables to the archive you
+> downloaded.
+
+Then, start the server with:
+
+```bash
+flowg-server \
+  --auth-dir /var/lib/flowg/data/auth \
+  --log-dir /var/lib/flowg/logs \
+  --config-dir /var/lib/flowg/config \
+  --http-bind 127.0.0.1:5080 \
+  --mgmt-bind 127.0.0.1:9113 \
+  --syslog-bind 127.0.0.1:5514
+```
+
+> **NB:** All the options are optional and default to the values shown above.
+
+For more informations about the command line interface, please consult
+[this document](https://github.com/link-society/flowg/blob/main/docs/cli.md).
+
 ### From Sources
 
 **Requirements:**
@@ -28,22 +59,7 @@ task build
 sudo install -m 755 ./bin/flowg-server /usr/local/bin/flowg-server
 ```
 
-Then, start the server with:
-
-```bash
-flowg-server \
-  --auth-dir /var/lib/flowg/data/auth \
-  --log-dir /var/lib/flowg/logs \
-  --config-dir /var/lib/flowg/config \
-  --http-bind 127.0.0.1:5080 \
-  --mgmt-bind 127.0.0.1:9113 \
-  --syslog-bind 127.0.0.1:5514
-```
-
-> **NB:** All the options are optional and default to the values shown above.
-
-For more informations about the command line interface, please consult
-[this document](https://github.com/link-society/flowg/blob/main/docs/cli.md).
+Then start the server like you would do with prebuilt binaries.
 
 ### Using Docker
 
