@@ -6,8 +6,11 @@ on:
     types:
       - published
 
+permissions:
+  contents: write
+
 jobs:
-  build:
+  docker:
     strategy:
       matrix:
         include:
@@ -43,3 +46,75 @@ jobs:
           load: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  binary:
+    strategy:
+      matrix:
+        include:
+          - ghrunner: ubuntu-latest
+            rstarget: x86_64-unknown-linux-gnu
+            goos: linux
+            goarch: amd64
+          - ghrunner: ubuntu-24.04-arm
+            rstarget: aarch64-unknown-linux-gnu
+            goos: linux
+            goarch: arm64
+          - ghrunner: macos-latest
+            rstarget: aarch64-apple-darwin
+            goos: darwin
+            goarch: arm64
+
+    runs-on: ${{ matrix.ghrunner }}
+
+    steps:
+      - name: checkout@scm
+        uses: actions/checkout@v4
+
+      - name: setup@go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+
+      - name: setup@node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 23
+
+      - name: setup@rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: 1.85.0
+          target: ${{ matrix.rstarget }}
+
+      - name: frontend@build
+        working-directory: ./web/app
+        run: |
+          npm i
+          NODE_ENV=production npm run build
+          mkdir -p ../public
+          cp -r ./dist/* ../public/
+
+      - name: backend-ffi-vrl@build
+        working-directory: ./internal/utils/ffi/vrl/rust-crate
+        run: cargo build --release
+
+      - name: backend-ffi-filterdsl@build
+        working-directory: ./internal/utils/ffi/filterdsl/rust-crate
+        run: cargo build --release
+
+      - name: backend@build
+        run: |
+          go get ./...
+          go generate ./...
+          go build -o bin/ ./...
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+
+      - name: upload@binary
+        run: |
+          tar -czf ${ARCHIVE_NAME} bin/ LICENSE.txt
+          gh release upload ${RELEASE_NAME} ${ARCHIVE_NAME}
+        env:
+          ARCHIVE_NAME: flowg-${{ github.event.release.tag_name }}-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
+          RELEASE_NAME: ${{ github.event.release.tag_name }}
