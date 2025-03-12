@@ -8,7 +8,15 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - ghrunner: ubuntu-latest
+            docker_image_tag_suffix: ""
+          - ghrunner: ubuntu-24.04-arm
+            docker_image_tag_suffix: "-linux-arm"
+
+    runs-on: ${{ matrix.ghrunner }}
 
     steps:
       - name: checkout@scm
@@ -29,8 +37,8 @@ jobs:
           context: .
           file: ./docker/flowg.dockerfile
           tags: |
-            linksociety/flowg:latest
-            linksociety/flowg:${{ github.event.release.tag_name }}
+            linksociety/flowg:latest${{ matrix.docker_image_tag_suffix }}
+            linksociety/flowg:${{ github.event.release.tag_name }}${{ matrix.docker_image_tag_suffix }}
           push: true
           load: true
           cache-from: type=gha
