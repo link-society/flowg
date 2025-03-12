@@ -72,6 +72,17 @@ docker run \
   linksociety/flowg:latest
 ```
 
+Or if you are on ARM:
+
+```bash
+docker run \
+  -p 5080:5080/tcp \
+  -p 9113:9113/tcp \
+  -p 5514:5514/udp \
+  -v flowg-data:/data \
+  linksociety/flowg:latest-linux-arm
+```
+
 ### Using Kubernetes
 
 First fetch the source code:
