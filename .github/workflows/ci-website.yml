@@ -1,5 +1,5 @@
 ---
-name: test-website
+name: ci-website
 
 on:
   pull_request:
