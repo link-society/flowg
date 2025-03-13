@@ -50,7 +50,6 @@ jobs:
           gh release create ${{ github.event.inputs.tag_name }} \
             --generate-notes \
             --latest \
-            --discussion-category "Announcements" \
-            --draft
+            --discussion-category "Announcements"
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
