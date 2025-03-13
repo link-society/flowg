@@ -29,9 +29,14 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           ref: main
 
+      - name: setup@scm
+        run: |
+          git config --global user.name "link-society[bot]"
+          git config --global user.email "noreply@link-society.com"
+          git remote set-url origin https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ github.repository }}.git
+
       - name: tag@scm
         run: |
-          git remote set-url origin https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ github.repository }}.git
           echo "${{ github.event.inputs.tag_name }}" > VERSION.txt
           git add VERSION.txt
           git commit -m ":bookmark: ${{ github.event.inputs.tag_name }}"
