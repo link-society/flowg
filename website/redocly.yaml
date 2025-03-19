@@ -1,0 +1,18 @@
+extends:
+  - recommended
+
+rules:
+  no-unused-components: error
+
+theme:
+  openapi:
+    requiredPropsFirst: true
+    noAutoAuth: true
+    hideDownloadButton: true
+    onlyRequiredInSamples: true
+    nativeScrollbars: true
+    scrollYOffset: 60
+    theme:
+      colors:
+        primary:
+          main: '#32329f'

@@ -1,6 +1,9 @@
 import prismMonokaiTheme from './prism.theme.monokai'
-import type {Config} from '@docusaurus/types'
+import type { Config } from '@docusaurus/types'
 import type * as Preset from '@docusaurus/preset-classic'
+import type * as Redocusaurus from 'redocusaurus'
+
+import path from 'path'
 
 const config: Config = {
   title: 'FlowG',
@@ -34,6 +37,15 @@ const config: Config = {
         },
       } satisfies Preset.Options,
     ],
+    [
+      'redocusaurus',
+      {
+        config: path.join(__dirname, 'redocly.yaml'),
+        specs: [
+          { spec: './src/openapi.json' },
+        ]
+      },
+    ] satisfies Redocusaurus.PresetEntry,
   ],
 
   markdown: {
