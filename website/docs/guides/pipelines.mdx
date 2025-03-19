@@ -1,0 +1,446 @@
+---
+sidebar_position: 5
+---
+
+# How To Build a Pipeline?
+
+## Introduction
+
+A pipeline is the entrypoint for logs in **FlowG**. Logs can be ingested via:
+
+ - the REST API on a specific pipeline's endpoint
+ - the Syslog Server endpoint (UDP, TCP, or TCP+TLS)
+
+As such, a pipeline flow will always have 2 root nodes:
+
+ - `DIRECT`: for logs ingested via the pipeline's API endpoint
+ - `SYSLOG`: for logs received via the Syslog endpoint
+
+From those nodes, you are able to add the following types of node:
+
+ - **Transform nodes:** Call a transformer to refine the log record and pass the
+   result to the next nodes
+ - **Switch nodes:** Pass the log record to the next nodes only if it matches
+   the node's [filter](/docs/guides/filtering)
+ - **Pipeline nodes:** Pass the log record to another pipeline
+ - **Alert nodes:** Send the log to an [Alert webhook](/docs/guides/alerting)
+ - **Router nodes:** Store the log record into a stream
+
+Using those nodes, a pipeline is able to parse, split, refine, enrich and route
+log records to the database.
+
+## Root nodes
+
+import NodeRouterDirectUrl from '@site/static/img/guides/pipelines/node-router-direct.png'
+import NodeRouterSyslogUrl from '@site/static/img/guides/pipelines/node-router-syslog.png'
+
+### Direct node
+
+```json
+POST /api/v1/pipelines/default/logs
+{
+  "record": {
+    "foo": "bar"
+  }
+}
+```
+
+<div
+  style={{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '2rem',
+  }}
+>
+  <div>
+    <img src={NodeRouterDirectUrl} alt="Direct node" />
+  </div>
+  <div style={{ fontSize: '4rem' }}>
+    &rArr;
+  </div>
+  <div>
+    ```json
+    {
+      "timestamp": "...",
+      "fields": {
+        "foo": "bar"
+      }
+    }
+    ```
+  </div>
+</div>
+
+### Syslog node (RFC3164)
+
+```bash
+logger -n localhost -P 5514 -d -t myapp --rfc3164 "hello world"
+```
+
+<div
+  style={{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '2rem',
+  }}
+>
+  <div>
+    <img src={NodeRouterSyslogUrl} alt="Syslog node" />
+  </div>
+  <div style={{ fontSize: '4rem' }}>
+    &rArr;
+  </div>
+  <div>
+    ```json
+    {
+      "timestamp": "...",
+      "fields": {
+        "timestamp": "...",
+        "client": "...",
+        "hostname": "...",
+        "tls_peer": "...",
+        "tag": "myapp",
+        "content": "hello world",
+        "priority": "13",
+        "facility": "1",
+        "severity": "6"
+      }
+    }
+    ```
+  </div>
+</div>
+
+
+### Syslog node (RFC5424)
+
+```bash
+logger -n localhost -P 5514 -d -t myapp --rfc5424 "hello world"
+```
+
+<div
+  style={{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '2rem',
+  }}
+>
+  <div>
+    <img src={NodeRouterSyslogUrl} alt="Syslog node" />
+  </div>
+  <div style={{ fontSize: '4rem' }}>
+    &rArr;
+  </div>
+  <div>
+    ```json
+    {
+      "timestamp": "...",
+      "fields": {
+        "timestamp": "...",
+        "client": "...",
+        "hostname": "...",
+        "tls_peer": "...",
+        "app_name": "myapp",
+        "message": "hello world",
+        "priority": "13",
+        "facility": "1",
+        "severity": "6",
+        "version": "1",
+        "msg_id": "",
+        "proc_id": "",
+        "structured_data": "[key key=\"value\"]",
+      }
+    }
+    ```
+  </div>
+</div>
+
+
+> **NB:** For more inforation about Syslog priorities, facilities and severities,
+> please refer to [this page](https://techdocs.broadcom.com/us/en/symantec-security-software/identity-security/privileged-access-manager/4-1/reference/messages-and-log-formats/syslog-message-formats/syslog-priority-facility-severity-grid.html).
+
+## Transformer nodes
+
+import NodeTransformerFromJsonUrl from '@site/static/img/guides/pipelines/node-transformer-fromjson.png'
+
+Let's assume we have a transformer named `from-json` with the following source
+code:
+
+```vrl
+. = parse_json!(.content)
+```
+
+<div
+  style={{
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+  }}
+>
+  <div>
+    ```json
+    {
+      "timestamp": "...",
+      "fields": {
+        "content": "{\"foo\": \"bar\"}"
+      }
+    }
+    ```
+  </div>
+  <div style={{ fontSize: '4rem' }}>
+    &dArr;
+  </div>
+  <div>
+    <img src={NodeTransformerFromJsonUrl} alt="Transformer node" />
+  </div>
+  <div style={{ fontSize: '4rem' }}>
+    &dArr;
+  </div>
+  <div>
+    ```json
+    {
+      "timestamp": "...",
+      "fields": {
+        "foo": "bar"
+      }
+    }
+    ```
+  </div>
+</div>
+
+## Switch nodes
+
+import NodeSwitchTagMyappUrl from '@site/static/img/guides/pipelines/node-switch-tagmyapp.png'
+
+<div
+  style={{
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'start',
+    justifyContent: 'center',
+    gap: '2rem',
+  }}
+>
+  <div
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}
+  >
+    <div>
+      ```json
+      {
+        "timestamp": "...",
+        "fields": {
+          "tag": "myapp",
+          "content": "hello world"
+        }
+      }
+      ```
+    </div>
+    <div style={{ fontSize: '4rem' }}>
+      &dArr;
+    </div>
+    <div>
+      <img src={NodeSwitchTagMyappUrl} alt="Switch node" />
+    </div>
+    <div style={{ fontSize: '4rem' }}>
+      &dArr;
+    </div>
+    <div>
+      ```json
+      {
+        "timestamp": "...",
+        "fields": {
+          "tag": "myapp",
+          "content": "hello world"
+        }
+      }
+      ```
+    </div>
+  </div>
+
+  <div
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}
+  >
+    <div>
+      ```json
+      {
+        "timestamp": "...",
+        "fields": {
+          "tag": "notmyapp",
+          "content": "hello world"
+        }
+      }
+      ```
+    </div>
+    <div style={{ fontSize: '4rem' }}>
+      &dArr;
+    </div>
+    <div>
+      <img src={NodeSwitchTagMyappUrl} alt="Switch node" />
+    </div>
+    <div style={{ fontSize: '4rem' }}>
+      &dArr;
+    </div>
+    <div style={{ fontSize: '4rem' }}>
+      &#9747;
+    </div>
+  </div>
+</div>
+
+## Pipeline nodes
+
+import NodePipelineDefaultUrl from '@site/static/img/guides/pipelines/node-pipeline-default.png'
+
+The following are equivalent:
+
+<div
+  style={{
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'start',
+    justifyContent: 'center',
+    gap: '2rem',
+  }}
+>
+  <div
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}
+  >
+    <div>
+      ```json
+      {
+        "timestamp": "...",
+        "fields": {
+          "content": "hello world"
+        }
+      }
+      ```
+    </div>
+    <div style={{ fontSize: '4rem' }}>
+      &dArr;
+    </div>
+    <div>
+      <img src={NodePipelineDefaultUrl} alt="Pipeline node" />
+    </div>
+  </div>
+
+  <div>
+    ```json
+    POST /api/v1/pipelines/default/logs
+    {
+      "record": {
+        "content": "hello world"
+      }
+    }
+    ```
+  </div>
+</div>
+
+## Alert nodes
+
+import NodeAlertZapierUrl from '@site/static/img/guides/pipelines/node-alert-zapier.png'
+
+Let's assume we have configured an alert named ``zapier`` with the following
+webhook URL:
+
+```
+http://example-zapier-webhook.com
+```
+
+The following are equivalent:
+
+<div
+  style={{
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'start',
+    justifyContent: 'center',
+    gap: '2rem',
+  }}
+>
+  <div
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}
+  >
+    <div>
+      ```json
+      {
+        "timestamp": "...",
+        "fields": {
+          "content": "hello world"
+        }
+      }
+      ```
+    </div>
+    <div style={{ fontSize: '4rem' }}>
+      &dArr;
+    </div>
+    <div>
+      <img src={NodeAlertZapierUrl} alt="Alert node" />
+    </div>
+  </div>
+
+  <div>
+    ```json
+    POST http://example-zapier-webhook.com
+    {
+      "timestamp": "...",
+      "fields": {
+        "content": "hello world"
+      }
+    }
+    ```
+  </div>
+</div>
+
+## Router nodes
+
+import NodeStreamDefaultUrl from '@site/static/img/guides/pipelines/node-stream-default.png'
+
+This will store the log record into the `default` stream:
+
+<div
+  style={{
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '2rem',
+  }}
+>
+  <div>
+    ```json
+    {
+      "timestamp": "...",
+      "fields": {
+        "content": "hello world"
+      }
+    }
+    ```
+  </div>
+  <div style={{ fontSize: '4rem' }}>
+    &rArr;
+  </div>
+  <div>
+    <img src={NodeStreamDefaultUrl} alt="Router node" />
+  </div>
+</div>
