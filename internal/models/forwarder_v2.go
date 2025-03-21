@@ -12,7 +12,7 @@ import (
 
 type ForwarderV2 struct {
 	Version int                `json:"version" default:"2"`
-	Config  ForwarderConfigV2 `json:"config"`
+	Config  *ForwarderConfigV2 `json:"config"`
 }
 
 type ForwarderConfigV2 struct {
@@ -23,6 +23,12 @@ type ForwarderHttpV2 struct {
 	Type    string            `json:"type" enum:"http"`
 	Url     string            `json:"url"`
 	Headers map[string]string `json:"headers"`
+}
+
+func (ForwarderConfigV2) JSONSchemaOneOf() []any {
+	return []any{
+		ForwarderHttpV2{},
+	}
 }
 
 func (f *ForwarderV2) Call(ctx context.Context, record *LogRecord) error {
@@ -64,17 +70,17 @@ func (f *ForwarderHttpV2) call(ctx context.Context, record *LogRecord) error {
 	return nil
 }
 
-func (cfg ForwarderConfigV2) MarshalJSON() ([]byte, error) {
+func (cfg *ForwarderConfigV2) MarshalJSON() ([]byte, error) {
 	switch {
 	case cfg.Http != nil:
-		return json.Marshal(cfg.Http)
+		return json.Marshal(&cfg.Http)
 
 	default:
 		return nil, fmt.Errorf("unsupported forwarder type")
 	}
 }
 
-func (cfg ForwarderConfigV2) UnmarshalJSON(data []byte) error {
+func (cfg *ForwarderConfigV2) UnmarshalJSON(data []byte) error {
 	var typeInfo struct {
 		Type string `json:"type"`
 	}
@@ -85,16 +91,9 @@ func (cfg ForwarderConfigV2) UnmarshalJSON(data []byte) error {
 
 	switch typeInfo.Type {
 	case "http":
-		cfg.Http = &ForwarderHttpV2{}
-		return json.Unmarshal(data, cfg.Http)
+		return json.Unmarshal(data, &cfg.Http)
 
 	default:
 		return fmt.Errorf("unsupported forwarder type: %s", typeInfo.Type)
-	}
-}
-
-func (ForwarderConfigV2) JSONSchemaOneOf() []any {
-	return []any{
-		ForwarderHttpV2{},
 	}
 }

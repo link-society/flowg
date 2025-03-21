@@ -44,9 +44,8 @@ func ConvertForwarder(content []byte) (*ForwarderV2, bool, error) {
 func forwarder_V1_V2(objV1 *ForwarderV1) *ForwarderV2 {
 	return &ForwarderV2{
 		Version: 2,
-		Config: ForwarderConfigV2{
+		Config: &ForwarderConfigV2{
 			Http: &ForwarderHttpV2{
-				Type:    "http",
 				Url:     objV1.Url,
 				Headers: objV1.Headers,
 			},
