@@ -61,8 +61,14 @@ func NewStorage(opts ...func(*options)) *Storage {
 		kvstore.OptReadOnly(options.readOnly),
 	)
 
+	process := proctree.NewProcessGroup(
+		proctree.DefaultProcessGroupOptions(),
+		kvStore,
+		proctree.NewProcess(&migratorProcH{kvStore: kvStore}),
+	)
+
 	return &Storage{
-		Process: kvStore,
+		Process: process,
 		kvStore: kvStore,
 	}
 }

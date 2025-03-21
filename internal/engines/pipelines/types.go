@@ -23,7 +23,7 @@ func Build(ctx context.Context, configStorage *config.Storage, name string) (*Pi
 
 	var (
 		pipelineNodes   = make(map[string]Node)
-		flowNodesByID   = make(map[string]*models.FlowNodeV1)
+		flowNodesByID   = make(map[string]*models.FlowNodeV2)
 		sourceNodeTypes = make(map[string]string)
 		entrypointNodes = make(map[string]Node)
 	)
@@ -79,17 +79,17 @@ func Build(ctx context.Context, configStorage *config.Storage, name string) (*Pi
 			}
 			pipelineNodes[flowNode.ID] = pipelineNode
 
-		case "alert":
-			alert, exists := flowNode.Data["alert"]
+		case "forwarder":
+			forwarder, exists := flowNode.Data["forwarder"]
 			if !exists {
 				return nil, &MissingFlowNodeDataError{
 					NodeID: flowNode.ID,
-					Key:    "alert",
+					Key:    "forwarder",
 				}
 			}
 
-			pipelineNode := &AlertNode{
-				Alert: alert,
+			pipelineNode := &ForwardNode{
+				Forwarder: forwarder,
 			}
 			pipelineNodes[flowNode.ID] = pipelineNode
 

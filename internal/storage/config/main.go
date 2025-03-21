@@ -22,7 +22,7 @@ import (
 const (
 	transformerExt = ".vrl"
 	pipelineExt    = ".json"
-	alertExt       = ".json.b64"
+	forwarderExt   = ".json.b64"
 )
 
 type options struct {
@@ -47,7 +47,7 @@ type Storage struct {
 
 	transformerStore *filestore.Storage
 	pipelineStore    *filestore.Storage
-	alertStore       *filestore.Storage
+	forwarderStore   *filestore.Storage
 }
 
 func NewStorage(opts ...func(*options)) *Storage {
@@ -70,17 +70,26 @@ func NewStorage(opts ...func(*options)) *Storage {
 		filestore.OptInMemory(options.inMemory),
 		filestore.OptExtension(pipelineExt),
 	)
-	alertStore := filestore.NewStorage(
-		filestore.OptDirectory(filepath.Join(options.dir, "alerts")),
+	forwarderStore := filestore.NewStorage(
+		filestore.OptDirectory(filepath.Join(options.dir, "forwarders")),
 		filestore.OptInMemory(options.inMemory),
-		filestore.OptExtension(alertExt),
+		filestore.OptExtension(forwarderExt),
 	)
+
+	children := []proctree.Process{
+		transformerStore,
+		pipelineStore,
+		forwarderStore,
+	}
+
+	if !options.inMemory {
+		migratorPH := proctree.NewProcess(&migratorProcH{baseDir: options.dir})
+		children = append([]proctree.Process{migratorPH}, children...)
+	}
 
 	process := proctree.NewProcessGroup(
 		proctree.DefaultProcessGroupOptions(),
-		transformerStore,
-		pipelineStore,
-		alertStore,
+		children...,
 	)
 
 	return &Storage{
@@ -88,7 +97,7 @@ func NewStorage(opts ...func(*options)) *Storage {
 
 		transformerStore: transformerStore,
 		pipelineStore:    pipelineStore,
-		alertStore:       alertStore,
+		forwarderStore:   forwarderStore,
 	}
 }
 
@@ -105,7 +114,7 @@ func (s *Storage) Backup(ctx context.Context, w io.Writer) error {
 	}{
 		{storage: s.transformerStore, kind: "transformer"},
 		{storage: s.pipelineStore, kind: "pipeline"},
-		{storage: s.alertStore, kind: "alert"},
+		{storage: s.forwarderStore, kind: "forwarder"},
 	}
 
 	for _, store := range stores {
@@ -198,9 +207,9 @@ func (s *Storage) Restore(ctx context.Context, r io.Reader) error {
 				storage = s.pipelineStore
 				ext = pipelineExt
 
-			case "alerts":
-				storage = s.alertStore
-				ext = alertExt
+			case "forwarders":
+				storage = s.forwarderStore
+				ext = forwarderExt
 
 			default:
 				return fmt.Errorf("unknown configuration item kind %s", kind)
@@ -250,7 +259,7 @@ func (s *Storage) ListPipelines(ctx context.Context) ([]string, error) {
 	return s.pipelineStore.ListFiles(ctx)
 }
 
-func (s *Storage) ReadPipeline(ctx context.Context, name string) (*models.FlowGraphV1, error) {
+func (s *Storage) ReadPipeline(ctx context.Context, name string) (*models.FlowGraphV2, error) {
 	content, err := s.pipelineStore.ReadFile(ctx, name)
 	if err != nil {
 		return nil, err
@@ -270,7 +279,7 @@ func (s *Storage) ReadPipeline(ctx context.Context, name string) (*models.FlowGr
 	return flowGraph, nil
 }
 
-func (s *Storage) WritePipeline(ctx context.Context, name string, flow *models.FlowGraphV1) error {
+func (s *Storage) WritePipeline(ctx context.Context, name string, flow *models.FlowGraphV2) error {
 	content, err := json.Marshal(flow)
 	if err != nil {
 		return fmt.Errorf("failed to marshal flow: %w", err)
@@ -287,12 +296,12 @@ func (s *Storage) DeletePipeline(ctx context.Context, name string) error {
 	return s.pipelineStore.DeleteFile(ctx, name)
 }
 
-func (s *Storage) ListAlerts(ctx context.Context) ([]string, error) {
-	return s.alertStore.ListFiles(ctx)
+func (s *Storage) ListForwarders(ctx context.Context) ([]string, error) {
+	return s.forwarderStore.ListFiles(ctx)
 }
 
-func (s *Storage) ReadAlert(ctx context.Context, name string) (*models.WebhookV1, error) {
-	b64content, err := s.alertStore.ReadFile(ctx, name)
+func (s *Storage) ReadForwarder(ctx context.Context, name string) (*models.ForwarderV2, error) {
+	b64content, err := s.forwarderStore.ReadFile(ctx, name)
 	if err != nil {
 		return nil, err
 	}
@@ -300,35 +309,35 @@ func (s *Storage) ReadAlert(ctx context.Context, name string) (*models.WebhookV1
 	content := make([]byte, base64.StdEncoding.DecodedLen(len(b64content)))
 	n, err := base64.StdEncoding.Decode(content, b64content)
 	if err != nil {
-		return nil, fmt.Errorf("failed to decode webhook %s: %w", name, err)
+		return nil, fmt.Errorf("failed to decode forwarder %s: %w", name, err)
 	}
 
-	webhook, changed, err := models.ConvertWebhook(content[:n])
+	webhook, changed, err := models.ConvertForwarder(content[:n])
 	if err != nil {
 		return nil, err
 	}
 
 	if changed {
-		if err := s.WriteAlert(ctx, name, webhook); err != nil {
-			return nil, fmt.Errorf("failed to write updated webhook: %w", err)
+		if err := s.WriteForwarder(ctx, name, webhook); err != nil {
+			return nil, fmt.Errorf("failed to write updated forwarder: %w", err)
 		}
 	}
 
 	return webhook, nil
 }
 
-func (s *Storage) WriteAlert(ctx context.Context, name string, webhook *models.WebhookV1) error {
-	content, err := json.Marshal(webhook)
+func (s *Storage) WriteForwarder(ctx context.Context, name string, forwarder *models.ForwarderV2) error {
+	content, err := json.Marshal(forwarder)
 	if err != nil {
-		return fmt.Errorf("failed to marshal webhook: %w", err)
+		return fmt.Errorf("failed to marshal forwarder: %w", err)
 	}
 
 	b64content := make([]byte, base64.StdEncoding.EncodedLen(len(content)))
 	base64.StdEncoding.Encode(b64content, content)
 
-	return s.alertStore.WriteFile(ctx, name, b64content)
+	return s.forwarderStore.WriteFile(ctx, name, b64content)
 }
 
-func (s *Storage) DeleteAlert(ctx context.Context, name string) error {
-	return s.alertStore.DeleteFile(ctx, name)
+func (s *Storage) DeleteForwarder(ctx context.Context, name string) error {
+	return s.forwarderStore.DeleteFile(ctx, name)
 }
