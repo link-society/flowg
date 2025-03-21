@@ -23,10 +23,9 @@ func TestForwarderHttp_Call(t *testing.T) {
 
 	forwarder := &models.ForwarderV2{
 		Version: 2,
-		Config: models.ForwarderConfigV2{
+		Config: &models.ForwarderConfigV2{
 			Http: &models.ForwarderHttpV2{
-				Type: "http",
-				Url:  testServer.URL,
+				Url: testServer.URL,
 				Headers: map[string]string{
 					"Foo": "Bar",
 				},
@@ -49,9 +48,8 @@ func TestForwarderHttp_Call_Failure(t *testing.T) {
 
 	forwarder := &models.ForwarderV2{
 		Version: 2,
-		Config: models.ForwarderConfigV2{
+		Config: &models.ForwarderConfigV2{
 			Http: &models.ForwarderHttpV2{
-				Type:    "http",
 				Url:     testServer.URL,
 				Headers: map[string]string{},
 			},
