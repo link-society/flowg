@@ -35,8 +35,8 @@ type PipelineNode struct {
 	Pipeline string
 }
 
-type AlertNode struct {
-	Alert string
+type ForwardNode struct {
+	Forwarder string
 }
 
 type RouterNode struct {
@@ -161,14 +161,14 @@ func (n *PipelineNode) Process(ctx context.Context, record *models.LogRecord) er
 	return pipeline.Process(ctx, DIRECT_ENTRYPOINT, record)
 }
 
-func (n *AlertNode) Process(ctx context.Context, record *models.LogRecord) error {
+func (n *ForwardNode) Process(ctx context.Context, record *models.LogRecord) error {
 	configStorage := getConfigStorage(ctx)
-	alert, err := configStorage.ReadAlert(ctx, n.Alert)
+	forwarder, err := configStorage.ReadForwarder(ctx, n.Forwarder)
 	if err != nil {
 		return err
 	}
 
-	return alert.Call(ctx, record)
+	return forwarder.Call(ctx, record)
 }
 
 func (n *RouterNode) Process(ctx context.Context, record *models.LogRecord) error {

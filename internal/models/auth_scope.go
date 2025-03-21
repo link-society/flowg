@@ -11,8 +11,8 @@ const (
 	SCOPE_WRITE_TRANSFORMERS Scope = "write_transformers"
 	SCOPE_READ_STREAMS       Scope = "read_streams"
 	SCOPE_WRITE_STREAMS      Scope = "write_streams"
-	SCOPE_READ_ALERTS        Scope = "read_alerts"
-	SCOPE_WRITE_ALERTS       Scope = "write_alerts"
+	SCOPE_READ_FORWARDERS    Scope = "read_forwarders"
+	SCOPE_WRITE_FORWARDERS   Scope = "write_forwarders"
 	SCOPE_READ_ACLS          Scope = "read_acls"
 	SCOPE_WRITE_ACLS         Scope = "write_acls"
 	SCOPE_SEND_LOGS          Scope = "send_logs"
@@ -32,10 +32,10 @@ func ParseScope(s string) (Scope, error) {
 		return SCOPE_READ_STREAMS, nil
 	case "write_streams":
 		return SCOPE_WRITE_STREAMS, nil
-	case "read_alerts":
-		return SCOPE_READ_ALERTS, nil
-	case "write_alerts":
-		return SCOPE_WRITE_ALERTS, nil
+	case "read_forwarders":
+		return SCOPE_READ_FORWARDERS, nil
+	case "write_forwarders":
+		return SCOPE_WRITE_FORWARDERS, nil
 	case "read_acls":
 		return SCOPE_READ_ACLS, nil
 	case "write_acls":

@@ -108,10 +108,10 @@ func NewHandler(deps *Dependencies) http.Handler {
 		)
 		r.Get("/api/v1/streams/{stream}/logs/watch", ctrl.WatchLogsUsecase())
 
-		r.Get("/api/v1/alerts", ctrl.ListAlertsUsecase())
-		r.Get("/api/v1/alerts/{alert}", ctrl.GetAlertUsecase())
-		r.Put("/api/v1/alerts/{alert}", ctrl.SaveAlertUsecase())
-		r.Delete("/api/v1/alerts/{alert}", ctrl.DeleteAlertUsecase())
+		r.Get("/api/v1/forwarders", ctrl.ListForwardersUsecase())
+		r.Get("/api/v1/forwarders/{forwarder}", ctrl.GetForwarderUsecase())
+		r.Put("/api/v1/forwarders/{forwarder}", ctrl.SaveForwarderUsecase())
+		r.Delete("/api/v1/forwarders/{forwarder}", ctrl.DeleteForwarderUsecase())
 
 		r.Get("/api/v1/roles", ctrl.ListRolesUsecase())
 		r.Put("/api/v1/roles/{role}", ctrl.SaveRoleUsecase())
@@ -129,7 +129,7 @@ func NewHandler(deps *Dependencies) http.Handler {
 		r.Delete("/api/v1/tokens/{token-uuid}", ctrl.DeleteTokenUsecase())
 
 		r.Post("/api/v1/test/transformer", ctrl.TestTransformerUsecase())
-		r.Post("/api/v1/test/alerts/{alert}", ctrl.TestAlertUsecase())
+		r.Post("/api/v1/test/forwarders/{forwarder}", ctrl.TestForwarderUsecase())
 
 		service.OpenAPICollector.AnnotateOperation(
 			"GET", "/api/v1/backup/auth",

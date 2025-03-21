@@ -12,31 +12,31 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
-type TestAlertRequest struct {
-	Alert  string            `path:"alert" minLength:"1"`
-	Record map[string]string `json:"record"`
+type TestForwarderRequest struct {
+	Forwarder string            `path:"forwarder" minLength:"1"`
+	Record    map[string]string `json:"record"`
 }
 
-type TestAlertResponse struct {
+type TestForwarderResponse struct {
 	Success bool `json:"success"`
 }
 
-func (ctrl *controller) TestAlertUsecase() usecase.Interactor {
+func (ctrl *controller) TestForwarderUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
 			ctrl.deps.AuthStorage,
-			models.SCOPE_WRITE_ALERTS,
+			models.SCOPE_WRITE_FORWARDERS,
 			func(
 				ctx context.Context,
-				req TestAlertRequest,
-				resp *TestAlertResponse,
+				req TestForwarderRequest,
+				resp *TestForwarderResponse,
 			) error {
-				webhook, err := ctrl.deps.ConfigStorage.ReadAlert(ctx, req.Alert)
+				forwarder, err := ctrl.deps.ConfigStorage.ReadForwarder(ctx, req.Forwarder)
 				if err != nil {
 					ctrl.logger.ErrorContext(
 						ctx,
-						"Failed to get alert",
-						slog.String("alert", req.Alert),
+						"Failed to get forwarder",
+						slog.String("forwarder", req.Forwarder),
 						slog.String("error", err.Error()),
 					)
 
@@ -45,12 +45,12 @@ func (ctrl *controller) TestAlertUsecase() usecase.Interactor {
 				}
 
 				logRecord := models.NewLogRecord(req.Record)
-				err = webhook.Call(ctx, logRecord)
+				err = forwarder.Call(ctx, logRecord)
 				if err != nil {
 					ctrl.logger.ErrorContext(
 						ctx,
-						"Failed to call alert webhook",
-						slog.String("alert", req.Alert),
+						"Failed to call forwarder",
+						slog.String("forwarder", req.Forwarder),
 						slog.String("error", err.Error()),
 					)
 
@@ -65,9 +65,9 @@ func (ctrl *controller) TestAlertUsecase() usecase.Interactor {
 		),
 	)
 
-	u.SetName("test_alert")
-	u.SetTitle("Test Alert")
-	u.SetDescription("Test alert")
+	u.SetName("test_forwarder")
+	u.SetTitle("Test Forwarder")
+	u.SetDescription("Test forwarder")
 	u.SetTags("tests")
 
 	u.SetExpectedErrors(status.PermissionDenied, status.NotFound, status.Internal)

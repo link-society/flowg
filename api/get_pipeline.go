@@ -18,7 +18,7 @@ type GetPipelineRequest struct {
 
 type GetPipelineResponse struct {
 	Success bool                `json:"success"`
-	Flow    *models.FlowGraphV1 `json:"flow"`
+	Flow    *models.FlowGraphV2 `json:"flow"`
 }
 
 func (ctrl *controller) GetPipelineUsecase() usecase.Interactor {
