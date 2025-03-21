@@ -31,14 +31,14 @@ GET http://localhost:5080/api/v1/pipelines
 Authorization: Bearer pat:{{guest_token}}
 HTTP 403
 
-GET http://localhost:5080/api/v1/alerts
+GET http://localhost:5080/api/v1/forwarders
 HTTP 401
 
-GET http://localhost:5080/api/v1/alerts
+GET http://localhost:5080/api/v1/forwarders
 Authorization: Bearer pat:{{admin_token}}
 HTTP 200
 
-GET http://localhost:5080/api/v1/alerts
+GET http://localhost:5080/api/v1/forwarders
 Authorization: Bearer pat:{{guest_token}}
 HTTP 403
 
