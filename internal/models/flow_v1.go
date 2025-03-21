@@ -1,7 +1,7 @@
 package models
 
 type FlowGraphV1 struct {
-	Version int           `json:"version"`
+	Version int           `json:"version" default:"1"`
 	Nodes   []*FlowNodeV1 `json:"nodes"`
 	Edges   []*FlowEdgeV1 `json:"edges"`
 }
