@@ -1,22 +1,25 @@
-GET http://localhost:5080/api/v1/alerts
+GET http://localhost:5080/api/v1/forwarders
 Authorization: Bearer pat:{{admin_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true
-jsonpath "$.alerts" count == 0
+jsonpath "$.forwarders" count == 0
 
-GET http://localhost:5080/api/v1/alerts/httpbin
+GET http://localhost:5080/api/v1/forwarders/httpbin
 Authorization: Bearer pat:{{admin_token}}
 HTTP 404
 
-PUT http://localhost:5080/api/v1/alerts/httpbin
+PUT http://localhost:5080/api/v1/forwarders/httpbin
 Authorization: Bearer pat:{{admin_token}}
 Content-Type: application/json
 {
-  "webhook": {
-    "url": "http://httpbin.org/anything",
-    "headers": {
-      "Foo": "Bar"
+  "forwarder": {
+    "config": {
+      "type": "http",
+      "url": "http://httpbin.org/anything",
+      "headers": {
+        "Foo": "Bar"
+      }
     }
   }
 }
@@ -24,21 +27,24 @@ HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 
-GET http://localhost:5080/api/v1/alerts
+GET http://localhost:5080/api/v1/forwarders
 Authorization: Bearer pat:{{admin_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true
-jsonpath "$.alerts" count == 1
-jsonpath "$.alerts[0]" == "httpbin"
+jsonpath "$.forwarders" count == 1
+jsonpath "$.forwarders[0]" == "httpbin"
 
-GET http://localhost:5080/api/v1/alerts/httpbin
+GET http://localhost:5080/api/v1/forwarders/httpbin
 Authorization: Bearer pat:{{admin_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true
+jsonpath "$.forwarder.config.type" == "http"
+jsonpath "$.forwarder.config.url" == "http://httpbin.org/anything"
+jsonpath "$.forwarder.config.headers.Foo" == "Bar"
 
-POST http://localhost:5080/api/v1/test/alerts/httpbin
+POST http://localhost:5080/api/v1/test/forwarders/httpbin
 Authorization: Bearer pat:{{admin_token}}
 Content-Type: application/json
 {
@@ -50,24 +56,27 @@ HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 
-DELETE http://localhost:5080/api/v1/alerts/httpbin
+DELETE http://localhost:5080/api/v1/forwarders/httpbin
 Authorization: Bearer pat:{{admin_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 
-GET http://localhost:5080/api/v1/alerts/httpbin
+GET http://localhost:5080/api/v1/forwarders/httpbin
 Authorization: Bearer pat:{{admin_token}}
 HTTP 404
 
-PUT http://localhost:5080/api/v1/alerts/fail
+PUT http://localhost:5080/api/v1/forwarders/fail
 Authorization: Bearer pat:{{admin_token}}
 Content-Type: application/json
 {
-  "webhook": {
-    "url": "http://httpbin.org/status/500",
-    "headers": {
-      "Foo": "Bar"
+  "forwarder": {
+    "config": {
+      "type": "http",
+      "url": "http://httpbin.org/status/500",
+      "headers": {
+        "Foo": "Bar"
+      }
     }
   }
 }
@@ -75,7 +84,7 @@ HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 
-POST http://localhost:5080/api/v1/test/alerts/fail
+POST http://localhost:5080/api/v1/test/forwarders/fail
 Authorization: Bearer pat:{{admin_token}}
 Content-Type: application/json
 {
@@ -85,7 +94,7 @@ Content-Type: application/json
 }
 HTTP 500
 
-DELETE http://localhost:5080/api/v1/alerts/fail
+DELETE http://localhost:5080/api/v1/forwarders/fail
 Authorization: Bearer pat:{{admin_token}}
 HTTP 200
 [Asserts]
