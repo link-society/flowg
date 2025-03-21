@@ -12,30 +12,31 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
-type DeleteAlertRequest struct {
-	Alert string `path:"alert" minLength:"1"`
+type SaveForwarderRequest struct {
+	Forwarder string             `path:"forwarder" minLength:"1"`
+	Config    models.ForwarderV2 `json:"config"`
 }
 
-type DeleteAlertResponse struct {
+type SaveForwarderResponse struct {
 	Success bool `json:"success"`
 }
 
-func (ctrl *controller) DeleteAlertUsecase() usecase.Interactor {
+func (ctrl *controller) SaveForwarderUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
 			ctrl.deps.AuthStorage,
-			models.SCOPE_WRITE_ALERTS,
+			models.SCOPE_WRITE_FORWARDERS,
 			func(
 				ctx context.Context,
-				req DeleteAlertRequest,
-				resp *DeleteAlertResponse,
+				req SaveForwarderRequest,
+				resp *SaveForwarderResponse,
 			) error {
-				err := ctrl.deps.ConfigStorage.DeleteAlert(ctx, req.Alert)
+				err := ctrl.deps.ConfigStorage.WriteForwarder(ctx, req.Forwarder, &req.Config)
 				if err != nil {
 					ctrl.logger.ErrorContext(
 						ctx,
-						"Failed to delete alert",
-						slog.String("alert", req.Alert),
+						"Failed to save forwarder",
+						slog.String("forwarder", req.Forwarder),
 						slog.String("error", err.Error()),
 					)
 
@@ -44,15 +45,16 @@ func (ctrl *controller) DeleteAlertUsecase() usecase.Interactor {
 				}
 
 				resp.Success = true
+
 				return nil
 			},
 		),
 	)
 
-	u.SetName("delete_alert")
-	u.SetTitle("Delete Alert")
-	u.SetDescription("Delete alert")
-	u.SetTags("alerts")
+	u.SetName("save_forwarder")
+	u.SetTitle("Save Forwarder")
+	u.SetDescription("Save forwarder")
+	u.SetTags("forwarders")
 
 	u.SetExpectedErrors(status.PermissionDenied, status.Internal)
 

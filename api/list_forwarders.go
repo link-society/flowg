@@ -12,31 +12,27 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
-type SaveAlertRequest struct {
-	Alert   string           `path:"alert" minLength:"1"`
-	Webhook models.WebhookV1 `json:"webhook"`
+type ListForwardersRequest struct{}
+type ListForwardersResponse struct {
+	Success    bool     `json:"success"`
+	Forwarders []string `json:"forwarders"`
 }
 
-type SaveAlertResponse struct {
-	Success bool `json:"success"`
-}
-
-func (ctrl *controller) SaveAlertUsecase() usecase.Interactor {
+func (ctrl *controller) ListForwardersUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
 			ctrl.deps.AuthStorage,
-			models.SCOPE_WRITE_ALERTS,
+			models.SCOPE_READ_FORWARDERS,
 			func(
 				ctx context.Context,
-				req SaveAlertRequest,
-				resp *SaveAlertResponse,
+				req ListForwardersRequest,
+				resp *ListForwardersResponse,
 			) error {
-				err := ctrl.deps.ConfigStorage.WriteAlert(ctx, req.Alert, &req.Webhook)
+				forwarders, err := ctrl.deps.ConfigStorage.ListForwarders(ctx)
 				if err != nil {
 					ctrl.logger.ErrorContext(
 						ctx,
-						"Failed to save alert",
-						slog.String("alert", req.Alert),
+						"Failed to list forwarders",
 						slog.String("error", err.Error()),
 					)
 
@@ -45,16 +41,17 @@ func (ctrl *controller) SaveAlertUsecase() usecase.Interactor {
 				}
 
 				resp.Success = true
+				resp.Forwarders = forwarders
 
 				return nil
 			},
 		),
 	)
 
-	u.SetName("save_alert")
-	u.SetTitle("Save Alert")
-	u.SetDescription("Save alert")
-	u.SetTags("alerts")
+	u.SetName("list_forwarders")
+	u.SetTitle("List Forwarders")
+	u.SetDescription("List forwarders")
+	u.SetTags("forwarders")
 
 	u.SetExpectedErrors(status.PermissionDenied, status.Internal)
 

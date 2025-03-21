@@ -236,7 +236,7 @@ func VerifyUserPermission(txn *badger.Txn, name string, scope models.Scope) (boo
 			case scope == models.SCOPE_READ_STREAMS && roleScope == models.SCOPE_WRITE_STREAMS:
 				return true, nil
 
-			case scope == models.SCOPE_READ_ALERTS && roleScope == models.SCOPE_WRITE_ALERTS:
+			case scope == models.SCOPE_READ_FORWARDERS && roleScope == models.SCOPE_WRITE_FORWARDERS:
 				return true, nil
 
 			case scope == models.SCOPE_READ_ACLS && roleScope == models.SCOPE_WRITE_ACLS:
@@ -293,9 +293,9 @@ func ListUserScopes(txn *badger.Txn, username string) ([]models.Scope, error) {
 				scopeMap[models.SCOPE_READ_STREAMS] = struct{}{}
 				scopeMap[models.SCOPE_WRITE_STREAMS] = struct{}{}
 
-			case models.SCOPE_WRITE_ALERTS:
-				scopeMap[models.SCOPE_READ_ALERTS] = struct{}{}
-				scopeMap[models.SCOPE_WRITE_ALERTS] = struct{}{}
+			case models.SCOPE_WRITE_FORWARDERS:
+				scopeMap[models.SCOPE_READ_FORWARDERS] = struct{}{}
+				scopeMap[models.SCOPE_WRITE_FORWARDERS] = struct{}{}
 
 			case models.SCOPE_WRITE_ACLS:
 				scopeMap[models.SCOPE_READ_ACLS] = struct{}{}

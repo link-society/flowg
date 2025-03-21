@@ -10,8 +10,8 @@ type Permissions struct {
 	CanViewStreams bool `json:"can_view_streams"`
 	CanEditStreams bool `json:"can_edit_streams"`
 
-	CanViewAlerts bool `json:"can_view_alerts"`
-	CanEditAlerts bool `json:"can_edit_alerts"`
+	CanViewForwarders bool `json:"can_view_forwarders"`
+	CanEditForwarders bool `json:"can_edit_forwarders"`
 
 	CanViewACLs bool `json:"can_view_acls"`
 	CanEditACLs bool `json:"can_edit_acls"`
@@ -35,10 +35,10 @@ func PermissionsFromScopes(scopes []Scope) Permissions {
 			permissions.CanViewStreams = true
 		case SCOPE_WRITE_STREAMS:
 			permissions.CanEditStreams = true
-		case SCOPE_READ_ALERTS:
-			permissions.CanViewAlerts = true
-		case SCOPE_WRITE_ALERTS:
-			permissions.CanEditAlerts = true
+		case SCOPE_READ_FORWARDERS:
+			permissions.CanViewForwarders = true
+		case SCOPE_WRITE_FORWARDERS:
+			permissions.CanEditForwarders = true
 		case SCOPE_READ_ACLS:
 			permissions.CanViewACLs = true
 		case SCOPE_WRITE_ACLS:
