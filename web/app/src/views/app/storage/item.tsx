@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useLoaderData, useNavigate } from 'react-router'
+import { useState, useEffect } from 'react'
+import { useLoaderData, useNavigate, useLocation } from 'react-router'
 import { useProfile } from '@/lib/context/profile'
 import { useApiOperation } from '@/lib/hooks/api'
 import { useNotify } from '@/lib/hooks/notify'
@@ -26,6 +26,7 @@ import { LoaderData } from './loader'
 
 export const StreamView = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const notify = useNotify()
 
   const { permissions } = useProfile()
@@ -33,6 +34,11 @@ export const StreamView = () => {
   const streamNames = Object.keys(streams)
 
   const [streamConfig, setStreamConfig] = useState(streams[currentStream!]!)
+
+  useEffect(
+    () => { setStreamConfig(streams[currentStream!]!) },
+    [location],
+  )
 
   const onCreate = (name: string) => {
     navigate(`/web/storage/${name}`)

@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useLoaderData, useNavigate } from 'react-router'
+import { useState, useEffect } from 'react'
+import { useLoaderData, useNavigate, useLocation } from 'react-router'
 import { useProfile } from '@/lib/context/profile'
 import { useApiOperation } from '@/lib/hooks/api'
 import { useNotify } from '@/lib/hooks/notify'
@@ -17,41 +17,46 @@ import ListItemText from '@mui/material/ListItemText'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 
-import { AlertEditor } from '@/components/editors/alert'
-import { NewAlertButton } from './new-btn'
+import { ForwarderEditor } from '@/components/editors/forwarder'
+import { NewForwarderButton } from './new-btn'
 
 import * as configApi from '@/lib/api/operations/config'
 
 import { LoaderData } from './loader'
 
-export const AlertView = () => {
+export const ForwarderView = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const notify = useNotify()
 
   const { permissions } = useProfile()
-  const { alerts, currentAlert } = useLoaderData() as LoaderData
+  const { forwarders, currentForwarder } = useLoaderData() as LoaderData
+  const [forwarder, setForwarder] = useState(currentForwarder!.forwarder)
 
-  const [webhook, setWebhook] = useState(currentAlert!.webhook)
+  useEffect(
+    () => { setForwarder(currentForwarder!.forwarder) },
+    [location],
+  )
 
   const onCreate = (name: string) => {
-    navigate(`/web/alerts/${name}`)
+    navigate(`/web/forwarders/${name}`)
   }
 
   const [onDelete, deleteLoading] = useApiOperation(
     async () => {
-      await configApi.deleteAlert(currentAlert!.name)
-      notify.success('Alert deleted')
-      navigate('/web/alerts')
+      await configApi.deleteForwarder(currentForwarder!.name)
+      notify.success('Forwarder deleted')
+      navigate('/web/forwarders')
     },
-    [currentAlert],
+    [currentForwarder],
   )
 
   const [onSave, saveLoading] = useApiOperation(
     async () => {
-      await configApi.saveAlert(currentAlert!.name, webhook)
-      notify.success('Alert saved')
+      await configApi.saveForwarder(currentForwarder!.name, forwarder)
+      notify.success('Forwarder saved')
     },
-    [webhook, currentAlert],
+    [forwarder, currentForwarder],
   )
 
   return (
@@ -77,14 +82,14 @@ export const AlertView = () => {
           </Button>
         </div>
 
-        {permissions.can_edit_alerts && (
+        {permissions.can_edit_forwarders && (
           <div className="flex flex-row items-center gap-3">
-            <NewAlertButton
-              onAlertCreated={onCreate}
+            <NewForwarderButton
+              onForwarderCreated={onCreate}
             />
 
             <Button
-              id="btn:alerts.delete"
+              id="btn:forwarders.delete"
               variant="contained"
               color="error"
               size="small"
@@ -99,7 +104,7 @@ export const AlertView = () => {
             </Button>
 
             <Button
-              id="btn:alerts.save"
+              id="btn:forwarders.save"
               variant="contained"
               color="secondary"
               size="small"
@@ -119,12 +124,12 @@ export const AlertView = () => {
         <Grid size={{ xs: 2 }} className="h-full">
           <Paper className="h-full overflow-auto">
             <List component="nav" className="p-0!">
-              {alerts.map((alert) => (
+              {forwarders.map((forwarder) => (
                 <ListItemButton
-                  key={alert}
+                  key={forwarder}
                   component="a"
-                  href={`/web/alerts/${alert}`}
-                  sx={alert !== currentAlert!.name
+                  href={`/web/forwarders/${forwarder}`}
+                  sx={forwarder !== currentForwarder!.name
                     ? {
                       color: 'secondary.main',
                     }
@@ -138,8 +143,8 @@ export const AlertView = () => {
                   }
                 >
                   <ListItemText
-                    id={`label:alerts.list-item.${alert}`}
-                    primary={alert}
+                    id={`label:forwarders.list-item.${forwarder}`}
+                    primary={forwarder}
                   />
                 </ListItemButton>
               ))}
@@ -148,7 +153,7 @@ export const AlertView = () => {
         </Grid>
         <Grid size={{ xs: 10 }} className="h-full">
           <Paper className="h-full overflow-auto p-3">
-            <AlertEditor webhook={webhook} onWebhookChange={setWebhook} />
+            <ForwarderEditor forwarder={forwarder} onForwarderChange={setForwarder} />
           </Paper>
         </Grid>
       </Grid>

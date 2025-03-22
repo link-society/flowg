@@ -19,11 +19,11 @@ import CircularProgress from '@mui/material/CircularProgress'
 
 import { TransitionProps } from '@mui/material/transitions'
 
-import { AlertEditor } from '@/components/editors/alert'
+import { ForwarderEditor } from '@/components/editors/forwarder'
 import { AuthenticatedAwait } from '@/components/routing/await'
 
 import * as configApi from '@/lib/api/operations/config'
-import { WebhookModel } from '@/lib/models'
+import { ForwarderModel } from '@/lib/models'
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & { children: React.ReactElement },
@@ -32,43 +32,40 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />
 })
 
-type OpenAlertDialogProps = Readonly<{
-  alert: string
+type OpenForwarderDialogProps = Readonly<{
+  forwarderName: string
 }>
 
-export const OpenAlertDialog = ({ alert }: OpenAlertDialogProps) => {
+export const OpenForwarderDialog = ({ forwarderName }: OpenForwarderDialogProps) => {
   const notify = useNotify()
 
   const [open, setOpen] = useState(false)
 
-  const [webhook, setWebhook] = useState<WebhookModel>({
-    url: '',
-    headers: {},
-  })
-  const [webhookPromise, setWebhookPromise] = useState<Promise<void> | null>(null)
+  const [forwarder, setForwarder] = useState<ForwarderModel>(undefined!)
+  const [forwarderPromise, setForwarderPromise] = useState<Promise<void> | null>(null)
 
   const [onFetch] = useApiOperation(
-    async (alert: string) => {
-      const webhook = await configApi.getAlert(alert)
-      setWebhook(webhook)
+    async (name: string) => {
+      const forwarder = await configApi.getForwarder(name)
+      setForwarder(forwarder)
     },
-    [alert],
+    [forwarderName],
   )
 
   useEffect(
     () => {
-      setWebhookPromise(onFetch(alert))
+      setForwarderPromise(onFetch(forwarderName))
     },
-    [alert],
+    [forwarderName],
   )
 
   const [onSave, saveLoading] = useApiOperation(
     async () => {
-      await configApi.saveAlert(alert, webhook)
-      notify.success('Alert saved')
-      setWebhookPromise(onFetch(alert))
+      await configApi.saveForwarder(forwarderName, forwarder)
+      notify.success('Forwarder saved')
+      setForwarderPromise(onFetch(forwarderName))
     },
-    [alert, webhook],
+    [forwarderName, forwarder],
   )
 
   return (
@@ -102,8 +99,8 @@ export const OpenAlertDialog = ({ alert }: OpenAlertDialogProps) => {
 
             <div className="grow">
               <TextField
-                label="Alert name"
-                value={alert}
+                label="Forwarder name"
+                value={forwarderName}
                 type="text"
                 variant="outlined"
                 size="small"
@@ -150,9 +147,9 @@ export const OpenAlertDialog = ({ alert }: OpenAlertDialogProps) => {
               </div>
             }
           >
-            {webhookPromise !== null && (
-              <AuthenticatedAwait resolve={webhookPromise}>
-                <AlertEditor webhook={webhook} onWebhookChange={setWebhook} />
+            {forwarderPromise !== null && (
+              <AuthenticatedAwait resolve={forwarderPromise}>
+                <ForwarderEditor forwarder={forwarder} onForwarderChange={setForwarder} />
               </AuthenticatedAwait>
             )}
           </React.Suspense>

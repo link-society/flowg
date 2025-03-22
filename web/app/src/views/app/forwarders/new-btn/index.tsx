@@ -6,31 +6,31 @@ import AddIcon from '@mui/icons-material/Add'
 
 import Button from '@mui/material/Button'
 
-import { NewAlertModal } from './modal'
+import { NewForwarderModal } from './modal'
 
-type NewAlertButtonProps = Readonly<{
-  onAlertCreated: (name: string) => void
+type NewForwarderButtonProps = Readonly<{
+  onForwarderCreated: (name: string) => void
 }>
 
-export const NewAlertButton = (props: NewAlertButtonProps) => {
+export const NewForwarderButton = (props: NewForwarderButtonProps) => {
   const dialogs = useDialogs()
   const notify = useNotify()
 
   const [handleClick] = useApiOperation(
     async () => {
-      const alertName = await dialogs.open(NewAlertModal) as string | null
-      if (alertName !== null) {
-        props.onAlertCreated(alertName)
+      const forwarderName = await dialogs.open(NewForwarderModal) as string | null
+      if (forwarderName !== null) {
+        props.onForwarderCreated(forwarderName)
 
-        notify.success('Alert created')
+        notify.success('Forwarder created')
       }
     },
-    [props.onAlertCreated],
+    [props.onForwarderCreated],
   )
 
   return (
     <Button
-      id="btn:alerts.create"
+      id="btn:forwarders.create"
       variant="contained"
       color="primary"
       size="small"

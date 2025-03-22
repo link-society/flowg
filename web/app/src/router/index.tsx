@@ -87,18 +87,18 @@ export default createBrowserRouter([
             },
           },
           {
-            path: 'alerts',
+            path: 'forwarders',
             lazy: async () => {
-              const { AlertView: Component } = await import('@/views/app/alerts/section')
-              const { loader } = await import('@/views/app/alerts/loader')
+              const { ForwarderView: Component } = await import('@/views/app/forwarders/section')
+              const { loader } = await import('@/views/app/forwarders/loader')
               return { Component, loader }
             },
           },
           {
-            path: 'alerts/:alert',
+            path: 'forwarders/:forwarder',
             lazy: async () => {
-              const { AlertView: Component } = await import('@/views/app/alerts/item')
-              const { loader } = await import('@/views/app/alerts/loader')
+              const { ForwarderView: Component } = await import('@/views/app/forwarders/item')
+              const { loader } = await import('@/views/app/forwarders/loader')
               return { Component, loader }
             },
           },

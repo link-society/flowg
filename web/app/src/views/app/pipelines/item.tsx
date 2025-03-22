@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react'
-import { useLoaderData, useNavigate } from 'react-router'
+import { useCallback, useState, useEffect } from 'react'
+import { useLoaderData, useNavigate, useLocation } from 'react-router'
 import { useProfile } from '@/lib/context/profile'
 import { useApiOperation } from '@/lib/hooks/api'
 import { useNotify } from '@/lib/hooks/notify'
@@ -21,7 +21,7 @@ import { ReactFlowProvider } from '@xyflow/react'
 import { FlowEditor } from '@/components/editors/pipeline/flow-editor'
 
 import { TransformerList } from './node-lists/transformer-list'
-import { AlertList } from './node-lists/alert-list'
+import { ForwarderList } from './node-lists/forwarder-list'
 import { StreamList } from './node-lists/stream-list'
 import { PipelineList } from './node-lists/pipeline-list'
 
@@ -32,6 +32,7 @@ import { LoaderData } from './loader'
 
 export const PipelineView = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const notify = useNotify()
 
   const { permissions } = useProfile()
@@ -39,6 +40,11 @@ export const PipelineView = () => {
   const initialFlow = currentPipeline!.flow
 
   const [flow, setFlow] = useState(initialFlow)
+
+  useEffect(
+    () => { setFlow(initialFlow) },
+    [location],
+  )
 
   const onChange = useCallback(
     (newFlow: PipelineModel) => {
@@ -158,7 +164,7 @@ export const PipelineView = () => {
           </Grid>
           <Grid size={{ xs: 2 }} className="h-full flex flex-col items-stretch gap-2">
             <TransformerList className="grow shrink h-0" />
-            <AlertList className="grow shrink h-0" />
+            <ForwarderList className="grow shrink h-0" />
             <StreamList className="grow shrink h-0" />
           </Grid>
         </Grid>

@@ -36,7 +36,7 @@ import { SourceNode } from './nodes/source'
 import { TransformNode } from './nodes/transform'
 import { SwitchNode } from './nodes/switch'
 import { PipelineNode } from './nodes/pipeline'
-import { AlertNode } from './nodes/alert'
+import { ForwarderNode } from './nodes/forwarder'
 import { RouterNode } from './nodes/router'
 
 import { PipelineModel } from '@/lib/models'
@@ -55,7 +55,7 @@ export const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange }) =>
       transform: TransformNode,
       switch: SwitchNode,
       pipeline: PipelineNode,
-      alert: AlertNode,
+      forwarder: ForwarderNode,
       router: RouterNode,
     }),
     [],
@@ -125,7 +125,7 @@ export const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange }) =>
       const itemToNodeMap = {
         transformer: 'transform',
         stream: 'router',
-        alert: 'alert',
+        forwarder: 'forwarder',
         pipeline: 'pipeline',
         switch: 'switch',
       }
@@ -159,8 +159,8 @@ export const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange }) =>
             newNode.data = {stream: event.dataTransfer.getData('item')}
             break
 
-          case 'alert':
-            newNode.data = {alert: event.dataTransfer.getData('item')}
+          case 'forwarder':
+            newNode.data = {forwarder: event.dataTransfer.getData('item')}
             break
 
           case 'pipeline':

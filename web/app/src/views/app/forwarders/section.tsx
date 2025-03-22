@@ -5,16 +5,16 @@ import Backdrop from '@mui/material/Backdrop'
 import CircularProgress from '@mui/material/CircularProgress'
 
 import { LoaderData } from './loader'
-import { NewAlertButton } from './new-btn'
+import { NewForwarderButton } from './new-btn'
 
-export const AlertView = () => {
-  const { alerts } = useLoaderData() as LoaderData
+export const ForwarderView = () => {
+  const { forwarders } = useLoaderData() as LoaderData
   const navigate = useNavigate()
 
   useEffect(
     () => {
-      if (alerts.length > 0) {
-        navigate(`/web/alerts/${alerts[0]}`)
+      if (forwarders.length > 0) {
+        navigate(`/web/forwarders/${forwarders[0]}`)
       }
     },
     [],
@@ -22,7 +22,7 @@ export const AlertView = () => {
 
   return (
     <>
-      {alerts.length > 0
+      {forwarders.length > 0
         ? (
           <Backdrop open={true}>
             <CircularProgress color="inherit" />
@@ -30,11 +30,11 @@ export const AlertView = () => {
         )
         : (
           <div className="w-full h-full flex flex-col items-center justify-center gap-5">
-            <h1 className="text-3xl font-semibold">No alert found, create one</h1>
+            <h1 className="text-3xl font-semibold">No forwarder found, create one</h1>
 
-            <NewAlertButton
-              onAlertCreated={(name) => {
-                navigate(`/web/alerts/${name}`)
+            <NewForwarderButton
+              onForwarderCreated={(name) => {
+                navigate(`/web/forwarders/${name}`)
               }}
             />
           </div>

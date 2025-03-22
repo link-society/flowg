@@ -1,6 +1,6 @@
 import * as request from '@/lib/api/request'
 
-import { PipelineModel, StreamConfigModel, WebhookModel } from '@/lib/models'
+import { PipelineModel, StreamConfigModel, ForwarderModel } from '@/lib/models'
 
 export const listTransformers = async (): Promise<string[]> => {
   type ListTransformersResponse = {
@@ -115,53 +115,53 @@ export const purgeStream = async (stream: string): Promise<void> => {
   })
 }
 
-export const listAlerts = async (): Promise<string[]> => {
-  type ListAlertsResponse = {
+export const listForwarders = async (): Promise<string[]> => {
+  type ListForwardersResponse = {
     success: boolean
-    alerts: string[]
+    forwarders: string[]
   }
 
-  const { body } = await request.GET<ListAlertsResponse>({
-    path: '/api/v1/alerts',
+  const { body } = await request.GET<ListForwardersResponse>({
+    path: '/api/v1/forwarders',
   })
-  return body.alerts
+  return body.forwarders
 }
 
-export const getAlert = async (alert: string): Promise<WebhookModel> => {
-  type GetAlertResponse = {
+export const getForwarder = async (forwarder: string): Promise<ForwarderModel> => {
+  type GetForwarderResponse = {
     success: boolean
-    webhook: WebhookModel
+    forwarder: ForwarderModel
   }
 
-  const { body } = await request.GET<GetAlertResponse>({
-    path: `/api/v1/alerts/${alert}`,
+  const { body } = await request.GET<GetForwarderResponse>({
+    path: `/api/v1/forwarders/${forwarder}`,
   })
 
-  return body.webhook
+  return body.forwarder
 }
 
-export const saveAlert = async (alert: string, webhook: WebhookModel): Promise<void> => {
-  type SaveAlertRequest = {
-    webhook: WebhookModel
+export const saveForwarder = async (name: string, forwarder: ForwarderModel): Promise<void> => {
+  type SaveForwarderRequest = {
+    forwarder: ForwarderModel
   }
 
-  type SaveAlertResponse = {
+  type SaveForwarderResponse = {
     success: boolean
   }
 
-  await request.PUT<SaveAlertRequest, SaveAlertResponse>({
-    path: `/api/v1/alerts/${alert}`,
-    body: { webhook },
+  await request.PUT<SaveForwarderRequest, SaveForwarderResponse>({
+    path: `/api/v1/forwarders/${name}`,
+    body: { forwarder },
   })
 }
 
-export const deleteAlert = async (alert: string): Promise<void> => {
-  type DeleteAlertResponse = {
+export const deleteForwarder = async (forwarder: string): Promise<void> => {
+  type DeleteForwarderResponse = {
     success: boolean
   }
 
-  await request.DELETE<DeleteAlertResponse>({
-    path: `/api/v1/alerts/${alert}`,
+  await request.DELETE<DeleteForwarderResponse>({
+    path: `/api/v1/forwarders/${forwarder}`,
   })
 }
 

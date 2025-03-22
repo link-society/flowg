@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useLoaderData, useNavigate } from 'react-router'
+import { useState, useEffect } from 'react'
+import { useLoaderData, useNavigate, useLocation } from 'react-router'
 import { useProfile } from '@/lib/context/profile'
 import { useApiOperation } from '@/lib/hooks/api'
 import { useNotify } from '@/lib/hooks/notify'
@@ -26,12 +26,18 @@ import { LoaderData } from './loader'
 
 export const TransformerView = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const notify = useNotify()
 
   const { permissions } = useProfile()
   const { transformers, currentTransformer } = useLoaderData() as LoaderData
 
   const [code, setCode] = useState(currentTransformer!.script)
+
+  useEffect(
+    () => { setCode(currentTransformer!.script) },
+    [location],
+  )
 
   const onCreate = (name: string) => {
     navigate(`/web/transformers/${name}`)
