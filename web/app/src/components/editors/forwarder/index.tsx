@@ -7,7 +7,7 @@ type ForwarderEditorProps = {
   onForwarderChange: (forwarder: ForwarderModel) => void
 }
 
-export const ForwarderEditor = ({ forwarder, onForwarderChange: onForwarderChange }: ForwarderEditorProps) => {
+export const ForwarderEditor = ({ forwarder, onForwarderChange }: ForwarderEditorProps) => {
   switch (forwarder.config.type) {
     case 'http':
       return (

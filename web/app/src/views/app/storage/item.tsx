@@ -36,7 +36,7 @@ export const StreamView = () => {
   const [streamConfig, setStreamConfig] = useState(streams[currentStream!]!)
 
   useEffect(
-    () => { setStreamConfig(streams[currentStream!]!) },
+    () => { setStreamConfig(streams[currentStream!]) },
     [location],
   )
 
