@@ -26,7 +26,7 @@ func (ctrl *controller) BackupConfigUsecase() usecase.Interactor {
 			[]models.Scope{
 				models.SCOPE_READ_PIPELINES,
 				models.SCOPE_READ_TRANSFORMERS,
-				models.SCOPE_READ_ALERTS,
+				models.SCOPE_READ_FORWARDERS,
 			},
 			func(
 				ctx context.Context,

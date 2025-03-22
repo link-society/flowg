@@ -28,7 +28,7 @@ func (ctrl *controller) RestoreConfigUsecase() usecase.Interactor {
 			[]models.Scope{
 				models.SCOPE_WRITE_PIPELINES,
 				models.SCOPE_WRITE_TRANSFORMERS,
-				models.SCOPE_WRITE_ALERTS,
+				models.SCOPE_WRITE_FORWARDERS,
 			},
 			func(
 				ctx context.Context,
