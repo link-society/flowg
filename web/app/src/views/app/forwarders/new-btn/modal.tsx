@@ -9,25 +9,48 @@ import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import TextField from '@mui/material/TextField'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import Select from '@mui/material/Select'
+import MenuItem from '@mui/material/MenuItem'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 
 import { DialogProps } from '@toolpad/core/useDialogs'
 
+import {
+  ForwarderModel,
+  ForwarderTypes,
+  ForwarderTypeValues,
+} from '@/lib/models'
 import * as configApi from '@/lib/api/operations/config'
 
-export const NewAlertModal = ({ open, onClose }: DialogProps<void, string | null>) => {
+const newForwarderFactory = (type: ForwarderTypes): ForwarderModel => {
+  switch (type) {
+    case 'http':
+      return {
+        config: {
+          type,
+          url: '',
+          headers: {},
+        },
+      }
+
+    default:
+      throw new Error(`Unknown forwarder type: ${type}`)
+  }
+}
+
+export const NewForwarderModal = ({ open, onClose }: DialogProps<void, string | null>) => {
   const [name, setName] = useState('')
+  const [type, setType] = useState<ForwarderTypes>('http')
 
   const [onSubmit, loading] = useApiOperation(
     async () => {
-      await configApi.saveAlert(name, {
-        url: '',
-        headers: {},
-      })
+      await configApi.saveForwarder(name, newForwarderFactory(type))
       onClose(name)
     },
-    [name],
+    [name, type],
   )
 
   return (
@@ -46,12 +69,12 @@ export const NewAlertModal = ({ open, onClose }: DialogProps<void, string | null
         },
       }}
     >
-      <DialogTitle>Create new alert</DialogTitle>
+      <DialogTitle>Create new forwarder</DialogTitle>
       <DialogContent>
-        <div className="pt-3 w-full">
+        <div className="pt-3 w-full flex flex-col items-stretch gap-3">
           <TextField
-            id="input:alerts.modal.name"
-            label="Alert name"
+            id="input:forwarder.modal.name"
+            label="Forwarder name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             type="text"
@@ -59,11 +82,32 @@ export const NewAlertModal = ({ open, onClose }: DialogProps<void, string | null
             required
             className="w-full"
           />
+
+          <FormControl fullWidth>
+            <InputLabel id="label:forwarder.modal.type">Forwarder type</InputLabel>
+            <Select<ForwarderTypes>
+              labelId="label:forwarder.modal.type"
+              id="select:forwarder.modal.type"
+              value={type}
+              label="Forwarder type"
+              onChange={(e) => setType(e.target.value as ForwarderTypes)}
+            >
+              {ForwarderTypeValues.map((t) => (
+                <MenuItem
+                  id={`option:forwarder.modal.type.${t.key}`}
+                  key={t.key}
+                  value={t.key}
+                >
+                  {t.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </div>
       </DialogContent>
       <DialogActions>
         <Button
-          id="btn:alerts.modal.cancel"
+          id="btn:forwarder.modal.cancel"
           variant="contained"
           startIcon={<CancelIcon />}
           onClick={() => onClose(null)}
@@ -72,7 +116,7 @@ export const NewAlertModal = ({ open, onClose }: DialogProps<void, string | null
           Cancel
         </Button>
         <Button
-          id="btn:alerts.modal.save"
+          id="btn:forwarder.modal.save"
           variant="contained"
           color="secondary"
           startIcon={!loading && <SaveIcon />}

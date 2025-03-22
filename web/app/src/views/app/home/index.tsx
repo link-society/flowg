@@ -1,6 +1,6 @@
 import StorageIcon from '@mui/icons-material/Storage'
 import FilterAltIcon from '@mui/icons-material/FilterAlt'
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
+import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox'
 import AccountTreeIcon from '@mui/icons-material/AccountTree'
 
 import Grid from '@mui/material/Grid2'
@@ -45,14 +45,14 @@ export const HomeView = () => {
           />
         </Grid>
       )}
-      {permissions.can_view_alerts && (
+      {permissions.can_view_forwarders && (
         <Grid size={{ xs: 12, md: 2 }}>
           <DynamicStatCard
-            icon={<NotificationsActiveIcon />}
-            title="Alerts"
-            href="/web/alerts"
-            resolver={() => configApi.listAlerts()}
-            renderer={(alerts: string[]) => alerts.length}
+            icon={<ForwardToInboxIcon />}
+            title="Forwarders"
+            href="/web/forwarders"
+            resolver={() => configApi.listForwarders()}
+            renderer={(forwarders: string[]) => forwarders.length}
           />
         </Grid>
       )}

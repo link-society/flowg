@@ -72,14 +72,14 @@ export const Permissions = () => {
             label={<span className="text-sm">View Alerts</span>}
             disabled
             control={
-              <Checkbox checked={permissions.can_view_alerts} />
+              <Checkbox checked={permissions.can_view_forwarders} />
             }
           />
           <FormControlLabel
             label={<span className="text-sm">Edit Alerts</span>}
             disabled
             control={
-              <Checkbox checked={permissions.can_edit_alerts} />
+              <Checkbox checked={permissions.can_edit_forwarders} />
             }
           />
         </FormGroup>

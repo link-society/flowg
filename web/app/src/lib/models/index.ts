@@ -20,8 +20,8 @@ export type PermissionsModel = {
   can_view_streams: boolean
   can_edit_streams: boolean
 
-  can_view_alerts: boolean
-  can_edit_alerts: boolean
+  can_view_forwarders: boolean
+  can_edit_forwarders: boolean
 
   can_view_acls: boolean
   can_edit_acls: boolean
@@ -40,10 +40,24 @@ export type StreamConfigModel = {
   size: number
 }
 
-export type WebhookModel = {
+export type ForwarderModel = {
+  config: ForwarderConfigModel
+}
+
+export const ForwarderTypeValues = [
+  { key: 'http', label: 'Webhook' },
+] as const
+
+export type ForwarderConfigModel =
+  | ForwarderConfigHttpModel
+
+export type ForwarderConfigHttpModel = {
+  type: 'http'
   url: string
   headers: Record<string, string>
 }
+
+export type ForwarderTypes = ForwarderConfigModel['type']
 
 export type TokenModel = {
   token: string

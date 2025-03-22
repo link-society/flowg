@@ -1,21 +1,21 @@
 import { Handle, Position, Node, NodeProps, NodeToolbar } from '@xyflow/react'
 
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
+import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox'
 
 import TextField from '@mui/material/TextField'
 
-import { OpenAlertDialog } from '@/components/editors/alert/dialog'
+import { OpenForwarderDialog } from '@/components/editors/forwarder/dialog'
 import { DeleteNodeButton } from '../delete-btn'
 
-type AlertNodeData = Node<{
-  alert: string
+type ForwarderNodeData = Node<{
+  forwarder: string
 }>
 
-export const AlertNode = ({ id, data, selected }: NodeProps<AlertNodeData>) => (
+export const ForwarderNode = ({ id, data, selected }: NodeProps<ForwarderNodeData>) => (
   <>
     {selected && (
       <NodeToolbar className="flex flex-row items-center gap-2">
-        <OpenAlertDialog alert={data.alert} />
+        <OpenForwarderDialog forwarderName={data.forwarder} />
         <DeleteNodeButton nodeId={id} />
       </NodeToolbar>
     )}
@@ -42,13 +42,13 @@ export const AlertNode = ({ id, data, selected }: NodeProps<AlertNodeData>) => (
       }}
     >
       <div className="bg-green-700 text-white p-3 flex flex-row items-center">
-        <NotificationsActiveIcon />
+        <ForwardToInboxIcon />
       </div>
       <div className="p-3 flex flex-row items-center nodrag">
         <TextField
-          label="Alert"
+          label="Forwarder"
           type="text"
-          value={data.alert}
+          value={data.forwarder}
           slotProps={{
             input: {
               readOnly: true,

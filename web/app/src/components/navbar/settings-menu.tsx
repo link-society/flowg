@@ -3,7 +3,7 @@ import { useState } from 'react'
 import AccountTreeIcon from '@mui/icons-material/AccountTree'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import FilterAltIcon from '@mui/icons-material/FilterAlt'
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
+import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox'
 import SdStorageIcon from '@mui/icons-material/SdStorage'
 import SettingsIcon from '@mui/icons-material/Settings'
 
@@ -64,15 +64,15 @@ export const SettingsMenu = () => {
           </MenuItem>
         )}
 
-        {permissions.can_view_alerts && (
+        {permissions.can_view_forwarders && (
           <MenuItem onClick={handleClose}>
             <Button
-              id="link:navbar.settings.alerts"
-              href="/web/alerts"
+              id="link:navbar.settings.forwarders"
+              href="/web/forwarders"
               color="secondary"
-              startIcon={<NotificationsActiveIcon />}
+              startIcon={<ForwardToInboxIcon />}
             >
-              Alerts
+              Forwarders
             </Button>
           </MenuItem>
         )}
