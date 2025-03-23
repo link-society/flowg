@@ -15,8 +15,8 @@ assigns permissions to one or more of the following **scopes**:
 | `write_transformers` | Can create, read, update, or delete a transformer script |
 | `read_streams` | Can query a stream |
 | `write_streams` | Can purge a stream |
-| `read_alerts` | Can see alert webhooks |
-| `write_alerts` | Can create, read, update or delete alert webhooks |
+| `read_forwarders` | Can see forwarder configurations |
+| `write_forwarders` | Can create, read, update or delete forwarder configurations |
 | `read_acls` | Can list users and roles, but cannot update them nor delete them |
 | `write_acls`| Can create, read, update or delete roles and users |
 | `send_logs` | Can send logs to a pipeline for processing (useful for log sources) |
