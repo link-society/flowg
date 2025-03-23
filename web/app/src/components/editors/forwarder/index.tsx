@@ -1,6 +1,7 @@
-import { ForwarderModel } from '@/lib/models/forwarder'
+import { ForwarderModel, ForwarderConfigModel } from '@/lib/models/forwarder'
 
-import { ForwarderConfigHttpEditor } from './http'
+import { HttpForwarderEditor } from './http'
+import { SyslogForwarderEditor } from './syslog'
 
 type ForwarderEditorProps = {
   forwarder: ForwarderModel
@@ -8,21 +9,28 @@ type ForwarderEditorProps = {
 }
 
 export const ForwarderEditor = ({ forwarder, onForwarderChange }: ForwarderEditorProps) => {
+  const onConfigChange = (config: ForwarderConfigModel) => {
+    onForwarderChange({
+      ...forwarder,
+      config,
+    })
+  }
+
   switch (forwarder.config.type) {
     case 'http':
       return (
-        <ForwarderConfigHttpEditor
+        <HttpForwarderEditor
           config={forwarder.config}
-          onConfigChange={(config) => {
-            onForwarderChange({
-              ...forwarder,
-              config,
-            })
-          }}
+          onConfigChange={onConfigChange}
         />
       )
 
-    default:
-      throw new Error(`Unknown forwarder type: ${forwarder.config.type}`)
+    case 'syslog':
+      return (
+        <SyslogForwarderEditor
+          config={forwarder.config}
+          onConfigChange={onConfigChange}
+        />
+      )
   }
 }
