@@ -52,6 +52,10 @@ const config: Config = {
     mermaid: true,
   },
 
+  plugins: [
+    'plugin-image-zoom',
+  ],
+
   themes: [
     '@docusaurus/theme-mermaid',
   ],
@@ -104,6 +108,13 @@ const config: Config = {
       darkTheme: prismMonokaiTheme as any,
       additionalLanguages: ['bash', 'ini', 'apacheconf', 'nginx'],
     },
+    imageZoom: {
+      selector: '.markdown div.with-zoom img',
+      options: {
+        margin: 24,
+        background: 'rgba(0, 0, 0, 0.9)',
+      },
+    }
   } satisfies Preset.ThemeConfig,
 }
 
