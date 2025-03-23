@@ -3,7 +3,7 @@ import { LoaderFunction } from 'react-router'
 import { loginRequired } from '@/lib/decorators/loaders'
 import * as aclApi from '@/lib/api/operations/acls'
 
-import { RoleModel, UserModel } from '@/lib/models'
+import { RoleModel, UserModel } from '@/lib/models/auth'
 
 export type LoaderData = {
   roles: RoleModel[]

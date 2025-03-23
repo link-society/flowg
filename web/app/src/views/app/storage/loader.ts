@@ -2,7 +2,7 @@ import { LoaderFunction } from 'react-router'
 
 import { loginRequired } from '@/lib/decorators/loaders'
 import * as configApi from '@/lib/api/operations/config'
-import { StreamConfigModel } from '@/lib/models'
+import { StreamConfigModel } from '@/lib/models/storage'
 
 export type LoaderData = {
   streams: Record<string, StreamConfigModel>

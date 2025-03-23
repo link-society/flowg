@@ -23,7 +23,7 @@ import { ForwarderEditor } from '@/components/editors/forwarder'
 import { AuthenticatedAwait } from '@/components/routing/await'
 
 import * as configApi from '@/lib/api/operations/config'
-import { ForwarderModel } from '@/lib/models'
+import { ForwarderModel } from '@/lib/models/forwarder'
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & { children: React.ReactElement },

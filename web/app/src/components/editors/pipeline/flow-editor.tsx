@@ -39,7 +39,7 @@ import { PipelineNode } from './nodes/pipeline'
 import { ForwarderNode } from './nodes/forwarder'
 import { RouterNode } from './nodes/router'
 
-import { PipelineModel } from '@/lib/models'
+import { PipelineModel } from '@/lib/models/pipeline'
 
 type FlowEditorProps = Readonly<{
   flow: PipelineModel

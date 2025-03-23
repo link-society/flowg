@@ -2,7 +2,7 @@ import { LoaderFunction } from 'react-router'
 
 import { loginRequired } from '@/lib/decorators/loaders'
 import * as configApi from '@/lib/api/operations/config'
-import { ForwarderModel } from '@/lib/models'
+import { ForwarderModel } from '@/lib/models/forwarder'
 
 export type LoaderData = {
   forwarders: string[]

@@ -16,7 +16,7 @@ import { CreateUserButton } from './create-btn'
 import { RolesCell } from './roles-cell'
 
 import * as aclApi from '@/lib/api/operations/acls'
-import { UserModel } from '@/lib/models'
+import { UserModel } from '@/lib/models/auth'
 
 type UserListProps = Readonly<{
   roles: string[]

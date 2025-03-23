@@ -22,7 +22,7 @@ import {
   ForwarderModel,
   ForwarderTypes,
   ForwarderTypeValues,
-} from '@/lib/models'
+} from '@/lib/models/forwarder'
 import * as configApi from '@/lib/api/operations/config'
 
 const newForwarderFactory = (type: ForwarderTypes): ForwarderModel => {

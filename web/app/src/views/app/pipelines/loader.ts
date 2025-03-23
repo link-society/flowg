@@ -2,7 +2,7 @@ import { LoaderFunction } from 'react-router'
 
 import { loginRequired } from '@/lib/decorators/loaders'
 import * as configApi from '@/lib/api/operations/config'
-import { PipelineModel } from '@/lib/models'
+import { PipelineModel } from '@/lib/models/pipeline'
 
 export type LoaderData = {
   pipelines: string[]

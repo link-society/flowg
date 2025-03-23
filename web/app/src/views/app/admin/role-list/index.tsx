@@ -16,7 +16,7 @@ import { CreateRoleButton } from './create-btn'
 import { ScopesCell } from './scopes-cell'
 
 import * as aclApi from '@/lib/api/operations/acls'
-import { RoleModel } from '@/lib/models'
+import { RoleModel } from '@/lib/models/auth'
 
 type RoleListProps = Readonly<{
   roles: RoleModel[]

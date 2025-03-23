@@ -1,4 +1,4 @@
-import { ForwarderModel } from '@/lib/models'
+import { ForwarderModel } from '@/lib/models/forwarder'
 
 import { ForwarderConfigHttpEditor } from './http'
 

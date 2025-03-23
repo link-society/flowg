@@ -8,7 +8,7 @@ import Paper from '@mui/material/Paper'
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 
-import { StreamConfigModel } from '@/lib/models'
+import { StreamConfigModel } from '@/lib/models/storage'
 
 type StreamEditorProps = {
   streamConfig: StreamConfigModel

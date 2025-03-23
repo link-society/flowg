@@ -14,7 +14,7 @@ import { LogTable } from './log-table'
 
 import * as logApi from '@/lib/api/operations/logs'
 
-import { LogEntryModel } from '@/lib/models'
+import { LogEntryModel } from '@/lib/models/log'
 import { ColDef } from 'ag-grid-community'
 
 import { LoaderData } from '../loader'
