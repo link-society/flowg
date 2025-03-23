@@ -5,7 +5,7 @@ import Box from '@mui/material/Box'
 import ApexChart from 'react-apexcharts'
 import type { ApexOptions } from 'apexcharts'
 
-import { LogEntryModel } from '@/lib/models'
+import { LogEntryModel } from '@/lib/models/log'
 import { aggregateLogs } from '@/lib/timeserie'
 
 type ChartProps = Readonly<{

@@ -1,6 +1,6 @@
 import * as request from '@/lib/api/request'
 
-import { ProfileModel, UserModel, PermissionsModel } from '@/lib/models'
+import { ProfileModel, UserModel, PermissionsModel } from '@/lib/models/auth'
 
 export const whoami = async (): Promise<ProfileModel> => {
   type WhoamiResponse = {

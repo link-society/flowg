@@ -26,7 +26,7 @@ import { StreamList } from './node-lists/stream-list'
 import { PipelineList } from './node-lists/pipeline-list'
 
 import * as configApi from '@/lib/api/operations/config'
-import { PipelineModel } from '@/lib/models'
+import { PipelineModel } from '@/lib/models/pipeline'
 
 import { LoaderData } from './loader'
 

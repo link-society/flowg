@@ -6,7 +6,7 @@ import Drawer from '@mui/material/Drawer'
 import { AgGridReact } from 'ag-grid-react'
 import { ColDef } from 'ag-grid-community'
 
-import { LogEntryModel } from '@/lib/models'
+import { LogEntryModel } from '@/lib/models/log'
 
 type LogTableProps = Readonly<{
   rowData: LogEntryModel[]

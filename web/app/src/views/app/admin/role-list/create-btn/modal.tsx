@@ -21,7 +21,7 @@ import { TransferList } from '@/components/form/transfer-list'
 
 import * as aclApi from '@/lib/api/operations/acls'
 import { SCOPES, SCOPE_LABELS } from '@/lib/models/permissions'
-import { RoleModel } from '@/lib/models'
+import { RoleModel } from '@/lib/models/auth'
 
 export const RoleFormModal = ({ open, onClose }: DialogProps<void, RoleModel | null>) => {
   const [name, setName] = useState('')

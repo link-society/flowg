@@ -5,11 +5,11 @@ import { KeyValueEditor } from '@/components/form/kv-editor'
 
 import HttpIcon from '@mui/icons-material/Http'
 
-import { ForwarderConfigHttpModel } from '@/lib/models'
+import { HttpForwarderModel } from '@/lib/models/forwarder/http'
 
 type ForwarderConfigHttpEditorProps = {
-  config: ForwarderConfigHttpModel
-  onConfigChange: (config: ForwarderConfigHttpModel) => void
+  config: HttpForwarderModel
+  onConfigChange: (config: HttpForwarderModel) => void
 }
 
 export const ForwarderConfigHttpEditor = ({ config, onConfigChange }: ForwarderConfigHttpEditorProps) => {

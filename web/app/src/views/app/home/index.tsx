@@ -8,7 +8,7 @@ import Grid from '@mui/material/Grid2'
 import { useProfile } from '@/lib/context/profile'
 
 import * as configApi from '@/lib/api/operations/config'
-import { StreamConfigModel } from '@/lib/models'
+import { StreamConfigModel } from '@/lib/models/storage'
 
 import { DynamicStatCard } from './dynstatcard'
 

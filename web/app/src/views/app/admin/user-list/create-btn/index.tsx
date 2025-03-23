@@ -6,7 +6,7 @@ import AddIcon from '@mui/icons-material/Add'
 
 import Button from '@mui/material/Button'
 
-import { UserModel } from '@/lib/models'
+import { UserModel } from '@/lib/models/auth'
 
 import { UserFormModal } from './modal'
 

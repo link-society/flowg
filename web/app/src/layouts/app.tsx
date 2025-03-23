@@ -6,7 +6,7 @@ import { ProfileProvider } from '@/lib/context/profile'
 
 import * as authApi from '@/lib/api/operations/auth'
 import { loginRequired } from '@/lib/decorators/loaders'
-import { ProfileModel } from '@/lib/models'
+import { ProfileModel } from '@/lib/models/auth'
 
 export const loader = async () => {
   return await loginRequired(authApi.whoami)()

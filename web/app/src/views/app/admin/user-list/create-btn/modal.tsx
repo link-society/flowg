@@ -22,7 +22,7 @@ import { DialogProps } from '@toolpad/core/useDialogs'
 import { TransferList } from '@/components/form/transfer-list'
 
 import * as aclApi from '@/lib/api/operations/acls'
-import { UserModel } from '@/lib/models'
+import { UserModel } from '@/lib/models/auth'
 
 export const UserFormModal = ({ open, payload, onClose }: DialogProps<string[], UserModel | null>) => {
   const [username, setUsername] = useState('')

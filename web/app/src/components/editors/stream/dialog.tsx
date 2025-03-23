@@ -23,7 +23,7 @@ import { StreamEditor } from '@/components/editors/stream'
 import { AuthenticatedAwait } from '@/components/routing/await'
 
 import * as configApi from '@/lib/api/operations/config'
-import { StreamConfigModel } from '@/lib/models'
+import { StreamConfigModel } from '@/lib/models/storage'
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & { children: React.ReactElement },
