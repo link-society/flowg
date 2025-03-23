@@ -1,5 +1,5 @@
 ---
-sidebar_position: 6
+sidebar_position: 5
 ---
 
 # Database Backup
@@ -58,7 +58,7 @@ curl \
 Performing an online backup requires the following permissions:
 
  - auth: `Read ACLs`
- - config: `Read Pipelines`, `Read Transformers`, `Read Alerts`
+ - config: `Read Pipelines`, `Read Transformers`, `Read Forwarders`
  - logs: `Read Streams`
 
 ## Performing a restore
@@ -116,5 +116,5 @@ curl \
 Performing an online restore requires the following permissions:
 
  - auth: `Write ACLs`
- - config: `Write Pipelines`, `Write Transformers`, `Write Alerts`
+ - config: `Write Pipelines`, `Write Transformers`, `Write Forwarders`
  - logs: `Write Streams`

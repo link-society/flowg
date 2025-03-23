@@ -1,5 +1,5 @@
 ---
-sidebar_position: 5
+sidebar_position: 4
 ---
 
 # How To Build a Pipeline?
@@ -23,7 +23,7 @@ From those nodes, you are able to add the following types of node:
  - **Switch nodes:** Pass the log record to the next nodes only if it matches
    the node's [filter](/docs/guides/filtering)
  - **Pipeline nodes:** Pass the log record to another pipeline
- - **Alert nodes:** Send the log to an [Alert webhook](/docs/guides/alerting)
+ - **Forward nodes:** Send the log to a third-party service
  - **Router nodes:** Store the log record into a stream
 
 Using those nodes, a pipeline is able to parse, split, refine, enrich and route
@@ -342,12 +342,12 @@ POST /api/v1/pipelines/default/logs
 }
 ```
 
-## Alert nodes
+## Forwarder nodes
 
-import NodeAlertZapierUrl from '@site/static/img/guides/pipelines/node-alert-zapier.png'
+import NodeForwarderHttpZapierUrl from '@site/static/img/guides/pipelines/node-forwarder-http-zapier.png'
 
-Let's assume we have configured an alert named ``zapier`` with the following
-webhook URL:
+Let's assume we have configured a Webhook Forwarder named ``zapier`` with the
+following webhook URL:
 
 ```
 http://example-zapier-webhook.com
@@ -378,7 +378,7 @@ The following are equivalent:
     &rArr;
   </div>
   <div>
-    <img src={NodeAlertZapierUrl} alt="Alert node" />
+    <img src={NodeForwarderHttpZapierUrl} alt="Forwarder node" />
   </div>
 </div>
 
