@@ -1,3592 +1,3611 @@
 {
- "openapi": "3.1.0",
- "info": {
-  "title": "Flowg API"
- },
- "servers": [
-  {
-    "url": "http://localhost:5080"
-  }
- ],
- "paths": {
-  "/api/v1/alerts": {
-   "get": {
-    "tags": [
-     "alerts"
-    ],
-    "summary": "List Alerts",
-    "description": "List alerts",
-    "operationId": "list_alerts",
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiListAlertsResponse"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
+  "openapi": "3.1.0",
+  "info": {
+   "title": "Flowg API"
   },
-  "/api/v1/alerts/{alert}": {
-   "get": {
-    "tags": [
-     "alerts"
-    ],
-    "summary": "Get Alert",
-    "description": "Get alert",
-    "operationId": "get_alert",
-    "parameters": [
-     {
-      "name": "alert",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "minLength": 1,
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "OK",
+  "paths": {
+   "/api/v1/auth/change-password": {
+    "post": {
+     "tags": [
+      "auth"
+     ],
+     "summary": "Change Password",
+     "description": "Change Password of current user",
+     "operationId": "change_password",
+     "requestBody": {
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/ApiGetAlertResponse"
+         "$ref": "#/components/schemas/ApiChangePasswordRequest"
         }
        }
       }
      },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiChangePasswordResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
         }
        }
       }
      },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
       }
-     },
-     "404": {
-      "description": "Not Found",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
+     ]
+    }
    },
-   "put": {
-    "tags": [
-     "alerts"
-    ],
-    "summary": "Save Alert",
-    "description": "Save alert",
-    "operationId": "save_alert",
-    "parameters": [
-     {
-      "name": "alert",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "minLength": 1,
-       "type": "string"
-      }
-     }
-    ],
-    "requestBody": {
-     "content": {
-      "application/json": {
-       "schema": {
-        "$ref": "#/components/schemas/ApiSaveAlertRequest"
-       }
-      }
-     }
-    },
-    "responses": {
-     "200": {
-      "description": "OK",
+   "/api/v1/auth/login": {
+    "post": {
+     "tags": [
+      "auth"
+     ],
+     "summary": "Authenticate",
+     "description": "Create new Session cookie",
+     "operationId": "login",
+     "requestBody": {
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/ApiSaveAlertResponse"
+         "$ref": "#/components/schemas/ApiLoginRequest"
         }
        }
       }
      },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiLoginResponse"
+         }
         }
        }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   },
-   "delete": {
-    "tags": [
-     "alerts"
-    ],
-    "summary": "Delete Alert",
-    "description": "Delete alert",
-    "operationId": "delete_alert",
-    "parameters": [
-     {
-      "name": "alert",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "minLength": 1,
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiDeleteAlertResponse"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/auth/change-password": {
-   "post": {
-    "tags": [
-     "auth"
-    ],
-    "summary": "Change Password",
-    "description": "Change Password of current user",
-    "operationId": "change_password",
-    "requestBody": {
-     "content": {
-      "application/json": {
-       "schema": {
-        "$ref": "#/components/schemas/ApiChangePasswordRequest"
-       }
-      }
-     }
-    },
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiChangePasswordResponse"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/auth/login": {
-   "post": {
-    "tags": [
-     "auth"
-    ],
-    "summary": "Authenticate",
-    "description": "Create new Session cookie",
-    "operationId": "login",
-    "requestBody": {
-     "content": {
-      "application/json": {
-       "schema": {
-        "$ref": "#/components/schemas/ApiLoginRequest"
-       }
-      }
-     }
-    },
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiLoginResponse"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
         }
        }
       }
      }
     }
-   }
-  },
-  "/api/v1/auth/whoami": {
-   "get": {
-    "tags": [
-     "auth"
-    ],
-    "summary": "Fetch current profile",
-    "description": "Fetch the profile of the currently authenticated user",
-    "operationId": "whoami",
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiWhoamiResponse"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/backup/auth": {
-   "get": {
-    "tags": [
-     "backup"
-    ],
-    "summary": "Backup Authentication Database",
-    "description": "Download a full snapshot of the authentication database.",
-    "operationId": "backup_auth",
-    "responses": {
-     "200": {
-      "description": "Binary file",
-      "content": {
-       "application/octet-stream": {
-        "schema": {
-         "format": "Binary file",
-         "type": "string"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/backup/config": {
-   "get": {
-    "tags": [
-     "backup"
-    ],
-    "summary": "Backup Configuration",
-    "description": "Download a full snapshot of the configuration database.",
-    "operationId": "backup_config",
-    "responses": {
-     "200": {
-      "description": "Binary file",
-      "content": {
-       "application/octet-stream": {
-        "schema": {
-         "format": "Binary file",
-         "type": "string"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/backup/logs": {
-   "get": {
-    "tags": [
-     "backup"
-    ],
-    "summary": "Backup Logs Database",
-    "description": "Download a full snapshot of the logs database.",
-    "operationId": "backup_logs",
-    "responses": {
-     "200": {
-      "description": "Binary file",
-      "content": {
-       "application/octet-stream": {
-        "schema": {
-         "format": "Binary file",
-         "type": "string"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/pipelines": {
-   "get": {
-    "tags": [
-     "pipelines"
-    ],
-    "summary": "List Pipelines",
-    "description": "List pipelines",
-    "operationId": "list_pipelines",
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiListPipelinesResponse"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/pipelines/{pipeline}": {
-   "get": {
-    "tags": [
-     "pipelines"
-    ],
-    "summary": "Get Pipeline",
-    "description": "Get pipeline",
-    "operationId": "get_pipeline",
-    "parameters": [
-     {
-      "name": "pipeline",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "minLength": 1,
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiGetPipelineResponse"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "404": {
-      "description": "Not Found",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
    },
-   "put": {
-    "tags": [
-     "pipelines"
-    ],
-    "summary": "Save Pipeline",
-    "description": "Save pipeline",
-    "operationId": "save_pipeline",
-    "parameters": [
-     {
-      "name": "pipeline",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "minLength": 1,
-       "type": "string"
+   "/api/v1/auth/whoami": {
+    "get": {
+     "tags": [
+      "auth"
+     ],
+     "summary": "Fetch current profile",
+     "description": "Fetch the profile of the currently authenticated user",
+     "operationId": "whoami",
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiWhoamiResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
       }
-     }
-    ],
-    "requestBody": {
-     "content": {
-      "application/json": {
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    }
+   },
+   "/api/v1/backup/auth": {
+    "get": {
+     "tags": [
+      "backup"
+     ],
+     "summary": "Backup Authentication Database",
+     "description": "Download a full snapshot of the authentication database.",
+     "operationId": "backup_auth",
+     "responses": {
+      "200": {
+       "description": "Binary file",
+       "content": {
+        "application/octet-stream": {
+         "schema": {
+          "format": "Binary file",
+          "type": "string"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    }
+   },
+   "/api/v1/backup/config": {
+    "get": {
+     "tags": [
+      "backup"
+     ],
+     "summary": "Backup Configuration",
+     "description": "Download a full snapshot of the configuration database.",
+     "operationId": "backup_config",
+     "responses": {
+      "200": {
+       "description": "Binary file",
+       "content": {
+        "application/octet-stream": {
+         "schema": {
+          "format": "Binary file",
+          "type": "string"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    }
+   },
+   "/api/v1/backup/logs": {
+    "get": {
+     "tags": [
+      "backup"
+     ],
+     "summary": "Backup Logs Database",
+     "description": "Download a full snapshot of the logs database.",
+     "operationId": "backup_logs",
+     "responses": {
+      "200": {
+       "description": "Binary file",
+       "content": {
+        "application/octet-stream": {
+         "schema": {
+          "format": "Binary file",
+          "type": "string"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    }
+   },
+   "/api/v1/forwarders": {
+    "get": {
+     "tags": [
+      "forwarders"
+     ],
+     "summary": "List Forwarders",
+     "description": "List forwarders",
+     "operationId": "list_forwarders",
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiListForwardersResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    }
+   },
+   "/api/v1/forwarders/{forwarder}": {
+    "get": {
+     "tags": [
+      "forwarders"
+     ],
+     "summary": "Get Forwarder",
+     "description": "Get forwarder",
+     "operationId": "get_forwarder",
+     "parameters": [
+      {
+       "name": "forwarder",
+       "in": "path",
+       "required": true,
        "schema": {
-        "$ref": "#/components/schemas/ApiSavePipelineRequest"
+        "minLength": 1,
+        "type": "string"
        }
       }
-     }
+     ],
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiGetForwarderResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "404": {
+       "description": "Not Found",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
     },
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiSavePipelineResponse"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   },
-   "delete": {
-    "tags": [
-     "pipelines"
-    ],
-    "summary": "Delete Pipeline",
-    "description": "Delete pipeline",
-    "operationId": "delete_pipeline",
-    "parameters": [
-     {
-      "name": "pipeline",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "minLength": 1,
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiDeletePipelineResponse"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/pipelines/{pipeline}/logs": {
-   "post": {
-    "tags": [
-     "pipelines"
-    ],
-    "summary": "Ingest Log",
-    "description": "Run log record through a pipeline",
-    "operationId": "ingest_log",
-    "parameters": [
-     {
-      "name": "pipeline",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "minLength": 1,
-       "type": "string"
-      }
-     }
-    ],
-    "requestBody": {
-     "content": {
-      "application/json": {
+    "put": {
+     "tags": [
+      "forwarders"
+     ],
+     "summary": "Save Forwarder",
+     "description": "Save forwarder",
+     "operationId": "save_forwarder",
+     "parameters": [
+      {
+       "name": "forwarder",
+       "in": "path",
+       "required": true,
        "schema": {
-        "$ref": "#/components/schemas/ApiIngestLogRequest"
+        "minLength": 1,
+        "type": "string"
        }
       }
-     }
+     ],
+     "requestBody": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ApiSaveForwarderRequest"
+        }
+       }
+      }
+     },
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiSaveForwarderResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
     },
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiIngestLogResponse"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/restore/auth": {
-   "post": {
-    "tags": [
-     "backup"
-    ],
-    "summary": "Restore Authentication Database",
-    "description": "Upload a full snapshot of the authentication database.",
-    "operationId": "restore_auth",
-    "requestBody": {
-     "content": {
-      "multipart/form-data": {
+    "delete": {
+     "tags": [
+      "forwarders"
+     ],
+     "summary": "Delete Forwarder",
+     "description": "Delete forwarder",
+     "operationId": "delete_forwarder",
+     "parameters": [
+      {
+       "name": "forwarder",
+       "in": "path",
+       "required": true,
        "schema": {
-        "$ref": "#/components/schemas/FormDataApiRestoreAuthRequest"
+        "minLength": 1,
+        "type": "string"
        }
       }
-     }
-    },
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiRestoreAuthResponse"
+     ],
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiDeleteForwarderResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
         }
        }
       }
      },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    }
+   },
+   "/api/v1/pipelines": {
+    "get": {
+     "tags": [
+      "pipelines"
+     ],
+     "summary": "List Pipelines",
+     "description": "List pipelines",
+     "operationId": "list_pipelines",
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiListPipelinesResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
         }
        }
       }
      },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
       }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/restore/config": {
-   "post": {
-    "tags": [
-     "backup"
-    ],
-    "summary": "Restore Configuration",
-    "description": "Upload a full snapshot of the configuration database.",
-    "operationId": "restore_config",
-    "requestBody": {
-     "content": {
-      "multipart/form-data": {
+     ]
+    }
+   },
+   "/api/v1/pipelines/{pipeline}": {
+    "get": {
+     "tags": [
+      "pipelines"
+     ],
+     "summary": "Get Pipeline",
+     "description": "Get pipeline",
+     "operationId": "get_pipeline",
+     "parameters": [
+      {
+       "name": "pipeline",
+       "in": "path",
+       "required": true,
        "schema": {
-        "$ref": "#/components/schemas/FormDataApiRestoreConfigRequest"
+        "minLength": 1,
+        "type": "string"
        }
       }
-     }
+     ],
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiGetPipelineResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "404": {
+       "description": "Not Found",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
     },
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiRestoreConfigResponse"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/restore/logs": {
-   "post": {
-    "tags": [
-     "backup"
-    ],
-    "summary": "Restore Logs Database",
-    "description": "Upload a full snapshot of the logs database.",
-    "operationId": "restore_logs",
-    "requestBody": {
-     "content": {
-      "multipart/form-data": {
+    "put": {
+     "tags": [
+      "pipelines"
+     ],
+     "summary": "Save Pipeline",
+     "description": "Save pipeline",
+     "operationId": "save_pipeline",
+     "parameters": [
+      {
+       "name": "pipeline",
+       "in": "path",
+       "required": true,
        "schema": {
-        "$ref": "#/components/schemas/FormDataApiRestoreLogsRequest"
+        "minLength": 1,
+        "type": "string"
        }
       }
-     }
+     ],
+     "requestBody": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ApiSavePipelineRequest"
+        }
+       }
+      }
+     },
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiSavePipelineResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
     },
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiRestoreLogsResponse"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/roles": {
-   "get": {
-    "tags": [
-     "acls"
-    ],
-    "summary": "List Roles",
-    "description": "List known roles",
-    "operationId": "list_roles",
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiListRolesResponse"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/roles/{role}": {
-   "put": {
-    "tags": [
-     "acls"
-    ],
-    "summary": "Save Role",
-    "description": "Save Role",
-    "operationId": "save_role",
-    "parameters": [
-     {
-      "name": "role",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "minLength": 1,
-       "type": "string"
-      }
-     }
-    ],
-    "requestBody": {
-     "content": {
-      "application/json": {
+    "delete": {
+     "tags": [
+      "pipelines"
+     ],
+     "summary": "Delete Pipeline",
+     "description": "Delete pipeline",
+     "operationId": "delete_pipeline",
+     "parameters": [
+      {
+       "name": "pipeline",
+       "in": "path",
+       "required": true,
        "schema": {
-        "$ref": "#/components/schemas/ApiSaveRoleRequest"
+        "minLength": 1,
+        "type": "string"
        }
       }
-     }
-    },
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiSaveRoleResponse"
+     ],
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiDeletePipelineResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
         }
        }
       }
      },
-     "400": {
-      "description": "Bad Request",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
       }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
+     ]
+    }
    },
-   "delete": {
-    "tags": [
-     "acls"
-    ],
-    "summary": "Delete Role",
-    "description": "Delete Role",
-    "operationId": "delete_role",
-    "parameters": [
-     {
-      "name": "role",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "minLength": 1,
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiDeleteRoleResponse"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/streams": {
-   "get": {
-    "tags": [
-     "streams"
-    ],
-    "summary": "List Streams",
-    "description": "List known stream",
-    "operationId": "list_streams",
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiListStreamsResponse"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/streams/{stream}": {
-   "get": {
-    "tags": [
-     "streams"
-    ],
-    "summary": "Get Stream Configuration",
-    "description": "Get or Create Stream configuration",
-    "operationId": "get_stream",
-    "parameters": [
-     {
-      "name": "stream",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "minLength": 1,
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiGetStreamResponse"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   },
-   "put": {
-    "tags": [
-     "streams"
-    ],
-    "summary": "Configure Stream",
-    "description": "Configure Stream retention and indexes",
-    "operationId": "configure_stream",
-    "parameters": [
-     {
-      "name": "stream",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "minLength": 1,
-       "type": "string"
-      }
-     }
-    ],
-    "requestBody": {
-     "content": {
-      "application/json": {
+   "/api/v1/pipelines/{pipeline}/logs": {
+    "post": {
+     "tags": [
+      "pipelines"
+     ],
+     "summary": "Ingest Log",
+     "description": "Run log record through a pipeline",
+     "operationId": "ingest_log",
+     "parameters": [
+      {
+       "name": "pipeline",
+       "in": "path",
+       "required": true,
        "schema": {
-        "$ref": "#/components/schemas/ApiConfigureStreamRequest"
+        "minLength": 1,
+        "type": "string"
        }
       }
-     }
-    },
-    "responses": {
-     "200": {
-      "description": "OK",
+     ],
+     "requestBody": {
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/ApiConfigureStreamResponse"
+         "$ref": "#/components/schemas/ApiIngestLogRequest"
         }
        }
       }
      },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiIngestLogResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
         }
        }
       }
      },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
       }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
+     ]
+    }
    },
-   "delete": {
-    "tags": [
-     "streams"
-    ],
-    "summary": "Purge Stream",
-    "description": "Remove all logs (and indexes) related to a stream",
-    "operationId": "purge_stream",
-    "parameters": [
-     {
-      "name": "stream",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "minLength": 1,
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "OK",
+   "/api/v1/restore/auth": {
+    "post": {
+     "tags": [
+      "backup"
+     ],
+     "summary": "Restore Authentication Database",
+     "description": "Upload a full snapshot of the authentication database.",
+     "operationId": "restore_auth",
+     "requestBody": {
       "content": {
-       "application/json": {
+       "multipart/form-data": {
         "schema": {
-         "$ref": "#/components/schemas/ApiPurgeStreamResponse"
+         "$ref": "#/components/schemas/FormDataApiRestoreAuthRequest"
         }
        }
       }
      },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiRestoreAuthResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
         }
        }
       }
      },
-     "403": {
-      "description": "Forbidden",
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    }
+   },
+   "/api/v1/restore/config": {
+    "post": {
+     "tags": [
+      "backup"
+     ],
+     "summary": "Restore Configuration",
+     "description": "Upload a full snapshot of the configuration database.",
+     "operationId": "restore_config",
+     "requestBody": {
       "content": {
-       "application/json": {
+       "multipart/form-data": {
         "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
+         "$ref": "#/components/schemas/FormDataApiRestoreConfigRequest"
         }
        }
       }
      },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiRestoreConfigResponse"
+         }
         }
        }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/streams/{stream}/fields": {
-   "get": {
-    "tags": [
-     "streams"
-    ],
-    "summary": "List Stream Fields",
-    "description": "List known fields for a stream",
-    "operationId": "list_stream_fields",
-    "parameters": [
-     {
-      "name": "stream",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "minLength": 1,
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiListStreamFieldsResponse"
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
         }
        }
       }
      },
-     "401": {
-      "description": "Unauthorized",
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    }
+   },
+   "/api/v1/restore/logs": {
+    "post": {
+     "tags": [
+      "backup"
+     ],
+     "summary": "Restore Logs Database",
+     "description": "Upload a full snapshot of the logs database.",
+     "operationId": "restore_logs",
+     "requestBody": {
       "content": {
-       "application/json": {
+       "multipart/form-data": {
         "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
+         "$ref": "#/components/schemas/FormDataApiRestoreLogsRequest"
         }
        }
       }
      },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiRestoreLogsResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
         }
        }
       }
      },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    }
+   },
+   "/api/v1/roles": {
+    "get": {
+     "tags": [
+      "acls"
+     ],
+     "summary": "List Roles",
+     "description": "List known roles",
+     "operationId": "list_roles",
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiListRolesResponse"
+         }
         }
        }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/streams/{stream}/logs": {
-   "get": {
-    "tags": [
-     "streams"
-    ],
-    "summary": "Query Stream",
-    "description": "Query logs from a stream",
-    "operationId": "query_stream",
-    "parameters": [
-     {
-      "name": "from",
-      "in": "query",
-      "required": true,
-      "schema": {
-       "format": "date-time",
-       "type": "string"
-      }
-     },
-     {
-      "name": "to",
-      "in": "query",
-      "required": true,
-      "schema": {
-       "format": "date-time",
-       "type": "string"
-      }
-     },
-     {
-      "name": "filter",
-      "in": "query",
-      "schema": {
-       "type": [
-        "null",
-        "string"
-       ]
-      }
-     },
-     {
-      "name": "stream",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "minLength": 1,
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiQueryStreamResponse"
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
         }
        }
       }
      },
-     "400": {
-      "description": "Bad Request",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
       }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/streams/{stream}/logs/watch": {
-   "get": {
-    "tags": [
-     "streams"
-    ],
-    "summary": "Watch Logs",
-    "description": "Server-Sent Events endpoint to watch logs in real time.",
-    "operationId": "watch_logs",
-    "parameters": [
-     {
-      "name": "filter",
-      "in": "query",
-      "schema": {
-       "type": [
-        "null",
-        "string"
-       ]
-      }
-     },
-     {
-      "name": "stream",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "minLength": 1,
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "Stream of log entries",
-      "content": {
-       "text/event-stream": {
-        "schema": {
-         "format": "Server-Sent Events",
-         "type": "string"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/test/alerts/{alert}": {
-   "post": {
-    "tags": [
-     "tests"
-    ],
-    "summary": "Test Alert",
-    "description": "Test alert",
-    "operationId": "test_alert",
-    "parameters": [
-     {
-      "name": "alert",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "minLength": 1,
-       "type": "string"
-      }
-     }
-    ],
-    "requestBody": {
-     "content": {
-      "application/json": {
+     ]
+    }
+   },
+   "/api/v1/roles/{role}": {
+    "put": {
+     "tags": [
+      "acls"
+     ],
+     "summary": "Save Role",
+     "description": "Save Role",
+     "operationId": "save_role",
+     "parameters": [
+      {
+       "name": "role",
+       "in": "path",
+       "required": true,
        "schema": {
-        "$ref": "#/components/schemas/ApiTestAlertRequest"
+        "minLength": 1,
+        "type": "string"
        }
       }
-     }
+     ],
+     "requestBody": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ApiSaveRoleRequest"
+        }
+       }
+      }
+     },
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiSaveRoleResponse"
+         }
+        }
+       }
+      },
+      "400": {
+       "description": "Bad Request",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
     },
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiTestAlertResponse"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "404": {
-      "description": "Not Found",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/test/transformer": {
-   "post": {
-    "tags": [
-     "tests"
-    ],
-    "summary": "Test Transformer",
-    "description": "Test Transformer",
-    "operationId": "test_transformer",
-    "requestBody": {
-     "content": {
-      "application/json": {
+    "delete": {
+     "tags": [
+      "acls"
+     ],
+     "summary": "Delete Role",
+     "description": "Delete Role",
+     "operationId": "delete_role",
+     "parameters": [
+      {
+       "name": "role",
+       "in": "path",
+       "required": true,
        "schema": {
-        "$ref": "#/components/schemas/ApiTestTransformerRequest"
+        "minLength": 1,
+        "type": "string"
        }
       }
-     }
-    },
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiTestTransformerResponse"
+     ],
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiDeleteRoleResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
         }
        }
       }
      },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
       }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/token": {
-   "post": {
-    "tags": [
-     "acls"
-    ],
-    "summary": "Create Token",
-    "description": "Create a new Personal Access Token for the current user",
-    "operationId": "create_token",
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiCreateTokenResponse"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "404": {
-      "description": "Not Found",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/tokens": {
-   "get": {
-    "tags": [
-     "acls"
-    ],
-    "summary": "List Tokens",
-    "description": "List Personal Access Token UUIDs for the current user",
-    "operationId": "list_tokens",
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiListTokensResponse"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/tokens/{token-uuid}": {
-   "delete": {
-    "tags": [
-     "acls"
-    ],
-    "summary": "Delete Token",
-    "description": "Delete Personal Access Token UUIDs for the current user",
-    "operationId": "delete_token",
-    "parameters": [
-     {
-      "name": "token-uuid",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "format": "uuid",
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiDeleteTokenResponse"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/transformers": {
-   "get": {
-    "tags": [
-     "transformers"
-    ],
-    "summary": "List Transformers",
-    "description": "List Transformers",
-    "operationId": "list_transformers",
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiListTransformersResponse"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/transformers/{transformer}": {
-   "get": {
-    "tags": [
-     "transformers"
-    ],
-    "summary": "Get Transformer",
-    "description": "Get Transformer",
-    "operationId": "get_transformer",
-    "parameters": [
-     {
-      "name": "transformer",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "minLength": 1,
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiGetTransformerResponse"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "404": {
-      "description": "Not Found",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
+     ]
+    }
    },
-   "put": {
-    "tags": [
-     "transformers"
-    ],
-    "summary": "Save Transformer",
-    "description": "Save Transformer",
-    "operationId": "save_transformer",
-    "parameters": [
-     {
-      "name": "transformer",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "minLength": 1,
-       "type": "string"
+   "/api/v1/streams": {
+    "get": {
+     "tags": [
+      "streams"
+     ],
+     "summary": "List Streams",
+     "description": "List known stream",
+     "operationId": "list_streams",
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiListStreamsResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
       }
-     }
-    ],
-    "requestBody": {
-     "content": {
-      "application/json": {
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    }
+   },
+   "/api/v1/streams/{stream}": {
+    "get": {
+     "tags": [
+      "streams"
+     ],
+     "summary": "Get Stream Configuration",
+     "description": "Get or Create Stream configuration",
+     "operationId": "get_stream",
+     "parameters": [
+      {
+       "name": "stream",
+       "in": "path",
+       "required": true,
        "schema": {
-        "$ref": "#/components/schemas/ApiSaveTransformerRequest"
+        "minLength": 1,
+        "type": "string"
        }
       }
-     }
+     ],
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiGetStreamResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
     },
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiSaveTransformerResponse"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   },
-   "delete": {
-    "tags": [
-     "transformers"
-    ],
-    "summary": "Delete Transformer",
-    "description": "Delete Transformer",
-    "operationId": "delete_transformer",
-    "parameters": [
-     {
-      "name": "transformer",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "minLength": 1,
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiDeleteTransformerResponse"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/users": {
-   "get": {
-    "tags": [
-     "acls"
-    ],
-    "summary": "List Users",
-    "description": "List known users",
-    "operationId": "list_users",
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiListUsersResponse"
-        }
-       }
-      }
-     },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
-   }
-  },
-  "/api/v1/users/{user}": {
-   "put": {
-    "tags": [
-     "acls"
-    ],
-    "summary": "Save User",
-    "description": "Save User",
-    "operationId": "save_user",
-    "parameters": [
-     {
-      "name": "user",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "minLength": 1,
-       "type": "string"
-      }
-     }
-    ],
-    "requestBody": {
-     "content": {
-      "application/json": {
+    "put": {
+     "tags": [
+      "streams"
+     ],
+     "summary": "Configure Stream",
+     "description": "Configure Stream retention and indexes",
+     "operationId": "configure_stream",
+     "parameters": [
+      {
+       "name": "stream",
+       "in": "path",
+       "required": true,
        "schema": {
-        "$ref": "#/components/schemas/ApiSaveUserRequest"
+        "minLength": 1,
+        "type": "string"
        }
       }
-     }
+     ],
+     "requestBody": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ApiConfigureStreamRequest"
+        }
+       }
+      }
+     },
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiConfigureStreamResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
     },
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiSaveUserResponse"
+    "delete": {
+     "tags": [
+      "streams"
+     ],
+     "summary": "Purge Stream",
+     "description": "Remove all logs (and indexes) related to a stream",
+     "operationId": "purge_stream",
+     "parameters": [
+      {
+       "name": "stream",
+       "in": "path",
+       "required": true,
+       "schema": {
+        "minLength": 1,
+        "type": "string"
+       }
+      }
+     ],
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiPurgeStreamResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
         }
        }
       }
      },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
       }
-     },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
-        }
-       }
-      }
-     }
-    },
-    "security": [
-     {
-      "jwtAuth": []
-     },
-     {
-      "patAuth": []
-     }
-    ]
+     ]
+    }
    },
-   "delete": {
-    "tags": [
-     "acls"
-    ],
-    "summary": "Delete User",
-    "description": "Delete User",
-    "operationId": "delete_user",
-    "parameters": [
-     {
-      "name": "user",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "minLength": 1,
-       "type": "string"
+   "/api/v1/streams/{stream}/fields": {
+    "get": {
+     "tags": [
+      "streams"
+     ],
+     "summary": "List Stream Fields",
+     "description": "List known fields for a stream",
+     "operationId": "list_stream_fields",
+     "parameters": [
+      {
+       "name": "stream",
+       "in": "path",
+       "required": true,
+       "schema": {
+        "minLength": 1,
+        "type": "string"
+       }
       }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ApiDeleteUserResponse"
+     ],
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiListStreamFieldsResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
         }
        }
       }
      },
-     "401": {
-      "description": "Unauthorized",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    }
+   },
+   "/api/v1/streams/{stream}/logs": {
+    "get": {
+     "tags": [
+      "streams"
+     ],
+     "summary": "Query Stream",
+     "description": "Query logs from a stream",
+     "operationId": "query_stream",
+     "parameters": [
+      {
+       "name": "from",
+       "in": "query",
+       "required": true,
+       "schema": {
+        "format": "date-time",
+        "type": "string"
+       }
+      },
+      {
+       "name": "to",
+       "in": "query",
+       "required": true,
+       "schema": {
+        "format": "date-time",
+        "type": "string"
+       }
+      },
+      {
+       "name": "filter",
+       "in": "query",
+       "schema": {
+        "type": [
+         "null",
+         "string"
+        ]
+       }
+      },
+      {
+       "name": "stream",
+       "in": "path",
+       "required": true,
+       "schema": {
+        "minLength": 1,
+        "type": "string"
+       }
+      }
+     ],
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiQueryStreamResponse"
+         }
+        }
+       }
+      },
+      "400": {
+       "description": "Bad Request",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
         }
        }
       }
      },
-     "403": {
-      "description": "Forbidden",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    }
+   },
+   "/api/v1/streams/{stream}/logs/watch": {
+    "get": {
+     "tags": [
+      "streams"
+     ],
+     "summary": "Watch Logs",
+     "description": "Server-Sent Events endpoint to watch logs in real time.",
+     "operationId": "watch_logs",
+     "parameters": [
+      {
+       "name": "filter",
+       "in": "query",
+       "schema": {
+        "type": [
+         "null",
+         "string"
+        ]
+       }
+      },
+      {
+       "name": "stream",
+       "in": "path",
+       "required": true,
+       "schema": {
+        "minLength": 1,
+        "type": "string"
+       }
+      }
+     ],
+     "responses": {
+      "200": {
+       "description": "Stream of log entries",
+       "content": {
+        "text/event-stream": {
+         "schema": {
+          "format": "Server-Sent Events",
+          "type": "string"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
         }
        }
       }
      },
-     "500": {
-      "description": "Internal Server Error",
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    }
+   },
+   "/api/v1/test/forwarders/{forwarder}": {
+    "post": {
+     "tags": [
+      "tests"
+     ],
+     "summary": "Test Forwarder",
+     "description": "Test forwarder",
+     "operationId": "test_forwarder",
+     "parameters": [
+      {
+       "name": "forwarder",
+       "in": "path",
+       "required": true,
+       "schema": {
+        "minLength": 1,
+        "type": "string"
+       }
+      }
+     ],
+     "requestBody": {
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/RestErrResponse"
+         "$ref": "#/components/schemas/ApiTestForwarderRequest"
         }
        }
       }
-     }
+     },
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiTestForwarderResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "404": {
+       "description": "Not Found",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    }
+   },
+   "/api/v1/test/transformer": {
+    "post": {
+     "tags": [
+      "tests"
+     ],
+     "summary": "Test Transformer",
+     "description": "Test Transformer",
+     "operationId": "test_transformer",
+     "requestBody": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ApiTestTransformerRequest"
+        }
+       }
+      }
+     },
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiTestTransformerResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    }
+   },
+   "/api/v1/token": {
+    "post": {
+     "tags": [
+      "acls"
+     ],
+     "summary": "Create Token",
+     "description": "Create a new Personal Access Token for the current user",
+     "operationId": "create_token",
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiCreateTokenResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "404": {
+       "description": "Not Found",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    }
+   },
+   "/api/v1/tokens": {
+    "get": {
+     "tags": [
+      "acls"
+     ],
+     "summary": "List Tokens",
+     "description": "List Personal Access Token UUIDs for the current user",
+     "operationId": "list_tokens",
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiListTokensResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    }
+   },
+   "/api/v1/tokens/{token-uuid}": {
+    "delete": {
+     "tags": [
+      "acls"
+     ],
+     "summary": "Delete Token",
+     "description": "Delete Personal Access Token UUIDs for the current user",
+     "operationId": "delete_token",
+     "parameters": [
+      {
+       "name": "token-uuid",
+       "in": "path",
+       "required": true,
+       "schema": {
+        "format": "uuid",
+        "type": "string"
+       }
+      }
+     ],
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiDeleteTokenResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    }
+   },
+   "/api/v1/transformers": {
+    "get": {
+     "tags": [
+      "transformers"
+     ],
+     "summary": "List Transformers",
+     "description": "List Transformers",
+     "operationId": "list_transformers",
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiListTransformersResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    }
+   },
+   "/api/v1/transformers/{transformer}": {
+    "get": {
+     "tags": [
+      "transformers"
+     ],
+     "summary": "Get Transformer",
+     "description": "Get Transformer",
+     "operationId": "get_transformer",
+     "parameters": [
+      {
+       "name": "transformer",
+       "in": "path",
+       "required": true,
+       "schema": {
+        "minLength": 1,
+        "type": "string"
+       }
+      }
+     ],
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiGetTransformerResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "404": {
+       "description": "Not Found",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
     },
-    "security": [
-     {
-      "jwtAuth": []
+    "put": {
+     "tags": [
+      "transformers"
+     ],
+     "summary": "Save Transformer",
+     "description": "Save Transformer",
+     "operationId": "save_transformer",
+     "parameters": [
+      {
+       "name": "transformer",
+       "in": "path",
+       "required": true,
+       "schema": {
+        "minLength": 1,
+        "type": "string"
+       }
+      }
+     ],
+     "requestBody": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ApiSaveTransformerRequest"
+        }
+       }
+      }
      },
-     {
-      "patAuth": []
-     }
-    ]
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiSaveTransformerResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    },
+    "delete": {
+     "tags": [
+      "transformers"
+     ],
+     "summary": "Delete Transformer",
+     "description": "Delete Transformer",
+     "operationId": "delete_transformer",
+     "parameters": [
+      {
+       "name": "transformer",
+       "in": "path",
+       "required": true,
+       "schema": {
+        "minLength": 1,
+        "type": "string"
+       }
+      }
+     ],
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiDeleteTransformerResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    }
+   },
+   "/api/v1/users": {
+    "get": {
+     "tags": [
+      "acls"
+     ],
+     "summary": "List Users",
+     "description": "List known users",
+     "operationId": "list_users",
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiListUsersResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    }
+   },
+   "/api/v1/users/{user}": {
+    "put": {
+     "tags": [
+      "acls"
+     ],
+     "summary": "Save User",
+     "description": "Save User",
+     "operationId": "save_user",
+     "parameters": [
+      {
+       "name": "user",
+       "in": "path",
+       "required": true,
+       "schema": {
+        "minLength": 1,
+        "type": "string"
+       }
+      }
+     ],
+     "requestBody": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ApiSaveUserRequest"
+        }
+       }
+      }
+     },
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiSaveUserResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    },
+    "delete": {
+     "tags": [
+      "acls"
+     ],
+     "summary": "Delete User",
+     "description": "Delete User",
+     "operationId": "delete_user",
+     "parameters": [
+      {
+       "name": "user",
+       "in": "path",
+       "required": true,
+       "schema": {
+        "minLength": 1,
+        "type": "string"
+       }
+      }
+     ],
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiDeleteUserResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    }
    }
-  }
- },
- "components": {
-  "schemas": {
-   "ApiChangePasswordRequest": {
-    "properties": {
-     "new_password": {
-      "type": "string"
-     },
-     "old_password": {
-      "type": "string"
-     }
-    },
-    "type": "object"
-   },
-   "ApiChangePasswordResponse": {
-    "properties": {
-     "success": {
-      "type": "boolean"
-     }
-    },
-    "type": "object"
-   },
-   "ApiConfigureStreamRequest": {
-    "properties": {
-     "config": {
-      "$ref": "#/components/schemas/ModelsStreamConfig"
-     }
-    },
-    "type": "object"
-   },
-   "ApiConfigureStreamResponse": {
-    "properties": {
-     "success": {
-      "type": "boolean"
-     }
-    },
-    "type": "object"
-   },
-   "ApiCreateTokenResponse": {
-    "properties": {
-     "success": {
-      "type": "boolean"
-     },
-     "token": {
-      "type": "string"
-     },
-     "token_uuid": {
-      "type": "string"
-     }
-    },
-    "type": "object"
-   },
-   "ApiDeleteAlertResponse": {
-    "properties": {
-     "success": {
-      "type": "boolean"
-     }
-    },
-    "type": "object"
-   },
-   "ApiDeletePipelineResponse": {
-    "properties": {
-     "success": {
-      "type": "boolean"
-     }
-    },
-    "type": "object"
-   },
-   "ApiDeleteRoleResponse": {
-    "properties": {
-     "success": {
-      "type": "boolean"
-     }
-    },
-    "type": "object"
-   },
-   "ApiDeleteTokenResponse": {
-    "properties": {
-     "success": {
-      "type": "boolean"
-     }
-    },
-    "type": "object"
-   },
-   "ApiDeleteTransformerResponse": {
-    "properties": {
-     "success": {
-      "type": "boolean"
-     }
-    },
-    "type": "object"
-   },
-   "ApiDeleteUserResponse": {
-    "properties": {
-     "success": {
-      "type": "boolean"
-     }
-    },
-    "type": "object"
-   },
-   "ApiGetAlertResponse": {
-    "properties": {
-     "success": {
-      "type": "boolean"
-     },
-     "webhook": {
-      "$ref": "#/components/schemas/ModelsWebhookV1"
-     }
-    },
-    "type": "object"
-   },
-   "ApiGetPipelineResponse": {
-    "properties": {
-     "flow": {
-      "$ref": "#/components/schemas/ModelsFlowGraphV1"
-     },
-     "success": {
-      "type": "boolean"
-     }
-    },
-    "type": "object"
-   },
-   "ApiGetStreamResponse": {
-    "properties": {
-     "config": {
-      "$ref": "#/components/schemas/ModelsStreamConfig"
-     },
-     "success": {
-      "type": "boolean"
-     }
-    },
-    "type": "object"
-   },
-   "ApiGetTransformerResponse": {
-    "properties": {
-     "script": {
-      "type": "string"
-     },
-     "success": {
-      "type": "boolean"
-     }
-    },
-    "type": "object"
-   },
-   "ApiIngestLogRequest": {
-    "properties": {
-     "record": {
-      "additionalProperties": {
+  },
+  "components": {
+   "schemas": {
+    "ApiChangePasswordRequest": {
+     "properties": {
+      "new_password": {
        "type": "string"
       },
-      "type": [
-       "object",
-       "null"
-      ]
-     }
+      "old_password": {
+       "type": "string"
+      }
+     },
+     "type": "object"
     },
-    "type": "object"
-   },
-   "ApiIngestLogResponse": {
-    "properties": {
-     "success": {
-      "type": "boolean"
-     }
+    "ApiChangePasswordResponse": {
+     "properties": {
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
     },
-    "type": "object"
-   },
-   "ApiListAlertsResponse": {
-    "properties": {
-     "alerts": {
-      "items": {
+    "ApiConfigureStreamRequest": {
+     "properties": {
+      "config": {
+       "$ref": "#/components/schemas/ModelsStreamConfig"
+      }
+     },
+     "type": "object"
+    },
+    "ApiConfigureStreamResponse": {
+     "properties": {
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiCreateTokenResponse": {
+     "properties": {
+      "success": {
+       "type": "boolean"
+      },
+      "token": {
        "type": "string"
       },
-      "type": [
-       "array",
-       "null"
-      ]
-     },
-     "success": {
-      "type": "boolean"
-     }
-    },
-    "type": "object"
-   },
-   "ApiListPipelinesResponse": {
-    "properties": {
-     "pipelines": {
-      "items": {
+      "token_uuid": {
        "type": "string"
-      },
-      "type": [
-       "array",
-       "null"
-      ]
+      }
      },
-     "success": {
-      "type": "boolean"
-     }
+     "type": "object"
     },
-    "type": "object"
-   },
-   "ApiListRolesResponse": {
-    "properties": {
-     "roles": {
-      "items": {
-       "$ref": "#/components/schemas/ModelsRole"
-      },
-      "type": [
-       "array",
-       "null"
-      ]
+    "ApiDeleteForwarderResponse": {
+     "properties": {
+      "success": {
+       "type": "boolean"
+      }
      },
-     "success": {
-      "type": "boolean"
-     }
+     "type": "object"
     },
-    "type": "object"
-   },
-   "ApiListStreamFieldsResponse": {
-    "properties": {
-     "fields": {
-      "items": {
-       "type": "string"
-      },
-      "type": [
-       "array",
-       "null"
-      ]
+    "ApiDeletePipelineResponse": {
+     "properties": {
+      "success": {
+       "type": "boolean"
+      }
      },
-     "success": {
-      "type": "boolean"
-     }
+     "type": "object"
     },
-    "type": "object"
-   },
-   "ApiListStreamsResponse": {
-    "properties": {
-     "streams": {
-      "additionalProperties": {
+    "ApiDeleteRoleResponse": {
+     "properties": {
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiDeleteTokenResponse": {
+     "properties": {
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiDeleteTransformerResponse": {
+     "properties": {
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiDeleteUserResponse": {
+     "properties": {
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiGetForwarderResponse": {
+     "properties": {
+      "forwarder": {
+       "$ref": "#/components/schemas/ModelsForwarderV2"
+      },
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiGetPipelineResponse": {
+     "properties": {
+      "flow": {
+       "$ref": "#/components/schemas/ModelsFlowGraphV2"
+      },
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiGetStreamResponse": {
+     "properties": {
+      "config": {
        "$ref": "#/components/schemas/ModelsStreamConfig"
       },
-      "type": [
-       "object",
-       "null"
-      ]
+      "success": {
+       "type": "boolean"
+      }
      },
-     "success": {
-      "type": "boolean"
-     }
+     "type": "object"
     },
-    "type": "object"
-   },
-   "ApiListTokensResponse": {
-    "properties": {
-     "success": {
-      "type": "boolean"
-     },
-     "token_uuids": {
-      "items": {
+    "ApiGetTransformerResponse": {
+     "properties": {
+      "script": {
        "type": "string"
       },
-      "type": [
-       "array",
-       "null"
-      ]
-     }
-    },
-    "type": "object"
-   },
-   "ApiListTransformersResponse": {
-    "properties": {
-     "success": {
-      "type": "boolean"
+      "success": {
+       "type": "boolean"
+      }
      },
-     "transformers": {
-      "items": {
+     "type": "object"
+    },
+    "ApiIngestLogRequest": {
+     "properties": {
+      "record": {
+       "additionalProperties": {
+        "type": "string"
+       },
+       "type": [
+        "object",
+        "null"
+       ]
+      }
+     },
+     "type": "object"
+    },
+    "ApiIngestLogResponse": {
+     "properties": {
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiListForwardersResponse": {
+     "properties": {
+      "forwarders": {
+       "items": {
+        "type": "string"
+       },
+       "type": [
+        "array",
+        "null"
+       ]
+      },
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiListPipelinesResponse": {
+     "properties": {
+      "pipelines": {
+       "items": {
+        "type": "string"
+       },
+       "type": [
+        "array",
+        "null"
+       ]
+      },
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiListRolesResponse": {
+     "properties": {
+      "roles": {
+       "items": {
+        "$ref": "#/components/schemas/ModelsRole"
+       },
+       "type": [
+        "array",
+        "null"
+       ]
+      },
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiListStreamFieldsResponse": {
+     "properties": {
+      "fields": {
+       "items": {
+        "type": "string"
+       },
+       "type": [
+        "array",
+        "null"
+       ]
+      },
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiListStreamsResponse": {
+     "properties": {
+      "streams": {
+       "additionalProperties": {
+        "$ref": "#/components/schemas/ModelsStreamConfig"
+       },
+       "type": [
+        "object",
+        "null"
+       ]
+      },
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiListTokensResponse": {
+     "properties": {
+      "success": {
+       "type": "boolean"
+      },
+      "token_uuids": {
+       "items": {
+        "type": "string"
+       },
+       "type": [
+        "array",
+        "null"
+       ]
+      }
+     },
+     "type": "object"
+    },
+    "ApiListTransformersResponse": {
+     "properties": {
+      "success": {
+       "type": "boolean"
+      },
+      "transformers": {
+       "items": {
+        "type": "string"
+       },
+       "type": [
+        "array",
+        "null"
+       ]
+      }
+     },
+     "type": "object"
+    },
+    "ApiListUsersResponse": {
+     "properties": {
+      "success": {
+       "type": "boolean"
+      },
+      "users": {
+       "items": {
+        "$ref": "#/components/schemas/ModelsUser"
+       },
+       "type": [
+        "array",
+        "null"
+       ]
+      }
+     },
+     "type": "object"
+    },
+    "ApiLoginRequest": {
+     "properties": {
+      "password": {
        "type": "string"
       },
-      "type": [
-       "array",
-       "null"
-      ]
-     }
-    },
-    "type": "object"
-   },
-   "ApiListUsersResponse": {
-    "properties": {
-     "success": {
-      "type": "boolean"
+      "username": {
+       "type": "string"
+      }
      },
-     "users": {
-      "items": {
+     "type": "object"
+    },
+    "ApiLoginResponse": {
+     "properties": {
+      "success": {
+       "type": "boolean"
+      },
+      "token": {
+       "type": "string"
+      }
+     },
+     "type": "object"
+    },
+    "ApiPurgeStreamResponse": {
+     "properties": {
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiQueryStreamResponse": {
+     "properties": {
+      "records": {
+       "items": {
+        "$ref": "#/components/schemas/ModelsLogRecord"
+       },
+       "type": [
+        "array",
+        "null"
+       ]
+      },
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiRestoreAuthResponse": {
+     "properties": {
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiRestoreConfigResponse": {
+     "properties": {
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiRestoreLogsResponse": {
+     "properties": {
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiSaveForwarderRequest": {
+     "properties": {
+      "forwarder": {
+       "$ref": "#/components/schemas/ModelsForwarderV2"
+      }
+     },
+     "type": "object"
+    },
+    "ApiSaveForwarderResponse": {
+     "properties": {
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiSavePipelineRequest": {
+     "properties": {
+      "flow": {
+       "$ref": "#/components/schemas/ModelsFlowGraphV2"
+      }
+     },
+     "type": "object"
+    },
+    "ApiSavePipelineResponse": {
+     "properties": {
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiSaveRoleRequest": {
+     "properties": {
+      "scopes": {
+       "items": {
+        "type": "string"
+       },
+       "type": [
+        "array",
+        "null"
+       ]
+      }
+     },
+     "type": "object"
+    },
+    "ApiSaveRoleResponse": {
+     "properties": {
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiSaveTransformerRequest": {
+     "properties": {
+      "script": {
+       "type": "string"
+      }
+     },
+     "type": "object"
+    },
+    "ApiSaveTransformerResponse": {
+     "properties": {
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiSaveUserRequest": {
+     "properties": {
+      "password": {
+       "type": "string"
+      },
+      "roles": {
+       "items": {
+        "type": "string"
+       },
+       "type": [
+        "array",
+        "null"
+       ]
+      }
+     },
+     "type": "object"
+    },
+    "ApiSaveUserResponse": {
+     "properties": {
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiTestForwarderRequest": {
+     "properties": {
+      "record": {
+       "additionalProperties": {
+        "type": "string"
+       },
+       "type": [
+        "object",
+        "null"
+       ]
+      }
+     },
+     "type": "object"
+    },
+    "ApiTestForwarderResponse": {
+     "properties": {
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiTestTransformerRequest": {
+     "properties": {
+      "code": {
+       "type": "string"
+      },
+      "record": {
+       "additionalProperties": {
+        "type": "string"
+       },
+       "type": [
+        "object",
+        "null"
+       ]
+      }
+     },
+     "type": "object"
+    },
+    "ApiTestTransformerResponse": {
+     "properties": {
+      "record": {
+       "additionalProperties": {
+        "type": "string"
+       },
+       "type": [
+        "object",
+        "null"
+       ]
+      },
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiWhoamiResponse": {
+     "properties": {
+      "permissions": {
+       "$ref": "#/components/schemas/ModelsPermissions"
+      },
+      "success": {
+       "type": "boolean"
+      },
+      "user": {
        "$ref": "#/components/schemas/ModelsUser"
-      },
-      "type": [
-       "array",
-       "null"
-      ]
-     }
-    },
-    "type": "object"
-   },
-   "ApiLoginRequest": {
-    "properties": {
-     "password": {
-      "type": "string"
+      }
      },
-     "username": {
-      "type": "string"
-     }
+     "type": "object"
     },
-    "type": "object"
-   },
-   "ApiLoginResponse": {
-    "properties": {
-     "success": {
-      "type": "boolean"
+    "FormDataApiRestoreAuthRequest": {
+     "properties": {
+      "backup": {
+       "$ref": "#/components/schemas/MultipartFile"
+      }
      },
-     "token": {
-      "type": "string"
-     }
+     "type": "object"
     },
-    "type": "object"
-   },
-   "ApiPurgeStreamResponse": {
-    "properties": {
-     "success": {
-      "type": "boolean"
-     }
-    },
-    "type": "object"
-   },
-   "ApiQueryStreamResponse": {
-    "properties": {
-     "records": {
-      "items": {
-       "$ref": "#/components/schemas/ModelsLogRecord"
-      },
-      "type": [
-       "array",
-       "null"
-      ]
+    "FormDataApiRestoreConfigRequest": {
+     "properties": {
+      "backup": {
+       "$ref": "#/components/schemas/MultipartFile"
+      }
      },
-     "success": {
-      "type": "boolean"
-     }
+     "type": "object"
     },
-    "type": "object"
-   },
-   "ApiRestoreAuthResponse": {
-    "properties": {
-     "success": {
-      "type": "boolean"
-     }
+    "FormDataApiRestoreLogsRequest": {
+     "properties": {
+      "backup": {
+       "$ref": "#/components/schemas/MultipartFile"
+      }
+     },
+     "type": "object"
     },
-    "type": "object"
-   },
-   "ApiRestoreConfigResponse": {
-    "properties": {
-     "success": {
-      "type": "boolean"
-     }
-    },
-    "type": "object"
-   },
-   "ApiRestoreLogsResponse": {
-    "properties": {
-     "success": {
-      "type": "boolean"
-     }
-    },
-    "type": "object"
-   },
-   "ApiSaveAlertRequest": {
-    "properties": {
-     "webhook": {
-      "$ref": "#/components/schemas/ModelsWebhookV1"
-     }
-    },
-    "type": "object"
-   },
-   "ApiSaveAlertResponse": {
-    "properties": {
-     "success": {
-      "type": "boolean"
-     }
-    },
-    "type": "object"
-   },
-   "ApiSavePipelineRequest": {
-    "properties": {
-     "flow": {
-      "$ref": "#/components/schemas/ModelsFlowGraphV1"
-     }
-    },
-    "type": "object"
-   },
-   "ApiSavePipelineResponse": {
-    "properties": {
-     "success": {
-      "type": "boolean"
-     }
-    },
-    "type": "object"
-   },
-   "ApiSaveRoleRequest": {
-    "properties": {
-     "scopes": {
-      "items": {
+    "ModelsFlowEdgeV2": {
+     "properties": {
+      "id": {
        "type": "string"
       },
-      "type": [
-       "array",
-       "null"
-      ]
-     }
-    },
-    "type": "object"
-   },
-   "ApiSaveRoleResponse": {
-    "properties": {
-     "success": {
-      "type": "boolean"
-     }
-    },
-    "type": "object"
-   },
-   "ApiSaveTransformerRequest": {
-    "properties": {
-     "script": {
-      "type": "string"
-     }
-    },
-    "type": "object"
-   },
-   "ApiSaveTransformerResponse": {
-    "properties": {
-     "success": {
-      "type": "boolean"
-     }
-    },
-    "type": "object"
-   },
-   "ApiSaveUserRequest": {
-    "properties": {
-     "password": {
-      "type": "string"
-     },
-     "roles": {
-      "items": {
+      "source": {
        "type": "string"
       },
-      "type": [
-       "array",
-       "null"
-      ]
-     }
-    },
-    "type": "object"
-   },
-   "ApiSaveUserResponse": {
-    "properties": {
-     "success": {
-      "type": "boolean"
-     }
-    },
-    "type": "object"
-   },
-   "ApiTestAlertRequest": {
-    "properties": {
-     "record": {
-      "additionalProperties": {
+      "sourceHandle": {
        "type": "string"
       },
-      "type": [
-       "object",
-       "null"
-      ]
-     }
-    },
-    "type": "object"
-   },
-   "ApiTestAlertResponse": {
-    "properties": {
-     "success": {
-      "type": "boolean"
-     }
-    },
-    "type": "object"
-   },
-   "ApiTestTransformerRequest": {
-    "properties": {
-     "code": {
-      "type": "string"
+      "target": {
+       "type": "string"
+      }
      },
-     "record": {
-      "additionalProperties": {
+     "type": "object"
+    },
+    "ModelsFlowGraphV2": {
+     "properties": {
+      "edges": {
+       "items": {
+        "$ref": "#/components/schemas/ModelsFlowEdgeV2"
+       },
+       "type": [
+        "array",
+        "null"
+       ]
+      },
+      "nodes": {
+       "items": {
+        "$ref": "#/components/schemas/ModelsFlowNodeV2"
+       },
+       "type": [
+        "array",
+        "null"
+       ]
+      },
+      "version": {
+       "default": 2,
+       "type": "integer"
+      }
+     },
+     "type": "object"
+    },
+    "ModelsFlowNodeV2": {
+     "properties": {
+      "data": {
+       "additionalProperties": {
+        "type": "string"
+       },
+       "type": [
+        "object",
+        "null"
+       ]
+      },
+      "id": {
        "type": "string"
       },
-      "type": [
-       "object",
-       "null"
-      ]
-     }
+      "position": {
+       "$ref": "#/components/schemas/ModelsFlowPositionV2"
+      },
+      "type": {
+       "type": "string"
+      }
+     },
+     "type": "object"
     },
-    "type": "object"
-   },
-   "ApiTestTransformerResponse": {
-    "properties": {
-     "record": {
-      "additionalProperties": {
+    "ModelsFlowPositionV2": {
+     "properties": {
+      "x": {
+       "format": "double",
+       "type": "number"
+      },
+      "y": {
+       "format": "double",
+       "type": "number"
+      }
+     },
+     "type": "object"
+    },
+    "ModelsForwarderConfigV2": {
+     "oneOf": [
+      {
+       "$ref": "#/components/schemas/ModelsForwarderHttpV2"
+      }
+     ],
+     "type": "object"
+    },
+    "ModelsForwarderHttpV2": {
+     "properties": {
+      "headers": {
+       "additionalProperties": {
+        "type": "string"
+       },
+       "type": [
+        "object",
+        "null"
+       ]
+      },
+      "type": {
+       "enum": [
+        "http"
+       ],
        "type": "string"
       },
-      "type": [
-       "object",
-       "null"
-      ]
+      "url": {
+       "type": "string"
+      }
      },
-     "success": {
-      "type": "boolean"
-     }
+     "type": "object"
     },
-    "type": "object"
-   },
-   "ApiWhoamiResponse": {
-    "properties": {
-     "permissions": {
-      "$ref": "#/components/schemas/ModelsPermissions"
-     },
-     "success": {
-      "type": "boolean"
-     },
-     "user": {
-      "$ref": "#/components/schemas/ModelsUser"
-     }
-    },
-    "type": "object"
-   },
-   "FormDataApiRestoreAuthRequest": {
-    "properties": {
-     "backup": {
-      "$ref": "#/components/schemas/MultipartFile"
-     }
-    },
-    "type": "object"
-   },
-   "FormDataApiRestoreConfigRequest": {
-    "properties": {
-     "backup": {
-      "$ref": "#/components/schemas/MultipartFile"
-     }
-    },
-    "type": "object"
-   },
-   "FormDataApiRestoreLogsRequest": {
-    "properties": {
-     "backup": {
-      "$ref": "#/components/schemas/MultipartFile"
-     }
-    },
-    "type": "object"
-   },
-   "ModelsFlowEdgeV1": {
-    "properties": {
-     "id": {
-      "type": "string"
-     },
-     "source": {
-      "type": "string"
-     },
-     "sourceHandle": {
-      "type": "string"
-     },
-     "target": {
-      "type": "string"
-     }
-    },
-    "type": "object"
-   },
-   "ModelsFlowGraphV1": {
-    "properties": {
-     "edges": {
-      "items": {
-       "$ref": "#/components/schemas/ModelsFlowEdgeV1"
+    "ModelsForwarderV2": {
+     "properties": {
+      "config": {
+       "$ref": "#/components/schemas/ModelsForwarderConfigV2"
       },
-      "type": [
-       "array",
-       "null"
-      ]
+      "version": {
+       "default": 2,
+       "type": "integer"
+      }
      },
-     "nodes": {
-      "items": {
-       "$ref": "#/components/schemas/ModelsFlowNodeV1"
-      },
-      "type": [
-       "array",
-       "null"
-      ]
-     },
-     "version": {
-      "type": "integer"
-     }
+     "type": "object"
     },
-    "type": "object"
-   },
-   "ModelsFlowNodeV1": {
-    "properties": {
-     "data": {
-      "additionalProperties": {
+    "ModelsLogRecord": {
+     "properties": {
+      "fields": {
+       "additionalProperties": {
+        "type": "string"
+       },
+       "type": [
+        "object",
+        "null"
+       ]
+      },
+      "timestamp": {
+       "format": "date-time",
+       "type": "string"
+      }
+     },
+     "type": "object"
+    },
+    "ModelsPermissions": {
+     "properties": {
+      "can_edit_acls": {
+       "type": "boolean"
+      },
+      "can_edit_forwarders": {
+       "type": "boolean"
+      },
+      "can_edit_pipelines": {
+       "type": "boolean"
+      },
+      "can_edit_streams": {
+       "type": "boolean"
+      },
+      "can_edit_transformers": {
+       "type": "boolean"
+      },
+      "can_send_logs": {
+       "type": "boolean"
+      },
+      "can_view_acls": {
+       "type": "boolean"
+      },
+      "can_view_forwarders": {
+       "type": "boolean"
+      },
+      "can_view_pipelines": {
+       "type": "boolean"
+      },
+      "can_view_streams": {
+       "type": "boolean"
+      },
+      "can_view_transformers": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ModelsRole": {
+     "properties": {
+      "name": {
        "type": "string"
       },
-      "type": [
-       "object",
-       "null"
-      ]
+      "scopes": {
+       "items": {
+        "type": "string"
+       },
+       "type": [
+        "array",
+        "null"
+       ]
+      }
      },
-     "id": {
-      "type": "string"
-     },
-     "position": {
-      "$ref": "#/components/schemas/ModelsFlowPositionV1"
-     },
-     "type": {
-      "type": "string"
-     }
+     "type": "object"
     },
-    "type": "object"
-   },
-   "ModelsFlowPositionV1": {
-    "properties": {
-     "x": {
-      "format": "double",
-      "type": "number"
+    "ModelsStreamConfig": {
+     "properties": {
+      "indexed_fields": {
+       "items": {
+        "type": "string"
+       },
+       "type": [
+        "array",
+        "null"
+       ]
+      },
+      "size": {
+       "description": "Maximum size in MB, 0 to disable",
+       "format": "int64",
+       "type": "integer"
+      },
+      "ttl": {
+       "description": "TTL in seconds, 0 to disable",
+       "format": "int64",
+       "type": "integer"
+      }
      },
-     "y": {
-      "format": "double",
-      "type": "number"
-     }
+     "type": "object"
     },
-    "type": "object"
-   },
-   "ModelsLogRecord": {
-    "properties": {
-     "fields": {
-      "additionalProperties": {
+    "ModelsUser": {
+     "properties": {
+      "name": {
        "type": "string"
       },
-      "type": [
-       "object",
-       "null"
-      ]
+      "roles": {
+       "items": {
+        "type": "string"
+       },
+       "type": [
+        "array",
+        "null"
+       ]
+      }
      },
-     "timestamp": {
-      "format": "date-time",
-      "type": "string"
-     }
+     "type": "object"
     },
-    "type": "object"
-   },
-   "ModelsPermissions": {
-    "properties": {
-     "can_edit_acls": {
-      "type": "boolean"
-     },
-     "can_edit_alerts": {
-      "type": "boolean"
-     },
-     "can_edit_pipelines": {
-      "type": "boolean"
-     },
-     "can_edit_streams": {
-      "type": "boolean"
-     },
-     "can_edit_transformers": {
-      "type": "boolean"
-     },
-     "can_send_logs": {
-      "type": "boolean"
-     },
-     "can_view_acls": {
-      "type": "boolean"
-     },
-     "can_view_alerts": {
-      "type": "boolean"
-     },
-     "can_view_pipelines": {
-      "type": "boolean"
-     },
-     "can_view_streams": {
-      "type": "boolean"
-     },
-     "can_view_transformers": {
-      "type": "boolean"
-     }
+    "MultipartFile": {
+     "contentMediaType": "application/octet-stream",
+     "format": "binary",
+     "type": "string"
     },
-    "type": "object"
-   },
-   "ModelsRole": {
-    "properties": {
-     "name": {
-      "type": "string"
-     },
-     "scopes": {
-      "items": {
+    "RestErrResponse": {
+     "properties": {
+      "code": {
+       "description": "Application-specific error code.",
+       "type": "integer"
+      },
+      "context": {
+       "additionalProperties": {},
+       "description": "Application context.",
+       "type": "object"
+      },
+      "error": {
+       "description": "Error message.",
        "type": "string"
       },
-      "type": [
-       "array",
-       "null"
-      ]
-     }
-    },
-    "type": "object"
-   },
-   "ModelsStreamConfig": {
-    "properties": {
-     "indexed_fields": {
-      "items": {
+      "status": {
+       "description": "Status text.",
        "type": "string"
-      },
-      "type": [
-       "array",
-       "null"
-      ]
+      }
      },
-     "size": {
-      "description": "Maximum size in MB, 0 to disable",
-      "format": "int64",
-      "type": "integer"
-     },
-     "ttl": {
-      "description": "TTL in seconds, 0 to disable",
-      "format": "int64",
-      "type": "integer"
-     }
+     "type": "object"
+    }
+   },
+   "securitySchemes": {
+    "jwtAuth": {
+     "description": "Authentication using JSON Web Token",
+     "type": "http",
+     "scheme": "bearer",
+     "bearerFormat": "JWT"
     },
-    "type": "object"
-   },
-   "ModelsUser": {
-    "properties": {
-     "name": {
-      "type": "string"
-     },
-     "roles": {
-      "items": {
-       "type": "string"
-      },
-      "type": [
-       "array",
-       "null"
-      ]
-     }
-    },
-    "type": "object"
-   },
-   "ModelsWebhookV1": {
-    "properties": {
-     "headers": {
-      "additionalProperties": {
-       "type": "string"
-      },
-      "type": [
-       "object",
-       "null"
-      ]
-     },
-     "url": {
-      "type": "string"
-     },
-     "version": {
-      "type": "integer"
-     }
-    },
-    "type": "object"
-   },
-   "MultipartFile": {
-    "contentMediaType": "application/octet-stream",
-    "format": "binary",
-    "type": "string"
-   },
-   "RestErrResponse": {
-    "properties": {
-     "code": {
-      "description": "Application-specific error code.",
-      "type": "integer"
-     },
-     "context": {
-      "additionalProperties": {},
-      "description": "Application context.",
-      "type": "object"
-     },
-     "error": {
-      "description": "Error message.",
-      "type": "string"
-     },
-     "status": {
-      "description": "Status text.",
-      "type": "string"
-     }
-    },
-    "type": "object"
-   }
-  },
-  "securitySchemes": {
-   "jwtAuth": {
-    "description": "Authentication using JSON Web Token",
-    "type": "http",
-    "scheme": "bearer",
-    "bearerFormat": "JWT"
-   },
-   "patAuth": {
-    "description": "Authentication using Personal Access Token",
-    "type": "http",
-    "scheme": "bearer",
-    "bearerFormat": "PAT"
+    "patAuth": {
+     "description": "Authentication using Personal Access Token",
+     "type": "http",
+     "scheme": "bearer",
+     "bearerFormat": "PAT"
+    }
    }
   }
  }
-}
