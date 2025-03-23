@@ -3412,6 +3412,9 @@
      "oneOf": [
       {
        "$ref": "#/components/schemas/ModelsForwarderHttpV2"
+      },
+      {
+       "$ref": "#/components/schemas/ModelsForwarderSyslogV2"
       }
      ],
      "type": "object"
@@ -3434,6 +3437,68 @@
        "type": "string"
       },
       "url": {
+       "type": "string"
+      }
+     },
+     "type": "object"
+    },
+    "ModelsForwarderSyslogV2": {
+     "properties": {
+      "address": {
+       "type": "string"
+      },
+      "facility": {
+       "enum": [
+        "kern",
+        "user",
+        "mail",
+        "daemon",
+        "auth",
+        "syslog",
+        "lpr",
+        "news",
+        "uucp",
+        "cron",
+        "authpriv",
+        "ftp",
+        "local0",
+        "local1",
+        "local2",
+        "local3",
+        "local4",
+        "local5",
+        "local6",
+        "local7"
+       ],
+       "type": "string"
+      },
+      "network": {
+       "enum": [
+        "tcp",
+        "udp"
+       ],
+       "type": "string"
+      },
+      "severity": {
+       "enum": [
+        "emerg",
+        "alert",
+        "crit",
+        "err",
+        "warning",
+        "notice",
+        "info",
+        "debug"
+       ],
+       "type": "string"
+      },
+      "tag": {
+       "type": "string"
+      },
+      "type": {
+       "enum": [
+        "syslog"
+       ],
        "type": "string"
       }
      },
