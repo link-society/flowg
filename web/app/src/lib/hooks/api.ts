@@ -21,6 +21,8 @@ export function useApiOperation<Args extends unknown[]>(
         await fn(...args)
       }
       catch (error) {
+        console.error(error)
+
         if (error instanceof UnauthenticatedError) {
           notify.error('Session expired')
           navigate('/web/login')
@@ -31,8 +33,6 @@ export function useApiOperation<Args extends unknown[]>(
         else {
           notify.error('Unknown error')
         }
-
-        console.error(error)
       }
 
       setLoading(false)
