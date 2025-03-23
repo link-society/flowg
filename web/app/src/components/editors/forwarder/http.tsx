@@ -5,14 +5,15 @@ import { KeyValueEditor } from '@/components/form/kv-editor'
 
 import HttpIcon from '@mui/icons-material/Http'
 
+import { ForwarderTypeLabelMap } from '@/lib/models/forwarder'
 import { HttpForwarderModel } from '@/lib/models/forwarder/http'
 
-type ForwarderConfigHttpEditorProps = {
+type HttpForwarderEditorProps = {
   config: HttpForwarderModel
   onConfigChange: (config: HttpForwarderModel) => void
 }
 
-export const ForwarderConfigHttpEditor = ({ config, onConfigChange }: ForwarderConfigHttpEditorProps) => {
+export const HttpForwarderEditor = ({ config, onConfigChange }: HttpForwarderEditorProps) => {
   return (
     <div
       id="container:editor.forwarders.http"
@@ -24,7 +25,7 @@ export const ForwarderConfigHttpEditor = ({ config, onConfigChange }: ForwarderC
           variant="outlined"
           className="w-full"
           type="text"
-          value="Webhook"
+          value={ForwarderTypeLabelMap.http}
           disabled
           slotProps={{
             input: {

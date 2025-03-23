@@ -1,11 +1,15 @@
 export type SyslogForwarderModel = {
   type: 'syslog'
-  network: 'tcp' | 'udp'
+  network: SyslogNetwork
   address: string
   tag: string
   severity: SyslogSeverity
   facility: SyslogFacility
 }
+
+export const SyslogNetworkValues = ['tcp', 'udp'] as const
+
+export type SyslogNetwork = typeof SyslogNetworkValues[number]
 
 export const SyslogSeverityValues = [
   'emerg',

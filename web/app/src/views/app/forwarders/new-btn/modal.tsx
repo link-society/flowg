@@ -36,6 +36,18 @@ const newForwarderFactory = (type: ForwarderTypes): ForwarderModel => {
         },
       }
 
+    case 'syslog':
+      return {
+        config: {
+          type,
+          network: 'tcp',
+          address: '127.0.0.1:514',
+          tag: '',
+          severity: 'info',
+          facility: 'local0',
+        },
+      }
+
     default:
       throw new Error(`Unknown forwarder type: ${type}`)
   }
