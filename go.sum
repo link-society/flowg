@@ -216,8 +216,8 @@ github.com/swaggest/usecase v1.3.1/go.mod h1:cae3lDd5VDmM36OQcOOOdAlEDg40TiQYIp9
 github.com/tv42/httpunix v0.0.0-20150427012821-b75d8614f926/go.mod h1:9ESjWnEqriFuLhtthL60Sar/7RFoluCcXsuvEwTV5KM=
 github.com/vearutop/statigz v1.4.0 h1:RQL0KG3j/uyA/PFpHeZ/L6l2ta920/MxlOAIGEOuwmU=
 github.com/vearutop/statigz v1.4.0/go.mod h1:LYTolBLiz9oJISwiVKnOQoIwhO1LWX1A7OECawGS8XE=
-github.com/vladopajic/go-actor v0.9.5 h1:JVY10T6bRjfCPxTB9Ckl6Y23WKWV+rrCMoio2tpykfA=
-github.com/vladopajic/go-actor v0.9.5/go.mod h1:BSoR3LsW0gQGywCRgoIF63vHO2x8aE/9R36rkvjgwXw=
+github.com/vladopajic/go-actor v0.9.6 h1:MSYIeThkoBTQMOIYcpPe3mUK7ZAqoVAzxLmQg3VAF8w=
+github.com/vladopajic/go-actor v0.9.6/go.mod h1:BSoR3LsW0gQGywCRgoIF63vHO2x8aE/9R36rkvjgwXw=
 github.com/yudai/gojsondiff v1.0.0 h1:27cbfqXLVEJ1o8I6v3y9lg8Ydm53EKqHXAOMxEGlCOA=
 github.com/yudai/gojsondiff v1.0.0/go.mod h1:AY32+k2cwILAkW1fbgxQ5mUmMiZFgLIV+FBNExI05xg=
 github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 h1:BHyfKlQyqbsFN5p3IfnEUduWvb9is428/nNb5L3U01M=
