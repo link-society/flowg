@@ -1,29 +1,27 @@
-import React, { useState } from 'react'
-import { useApiOperation } from '@/lib/hooks/api'
-
-import CancelIcon from '@mui/icons-material/Cancel'
-import SaveIcon from '@mui/icons-material/Save'
-
-import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle'
-import DialogContent from '@mui/material/DialogContent'
-import DialogActions from '@mui/material/DialogActions'
-import TextField from '@mui/material/TextField'
-import FormControl from '@mui/material/FormControl'
-import InputLabel from '@mui/material/InputLabel'
-import Select from '@mui/material/Select'
-import MenuItem from '@mui/material/MenuItem'
-import Button from '@mui/material/Button'
-import CircularProgress from '@mui/material/CircularProgress'
-
-import { DialogProps } from '@toolpad/core/useDialogs'
+import * as configApi from '@/lib/api/operations/config'
 
 import {
   ForwarderModel,
-  ForwarderTypes,
   ForwarderTypeValues,
+  ForwarderTypes,
 } from '@/lib/models/forwarder'
-import * as configApi from '@/lib/api/operations/config'
+import React, { useState } from 'react'
+
+import Button from '@mui/material/Button'
+import CancelIcon from '@mui/icons-material/Cancel'
+import CircularProgress from '@mui/material/CircularProgress'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import { DialogProps } from '@toolpad/core/useDialogs'
+import DialogTitle from '@mui/material/DialogTitle'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import MenuItem from '@mui/material/MenuItem'
+import SaveIcon from '@mui/icons-material/Save'
+import Select from '@mui/material/Select'
+import TextField from '@mui/material/TextField'
+import { useApiOperation } from '@/lib/hooks/api'
 
 const newForwarderFactory = (type: ForwarderTypes): ForwarderModel => {
   switch (type) {
@@ -45,6 +43,15 @@ const newForwarderFactory = (type: ForwarderTypes): ForwarderModel => {
           tag: '',
           severity: 'info',
           facility: 'local0',
+        },
+      }
+
+    case 'dd':
+      return {
+        config: {
+          type,
+          url: '',
+          apiKey: '',
         },
       }
 

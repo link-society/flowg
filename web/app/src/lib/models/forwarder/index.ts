@@ -1,3 +1,4 @@
+import { DatadogForwarderModel } from '@/lib/models/forwarder/datadog'
 import { HttpForwarderModel } from '@/lib/models/forwarder/http'
 import { SyslogForwarderModel } from '@/lib/models/forwarder/syslog'
 
@@ -8,6 +9,7 @@ export type ForwarderModel = {
 export const ForwarderTypeValues = [
   { key: 'http', label: 'Webhook' },
   { key: 'syslog', label: 'Syslog Server' },
+  { key: 'dd', label: 'Datadog' },
 ] as const
 
 export const ForwarderTypeLabelMap = ForwarderTypeValues.reduce(
@@ -21,5 +23,6 @@ export const ForwarderTypeLabelMap = ForwarderTypeValues.reduce(
 export type ForwarderConfigModel =
   | HttpForwarderModel
   | SyslogForwarderModel
+  | DatadogForwarderModel
 
 export type ForwarderTypes = ForwarderConfigModel['type']
