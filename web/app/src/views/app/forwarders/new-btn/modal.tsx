@@ -46,12 +46,14 @@ const newForwarderFactory = (type: ForwarderTypes): ForwarderModel => {
         },
       }
 
-    case 'dd':
+    case 'datadog':
       return {
         config: {
           type,
-          url: '',
+          url: 'https://http-intake.logs.datadoghq.com/api/v2/logs',
           apiKey: '',
+          source: '',
+          service: ''
         },
       }
 

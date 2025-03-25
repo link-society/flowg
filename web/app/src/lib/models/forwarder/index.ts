@@ -9,7 +9,7 @@ export type ForwarderModel = {
 export const ForwarderTypeValues = [
   { key: 'http', label: 'Webhook' },
   { key: 'syslog', label: 'Syslog Server' },
-  { key: 'dd', label: 'Datadog' },
+  { key: 'datadog', label: 'Datadog' },
 ] as const
 
 export const ForwarderTypeLabelMap = ForwarderTypeValues.reduce(

@@ -13,14 +13,16 @@ type ForwarderV2 struct {
 }
 
 type ForwarderConfigV2 struct {
-	Http   *ForwarderHttpV2   `json:"-"`
-	Syslog *ForwarderSyslogV2 `json:"-"`
+	Http    *ForwarderHttpV2    `json:"-"`
+	Syslog  *ForwarderSyslogV2  `json:"-"`
+	Datadog *ForwarderDatadogV2 `json:"-"`
 }
 
 func (ForwarderConfigV2) JSONSchemaOneOf() []any {
 	return []any{
 		ForwarderHttpV2{},
 		ForwarderSyslogV2{},
+		ForwarderDatadogV2{},
 	}
 }
 
@@ -31,6 +33,9 @@ func (f *ForwarderV2) Call(ctx context.Context, record *LogRecord) error {
 
 	case f.Config.Syslog != nil:
 		return f.Config.Syslog.call(ctx, record)
+
+	case f.Config.Datadog != nil:
+		return f.Config.Datadog.call(ctx, record)
 
 	default:
 		return fmt.Errorf("unsupported forwarder type")
@@ -44,6 +49,9 @@ func (cfg *ForwarderConfigV2) MarshalJSON() ([]byte, error) {
 
 	case cfg.Syslog != nil:
 		return json.Marshal(&cfg.Syslog)
+
+	case cfg.Datadog != nil:
+		return json.Marshal(&cfg.Datadog)
 
 	default:
 		return nil, fmt.Errorf("unsupported forwarder type")
@@ -65,6 +73,9 @@ func (cfg *ForwarderConfigV2) UnmarshalJSON(data []byte) error {
 
 	case "syslog":
 		return json.Unmarshal(data, &cfg.Syslog)
+
+	case "datadog":
+		return json.Unmarshal(data, &cfg.Datadog)
 
 	default:
 		return fmt.Errorf("unsupported forwarder type: %s", typeInfo.Type)

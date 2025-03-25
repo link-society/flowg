@@ -13,7 +13,7 @@ type DatadogForwarderEditorProps = {
 export const DatadogForwarderEditor = ({ config, onConfigChange }: DatadogForwarderEditorProps) => {
   return (
     <div
-      id="container:editor.forwarders.dd"
+      id="container:editor.forwarders.datadog"
       className="flex flex-col items-stretch gap-3"
     >
       <div className="mb-6 shadow">
@@ -22,7 +22,7 @@ export const DatadogForwarderEditor = ({ config, onConfigChange }: DatadogForwar
           variant="outlined"
           className="w-full"
           type="text"
-          value={ForwarderTypeLabelMap.dd}
+          value={ForwarderTypeLabelMap.datadog}
           disabled
           slotProps={{
             input: {
@@ -37,7 +37,7 @@ export const DatadogForwarderEditor = ({ config, onConfigChange }: DatadogForwar
       </div>
 
       <TextField
-        id="input:editor.forwarders.dd.url"
+        id="input:editor.forwarders.datadog.url"
         label="URL"
         variant="outlined"
         type="text"
@@ -53,18 +53,51 @@ export const DatadogForwarderEditor = ({ config, onConfigChange }: DatadogForwar
       <Divider />
 
       <TextField
-        id="input:editor.forwarders.dd.apiKey"
-        label="URL"
+        id="input:editor.forwarders.datadog.apiKey"
+        label="ApiKey"
         variant="outlined"
         type="text"
         value={config.apiKey}
         onChange={(e) => {
           onConfigChange({
             ...config,
-            url: e.target.value,
+            apiKey: e.target.value,
+          })
+        }}
+      />
+
+    <Divider /> 
+
+    <TextField
+        id="input:editor.forwarders.datadog.source"
+        label="Source"
+        variant="outlined"
+        type="text"
+        value={config.apiKey}
+        onChange={(e) => {
+          onConfigChange({
+            ...config,
+            source: e.target.value,
+          })
+        }}
+      />
+
+    <Divider />
+
+    <TextField
+        id="input:editor.forwarders.datadog.service"
+        label="Service"
+        variant="outlined"
+        type="text"
+        value={config.apiKey}
+        onChange={(e) => {
+          onConfigChange({
+            ...config,
+            service: e.target.value,
           })
         }}
       />
     </div>
+    
   )
 }
