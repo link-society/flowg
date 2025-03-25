@@ -73,7 +73,7 @@ export const DatadogForwarderEditor = ({ config, onConfigChange }: DatadogForwar
         label="Source"
         variant="outlined"
         type="text"
-        value={config.apiKey}
+        value={config.source}
         onChange={(e) => {
           onConfigChange({
             ...config,
@@ -89,7 +89,7 @@ export const DatadogForwarderEditor = ({ config, onConfigChange }: DatadogForwar
         label="Service"
         variant="outlined"
         type="text"
-        value={config.apiKey}
+        value={config.service}
         onChange={(e) => {
           onConfigChange({
             ...config,
