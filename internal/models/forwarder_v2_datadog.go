@@ -26,7 +26,7 @@ type DatadogLogItem struct {
 }
 
 func (f *ForwarderDatadogV2) call(ctx context.Context, record *LogRecord) error {
-	logItems := []*DatadogLogItem{f.createDatadogHttpLogItem(ctx, record)}
+	logItems := []*DatadogLogItem{CreateDatadogHttpLogItem(f, record)}
 
 	payload, err := json.Marshal(logItems)
 	if err != nil {
@@ -57,7 +57,7 @@ func (f *ForwarderDatadogV2) call(ctx context.Context, record *LogRecord) error 
 	return nil
 }
 
-func (f *ForwarderDatadogV2) createDatadogHttpLogItem(ctx context.Context, record *LogRecord) *DatadogLogItem {
+func CreateDatadogHttpLogItem(f *ForwarderDatadogV2, record *LogRecord) *DatadogLogItem {
 	logItem := &DatadogLogItem{}
 	var tags []string
 
