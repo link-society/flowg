@@ -1,5 +1,7 @@
 # syntax=docker/dockerfile:1.7-labs
 
+ARG UPX_VERSION="5.0.0"
+
 ##############################
 ## SOURCES FILES
 ##############################
@@ -78,8 +80,15 @@ RUN NODE_ENV="production" npm run build
 ##############################
 
 FROM golang:1.24-alpine3.21 AS builder-go
+ARG UPX_VERSION
 
-RUN apk add --no-cache gcc musl-dev
+RUN apk add --no-cache gcc musl-dev wget
+
+RUN set -ex && \
+    wget https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-${UPX_VERSION}-amd64_linux.tar.xz && \
+    tar -xvf upx-${UPX_VERSION}-amd64_linux.tar.xz && \
+    mv upx-${UPX_VERSION}-amd64_linux/upx /usr/local/bin/ && \
+    rm -rf upx-${UPX_VERSION}-amd64_linux.tar.xz upx-${UPX_VERSION}-amd64_linux
 
 COPY --from=sources-go /src /workspace
 COPY --from=builder-rust-filterdsl /workspace/internal/utils/ffi/filterdsl/rust-crate/target/release/libflowg_filterdsl.a /workspace/internal/utils/ffi/filterdsl/rust-crate/target/release/libflowg_filterdsl.a
@@ -88,8 +97,9 @@ COPY --from=builder-js /workspace/web/app/dist /workspace/web/public
 WORKDIR /workspace
 
 RUN go generate ./...
-RUN go build -o bin/ ./...
 RUN go test -timeout 500ms -v ./...
+RUN go build -ldflags="-s -w" -o bin/ ./cmd/flowg-server
+RUN upx bin/flowg-server
 
 ##############################
 ## FINAL ARTIFACT
@@ -99,7 +109,7 @@ FROM alpine:3.21 AS runner
 
 RUN apk add --no-cache libgcc su-exec
 
-COPY --from=builder-go /workspace/bin/ /usr/local/bin/
+COPY --from=builder-go /workspace/bin/flowg-server /usr/local/bin/flowg-server
 
 ADD docker/docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod 0700 /docker-entrypoint.sh
