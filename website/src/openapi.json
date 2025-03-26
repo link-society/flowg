@@ -3504,6 +3504,29 @@
      },
      "type": "object"
     },
+    "ModelsForwarderDatadogV2": {
+     "properties": {
+      "type": {
+       "enum": [
+        "datadog"
+       ],
+       "type": "string"
+      },
+      "url": {
+       "type": "string"
+      },
+      "apiKey":{
+        "type": "string"
+      },
+      "service": {
+        "type": "string"
+      },
+      "source": {
+        "type": "string"
+      }
+     },
+     "type": "object"
+    },
     "ModelsForwarderV2": {
      "properties": {
       "config": {
