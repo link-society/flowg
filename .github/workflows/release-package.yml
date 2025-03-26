@@ -86,6 +86,13 @@ jobs:
           toolchain: 1.85.0
           target: ${{ matrix.rstarget }}
 
+      - name: setup@upx
+        if: ${{ matrix.goos != "darwin" }}
+        run: |
+          wget https://github.com/upx/upx/releases/download/v5.0.0/upx-5.0.0-${{ matrix.goarch }}_${{ matrix.goos }}.tar.xz
+          tar xvf upx-5.0.0-${{ matrix.goarch }}_${{ matrix.goos }}.tar.xz
+          sudo cp upx-5.0.0-${{ matrix.goarch }}_${{ matrix.goos }}/upx /usr/local/bin/
+
       - name: frontend@build
         working-directory: ./web/app
         run: |
@@ -106,10 +113,14 @@ jobs:
         run: |
           go get ./...
           go generate ./...
-          go build -o bin/ ./...
+          go build -ldflags="-s -w" -o bin/ ./...
         env:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
+
+      - name: compress@binary
+        if: ${{ matrix.goos != "darwin" }}
+        run: upx bin/*
 
       - name: upload@binary
         run: |
