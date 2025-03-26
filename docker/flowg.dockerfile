@@ -82,10 +82,13 @@ RUN NODE_ENV="production" npm run build
 FROM golang:1.24-alpine3.21 AS builder-go
 ARG UPX_VERSION
 
-RUN apk add --no-cache gcc musl-dev wget
+RUN apk add --no-cache gcc musl-dev curl
 
 RUN set -ex && \
-    wget https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-${UPX_VERSION}-amd64_linux.tar.xz && \
+    curl -L --proto "=https" --tlsv1.2 -sSf \
+        https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-${UPX_VERSION}-amd64_linux.tar.xz \
+        --output upx-${UPX_VERSION}-amd64_linux.tar.xz \
+      && \
     tar -xvf upx-${UPX_VERSION}-amd64_linux.tar.xz && \
     mv upx-${UPX_VERSION}-amd64_linux/upx /usr/local/bin/ && \
     rm -rf upx-${UPX_VERSION}-amd64_linux.tar.xz upx-${UPX_VERSION}-amd64_linux

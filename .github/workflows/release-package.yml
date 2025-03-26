@@ -89,7 +89,9 @@ jobs:
       - name: setup@upx
         if: ${{ matrix.goos != "darwin" }}
         run: |
-          wget https://github.com/upx/upx/releases/download/v5.0.0/upx-5.0.0-${{ matrix.goarch }}_${{ matrix.goos }}.tar.xz
+          curl -L --proto "=https" --tlsv1.2 -sSf \
+            https://github.com/upx/upx/releases/download/v5.0.0/upx-5.0.0-amd64_linux.tar.xz \
+            --output upx-5.0.0-amd64_linux.tar.xz \
           tar xvf upx-5.0.0-${{ matrix.goarch }}_${{ matrix.goos }}.tar.xz
           sudo cp upx-5.0.0-${{ matrix.goarch }}_${{ matrix.goos }}/upx /usr/local/bin/
 
