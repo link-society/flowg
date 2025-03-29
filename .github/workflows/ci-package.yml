@@ -84,7 +84,7 @@ jobs:
 
       - name: report@test
         uses: mikepenz/action-junit-report@v5
-        if: ${{ github.event_name == 'pull_request' && (success() || failure()) }}
+        if: ${{ github.event_name == 'pull_request_target' && (success() || failure()) }}
         with:
           report_paths: "./tests/reports/api/junit.xml"
           include_passed: true
@@ -130,33 +130,33 @@ jobs:
 
       - name: report@test
         uses: joonvena/robotframework-reporter-action@v2.5
-        if: ${{ github.event_name == 'pull_request' && (success() || failure()) }}
+        if: ${{ github.event_name == 'pull_request_target' && (success() || failure()) }}
         with:
           gh_access_token: ${{ secrets.GITHUB_TOKEN }}
           report_path: "./tests/reports/web/"
 
       - name: report-success@status
         uses: guibranco/github-status-action-v2@v1
-        if: ${{ github.event_name == 'pull_request' && success() }}
+        if: ${{ github.event_name == 'pull_request_target' && success() }}
         with:
           authToken: ${{ secrets.GITHUB_TOKEN }}
           context: 'Web End-To-End Test Report'
           description: 'Passed'
           state: 'success'
-          sha: ${{github.event.pull_request.head.sha }}
+          sha: ${{github.event.pull_request_target.head.sha }}
 
       - name: report-failure@status
         uses: guibranco/github-status-action-v2@v1
-        if: ${{ github.event_name == 'pull_request' && failure() }}
+        if: ${{ github.event_name == 'pull_request_target' && failure() }}
         with:
           authToken: ${{ secrets.GITHUB_TOKEN }}
           context: 'Web End-To-End Test Report'
           description: 'Failure'
           state: 'failure'
-          sha: ${{github.event.pull_request.head.sha }}
+          sha: ${{github.event.pull_request_target.head.sha }}
 
       - name: upload-logs@artifact
-        if: ${{ github.event_name == 'pull_request' && failure() }}
+        if: ${{ github.event_name == 'pull_request_target' && failure() }}
         uses: actions/upload-artifact@v4
         with:
           name: web-e2e-reports
@@ -164,7 +164,7 @@ jobs:
           retention-days: 1
 
       - name: report@fail
-        if: ${{ github.event_name == 'pull_request' && failure() }}
+        if: ${{ github.event_name == 'pull_request_target' && failure() }}
         run: exit 1
 
   test-k8s:
