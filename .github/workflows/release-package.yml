@@ -16,8 +16,12 @@ jobs:
         include:
           - ghrunner: ubuntu-latest
             docker_image_tag_suffix: ""
+            arch: "amd64"
+            os: "linux"
           - ghrunner: ubuntu-24.04-arm
             docker_image_tag_suffix: "-linux-arm"
+            arch: "arm64"
+            os: "linux"
 
     runs-on: ${{ matrix.ghrunner }}
 
@@ -39,6 +43,9 @@ jobs:
         with:
           context: .
           file: ./docker/flowg.dockerfile
+          build-args: |
+            UPX_ARCH=${{ matrix.arch }}
+            UPX_OS=${{ matrix.os }}
           tags: |
             linksociety/flowg:latest${{ matrix.docker_image_tag_suffix }}
             linksociety/flowg:${{ github.event.release.tag_name }}${{ matrix.docker_image_tag_suffix }}
