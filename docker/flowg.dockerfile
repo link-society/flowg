@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1.7-labs
 
-ARG UPX_VERSION="5.0.0"
+ARG UPX_VERSION="4.2.4"
+ARG UPX_ARCH="amd64"
+ARG UPX_OS="linux"
 
 ##############################
 ## SOURCES FILES
@@ -84,14 +86,11 @@ ARG UPX_VERSION
 
 RUN apk add --no-cache gcc musl-dev curl
 
+ADD https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-${UPX_VERSION}-${UPX_ARCH}_${UPX_OS}.tar.xz /tmp/upx.tar.xz
 RUN set -ex && \
-    curl -L --proto "=https" --tlsv1.2 -sSf \
-        https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-${UPX_VERSION}-amd64_linux.tar.xz \
-        --output upx-${UPX_VERSION}-amd64_linux.tar.xz \
-      && \
-    tar -xvf upx-${UPX_VERSION}-amd64_linux.tar.xz && \
-    mv upx-${UPX_VERSION}-amd64_linux/upx /usr/local/bin/ && \
-    rm -rf upx-${UPX_VERSION}-amd64_linux.tar.xz upx-${UPX_VERSION}-amd64_linux
+    tar -xvf /tmp/upx.tar.xz && \
+    mv upx-${UPX_VERSION}-${UPX_ARCH}_${UPX_OS}/upx /usr/local/bin/ && \
+    rm -rf /tmp/upx.tar.xz upx-${UPX_VERSION}-${UPX_ARCH}_${UPX_OS}
 
 COPY --from=sources-go /src /workspace
 COPY --from=builder-rust-filterdsl /workspace/internal/utils/ffi/filterdsl/rust-crate/target/release/libflowg_filterdsl.a /workspace/internal/utils/ffi/filterdsl/rust-crate/target/release/libflowg_filterdsl.a
