@@ -51,9 +51,7 @@ const newForwarderFactory = (type: ForwarderTypes): ForwarderModel => {
         config: {
           type,
           url: 'https://http-intake.logs.datadoghq.com/api/v2/logs',
-          apiKey: '',
-          source: '',
-          service: ''
+          apiKey: ''
         },
       }
 

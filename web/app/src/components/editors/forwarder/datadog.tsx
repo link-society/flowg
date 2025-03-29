@@ -65,38 +65,6 @@ export const DatadogForwarderEditor = ({ config, onConfigChange }: DatadogForwar
           })
         }}
       />
-
-    <Divider /> 
-
-    <TextField
-        id="input:editor.forwarders.datadog.source"
-        label="Source"
-        variant="outlined"
-        type="text"
-        value={config.source}
-        onChange={(e) => {
-          onConfigChange({
-            ...config,
-            source: e.target.value,
-          })
-        }}
-      />
-
-    <Divider />
-
-    <TextField
-        id="input:editor.forwarders.datadog.service"
-        label="Service"
-        variant="outlined"
-        type="text"
-        value={config.service}
-        onChange={(e) => {
-          onConfigChange({
-            ...config,
-            service: e.target.value,
-          })
-        }}
-      />
     </div>
     
   )

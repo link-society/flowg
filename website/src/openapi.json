@@ -3517,12 +3517,6 @@
       },
       "apiKey":{
         "type": "string"
-      },
-      "service": {
-        "type": "string"
-      },
-      "source": {
-        "type": "string"
       }
      },
      "type": "object"
