@@ -56,7 +56,7 @@ export const DatadogForwarderEditor = ({ config, onConfigChange }: DatadogForwar
         id="input:editor.forwarders.datadog.apiKey"
         label="ApiKey"
         variant="outlined"
-        type="text"
+        type="password"
         value={config.apiKey}
         onChange={(e) => {
           onConfigChange({
