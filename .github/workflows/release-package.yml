@@ -86,15 +86,6 @@ jobs:
           toolchain: 1.85.0
           target: ${{ matrix.rstarget }}
 
-      - name: setup@upx
-        if: matrix.goos != 'darwin'
-        run: |
-          curl -L --proto "=https" --tlsv1.2 -sSf \
-            https://github.com/upx/upx/releases/download/v5.0.0/upx-5.0.0-amd64_linux.tar.xz \
-            --output upx-5.0.0-amd64_linux.tar.xz \
-          tar xvf upx-5.0.0-${{ matrix.goarch }}_${{ matrix.goos }}.tar.xz
-          sudo cp upx-5.0.0-${{ matrix.goarch }}_${{ matrix.goos }}/upx /usr/local/bin/
-
       - name: frontend@build
         working-directory: ./web/app
         run: |
@@ -122,7 +113,9 @@ jobs:
 
       - name: compress@binary
         if: matrix.goos != 'darwin'
-        run: upx bin/*
+        uses: crazy-max/ghaction-upx@v3
+        with:
+          files: bin/*
 
       - name: upload@binary
         run: |
