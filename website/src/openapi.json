@@ -3415,8 +3415,28 @@
       },
       {
        "$ref": "#/components/schemas/ModelsForwarderSyslogV2"
+      },
+      {
+       "$ref": "#/components/schemas/ModelsForwarderDatadogV2"
       }
      ],
+     "type": "object"
+    },
+    "ModelsForwarderDatadogV2": {
+     "properties": {
+      "apiKey": {
+       "type": "string"
+      },
+      "type": {
+       "enum": [
+        "datadog"
+       ],
+       "type": "string"
+      },
+      "url": {
+       "type": "string"
+      }
+     },
      "type": "object"
     },
     "ModelsForwarderHttpV2": {
@@ -3500,23 +3520,6 @@
         "syslog"
        ],
        "type": "string"
-      }
-     },
-     "type": "object"
-    },
-    "ModelsForwarderDatadogV2": {
-     "properties": {
-      "type": {
-       "enum": [
-        "datadog"
-       ],
-       "type": "string"
-      },
-      "url": {
-       "type": "string"
-      },
-      "apiKey":{
-        "type": "string"
       }
      },
      "type": "object"
