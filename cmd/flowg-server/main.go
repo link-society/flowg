@@ -30,49 +30,56 @@ func main() {
 			logging.Setup(opts.verbose)
 			metrics.Setup()
 		},
-		RunE: func(cmd *cobra.Command, args []string) error {
-			config, err := newServerConfig(opts)
-			if err != nil {
-				return fmt.Errorf("failed to create server configuration: %w", err)
-			}
+		Run: func(cmd *cobra.Command, args []string) {
+			err := func() error {
+				config, err := newServerConfig(opts)
+				if err != nil {
+					return fmt.Errorf("failed to create server configuration: %w", err)
+				}
 
-			srv := server.NewServer(config)
+				srv := server.NewServer(config)
 
-			srv.Start()
-			if err := srv.WaitReady(context.Background()); err != nil {
-				return fmt.Errorf("failed to start server: %w", err)
-			}
+				srv.Start()
+				if err := srv.WaitReady(context.Background()); err != nil {
+					return fmt.Errorf("failed to start server: %w", err)
+				}
 
-			monitorCtx, monitorCancel := context.WithCancel(context.Background())
-			doneC := make(chan error, 1)
-			go func() {
-				err := srv.Join(monitorCtx)
-				doneC <- err
+				monitorCtx, monitorCancel := context.WithCancel(context.Background())
+				doneC := make(chan error, 1)
+				go func() {
+					err := srv.Join(monitorCtx)
+					doneC <- err
+				}()
+
+				sigC := make(chan os.Signal, 1)
+				signal.Notify(sigC, syscall.SIGINT, syscall.SIGTERM)
+
+				select {
+				case <-sigC:
+					monitorCancel()
+					srv.Stop()
+
+					ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+					defer cancel()
+					err := srv.Join(ctx)
+					if err != nil {
+						return fmt.Errorf("failed to stop server: %w", err)
+					}
+
+				case err := <-doneC:
+					monitorCancel()
+					if err != nil {
+						return fmt.Errorf("server stopped unexpectedly: %w", err)
+					}
+				}
+
+				return nil
 			}()
 
-			sigC := make(chan os.Signal, 1)
-			signal.Notify(sigC, syscall.SIGINT, syscall.SIGTERM)
-
-			select {
-			case <-sigC:
-				monitorCancel()
-				srv.Stop()
-
-				ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-				defer cancel()
-				err := srv.Join(ctx)
-				if err != nil {
-					return fmt.Errorf("failed to stop server: %w", err)
-				}
-
-			case err := <-doneC:
-				monitorCancel()
-				if err != nil {
-					return fmt.Errorf("server stopped unexpectedly: %w", err)
-				}
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "ERROR: %v\n", err)
+				exitCode = 1
 			}
-
-			return nil
 		},
 	}
 
