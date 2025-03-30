@@ -17,6 +17,7 @@ func NewStreamCommand() *cobra.Command {
 		NewStreamTailCommand(),
 		NewStreamSetCommand(),
 		NewStreamIndexCommand(),
+		NewStreamPurgeCommand(),
 	)
 
 	return cmd
