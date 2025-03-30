@@ -57,6 +57,7 @@ func main() {
 	rootCmd.AddCommand(
 		NewStreamCommand(),
 		NewPipelineCommand(),
+		NewTransformerCommand(),
 	)
 
 	if err := rootCmd.Execute(); err != nil {
