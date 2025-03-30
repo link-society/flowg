@@ -20,6 +20,7 @@ import (
 
 func NewStreamTailCommand() *cobra.Command {
 	type options struct {
+		name   string
 		filter string
 		period string
 	}
@@ -30,8 +31,6 @@ func NewStreamTailCommand() *cobra.Command {
 		Use:   "tail",
 		Short: "Fetch logs until now",
 		Run: func(cmd *cobra.Command, args []string) {
-			streamName := cmd.Context().Value(StreamName).(string)
-
 			period, err := timex.ParseDuration(opts.period)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not parse period: %v\n", err)
@@ -42,7 +41,7 @@ func NewStreamTailCommand() *cobra.Command {
 			to := time.Now()
 			from := to.Add(-period)
 
-			url := fmt.Sprintf("/api/v1/streams/%s/logs", streamName)
+			url := fmt.Sprintf("/api/v1/streams/%s/logs", opts.name)
 			client := cmd.Context().Value(ApiClient).(*client.Client)
 			req, err := http.NewRequest("GET", url, nil)
 			if err != nil {
@@ -96,6 +95,13 @@ func NewStreamTailCommand() *cobra.Command {
 			}
 		},
 	}
+
+	cmd.Flags().StringVar(
+		&opts.name,
+		"name",
+		"default",
+		"Name of the stream",
+	)
 
 	cmd.Flags().StringVar(
 		&opts.filter,

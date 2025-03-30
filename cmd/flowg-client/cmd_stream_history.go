@@ -19,6 +19,7 @@ import (
 
 func NewStreamHistoryCommand() *cobra.Command {
 	type options struct {
+		name   string
 		filter string
 		from   string
 		to     string
@@ -30,9 +31,7 @@ func NewStreamHistoryCommand() *cobra.Command {
 		Use:   "history",
 		Short: "Fetch logs using a time window",
 		Run: func(cmd *cobra.Command, args []string) {
-			streamName := cmd.Context().Value(StreamName).(string)
-
-			url := fmt.Sprintf("/api/v1/streams/%s/logs", streamName)
+			url := fmt.Sprintf("/api/v1/streams/%s/logs", opts.name)
 			client := cmd.Context().Value(ApiClient).(*client.Client)
 			req, err := http.NewRequest("GET", url, nil)
 			if err != nil {
@@ -86,6 +85,13 @@ func NewStreamHistoryCommand() *cobra.Command {
 			}
 		},
 	}
+
+	cmd.Flags().StringVar(
+		&opts.name,
+		"name",
+		"default",
+		"Name of the stream",
+	)
 
 	cmd.Flags().StringVar(
 		&opts.filter,
