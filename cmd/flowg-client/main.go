@@ -54,7 +54,10 @@ func main() {
 		"URL to FlowG Management HTTP API",
 	)
 
-	rootCmd.AddCommand(NewStreamCommand())
+	rootCmd.AddCommand(
+		NewStreamCommand(),
+		NewPipelineCommand(),
+	)
 
 	if err := rootCmd.Execute(); err != nil {
 		exitCode = 1
