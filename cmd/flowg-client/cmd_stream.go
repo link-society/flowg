@@ -11,6 +11,7 @@ func NewStreamCommand() *cobra.Command {
 	}
 
 	cmd.AddCommand(
+		NewStreamListCommand(),
 		NewStreamWatchCommand(),
 		NewStreamHistoryCommand(),
 		NewStreamTailCommand(),
