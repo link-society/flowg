@@ -19,6 +19,7 @@ import (
 
 func NewStreamWatchCommand() *cobra.Command {
 	type options struct {
+		name   string
 		filter string
 	}
 
@@ -28,9 +29,7 @@ func NewStreamWatchCommand() *cobra.Command {
 		Use:   "watch",
 		Short: "Watch logs in real-time",
 		Run: func(cmd *cobra.Command, args []string) {
-			streamName := cmd.Context().Value(StreamName).(string)
-
-			url := fmt.Sprintf("/api/v1/streams/%s/logs/watch", streamName)
+			url := fmt.Sprintf("/api/v1/streams/%s/logs/watch", opts.name)
 			client := cmd.Context().Value(ApiClient).(*client.Client)
 			req, err := http.NewRequest("GET", url, nil)
 			if err != nil {
@@ -99,6 +98,13 @@ func NewStreamWatchCommand() *cobra.Command {
 			}
 		},
 	}
+
+	cmd.Flags().StringVar(
+		&opts.name,
+		"name",
+		"default",
+		"Name of the stream",
+	)
 
 	cmd.Flags().StringVar(
 		&opts.filter,
