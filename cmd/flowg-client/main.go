@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -58,7 +57,6 @@ func main() {
 	rootCmd.AddCommand(NewStreamCommand())
 
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: %v\n", err)
 		exitCode = 1
 	}
 
