@@ -146,8 +146,7 @@ ENV FLOWG_AUTH_DIR="/data/auth"
 ENV FLOWG_CONFIG_DIR="/data/config"
 ENV FLOWG_LOG_DIR="/data/logs"
 
-HEALTHCHECK --interval=5m --timeout=3s \
-  CMD curl -f http://localhost:9113/health || exit 1
+HEALTHCHECK --interval=5m --timeout=3s CMD curl -f http://localhost:9113/health || exit 1
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["serve"]
