@@ -200,6 +200,15 @@ func (s *Storage) SaveUser(ctx context.Context, user models.User, password strin
 	)
 }
 
+func (s *Storage) PatchUserRoles(ctx context.Context, user models.User) error {
+	return s.kvStore.Update(
+		ctx,
+		func(txn *badger.Txn) error {
+			return transactions.PatchUserRoles(txn, user)
+		},
+	)
+}
+
 func (s *Storage) DeleteUser(ctx context.Context, name string) error {
 	return s.kvStore.Update(
 		ctx,
