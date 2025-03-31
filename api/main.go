@@ -121,6 +121,7 @@ func NewHandler(deps *Dependencies) http.Handler {
 		r.Delete("/api/v1/roles/{role}", ctrl.DeleteRoleUsecase())
 
 		r.Get("/api/v1/users", ctrl.ListUsersUsecase())
+		r.Get("/api/v1/users/{user}", ctrl.GetUserUsecase())
 		r.Put("/api/v1/users/{user}", ctrl.SaveUserUsecase())
 		r.Patch("/api/v1/users/{user}", ctrl.PatchUserRolesUsecase())
 		r.Delete("/api/v1/users/{user}", ctrl.DeleteUserUsecase())
