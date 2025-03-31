@@ -65,16 +65,20 @@ func SaveUser(txn *badger.Txn, user models.User, password string) error {
 		return fmt.Errorf("failed to hash password: %w", err)
 	}
 
-	key := []byte(fmt.Sprintf("index:user:%s", user.Name))
-	err = txn.Set(key, []byte{})
-	if err != nil {
-		return fmt.Errorf("failed to save index of user '%s': %w", user.Name, err)
-	}
-
-	key = []byte(fmt.Sprintf("user:%s:password", user.Name))
+	key := []byte(fmt.Sprintf("user:%s:password", user.Name))
 	err = txn.Set(key, []byte(passwordHash))
 	if err != nil {
 		return fmt.Errorf("failed to save password of user '%s': %w", user.Name, err)
+	}
+
+	return PatchUserRoles(txn, user)
+}
+
+func PatchUserRoles(txn *badger.Txn, user models.User) error {
+	key := []byte(fmt.Sprintf("index:user:%s", user.Name))
+	err := txn.Set(key, []byte{})
+	if err != nil {
+		return fmt.Errorf("failed to save index of user '%s': %w", user.Name, err)
 	}
 
 	opts := badger.DefaultIteratorOptions
