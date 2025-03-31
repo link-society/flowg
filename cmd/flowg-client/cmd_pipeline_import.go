@@ -62,7 +62,7 @@ func NewPipelineImportCommand() *cobra.Command {
 
 			client := cmd.Context().Value(ApiClient).(*client.Client)
 			url := fmt.Sprintf("/api/v1/pipelines/%s", opts.name)
-			req, err := http.NewRequest("PUT", url, bytes.NewBuffer(payload))
+			req, err := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(payload))
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not prepare request: %v\n", err)
 				exitCode = 1

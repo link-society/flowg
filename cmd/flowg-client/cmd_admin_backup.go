@@ -64,7 +64,7 @@ func NewAdminBackupCommand() *cobra.Command {
 
 func backup(client *client.Client, dbType string, destDir string) error {
 	url := fmt.Sprintf("/api/v1/backup/%s", dbType)
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
 	}

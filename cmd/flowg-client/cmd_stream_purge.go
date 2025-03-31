@@ -24,7 +24,7 @@ func NewStreamPurgeCommand() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			client := cmd.Context().Value(ApiClient).(*client.Client)
 			url := fmt.Sprintf("/api/v1/streams/%s", opts.name)
-			req, err := http.NewRequest("DELETE", url, nil)
+			req, err := http.NewRequest(http.MethodDelete, url, nil)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not prepare request: %v\n", err)
 				exitCode = 1
