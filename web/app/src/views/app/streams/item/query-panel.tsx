@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 import SearchIcon from '@mui/icons-material/Search'
 
-import Grid from '@mui/material/Grid2'
+import Grid from '@mui/material/Grid'
 import CircularProgress from '@mui/material/CircularProgress'
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'

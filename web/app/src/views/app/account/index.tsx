@@ -1,6 +1,6 @@
 import { useLoaderData } from 'react-router'
 
-import Grid from '@mui/material/Grid2'
+import Grid from '@mui/material/Grid'
 
 import { ProfileInfo } from './profile-info'
 import { TokenList } from './token-list'

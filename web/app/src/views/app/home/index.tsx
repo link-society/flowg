@@ -3,7 +3,7 @@ import FilterAltIcon from '@mui/icons-material/FilterAlt'
 import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox'
 import AccountTreeIcon from '@mui/icons-material/AccountTree'
 
-import Grid from '@mui/material/Grid2'
+import Grid from '@mui/material/Grid'
 
 import { useProfile } from '@/lib/context/profile'
 

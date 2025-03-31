@@ -3,7 +3,7 @@ import { useLoaderData, useParams } from 'react-router'
 import { useApiOperation } from '@/lib/hooks/api'
 import { useNotify } from '@/lib/hooks/notify'
 
-import Grid from '@mui/material/Grid2'
+import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
 import Divider from '@mui/material/Divider'
 

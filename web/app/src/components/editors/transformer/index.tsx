@@ -3,7 +3,7 @@ import { useApiOperation } from '@/lib/hooks/api'
 
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 
-import Grid from '@mui/material/Grid2'
+import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
