@@ -68,7 +68,7 @@ func restore(client *client.Client, dbType string, srcDir string) error {
 	body, writer := io.Pipe()
 
 	url := fmt.Sprintf("/api/v1/restore/%s", dbType)
-	req, err := http.NewRequest("POST", url, body)
+	req, err := http.NewRequest(http.MethodPost, url, body)
 	if err != nil {
 		return fmt.Errorf("failed to prepare request: %w", err)
 	}

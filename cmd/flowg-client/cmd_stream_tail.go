@@ -43,7 +43,7 @@ func NewStreamTailCommand() *cobra.Command {
 
 			url := fmt.Sprintf("/api/v1/streams/%s/logs", opts.name)
 			client := cmd.Context().Value(ApiClient).(*client.Client)
-			req, err := http.NewRequest("GET", url, nil)
+			req, err := http.NewRequest(http.MethodGet, url, nil)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not prepare request: %v\n", err)
 				exitCode = 1
