@@ -143,7 +143,7 @@ jobs:
           context: 'Web End-To-End Test Report'
           description: 'Passed'
           state: 'success'
-          sha: ${{github.event.pull_request_target.head.sha }}
+          sha: ${{ github.event.pull_request.head.sha }}
 
       - name: report-failure@status
         uses: guibranco/github-status-action-v2@v1
@@ -153,7 +153,7 @@ jobs:
           context: 'Web End-To-End Test Report'
           description: 'Failure'
           state: 'failure'
-          sha: ${{github.event.pull_request_target.head.sha }}
+          sha: ${{ github.event.pull_request.head.sha }}
 
       - name: upload-logs@artifact
         if: ${{ github.event_name == 'pull_request_target' && failure() }}
