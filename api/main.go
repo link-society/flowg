@@ -117,6 +117,7 @@ func NewHandler(deps *Dependencies) http.Handler {
 		r.Delete("/api/v1/forwarders/{forwarder}", ctrl.DeleteForwarderUsecase())
 
 		r.Get("/api/v1/roles", ctrl.ListRolesUsecase())
+		r.Get("/api/v1/roles/{role}", ctrl.GetRoleUsecase())
 		r.Put("/api/v1/roles/{role}", ctrl.SaveRoleUsecase())
 		r.Delete("/api/v1/roles/{role}", ctrl.DeleteRoleUsecase())
 
