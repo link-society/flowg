@@ -8,7 +8,7 @@ import LockIcon from '@mui/icons-material/Lock'
 import LoginIcon from '@mui/icons-material/Login'
 
 import Divider from '@mui/material/Divider'
-import Grid from '@mui/material/Grid2'
+import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'

@@ -1,6 +1,6 @@
 import { useLoaderData } from 'react-router'
 
-import Grid from '@mui/material/Grid2'
+import Grid from '@mui/material/Grid'
 
 import { RoleList } from './role-list'
 import { UserList } from './user-list'
