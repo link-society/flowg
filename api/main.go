@@ -122,6 +122,7 @@ func NewHandler(deps *Dependencies) http.Handler {
 
 		r.Get("/api/v1/users", ctrl.ListUsersUsecase())
 		r.Put("/api/v1/users/{user}", ctrl.SaveUserUsecase())
+		r.Patch("/api/v1/users/{user}", ctrl.PatchUserRolesUsecase())
 		r.Delete("/api/v1/users/{user}", ctrl.DeleteUserUsecase())
 
 		r.Get("/api/v1/auth/whoami", ctrl.WhoamiUsecase())
@@ -213,6 +214,10 @@ func (r *routerWrapper) Post(pattern string, u usecase.Interactor) {
 
 func (r *routerWrapper) Put(pattern string, u usecase.Interactor) {
 	r.Method(http.MethodPut, pattern, nethttp.NewHandler(u))
+}
+
+func (r *routerWrapper) Patch(pattern string, u usecase.Interactor) {
+	r.Method(http.MethodPatch, pattern, nethttp.NewHandler(u))
 }
 
 func (r *routerWrapper) Delete(pattern string, u usecase.Interactor) {
