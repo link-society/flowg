@@ -111,7 +111,7 @@ RUN upx bin/flowg-server
 
 FROM alpine:3.21 AS runner
 
-RUN apk add --no-cache libgcc su-exec curl
+RUN apk add --no-cache curl libgcc su-exec
 
 COPY --from=builder-go /workspace/bin/flowg-server /usr/local/bin/flowg-server
 
@@ -146,7 +146,7 @@ ENV FLOWG_AUTH_DIR="/data/auth"
 ENV FLOWG_CONFIG_DIR="/data/config"
 ENV FLOWG_LOG_DIR="/data/logs"
 
-HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost:9113/health | grep -q OK || exit 1
+HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost${FLOWG_MGMT_BIND_ADDRESS}/health | grep -q OK || exit 1
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["serve"]
