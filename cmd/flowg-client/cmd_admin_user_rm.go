@@ -51,7 +51,7 @@ func NewAdminUserDeleteCommand() *cobra.Command {
 		&opts.username,
 		"username",
 		"",
-		"Name of the new user",
+		"Name of the user",
 	)
 	cmd.MarkFlagRequired("username")
 
