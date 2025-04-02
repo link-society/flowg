@@ -102,8 +102,8 @@ WORKDIR /workspace
 
 RUN go generate ./...
 RUN go test -timeout 500ms -v ./...
-RUN go build -ldflags="-s -w" -o bin/ ./cmd/flowg-server
-RUN upx bin/flowg-server
+RUN go build -ldflags="-s -w" -o bin/ ./...
+RUN upx bin/*
 
 ##############################
 ## FINAL ARTIFACT
@@ -114,6 +114,7 @@ FROM alpine:3.21 AS runner
 RUN apk add --no-cache libgcc su-exec
 
 COPY --from=builder-go /workspace/bin/flowg-server /usr/local/bin/flowg-server
+COPY --from=builder-go /workspace/bin/flowg-health /usr/local/bin/flowg-health
 
 ADD docker/docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod 0700 /docker-entrypoint.sh
@@ -147,4 +148,6 @@ ENV FLOWG_CONFIG_DIR="/data/config"
 ENV FLOWG_LOG_DIR="/data/logs"
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["serve"]
+CMD []
+
+HEALTHCHECK --interval=5s --timeout=1s --retries=3 CMD ["/usr/local/bin/flowg-health", "--pid", "1"]
