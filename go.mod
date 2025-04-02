@@ -13,6 +13,7 @@ require (
 	github.com/hashicorp/memberlist v0.5.3
 	github.com/jarcoal/httpmock v1.3.1
 	github.com/prometheus/client_golang v1.21.1
+	github.com/prometheus/procfs v0.15.1
 	github.com/spf13/cobra v1.9.1
 	github.com/swaggest/openapi-go v0.2.57
 	github.com/swaggest/rest v0.2.73
@@ -50,7 +51,6 @@ require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.62.0 // indirect
-	github.com/prometheus/procfs v0.15.1 // indirect
 	github.com/santhosh-tekuri/jsonschema/v3 v3.1.0 // indirect
 	github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
