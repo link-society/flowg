@@ -11,6 +11,7 @@ func NewAdminCommand() *cobra.Command {
 	cmd.AddCommand(
 		NewAdminBackupCommand(),
 		NewAdminRestoreCommand(),
+		NewAdminUserCommand(),
 	)
 
 	return cmd
