@@ -1,11 +1,9 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"os"
 
-	"encoding/json"
 	"net/http"
 
 	"github.com/spf13/cobra"
@@ -13,33 +11,20 @@ import (
 	"link-society.com/flowg/internal/utils/client"
 )
 
-func NewAdminRoleAddCommand() *cobra.Command {
+func NewAclUserDeleteCommand() *cobra.Command {
 	type options struct {
-		name string
+		username string
 	}
 
 	opts := &options{}
 
 	cmd := &cobra.Command{
-		Use:   "add",
-		Short: "Add new role",
+		Use:   "rm",
+		Short: "Remove user",
 		Run: func(cmd *cobra.Command, args []string) {
-			body := struct {
-				Scopes []string `json:"scopes"`
-			}{
-				Scopes: []string{},
-			}
-
-			payload, err := json.Marshal(body)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "ERROR: Failed to marshal request body: %v\n", err)
-				exitCode = 1
-				return
-			}
-
 			client := cmd.Context().Value(ApiClient).(*client.Client)
-			url := fmt.Sprintf("/api/v1/roles/%s", opts.name)
-			req, err := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(payload))
+			url := fmt.Sprintf("/api/v1/users/%s", opts.username)
+			req, err := http.NewRequest(http.MethodDelete, url, nil)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Failed to prepare request: %v\n", err)
 				exitCode = 1
@@ -63,12 +48,12 @@ func NewAdminRoleAddCommand() *cobra.Command {
 	}
 
 	cmd.Flags().StringVar(
-		&opts.name,
-		"name",
+		&opts.username,
+		"username",
 		"",
-		"Name of the new role",
+		"Name of the user",
 	)
-	cmd.MarkFlagRequired("name")
+	cmd.MarkFlagRequired("username")
 
 	return cmd
 }

@@ -58,6 +58,7 @@ func main() {
 		NewStreamCommand(),
 		NewPipelineCommand(),
 		NewTransformerCommand(),
+		NewAclCommand(),
 		NewAdminCommand(),
 	)
 

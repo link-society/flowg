@@ -16,7 +16,7 @@ import (
 	"link-society.com/flowg/internal/utils/client"
 )
 
-func NewAdminRoleListCommand() *cobra.Command {
+func NewAclRoleListCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "ls",
 		Short: "List all roles",
