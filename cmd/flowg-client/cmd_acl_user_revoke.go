@@ -12,32 +12,24 @@ import (
 
 	"link-society.com/flowg/api"
 
-	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/utils/client"
 )
 
-func NewAdminRoleGrantCommand() *cobra.Command {
+func NewAclUserRevokeCommand() *cobra.Command {
 	type options struct {
-		name       string
-		permission string
+		username string
+		rolename string
 	}
 
 	opts := &options{}
 
 	cmd := &cobra.Command{
-		Use:   "grant",
-		Short: "Grant a permission to a role",
+		Use:   "revoke",
+		Short: "Revoke a role from a user",
 		Run: func(cmd *cobra.Command, args []string) {
-			newScope, err := models.ParseScope(opts.permission)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "ERROR: Invalid permission: %v\n", err)
-				exitCode = 1
-				return
-			}
-
 			client := cmd.Context().Value(ApiClient).(*client.Client)
 
-			url := fmt.Sprintf("/api/v1/roles/%s", opts.name)
+			url := fmt.Sprintf("/api/v1/users/%s", opts.username)
 			req, err := http.NewRequest(http.MethodGet, url, nil)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not prepare request: %v\n", err)
@@ -59,7 +51,7 @@ func NewAdminRoleGrantCommand() *cobra.Command {
 				return
 			}
 
-			var data api.GetRoleResponse
+			var data api.GetUserResponse
 			if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not decode response: %v\n", err)
 				exitCode = 1
@@ -67,23 +59,21 @@ func NewAdminRoleGrantCommand() *cobra.Command {
 			}
 
 			found := false
-			for _, scope := range data.Role.Scopes {
-				if scope == newScope {
+			for i, role := range data.User.Roles {
+				if role == opts.rolename {
+					data.User.Roles = append(
+						data.User.Roles[:i],
+						data.User.Roles[i+1:]...,
+					)
 					found = true
 					break
 				}
 			}
-			if !found {
-				data.Role.Scopes = append(data.Role.Scopes, newScope)
-				scopes := make([]string, len(data.Role.Scopes))
-				for i, scope := range data.Role.Scopes {
-					scopes[i] = string(scope)
-				}
-
+			if found {
 				body := struct {
-					Scopes []string `json:"scopes"`
+					Roles []string `json:"roles"`
 				}{
-					Scopes: scopes,
+					Roles: data.User.Roles,
 				}
 
 				payload, err := json.Marshal(body)
@@ -93,7 +83,7 @@ func NewAdminRoleGrantCommand() *cobra.Command {
 					return
 				}
 
-				req, err := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(payload))
+				req, err := http.NewRequest(http.MethodPatch, url, bytes.NewBuffer(payload))
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "ERROR: Could not prepare request: %v\n", err)
 					exitCode = 1
@@ -118,20 +108,20 @@ func NewAdminRoleGrantCommand() *cobra.Command {
 	}
 
 	cmd.Flags().StringVar(
-		&opts.name,
-		"name",
+		&opts.username,
+		"username",
 		"",
-		"Name of the role to grant the permission to",
+		"Name of the user to revoke the role from",
 	)
-	cmd.MarkFlagRequired("name")
+	cmd.MarkFlagRequired("username")
 
 	cmd.Flags().StringVar(
-		&opts.permission,
-		"permission",
+		&opts.rolename,
+		"rolename",
 		"",
-		"Permission to grant to the role",
+		"Name of the role to revoke from the user",
 	)
-	cmd.MarkFlagRequired("permission")
+	cmd.MarkFlagRequired("rolename")
 
 	return cmd
 }

@@ -16,7 +16,7 @@ import (
 	"link-society.com/flowg/internal/utils/client"
 )
 
-func NewAdminUserListCommand() *cobra.Command {
+func NewAclUserListCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "ls",
 		Short: "List all users",
