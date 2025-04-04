@@ -8,16 +8,21 @@
     "@trivago/prettier-plugin-sort-imports"
   ],
   "importOrder": [
+    "^(@xyflow/(.*)|ag-grid-(community|react)/(.*)).css$",
+    "^\\./(.*).css$",
     "^(react(/.*)?)",
-    "^@(mui|toolpad)/(.*)",
+    "^@(mui/material/(.*)|toolpad/core/(.*))",
     "^@mui/icons-material/(.*)",
     "^@(xyflow|monaco-editor)/(.*)",
-    "^ag-grid-(community|react)$",
-    "^@/lib/(.*)",
-    "^@/layouts/(.*)",
-    "^@/components/(.*)",
-    "^@/views/(.*)",
-    "^\\./(.*)"
+    "^ag-grid-(community|react)(/(.*))?$",
+    "^@/lib(/(.*))?",
+    "^@/layouts(/(.*))?",
+    "^@/components(/(.*))?",
+    "^@/views(/(.*))?",
+    "^@/router(/(.*))?",
+    "^@/App",
+    "^\\./(.*)",
+    "^\\.\\./(.*)"
   ],
   "importOrderSeparation": true,
   "importOrderSortSpecifiers": true
