@@ -47,8 +47,7 @@ const request = async<B, R extends { success: boolean }>(
 
   try {
     responseBody = await response.json()
-
-  } catch (error) {
+  } catch {
     throw new errors.InvalidResponseError(
       'Invalid response from the server',
       await response.text(),
