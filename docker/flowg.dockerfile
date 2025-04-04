@@ -75,6 +75,7 @@ COPY --from=sources-js /src /workspace
 WORKDIR /workspace/web/app
 
 RUN npm i
+RUN npm run lint
 RUN NODE_ENV="production" npm run build
 
 ##############################
