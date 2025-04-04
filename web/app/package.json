@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc -b && vite build",
     "build:dev": "tsc -b && vite build --mode development",
-    "lint": "eslint . && prettier --check ."
+    "lint": "eslint . && prettier --check .",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
