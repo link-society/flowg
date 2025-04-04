@@ -1,12 +1,12 @@
 import { useState } from 'react'
 
-import AddIcon from '@mui/icons-material/Add'
-import DeleteIcon from '@mui/icons-material/Delete'
-
+import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
 import Paper from '@mui/material/Paper'
-import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
+
+import AddIcon from '@mui/icons-material/Add'
+import DeleteIcon from '@mui/icons-material/Delete'
 
 import { StreamConfigModel } from '@/lib/models/storage'
 
@@ -15,13 +15,18 @@ type StreamEditorProps = {
   onStreamConfigChange: (config: StreamConfigModel) => void
 }
 
-export const StreamEditor = ({ streamConfig, onStreamConfigChange }: StreamEditorProps) => {
+export const StreamEditor = ({
+  streamConfig,
+  onStreamConfigChange,
+}: StreamEditorProps) => {
   const [newField, setNewField] = useState('')
 
   return (
     <div className="h-full flex flex-row items-stretch gap-3">
       <Paper className="h-full flex-1 flex flex-col items-stretch">
-        <h1 className="p-3 bg-gray-100 text-xl text-center font-semibold">Retention</h1>
+        <h1 className="p-3 bg-gray-100 text-xl text-center font-semibold">
+          Retention
+        </h1>
         <Divider />
 
         <div
@@ -58,12 +63,18 @@ export const StreamEditor = ({ streamConfig, onStreamConfigChange }: StreamEdito
             }}
           />
 
-          <p className="italic">Use <code className="font-mono bg-gray-200 text-red-500 px-1">0</code> to disable</p>
+          <p className="italic">
+            Use{' '}
+            <code className="font-mono bg-gray-200 text-red-500 px-1">0</code>{' '}
+            to disable
+          </p>
         </div>
       </Paper>
 
       <Paper className="h-full flex-1 flex flex-col items-stretch">
-        <h1 className="p-3 bg-gray-100 text-xl text-center font-semibold">Indexes</h1>
+        <h1 className="p-3 bg-gray-100 text-xl text-center font-semibold">
+          Indexes
+        </h1>
         <Divider />
 
         <div
@@ -83,8 +94,8 @@ export const StreamEditor = ({ streamConfig, onStreamConfigChange }: StreamEdito
                 onChange={(e) => {
                   onStreamConfigChange({
                     ...streamConfig,
-                    indexed_fields: streamConfig.indexed_fields.map(
-                      (f) => f === field ? e.target.value : f
+                    indexed_fields: streamConfig.indexed_fields.map((f) =>
+                      f === field ? e.target.value : f
                     ),
                   })
                 }}

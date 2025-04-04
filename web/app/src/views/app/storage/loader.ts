@@ -1,7 +1,7 @@
 import { LoaderFunction } from 'react-router'
 
-import { loginRequired } from '@/lib/decorators/loaders'
 import * as configApi from '@/lib/api/operations/config'
+import { loginRequired } from '@/lib/decorators/loaders'
 import { StreamConfigModel } from '@/lib/models/storage'
 
 export type LoaderData = {
@@ -9,24 +9,19 @@ export type LoaderData = {
   currentStream?: string
 }
 
-export const loader: LoaderFunction = loginRequired(
-  async ({ params }) => {
-    const streams = await configApi.listStreams()
+export const loader: LoaderFunction = loginRequired(async ({ params }) => {
+  const streams = await configApi.listStreams()
 
-    if (params.stream !== undefined) {
-      if (streams[params.stream] === undefined) {
-        throw new Response(
-          `Stream ${params.stream} not found`,
-          { status: 404 },
-        )
-      }
-
-      return {
-        streams,
-        currentStream: params.stream,
-      }
+  if (params.stream !== undefined) {
+    if (streams[params.stream] === undefined) {
+      throw new Response(`Stream ${params.stream} not found`, { status: 404 })
     }
 
-    return { streams }
-  },
-)
+    return {
+      streams,
+      currentStream: params.stream,
+    }
+  }
+
+  return { streams }
+})

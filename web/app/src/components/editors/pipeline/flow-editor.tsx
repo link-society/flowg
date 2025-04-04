@@ -7,46 +7,47 @@ import React, {
   useState,
 } from 'react'
 
+import Chip from '@mui/material/Chip'
+import Paper from '@mui/material/Paper'
 import * as colors from '@mui/material/colors'
 
 import DeviceHubIcon from '@mui/icons-material/DeviceHub'
 
-import Paper from '@mui/material/Paper'
-import Chip from '@mui/material/Chip'
-
 import {
-  ReactFlow,
   Background,
   Controls,
+  type Edge,
+  type Node,
+  type OnConnect,
+  type OnEdgesChange,
+  type OnNodesChange,
   Panel,
+  ReactFlow,
   addEdge,
   applyEdgeChanges,
   applyNodeChanges,
   useReactFlow,
-  type Node,
-  type Edge,
-  type OnNodesChange,
-  type OnEdgesChange,
-  type OnConnect,
 } from '@xyflow/react'
 
-import { HooksContext } from './hooks'
-
-import { SourceNode } from './nodes/source'
-import { TransformNode } from './nodes/transform'
-import { SwitchNode } from './nodes/switch'
-import { PipelineNode } from './nodes/pipeline'
-import { ForwarderNode } from './nodes/forwarder'
-import { RouterNode } from './nodes/router'
-
 import { PipelineModel } from '@/lib/models/pipeline'
+
+import { HooksContext } from './hooks'
+import { ForwarderNode } from './nodes/forwarder'
+import { PipelineNode } from './nodes/pipeline'
+import { RouterNode } from './nodes/router'
+import { SourceNode } from './nodes/source'
+import { SwitchNode } from './nodes/switch'
+import { TransformNode } from './nodes/transform'
 
 type FlowEditorProps = Readonly<{
   flow: PipelineModel
   onFlowChange: (flow: PipelineModel) => void
 }>
 
-export const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange }) => {
+export const FlowEditor: React.FC<FlowEditorProps> = ({
+  flow,
+  onFlowChange,
+}) => {
   const { screenToFlowPosition } = useReactFlow()
 
   const nodeTypes = useMemo(
@@ -58,51 +59,52 @@ export const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange }) =>
       forwarder: ForwarderNode,
       router: RouterNode,
     }),
-    [],
+    []
   )
 
-  const [nodes, setNodes] = useState<Node[]>(flow.nodes.map(node => {
-    if (node.type === 'source') {
-      node.deletable = false
-    }
+  const [nodes, setNodes] = useState<Node[]>(
+    flow.nodes.map((node) => {
+      if (node.type === 'source') {
+        node.deletable = false
+      }
 
-    return node
-  }))
+      return node
+    })
+  )
 
   const [edges, setEdges] = useState<Edge[]>(flow.edges)
 
   const hooksCtx = useContext(HooksContext)
   hooksCtx.setNodes = setNodes
 
-  useEffect(
-    () => {
-      const initialNodes = flow.nodes
-      const initialEdges = flow.edges
+  useEffect(() => {
+    const initialNodes = flow.nodes
+    const initialEdges = flow.edges
 
-      setNodes((oldNodes) => {
-        const oldNodesById = oldNodes.reduce((acc, node) => {
+    setNodes((oldNodes) => {
+      const oldNodesById = oldNodes.reduce(
+        (acc, node) => {
           acc[node.id] = node
           return acc
-        }, {} as { [key: string]: Node })
+        },
+        {} as { [key: string]: Node }
+      )
 
-        return initialNodes.map((node: Node) => {
-          const oldNode = oldNodesById[node.id]
-          if (oldNode !== undefined && oldNode.measured) {
-            node.measured = oldNode.measured
-          }
+      return initialNodes.map((node: Node) => {
+        const oldNode = oldNodesById[node.id]
+        if (oldNode !== undefined && oldNode.measured) {
+          node.measured = oldNode.measured
+        }
 
-          return node
-        })
+        return node
       })
-      setEdges(initialEdges)
-    },
-    [flow],
-  )
+    })
+    setEdges(initialEdges)
+  }, [flow])
 
-  useEffect(
-    () => { onFlowChange({ nodes, edges }) },
-    [nodes, edges],
-  )
+  useEffect(() => {
+    onFlowChange({ nodes, edges })
+  }, [nodes, edges])
 
   const onNodesChange: OnNodesChange = (changes) =>
     setNodes((nds) => applyNodeChanges(changes, nds))
@@ -110,8 +112,7 @@ export const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange }) =>
   const onEdgesChange: OnEdgesChange = (changes) =>
     setEdges((eds) => applyEdgeChanges(changes, eds))
 
-  const onConnect: OnConnect = (conn) =>
-    setEdges((eds) => addEdge(conn, eds))
+  const onConnect: OnConnect = (conn) => setEdges((eds) => addEdge(conn, eds))
 
   const onDragOver: DragEventHandler<HTMLDivElement> = (event) => {
     event.preventDefault()
@@ -129,7 +130,9 @@ export const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange }) =>
         pipeline: 'pipeline',
         switch: 'switch',
       }
-      const itemType = event.dataTransfer.getData('item-type') as keyof typeof itemToNodeMap
+      const itemType = event.dataTransfer.getData(
+        'item-type'
+      ) as keyof typeof itemToNodeMap
       const dndNodeType = itemToNodeMap[itemType]
 
       if (!dndNodeType) {
@@ -152,26 +155,26 @@ export const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange }) =>
 
         switch (type) {
           case 'transform':
-            newNode.data = {transformer: event.dataTransfer.getData('item')}
+            newNode.data = { transformer: event.dataTransfer.getData('item') }
             break
 
           case 'router':
-            newNode.data = {stream: event.dataTransfer.getData('item')}
+            newNode.data = { stream: event.dataTransfer.getData('item') }
             break
 
           case 'forwarder':
-            newNode.data = {forwarder: event.dataTransfer.getData('item')}
+            newNode.data = { forwarder: event.dataTransfer.getData('item') }
             break
 
           case 'pipeline':
-            newNode.data = {pipeline: event.dataTransfer.getData('item')}
+            newNode.data = { pipeline: event.dataTransfer.getData('item') }
             break
         }
 
         return [...nds, newNode]
       })
     },
-    [screenToFlowPosition],
+    [screenToFlowPosition]
   )
 
   return (
@@ -193,7 +196,10 @@ export const FlowEditor: React.FC<FlowEditorProps> = ({ flow, onFlowChange }) =>
         <Controls />
 
         <Panel position="top-left">
-          <Paper variant="outlined" className="flex flex-row items-center gap-3 shadow-xs">
+          <Paper
+            variant="outlined"
+            className="flex flex-row items-center gap-3 shadow-xs"
+          >
             <div
               className="
                 self-stretch flex flex-row items-center

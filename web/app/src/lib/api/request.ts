@@ -16,13 +16,13 @@ type ApiRequestResult<R> = {
 
 type RequestOptions<B> = {
   path: string
-  searchParams?: URLSearchParams,
+  searchParams?: URLSearchParams
   body?: B
 }
 
-const request = async<B, R extends { success: boolean }>(
+const request = async <B, R extends { success: boolean }>(
   method: ApiMethod,
-  { path, searchParams, body }: RequestOptions<B>,
+  { path, searchParams, body }: RequestOptions<B>
 ): Promise<ApiRequestResult<R>> => {
   let authHeader = ''
 
@@ -31,17 +31,14 @@ const request = async<B, R extends { success: boolean }>(
     authHeader = `Bearer jwt:${token}`
   }
 
-  const response = await fetch(
-    `${path}?${searchParams?.toString() ?? ''}`,
-    {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': authHeader,
-      },
-      body: JSON.stringify(body),
+  const response = await fetch(`${path}?${searchParams?.toString() ?? ''}`, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: authHeader,
     },
-  )
+    body: JSON.stringify(body),
+  })
 
   let responseBody: unknown
 
@@ -52,7 +49,7 @@ const request = async<B, R extends { success: boolean }>(
       'Invalid response from the server',
       await response.text(),
       response.status,
-      response.ok,
+      response.ok
     )
   }
 
@@ -82,41 +79,39 @@ const request = async<B, R extends { success: boolean }>(
   }
 }
 
-export const GET = async<R extends { success: boolean }>(
-  options: RequestOptions<never>,
+export const GET = async <R extends { success: boolean }>(
+  options: RequestOptions<never>
 ): Promise<ApiRequestResult<R>> => {
   return request('GET', options)
 }
 
-export const POST = async<B, R extends { success: boolean }>(
-  options: RequestOptions<B>,
+export const POST = async <B, R extends { success: boolean }>(
+  options: RequestOptions<B>
 ): Promise<ApiRequestResult<R>> => {
   return request('POST', options)
 }
 
-export const PUT = async<B, R extends { success: boolean }>(
-  options: RequestOptions<B>,
+export const PUT = async <B, R extends { success: boolean }>(
+  options: RequestOptions<B>
 ): Promise<ApiRequestResult<R>> => {
   return request('PUT', options)
 }
 
-export const DELETE = async<R extends { success: boolean }>(
-  options: RequestOptions<never>,
+export const DELETE = async <R extends { success: boolean }>(
+  options: RequestOptions<never>
 ): Promise<ApiRequestResult<R>> => {
   return request('DELETE', options)
 }
 
-export const SSE = (
-  options: RequestOptions<never>,
-) => {
+export const SSE = (options: RequestOptions<never>) => {
   const eventSource = new EventSourcePlus(
     `${options.path}?${options.searchParams?.toString() ?? ''}`,
     {
       maxRetryCount: 0,
       headers: {
-        'Authorization': `Bearer jwt:${localStorage.getItem('token')}`,
+        Authorization: `Bearer jwt:${localStorage.getItem('token')}`,
       },
-    },
+    }
   )
 
   const messages = new EventTarget()
@@ -142,8 +137,7 @@ export const SSE = (
           default:
             throw new errors.ApiError(content.error)
         }
-      }
-      catch (error) {
+      } catch (error) {
         cancelScope.abort(`${error}`)
         control.dispatchEvent(new CustomEvent('error', { detail: error }))
       }
@@ -156,7 +150,7 @@ export const SSE = (
       }
 
       messages.dispatchEvent(new CustomEvent(msg.event, { detail }))
-    }
+    },
   })
 
   return {
@@ -164,6 +158,6 @@ export const SSE = (
     control,
     close() {
       cancelScope.abort('normal')
-    }
+    },
   }
 }

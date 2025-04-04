@@ -1,5 +1,4 @@
 import * as request from '@/lib/api/request'
-
 import { TokenModel } from '@/lib/models/auth'
 
 export const listTokens = async (): Promise<string[]> => {

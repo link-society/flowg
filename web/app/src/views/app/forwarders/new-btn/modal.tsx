@@ -1,27 +1,28 @@
-import * as configApi from '@/lib/api/operations/config'
+import React, { useState } from 'react'
 
+import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import MenuItem from '@mui/material/MenuItem'
+import Select from '@mui/material/Select'
+import TextField from '@mui/material/TextField'
+import { DialogProps } from '@toolpad/core/useDialogs'
+
+import CancelIcon from '@mui/icons-material/Cancel'
+import SaveIcon from '@mui/icons-material/Save'
+
+import * as configApi from '@/lib/api/operations/config'
+import { useApiOperation } from '@/lib/hooks/api'
 import {
   ForwarderModel,
   ForwarderTypeValues,
   ForwarderTypes,
 } from '@/lib/models/forwarder'
-import React, { useState } from 'react'
-
-import Button from '@mui/material/Button'
-import CancelIcon from '@mui/icons-material/Cancel'
-import CircularProgress from '@mui/material/CircularProgress'
-import Dialog from '@mui/material/Dialog'
-import DialogActions from '@mui/material/DialogActions'
-import DialogContent from '@mui/material/DialogContent'
-import { DialogProps } from '@toolpad/core/useDialogs'
-import DialogTitle from '@mui/material/DialogTitle'
-import FormControl from '@mui/material/FormControl'
-import InputLabel from '@mui/material/InputLabel'
-import MenuItem from '@mui/material/MenuItem'
-import SaveIcon from '@mui/icons-material/Save'
-import Select from '@mui/material/Select'
-import TextField from '@mui/material/TextField'
-import { useApiOperation } from '@/lib/hooks/api'
 
 const newForwarderFactory = (type: ForwarderTypes): ForwarderModel => {
   switch (type) {
@@ -51,7 +52,7 @@ const newForwarderFactory = (type: ForwarderTypes): ForwarderModel => {
         config: {
           type,
           url: 'https://http-intake.logs.datadoghq.com/api/v2/logs',
-          apiKey: ''
+          apiKey: '',
         },
       }
 
@@ -60,17 +61,17 @@ const newForwarderFactory = (type: ForwarderTypes): ForwarderModel => {
   }
 }
 
-export const NewForwarderModal = ({ open, onClose }: DialogProps<void, string | null>) => {
+export const NewForwarderModal = ({
+  open,
+  onClose,
+}: DialogProps<void, string | null>) => {
   const [name, setName] = useState('')
   const [type, setType] = useState<ForwarderTypes>('http')
 
-  const [onSubmit, loading] = useApiOperation(
-    async () => {
-      await configApi.saveForwarder(name, newForwarderFactory(type))
-      onClose(name)
-    },
-    [name, type],
-  )
+  const [onSubmit, loading] = useApiOperation(async () => {
+    await configApi.saveForwarder(name, newForwarderFactory(type))
+    onClose(name)
+  }, [name, type])
 
   return (
     <Dialog
@@ -103,7 +104,9 @@ export const NewForwarderModal = ({ open, onClose }: DialogProps<void, string | 
           />
 
           <FormControl fullWidth>
-            <InputLabel id="label:forwarder.modal.type">Forwarder type</InputLabel>
+            <InputLabel id="label:forwarder.modal.type">
+              Forwarder type
+            </InputLabel>
             <Select<ForwarderTypes>
               labelId="label:forwarder.modal.type"
               id="select:forwarder.modal.type"
@@ -142,10 +145,7 @@ export const NewForwarderModal = ({ open, onClose }: DialogProps<void, string | 
           disabled={loading}
           type="submit"
         >
-          {loading
-            ? <CircularProgress color="inherit" size={24} />
-            : <>Save</>
-          }
+          {loading ? <CircularProgress color="inherit" size={24} /> : <>Save</>}
         </Button>
       </DialogActions>
     </Dialog>

@@ -1,11 +1,11 @@
-import { useProfile } from '@/lib/context/profile'
-
 import FilterAltIcon from '@mui/icons-material/FilterAlt'
 
-import { NodeList } from '@/components/editors/pipeline/node-list'
-import { NewTransformerButton } from '@/views/app/transformers/new-btn'
-
 import * as configApi from '@/lib/api/operations/config'
+import { useProfile } from '@/lib/context/profile'
+
+import { NodeList } from '@/components/editors/pipeline/node-list'
+
+import { NewTransformerButton } from '@/views/app/transformers/new-btn'
 
 type TransformerListProps = Readonly<{
   className?: string

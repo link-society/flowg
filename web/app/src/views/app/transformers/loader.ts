@@ -1,7 +1,7 @@
 import { LoaderFunction } from 'react-router'
 
-import { loginRequired } from '@/lib/decorators/loaders'
 import * as configApi from '@/lib/api/operations/config'
+import { loginRequired } from '@/lib/decorators/loaders'
 
 export type LoaderData = {
   transformers: string[]
@@ -17,10 +17,9 @@ export const loader: LoaderFunction = loginRequired(
 
     if (params.transformer !== undefined) {
       if (!transformers.includes(params.transformer)) {
-        throw new Response(
-          `Transformer ${params.transformer} not found`,
-          { status: 404 },
-        )
+        throw new Response(`Transformer ${params.transformer} not found`, {
+          status: 404,
+        })
       }
 
       const script = await configApi.getTransformer(params.transformer)
@@ -34,5 +33,5 @@ export const loader: LoaderFunction = loginRequired(
     }
 
     return { transformers }
-  },
+  }
 )

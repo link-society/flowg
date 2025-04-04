@@ -1,10 +1,10 @@
+import Button from '@mui/material/Button'
 import { useDialogs } from '@toolpad/core/useDialogs'
-import { useApiOperation } from '@/lib/hooks/api'
-import { useNotify } from '@/lib/hooks/notify'
 
 import AddIcon from '@mui/icons-material/Add'
 
-import Button from '@mui/material/Button'
+import { useApiOperation } from '@/lib/hooks/api'
+import { useNotify } from '@/lib/hooks/notify'
 
 import { NewForwarderModal } from './modal'
 
@@ -16,17 +16,16 @@ export const NewForwarderButton = (props: NewForwarderButtonProps) => {
   const dialogs = useDialogs()
   const notify = useNotify()
 
-  const [handleClick] = useApiOperation(
-    async () => {
-      const forwarderName = await dialogs.open(NewForwarderModal) as string | null
-      if (forwarderName !== null) {
-        props.onForwarderCreated(forwarderName)
+  const [handleClick] = useApiOperation(async () => {
+    const forwarderName = (await dialogs.open(NewForwarderModal)) as
+      | string
+      | null
+    if (forwarderName !== null) {
+      props.onForwarderCreated(forwarderName)
 
-        notify.success('Forwarder created')
-      }
-    },
-    [props.onForwarderCreated],
-  )
+      notify.success('Forwarder created')
+    }
+  }, [props.onForwarderCreated])
 
   return (
     <Button

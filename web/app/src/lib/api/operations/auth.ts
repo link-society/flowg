@@ -1,6 +1,5 @@
 import * as request from '@/lib/api/request'
-
-import { ProfileModel, UserModel, PermissionsModel } from '@/lib/models/auth'
+import { PermissionsModel, ProfileModel, UserModel } from '@/lib/models/auth'
 
 export const whoami = async (): Promise<ProfileModel> => {
   type WhoamiResponse = {
@@ -15,7 +14,10 @@ export const whoami = async (): Promise<ProfileModel> => {
   return { user: body.user, permissions: body.permissions }
 }
 
-export const login = async (username: string, password: string): Promise<void> => {
+export const login = async (
+  username: string,
+  password: string
+): Promise<void> => {
   type LoginRequest = {
     username: string
     password: string
@@ -32,8 +34,7 @@ export const login = async (username: string, password: string): Promise<void> =
       body: { username, password },
     })
     localStorage.setItem('token', body.token)
-  }
-  catch (error) {
+  } catch (error) {
     localStorage.removeItem('token')
     throw error
   }
@@ -43,7 +44,10 @@ export const logout = async (): Promise<void> => {
   localStorage.removeItem('token')
 }
 
-export const changePassword = async (oldPassword: string, newPassword: string): Promise<void> => {
+export const changePassword = async (
+  oldPassword: string,
+  newPassword: string
+): Promise<void> => {
   type ChangePasswordRequest = {
     old_password: string
     new_password: string

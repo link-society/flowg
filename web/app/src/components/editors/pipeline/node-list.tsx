@@ -1,12 +1,11 @@
-import { useEffect, useState, ReactNode } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
+
+import Chip from '@mui/material/Chip'
+import CircularProgress from '@mui/material/CircularProgress'
+import Paper from '@mui/material/Paper'
+import * as colors from '@mui/material/colors'
 
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
-
-import Paper from '@mui/material/Paper'
-import CircularProgress from '@mui/material/CircularProgress'
-import Chip from '@mui/material/Chip'
-
-import * as colors from '@mui/material/colors'
 
 type NodeListProps = Readonly<{
   title: ReactNode
@@ -32,27 +31,22 @@ export function NodeList(props: NodeListProps) {
       const items = await props.fetchItems()
       setItems(items)
       setDirty(false)
-    }
-    catch (err) {
+    } catch (err) {
       setError(err as Error)
     }
 
     setLoading(false)
   }
 
-  useEffect(
-    () => { refresh() },
-    [dirty],
-  )
+  useEffect(() => {
+    refresh()
+  }, [dirty])
 
-  useEffect(
-    () => {
-      if (error !== null) {
-        throw error
-      }
-    },
-    [error],
-  )
+  useEffect(() => {
+    if (error !== null) {
+      throw error
+    }
+  }, [error])
 
   const baseColorMap = colors[props.itemColor]
   const bgColorIndex = 50 as keyof typeof baseColorMap
@@ -67,48 +61,45 @@ export function NodeList(props: NodeListProps) {
           <div className="grow text-semibold">{props.title}</div>
           {props.newButton(() => setDirty(true))}
         </div>
-        {loading
-          ? (
-            <div
-              className="
+        {loading ? (
+          <div
+            className="
                 grow shrink h-0
                 flex flex-col items-center justify-center
               "
-            >
-              <CircularProgress size={24} />
-            </div>
-          )
-          : (
-            <div
-              className="
+          >
+            <CircularProgress size={24} />
+          </div>
+        ) : (
+          <div
+            className="
                 grow shrink h-0 overflow-auto
                 flex flex-col items-start gap-2 p-2
               "
-            >
-              {items.map((item) => (
-                <Chip
-                  key={item}
-                  icon={<>{props.itemIcon}</>}
-                  label={item}
-                  onDelete={() => props.onItemOpen(item)}
-                  deleteIcon={<OpenInNewIcon />}
-                  variant="outlined"
-                  sx={{
-                    backgroundColor,
-                    borderColor,
-                  }}
-                  className="rounded-none! shadow-xs hover:shadow-lg font-mono!"
-                  draggable
-                  onDragStart={(evt) => {
-                    evt.dataTransfer.setData('item-type', props.itemType)
-                    evt.dataTransfer.setData('item', item)
-                    evt.dataTransfer.effectAllowed = 'move'
-                  }}
-                />
-              ))}
-            </div>
-          )
-        }
+          >
+            {items.map((item) => (
+              <Chip
+                key={item}
+                icon={<>{props.itemIcon}</>}
+                label={item}
+                onDelete={() => props.onItemOpen(item)}
+                deleteIcon={<OpenInNewIcon />}
+                variant="outlined"
+                sx={{
+                  backgroundColor,
+                  borderColor,
+                }}
+                className="rounded-none! shadow-xs hover:shadow-lg font-mono!"
+                draggable
+                onDragStart={(evt) => {
+                  evt.dataTransfer.setData('item-type', props.itemType)
+                  evt.dataTransfer.setData('item', item)
+                  evt.dataTransfer.effectAllowed = 'move'
+                }}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </Paper>
   )

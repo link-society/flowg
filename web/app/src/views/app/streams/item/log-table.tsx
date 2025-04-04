@@ -1,10 +1,10 @@
 import { useState } from 'react'
 
-import Paper from '@mui/material/Paper'
 import Drawer from '@mui/material/Drawer'
+import Paper from '@mui/material/Paper'
 
-import { AgGridReact } from 'ag-grid-react'
 import { ColDef } from 'ag-grid-community'
+import { AgGridReact } from 'ag-grid-react'
 
 import { LogEntryModel } from '@/lib/models/log'
 
@@ -14,7 +14,9 @@ type LogTableProps = Readonly<{
 }>
 
 export const LogTable = (props: LogTableProps) => {
-  const [selectedRow, setSelectedRow] = useState<LogEntryModel | undefined>(undefined)
+  const [selectedRow, setSelectedRow] = useState<LogEntryModel | undefined>(
+    undefined
+  )
 
   return (
     <Paper className="grow ag-theme-balham">
@@ -23,7 +25,7 @@ export const LogTable = (props: LogTableProps) => {
         columnDefs={props.columnDefs}
         suppressFieldDotNotation
         enableCellTextSelection
-        autoSizeStrategy={{type: 'fitCellContents'}}
+        autoSizeStrategy={{ type: 'fitCellContents' }}
         onRowDoubleClicked={(e) => {
           setSelectedRow(e.data)
         }}

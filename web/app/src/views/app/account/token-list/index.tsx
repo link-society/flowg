@@ -1,23 +1,23 @@
 import { useCallback, useRef, useState } from 'react'
-import { useApiOperation } from '@/lib/hooks/api'
-import { useNotify } from '@/lib/hooks/notify'
+
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import CardHeader from '@mui/material/CardHeader'
 
 import KeyIcon from '@mui/icons-material/Key'
 
-import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
-import CardContent from '@mui/material/CardContent'
-
-import { AgGridReact } from 'ag-grid-react'
 import { ColDef } from 'ag-grid-community'
+import { AgGridReact } from 'ag-grid-react'
+
+import * as tokenApi from '@/lib/api/operations/token'
+import { useApiOperation } from '@/lib/hooks/api'
+import { useNotify } from '@/lib/hooks/notify'
 
 import { Actions } from '@/components/table/actions'
 
+import { TokenCell } from './cell'
 import { CreateTokenButton } from './create-btn'
 import { RowType } from './types'
-import { TokenCell } from './cell'
-
-import * as tokenApi from '@/lib/api/operations/token'
 
 type TokenListProps = Readonly<{
   tokens: string[]
@@ -34,7 +34,7 @@ export const TokenList = ({ tokens }: TokenListProps) => {
         add: [{ token }],
       })
     },
-    [gridRef],
+    [gridRef]
   )
 
   const [onDelete, loading] = useApiOperation(
@@ -50,12 +50,10 @@ export const TokenList = ({ tokens }: TokenListProps) => {
 
       notify.success('Token deleted')
     },
-    [gridRef],
+    [gridRef]
   )
 
-  const [rowData] = useState<RowType[]>(
-    tokens.map(token => ({ token })),
-  )
+  const [rowData] = useState<RowType[]>(tokens.map((token) => ({ token })))
   const [columnDefs] = useState<ColDef<RowType>[]>([
     {
       headerName: 'Token',

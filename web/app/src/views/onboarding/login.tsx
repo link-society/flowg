@@ -1,22 +1,22 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
-import { useApiOperation } from '@/lib/hooks/api'
-import { useNotify } from '@/lib/hooks/notify'
+
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import Card from '@mui/material/Card'
+import CircularProgress from '@mui/material/CircularProgress'
+import Divider from '@mui/material/Divider'
+import Grid from '@mui/material/Grid'
+import TextField from '@mui/material/TextField'
 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import LockIcon from '@mui/icons-material/Lock'
 import LoginIcon from '@mui/icons-material/Login'
 
-import Divider from '@mui/material/Divider'
-import Grid from '@mui/material/Grid'
-import Card from '@mui/material/Card'
-import Box from '@mui/material/Box'
-import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
-import CircularProgress from '@mui/material/CircularProgress'
-
-import * as authApi from '@/lib/api/operations/auth'
 import { UnauthenticatedError } from '@/lib/api/errors'
+import * as authApi from '@/lib/api/operations/auth'
+import { useApiOperation } from '@/lib/hooks/api'
+import { useNotify } from '@/lib/hooks/notify'
 
 export const LoginView = () => {
   const navigate = useNavigate()
@@ -25,25 +25,20 @@ export const LoginView = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
-  const [handleLogin, loading] = useApiOperation(
-    async () => {
-      try {
-        await authApi.login(username, password)
+  const [handleLogin, loading] = useApiOperation(async () => {
+    try {
+      await authApi.login(username, password)
+    } catch (error) {
+      if (error instanceof UnauthenticatedError) {
+        notify.error('Invalid credentials')
+        return
+      } else {
+        throw error
       }
-      catch (error) {
-        if (error instanceof UnauthenticatedError) {
-          notify.error('Invalid credentials')
-          return
-        }
-        else {
-          throw error
-        }
-      }
+    }
 
-      navigate('/web/')
-    },
-    [username, password],
-  )
+    navigate('/web/')
+  }, [username, password])
 
   return (
     <div className="py-6">
@@ -58,20 +53,24 @@ export const LoginView = () => {
               }}
             >
               <header>
-                <h1 className="text-2xl text-center">Sign In with your account</h1>
+                <h1 className="text-2xl text-center">
+                  Sign In with your account
+                </h1>
               </header>
 
               <Divider />
 
               <section className="flex flex-col items-stretch gap-3">
                 <Box className="flex flex-row items-end">
-                  <AccountCircleIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />
+                  <AccountCircleIcon
+                    sx={{ color: 'action.active', mr: 1, my: 0.5 }}
+                  />
                   <TextField
                     id="input:login.username"
                     label="Username"
                     value={username}
                     type="text"
-                    onChange={e => setUsername(e.target.value)}
+                    onChange={(e) => setUsername(e.target.value)}
                     variant="standard"
                     className="grow"
                     required
@@ -85,7 +84,7 @@ export const LoginView = () => {
                     label="Password"
                     value={password}
                     type="password"
-                    onChange={e => setPassword(e.target.value)}
+                    onChange={(e) => setPassword(e.target.value)}
                     variant="standard"
                     className="grow"
                     disabled={loading}
@@ -104,10 +103,11 @@ export const LoginView = () => {
                 type="submit"
                 startIcon={!loading && <LoginIcon />}
               >
-                {loading
-                  ? <CircularProgress color="inherit" size={24} />
-                  : <>Sign In</>
-                }
+                {loading ? (
+                  <CircularProgress color="inherit" size={24} />
+                ) : (
+                  <>Sign In</>
+                )}
               </Button>
             </form>
           </Card>

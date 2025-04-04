@@ -1,17 +1,22 @@
-import { Handle, Position, Node, NodeProps, NodeToolbar } from '@xyflow/react'
+import TextField from '@mui/material/TextField'
 
 import StorageIcon from '@mui/icons-material/Storage'
 
-import TextField from '@mui/material/TextField'
+import { Handle, Node, NodeProps, NodeToolbar, Position } from '@xyflow/react'
 
 import { OpenStreamDialog } from '@/components/editors/stream/dialog'
+
 import { DeleteNodeButton } from '../delete-btn'
 
 type RouterNodeData = Node<{
   stream: string
 }>
 
-export const RouterNode = ({ id, data, selected }: NodeProps<RouterNodeData>) => (
+export const RouterNode = ({
+  id,
+  data,
+  selected,
+}: NodeProps<RouterNodeData>) => (
   <>
     {selected && (
       <NodeToolbar className="flex flex-row items-center gap-2">

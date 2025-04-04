@@ -1,22 +1,23 @@
 import { useCallback, useRef, useState } from 'react'
-import { useApiOperation } from '@/lib/hooks/api'
-import { useNotify } from '@/lib/hooks/notify'
+
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import CardHeader from '@mui/material/CardHeader'
 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 
-import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
-import CardContent from '@mui/material/CardContent'
-
-import { AgGridReact } from 'ag-grid-react'
 import { ColDef } from 'ag-grid-community'
-
-import { Actions } from '@/components/table/actions'
-import { CreateUserButton } from './create-btn'
-import { RolesCell } from './roles-cell'
+import { AgGridReact } from 'ag-grid-react'
 
 import * as aclApi from '@/lib/api/operations/acls'
+import { useApiOperation } from '@/lib/hooks/api'
+import { useNotify } from '@/lib/hooks/notify'
 import { UserModel } from '@/lib/models/auth'
+
+import { Actions } from '@/components/table/actions'
+
+import { CreateUserButton } from './create-btn'
+import { RolesCell } from './roles-cell'
 
 type UserListProps = Readonly<{
   roles: string[]
@@ -34,7 +35,7 @@ export const UserList = ({ roles, users }: UserListProps) => {
         add: [user],
       })
     },
-    [gridRef],
+    [gridRef]
   )
 
   const [onDelete, loading] = useApiOperation(
@@ -50,7 +51,7 @@ export const UserList = ({ roles, users }: UserListProps) => {
 
       notify.success('User deleted')
     },
-    [gridRef],
+    [gridRef]
   )
 
   const [rowData] = useState<UserModel[]>(users)
@@ -103,7 +104,7 @@ export const UserList = ({ roles, users }: UserListProps) => {
           rowData={rowData}
           columnDefs={columnDefs}
           enableCellTextSelection
-          autoSizeStrategy={{type: 'fitCellContents'}}
+          autoSizeStrategy={{ type: 'fitCellContents' }}
           getRowId={({ data }) => data.name}
         />
       </CardContent>

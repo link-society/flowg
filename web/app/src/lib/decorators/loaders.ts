@@ -8,12 +8,10 @@ export const loginRequired = <Args extends unknown[], ReturnType>(
   return async (...args: Args) => {
     try {
       return await fn(...args)
-    }
-    catch (error) {
+    } catch (error) {
       if (error instanceof UnauthenticatedError) {
         throw redirect('/web/login')
-      }
-      else {
+      } else {
         throw error
       }
     }

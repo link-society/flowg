@@ -1,22 +1,23 @@
 import { useCallback, useRef, useState } from 'react'
-import { useApiOperation } from '@/lib/hooks/api'
-import { useNotify } from '@/lib/hooks/notify'
+
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import CardHeader from '@mui/material/CardHeader'
 
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
 
-import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
-import CardContent from '@mui/material/CardContent'
-
-import { AgGridReact } from 'ag-grid-react'
 import { ColDef } from 'ag-grid-community'
-
-import { Actions } from '@/components/table/actions'
-import { CreateRoleButton } from './create-btn'
-import { ScopesCell } from './scopes-cell'
+import { AgGridReact } from 'ag-grid-react'
 
 import * as aclApi from '@/lib/api/operations/acls'
+import { useApiOperation } from '@/lib/hooks/api'
+import { useNotify } from '@/lib/hooks/notify'
 import { RoleModel } from '@/lib/models/auth'
+
+import { Actions } from '@/components/table/actions'
+
+import { CreateRoleButton } from './create-btn'
+import { ScopesCell } from './scopes-cell'
 
 type RoleListProps = Readonly<{
   roles: RoleModel[]
@@ -33,7 +34,7 @@ export const RoleList = ({ roles }: RoleListProps) => {
         add: [role],
       })
     },
-    [gridRef],
+    [gridRef]
   )
 
   const [onDelete, loading] = useApiOperation(
@@ -49,7 +50,7 @@ export const RoleList = ({ roles }: RoleListProps) => {
 
       notify.success('Role deleted')
     },
-    [gridRef],
+    [gridRef]
   )
 
   const [rowData] = useState<RoleModel[]>(roles)
@@ -102,7 +103,7 @@ export const RoleList = ({ roles }: RoleListProps) => {
           rowData={rowData}
           columnDefs={columnDefs}
           enableCellTextSelection
-          autoSizeStrategy={{type: 'fitCellContents'}}
+          autoSizeStrategy={{ type: 'fitCellContents' }}
           getRowId={({ data }) => data.name}
         />
       </CardContent>

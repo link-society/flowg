@@ -1,8 +1,8 @@
-import { Handle, Position, Node, NodeProps } from '@xyflow/react'
+import TextField from '@mui/material/TextField'
 
 import InputIcon from '@mui/icons-material/Input'
 
-import TextField from '@mui/material/TextField'
+import { Handle, Node, NodeProps, Position } from '@xyflow/react'
 
 type SourceNodeData = Node<{
   type: string

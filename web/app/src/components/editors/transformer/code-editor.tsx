@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react'
 
 import Editor, { useMonaco } from '@monaco-editor/react'
-import { vrlLanguageDefinition, vrlThemeDefinition } from '@/lib/vrl-highlighter'
+
+import {
+  vrlLanguageDefinition,
+  vrlThemeDefinition,
+} from '@/lib/vrl-highlighter'
 
 type CodeEditorProps = Readonly<{
   id?: string
@@ -13,23 +17,20 @@ export const CodeEditor = ({ id, code, onCodeChange }: CodeEditorProps) => {
   const [value, setValue] = useState(code)
   const monaco = useMonaco()
 
-  useEffect(
-    () => {
-      setValue(code)
-    },
-    [code],
-  )
+  useEffect(() => {
+    setValue(code)
+  }, [code])
 
-  useEffect(
-    () => {
-      if (!monaco) return
+  useEffect(() => {
+    if (!monaco) return
 
-      monaco.languages.register({id: 'vrl'})
-      monaco.editor.defineTheme('vrl-theme', vrlThemeDefinition as any)
-      monaco.languages.setMonarchTokensProvider('vrl', vrlLanguageDefinition as any)
-    },
-    [monaco],
-  )
+    monaco.languages.register({ id: 'vrl' })
+    monaco.editor.defineTheme('vrl-theme', vrlThemeDefinition as any)
+    monaco.languages.setMonarchTokensProvider(
+      'vrl',
+      vrlLanguageDefinition as any
+    )
+  }, [monaco])
 
   const onChange = (val?: string) => {
     setValue(val ?? '')
@@ -38,12 +39,12 @@ export const CodeEditor = ({ id, code, onCodeChange }: CodeEditorProps) => {
 
   return (
     <Editor
-      wrapperProps={{id: id ?? ''}}
+      wrapperProps={{ id: id ?? '' }}
       defaultValue={value}
-      defaultLanguage='vrl'
-      theme='vrl-theme'
+      defaultLanguage="vrl"
+      theme="vrl-theme"
       onChange={onChange}
-      options={{minimap: {enabled: false}}}
+      options={{ minimap: { enabled: false } }}
     />
   )
 }

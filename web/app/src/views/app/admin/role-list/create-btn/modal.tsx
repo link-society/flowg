@@ -1,44 +1,43 @@
 import React, { useState } from 'react'
-import { useApiOperation } from '@/lib/hooks/api'
+
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import Chip from '@mui/material/Chip'
+import CircularProgress from '@mui/material/CircularProgress'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
+import TextField from '@mui/material/TextField'
+import Tooltip from '@mui/material/Tooltip'
+import { DialogProps } from '@toolpad/core/useDialogs'
 
 import CancelIcon from '@mui/icons-material/Cancel'
 import SaveIcon from '@mui/icons-material/Save'
 
-import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle'
-import DialogContent from '@mui/material/DialogContent'
-import DialogActions from '@mui/material/DialogActions'
-import CircularProgress from '@mui/material/CircularProgress'
-import Box from '@mui/material/Box'
-import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
-import Chip from '@mui/material/Chip'
-import Tooltip from '@mui/material/Tooltip'
-
-import { DialogProps } from '@toolpad/core/useDialogs'
+import * as aclApi from '@/lib/api/operations/acls'
+import { useApiOperation } from '@/lib/hooks/api'
+import { RoleModel } from '@/lib/models/auth'
+import { SCOPES, SCOPE_LABELS } from '@/lib/models/permissions'
 
 import { TransferList } from '@/components/form/transfer-list'
 
-import * as aclApi from '@/lib/api/operations/acls'
-import { SCOPES, SCOPE_LABELS } from '@/lib/models/permissions'
-import { RoleModel } from '@/lib/models/auth'
-
-export const RoleFormModal = ({ open, onClose }: DialogProps<void, RoleModel | null>) => {
+export const RoleFormModal = ({
+  open,
+  onClose,
+}: DialogProps<void, RoleModel | null>) => {
   const [name, setName] = useState('')
   const [scopes, setScopes] = useState<string[]>([])
 
-  const [onSubmit, loading] = useApiOperation(
-    async () => {
-      const role = {
-        name,
-        scopes,
-      }
+  const [onSubmit, loading] = useApiOperation(async () => {
+    const role = {
+      name,
+      scopes,
+    }
 
-      await aclApi.saveRole(role)
-      onClose(role)
-    },
-    [name, scopes, onClose],
-  )
+    await aclApi.saveRole(role)
+    onClose(role)
+  }, [name, scopes, onClose])
 
   return (
     <Dialog
@@ -80,11 +79,15 @@ export const RoleFormModal = ({ open, onClose }: DialogProps<void, RoleModel | n
               getItemId={(v) => v}
               renderItem={(v) => (
                 <Tooltip
-                  title={SCOPE_LABELS[v as keyof typeof SCOPE_LABELS] ?? '#ERR#'}
+                  title={
+                    SCOPE_LABELS[v as keyof typeof SCOPE_LABELS] ?? '#ERR#'
+                  }
                   placement="right-start"
                 >
                   <Chip
-                    label={SCOPE_LABELS[v as keyof typeof SCOPE_LABELS] ?? '#ERR#'}
+                    label={
+                      SCOPE_LABELS[v as keyof typeof SCOPE_LABELS] ?? '#ERR#'
+                    }
                     size="small"
                   />
                 </Tooltip>
@@ -112,10 +115,7 @@ export const RoleFormModal = ({ open, onClose }: DialogProps<void, RoleModel | n
           disabled={loading}
           type="submit"
         >
-          {loading
-            ? <CircularProgress color="inherit" size={24} />
-            : <>Save</>
-          }
+          {loading ? <CircularProgress color="inherit" size={24} /> : <>Save</>}
         </Button>
       </DialogActions>
     </Dialog>

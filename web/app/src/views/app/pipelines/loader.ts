@@ -1,7 +1,7 @@
 import { LoaderFunction } from 'react-router'
 
-import { loginRequired } from '@/lib/decorators/loaders'
 import * as configApi from '@/lib/api/operations/config'
+import { loginRequired } from '@/lib/decorators/loaders'
 import { PipelineModel } from '@/lib/models/pipeline'
 
 export type LoaderData = {
@@ -18,10 +18,9 @@ export const loader: LoaderFunction = loginRequired(
 
     if (params.pipeline !== undefined) {
       if (!pipelines.includes(params.pipeline)) {
-        throw new Response(
-          `Pipeline ${params.pipeline} not found`,
-          { status: 404 },
-        )
+        throw new Response(`Pipeline ${params.pipeline} not found`, {
+          status: 404,
+        })
       }
 
       const flow = await configApi.getPipeline(params.pipeline)
@@ -35,5 +34,5 @@ export const loader: LoaderFunction = loginRequired(
     }
 
     return { pipelines }
-  },
+  }
 )

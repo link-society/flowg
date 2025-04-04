@@ -9,7 +9,7 @@ export type SyslogForwarderModel = {
 
 export const SyslogNetworkValues = ['tcp', 'udp'] as const
 
-export type SyslogNetwork = typeof SyslogNetworkValues[number]
+export type SyslogNetwork = (typeof SyslogNetworkValues)[number]
 
 export const SyslogSeverityValues = [
   'emerg',
@@ -22,7 +22,7 @@ export const SyslogSeverityValues = [
   'debug',
 ]
 
-export type SyslogSeverity = typeof SyslogSeverityValues[number]
+export type SyslogSeverity = (typeof SyslogSeverityValues)[number]
 
 export const SyslogFacilityValues = [
   'kern',
@@ -47,4 +47,4 @@ export const SyslogFacilityValues = [
   'local7',
 ]
 
-export type SyslogFacility = typeof SyslogFacilityValues[number]
+export type SyslogFacility = (typeof SyslogFacilityValues)[number]

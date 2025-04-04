@@ -1,28 +1,28 @@
-import { useState, useEffect } from 'react'
-import { useLoaderData, useNavigate, useLocation } from 'react-router'
+import { useEffect, useState } from 'react'
+import { useLoaderData, useLocation, useNavigate } from 'react-router'
+
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
+import Grid from '@mui/material/Grid'
+import List from '@mui/material/List'
+import ListItemButton from '@mui/material/ListItemButton'
+import ListItemText from '@mui/material/ListItemText'
+import Paper from '@mui/material/Paper'
+
+import DeleteIcon from '@mui/icons-material/Delete'
+import HelpIcon from '@mui/icons-material/Help'
+import SaveIcon from '@mui/icons-material/Save'
+
+import * as configApi from '@/lib/api/operations/config'
 import { useProfile } from '@/lib/context/profile'
 import { useApiOperation } from '@/lib/hooks/api'
 import { useNotify } from '@/lib/hooks/notify'
 
-import HelpIcon from '@mui/icons-material/Help'
-import DeleteIcon from '@mui/icons-material/Delete'
-import SaveIcon from '@mui/icons-material/Save'
-
-import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
-import Paper from '@mui/material/Paper'
-import List from '@mui/material/List'
-import ListItemButton from '@mui/material/ListItemButton'
-import ListItemText from '@mui/material/ListItemText'
-import Button from '@mui/material/Button'
-import CircularProgress from '@mui/material/CircularProgress'
-
 import { StreamEditor } from '@/components/editors/stream'
-import { NewStreamButton } from './new-btn'
-
-import * as configApi from '@/lib/api/operations/config'
 
 import { LoaderData } from './loader'
+import { NewStreamButton } from './new-btn'
 
 export const StreamView = () => {
   const navigate = useNavigate()
@@ -35,31 +35,24 @@ export const StreamView = () => {
 
   const [streamConfig, setStreamConfig] = useState(streams[currentStream!]!)
 
-  useEffect(
-    () => { setStreamConfig(streams[currentStream!]) },
-    [location],
-  )
+  useEffect(() => {
+    setStreamConfig(streams[currentStream!])
+  }, [location])
 
   const onCreate = (name: string) => {
     navigate(`/web/storage/${name}`)
   }
 
-  const [onDelete, deleteLoading] = useApiOperation(
-    async () => {
-      await configApi.purgeStream(currentStream!)
-      notify.success('Stream deleted')
-      navigate('/web/storage')
-    },
-    [currentStream],
-  )
+  const [onDelete, deleteLoading] = useApiOperation(async () => {
+    await configApi.purgeStream(currentStream!)
+    notify.success('Stream deleted')
+    navigate('/web/storage')
+  }, [currentStream])
 
-  const [onSave, saveLoading] = useApiOperation(
-    async () => {
-      await configApi.configureStream(currentStream!, streamConfig)
-      notify.success('Stream saved')
-    },
-    [streamConfig, currentStream],
-  )
+  const [onSave, saveLoading] = useApiOperation(async () => {
+    await configApi.configureStream(currentStream!, streamConfig)
+    notify.success('Stream saved')
+  }, [streamConfig, currentStream])
 
   return (
     <Box className="h-full flex flex-col items-stretch">
@@ -86,9 +79,7 @@ export const StreamView = () => {
 
         {permissions.can_edit_streams && (
           <div className="flex flex-row items-center gap-3">
-            <NewStreamButton
-              onStreamCreated={onCreate}
-            />
+            <NewStreamButton onStreamCreated={onCreate} />
 
             <Button
               id="btn:streams.delete"
@@ -99,10 +90,7 @@ export const StreamView = () => {
               disabled={deleteLoading}
               startIcon={!deleteLoading && <DeleteIcon />}
             >
-              {deleteLoading
-                ? <CircularProgress size={24} />
-                : <>Delete</>
-              }
+              {deleteLoading ? <CircularProgress size={24} /> : <>Delete</>}
             </Button>
 
             <Button
@@ -114,10 +102,7 @@ export const StreamView = () => {
               disabled={saveLoading}
               startIcon={!saveLoading && <SaveIcon />}
             >
-              {saveLoading
-                ? <CircularProgress size={24} />
-                : <>Save</>
-              }
+              {saveLoading ? <CircularProgress size={24} /> : <>Save</>}
             </Button>
           </div>
         )}
@@ -131,17 +116,18 @@ export const StreamView = () => {
                   key={stream}
                   component="a"
                   href={`/web/storage/${stream}`}
-                  sx={stream !== currentStream!
-                    ? {
-                      color: 'secondary.main',
-                    }
-                    : {
-                      backgroundColor: 'secondary.main',
-                      '&:hover': {
-                        backgroundColor: 'secondary.main',
-                      },
-                      color: 'white',
-                    }
+                  sx={
+                    stream !== currentStream!
+                      ? {
+                          color: 'secondary.main',
+                        }
+                      : {
+                          backgroundColor: 'secondary.main',
+                          '&:hover': {
+                            backgroundColor: 'secondary.main',
+                          },
+                          color: 'white',
+                        }
                   }
                 >
                   <ListItemText

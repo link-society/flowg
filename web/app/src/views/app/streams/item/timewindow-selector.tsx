@@ -1,17 +1,17 @@
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
+import dayjs from 'dayjs'
+
 import { useCallback, useEffect, useMemo, useState } from 'react'
+
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import Divider from '@mui/material/Divider'
+import Menu from '@mui/material/Menu'
+import ToggleButton from '@mui/material/ToggleButton'
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import CheckIcon from '@mui/icons-material/Check'
-
-import Box from '@mui/material/Box'
-import Divider from '@mui/material/Divider'
-import Button from '@mui/material/Button'
-import Menu from '@mui/material/Menu'
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
-import ToggleButton from '@mui/material/ToggleButton'
-
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
-import dayjs from 'dayjs'
 
 type RelTimeWindowOption = {
   key: string
@@ -31,7 +31,7 @@ const RELATIVE_TIMEWINDOW_LABELS_BY_VALUE = RELATIVE_TIMEWINDOW_OPTIONS.reduce(
     acc[option.value] = option.label
     return acc
   },
-  {} as Record<number, string>,
+  {} as Record<number, string>
 )
 
 export const DEFAULT_TIMEWINDOW_VALUE = RELATIVE_TIMEWINDOW_OPTIONS[0].value
@@ -46,96 +46,89 @@ type LabelRendererProps = Readonly<{
 
 const LabelRenderer = (props: LabelRendererProps) => (
   <Box className="flex flex-row items-center justify-center gap-1">
-    {props.live
-      ? (
-        <>
-          <span className="font-semibold">From</span>
-          <span>{props.from.toLocaleString()}</span>
-        </>
-      )
-      : (
-        props.timewindowType === 'relative'
-          ? (
-            <span>
-              {RELATIVE_TIMEWINDOW_LABELS_BY_VALUE[props.relativeTimewindow] ?? '#ERR#'}
-            </span>
-          )
-          : (
-            <>
-              <span className="font-semibold">From</span>
-              <span>{props.from.toLocaleString()}</span>
-              <span className="font-semibold">to</span>
-              <span>{props.to.toLocaleString()}</span>
-            </>
-          )
-      )
-    }
+    {props.live ? (
+      <>
+        <span className="font-semibold">From</span>
+        <span>{props.from.toLocaleString()}</span>
+      </>
+    ) : props.timewindowType === 'relative' ? (
+      <span>
+        {RELATIVE_TIMEWINDOW_LABELS_BY_VALUE[props.relativeTimewindow] ??
+          '#ERR#'}
+      </span>
+    ) : (
+      <>
+        <span className="font-semibold">From</span>
+        <span>{props.from.toLocaleString()}</span>
+        <span className="font-semibold">to</span>
+        <span>{props.to.toLocaleString()}</span>
+      </>
+    )}
   </Box>
 )
 
 type TimeWindow = {
-  from: Date,
-  to: Date,
-  live: boolean,
+  from: Date
+  to: Date
+  live: boolean
 }
 
 export type TimeWindowFactory = {
-  make: () => TimeWindow,
+  make: () => TimeWindow
 }
 
 type TimeWindowSelectorProps = Readonly<{
   onTimeWindowChanged: (factory: TimeWindowFactory) => void
 }>
 
-export const TimeWindowSelector = ({ onTimeWindowChanged }: TimeWindowSelectorProps) => {
-  const now = useMemo(
-    () => new Date(),
-    [],
-  )
+export const TimeWindowSelector = ({
+  onTimeWindowChanged,
+}: TimeWindowSelectorProps) => {
+  const now = useMemo(() => new Date(), [])
 
   const [menu, setMenu] = useState<HTMLElement | null>(null)
   const open = Boolean(menu)
 
-  const [from, setFrom] = useState(new Date(now.getTime() - DEFAULT_TIMEWINDOW_VALUE))
+  const [from, setFrom] = useState(
+    new Date(now.getTime() - DEFAULT_TIMEWINDOW_VALUE)
+  )
   const [to, setTo] = useState(now)
   const [live, setLive] = useState(false)
 
-  const [timeWindowType, setTimeWindowType] = useState<'relative' | 'absolute'>('relative')
-  const [relativeTimeWindow, setRelativeTimeWindow] = useState(DEFAULT_TIMEWINDOW_VALUE)
-
-  const timeWindowFactory = useCallback(
-    () => {
-      switch (timeWindowType) {
-        case 'relative': {
-          const now = new Date()
-          return {
-            from: new Date(now.getTime() - relativeTimeWindow),
-            to: now,
-            live,
-          }
-        }
-
-        case 'absolute':
-          return { from, to, live }
-
-        default:
-          throw new Error('Invalid timewindow type')
-      }
-    },
-    [timeWindowType, relativeTimeWindow, from, to, live],
+  const [timeWindowType, setTimeWindowType] = useState<'relative' | 'absolute'>(
+    'relative'
   )
+  const [relativeTimeWindow, setRelativeTimeWindow] = useState(
+    DEFAULT_TIMEWINDOW_VALUE
+  )
+
+  const timeWindowFactory = useCallback(() => {
+    switch (timeWindowType) {
+      case 'relative': {
+        const now = new Date()
+        return {
+          from: new Date(now.getTime() - relativeTimeWindow),
+          to: now,
+          live,
+        }
+      }
+
+      case 'absolute':
+        return { from, to, live }
+
+      default:
+        throw new Error('Invalid timewindow type')
+    }
+  }, [timeWindowType, relativeTimeWindow, from, to, live])
 
   const handleClose = () => {
     setMenu(null)
     onTimeWindowChanged({ make: timeWindowFactory })
   }
 
-  useEffect(
-    () => {
-      onTimeWindowChanged({ make: timeWindowFactory })
-    },
-    [],
-  )
+  useEffect(() => {
+    onTimeWindowChanged({ make: timeWindowFactory })
+  }, [])
 
   return (
     <>
@@ -150,7 +143,7 @@ export const TimeWindowSelector = ({ onTimeWindowChanged }: TimeWindowSelectorPr
         sx={{
           '& .MuiButton-icon': {
             marginLeft: 'auto',
-          }
+          },
         }}
       >
         <LabelRenderer

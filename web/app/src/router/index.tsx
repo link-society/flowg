@@ -4,7 +4,6 @@ import LinearProgress from '@mui/material/LinearProgress'
 
 import { ErrorBoundary } from '@/components/routing/error'
 
-
 export default createBrowserRouter([
   {
     path: '/web/',
@@ -20,14 +19,18 @@ export default createBrowserRouter([
       {
         path: 'login',
         lazy: async () => {
-          const { LoginView: Component } = await import('@/views/onboarding/login')
+          const { LoginView: Component } = await import(
+            '@/views/onboarding/login'
+          )
           return { Component }
         },
       },
       {
         path: 'logout',
         lazy: async () => {
-          const { LogoutView: Component, loader } = await import('@/views/onboarding/logout')
+          const { LogoutView: Component, loader } = await import(
+            '@/views/onboarding/logout'
+          )
           return { Component, loader }
         },
       },
@@ -41,7 +44,9 @@ export default createBrowserRouter([
           {
             path: 'account',
             lazy: async () => {
-              const { AccountView: Component } = await import('@/views/app/account')
+              const { AccountView: Component } = await import(
+                '@/views/app/account'
+              )
               const { loader } = await import('@/views/app/account/loader')
               return { Component, loader }
             },
@@ -57,7 +62,9 @@ export default createBrowserRouter([
           {
             path: 'transformers',
             lazy: async () => {
-              const { TransformerView: Component } = await import('@/views/app/transformers/section')
+              const { TransformerView: Component } = await import(
+                '@/views/app/transformers/section'
+              )
               const { loader } = await import('@/views/app/transformers/loader')
               return { Component, loader }
             },
@@ -65,7 +72,9 @@ export default createBrowserRouter([
           {
             path: 'transformers/:transformer',
             lazy: async () => {
-              const { TransformerView: Component } = await import('@/views/app/transformers/item')
+              const { TransformerView: Component } = await import(
+                '@/views/app/transformers/item'
+              )
               const { loader } = await import('@/views/app/transformers/loader')
               return { Component, loader }
             },
@@ -73,7 +82,9 @@ export default createBrowserRouter([
           {
             path: 'storage',
             lazy: async () => {
-              const { StreamView: Component } = await import('@/views/app/storage/section')
+              const { StreamView: Component } = await import(
+                '@/views/app/storage/section'
+              )
               const { loader } = await import('@/views/app/storage/loader')
               return { Component, loader }
             },
@@ -81,7 +92,9 @@ export default createBrowserRouter([
           {
             path: 'storage/:stream',
             lazy: async () => {
-              const { StreamView: Component } = await import('@/views/app/storage/item')
+              const { StreamView: Component } = await import(
+                '@/views/app/storage/item'
+              )
               const { loader } = await import('@/views/app/storage/loader')
               return { Component, loader }
             },
@@ -89,7 +102,9 @@ export default createBrowserRouter([
           {
             path: 'forwarders',
             lazy: async () => {
-              const { ForwarderView: Component } = await import('@/views/app/forwarders/section')
+              const { ForwarderView: Component } = await import(
+                '@/views/app/forwarders/section'
+              )
               const { loader } = await import('@/views/app/forwarders/loader')
               return { Component, loader }
             },
@@ -97,7 +112,9 @@ export default createBrowserRouter([
           {
             path: 'forwarders/:forwarder',
             lazy: async () => {
-              const { ForwarderView: Component } = await import('@/views/app/forwarders/item')
+              const { ForwarderView: Component } = await import(
+                '@/views/app/forwarders/item'
+              )
               const { loader } = await import('@/views/app/forwarders/loader')
               return { Component, loader }
             },
@@ -105,7 +122,9 @@ export default createBrowserRouter([
           {
             path: 'pipelines',
             lazy: async () => {
-              const { PipelineView: Component } = await import('@/views/app/pipelines/section')
+              const { PipelineView: Component } = await import(
+                '@/views/app/pipelines/section'
+              )
               const { loader } = await import('@/views/app/pipelines/loader')
               return { Component, loader }
             },
@@ -113,7 +132,9 @@ export default createBrowserRouter([
           {
             path: 'pipelines/:pipeline',
             lazy: async () => {
-              const { PipelineView: Component } = await import('@/views/app/pipelines/item')
+              const { PipelineView: Component } = await import(
+                '@/views/app/pipelines/item'
+              )
               const { loader } = await import('@/views/app/pipelines/loader')
               return { Component, loader }
             },
@@ -121,7 +142,9 @@ export default createBrowserRouter([
           {
             path: 'streams',
             lazy: async () => {
-              const { StreamView: Component } = await import('@/views/app/streams/section')
+              const { StreamView: Component } = await import(
+                '@/views/app/streams/section'
+              )
               const { loader } = await import('@/views/app/streams/loader')
               return { Component, loader }
             },
@@ -129,7 +152,9 @@ export default createBrowserRouter([
           {
             path: 'streams/:stream',
             lazy: async () => {
-              const { StreamView: Component } = await import('@/views/app/streams/item')
+              const { StreamView: Component } = await import(
+                '@/views/app/streams/item'
+              )
               const { loader } = await import('@/views/app/streams/loader')
               return { Component, loader }
             },

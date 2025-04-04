@@ -1,19 +1,23 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { HooksContext } from '../hooks'
-
-import { Handle, Position, Node, NodeProps, NodeToolbar } from '@xyflow/react'
-
-import DeviceHubIcon from '@mui/icons-material/DeviceHub'
 
 import TextField from '@mui/material/TextField'
 
+import DeviceHubIcon from '@mui/icons-material/DeviceHub'
+
+import { Handle, Node, NodeProps, NodeToolbar, Position } from '@xyflow/react'
+
 import { DeleteNodeButton } from '../delete-btn'
+import { HooksContext } from '../hooks'
 
 type SwitchNodeData = Node<{
   condition: string
 }>
 
-export const SwitchNode = ({ id, data, selected }: NodeProps<SwitchNodeData>) => {
+export const SwitchNode = ({
+  id,
+  data,
+  selected,
+}: NodeProps<SwitchNodeData>) => {
   const hooksCtx = useContext(HooksContext)
 
   const [code, setCode] = useState(data.condition)
@@ -22,22 +26,19 @@ export const SwitchNode = ({ id, data, selected }: NodeProps<SwitchNodeData>) =>
     setCode(evt.target.value)
   }
 
-  useEffect(
-    () => {
-      hooksCtx.setNodes((prevNodes) => {
-        const newNodes = [...prevNodes]
+  useEffect(() => {
+    hooksCtx.setNodes((prevNodes) => {
+      const newNodes = [...prevNodes]
 
-        for (const node of newNodes) {
-          if (node.id === id) {
-            node.data = {condition: code}
-          }
+      for (const node of newNodes) {
+        if (node.id === id) {
+          node.data = { condition: code }
         }
+      }
 
-        return newNodes
-      })
-    },
-    [hooksCtx, id, code],
-  )
+      return newNodes
+    })
+  }, [hooksCtx, id, code])
 
   return (
     <>

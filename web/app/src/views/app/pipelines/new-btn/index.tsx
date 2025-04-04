@@ -1,10 +1,10 @@
+import Button from '@mui/material/Button'
 import { useDialogs } from '@toolpad/core/useDialogs'
-import { useApiOperation } from '@/lib/hooks/api'
-import { useNotify } from '@/lib/hooks/notify'
 
 import AddIcon from '@mui/icons-material/Add'
 
-import Button from '@mui/material/Button'
+import { useApiOperation } from '@/lib/hooks/api'
+import { useNotify } from '@/lib/hooks/notify'
 
 import { NewPipelineModal } from './modal'
 
@@ -16,17 +16,14 @@ export const NewPipelineButton = (props: NewPipelineButtonProps) => {
   const dialogs = useDialogs()
   const notify = useNotify()
 
-  const [handleClick] = useApiOperation(
-    async () => {
-      const pipelineName = await dialogs.open(NewPipelineModal) as string | null
-      if (pipelineName !== null) {
-        props.onPipelineCreated(pipelineName)
+  const [handleClick] = useApiOperation(async () => {
+    const pipelineName = (await dialogs.open(NewPipelineModal)) as string | null
+    if (pipelineName !== null) {
+      props.onPipelineCreated(pipelineName)
 
-        notify.success('Pipeline created')
-      }
-    },
-    [props.onPipelineCreated],
-  )
+      notify.success('Pipeline created')
+    }
+  }, [props.onPipelineCreated])
 
   return (
     <Button

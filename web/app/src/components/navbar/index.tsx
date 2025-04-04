@@ -1,17 +1,16 @@
-import { useProfile } from '@/lib/context/profile'
+import AppBar from '@mui/material/AppBar'
+import Button from '@mui/material/Button'
+import Toolbar from '@mui/material/Toolbar'
+import Typography from '@mui/material/Typography'
 
 import ApiIcon from '@mui/icons-material/Api'
 import GitHubIcon from '@mui/icons-material/GitHub'
 import StorageIcon from '@mui/icons-material/Storage'
 
-import AppBar from '@mui/material/AppBar'
-import Toolbar from '@mui/material/Toolbar'
-import Typography from '@mui/material/Typography'
-import Button from '@mui/material/Button'
+import { useProfile } from '@/lib/context/profile'
 
 import { ProfileMenu } from './profile-menu'
 import { SettingsMenu } from './settings-menu'
-
 
 export const NavBar = () => {
   const { permissions } = useProfile()
@@ -19,7 +18,9 @@ export const NavBar = () => {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Typography variant="h6" sx={{ mr: 2 }}>FlowG</Typography>
+        <Typography variant="h6" sx={{ mr: 2 }}>
+          FlowG
+        </Typography>
         <section className="h-full flex flex-row items-stretch gap-3 grow">
           <Button
             href="https://github.com/link-society/flowg"
