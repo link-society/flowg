@@ -1,0 +1,24 @@
+{
+  "trailingComma": "es5",
+  "tabWidth": 2,
+  "semi": false,
+  "singleQuote": true,
+  "plugins": [
+    "prettier-plugin-organize-imports",
+    "@trivago/prettier-plugin-sort-imports"
+  ],
+  "importOrder": [
+    "^(react(/.*)?)",
+    "^@(mui|toolpad)/(.*)",
+    "^@mui/icons-material/(.*)",
+    "^@(xyflow|monaco-editor)/(.*)",
+    "^ag-grid-(community|react)$",
+    "^@/lib/(.*)",
+    "^@/layouts/(.*)",
+    "^@/components/(.*)",
+    "^@/views/(.*)",
+    "^\\./(.*)"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true
+}
