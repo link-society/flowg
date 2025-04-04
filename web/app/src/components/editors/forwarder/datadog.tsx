@@ -1,16 +1,21 @@
-import { DatadogForwarderModel } from '@/lib/models/forwarder/datadog'
 import Divider from '@mui/material/Divider'
-import { ForwarderTypeLabelMap } from '@/lib/models/forwarder'
-import HttpIcon from '@mui/icons-material/Http'
 import InputAdornment from '@mui/material/InputAdornment'
 import TextField from '@mui/material/TextField'
+
+import HttpIcon from '@mui/icons-material/Http'
+
+import { ForwarderTypeLabelMap } from '@/lib/models/forwarder'
+import { DatadogForwarderModel } from '@/lib/models/forwarder/datadog'
 
 type DatadogForwarderEditorProps = {
   config: DatadogForwarderModel
   onConfigChange: (config: DatadogForwarderModel) => void
 }
 
-export const DatadogForwarderEditor = ({ config, onConfigChange }: DatadogForwarderEditorProps) => {
+export const DatadogForwarderEditor = ({
+  config,
+  onConfigChange,
+}: DatadogForwarderEditorProps) => {
   return (
     <div
       id="container:editor.forwarders.datadog"
@@ -31,7 +36,7 @@ export const DatadogForwarderEditor = ({ config, onConfigChange }: DatadogForwar
                   <HttpIcon />
                 </InputAdornment>
               ),
-            }
+            },
           }}
         />
       </div>
@@ -66,6 +71,5 @@ export const DatadogForwarderEditor = ({ config, onConfigChange }: DatadogForwar
         }}
       />
     </div>
-    
   )
 }

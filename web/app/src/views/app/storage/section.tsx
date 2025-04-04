@@ -13,35 +13,31 @@ export const StreamView = () => {
   const { streams } = useLoaderData() as LoaderData
   const streamNames = Object.keys(streams)
 
-  useEffect(
-    () => {
-      if (streamNames.length > 0) {
-        navigate(`/web/storage/${streamNames[0]}`)
-      }
-    },
-    [],
-  )
+  useEffect(() => {
+    if (streamNames.length > 0) {
+      navigate(`/web/storage/${streamNames[0]}`)
+    }
+  }, [])
 
   return (
     <>
-      {streamNames.length > 0
-        ? (
-          <Backdrop open={true}>
-            <CircularProgress color="inherit" />
-          </Backdrop>
-        )
-        : (
-          <div className="w-full h-full flex flex-col items-center justify-center gap-5">
-            <h1 className="text-3xl font-semibold">No stream found, create one</h1>
+      {streamNames.length > 0 ? (
+        <Backdrop open={true}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
+      ) : (
+        <div className="w-full h-full flex flex-col items-center justify-center gap-5">
+          <h1 className="text-3xl font-semibold">
+            No stream found, create one
+          </h1>
 
-            <NewStreamButton
-              onStreamCreated={(name) => {
-                navigate(`/web/storage/${name}`)
-              }}
-            />
-          </div>
-        )
-      }
+          <NewStreamButton
+            onStreamCreated={(name) => {
+              navigate(`/web/storage/${name}`)
+            }}
+          />
+        </div>
+      )}
     </>
   )
 }

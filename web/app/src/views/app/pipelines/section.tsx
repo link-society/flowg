@@ -11,35 +11,31 @@ export const PipelineView = () => {
   const { pipelines } = useLoaderData() as LoaderData
   const navigate = useNavigate()
 
-  useEffect(
-    () => {
-      if (pipelines.length > 0) {
-        navigate(`/web/pipelines/${pipelines[0]}`)
-      }
-    },
-    [],
-  )
+  useEffect(() => {
+    if (pipelines.length > 0) {
+      navigate(`/web/pipelines/${pipelines[0]}`)
+    }
+  }, [])
 
   return (
     <>
-      {pipelines.length > 0
-        ? (
-          <Backdrop open={true}>
-            <CircularProgress color="inherit" />
-          </Backdrop>
-        )
-        : (
-          <div className="w-full h-full flex flex-col items-center justify-center gap-5">
-            <h1 className="text-3xl font-semibold">No pipeline found, create one</h1>
+      {pipelines.length > 0 ? (
+        <Backdrop open={true}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
+      ) : (
+        <div className="w-full h-full flex flex-col items-center justify-center gap-5">
+          <h1 className="text-3xl font-semibold">
+            No pipeline found, create one
+          </h1>
 
-            <NewPipelineButton
-              onPipelineCreated={(name) => {
-                window.location.pathname = `/web/pipelines/${name}`
-              }}
-            />
-          </div>
-        )
-      }
+          <NewPipelineButton
+            onPipelineCreated={(name) => {
+              window.location.pathname = `/web/pipelines/${name}`
+            }}
+          />
+        </div>
+      )}
     </>
   )
 }

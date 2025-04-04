@@ -1,34 +1,32 @@
-import { useCallback, useState, useEffect } from 'react'
-import { useLoaderData, useNavigate, useLocation } from 'react-router'
-import { useProfile } from '@/lib/context/profile'
-import { useApiOperation } from '@/lib/hooks/api'
-import { useNotify } from '@/lib/hooks/notify'
-
-import * as colors from '@mui/material/colors'
-
-import HelpIcon from '@mui/icons-material/Help'
-import DeleteIcon from '@mui/icons-material/Delete'
-import SaveIcon from '@mui/icons-material/Save'
+import { useCallback, useEffect, useState } from 'react'
+import { useLoaderData, useLocation, useNavigate } from 'react-router'
 
 import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
-import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
+import Grid from '@mui/material/Grid'
+import TextField from '@mui/material/TextField'
+import * as colors from '@mui/material/colors'
+
+import DeleteIcon from '@mui/icons-material/Delete'
+import HelpIcon from '@mui/icons-material/Help'
+import SaveIcon from '@mui/icons-material/Save'
 
 import { ReactFlowProvider } from '@xyflow/react'
 
-import { FlowEditor } from '@/components/editors/pipeline/flow-editor'
-
-import { TransformerList } from './node-lists/transformer-list'
-import { ForwarderList } from './node-lists/forwarder-list'
-import { StreamList } from './node-lists/stream-list'
-import { PipelineList } from './node-lists/pipeline-list'
-
 import * as configApi from '@/lib/api/operations/config'
+import { useProfile } from '@/lib/context/profile'
+import { useApiOperation } from '@/lib/hooks/api'
+import { useNotify } from '@/lib/hooks/notify'
 import { PipelineModel } from '@/lib/models/pipeline'
 
+import { FlowEditor } from '@/components/editors/pipeline/flow-editor'
+
 import { LoaderData } from './loader'
+import { ForwarderList } from './node-lists/forwarder-list'
+import { PipelineList } from './node-lists/pipeline-list'
+import { StreamList } from './node-lists/stream-list'
+import { TransformerList } from './node-lists/transformer-list'
 
 export const PipelineView = () => {
   const navigate = useNavigate()
@@ -41,10 +39,9 @@ export const PipelineView = () => {
 
   const [flow, setFlow] = useState(initialFlow)
 
-  useEffect(
-    () => { setFlow(initialFlow) },
-    [location],
-  )
+  useEffect(() => {
+    setFlow(initialFlow)
+  }, [location])
 
   const onChange = useCallback(
     (newFlow: PipelineModel) => {
@@ -55,24 +52,18 @@ export const PipelineView = () => {
         setFlow(newFlow)
       }
     },
-    [flow],
+    [flow]
   )
 
-  const [onDelete, deleteLoading] = useApiOperation(
-    async () => {
-      await configApi.deletePipeline(currentPipeline!.name)
-      navigate('/web/pipelines')
-    },
-    [currentPipeline],
-  )
+  const [onDelete, deleteLoading] = useApiOperation(async () => {
+    await configApi.deletePipeline(currentPipeline!.name)
+    navigate('/web/pipelines')
+  }, [currentPipeline])
 
-  const [onSave, saveLoading] = useApiOperation(
-    async () => {
-      await configApi.savePipeline(currentPipeline!.name, flow)
-      notify.success('Pipeline saved')
-    },
-    [flow, currentPipeline],
-  )
+  const [onSave, saveLoading] = useApiOperation(async () => {
+    await configApi.savePipeline(currentPipeline!.name, flow)
+    notify.success('Pipeline saved')
+  }, [flow, currentPipeline])
 
   return (
     <ReactFlowProvider>
@@ -107,7 +98,7 @@ export const PipelineView = () => {
                       color: 'white',
                     },
                   },
-                }
+                },
               }}
             />
 
@@ -133,10 +124,7 @@ export const PipelineView = () => {
                 disabled={deleteLoading}
                 startIcon={!deleteLoading && <DeleteIcon />}
               >
-                {deleteLoading
-                  ? <CircularProgress size={24} />
-                  : <>Delete</>
-                }
+                {deleteLoading ? <CircularProgress size={24} /> : <>Delete</>}
               </Button>
 
               <Button
@@ -147,10 +135,7 @@ export const PipelineView = () => {
                 disabled={saveLoading}
                 startIcon={!saveLoading && <SaveIcon />}
               >
-                {saveLoading
-                  ? <CircularProgress size={24} />
-                  : <>Save</>
-                }
+                {saveLoading ? <CircularProgress size={24} /> : <>Save</>}
               </Button>
             </div>
           )}
@@ -162,7 +147,10 @@ export const PipelineView = () => {
           <Grid size={{ xs: 8 }} className="h-full">
             <FlowEditor flow={initialFlow} onFlowChange={onChange} />
           </Grid>
-          <Grid size={{ xs: 2 }} className="h-full flex flex-col items-stretch gap-2">
+          <Grid
+            size={{ xs: 2 }}
+            className="h-full flex flex-col items-stretch gap-2"
+          >
             <TransformerList className="grow shrink h-0" />
             <ForwarderList className="grow shrink h-0" />
             <StreamList className="grow shrink h-0" />

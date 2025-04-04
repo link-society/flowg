@@ -9,7 +9,10 @@ type ForwarderEditorProps = {
   onForwarderChange: (forwarder: ForwarderModel) => void
 }
 
-export const ForwarderEditor = ({ forwarder, onForwarderChange }: ForwarderEditorProps) => {
+export const ForwarderEditor = ({
+  forwarder,
+  onForwarderChange,
+}: ForwarderEditorProps) => {
   const onConfigChange = (config: ForwarderConfigModel) => {
     onForwarderChange({
       ...forwarder,

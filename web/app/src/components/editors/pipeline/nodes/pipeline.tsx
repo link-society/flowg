@@ -1,8 +1,8 @@
-import { Handle, Position, Node, NodeProps, NodeToolbar } from '@xyflow/react'
+import TextField from '@mui/material/TextField'
 
 import AccountTreeIcon from '@mui/icons-material/AccountTree'
 
-import TextField from '@mui/material/TextField'
+import { Handle, Node, NodeProps, NodeToolbar, Position } from '@xyflow/react'
 
 import { DeleteNodeButton } from '../delete-btn'
 
@@ -10,7 +10,11 @@ type PipelineNodeData = Node<{
   pipeline: string
 }>
 
-export const PipelineNode = ({ id, data, selected }: NodeProps<PipelineNodeData>) => (
+export const PipelineNode = ({
+  id,
+  data,
+  selected,
+}: NodeProps<PipelineNodeData>) => (
   <>
     {selected && (
       <NodeToolbar className="flex flex-row items-center gap-2">

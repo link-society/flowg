@@ -1,19 +1,24 @@
-import { useProfile } from '@/lib/context/profile'
-
-import { Handle, Position, Node, NodeProps, NodeToolbar } from '@xyflow/react'
+import TextField from '@mui/material/TextField'
 
 import FilterAltIcon from '@mui/icons-material/FilterAlt'
 
-import TextField from '@mui/material/TextField'
+import { Handle, Node, NodeProps, NodeToolbar, Position } from '@xyflow/react'
+
+import { useProfile } from '@/lib/context/profile'
 
 import { OpenTransformerDialog } from '@/components/editors/transformer/dialog'
+
 import { DeleteNodeButton } from '../delete-btn'
 
 type TransformNodeData = Node<{
   transformer: string
 }>
 
-export const TransformNode = ({ id, data, selected }: NodeProps<TransformNodeData>) => {
+export const TransformNode = ({
+  id,
+  data,
+  selected,
+}: NodeProps<TransformNodeData>) => {
   const { permissions } = useProfile()
 
   return (

@@ -1,7 +1,6 @@
 import * as request from '@/lib/api/request'
-
-import { PipelineModel } from '@/lib/models/pipeline'
 import { ForwarderModel } from '@/lib/models/forwarder'
+import { PipelineModel } from '@/lib/models/pipeline'
 import { StreamConfigModel } from '@/lib/models/storage'
 
 export const listTransformers = async (): Promise<string[]> => {
@@ -29,7 +28,10 @@ export const getTransformer = async (transformer: string): Promise<string> => {
   return body.script
 }
 
-export const saveTransformer = async (transformer: string, script: string): Promise<void> => {
+export const saveTransformer = async (
+  transformer: string,
+  script: string
+): Promise<void> => {
   type SaveTransformerRequest = {
     script: string
   }
@@ -54,7 +56,9 @@ export const deleteTransformer = async (transformer: string): Promise<void> => {
   })
 }
 
-export const listStreams = async (): Promise<{ [stream: string]: StreamConfigModel }> => {
+export const listStreams = async (): Promise<{
+  [stream: string]: StreamConfigModel
+}> => {
   type ListStreamsResponse = {
     success: boolean
     streams: { [stream: string]: StreamConfigModel }
@@ -79,7 +83,9 @@ export const listStreamFields = async (stream: string): Promise<string[]> => {
   return body.fields
 }
 
-export const getStreamConfig = async (stream: string): Promise<StreamConfigModel> => {
+export const getStreamConfig = async (
+  stream: string
+): Promise<StreamConfigModel> => {
   type GetStreamConfigResponse = {
     success: boolean
     config: StreamConfigModel
@@ -92,7 +98,10 @@ export const getStreamConfig = async (stream: string): Promise<StreamConfigModel
   return body.config
 }
 
-export const configureStream = async (stream: string, config: StreamConfigModel): Promise<void> => {
+export const configureStream = async (
+  stream: string,
+  config: StreamConfigModel
+): Promise<void> => {
   type ConfigureStreamRequest = {
     config: StreamConfigModel
   }
@@ -129,7 +138,9 @@ export const listForwarders = async (): Promise<string[]> => {
   return body.forwarders
 }
 
-export const getForwarder = async (forwarder: string): Promise<ForwarderModel> => {
+export const getForwarder = async (
+  forwarder: string
+): Promise<ForwarderModel> => {
   type GetForwarderResponse = {
     success: boolean
     forwarder: ForwarderModel
@@ -142,7 +153,10 @@ export const getForwarder = async (forwarder: string): Promise<ForwarderModel> =
   return body.forwarder
 }
 
-export const saveForwarder = async (name: string, forwarder: ForwarderModel): Promise<void> => {
+export const saveForwarder = async (
+  name: string,
+  forwarder: ForwarderModel
+): Promise<void> => {
   type SaveForwarderRequest = {
     forwarder: ForwarderModel
   }
@@ -192,7 +206,10 @@ export const getPipeline = async (pipeline: string): Promise<PipelineModel> => {
   return body.flow
 }
 
-export const savePipeline = async (pipeline: string, flow: PipelineModel): Promise<void> => {
+export const savePipeline = async (
+  pipeline: string,
+  flow: PipelineModel
+): Promise<void> => {
   type SavePipelineRequest = {
     flow: PipelineModel
   }

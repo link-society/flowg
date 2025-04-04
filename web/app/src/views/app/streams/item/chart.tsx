@@ -1,17 +1,17 @@
+import type { ApexOptions } from 'apexcharts'
+
 import { useMemo } from 'react'
+import ApexChart from 'react-apexcharts'
 
 import Box from '@mui/material/Box'
-
-import ApexChart from 'react-apexcharts'
-import type { ApexOptions } from 'apexcharts'
 
 import { LogEntryModel } from '@/lib/models/log'
 import { aggregateLogs } from '@/lib/timeserie'
 
 type ChartProps = Readonly<{
   rowData: LogEntryModel[]
-  from: Date,
-  to: Date,
+  from: Date
+  to: Date
 }>
 
 const CHART_OPTIONS: ApexOptions = {
@@ -34,9 +34,9 @@ export const Chart = ({ rowData, from, to }: ChartProps) => {
       {
         name: 'Logs',
         data: aggregateLogs(rowData, from, to),
-      }
+      },
     ],
-    [rowData, from, to],
+    [rowData, from, to]
   )
 
   return (

@@ -1,7 +1,7 @@
-import { Outlet } from 'react-router'
-
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+
+import { Outlet } from 'react-router'
 
 import { DialogsProvider } from '@toolpad/core/useDialogs'
 import { NotificationsProvider } from '@toolpad/core/useNotifications'

@@ -11,5 +11,5 @@ export const loader: LoaderFunction = loginRequired(
   async (): Promise<LoaderData> => {
     const tokens = await tokenApi.listTokens()
     return { tokens }
-  },
+  }
 )

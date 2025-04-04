@@ -1,15 +1,15 @@
 import { useState } from 'react'
 
+import Button from '@mui/material/Button'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
+
 import AccountTreeIcon from '@mui/icons-material/AccountTree'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import FilterAltIcon from '@mui/icons-material/FilterAlt'
 import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox'
 import SdStorageIcon from '@mui/icons-material/SdStorage'
 import SettingsIcon from '@mui/icons-material/Settings'
-
-import Button from '@mui/material/Button'
-import Menu from '@mui/material/Menu'
-import MenuItem from '@mui/material/MenuItem'
 
 import { useProfile } from '@/lib/context/profile'
 
@@ -102,7 +102,6 @@ export const SettingsMenu = () => {
             </Button>
           </MenuItem>
         )}
-
       </Menu>
     </>
   )

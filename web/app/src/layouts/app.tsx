@@ -1,12 +1,12 @@
 import { Outlet, useLoaderData } from 'react-router'
 
-import { NavBar } from '@/components/navbar'
-import { Footer } from '@/components/footer'
-import { ProfileProvider } from '@/lib/context/profile'
-
 import * as authApi from '@/lib/api/operations/auth'
+import { ProfileProvider } from '@/lib/context/profile'
 import { loginRequired } from '@/lib/decorators/loaders'
 import { ProfileModel } from '@/lib/models/auth'
+
+import { Footer } from '@/components/footer'
+import { NavBar } from '@/components/navbar'
 
 export const loader = async () => {
   return await loginRequired(authApi.whoami)()

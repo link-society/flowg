@@ -1,5 +1,5 @@
 export type DatadogForwarderModel = {
-    type: 'datadog'
-    url: string
-    apiKey: string
-  }
+  type: 'datadog'
+  url: string
+  apiKey: string
+}

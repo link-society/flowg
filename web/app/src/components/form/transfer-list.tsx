@@ -1,29 +1,33 @@
 import { ReactNode, useEffect, useState } from 'react'
 
-import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft'
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
-import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft'
-import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight'
-
+import Button from '@mui/material/Button'
+import Checkbox from '@mui/material/Checkbox'
 import Grid from '@mui/material/Grid'
 import List from '@mui/material/List'
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
-import Checkbox from '@mui/material/Checkbox'
-import Button from '@mui/material/Button'
 import Paper from '@mui/material/Paper'
 
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft'
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
+import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft'
+import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight'
+
 function not<T>(a: readonly T[], b: readonly T[], getItemId: (item: T) => any) {
-  return a.filter((value) => !b.find(
-    (item) => getItemId(item) === getItemId(value)
-  ))
+  return a.filter(
+    (value) => !b.find((item) => getItemId(item) === getItemId(value))
+  )
 }
 
-function intersection<T>(a: readonly T[], b: readonly T[], getItemId: (item: T) => any) {
-  return a.filter((value) => b.find(
-    (item) => getItemId(item) === getItemId(value)
-  ))
+function intersection<T>(
+  a: readonly T[],
+  b: readonly T[],
+  getItemId: (item: T) => any
+) {
+  return a.filter((value) =>
+    b.find((item) => getItemId(item) === getItemId(value))
+  )
 }
 
 type TransferListProps<T> = Readonly<{
@@ -38,10 +42,7 @@ export function TransferList<T>(props: TransferListProps<T>) {
   const [left, setLeft] = useState<T[]>(props.choices)
   const [right, setRight] = useState<T[]>([])
 
-  useEffect(
-    () => props.onChoiceUpdate(right),
-    [right]
-  )
+  useEffect(() => props.onChoiceUpdate(right), [right])
 
   const leftChecked = intersection(checked, left, props.getItemId)
   const rightChecked = intersection(checked, right, props.getItemId)
@@ -96,9 +97,11 @@ export function TransferList<T>(props: TransferListProps<T>) {
               <ListItemIcon>
                 <Checkbox
                   id={inputId}
-                  checked={checked.find((v) => {
-                    return props.getItemId(v) === props.getItemId(value)
-                  }) !== undefined}
+                  checked={
+                    checked.find((v) => {
+                      return props.getItemId(v) === props.getItemId(value)
+                    }) !== undefined
+                  }
                   tabIndex={-1}
                   disableRipple
                   inputProps={{
@@ -115,15 +118,8 @@ export function TransferList<T>(props: TransferListProps<T>) {
   )
 
   return (
-    <Grid
-      container
-      spacing={2}
-      className="justify-center items-center"
-    >
-      <Grid
-        data-ref="container:generic.transfer-list.items-left"
-        size="grow"
-      >
+    <Grid container spacing={2} className="justify-center items-center">
+      <Grid data-ref="container:generic.transfer-list.items-left" size="grow">
         {customList(left)}
       </Grid>
       <Grid>
@@ -174,10 +170,7 @@ export function TransferList<T>(props: TransferListProps<T>) {
           </Button>
         </Grid>
       </Grid>
-      <Grid
-        data-ref="container:generic.transfer-list.items-right"
-        size="grow"
-      >
+      <Grid data-ref="container:generic.transfer-list.items-right" size="grow">
         {customList(right)}
       </Grid>
     </Grid>

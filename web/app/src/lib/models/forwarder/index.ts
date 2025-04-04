@@ -17,7 +17,7 @@ export const ForwarderTypeLabelMap = ForwarderTypeValues.reduce(
     acc[cur.key] = cur.label
     return acc
   },
-  {} as Record<ForwarderTypes, string>,
+  {} as Record<ForwarderTypes, string>
 )
 
 export type ForwarderConfigModel =

@@ -1,7 +1,7 @@
 import { RouterProvider } from 'react-router'
 
-import { createTheme, ThemeProvider } from '@mui/material/styles'
 import * as colors from '@mui/material/colors'
+import { ThemeProvider, createTheme } from '@mui/material/styles'
 
 import router from '@/router'
 
@@ -15,9 +15,8 @@ const theme = createTheme({
     },
     secondary: {
       main: colors.teal[400],
-
-    }
-  }
+    },
+  },
 })
 
 export default function App() {

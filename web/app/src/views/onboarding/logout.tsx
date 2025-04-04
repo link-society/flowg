@@ -8,9 +8,5 @@ export const loader = async () => {
 }
 
 export const LogoutView = () => {
-  return (
-    <div className="py-6">
-      You are being logged out...
-    </div>
-  )
+  return <div className="py-6">You are being logged out...</div>
 }

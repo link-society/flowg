@@ -1,14 +1,14 @@
 import { useState } from 'react'
 
+import Button from '@mui/material/Button'
+import Divider from '@mui/material/Divider'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
+
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import DashboardIcon from '@mui/icons-material/Dashboard'
 import LogoutIcon from '@mui/icons-material/Logout'
-
-import Divider from '@mui/material/Divider'
-import Button from '@mui/material/Button'
-import Menu from '@mui/material/Menu'
-import MenuItem from '@mui/material/MenuItem'
 
 import { useProfile } from '@/lib/context/profile'
 

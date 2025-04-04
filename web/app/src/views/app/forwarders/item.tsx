@@ -1,28 +1,28 @@
-import { useState, useEffect } from 'react'
-import { useLoaderData, useNavigate, useLocation } from 'react-router'
+import { useEffect, useState } from 'react'
+import { useLoaderData, useLocation, useNavigate } from 'react-router'
+
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
+import Grid from '@mui/material/Grid'
+import List from '@mui/material/List'
+import ListItemButton from '@mui/material/ListItemButton'
+import ListItemText from '@mui/material/ListItemText'
+import Paper from '@mui/material/Paper'
+
+import DeleteIcon from '@mui/icons-material/Delete'
+import HelpIcon from '@mui/icons-material/Help'
+import SaveIcon from '@mui/icons-material/Save'
+
+import * as configApi from '@/lib/api/operations/config'
 import { useProfile } from '@/lib/context/profile'
 import { useApiOperation } from '@/lib/hooks/api'
 import { useNotify } from '@/lib/hooks/notify'
 
-import HelpIcon from '@mui/icons-material/Help'
-import DeleteIcon from '@mui/icons-material/Delete'
-import SaveIcon from '@mui/icons-material/Save'
-
-import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
-import Paper from '@mui/material/Paper'
-import List from '@mui/material/List'
-import ListItemButton from '@mui/material/ListItemButton'
-import ListItemText from '@mui/material/ListItemText'
-import Button from '@mui/material/Button'
-import CircularProgress from '@mui/material/CircularProgress'
-
 import { ForwarderEditor } from '@/components/editors/forwarder'
-import { NewForwarderButton } from './new-btn'
-
-import * as configApi from '@/lib/api/operations/config'
 
 import { LoaderData } from './loader'
+import { NewForwarderButton } from './new-btn'
 
 export const ForwarderView = () => {
   const navigate = useNavigate()
@@ -33,31 +33,24 @@ export const ForwarderView = () => {
   const { forwarders, currentForwarder } = useLoaderData() as LoaderData
   const [forwarder, setForwarder] = useState(currentForwarder!.forwarder)
 
-  useEffect(
-    () => { setForwarder(currentForwarder!.forwarder) },
-    [location],
-  )
+  useEffect(() => {
+    setForwarder(currentForwarder!.forwarder)
+  }, [location])
 
   const onCreate = (name: string) => {
     navigate(`/web/forwarders/${name}`)
   }
 
-  const [onDelete, deleteLoading] = useApiOperation(
-    async () => {
-      await configApi.deleteForwarder(currentForwarder!.name)
-      notify.success('Forwarder deleted')
-      navigate('/web/forwarders')
-    },
-    [currentForwarder],
-  )
+  const [onDelete, deleteLoading] = useApiOperation(async () => {
+    await configApi.deleteForwarder(currentForwarder!.name)
+    notify.success('Forwarder deleted')
+    navigate('/web/forwarders')
+  }, [currentForwarder])
 
-  const [onSave, saveLoading] = useApiOperation(
-    async () => {
-      await configApi.saveForwarder(currentForwarder!.name, forwarder)
-      notify.success('Forwarder saved')
-    },
-    [forwarder, currentForwarder],
-  )
+  const [onSave, saveLoading] = useApiOperation(async () => {
+    await configApi.saveForwarder(currentForwarder!.name, forwarder)
+    notify.success('Forwarder saved')
+  }, [forwarder, currentForwarder])
 
   return (
     <Box className="h-full flex flex-col items-stretch">
@@ -84,9 +77,7 @@ export const ForwarderView = () => {
 
         {permissions.can_edit_forwarders && (
           <div className="flex flex-row items-center gap-3">
-            <NewForwarderButton
-              onForwarderCreated={onCreate}
-            />
+            <NewForwarderButton onForwarderCreated={onCreate} />
 
             <Button
               id="btn:forwarders.delete"
@@ -97,10 +88,7 @@ export const ForwarderView = () => {
               disabled={deleteLoading}
               startIcon={!deleteLoading && <DeleteIcon />}
             >
-              {deleteLoading
-                ? <CircularProgress size={24} />
-                : <>Delete</>
-              }
+              {deleteLoading ? <CircularProgress size={24} /> : <>Delete</>}
             </Button>
 
             <Button
@@ -112,10 +100,7 @@ export const ForwarderView = () => {
               disabled={saveLoading}
               startIcon={!saveLoading && <SaveIcon />}
             >
-              {saveLoading
-                ? <CircularProgress size={24} />
-                : <>Save</>
-              }
+              {saveLoading ? <CircularProgress size={24} /> : <>Save</>}
             </Button>
           </div>
         )}
@@ -129,17 +114,18 @@ export const ForwarderView = () => {
                   key={forwarder}
                   component="a"
                   href={`/web/forwarders/${forwarder}`}
-                  sx={forwarder !== currentForwarder!.name
-                    ? {
-                      color: 'secondary.main',
-                    }
-                    : {
-                      backgroundColor: 'secondary.main',
-                      '&:hover': {
-                        backgroundColor: 'secondary.main',
-                      },
-                      color: 'white',
-                    }
+                  sx={
+                    forwarder !== currentForwarder!.name
+                      ? {
+                          color: 'secondary.main',
+                        }
+                      : {
+                          backgroundColor: 'secondary.main',
+                          '&:hover': {
+                            backgroundColor: 'secondary.main',
+                          },
+                          color: 'white',
+                        }
                   }
                 >
                   <ListItemText
@@ -153,7 +139,10 @@ export const ForwarderView = () => {
         </Grid>
         <Grid size={{ xs: 10 }} className="h-full">
           <Paper className="h-full overflow-auto p-3">
-            <ForwarderEditor forwarder={forwarder} onForwarderChange={setForwarder} />
+            <ForwarderEditor
+              forwarder={forwarder}
+              onForwarderChange={setForwarder}
+            />
           </Paper>
         </Grid>
       </Grid>

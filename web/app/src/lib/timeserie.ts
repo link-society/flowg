@@ -1,10 +1,10 @@
 import { LogEntryModel } from '@/lib/models/log'
 
 const INTERVAL_OPTIONS = [
-  5 * 1000,             // 5 seconds
-  5 * 60 * 1000,        // 5 minutes
-  60 * 60 * 1000,       // 1 hour
-  24 * 60 * 60 * 1000,  // 1 day
+  5 * 1000, // 5 seconds
+  5 * 60 * 1000, // 5 minutes
+  60 * 60 * 1000, // 1 hour
+  24 * 60 * 60 * 1000, // 1 day
 ]
 
 const TARGET_POINT_COUNT = 100

@@ -8,7 +8,7 @@ type ScopesCellProps = CustomCellRendererProps<string[]>
 
 export const ScopesCell = (props: ScopesCellProps) => (
   <>
-    {(props.value as string[] | null ?? []).map((scope) => (
+    {((props.value as string[] | null) ?? []).map((scope) => (
       <Chip
         key={scope}
         label={SCOPE_LABELS[scope as keyof typeof SCOPE_LABELS] ?? '#ERR#'}

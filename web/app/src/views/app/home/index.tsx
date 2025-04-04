@@ -1,13 +1,12 @@
-import StorageIcon from '@mui/icons-material/Storage'
-import FilterAltIcon from '@mui/icons-material/FilterAlt'
-import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox'
-import AccountTreeIcon from '@mui/icons-material/AccountTree'
-
 import Grid from '@mui/material/Grid'
 
-import { useProfile } from '@/lib/context/profile'
+import AccountTreeIcon from '@mui/icons-material/AccountTree'
+import FilterAltIcon from '@mui/icons-material/FilterAlt'
+import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox'
+import StorageIcon from '@mui/icons-material/Storage'
 
 import * as configApi from '@/lib/api/operations/config'
+import { useProfile } from '@/lib/context/profile'
 import { StreamConfigModel } from '@/lib/models/storage'
 
 import { DynamicStatCard } from './dynstatcard'
@@ -16,7 +15,11 @@ export const HomeView = () => {
   const { permissions } = useProfile()
 
   return (
-    <Grid container spacing={2} className="justify-center p-6 h-full overflow-auto">
+    <Grid
+      container
+      spacing={2}
+      className="justify-center p-6 h-full overflow-auto"
+    >
       <Grid size={{ xs: 12 }}>
         <h1 className="text-3xl text-center">Welcome to FlowG</h1>
       </Grid>

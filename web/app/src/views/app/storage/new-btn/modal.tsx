@@ -1,35 +1,34 @@
 import React, { useState } from 'react'
-import { useApiOperation } from '@/lib/hooks/api'
+
+import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
+import TextField from '@mui/material/TextField'
+import { DialogProps } from '@toolpad/core/useDialogs'
 
 import CancelIcon from '@mui/icons-material/Cancel'
 import SaveIcon from '@mui/icons-material/Save'
 
-import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle'
-import DialogContent from '@mui/material/DialogContent'
-import DialogActions from '@mui/material/DialogActions'
-import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
-import CircularProgress from '@mui/material/CircularProgress'
-
-import { DialogProps } from '@toolpad/core/useDialogs'
-
 import * as configApi from '@/lib/api/operations/config'
+import { useApiOperation } from '@/lib/hooks/api'
 
-export const NewStreamModal = ({ open, onClose }: DialogProps<void, string | null>) => {
+export const NewStreamModal = ({
+  open,
+  onClose,
+}: DialogProps<void, string | null>) => {
   const [name, setName] = useState('')
 
-  const [onSubmit, loading] = useApiOperation(
-    async () => {
-      await configApi.configureStream(name, {
-        indexed_fields: [],
-        ttl: 0,
-        size: 0,
-      })
-      onClose(name)
-    },
-    [name],
-  )
+  const [onSubmit, loading] = useApiOperation(async () => {
+    await configApi.configureStream(name, {
+      indexed_fields: [],
+      ttl: 0,
+      size: 0,
+    })
+    onClose(name)
+  }, [name])
 
   return (
     <Dialog
@@ -80,10 +79,7 @@ export const NewStreamModal = ({ open, onClose }: DialogProps<void, string | nul
           disabled={loading}
           type="submit"
         >
-          {loading
-            ? <CircularProgress color="inherit" size={24} />
-            : <>Save</>
-          }
+          {loading ? <CircularProgress color="inherit" size={24} /> : <>Save</>}
         </Button>
       </DialogActions>
     </Dialog>

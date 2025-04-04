@@ -1,33 +1,31 @@
 import React, { useEffect, useState } from 'react'
-import { useApiOperation } from '@/lib/hooks/api'
-import { useNotify } from '@/lib/hooks/notify'
 
+import AppBar from '@mui/material/AppBar'
+import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
+import Dialog from '@mui/material/Dialog'
+import IconButton from '@mui/material/IconButton'
+import Slide from '@mui/material/Slide'
+import TextField from '@mui/material/TextField'
+import Toolbar from '@mui/material/Toolbar'
 import * as colors from '@mui/material/colors'
+import { TransitionProps } from '@mui/material/transitions'
 
-import EditIcon from '@mui/icons-material/Edit'
 import CloseIcon from '@mui/icons-material/Close'
+import EditIcon from '@mui/icons-material/Edit'
 import SaveIcon from '@mui/icons-material/Save'
 
-import Slide from '@mui/material/Slide'
-import Dialog from '@mui/material/Dialog'
-import AppBar from '@mui/material/AppBar'
-import Toolbar from '@mui/material/Toolbar'
-import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
-import IconButton from '@mui/material/IconButton'
-import CircularProgress from '@mui/material/CircularProgress'
-
-import { TransitionProps } from '@mui/material/transitions'
+import * as configApi from '@/lib/api/operations/config'
+import { useApiOperation } from '@/lib/hooks/api'
+import { useNotify } from '@/lib/hooks/notify'
+import { ForwarderModel } from '@/lib/models/forwarder'
 
 import { ForwarderEditor } from '@/components/editors/forwarder'
 import { AuthenticatedAwait } from '@/components/routing/await'
 
-import * as configApi from '@/lib/api/operations/config'
-import { ForwarderModel } from '@/lib/models/forwarder'
-
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & { children: React.ReactElement },
-  ref: React.Ref<unknown>,
+  ref: React.Ref<unknown>
 ) {
   return <Slide direction="up" ref={ref} {...props} />
 })
@@ -36,37 +34,34 @@ type OpenForwarderDialogProps = Readonly<{
   forwarderName: string
 }>
 
-export const OpenForwarderDialog = ({ forwarderName }: OpenForwarderDialogProps) => {
+export const OpenForwarderDialog = ({
+  forwarderName,
+}: OpenForwarderDialogProps) => {
   const notify = useNotify()
 
   const [open, setOpen] = useState(false)
 
   const [forwarder, setForwarder] = useState<ForwarderModel>(undefined!)
-  const [forwarderPromise, setForwarderPromise] = useState<Promise<void> | null>(null)
+  const [forwarderPromise, setForwarderPromise] =
+    useState<Promise<void> | null>(null)
 
   const [onFetch] = useApiOperation(
     async (name: string) => {
       const forwarder = await configApi.getForwarder(name)
       setForwarder(forwarder)
     },
-    [forwarderName],
+    [forwarderName]
   )
 
-  useEffect(
-    () => {
-      setForwarderPromise(onFetch(forwarderName))
-    },
-    [forwarderName],
-  )
+  useEffect(() => {
+    setForwarderPromise(onFetch(forwarderName))
+  }, [forwarderName])
 
-  const [onSave, saveLoading] = useApiOperation(
-    async () => {
-      await configApi.saveForwarder(forwarderName, forwarder)
-      notify.success('Forwarder saved')
-      setForwarderPromise(onFetch(forwarderName))
-    },
-    [forwarderName, forwarder],
-  )
+  const [onSave, saveLoading] = useApiOperation(async () => {
+    await configApi.saveForwarder(forwarderName, forwarder)
+    notify.success('Forwarder saved')
+    setForwarderPromise(onFetch(forwarderName))
+  }, [forwarderName, forwarder])
 
   return (
     <>
@@ -109,7 +104,7 @@ export const OpenForwarderDialog = ({ forwarderName }: OpenForwarderDialogProps)
                     readOnly: true,
                     sx: {
                       color: 'white',
-                      backgroundColor: colors.blue[700]
+                      backgroundColor: colors.blue[700],
                     },
                   },
                   inputLabel: {
@@ -132,10 +127,7 @@ export const OpenForwarderDialog = ({ forwarderName }: OpenForwarderDialogProps)
               disabled={saveLoading}
               startIcon={!saveLoading && <SaveIcon />}
             >
-              {saveLoading
-                ? <CircularProgress size={24} />
-                : <>Save</>
-              }
+              {saveLoading ? <CircularProgress size={24} /> : <>Save</>}
             </Button>
           </Toolbar>
         </AppBar>
@@ -149,7 +141,10 @@ export const OpenForwarderDialog = ({ forwarderName }: OpenForwarderDialogProps)
           >
             {forwarderPromise !== null && (
               <AuthenticatedAwait resolve={forwarderPromise}>
-                <ForwarderEditor forwarder={forwarder} onForwarderChange={setForwarder} />
+                <ForwarderEditor
+                  forwarder={forwarder}
+                  onForwarderChange={setForwarder}
+                />
               </AuthenticatedAwait>
             )}
           </React.Suspense>

@@ -1,19 +1,23 @@
 import Divider from '@mui/material/Divider'
-import TextField from '@mui/material/TextField'
 import InputAdornment from '@mui/material/InputAdornment'
-import { KeyValueEditor } from '@/components/form/kv-editor'
+import TextField from '@mui/material/TextField'
 
 import HttpIcon from '@mui/icons-material/Http'
 
 import { ForwarderTypeLabelMap } from '@/lib/models/forwarder'
 import { HttpForwarderModel } from '@/lib/models/forwarder/http'
 
+import { KeyValueEditor } from '@/components/form/kv-editor'
+
 type HttpForwarderEditorProps = {
   config: HttpForwarderModel
   onConfigChange: (config: HttpForwarderModel) => void
 }
 
-export const HttpForwarderEditor = ({ config, onConfigChange }: HttpForwarderEditorProps) => {
+export const HttpForwarderEditor = ({
+  config,
+  onConfigChange,
+}: HttpForwarderEditorProps) => {
   return (
     <div
       id="container:editor.forwarders.http"
@@ -34,7 +38,7 @@ export const HttpForwarderEditor = ({ config, onConfigChange }: HttpForwarderEdi
                   <HttpIcon />
                 </InputAdornment>
               ),
-            }
+            },
           }}
         />
       </div>

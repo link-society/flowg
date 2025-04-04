@@ -1,21 +1,21 @@
-import TextField from '@mui/material/TextField'
-import InputAdornment from '@mui/material/InputAdornment'
 import FormControl from '@mui/material/FormControl'
+import InputAdornment from '@mui/material/InputAdornment'
 import InputLabel from '@mui/material/InputLabel'
-import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
+import Select from '@mui/material/Select'
+import TextField from '@mui/material/TextField'
 
 import TextSnippetIcon from '@mui/icons-material/TextSnippet'
 
 import { ForwarderTypeLabelMap } from '@/lib/models/forwarder'
 import {
+  SyslogFacility,
+  SyslogFacilityValues,
   SyslogForwarderModel,
   SyslogNetwork,
-  SyslogSeverity,
-  SyslogFacility,
   SyslogNetworkValues,
+  SyslogSeverity,
   SyslogSeverityValues,
-  SyslogFacilityValues,
 } from '@/lib/models/forwarder/syslog'
 
 type SyslogForwarderEditorProps = {
@@ -23,7 +23,10 @@ type SyslogForwarderEditorProps = {
   onConfigChange: (config: SyslogForwarderModel) => void
 }
 
-export const SyslogForwarderEditor = ({ config, onConfigChange }: SyslogForwarderEditorProps) => {
+export const SyslogForwarderEditor = ({
+  config,
+  onConfigChange,
+}: SyslogForwarderEditorProps) => {
   return (
     <div
       id="container:editor.forwarders.syslog"
@@ -44,14 +47,16 @@ export const SyslogForwarderEditor = ({ config, onConfigChange }: SyslogForwarde
                   <TextSnippetIcon />
                 </InputAdornment>
               ),
-            }
+            },
           }}
         />
       </div>
 
       <div className="flex flex-row items-center gap-3">
         <FormControl>
-          <InputLabel id="label:editor.forwarders.syslog.network">Network</InputLabel>
+          <InputLabel id="label:editor.forwarders.syslog.network">
+            Network
+          </InputLabel>
           <Select<SyslogNetwork>
             labelId="label:editor.forwarders.syslog.network"
             id="select:editor.forwarders.syslog.network"
@@ -108,7 +113,9 @@ export const SyslogForwarderEditor = ({ config, onConfigChange }: SyslogForwarde
 
       <div className="flex flex-row gap-3">
         <FormControl className="grow">
-          <InputLabel id="label:editor.forwarders.syslog.severity">Severity</InputLabel>
+          <InputLabel id="label:editor.forwarders.syslog.severity">
+            Severity
+          </InputLabel>
           <Select<SyslogSeverity>
             labelId="label:editor.forwarders.syslog.severity"
             id="select:editor.forwarders.syslog.severity"
@@ -134,7 +141,9 @@ export const SyslogForwarderEditor = ({ config, onConfigChange }: SyslogForwarde
         </FormControl>
 
         <FormControl className="grow">
-          <InputLabel id="label:editor.forwarders.syslog.facility">Facility</InputLabel>
+          <InputLabel id="label:editor.forwarders.syslog.facility">
+            Facility
+          </InputLabel>
           <Select<SyslogFacility>
             labelId="label:editor.forwarders.syslog.facility"
             id="select:editor.forwarders.syslog.facility"

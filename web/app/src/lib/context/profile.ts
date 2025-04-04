@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react'
+
 import { ProfileModel } from '@/lib/models/auth'
 
 const ProfileContext = createContext<ProfileModel>(null!)

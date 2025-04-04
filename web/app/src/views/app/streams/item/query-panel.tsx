@@ -1,39 +1,39 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import SearchIcon from '@mui/icons-material/Search'
-
-import Grid from '@mui/material/Grid'
-import CircularProgress from '@mui/material/CircularProgress'
 import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
+import Grid from '@mui/material/Grid'
 import TextField from '@mui/material/TextField'
 
-import { TimeWindowSelector, TimeWindowFactory } from './timewindow-selector'
+import SearchIcon from '@mui/icons-material/Search'
+
+import { TimeWindowFactory, TimeWindowSelector } from './timewindow-selector'
 
 type QueryPanelProps = Readonly<{
   loading: boolean
-  onFetchRequested: (filter: string, from: Date, to: Date, live: boolean) => void
+  onFetchRequested: (
+    filter: string,
+    from: Date,
+    to: Date,
+    live: boolean
+  ) => void
 }>
 
 export const QueryPanel = (props: QueryPanelProps) => {
   const [filter, setFilter] = useState('')
-  const [timeWindowFactory, setTimeWindowFactory] = useState<TimeWindowFactory | null>(null)
+  const [timeWindowFactory, setTimeWindowFactory] =
+    useState<TimeWindowFactory | null>(null)
 
-  const requestFetch = useCallback(
-    () => {
-      if (timeWindowFactory !== null) {
-        const { from, to, live } = timeWindowFactory.make()
-        props.onFetchRequested(filter, from, to, live)
-      }
-    },
-    [timeWindowFactory, filter],
-  )
+  const requestFetch = useCallback(() => {
+    if (timeWindowFactory !== null) {
+      const { from, to, live } = timeWindowFactory.make()
+      props.onFetchRequested(filter, from, to, live)
+    }
+  }, [timeWindowFactory, filter])
 
-  useEffect(
-    () => {
-      requestFetch()
-    },
-    [timeWindowFactory],
-  )
+  useEffect(() => {
+    requestFetch()
+  }, [timeWindowFactory])
 
   return (
     <Grid container spacing={2} className="p-3 items-center">
@@ -74,10 +74,11 @@ export const QueryPanel = (props: QueryPanelProps) => {
           endIcon={!props.loading && <SearchIcon />}
           disabled={props.loading}
         >
-          {props.loading
-            ? <CircularProgress color="inherit" size={24} />
-            : <>Query Logs</>
-          }
+          {props.loading ? (
+            <CircularProgress color="inherit" size={24} />
+          ) : (
+            <>Query Logs</>
+          )}
         </Button>
       </Grid>
     </Grid>

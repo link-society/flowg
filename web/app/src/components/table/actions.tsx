@@ -1,8 +1,8 @@
-import { CustomCellRendererProps } from 'ag-grid-react'
+import Button from '@mui/material/Button'
 
 import DeleteIcon from '@mui/icons-material/Delete'
 
-import Button from '@mui/material/Button'
+import { CustomCellRendererProps } from 'ag-grid-react'
 
 type ActionsProps<T> = CustomCellRendererProps<T> & {
   onDelete?: (data: T) => void

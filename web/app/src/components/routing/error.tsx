@@ -1,11 +1,10 @@
 import { useRouteError } from 'react-router'
 
-import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied'
-
 import TextField from '@mui/material/TextField'
 
-import * as errors from '@/lib/api/errors'
+import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied'
 
+import * as errors from '@/lib/api/errors'
 
 const Heading = ({ title }: { title: string }) => (
   <h1 className="text-2xl text-red-600 flex flex-row items-center">
@@ -16,7 +15,9 @@ const Heading = ({ title }: { title: string }) => (
 )
 
 const CodeBlock = ({ content }: { content: string }) => (
-  <pre className="p-2 bg-black text-gray-400 shadow"><code>{content}</code></pre>
+  <pre className="p-2 bg-black text-gray-400 shadow">
+    <code>{content}</code>
+  </pre>
 )
 
 export const ErrorBoundary = () => {
@@ -38,16 +39,16 @@ export const ErrorBoundary = () => {
         <CodeBlock content={error.body} />
       </div>
     )
-  }
-  else if (error instanceof Error) {
+  } else if (error instanceof Error) {
     return (
       <div className="p-3 flex flex-col gap-3">
         <Heading title={error.message} />
 
-        {error.stack
-          ? <CodeBlock content={error.stack} />
-          : <p>No stacktrace available</p>
-        }
+        {error.stack ? (
+          <CodeBlock content={error.stack} />
+        ) : (
+          <p>No stacktrace available</p>
+        )}
       </div>
     )
   }
@@ -60,4 +61,3 @@ export const ErrorBoundary = () => {
     </div>
   )
 }
-

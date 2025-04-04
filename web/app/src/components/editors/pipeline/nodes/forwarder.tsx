@@ -1,17 +1,22 @@
-import { Handle, Position, Node, NodeProps, NodeToolbar } from '@xyflow/react'
+import TextField from '@mui/material/TextField'
 
 import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox'
 
-import TextField from '@mui/material/TextField'
+import { Handle, Node, NodeProps, NodeToolbar, Position } from '@xyflow/react'
 
 import { OpenForwarderDialog } from '@/components/editors/forwarder/dialog'
+
 import { DeleteNodeButton } from '../delete-btn'
 
 type ForwarderNodeData = Node<{
   forwarder: string
 }>
 
-export const ForwarderNode = ({ id, data, selected }: NodeProps<ForwarderNodeData>) => (
+export const ForwarderNode = ({
+  id,
+  data,
+  selected,
+}: NodeProps<ForwarderNodeData>) => (
   <>
     {selected && (
       <NodeToolbar className="flex flex-row items-center gap-2">

@@ -1,46 +1,46 @@
 import React, { useState } from 'react'
-import { useApiOperation } from '@/lib/hooks/api'
 
-import AccountCircleIcon from '@mui/icons-material/AccountCircle'
-import LockIcon from '@mui/icons-material/Lock'
-import CancelIcon from '@mui/icons-material/Cancel'
-import SaveIcon from '@mui/icons-material/Save'
-
-import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle'
-import DialogContent from '@mui/material/DialogContent'
-import DialogActions from '@mui/material/DialogActions'
-import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
-import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
+import CircularProgress from '@mui/material/CircularProgress'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
+import TextField from '@mui/material/TextField'
 import Tooltip from '@mui/material/Tooltip'
-
 import { DialogProps } from '@toolpad/core/useDialogs'
+
+import AccountCircleIcon from '@mui/icons-material/AccountCircle'
+import CancelIcon from '@mui/icons-material/Cancel'
+import LockIcon from '@mui/icons-material/Lock'
+import SaveIcon from '@mui/icons-material/Save'
+
+import * as aclApi from '@/lib/api/operations/acls'
+import { useApiOperation } from '@/lib/hooks/api'
+import { UserModel } from '@/lib/models/auth'
 
 import { TransferList } from '@/components/form/transfer-list'
 
-import * as aclApi from '@/lib/api/operations/acls'
-import { UserModel } from '@/lib/models/auth'
-
-export const UserFormModal = ({ open, payload, onClose }: DialogProps<string[], UserModel | null>) => {
+export const UserFormModal = ({
+  open,
+  payload,
+  onClose,
+}: DialogProps<string[], UserModel | null>) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [roles, setRoles] = useState<string[]>([])
 
-  const [onSubmit, loading] = useApiOperation(
-    async () => {
-      const user = {
-        name: username,
-        roles,
-      }
+  const [onSubmit, loading] = useApiOperation(async () => {
+    const user = {
+      name: username,
+      roles,
+    }
 
-      await aclApi.saveUser(user, password)
-      onClose(user)
-    },
-    [username, password, roles, onClose],
-  )
+    await aclApi.saveUser(user, password)
+    onClose(user)
+  }, [username, password, roles, onClose])
 
   return (
     <Dialog
@@ -125,10 +125,7 @@ export const UserFormModal = ({ open, payload, onClose }: DialogProps<string[], 
           disabled={loading}
           type="submit"
         >
-          {loading
-            ? <CircularProgress color="inherit" size={24} />
-            : <>Save</>
-          }
+          {loading ? <CircularProgress color="inherit" size={24} /> : <>Save</>}
         </Button>
       </DialogActions>
     </Dialog>

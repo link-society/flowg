@@ -1,21 +1,21 @@
 import { useEffect, useState } from 'react'
 import { useLoaderData, useParams } from 'react-router'
-import { useApiOperation } from '@/lib/hooks/api'
-import { useNotify } from '@/lib/hooks/notify'
 
+import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
-import Divider from '@mui/material/Divider'
 
-import { StreamList } from './stream-list'
-import { QueryPanel } from './query-panel'
-import { Chart } from './chart'
-import { LogTable } from './log-table'
+import { ColDef } from 'ag-grid-community'
 
 import * as logApi from '@/lib/api/operations/logs'
-
+import { useApiOperation } from '@/lib/hooks/api'
+import { useNotify } from '@/lib/hooks/notify'
 import { LogEntryModel } from '@/lib/models/log'
-import { ColDef } from 'ag-grid-community'
+
+import { Chart } from './chart'
+import { LogTable } from './log-table'
+import { QueryPanel } from './query-panel'
+import { StreamList } from './stream-list'
 
 import { LoaderData } from '../loader'
 
@@ -45,12 +45,12 @@ export const StreamView = () => {
     valueGetter: ({ data }) => data?.fields[field],
   })
 
-  const [watcher, setWatcher] = useState<{ enabled: boolean, filter: string }>({
+  const [watcher, setWatcher] = useState<{ enabled: boolean; filter: string }>({
     enabled: false,
     filter: '',
   })
 
-  const [timeWindow, setTimeWindow] = useState<{ from: Date, to: Date }>({
+  const [timeWindow, setTimeWindow] = useState<{ from: Date; to: Date }>({
     from: new Date(),
     to: new Date(),
   })
@@ -65,94 +65,88 @@ export const StreamView = () => {
     async (filter: string, from: Date, to: Date, live: boolean) => {
       const logs = await logApi.queryLogs(
         currentStream!,
-        from, to,
-        filter ? filter : undefined,
+        from,
+        to,
+        filter ? filter : undefined
       )
       setRowData(logs)
       setTimeWindow({ from, to })
       setWatcher({ enabled: live, filter })
     },
-    [currentStream, setRowData],
+    [currentStream, setRowData]
   )
 
-  const [handleLiveError] = useApiOperation(
-    async (err: Error) => { throw err },
-    [],
-  )
+  const [handleLiveError] = useApiOperation(async (err: Error) => {
+    throw err
+  }, [])
 
-  useEffect(
-    () => {
-      if (watcher.enabled) {
-        const bus = logApi.watchLogs(currentStream!, watcher.filter)
+  useEffect(() => {
+    if (watcher.enabled) {
+      const bus = logApi.watchLogs(currentStream!, watcher.filter)
 
-        const incomingState = {
-          rowData: [] as LogEntryModel[],
-          columnDefs,
-        }
-
-        bus.control.addEventListener('error', (event) => {
-          const evt = event as CustomEvent
-          handleLiveError(evt.detail)
-        })
-
-        bus.messages.addEventListener('log', (event) => {
-          const evt = event as CustomEvent
-          type RawLogEntry = {
-            timestamp: string
-            fields: Record<string, string>
-          }
-          const rawlogEntry: RawLogEntry = JSON.parse(evt.detail.data)
-          const logEntry: LogEntryModel = {
-            timestamp: new Date(rawlogEntry.timestamp),
-            fields: rawlogEntry.fields,
-          }
-          incomingState.rowData.push(logEntry)
-
-          const allFields = [...fields!]
-
-          for (const field of Object.keys(logEntry.fields)) {
-            if (!allFields.includes(field)) {
-              allFields.push(field)
-            }
-          }
-
-          allFields.sort()
-
-          incomingState.columnDefs = [
-            timestampColumnDef(),
-            ...allFields.map(fieldToColumnDef),
-          ]
-        })
-
-        bus.messages.addEventListener('exception', (event) => {
-          const evt = event as CustomEvent
-          notify.error('An error occured while watching logs')
-          console.error(evt.detail.data)
-        })
-
-        const token = setInterval(
-          () => {
-            setRowData((prev) => {
-              return [...prev, ...incomingState.rowData]
-            })
-            setColumnDefs(incomingState.columnDefs)
-            setTimeWindow((prev) => ({
-              from: prev.from,
-              to: new Date(),
-            }))
-            incomingState.rowData = []
-          },
-          1000,
-        )
-
-        return () => {
-          bus.close()
-          clearInterval(token)
-        }
+      const incomingState = {
+        rowData: [] as LogEntryModel[],
+        columnDefs,
       }
-    },
-    [currentStream, watcher],
-  )
+
+      bus.control.addEventListener('error', (event) => {
+        const evt = event as CustomEvent
+        handleLiveError(evt.detail)
+      })
+
+      bus.messages.addEventListener('log', (event) => {
+        const evt = event as CustomEvent
+        type RawLogEntry = {
+          timestamp: string
+          fields: Record<string, string>
+        }
+        const rawlogEntry: RawLogEntry = JSON.parse(evt.detail.data)
+        const logEntry: LogEntryModel = {
+          timestamp: new Date(rawlogEntry.timestamp),
+          fields: rawlogEntry.fields,
+        }
+        incomingState.rowData.push(logEntry)
+
+        const allFields = [...fields!]
+
+        for (const field of Object.keys(logEntry.fields)) {
+          if (!allFields.includes(field)) {
+            allFields.push(field)
+          }
+        }
+
+        allFields.sort()
+
+        incomingState.columnDefs = [
+          timestampColumnDef(),
+          ...allFields.map(fieldToColumnDef),
+        ]
+      })
+
+      bus.messages.addEventListener('exception', (event) => {
+        const evt = event as CustomEvent
+        notify.error('An error occured while watching logs')
+        console.error(evt.detail.data)
+      })
+
+      const token = setInterval(() => {
+        setRowData((prev) => {
+          return [...prev, ...incomingState.rowData]
+        })
+        setColumnDefs(incomingState.columnDefs)
+        setTimeWindow((prev) => ({
+          from: prev.from,
+          to: new Date(),
+        }))
+        incomingState.rowData = []
+      }, 1000)
+
+      return () => {
+        bus.close()
+        clearInterval(token)
+      }
+    }
+  }, [currentStream, watcher])
 
   return (
     <Grid container spacing={1} className="p-2 h-full">
@@ -163,16 +157,9 @@ export const StreamView = () => {
       </Grid>
       <Grid size={{ xs: 10 }} className="flex flex-col items-stretch gap-2">
         <Paper>
-          <QueryPanel
-            loading={loading}
-            onFetchRequested={fetchLogs}
-          />
+          <QueryPanel loading={loading} onFetchRequested={fetchLogs} />
           <Divider />
-          <Chart
-            rowData={rowData}
-            from={timeWindow.from}
-            to={timeWindow.to}
-          />
+          <Chart rowData={rowData} from={timeWindow.from} to={timeWindow.to} />
         </Paper>
 
         <LogTable rowData={rowData} columnDefs={columnDefs} />

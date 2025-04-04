@@ -1,6 +1,6 @@
-import Paper from '@mui/material/Paper'
 import Chip from '@mui/material/Chip'
 import ListItem from '@mui/material/ListItem'
+import Paper from '@mui/material/Paper'
 
 import { useProfile } from '@/lib/context/profile'
 
@@ -9,9 +9,7 @@ export const RoleList = () => {
 
   return (
     <div>
-      <span className="font-semibold mb-1">
-        Roles:
-      </span>
+      <span className="font-semibold mb-1">Roles:</span>
 
       <Paper
         className="

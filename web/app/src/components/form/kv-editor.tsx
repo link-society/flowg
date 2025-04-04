@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 
-import DeleteIcon from '@mui/icons-material/Delete'
-import AddIcon from '@mui/icons-material/Add'
-
-import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
+
+import AddIcon from '@mui/icons-material/Add'
+import DeleteIcon from '@mui/icons-material/Delete'
 
 type KeyValue = [string, string]
 
@@ -22,10 +22,9 @@ export const KeyValueEditor = (props: KeyValueEditorProps) => {
   const [newKey, setNewKey] = useState('')
   const [newValue, setNewValue] = useState('')
 
-  useEffect(
-    () => { props.onChange(pairs) },
-    [pairs]
-  )
+  useEffect(() => {
+    props.onChange(pairs)
+  }, [pairs])
 
   return (
     <div

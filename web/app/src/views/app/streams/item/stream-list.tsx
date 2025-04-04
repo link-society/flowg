@@ -15,17 +15,18 @@ export const StreamList = (props: StreamListProps) => {
           key={stream}
           component="a"
           href={`/web/streams/${stream}`}
-          sx={stream !== props.currentStream
-            ? {
-              color: 'secondary.main',
-            }
-            : {
-              backgroundColor: 'secondary.main',
-              '&:hover': {
-                backgroundColor: 'secondary.main',
-              },
-              color: 'white',
-            }
+          sx={
+            stream !== props.currentStream
+              ? {
+                  color: 'secondary.main',
+                }
+              : {
+                  backgroundColor: 'secondary.main',
+                  '&:hover': {
+                    backgroundColor: 'secondary.main',
+                  },
+                  color: 'white',
+                }
           }
         >
           <ListItemText primary={stream} />

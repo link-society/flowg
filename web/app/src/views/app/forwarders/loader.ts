@@ -1,7 +1,7 @@
 import { LoaderFunction } from 'react-router'
 
-import { loginRequired } from '@/lib/decorators/loaders'
 import * as configApi from '@/lib/api/operations/config'
+import { loginRequired } from '@/lib/decorators/loaders'
 import { ForwarderModel } from '@/lib/models/forwarder'
 
 export type LoaderData = {
@@ -18,10 +18,9 @@ export const loader: LoaderFunction = loginRequired(
 
     if (params.forwarder !== undefined) {
       if (!forwarders.includes(params.forwarder)) {
-        throw new Response(
-          `Forwarder ${params.forwarder} not found`,
-          { status: 404 },
-        )
+        throw new Response(`Forwarder ${params.forwarder} not found`, {
+          status: 404,
+        })
       }
 
       const forwarder = await configApi.getForwarder(params.forwarder)
@@ -35,5 +34,5 @@ export const loader: LoaderFunction = loginRequired(
     }
 
     return { forwarders: forwarders }
-  },
+  }
 )

@@ -1,11 +1,11 @@
-import { useProfile } from '@/lib/context/profile'
-
 import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox'
 
-import { NodeList } from '@/components/editors/pipeline/node-list'
-import { NewForwarderButton } from '@/views/app/forwarders/new-btn'
-
 import * as configApi from '@/lib/api/operations/config'
+import { useProfile } from '@/lib/context/profile'
+
+import { NodeList } from '@/components/editors/pipeline/node-list'
+
+import { NewForwarderButton } from '@/views/app/forwarders/new-btn'
 
 type ForwarderListProps = Readonly<{
   className?: string

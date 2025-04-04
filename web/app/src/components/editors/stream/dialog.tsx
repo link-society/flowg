@@ -1,33 +1,31 @@
 import React, { useEffect, useState } from 'react'
-import { useApiOperation } from '@/lib/hooks/api'
-import { useNotify } from '@/lib/hooks/notify'
 
+import AppBar from '@mui/material/AppBar'
+import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
+import Dialog from '@mui/material/Dialog'
+import IconButton from '@mui/material/IconButton'
+import Slide from '@mui/material/Slide'
+import TextField from '@mui/material/TextField'
+import Toolbar from '@mui/material/Toolbar'
 import * as colors from '@mui/material/colors'
+import { TransitionProps } from '@mui/material/transitions'
 
-import EditIcon from '@mui/icons-material/Edit'
 import CloseIcon from '@mui/icons-material/Close'
+import EditIcon from '@mui/icons-material/Edit'
 import SaveIcon from '@mui/icons-material/Save'
 
-import Slide from '@mui/material/Slide'
-import Dialog from '@mui/material/Dialog'
-import AppBar from '@mui/material/AppBar'
-import Toolbar from '@mui/material/Toolbar'
-import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
-import IconButton from '@mui/material/IconButton'
-import CircularProgress from '@mui/material/CircularProgress'
-
-import { TransitionProps } from '@mui/material/transitions'
+import * as configApi from '@/lib/api/operations/config'
+import { useApiOperation } from '@/lib/hooks/api'
+import { useNotify } from '@/lib/hooks/notify'
+import { StreamConfigModel } from '@/lib/models/storage'
 
 import { StreamEditor } from '@/components/editors/stream'
 import { AuthenticatedAwait } from '@/components/routing/await'
 
-import * as configApi from '@/lib/api/operations/config'
-import { StreamConfigModel } from '@/lib/models/storage'
-
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & { children: React.ReactElement },
-  ref: React.Ref<unknown>,
+  ref: React.Ref<unknown>
 ) {
   return <Slide direction="up" ref={ref} {...props} />
 })
@@ -46,31 +44,26 @@ export const OpenStreamDialog = ({ stream }: OpenStreamDialogProps) => {
     size: 0,
     ttl: 0,
   })
-  const [streamConfigPromise, setStreamConfigPromise] = useState<Promise<void> | null>(null)
+  const [streamConfigPromise, setStreamConfigPromise] =
+    useState<Promise<void> | null>(null)
 
   const [onFetch] = useApiOperation(
     async (stream: string) => {
       const streamConfig = await configApi.getStreamConfig(stream)
       setStreamConfig(streamConfig)
     },
-    [stream],
+    [stream]
   )
 
-  useEffect(
-    () => {
-      setStreamConfigPromise(onFetch(stream))
-    },
-    [stream],
-  )
+  useEffect(() => {
+    setStreamConfigPromise(onFetch(stream))
+  }, [stream])
 
-  const [onSave, saveLoading] = useApiOperation(
-    async () => {
-      await configApi.configureStream(stream, streamConfig)
-      notify.success('Stream saved')
-      setStreamConfigPromise(onFetch(stream))
-    },
-    [stream, streamConfig],
-  )
+  const [onSave, saveLoading] = useApiOperation(async () => {
+    await configApi.configureStream(stream, streamConfig)
+    notify.success('Stream saved')
+    setStreamConfigPromise(onFetch(stream))
+  }, [stream, streamConfig])
 
   return (
     <>
@@ -113,7 +106,7 @@ export const OpenStreamDialog = ({ stream }: OpenStreamDialogProps) => {
                     readOnly: true,
                     sx: {
                       color: 'white',
-                      backgroundColor: colors.blue[700]
+                      backgroundColor: colors.blue[700],
                     },
                   },
                   inputLabel: {
@@ -136,10 +129,7 @@ export const OpenStreamDialog = ({ stream }: OpenStreamDialogProps) => {
               disabled={saveLoading}
               startIcon={!saveLoading && <SaveIcon />}
             >
-              {saveLoading
-                ? <CircularProgress size={24} />
-                : <>Save</>
-              }
+              {saveLoading ? <CircularProgress size={24} /> : <>Save</>}
             </Button>
           </Toolbar>
         </AppBar>
