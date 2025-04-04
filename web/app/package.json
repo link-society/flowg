@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc -b && vite build",
     "build:dev": "tsc -b && vite build --mode development",
-    "lint": "eslint ."
+    "lint": "eslint . && prettier --check ."
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -29,6 +29,7 @@
   "devDependencies": {
     "@eslint/js": "^9.23.0",
     "@tailwindcss/vite": "^4.0.17",
+    "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/node": "^22.13.14",
     "@types/react": "^19.0.12",
     "@types/react-dom": "^19.0.4",
@@ -38,6 +39,8 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
+    "prettier": "^3.5.3",
+    "prettier-plugin-organize-imports": "^4.1.0",
     "tailwindcss": "^4.0.17",
     "typescript": "^5.8.2",
     "typescript-eslint": "^8.28.0",
