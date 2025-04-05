@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid'
+
 import React, {
   DragEventHandler,
   useCallback,
@@ -147,7 +149,7 @@ export const FlowEditor: React.FC<FlowEditorProps> = ({
 
       setNodes((nds) => {
         const newNode = {
-          id: `node-${nds.length}`,
+          id: `node-${uuidv4()}`,
           type,
           position,
           data: {},
