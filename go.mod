@@ -21,7 +21,7 @@ require (
 	github.com/swaggest/swgui v1.8.2
 	github.com/swaggest/usecase v1.3.1
 	github.com/vladopajic/go-actor v0.9.6
-	golang.org/x/crypto v0.36.0
+	golang.org/x/crypto v0.37.0
 	gopkg.in/mcuadros/go-syslog.v2 v2.3.0
 )
 
@@ -63,7 +63,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.34.0 // indirect
 	go.opentelemetry.io/otel/trace v1.34.0 // indirect
 	golang.org/x/net v0.36.0 // indirect
-	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/sys v0.32.0 // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
