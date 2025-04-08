@@ -44,6 +44,8 @@ var (
 	defaultAuthDir   = getEnvString("FLOWG_AUTH_DIR", "./data/auth")
 	defaultConfigDir = getEnvString("FLOWG_CONFIG_DIR", "./data/config")
 	defaultLogDir    = getEnvString("FLOWG_LOG_DIR", "./data/logs")
+
+	defaultConsulUrl = getEnvString("CONSUL_URL", "")
 )
 
 func getEnvString(key string, defaultValue string) string {
