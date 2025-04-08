@@ -30,6 +30,8 @@ type options struct {
 	logDir    string
 	configDir string
 	verbose   bool
+
+	consulUrl string
 }
 
 func (opts *options) defineCliOptions(cmd *cobra.Command) {
@@ -194,5 +196,12 @@ func (opts *options) defineCliOptions(cmd *cobra.Command) {
 		"verbose",
 		defaultVerbose,
 		"Enable verbose logging",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.consulUrl,
+		"consul-url",
+		defaultConsulUrl,
+		"URL to local consul instance",
 	)
 }
