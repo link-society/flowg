@@ -114,6 +114,8 @@ func newServerConfig(opts *options) (server.Options, error) {
 		ConfigStorageDir: opts.configDir,
 		AuthStorageDir:   opts.authDir,
 		LogStorageDir:    opts.logDir,
+
+		ConsulUrl: opts.consulUrl,
 	}
 
 	return config, nil
