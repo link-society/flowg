@@ -32,7 +32,7 @@ func (h *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 	// If no consul url is provided then stop the consul service as it is not needed
 	if h.opts.ConsulUrl == "" {
 		h.logger.InfoContext(ctx, "no consul url provided")
-		return proctree.Terminate(nil)
+		return proctree.Continue()
 	}
 
 	// Register node with Consul
@@ -66,12 +66,16 @@ func (h *procHandler) DoWork(ctx actor.Context) proctree.ProcessResult {
 }
 
 func (h *procHandler) Terminate(ctx actor.Context, err error) error {
+	if h.opts.ConsulUrl == "" {
+		return err
+	}
+
 	h.logger.InfoContext(ctx, "Deregistering service with consul")
 
 	if deregisterErr := h.consulClient.Agent().ServiceDeregister(h.opts.NodeId); err != nil {
 		h.logger.ErrorContext(
 			ctx,
-			"Failed to shutdown HTTP server",
+			"failed to deregister from consul",
 			slog.String("error", deregisterErr.Error()),
 		)
 		err = errors.Join(err, deregisterErr)
@@ -109,11 +113,11 @@ func (h *procHandler) registerNode(ctx actor.Context) error {
 	registration := &api.AgentServiceRegistration{
 		ID:      h.opts.NodeId,
 		Name:    h.opts.ServiceName,
-		Address: h.opts.NodeHost,
+		Address: h.opts.NodeAddress,
 		Port:    port,
 		Check: &api.AgentServiceCheck{
 			Interval: healthCheckInterval.String(),
-			HTTP:     fmt.Sprintf("http://%s:%d%s", h.opts.NodeHost, port, healthCheckPath),
+			HTTP:     fmt.Sprintf("http://%s:%d%s", h.opts.NodeAddress, port, healthCheckPath),
 			Timeout:  healthCheckTimeout.String(),
 		},
 	}

@@ -29,7 +29,8 @@ type Options struct {
 	MgmtTlsConfig   *tls.Config
 
 	ClusterNodeID       string
-	ClusterNodeAddress  *url.URL
+	ClusterNodeAddress  string
+	ClusterNodePort     string
 	ClusterJoinNodeID   string
 	ClusterJoinEndpoint *url.URL
 	ClusterCookie       string
@@ -95,8 +96,8 @@ func NewServer(opts Options) proctree.Process {
 
 		consulService = consul.NewConsulService(&consul.ConsulServiceOptions{
 			NodeId:      opts.ClusterNodeID,
-			NodeHost:    opts.ClusterNodeAddress.Host,
-			NodePort:    opts.ClusterNodeAddress.Port(),
+			NodeAddress: opts.ClusterNodeAddress,
+			NodePort:    opts.ClusterNodePort,
 			ServiceName: opts.ServiceName,
 			ConsulUrl:   opts.ConsulUrl,
 		})
