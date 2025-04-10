@@ -8,7 +8,7 @@ import (
 
 type ConsulServiceOptions struct {
 	NodeId      string
-	NodeHost    string
+	NodeAddress string
 	NodePort    string
 	ServiceName string
 	ConsulUrl   string
