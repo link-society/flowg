@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"math/rand"
+	"math/rand/v2"
 	"strconv"
 	"time"
 
@@ -165,7 +165,7 @@ func (h *procHandler) getNodes(ctx actor.Context) ([]string, error) {
 			// Exponential backoff
 			delay = delay * 2
 			// Add jitter to the delay
-			delay += time.Duration(rand.Int63n(int64(delay / 4)))
+			delay += time.Duration(rand.IntN(int(delay / 4)))
 		}
 	}
 
