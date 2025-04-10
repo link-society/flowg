@@ -21,6 +21,7 @@ var (
 	defaultMgmtTlsCertKey  = getEnvString("FLOWG_MGMT_TLS_KEY", "")
 
 	defaultClusterNodeID       = getEnvString("FLOWG_CLUSTER_NODE_ID", "")
+	defaultClusterNodeAddress  = getEnvString("FLOWG_CLUSTER_NODE_ADDRESS", "")
 	defaultClusterJoinNodeID   = getEnvString("FLOWG_CLUSTER_JOIN_NODE_ID", "")
 	defaultClusterJoinEndpoint = getEnvString("FLOWG_CLUSTER_JOIN_ENDPOINT", "")
 	defaultClusterCookie       = getEnvString("FLOWG_CLUSTER_COOKIE", "")
@@ -45,7 +46,8 @@ var (
 	defaultConfigDir = getEnvString("FLOWG_CONFIG_DIR", "./data/config")
 	defaultLogDir    = getEnvString("FLOWG_LOG_DIR", "./data/logs")
 
-	defaultConsulUrl = getEnvString("CONSUL_URL", "")
+	defaultServiceName = getEnvString("FLOWG_SERVICE_NAME", "FlowG")
+	defaultConsulUrl   = getEnvString("CONSUL_URL", "")
 )
 
 func getEnvString(key string, defaultValue string) string {
