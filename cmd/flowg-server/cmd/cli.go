@@ -15,6 +15,7 @@ type options struct {
 
 	clusterNodeID       string
 	clusterNodeAddress  string
+	clusterNodePort     string
 	clusterJoinNodeID   string
 	clusterJoinEndpoint string
 	clusterCookie       string
@@ -102,8 +103,15 @@ func (opts *options) defineCliOptions(cmd *cobra.Command) {
 
 	cmd.Flags().StringVar(
 		&opts.clusterNodeAddress,
-		"cluster-node-id",
+		"cluster-node-address",
 		defaultClusterNodeAddress,
+		"Address for this node in the cluster",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.clusterNodePort,
+		"cluster-node-port",
+		defaultClusterNodePort,
 		"Address for this node in the cluster",
 	)
 
@@ -209,7 +217,7 @@ func (opts *options) defineCliOptions(cmd *cobra.Command) {
 
 	cmd.Flags().StringVar(
 		&opts.serviceName,
-		"cluster-node-id",
+		"service-name",
 		defaultServiceName,
 		"Name of the service",
 	)

@@ -7,10 +7,12 @@ import (
 	"strings"
 )
 
+const defaultFlowGBindPort = "5080"
+
 var (
 	defaultVerbose = getEnvBool("FLOWG_VERBOSE", false)
 
-	defaultHttpBindAddress = getEnvString("FLOWG_HTTP_BIND_ADDRESS", ":5080")
+	defaultHttpBindAddress = getEnvString("FLOWG_HTTP_BIND_ADDRESS", ":"+defaultFlowGBindPort)
 	defaultHttpTlsEnabled  = getEnvBool("FLOWG_HTTP_TLS_ENABLED", false)
 	defaultHttpTlsCert     = getEnvString("FLOWG_HTTP_TLS_CERT", "")
 	defaultHttpTlsCertKey  = getEnvString("FLOWG_HTTP_TLS_KEY", "")
@@ -22,6 +24,7 @@ var (
 
 	defaultClusterNodeID       = getEnvString("FLOWG_CLUSTER_NODE_ID", "")
 	defaultClusterNodeAddress  = getEnvString("FLOWG_CLUSTER_NODE_ADDRESS", "")
+	defaultClusterNodePort     = getEnvString("FLOWG_CLUSTER_NODE_PORT", defaultFlowGBindPort)
 	defaultClusterJoinNodeID   = getEnvString("FLOWG_CLUSTER_JOIN_NODE_ID", "")
 	defaultClusterJoinEndpoint = getEnvString("FLOWG_CLUSTER_JOIN_ENDPOINT", "")
 	defaultClusterCookie       = getEnvString("FLOWG_CLUSTER_COOKIE", "")
