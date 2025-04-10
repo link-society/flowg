@@ -7,7 +7,11 @@ import (
 )
 
 type ConsulServiceOptions struct {
-	ConsulUrl string
+	NodeId      string
+	NodeHost    string
+	NodePort    string
+	ServiceName string
+	ConsulUrl   string
 }
 
 func NewConsulService(opts *ConsulServiceOptions) proctree.Process {
