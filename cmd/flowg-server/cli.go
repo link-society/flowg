@@ -14,6 +14,8 @@ type options struct {
 	mgmtTlsCertKey  string
 
 	clusterNodeID       string
+	clusterNodeAddress  string
+	clusterNodePort     string
 	clusterJoinNodeID   string
 	clusterJoinEndpoint string
 	clusterCookie       string
@@ -30,6 +32,9 @@ type options struct {
 	logDir    string
 	configDir string
 	verbose   bool
+
+	serviceName string
+	consulUrl   string
 }
 
 func (opts *options) defineCliOptions(cmd *cobra.Command) {
@@ -94,6 +99,20 @@ func (opts *options) defineCliOptions(cmd *cobra.Command) {
 		"cluster-node-id",
 		defaultClusterNodeID,
 		"Unique identifier for this node in the cluster",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.clusterNodeAddress,
+		"cluster-node-address",
+		defaultClusterNodeAddress,
+		"Address for this node in the cluster",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.clusterNodePort,
+		"cluster-node-port",
+		defaultClusterNodePort,
+		"Address for this node in the cluster",
 	)
 
 	cmd.Flags().StringVar(
@@ -194,5 +213,19 @@ func (opts *options) defineCliOptions(cmd *cobra.Command) {
 		"verbose",
 		defaultVerbose,
 		"Enable verbose logging",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.serviceName,
+		"service-name",
+		defaultServiceName,
+		"Name of the service",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.consulUrl,
+		"consul-url",
+		defaultConsulUrl,
+		"URL to local consul instance",
 	)
 }
