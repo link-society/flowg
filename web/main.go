@@ -12,6 +12,8 @@ import (
 //go:embed public/**/*.css
 //go:embed public/**/*.js
 //go:embed public/**/*.map
+//go:embed public/**/*.ico
+//go:embed public/**/*.png
 //go:embed public/index.html
 var staticfiles embed.FS
 

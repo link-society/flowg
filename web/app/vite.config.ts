@@ -9,11 +9,14 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vitejs.dev/config/
 export default defineConfig({
   base: './',
+  publicDir: 'static',
   plugins: [
     react(),
     tailwindcss(),
     compression({
-      include: /\.(html|css|js|map)$/,
+      include: [
+        /\.(html|css|js|map|ico|png)$/,
+      ],
       filename: '[path][base]',
       deleteOriginalAssets: true
     }),
