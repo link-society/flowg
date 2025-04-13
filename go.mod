@@ -26,6 +26,7 @@ require (
 	go.opentelemetry.io/proto/otlp v1.5.0
 	golang.org/x/crypto v0.37.0
 	google.golang.org/protobuf v1.36.6
+	golang.org/x/term v0.31.0
 	gopkg.in/mcuadros/go-syslog.v2 v2.3.0
 )
 
