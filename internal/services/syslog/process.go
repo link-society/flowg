@@ -27,6 +27,8 @@ type procHandler struct {
 	server  *gosyslog.Server
 }
 
+var _ proctree.ProcessHandler = (*procHandler)(nil)
+
 func (h *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 	h.channel = make(gosyslog.LogPartsChannel)
 	h.handler = gosyslog.NewChannelHandler(h.channel)

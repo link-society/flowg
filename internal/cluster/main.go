@@ -27,6 +27,8 @@ type Manager struct {
 	handler *procHandler
 }
 
+var _ proctree.Process = (*Manager)(nil)
+
 func NewManager(opts *ManagerOptions) *Manager {
 	connM := actor.NewMailbox[net.Conn]()
 	packetM := actor.NewMailbox[*memberlist.Packet]()

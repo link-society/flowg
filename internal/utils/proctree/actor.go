@@ -43,6 +43,8 @@ type actorProcess struct {
 	doneCond  *condValue[error]
 }
 
+var _ Process = (*actorProcess)(nil)
+
 func (p *actorProcess) WaitReady(ctx context.Context) error {
 	readyC := make(chan struct{}, 1)
 

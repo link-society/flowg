@@ -10,6 +10,8 @@ type handler struct {
 	parent slog.Handler
 }
 
+var _ slog.Handler = (*handler)(nil)
+
 func newHandler(w io.Writer, opts *slog.HandlerOptions) *handler {
 	return &handler{
 		parent: slog.NewTextHandler(w, opts),

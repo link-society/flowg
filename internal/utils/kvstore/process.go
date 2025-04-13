@@ -17,6 +17,8 @@ type procHandler struct {
 	mbox actor.MailboxReceiver[message]
 }
 
+var _ proctree.ProcessHandler = (*procHandler)(nil)
+
 func (h *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 	db, err := badger.Open(h.dbOpts)
 	if err != nil {

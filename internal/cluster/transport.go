@@ -32,6 +32,8 @@ type httpTransport struct {
 	packetM actor.Mailbox[*memberlist.Packet]
 }
 
+var _ memberlist.Transport = (*httpTransport)(nil)
+
 func (t *httpTransport) FinalAdvertiseAddr(string, int) (net.IP, int, error) {
 	host, port, err := net.SplitHostPort(t.delegate.localEndpoint.Host)
 	if err != nil {

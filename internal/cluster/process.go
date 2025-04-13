@@ -30,6 +30,8 @@ type procHandler struct {
 	httpHandler http.Handler
 }
 
+var _ proctree.ProcessHandler = (*procHandler)(nil)
+
 func (p *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 	var err error
 

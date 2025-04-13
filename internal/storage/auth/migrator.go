@@ -16,6 +16,8 @@ type migratorProcH struct {
 	kvStore *kvstore.Storage
 }
 
+var _ proctree.ProcessHandler = (*migratorProcH)(nil)
+
 func (p *migratorProcH) Init(ctx actor.Context) proctree.ProcessResult {
 	if err := p.migrateAlertScopes(ctx); err != nil {
 		return proctree.Terminate(err)

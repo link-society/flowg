@@ -51,6 +51,8 @@ type Storage struct {
 	mbox actor.Mailbox[message]
 }
 
+var _ proctree.Process = (*Storage)(nil)
+
 func NewStorage(opts ...func(*options)) *Storage {
 	options := options{
 		logChannel: "kv",

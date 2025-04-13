@@ -17,6 +17,8 @@ type gcWorker struct {
 	gcInterval time.Duration
 }
 
+var _ actor.Worker = (*gcWorker)(nil)
+
 func (w *gcWorker) DoWork(ctx actor.Context) actor.WorkerStatus {
 	select {
 	case <-ctx.Done():

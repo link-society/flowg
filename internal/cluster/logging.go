@@ -2,14 +2,19 @@ package cluster
 
 import (
 	"context"
+
 	"log"
 	"log/slog"
+
+	"io"
 	"strings"
 )
 
 type memberlistLoggerWriter struct {
 	parent *slog.Logger
 }
+
+var _ io.Writer = (*memberlistLoggerWriter)(nil)
 
 func (w *memberlistLoggerWriter) Write(p []byte) (n int, err error) {
 	msg := string(p)

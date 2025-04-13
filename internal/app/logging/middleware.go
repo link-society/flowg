@@ -9,6 +9,8 @@ type middleware struct {
 	handler http.Handler
 }
 
+var _ http.Handler = (*middleware)(nil)
+
 type responseWriter struct {
 	http.ResponseWriter
 	statusCode int

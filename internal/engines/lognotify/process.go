@@ -17,6 +17,8 @@ type procHandler struct {
 	logMbox     actor.MailboxReceiver[LogMessage]
 }
 
+var _ proctree.ProcessHandler = (*procHandler)(nil)
+
 func (h *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 	return proctree.Continue()
 }

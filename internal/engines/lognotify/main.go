@@ -17,6 +17,8 @@ type LogNotifier struct {
 	logMbox actor.MailboxSender[LogMessage]
 }
 
+var _ proctree.Process = (*LogNotifier)(nil)
+
 func NewLogNotifier() *LogNotifier {
 	subMbox := actor.NewMailbox[SubscribeMessage]()
 	logMbox := actor.NewMailbox[LogMessage]()

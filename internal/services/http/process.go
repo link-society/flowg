@@ -26,6 +26,8 @@ type procHandler struct {
 	server *gohttp.Server
 }
 
+var _ proctree.ProcessHandler = (*procHandler)(nil)
+
 func (h *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 	apiHandler := api.NewHandler(&api.Dependencies{
 		AuthStorage:   h.opts.AuthStorage,

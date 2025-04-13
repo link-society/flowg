@@ -39,6 +39,8 @@ type group struct {
 	shutdownC chan struct{}
 }
 
+var _ Process = (*group)(nil)
+
 func (g *group) Start() {
 	go g.run()
 }

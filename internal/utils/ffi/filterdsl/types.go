@@ -28,6 +28,12 @@ type FilterMatchFieldList struct {
 	Values []string
 }
 
+var _ Filter = (*FilterAnd)(nil)
+var _ Filter = (*FilterOr)(nil)
+var _ Filter = (*FilterNot)(nil)
+var _ Filter = (*FilterMatchField)(nil)
+var _ Filter = (*FilterMatchFieldList)(nil)
+
 func (f *FilterAnd) Evaluate(record *models.LogRecord) bool {
 	for _, filter := range f.Filters {
 		if !filter.Evaluate(record) {

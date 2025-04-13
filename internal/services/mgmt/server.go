@@ -31,6 +31,8 @@ type serverHandler struct {
 	server *http.Server
 }
 
+var _ proctree.ProcessHandler = (*serverHandler)(nil)
+
 func (h *serverHandler) Init(ctx actor.Context) proctree.ProcessResult {
 	h.logger.InfoContext(ctx, "Start Management HTTP server")
 

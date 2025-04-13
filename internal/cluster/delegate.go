@@ -15,6 +15,8 @@ type delegate struct {
 	endpoints     map[string]*url.URL
 }
 
+var _ memberlist.Delegate = (*delegate)(nil)
+
 func (d *delegate) NodeMeta(int) []byte {
 	return []byte(d.localEndpoint.String())
 }

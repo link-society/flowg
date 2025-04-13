@@ -31,6 +31,11 @@ type updateOperation struct {
 	txnFn func(txn *badger.Txn) error
 }
 
+var _ operation = (*backupOperation)(nil)
+var _ operation = (*restoreOperation)(nil)
+var _ operation = (*viewOperation)(nil)
+var _ operation = (*updateOperation)(nil)
+
 func (m *backupOperation) Handle(db *badger.DB) error {
 	_, err := db.Backup(m.w, 0)
 	return err

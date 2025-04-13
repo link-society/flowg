@@ -21,6 +21,8 @@ type Runner struct {
 	mbox actor.MailboxSender[message]
 }
 
+var _ proctree.Process = (*Runner)(nil)
+
 func NewRunner(
 	configStorage *config.Storage,
 	logStorage *log.Storage,

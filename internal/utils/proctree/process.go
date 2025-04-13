@@ -38,6 +38,8 @@ type proc struct {
 	worker *procWorker
 }
 
+var _ Process = (*proc)(nil)
+
 func (p *proc) WaitReady(ctx context.Context) error {
 	readyC := make(chan error, 1)
 

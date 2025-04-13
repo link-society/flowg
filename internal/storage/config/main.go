@@ -50,6 +50,8 @@ type Storage struct {
 	forwarderStore   *filestore.Storage
 }
 
+var _ proctree.Process = (*Storage)(nil)
+
 func NewStorage(opts ...func(*options)) *Storage {
 	options := options{
 		dir:      "./data/config",

@@ -20,6 +20,8 @@ type bootstrapProcHandler struct {
 	configStorage *config.Storage
 }
 
+var _ proctree.ProcessHandler = (*bootstrapProcHandler)(nil)
+
 func (h *bootstrapProcHandler) Init(ctx actor.Context) proctree.ProcessResult {
 	err := bootstrap.DefaultRolesAndUsers(ctx, h.authStorage)
 	if err != nil {

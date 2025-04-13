@@ -31,6 +31,8 @@ func Terminate(err error) ProcessResult {
 
 type continueR struct{}
 
+var _ ProcessResult = (*continueR)(nil)
+
 func (r *continueR) Error() error {
 	return nil
 }
@@ -42,6 +44,8 @@ func (r *continueR) Done() bool {
 type terminateR struct {
 	err error
 }
+
+var _ ProcessResult = (*terminateR)(nil)
 
 func (r *terminateR) Error() error {
 	return r.err

@@ -40,6 +40,8 @@ type Storage struct {
 	mbox actor.MailboxSender[message]
 }
 
+var _ proctree.Process = (*Storage)(nil)
+
 func NewStorage(opts ...func(*options)) *Storage {
 	options := options{
 		dir:       "",

@@ -4,11 +4,15 @@ import (
 	"fmt"
 	"log/slog"
 	"strings"
+
+	"github.com/dgraph-io/badger/v4"
 )
 
 type BadgerLogger struct {
 	Channel string
 }
+
+var _ badger.Logger = (*BadgerLogger)(nil)
 
 func (l *BadgerLogger) Errorf(format string, v ...interface{}) {
 	content := fmt.Sprintf(format, v...)

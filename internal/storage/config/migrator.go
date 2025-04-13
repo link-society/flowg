@@ -12,6 +12,8 @@ type migratorProcH struct {
 	baseDir string
 }
 
+var _ proctree.ProcessHandler = (*migratorProcH)(nil)
+
 func (p *migratorProcH) Init(ctx actor.Context) proctree.ProcessResult {
 	if err := p.migrateAlerts(ctx); err != nil {
 		return proctree.Terminate(err)

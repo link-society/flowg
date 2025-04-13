@@ -43,6 +43,13 @@ type RouterNode struct {
 	Stream string
 }
 
+var _ Node = (*SourceNode)(nil)
+var _ Node = (*TransformNode)(nil)
+var _ Node = (*SwitchNode)(nil)
+var _ Node = (*PipelineNode)(nil)
+var _ Node = (*ForwardNode)(nil)
+var _ Node = (*RouterNode)(nil)
+
 func (n *SourceNode) Process(ctx context.Context, record *models.LogRecord) error {
 	errC := make(chan error, len(n.Next))
 	wg := sync.WaitGroup{}

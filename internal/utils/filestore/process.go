@@ -20,6 +20,8 @@ type procHandler struct {
 	cache   *sync.Map
 }
 
+var _ proctree.ProcessHandler = (*procHandler)(nil)
+
 func (h *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 	if h.inMemory {
 		h.backend = newMemBackend()

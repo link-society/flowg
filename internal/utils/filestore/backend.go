@@ -19,6 +19,8 @@ type fsBackend struct {
 	baseDir string
 }
 
+var _ backend = (*fsBackend)(nil)
+
 func newFsBackend(baseDir string) (*fsBackend, error) {
 	err := os.MkdirAll(baseDir, os.ModePerm)
 	if err != nil {
@@ -69,6 +71,8 @@ func (b *fsBackend) StatFile(path string) (fs.FileInfo, error) {
 type memBackend struct {
 	files map[string][]byte
 }
+
+var _ backend = (*memBackend)(nil)
 
 type memFileInfo struct {
 	name    string

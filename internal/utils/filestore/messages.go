@@ -65,6 +65,12 @@ type statItem struct {
 	key     string
 }
 
+var _ message = (*listItems)(nil)
+var _ message = (*readItem)(nil)
+var _ message = (*writeItem)(nil)
+var _ message = (*deleteItem)(nil)
+var _ message = (*statItem)(nil)
+
 func (msg *listItems) Handle(handler *procHandler) {
 	keys := []string{}
 
