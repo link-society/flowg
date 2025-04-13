@@ -6,6 +6,7 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
 import Layout from '@theme/Layout'
 import Heading from '@theme/Heading'
 
+import LogoUrl from '@site/static/img/logo.png'
 import PipelineScreenshotUrl from '@site/static/img/screenshots/pipelines.png'
 import StreamsScreenshotUrl from '@site/static/img/screenshots/streams.png'
 
@@ -17,8 +18,13 @@ function HomepageHeader() {
   return (
     <header className={clsx('hero', styles.heroBanner)}>
       <div className="container">
-        <Heading as="h1" className="hero__title">
-          {siteConfig.title}
+        <Heading as="h1" className={`hero__title ${styles.titleWithLogo}`}>
+          <img
+            className={styles.logo}
+            src={LogoUrl}
+            alt="Flowg logo"
+          />
+          <span>{siteConfig.title}</span>
         </Heading>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
         <div className={styles.buttons}>
