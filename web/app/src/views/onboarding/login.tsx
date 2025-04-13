@@ -42,6 +42,11 @@ export const LoginView = () => {
 
   return (
     <div className="py-6">
+      <header className="mb-6 flex flex-row items-center justify-center gap-2">
+        <img src="/web/assets/logo.png" alt="Logo" className="h-16" />
+        <h1 className="text-5xl font-bold text-center">FlowG</h1>
+      </header>
+
       <Grid container>
         <Grid size={{ sm: 12, md: 6, lg: 4 }} offset={{ sm: 0, md: 3, lg: 4 }}>
           <Card className="p-3">

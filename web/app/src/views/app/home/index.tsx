@@ -21,7 +21,10 @@ export const HomeView = () => {
       className="justify-center p-6 h-full overflow-auto"
     >
       <Grid size={{ xs: 12 }}>
-        <h1 className="text-3xl text-center">Welcome to FlowG</h1>
+        <h1 className="flex flex-row items-center justify-center gap-2">
+          <span className="text-3xl">Welcome to FlowG</span>
+          <img src="/web/assets/logo.png" alt="Logo" className="h-8" />
+        </h1>
       </Grid>
 
       {permissions.can_view_streams && (
