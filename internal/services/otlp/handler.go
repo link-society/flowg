@@ -1,6 +1,7 @@
 package otlp
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log/slog"
@@ -12,21 +13,18 @@ import (
 	collectlogs "go.opentelemetry.io/proto/otlp/collector/logs/v1"
 	collectmetrics "go.opentelemetry.io/proto/otlp/collector/metrics/v1"
 	collecttraces "go.opentelemetry.io/proto/otlp/collector/trace/v1"
-
 	"google.golang.org/protobuf/proto"
 
 	"link-society.com/flowg/internal/engines/pipelines"
 	"link-society.com/flowg/internal/models"
 )
 
-func logsToLogRecords(body []byte, w http.ResponseWriter) ([]models.LogRecord, error) {
+type requestToLogRecords = func(request proto.Message) ([]models.LogRecord, error)
+
+func logsToLogRecords(request proto.Message) ([]models.LogRecord, error) {
 	logRecords := make([]models.LogRecord, 0)
 
-	req := &collectlogs.ExportLogsServiceRequest{}
-	if err := proto.Unmarshal(body, req); err != nil {
-		http.Error(w, "invalid protobuf", 400)
-		return nil, err
-	}
+	req := request.(*collectlogs.ExportLogsServiceRequest)
 
 	for _, resourceLogs := range req.GetResourceLogs() {
 		for _, scopeLogs := range resourceLogs.GetScopeLogs() {
@@ -34,9 +32,7 @@ func logsToLogRecords(body []byte, w http.ResponseWriter) ([]models.LogRecord, e
 
 				logRecordModel, err := LogToLogRecord(logRecord)
 				if err != nil {
-
-					http.Error(w, fmt.Sprintf("Error converting logRecord to LogRecord: %v", err.Error()), 500)
-					continue
+					return nil, err
 				}
 				logRecords = append(logRecords, logRecordModel)
 			}
@@ -46,21 +42,17 @@ func logsToLogRecords(body []byte, w http.ResponseWriter) ([]models.LogRecord, e
 	return logRecords, nil
 }
 
-func tracesToLogRecords(body []byte, w http.ResponseWriter) ([]models.LogRecord, error) {
+func tracesToLogRecords(request proto.Message) ([]models.LogRecord, error) {
 	logRecords := make([]models.LogRecord, 0)
-	req := &collecttraces.ExportTraceServiceRequest{}
-	if err := proto.Unmarshal(body, req); err != nil {
-		http.Error(w, "invalid protobuf", 400)
-		return nil, err
-	}
+
+	req := request.(*collecttraces.ExportTraceServiceRequest)
 
 	for _, resourceSpan := range req.ResourceSpans {
 		for _, scopeSpan := range resourceSpan.GetScopeSpans() {
 			for _, span := range scopeSpan.GetSpans() {
 				logRecordModel, err := SpanToLogRecord(span)
 				if err != nil {
-					http.Error(w, fmt.Sprintf("Error converting logRecord to LogRecord: %v", err.Error()), 500)
-					continue
+					return nil, err
 				}
 				logRecords = append(logRecords, logRecordModel)
 			}
@@ -68,21 +60,17 @@ func tracesToLogRecords(body []byte, w http.ResponseWriter) ([]models.LogRecord,
 	}
 	return logRecords, nil
 }
-func metricsToLogRecords(body []byte, w http.ResponseWriter) ([]models.LogRecord, error) {
+func metricsToLogRecords(request proto.Message) ([]models.LogRecord, error) {
 	logRecords := make([]models.LogRecord, 0)
-	req := &collectmetrics.ExportMetricsServiceRequest{}
-	if err := proto.Unmarshal(body, req); err != nil {
-		http.Error(w, "invalid protobuf", 400)
-		return nil, err
-	}
+
+	req := request.(*collectmetrics.ExportMetricsServiceRequest)
 
 	for _, resourceMetrics := range req.GetResourceMetrics() {
 		for _, scopeMetrics := range resourceMetrics.GetScopeMetrics() {
 			for _, metric := range scopeMetrics.GetMetrics() {
 				logRecordModel, err := MetricToLogRecord(metric)
 				if err != nil {
-					http.Error(w, fmt.Sprintf("Error converting metric to LogRecord: %v", err.Error()), 500)
-					continue
+					return nil, err
 				}
 				logRecords = append(logRecords, logRecordModel)
 			}
@@ -92,7 +80,6 @@ func metricsToLogRecords(body []byte, w http.ResponseWriter) ([]models.LogRecord
 }
 
 func (h *procHandler) sendToPipelines(ctx context.Context, logRecords []models.LogRecord) error {
-
 	pipelineNames, err := h.opts.ConfigStorage.ListPipelines(ctx)
 	if err != nil {
 		h.logger.ErrorContext(
@@ -135,7 +122,7 @@ func (h *procHandler) sendToPipelines(ctx context.Context, logRecords []models.L
 	return nil
 }
 
-func (h *procHandler) GetOTLPHandler(ctx context.Context, logRecordsGetter func(body []byte, w http.ResponseWriter) ([]models.LogRecord, error)) http.HandlerFunc {
+func (h *procHandler) GetOTLPHandler(ctx context.Context, request proto.Message, logRecordsGetter requestToLogRecords) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "HTTP METHOD POST only", http.StatusMethodNotAllowed)
@@ -149,7 +136,27 @@ func (h *procHandler) GetOTLPHandler(ctx context.Context, logRecordsGetter func(
 		}
 		defer r.Body.Close()
 
-		logRecords, err := logRecordsGetter(body, w)
+		contentType := r.Header.Get("Content-Type")
+		switch contentType {
+		case "application/x-protobuf":
+			err := proto.Unmarshal(body, request)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+		case "application/json":
+			err := json.Unmarshal(body, request)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+
+		default:
+			http.Error(w, fmt.Sprintf("Unsupported content type: %s", contentType), http.StatusUnsupportedMediaType)
+			return
+		}
+
+		logRecords, err := logRecordsGetter(request)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
