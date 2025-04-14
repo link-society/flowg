@@ -102,6 +102,8 @@ func newServerConfig(opts *options) (server.Options, error) {
 		MgmtTlsConfig:   mgmtTlsConfig,
 
 		ClusterNodeID:       opts.clusterNodeID,
+		ClusterNodeAddress:  opts.clusterNodeAddress,
+		ClusterNodePort:     opts.clusterNodePort,
 		ClusterJoinNodeID:   opts.clusterJoinNodeID,
 		ClusterJoinEndpoint: clusterJoinEndpointUrl,
 		ClusterCookie:       opts.clusterCookie,
@@ -114,6 +116,9 @@ func newServerConfig(opts *options) (server.Options, error) {
 		ConfigStorageDir: opts.configDir,
 		AuthStorageDir:   opts.authDir,
 		LogStorageDir:    opts.logDir,
+
+		ServiceName: opts.serviceName,
+		ConsulUrl:   opts.consulUrl,
 	}
 
 	return config, nil

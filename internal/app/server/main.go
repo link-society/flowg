@@ -13,6 +13,7 @@ import (
 	"link-society.com/flowg/internal/engines/lognotify"
 	"link-society.com/flowg/internal/engines/pipelines"
 
+	"link-society.com/flowg/internal/services/consul"
 	"link-society.com/flowg/internal/services/http"
 	"link-society.com/flowg/internal/services/mgmt"
 	"link-society.com/flowg/internal/services/syslog"
@@ -28,6 +29,8 @@ type Options struct {
 	MgmtTlsConfig   *tls.Config
 
 	ClusterNodeID       string
+	ClusterNodeAddress  string
+	ClusterNodePort     string
 	ClusterJoinNodeID   string
 	ClusterJoinEndpoint *url.URL
 	ClusterCookie       string
@@ -40,6 +43,9 @@ type Options struct {
 	AuthStorageDir   string
 	ConfigStorageDir string
 	LogStorageDir    string
+
+	ServiceName string
+	ConsulUrl   string
 }
 
 func NewServer(opts Options) proctree.Process {
@@ -87,6 +93,14 @@ func NewServer(opts Options) proctree.Process {
 			ConfigStorage:  configStorage,
 			PipelineRunner: pipelineRunner,
 		})
+
+		consulService = consul.NewConsulService(&consul.ConsulServiceOptions{
+			NodeId:      opts.ClusterNodeID,
+			NodeAddress: opts.ClusterNodeAddress,
+			NodePort:    opts.ClusterNodePort,
+			ServiceName: opts.ServiceName,
+			ConsulUrl:   opts.ConsulUrl,
+		})
 	)
 
 	bootstrap := proctree.NewProcess(&bootstrapProcHandler{
@@ -114,6 +128,7 @@ func NewServer(opts Options) proctree.Process {
 			httpServer,
 			mgmtServer,
 			syslogServer,
+			consulService,
 		),
 		bootstrap,
 	)
