@@ -1,74 +1,166 @@
 package otlp
 
 import (
-	"encoding/json"
 	"fmt"
-	"reflect"
-	"time"
+	"io"
+	"log/slog"
+	"sync"
 
-	logsmodels "go.opentelemetry.io/proto/otlp/logs/v1"
-	metricsmodels "go.opentelemetry.io/proto/otlp/metrics/v1"
-	tracesmodels "go.opentelemetry.io/proto/otlp/trace/v1"
+	"context"
+	"net/http"
+
+	collectlogs "go.opentelemetry.io/proto/otlp/collector/logs/v1"
+	collectmetrics "go.opentelemetry.io/proto/otlp/collector/metrics/v1"
+	collecttraces "go.opentelemetry.io/proto/otlp/collector/trace/v1"
+
+	"google.golang.org/protobuf/proto"
+
+	"link-society.com/flowg/internal/engines/pipelines"
 	"link-society.com/flowg/internal/models"
 )
 
-// ToFields convert a struct to a map[string]string
-func ToFields(obj interface{}) (map[string]string, error) {
-	out := make(map[string]string)
-	v := reflect.ValueOf(obj)
-	if v.Kind() == reflect.Ptr && !v.IsNil() {
-		v = v.Elem()
+func logsToLogRecords(body []byte, w http.ResponseWriter) ([]models.LogRecord, error) {
+	logRecords := make([]models.LogRecord, 0)
+
+	req := &collectlogs.ExportLogsServiceRequest{}
+	if err := proto.Unmarshal(body, req); err != nil {
+		http.Error(w, "invalid protobuf", 400)
+		return nil, err
 	}
-	if v.Kind() != reflect.Struct {
-		return nil, fmt.Errorf("expected a struct, got %T", obj)
-	}
-	t := v.Type()
-	for i := 0; i < v.NumField(); i++ {
-		field := v.Field(i)
-		fieldType := t.Field(i)
-		fieldName := fieldType.Name
-		tag := fieldType.Tag.Get("json")
-		if tag != "" && tag != "-" {
-			if commaIndex := len(tag); commaIndex > 0 && tag[commaIndex-1] == ',' {
-				tag = tag[:commaIndex-1]
+
+	for _, resourceLogs := range req.GetResourceLogs() {
+		for _, scopeLogs := range resourceLogs.GetScopeLogs() {
+			for _, logRecord := range scopeLogs.GetLogRecords() {
+
+				logRecordModel, err := LogToLogRecord(logRecord)
+				if err != nil {
+
+					http.Error(w, fmt.Sprintf("Error converting logRecord to LogRecord: %v", err.Error()), 500)
+					continue
+				}
+				logRecords = append(logRecords, logRecordModel)
 			}
-			fieldName = tag
+		}
+	}
+
+	return logRecords, nil
+}
+
+func tracesToLogRecords(body []byte, w http.ResponseWriter) ([]models.LogRecord, error) {
+	logRecords := make([]models.LogRecord, 0)
+	req := &collecttraces.ExportTraceServiceRequest{}
+	if err := proto.Unmarshal(body, req); err != nil {
+		http.Error(w, "invalid protobuf", 400)
+		return nil, err
+	}
+
+	for _, resourceSpan := range req.ResourceSpans {
+		for _, scopeSpan := range resourceSpan.GetScopeSpans() {
+			for _, span := range scopeSpan.GetSpans() {
+				logRecordModel, err := SpanToLogRecord(span)
+				if err != nil {
+					http.Error(w, fmt.Sprintf("Error converting logRecord to LogRecord: %v", err.Error()), 500)
+					continue
+				}
+				logRecords = append(logRecords, logRecordModel)
+			}
+		}
+	}
+	return logRecords, nil
+}
+func metricsToLogRecords(body []byte, w http.ResponseWriter) ([]models.LogRecord, error) {
+	logRecords := make([]models.LogRecord, 0)
+	req := &collectmetrics.ExportMetricsServiceRequest{}
+	if err := proto.Unmarshal(body, req); err != nil {
+		http.Error(w, "invalid protobuf", 400)
+		return nil, err
+	}
+
+	for _, resourceMetrics := range req.GetResourceMetrics() {
+		for _, scopeMetrics := range resourceMetrics.GetScopeMetrics() {
+			for _, metric := range scopeMetrics.GetMetrics() {
+				logRecordModel, err := MetricToLogRecord(metric)
+				if err != nil {
+					http.Error(w, fmt.Sprintf("Error converting metric to LogRecord: %v", err.Error()), 500)
+					continue
+				}
+				logRecords = append(logRecords, logRecordModel)
+			}
+		}
+	}
+	return logRecords, nil
+}
+
+func (h *procHandler) sendToPipelines(ctx context.Context, logRecords []models.LogRecord) error {
+
+	pipelineNames, err := h.opts.ConfigStorage.ListPipelines(ctx)
+	if err != nil {
+		h.logger.ErrorContext(
+			ctx,
+			"Failed to list pipelines",
+			slog.String("error", err.Error()),
+		)
+		return err
+	}
+
+	wg := sync.WaitGroup{}
+
+	for _, pipelineName := range pipelineNames {
+		wg.Add(1)
+		go func(pipelineName string) {
+			defer wg.Done()
+
+			for _, logRecord := range logRecords {
+
+				err := h.opts.PipelineRunner.Run(
+					ctx,
+					pipelineName,
+					pipelines.SYSLOG_ENTRYPOINT,
+					&logRecord,
+				)
+				if err != nil {
+					h.logger.ErrorContext(
+						ctx,
+						"Failed to process log entry",
+						slog.String("pipeline", pipelineName),
+						slog.String("error", err.Error()),
+					)
+				}
+			}
+		}(pipelineName)
+	}
+
+	wg.Wait()
+
+	return nil
+}
+
+func (h *procHandler) GetOTLPHandler(ctx context.Context, logRecordsGetter func(body []byte, w http.ResponseWriter) ([]models.LogRecord, error)) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "HTTP METHOD POST only", http.StatusMethodNotAllowed)
+			return
 		}
 
-		b, err := json.Marshal(field.Interface())
+		body, err := io.ReadAll(r.Body)
 		if err != nil {
-			return nil, fmt.Errorf("failed to marshal field %s: %w", fieldName, err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
 		}
-		out[fieldName] = string(b)
+		defer r.Body.Close()
+
+		logRecords, err := logRecordsGetter(body, w)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		err = h.sendToPipelines(r.Context(), logRecords)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
 	}
-	return out, nil
-}
-
-func MetricToLogRecord(metric *metricsmodels.Metric) (result models.LogRecord, err error) {
-	result = models.LogRecord{
-		Timestamp: time.Now(),
-	}
-	result.Fields, err = ToFields(metric)
-
-	return
-}
-
-func LogToLogRecord(logRecord *logsmodels.LogRecord) (result models.LogRecord, err error) {
-	result = models.LogRecord{
-		Timestamp: time.Unix(0, int64(logRecord.TimeUnixNano)),
-	}
-
-	result.Fields, err = ToFields(logRecord)
-
-	return
-}
-
-func SpanToLogRecord(span *tracesmodels.Span) (result models.LogRecord, err error) {
-	result = models.LogRecord{
-		Timestamp: time.Unix(0, int64(span.StartTimeUnixNano)),
-	}
-
-	result.Fields, err = ToFields(span)
-
-	return
 }
