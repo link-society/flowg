@@ -15,6 +15,7 @@ import (
 
 	"link-society.com/flowg/internal/services/http"
 	"link-society.com/flowg/internal/services/mgmt"
+	"link-society.com/flowg/internal/services/otlp"
 	"link-society.com/flowg/internal/services/syslog"
 
 	"link-society.com/flowg/internal/utils/proctree"
@@ -87,6 +88,14 @@ func NewServer(opts Options) proctree.Process {
 			ConfigStorage:  configStorage,
 			PipelineRunner: pipelineRunner,
 		})
+		otelServer = otlp.NewServer(&otlp.ServerOptions{
+			PipelineRunner: pipelineRunner,
+			AuthStorage:    authStorage,
+			ConfigStorage:  configStorage,
+			LogStorage:     logStorage,
+			TlsConfig:      opts.HttpTlsConfig,
+			BindAddress:    opts.HttpBindAddress,
+		})
 	)
 
 	bootstrap := proctree.NewProcess(&bootstrapProcHandler{
@@ -114,6 +123,7 @@ func NewServer(opts Options) proctree.Process {
 			httpServer,
 			mgmtServer,
 			syslogServer,
+			otelServer,
 		),
 		bootstrap,
 	)
