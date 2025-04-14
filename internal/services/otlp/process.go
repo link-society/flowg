@@ -13,6 +13,10 @@ import (
 
 	"link-society.com/flowg/internal/app/logging"
 	"link-society.com/flowg/internal/utils/proctree"
+
+	collectlogs "go.opentelemetry.io/proto/otlp/collector/logs/v1"
+	collectmetrics "go.opentelemetry.io/proto/otlp/collector/metrics/v1"
+	collecttraces "go.opentelemetry.io/proto/otlp/collector/trace/v1"
 )
 
 type procHandler struct {
@@ -38,9 +42,9 @@ func (h *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 	}
 
 	rootHandler := gohttp.NewServeMux()
-	rootHandler.Handle("/logs/otlp", h.GetOTLPHandler(ctx, logsToLogRecords))
-	rootHandler.Handle("/metrics/otlp", h.GetOTLPHandler(ctx, metricsToLogRecords))
-	rootHandler.Handle("/traces/otlp", h.GetOTLPHandler(ctx, tracesToLogRecords))
+	rootHandler.Handle("/logs/otlp", h.GetOTLPHandler(ctx, &collectlogs.ExportLogsServiceRequest{}, logsToLogRecords))
+	rootHandler.Handle("/metrics/otlp", h.GetOTLPHandler(ctx, &collectmetrics.ExportMetricsServiceRequest{}, metricsToLogRecords))
+	rootHandler.Handle("/traces/otlp", h.GetOTLPHandler(ctx, &collecttraces.ExportTraceServiceRequest{}, tracesToLogRecords))
 
 	h.server = &gohttp.Server{
 		Addr:      h.opts.BindAddress,
