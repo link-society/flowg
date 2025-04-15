@@ -14,8 +14,6 @@ type options struct {
 	mgmtTlsCertKey  string
 
 	clusterNodeID       string
-	clusterNodeAddress  string
-	clusterNodePort     string
 	clusterJoinNodeID   string
 	clusterJoinEndpoint string
 	clusterCookie       string
@@ -99,20 +97,6 @@ func (opts *options) defineCliOptions(cmd *cobra.Command) {
 		"cluster-node-id",
 		defaultClusterNodeID,
 		"Unique identifier for this node in the cluster (leave empty to generate one)",
-	)
-
-	cmd.Flags().StringVar(
-		&opts.clusterNodeAddress,
-		"cluster-node-address",
-		defaultClusterNodeAddress,
-		"Address for this node in the cluster",
-	)
-
-	cmd.Flags().StringVar(
-		&opts.clusterNodePort,
-		"cluster-node-port",
-		defaultClusterNodePort,
-		"Address for this node in the cluster",
 	)
 
 	cmd.Flags().StringVar(

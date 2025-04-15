@@ -46,17 +46,6 @@ func newServerConfig(opts *options) (server.Options, error) {
 		opts.clusterNodeID = rnd.RandomName()
 	}
 
-	var clusterNodeAddressUrl *url.URL
-	if opts.clusterNodeAddress != "" {
-		var err error
-		clusterNodeAddressUrl, err = url.Parse(opts.clusterNodeAddress)
-		if err != nil {
-			return server.Options{}, fmt.Errorf("invalid cluster node address: %w", err)
-		}
-	} else {
-		return server.Options{}, fmt.Errorf("cluster node address is required when starting a node")
-	}
-
 	var clusterJoinEndpointUrl *url.URL
 	if opts.clusterJoinNodeID != "" {
 		if opts.clusterJoinEndpoint == "" {
@@ -118,8 +107,6 @@ func newServerConfig(opts *options) (server.Options, error) {
 		MgmtTlsConfig:   mgmtTlsConfig,
 
 		ClusterNodeID:       opts.clusterNodeID,
-		ClusterNodeAddress:  opts.clusterNodeAddress,
-		ClusterNodePort:     opts.clusterNodePort,
 		ClusterJoinNodeID:   opts.clusterJoinNodeID,
 		ClusterJoinEndpoint: clusterJoinEndpointUrl,
 		ClusterCookie:       opts.clusterCookie,
