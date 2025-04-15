@@ -102,8 +102,6 @@ func newServerConfig(opts *options) (server.Options, error) {
 		MgmtTlsConfig:   mgmtTlsConfig,
 
 		ClusterNodeID:       opts.clusterNodeID,
-		ClusterNodeAddress:  opts.clusterNodeAddress,
-		ClusterNodePort:     opts.clusterNodePort,
 		ClusterJoinNodeID:   opts.clusterJoinNodeID,
 		ClusterJoinEndpoint: clusterJoinEndpointUrl,
 		ClusterCookie:       opts.clusterCookie,

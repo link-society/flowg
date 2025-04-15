@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"math/rand/v2"
+	"net/url"
 	"strconv"
 	"time"
 
@@ -18,6 +19,8 @@ type procHandler struct {
 	consulClient *api.Client
 	logger       *slog.Logger
 	opts         *ConsulServiceOptions
+
+	LocalEndpointResolver func() (*url.URL, error)
 }
 
 const (
@@ -85,8 +88,12 @@ func (h *procHandler) Terminate(ctx actor.Context, err error) error {
 }
 
 func (h *procHandler) registerNode(ctx actor.Context) error {
+	localEndpoint, err := h.LocalEndpointResolver()
+	if err != nil {
+		return err
+	}
+
 	// Create a Consul client
-	var err error
 	config := api.DefaultConfig()
 	config.Address = h.opts.ConsulUrl
 	h.consulClient, err = api.NewClient(config)
@@ -99,7 +106,7 @@ func (h *procHandler) registerNode(ctx actor.Context) error {
 		return err
 	}
 	var port int
-	port, err = strconv.Atoi(h.opts.NodePort)
+	port, err = strconv.Atoi(localEndpoint.Port())
 	if err != nil {
 		h.logger.ErrorContext(
 			ctx,
@@ -113,11 +120,11 @@ func (h *procHandler) registerNode(ctx actor.Context) error {
 	registration := &api.AgentServiceRegistration{
 		ID:      h.opts.NodeId,
 		Name:    h.opts.ServiceName,
-		Address: h.opts.NodeAddress,
+		Address: localEndpoint.Host,
 		Port:    port,
 		Check: &api.AgentServiceCheck{
 			Interval: healthCheckInterval.String(),
-			HTTP:     fmt.Sprintf("http://%s:%d%s", h.opts.NodeAddress, port, healthCheckPath),
+			HTTP:     fmt.Sprintf("%s://%s:%d%s", localEndpoint.Scheme, localEndpoint.Host, port, healthCheckPath),
 			Timeout:  healthCheckTimeout.String(),
 		},
 	}

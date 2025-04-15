@@ -25,8 +25,6 @@ var (
 	defaultMgmtTlsCertKey  = getEnvString("FLOWG_MGMT_TLS_KEY", "")
 
 	defaultClusterNodeID       = getEnvString("FLOWG_CLUSTER_NODE_ID", rnd.RandomName())
-	defaultClusterNodeAddress  = getEnvString("FLOWG_CLUSTER_NODE_ADDRESS", "localhost")
-	defaultClusterNodePort     = getEnvString("FLOWG_CLUSTER_NODE_PORT", defaultFlowGBindPort)
 	defaultClusterJoinNodeID   = getEnvString("FLOWG_CLUSTER_JOIN_NODE_ID", "")
 	defaultClusterJoinEndpoint = getEnvString("FLOWG_CLUSTER_JOIN_ENDPOINT", "")
 	defaultClusterCookie       = getEnvString("FLOWG_CLUSTER_COOKIE", "")
