@@ -48,8 +48,8 @@ func (h *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 		return proctree.Terminate(err)
 	}
 
-	// Get other nodes from consul to form a cluster with memberlist
-	_, err := h.getNodes(ctx)
+	// Set the JoinNode in ClusterJoinNode
+	err := h.setJoinNodes(ctx)
 	if err != nil {
 		h.logger.WarnContext(
 			ctx,
@@ -142,8 +142,10 @@ func (h *procHandler) registerNode(ctx actor.Context) error {
 	return nil
 }
 
-// getNodes() retries with exponential backoff with jitter to fetch other nodes in the cluster using consul
-func (h *procHandler) getNodes(ctx actor.Context) ([]string, error) {
+// setJoinNodes() retries with exponential backoff with jitter to fetch other nodes in the cluster using consul
+// and sets one node as a JoinNode in the ClusterJoinNode
+// ClusterJoinNode is shared between ConsulService and ManagementServer
+func (h *procHandler) setJoinNodes(ctx actor.Context) error {
 	retryCount := 0
 	delay := 100 * time.Millisecond
 
@@ -155,18 +157,18 @@ func (h *procHandler) getNodes(ctx actor.Context) ([]string, error) {
 				"failed to get nodes from consul",
 				slog.Any("error", err),
 			)
-			return nil, err
+			return err
 		}
 
-		otherNodes := []string{}
 		for _, node := range nodes {
-			if node.Service.ID != h.opts.NodeId {
-				otherNodes = append(otherNodes, node.Node.Address)
+			if node.Node.ID != h.opts.NodeId {
+				h.opts.ClusterJoinNode.JoinNodeID = node.Node.ID
+				h.opts.ClusterJoinNode.JoinNodeEndpoint, err = url.Parse(node.Node.Address)
+				if err != nil {
+					return fmt.Errorf("failed to parse join node address")
+				}
+				return nil
 			}
-		}
-
-		if len(otherNodes) >= 1 {
-			return otherNodes, nil
 		}
 
 		retryCount++
@@ -180,6 +182,5 @@ func (h *procHandler) getNodes(ctx actor.Context) ([]string, error) {
 		}
 	}
 
-	return nil, errors.New("failed to find other nodes")
-
+	return fmt.Errorf("failed to find other nodes")
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/go-sockaddr"
 
 	"link-society.com/flowg/internal/cluster"
+	"link-society.com/flowg/internal/models"
 
 	"link-society.com/flowg/internal/utils/proctree"
 )
@@ -19,10 +20,12 @@ type ServerOptions struct {
 	BindAddress string
 	TlsConfig   *tls.Config
 
-	ClusterNodeID       string
-	ClusterJoinNodeID   string
-	ClusterJoinEndpoint *url.URL
-	ClusterCookie       string
+	ClusterNodeID string
+	ClusterCookie string
+
+	ClusterJoinNode *models.ClusterJoinNode
+
+	AutomaticClusterFormation bool
 }
 
 func NewServer(opts *ServerOptions) proctree.Process {
@@ -39,10 +42,12 @@ func NewServer(opts *ServerOptions) proctree.Process {
 	}
 
 	clusterManager := cluster.NewManager(&cluster.ManagerOptions{
-		NodeID:           opts.ClusterNodeID,
-		JoinNodeID:       opts.ClusterJoinNodeID,
-		JoinNodeEndpoint: opts.ClusterJoinEndpoint,
-		Cookie:           opts.ClusterCookie,
+		NodeID: opts.ClusterNodeID,
+		Cookie: opts.ClusterCookie,
+
+		ClusterJoinNode: opts.ClusterJoinNode,
+
+		AutomaticClusterFormation: opts.AutomaticClusterFormation,
 
 		LocalEndpointResolver: func() (*url.URL, error) {
 			host, port, err := net.SplitHostPort(listenerH.listener.Addr().String())

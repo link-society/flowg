@@ -7,14 +7,16 @@ import (
 	"net/url"
 
 	"github.com/hashicorp/go-sockaddr"
+	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/utils/proctree"
 )
 
 type ConsulServiceOptions struct {
-	BindAddress string
-	NodeId      string
-	ServiceName string
-	ConsulUrl   string
+	BindAddress     string
+	NodeId          string
+	ServiceName     string
+	ConsulUrl       string
+	ClusterJoinNode *models.ClusterJoinNode
 }
 
 func NewConsulService(opts *ConsulServiceOptions) proctree.Process {
