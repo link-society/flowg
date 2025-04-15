@@ -7,16 +7,19 @@ import (
 
 	"github.com/vladopajic/go-actor/actor"
 
+	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/utils/proctree"
 
 	"github.com/hashicorp/memberlist"
 )
 
 type ManagerOptions struct {
-	NodeID           string
-	JoinNodeID       string
-	JoinNodeEndpoint *url.URL
-	Cookie           string
+	NodeID string
+	Cookie string
+
+	ClusterJoinNode *models.ClusterJoinNode
+
+	AutomaticClusterFormation bool
 
 	LocalEndpointResolver func() (*url.URL, error)
 }

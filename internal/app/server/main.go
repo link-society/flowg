@@ -6,6 +6,7 @@ import (
 
 	"crypto/tls"
 
+	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage/auth"
 	"link-society.com/flowg/internal/storage/config"
 	"link-society.com/flowg/internal/storage/log"
@@ -47,6 +48,9 @@ type Options struct {
 }
 
 func NewServer(opts Options) proctree.Process {
+	//JoinNode shared between ConsulService and ManagementServer
+	ClusterJoinNode := &models.ClusterJoinNode{}
+
 	// Storage Layer
 	var (
 		authStorage   = auth.NewStorage(auth.OptDirectory(opts.AuthStorageDir))
@@ -73,14 +77,21 @@ func NewServer(opts Options) proctree.Process {
 			LogNotifier:    logNotifier,
 			PipelineRunner: pipelineRunner,
 		})
+		consulService = consul.NewConsulService(&consul.ConsulServiceOptions{
+			NodeId:      opts.ClusterNodeID,
+			BindAddress: opts.HttpBindAddress,
+			ServiceName: opts.ServiceName,
+			ConsulUrl:   opts.ConsulUrl,
+		})
 		mgmtServer = mgmt.NewServer(&mgmt.ServerOptions{
 			BindAddress: opts.MgmtBindAddress,
 			TlsConfig:   opts.MgmtTlsConfig,
 
-			ClusterNodeID:       opts.ClusterNodeID,
-			ClusterJoinNodeID:   opts.ClusterJoinNodeID,
-			ClusterJoinEndpoint: opts.ClusterJoinEndpoint,
-			ClusterCookie:       opts.ClusterCookie,
+			ClusterNodeID:   opts.ClusterNodeID,
+			ClusterCookie:   opts.ClusterCookie,
+			ClusterJoinNode: ClusterJoinNode,
+
+			AutomaticClusterFormation: isAutomaticClusterformation(opts.ConsulUrl),
 		})
 		syslogServer = syslog.NewServer(&syslog.ServerOptions{
 			TcpMode:      opts.SyslogTcpMode,
@@ -90,13 +101,6 @@ func NewServer(opts Options) proctree.Process {
 
 			ConfigStorage:  configStorage,
 			PipelineRunner: pipelineRunner,
-		})
-
-		consulService = consul.NewConsulService(&consul.ConsulServiceOptions{
-			NodeId:      opts.ClusterNodeID,
-			BindAddress: opts.HttpBindAddress,
-			ServiceName: opts.ServiceName,
-			ConsulUrl:   opts.ConsulUrl,
 		})
 	)
 
@@ -123,10 +127,17 @@ func NewServer(opts Options) proctree.Process {
 		proctree.NewProcessGroup(
 			proctree.DefaultProcessGroupOptions(),
 			httpServer,
+			consulService,
 			mgmtServer,
 			syslogServer,
-			consulService,
 		),
 		bootstrap,
 	)
+}
+
+func isAutomaticClusterformation(consulUrl string) bool {
+	if consulUrl != "" {
+		return true
+	}
+	return false
 }
