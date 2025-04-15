@@ -86,9 +86,10 @@ func (h *procHandler) Terminate(ctx actor.Context, err error) error {
 
 func (h *procHandler) registerNode(ctx actor.Context) error {
 	// Create a Consul client
+	var err error
 	config := api.DefaultConfig()
 	config.Address = h.opts.ConsulUrl
-	client, err := api.NewClient(config)
+	h.consulClient, err = api.NewClient(config)
 	if err != nil {
 		h.logger.ErrorContext(
 			ctx,
@@ -97,7 +98,6 @@ func (h *procHandler) registerNode(ctx actor.Context) error {
 		)
 		return err
 	}
-	h.consulClient = client
 	var port int
 	port, err = strconv.Atoi(h.opts.NodePort)
 	if err != nil {
@@ -123,7 +123,7 @@ func (h *procHandler) registerNode(ctx actor.Context) error {
 	}
 
 	// Register the service with Consul
-	if err = client.Agent().ServiceRegister(registration); err != nil {
+	if err = h.consulClient.Agent().ServiceRegister(registration); err != nil {
 		h.logger.ErrorContext(
 			ctx,
 			"failed to register service with Consul",
