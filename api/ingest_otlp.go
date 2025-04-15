@@ -8,7 +8,6 @@ import (
 	"log/slog"
 	"net/http"
 	"reflect"
-	"sync"
 	"time"
 
 	"github.com/swaggest/usecase"
@@ -195,57 +194,25 @@ func (o *MetricsToLogRecordsConvertor) GetLogRecords() ([]*models.LogRecord, err
 	return logRecords, nil
 }
 
-func SendToPipelines(ctx context.Context, logRecords []*models.LogRecord, pipelineName string, pipelineRunner *pipelines.Runner, configStorage *config.Storage, logger *slog.Logger) error {
-	var pipelineNames []string
-	if pipelineName != "" {
-		pipelineNames = []string{pipelineName}
-	} else {
-		var err error
-		pipelineNames, err = configStorage.ListPipelines(ctx)
+func SendToPipeline(ctx context.Context, logRecords []*models.LogRecord, pipelineName string, pipelineRunner *pipelines.Runner, configStorage *config.Storage, logger *slog.Logger) error {
+	for _, logRecord := range logRecords {
+
+		err := pipelineRunner.Run(
+			ctx,
+			pipelineName,
+			pipelines.SYSLOG_ENTRYPOINT,
+			logRecord,
+		)
 		if err != nil {
-			logger.ErrorContext(
-				ctx,
-				"Failed to list pipelines",
-				slog.String("error", err.Error()),
-			)
 			return err
 		}
 	}
-
-	wg := sync.WaitGroup{}
-
-	for _, pipelineName := range pipelineNames {
-		wg.Add(1)
-		go func(pipelineName string) {
-			defer wg.Done()
-
-			for _, logRecord := range logRecords {
-
-				err := pipelineRunner.Run(
-					ctx,
-					pipelineName,
-					pipelines.SYSLOG_ENTRYPOINT,
-					logRecord,
-				)
-				if err != nil {
-					logger.ErrorContext(
-						ctx,
-						"Failed to process log entry",
-						slog.String("pipeline", pipelineName),
-						slog.String("error", err.Error()),
-					)
-				}
-			}
-		}(pipelineName)
-	}
-
-	wg.Wait()
 
 	return nil
 }
 
 type IngestOTLPRequest struct {
-	Pipeline    string `path:"pipeline" minLength:""`
+	Pipeline    string `path:"pipeline" minLength:"1"`
 	Body        []byte
 	ContentType ContentType
 }
@@ -342,12 +309,13 @@ func (ctrl *controller) IngestOTLPUsecase(otlDataType OTLPDataType) usecase.Inte
 					return status.Wrap(err, status.Internal)
 				}
 
-				err = SendToPipelines(ctx, logRecords, req.Pipeline, ctrl.deps.PipelineRunner, ctrl.deps.ConfigStorage, ctrl.logger)
+				err = SendToPipeline(ctx, logRecords, req.Pipeline, ctrl.deps.PipelineRunner, ctrl.deps.ConfigStorage, ctrl.logger)
 				if err != nil {
 					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to send log records to pipelines",
 						slog.String("error", err.Error()),
+						slog.String("pipeline", req.Pipeline),
 					)
 					return status.Wrap(err, status.Internal)
 				}
@@ -364,9 +332,10 @@ func (ctrl *controller) IngestOTLPUsecase(otlDataType OTLPDataType) usecase.Inte
 		),
 	)
 
-	u.SetName("ingest_otlp logs")
-	u.SetTitle("Ingest OTLP Logs")
-	u.SetDescription("Run otlp log records through a pipeline")
+	u.SetName(fmt.Sprintf("ingest_otlp %s", otlDataType))
+	u.SetTitle(fmt.Sprintf("Ingest OTLP %s", otlDataType))
+
+	u.SetDescription(fmt.Sprintf("Run otlp %s records through a pipeline", otlDataType))
 	u.SetTags("pipelines")
 
 	u.SetExpectedErrors(status.PermissionDenied, status.Internal)
