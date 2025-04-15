@@ -30,6 +30,10 @@ type procHandler struct {
 	httpHandler http.Handler
 }
 
+const (
+	automaticClusterFormationMaxRetry = 10
+)
+
 var _ proctree.ProcessHandler = (*procHandler)(nil)
 
 func (p *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
@@ -53,8 +57,13 @@ func (p *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 		endpoints:     make(map[string]*url.URL),
 	}
 
-	if p.opts.JoinNodeID != "" && p.opts.JoinNodeEndpoint != nil {
-		d.endpoints[p.opts.JoinNodeID] = p.opts.JoinNodeEndpoint
+	err = p.awaitAutoCluster()
+	if err != nil {
+		return proctree.Terminate(err)
+	}
+
+	if p.opts.ClusterJoinNode.JoinNodeID != "" && p.opts.ClusterJoinNode.JoinNodeEndpoint != nil {
+		d.endpoints[p.opts.ClusterJoinNode.JoinNodeID] = p.opts.ClusterJoinNode.JoinNodeEndpoint
 	}
 
 	transport := &httpTransport{
@@ -78,8 +87,8 @@ func (p *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 		return proctree.Terminate(err)
 	}
 
-	if p.opts.JoinNodeID != "" && p.opts.JoinNodeEndpoint != nil {
-		joinAddr := fmt.Sprintf("%s/%s", p.opts.JoinNodeID, p.opts.JoinNodeEndpoint.Host)
+	if p.opts.ClusterJoinNode.JoinNodeID != "" && p.opts.ClusterJoinNode.JoinNodeEndpoint != nil {
+		joinAddr := fmt.Sprintf("%s/%s", p.opts.ClusterJoinNode.JoinNodeID, p.opts.ClusterJoinNode.JoinNodeEndpoint.Host)
 		_, err = p.mlist.Join([]string{joinAddr})
 		if err != nil {
 			return proctree.Terminate(err)
@@ -108,4 +117,30 @@ func (p *procHandler) Terminate(ctx actor.Context, parentErr error) error {
 	}
 
 	return parentErr
+}
+
+// Wait for ConsulService to discover other nodes
+// ManagementServer and ConsulService share ClusterJoinNode.
+// ConsulService writes to ClusterJoinNode whereas ManagementServer reads ClusterJoinNode
+func (p *procHandler) awaitAutoCluster() error {
+	if !p.opts.AutomaticClusterFormation {
+		return nil
+	}
+
+	retryCount := 0
+	delay := 100 * time.Millisecond
+
+	for retryCount < automaticClusterFormationMaxRetry {
+		if p.opts.ClusterJoinNode.JoinNodeID == "" {
+			time.Sleep(delay)
+			// Exponential backoff
+			delay = delay * 2
+		}
+		retryCount++
+	}
+
+	if p.opts.ClusterJoinNode.JoinNodeID == "" {
+		return fmt.Errorf("exceed max retry to get join node through automatic cluster formation")
+	}
+	return nil
 }
