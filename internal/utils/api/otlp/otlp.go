@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"time"
 
-	logsmodels "go.opentelemetry.io/proto/otlp/logs/v1"
+	otlpmodels "go.opentelemetry.io/proto/otlp/logs/v1"
 	"google.golang.org/protobuf/proto"
 
 	collectlogs "go.opentelemetry.io/proto/otlp/collector/logs/v1"
@@ -66,7 +66,6 @@ func UnmarshalLogRecords(r *http.Request) ([]*models.LogRecord, error) {
 	return logRecords, nil
 }
 
-// OTLPDataToLogRecordFields convert a struct to a map[string]string
 func OTLPDataToLogRecordFields(obj interface{}) (map[string]string, error) {
 	out := make(map[string]string)
 	v := reflect.ValueOf(obj)
@@ -98,7 +97,7 @@ func OTLPDataToLogRecordFields(obj interface{}) (map[string]string, error) {
 	return out, nil
 }
 
-func LogToLogRecord(logRecord *logsmodels.LogRecord) (result *models.LogRecord, err error) {
+func LogToLogRecord(logRecord *otlpmodels.LogRecord) (result *models.LogRecord, err error) {
 	result = &models.LogRecord{
 		Timestamp: time.Unix(0, int64(logRecord.TimeUnixNano)),
 	}

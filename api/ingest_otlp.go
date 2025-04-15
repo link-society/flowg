@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/swaggest/rest/request"
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
@@ -28,6 +29,8 @@ func (ior *IngestOTLPRequest) LoadFromHTTPRequest(r *http.Request) (err error) {
 	return err
 }
 
+var _ request.Loader = (*IngestOTLPRequest)(nil)
+
 type IngestOTLPResponse struct {
 	Success bool `json:"success"`
 }
@@ -39,7 +42,7 @@ func (ctrl *controller) IngestOTLPUsecase() usecase.Interactor {
 			models.SCOPE_SEND_LOGS,
 			func(
 				ctx context.Context,
-				req IngestOTLPRequest,
+				req *IngestOTLPRequest,
 				resp *IngestOTLPResponse,
 			) error {
 				for _, logRecord := range req.logRecords {
