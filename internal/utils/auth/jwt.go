@@ -2,6 +2,7 @@ package auth
 
 import (
 	"fmt"
+
 	"os"
 	"time"
 
@@ -29,7 +30,13 @@ func NewJWT(username string) (string, error) {
 		"sub": username,
 		"exp": time.Now().Add(time.Hour * 24).Unix(),
 	})
-	return t.SignedString([]byte(JWT_SIGNING_KEY))
+
+	tok, err := t.SignedString([]byte(JWT_SIGNING_KEY))
+	if err != nil {
+		return "", fmt.Errorf("failed to sign JWT: %w", err)
+	}
+
+	return fmt.Sprintf("jwt_%s", tok), nil
 }
 
 func VerifyJWT(token string) (string, error) {
