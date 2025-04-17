@@ -12,17 +12,17 @@ Using a Personal Access Token:
 export FLOWG_TOKEN="<your token>"
 
 curl \
-  -H "Authorization: Bearer pat:${FLOWG_TOKEN}" \
+  -H "Authorization: Bearer ${FLOWG_TOKEN}" \
   http://localhost:5080/api/v1/backup/auth \
   --output auth.db
 
 curl \
-  -H "Authorization: Bearer pat:${FLOWG_TOKEN}" \
+  -H "Authorization: Bearer ${FLOWG_TOKEN}" \
   http://localhost:5080/api/v1/backup/config \
   --output config.db
 
 curl \
-  -H "Authorization: Bearer pat:${FLOWG_TOKEN}" \
+  -H "Authorization: Bearer ${FLOWG_TOKEN}" \
   http://localhost:5080/api/v1/backup/logs \
   --output logs.db
 ```
@@ -40,17 +40,17 @@ export FLOWG_TOKEN=$(
 )
 
 curl \
-  -H "Authorization: Bearer jwt:${FLOWG_TOKEN}" \
+  -H "Authorization: Bearer ${FLOWG_TOKEN}" \
   http://localhost:5080/api/v1/backup/auth \
   --output auth.db
 
 curl \
-  -H "Authorization: Bearer jwt:${FLOWG_TOKEN}" \
+  -H "Authorization: Bearer ${FLOWG_TOKEN}" \
   http://localhost:5080/api/v1/backup/config \
   --output config.db
 
 curl \
-  -H "Authorization: Bearer jwt:${FLOWG_TOKEN}" \
+  -H "Authorization: Bearer ${FLOWG_TOKEN}" \
   http://localhost:5080/api/v1/backup/logs \
   --output logs.db
 ```
@@ -70,17 +70,17 @@ Using a Personal Access Token:
 export FLOWG_TOKEN="<your token>"
 
 curl \
-  -H "Authorization: Bearer pat:${FLOWG_TOKEN}" \
+  -H "Authorization: Bearer ${FLOWG_TOKEN}" \
   http://localhost:5080/api/v1/restore/auth \
   -X POST --form backup=auth.db
 
 curl \
-  -H "Authorization: Bearer pat:${FLOWG_TOKEN}" \
+  -H "Authorization: Bearer ${FLOWG_TOKEN}" \
   http://localhost:5080/api/v1/restore/config \
   -X POST --form backup=config.db
 
 curl \
-  -H "Authorization: Bearer pat:${FLOWG_TOKEN}" \
+  -H "Authorization: Bearer ${FLOWG_TOKEN}" \
   http://localhost:5080/api/v1/restore/logs \
   -X POST --form backup=logs.db
 ```
@@ -98,17 +98,17 @@ export FLOWG_TOKEN=$(
 )
 
 curl \
-  -H "Authorization: Bearer jwt:${FLOWG_TOKEN}" \
+  -H "Authorization: Bearer ${FLOWG_TOKEN}" \
   http://localhost:5080/api/v1/restore/auth \
   -X POST --form backup=auth.db
 
 curl \
-  -H "Authorization: Bearer jwt:${FLOWG_TOKEN}" \
+  -H "Authorization: Bearer ${FLOWG_TOKEN}" \
   http://localhost:5080/api/v1/restore/config \
   -X POST --form backup=config.db
 
 curl \
-  -H "Authorization: Bearer jwt:${FLOWG_TOKEN}" \
+  -H "Authorization: Bearer ${FLOWG_TOKEN}" \
   http://localhost:5080/api/v1/restore/logs \
   -X POST --form backup=logs.db
 ```
