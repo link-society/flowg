@@ -26,26 +26,26 @@ func NewAdminRestoreCommand() *cobra.Command {
 		Short: "Restore FlowG data",
 		Run: func(cmd *cobra.Command, args []string) {
 			if _, err := os.Stat(opts.src); err != nil {
-				fmt.Fprintf(os.Stderr, "Failed to find backup directory: %v\n", err)
+				fmt.Fprintf(os.Stderr, "ERROR: Failed to find backup directory: %v\n", err)
 				exitCode = 1
 				return
 			}
 
 			client := cmd.Context().Value(ApiClient).(*client.Client)
 			if err := restore(client, "auth", opts.src); err != nil {
-				fmt.Fprintf(os.Stderr, "Failed to restore auth database: %v\n", err)
+				fmt.Fprintf(os.Stderr, "ERROR: Failed to restore auth database: %v\n", err)
 				exitCode = 1
 				return
 			}
 
 			if err := restore(client, "config", opts.src); err != nil {
-				fmt.Fprintf(os.Stderr, "Failed to restore config database: %v\n", err)
+				fmt.Fprintf(os.Stderr, "ERROR: Failed to restore config database: %v\n", err)
 				exitCode = 1
 				return
 			}
 
 			if err := restore(client, "logs", opts.src); err != nil {
-				fmt.Fprintf(os.Stderr, "Failed to restore logs database: %v\n", err)
+				fmt.Fprintf(os.Stderr, "ERROR: Failed to restore logs database: %v\n", err)
 				exitCode = 1
 				return
 			}

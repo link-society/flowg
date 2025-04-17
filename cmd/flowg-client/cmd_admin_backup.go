@@ -26,26 +26,26 @@ func NewAdminBackupCommand() *cobra.Command {
 		Short: "Backup FlowG data",
 		Run: func(cmd *cobra.Command, args []string) {
 			if err := os.MkdirAll(opts.dest, os.ModePerm); err != nil {
-				fmt.Fprintf(os.Stderr, "Failed to create backup directory: %v\n", err)
+				fmt.Fprintf(os.Stderr, "ERROR: Failed to create backup directory: %v\n", err)
 				exitCode = 1
 				return
 			}
 
 			client := cmd.Context().Value(ApiClient).(*client.Client)
 			if err := backup(client, "auth", opts.dest); err != nil {
-				fmt.Fprintf(os.Stderr, "Failed to backup auth database: %v\n", err)
+				fmt.Fprintf(os.Stderr, "ERROR: Failed to backup auth database: %v\n", err)
 				exitCode = 1
 				return
 			}
 
 			if err := backup(client, "config", opts.dest); err != nil {
-				fmt.Fprintf(os.Stderr, "Failed to backup config database: %v\n", err)
+				fmt.Fprintf(os.Stderr, "ERROR: Failed to backup config database: %v\n", err)
 				exitCode = 1
 				return
 			}
 
 			if err := backup(client, "logs", opts.dest); err != nil {
-				fmt.Fprintf(os.Stderr, "Failed to backup logs database: %v\n", err)
+				fmt.Fprintf(os.Stderr, "ERROR: Failed to backup logs database: %v\n", err)
 				exitCode = 1
 				return
 			}
