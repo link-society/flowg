@@ -55,6 +55,7 @@ func main() {
 	)
 
 	rootCmd.AddCommand(
+		NewLoginCommand(),
 		NewStreamCommand(),
 		NewPipelineCommand(),
 		NewTransformerCommand(),
