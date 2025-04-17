@@ -2,6 +2,7 @@ package auth
 
 import (
 	"fmt"
+	"strings"
 
 	"os"
 	"time"
@@ -40,6 +41,11 @@ func NewJWT(username string) (string, error) {
 }
 
 func VerifyJWT(token string) (string, error) {
+	if !strings.HasPrefix(token, "jwt_") {
+		return "", fmt.Errorf("invalid token prefix")
+	}
+	token = token[len("jwt_"):]
+
 	t, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
 		return []byte(JWT_SIGNING_KEY), nil
 	})
