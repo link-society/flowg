@@ -265,7 +265,7 @@ def flowg_admin_token(flowg_cluster):
 
     resp = requests.post(
         "http://localhost:5080/api/v1/token",
-        headers={"Authorization": f"Bearer jwt:{admin_jwt}"},
+        headers={"Authorization": f"Bearer {admin_jwt}"},
     )
     resp.raise_for_status()
     data = resp.json()
@@ -277,7 +277,7 @@ def flowg_guest_token(flowg_admin_token):
     print("Creating guest token")
     resp = requests.put(
         "http://localhost:5080/api/v1/users/guest",
-        headers={"Authorization": f"Bearer pat:{flowg_admin_token}"},
+        headers={"Authorization": f"Bearer {flowg_admin_token}"},
         json={"password": "guest", "roles": []},
     )
     resp.raise_for_status()
@@ -292,7 +292,7 @@ def flowg_guest_token(flowg_admin_token):
 
     resp = requests.post(
         "http://localhost:5080/api/v1/token",
-        headers={"Authorization": f"Bearer jwt:{guest_jwt}"},
+        headers={"Authorization": f"Bearer {guest_jwt}"},
     )
     resp.raise_for_status()
     data = resp.json()

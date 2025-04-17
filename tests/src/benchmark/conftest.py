@@ -93,7 +93,7 @@ def flowg_config(flowg_admin_token, spec_dir):
 
             resp = requests.put(
                 f"http://localhost:5080/api/v1/pipelines/{pipeline_name}",
-                headers={"Authorization": f"Bearer pat:{flowg_admin_token}"},
+                headers={"Authorization": f"Bearer {flowg_admin_token}"},
                 json={"flow": pipeline},
             )
             resp.raise_for_status()
@@ -108,7 +108,7 @@ def flowg_config(flowg_admin_token, spec_dir):
 
             resp = requests.put(
                 f"http://localhost:5080/api/v1/transformers/{transformer_name}",
-                headers={"Authorization": f"Bearer pat:{flowg_admin_token}"},
+                headers={"Authorization": f"Bearer {flowg_admin_token}"},
                 json={"script": transformer},
             )
             resp.raise_for_status()

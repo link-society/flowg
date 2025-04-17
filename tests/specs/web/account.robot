@@ -24,11 +24,11 @@ Create and Delete Personal Access Token
     Wait Until Page Contains       Token created  timeout=5s
     Element Should Not Be Visible  id=input:account.tokens.modal.token_uuid
     Wait Until Page Contains       ${token_uuid}  timeout=5s
-    API GET                        path=/api/v1/auth/whoami  token=pat:${token}  expected_status=200
+    API GET                        path=/api/v1/auth/whoami  token=${token}  expected_status=200
     Remove Row                     table=table:account.tokens  row=${token_uuid}
     Wait Until Page Contains       Token deleted  timeout=5s
     Row Should Not Be Visible      table=table:account.tokens  row=${token_uuid}
-    API GET                        path=/api/v1/auth/whoami  token=pat:${token}  expected_status=401
+    API GET                        path=/api/v1/auth/whoami  token=${token}  expected_status=401
     Close Browser
 
 Change Password

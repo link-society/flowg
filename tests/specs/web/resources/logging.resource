@@ -12,7 +12,7 @@ Send log via API
     [Arguments]                      ${message}
     ${token}=    Get JSON Web Token  username=root  password=root
     ${payload}=  Evaluate            {"record": {"appname": "robotframework", "message": "${message}"}}
-    API POST                         path=/api/v1/pipelines/default/logs  token=jwt:${token}  body=${payload}  expected_status=200
+    API POST                         path=/api/v1/pipelines/default/logs  token=${token}  body=${payload}  expected_status=200
 
 Send log via Syslog (RFC 5424)
     [Arguments]              ${message}
