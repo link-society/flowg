@@ -19,7 +19,7 @@ def send_log(token, log):
         data=payload,
         headers={
             "Content-Type": "application/json",
-            "Authorization": f"Bearer pat:{token}",
+            "Authorization": f"Bearer {token}",
         },
     )
     resp.raise_for_status()
