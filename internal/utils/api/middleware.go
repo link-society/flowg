@@ -51,8 +51,8 @@ func ApiMiddleware(authStorage *auth.Storage) func(http.Handler) http.Handler {
 			authHeader := r.Header.Get("Authorization")
 
 			switch {
-			case strings.HasPrefix(strings.ToLower(authHeader), "bearer pat:"):
-				token := authHeader[len("bearer pat:"):]
+			case strings.HasPrefix(strings.ToLower(authHeader), "bearer pat_"):
+				token := authHeader[len("bearer pat_"):]
 
 				user, err := authStorage.VerifyToken(r.Context(), token)
 				switch {
@@ -66,8 +66,8 @@ func ApiMiddleware(authStorage *auth.Storage) func(http.Handler) http.Handler {
 					serveNext(w, r, user)
 				}
 
-			case strings.HasPrefix(strings.ToLower(authHeader), "bearer jwt:"):
-				token := authHeader[len("bearer jwt:"):]
+			case strings.HasPrefix(strings.ToLower(authHeader), "bearer jwt_"):
+				token := authHeader[len("bearer jwt_"):]
 
 				username, err := authUtils.VerifyJWT(token)
 				if err != nil {

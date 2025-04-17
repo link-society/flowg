@@ -28,7 +28,7 @@ const request = async <B, R extends { success: boolean }>(
 
   const token = localStorage.getItem('token')
   if (token !== null) {
-    authHeader = `Bearer jwt:${token}`
+    authHeader = `Bearer ${token}`
   }
 
   const response = await fetch(`${path}?${searchParams?.toString() ?? ''}`, {
@@ -109,7 +109,7 @@ export const SSE = (options: RequestOptions<never>) => {
     {
       maxRetryCount: 0,
       headers: {
-        Authorization: `Bearer jwt:${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     }
   )
