@@ -2,3 +2,4 @@
 /data/
 /backup/
 .vscode
+.DS_Store
