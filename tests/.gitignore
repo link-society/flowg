@@ -5,3 +5,4 @@ __pycache__
 
 /cache
 /reports
+.pdm-python
