@@ -13,6 +13,7 @@ def test_hurl(
     cache_dir,
     flowg_admin_token,
     flowg_guest_token,
+    otlp_pb,
 ):
     print("Running Hurl test suite:\n")
 
