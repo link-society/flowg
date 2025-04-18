@@ -11,28 +11,38 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	apiUtils "link-society.com/flowg/internal/utils/api"
-	"link-society.com/flowg/internal/utils/api/otlp"
+	"link-society.com/flowg/internal/utils/otlp"
 
 	"link-society.com/flowg/internal/models"
 
+	collectlogs "go.opentelemetry.io/proto/otlp/collector/logs/v1"
 	"link-society.com/flowg/internal/engines/pipelines"
 )
 
 type IngestOTLPRequest struct {
 	Pipeline   string `path:"pipeline" minLength:"1"`
 	logRecords []*models.LogRecord
-}
-
-func (ior *IngestOTLPRequest) LoadFromHTTPRequest(r *http.Request) (err error) {
-	ior.logRecords, err = otlp.UnmarshalLogRecords(r)
-
-	return err
+	collectlogs.ExportLogsServiceRequest
 }
 
 var _ request.Loader = (*IngestOTLPRequest)(nil)
 
+func (ior *IngestOTLPRequest) LoadFromHTTPRequest(r *http.Request) error {
+	var err error
+
+	ior.logRecords, err = otlp.UnmarshalLogRecords(r)
+
+	ior.Pipeline = r.PathValue("pipeline")
+	if ior.Pipeline == "" {
+		return fmt.Errorf("pipeline is required")
+	}
+
+	return err
+}
+
 type IngestOTLPResponse struct {
-	Success bool `json:"success"`
+	Success        bool `json:"success"`
+	ProcessedCount int  `json:"processed_count"`
 }
 
 func (ctrl *controller) IngestOTLPUsecase() usecase.Interactor {
@@ -63,24 +73,25 @@ func (ctrl *controller) IngestOTLPUsecase() usecase.Interactor {
 						resp.Success = false
 						return status.Wrap(err, status.Internal)
 					}
+					ctrl.logger.InfoContext(
+						ctx,
+						"Log entry processed",
+						slog.String("pipeline", req.Pipeline),
+					)
 				}
 
-				ctrl.logger.InfoContext(
-					ctx,
-					"Log entry processed",
-					slog.String("pipeline", req.Pipeline),
-				)
 				resp.Success = true
+				resp.ProcessedCount = len(req.logRecords)
 
 				return nil
 			},
 		),
 	)
 
-	u.SetName(fmt.Sprintf("ingest_otlp logs"))
-	u.SetTitle(fmt.Sprintf("Ingest OTLP logs"))
+	u.SetName("ingest_otlp logs")
+	u.SetTitle("Ingest OTLP logs")
 
-	u.SetDescription(fmt.Sprintf("Run otlp logs records through a pipeline"))
+	u.SetDescription("Run otlp logs records through a pipeline")
 	u.SetTags("pipelines")
 
 	u.SetExpectedErrors(status.PermissionDenied, status.Internal)

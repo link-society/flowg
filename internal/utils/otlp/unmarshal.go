@@ -51,10 +51,7 @@ func UnmarshalLogRecords(r *http.Request) ([]*models.LogRecord, error) {
 	for _, resourceLogs := range message.GetResourceLogs() {
 		for _, scopeLogs := range resourceLogs.GetScopeLogs() {
 			for _, logRecord := range scopeLogs.GetLogRecords() {
-				logRecordModel, err := LogToLogRecord(logRecord)
-				if err != nil {
-					return nil, err
-				}
+				logRecordModel := models.NewFromOTLP(logRecord)
 				logRecords = append(logRecords, logRecordModel)
 			}
 		}
