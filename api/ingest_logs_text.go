@@ -37,12 +37,20 @@ func (ctrl *controller) IngestLogsTextUsecase() usecase.Interactor {
 				resp *IngestLogsTextResponse,
 			) error {
 				lines := strings.Split(strings.ReplaceAll(req.TextBody, "\r\n", "\n"), "\n")
+				messages := []string{}
 
 				for _, line := range lines {
+					line = strings.TrimSpace(line)
+					if line != "" {
+						messages = append(messages, line)
+					}
+				}
+
+				for _, message := range messages {
 					record := &models.LogRecord{
 						Timestamp: time.Now(),
 						Fields: map[string]string{
-							"content": line,
+							"content": message,
 						},
 					}
 
@@ -72,7 +80,7 @@ func (ctrl *controller) IngestLogsTextUsecase() usecase.Interactor {
 				}
 
 				resp.Success = true
-				resp.ProcessedCount = len(lines)
+				resp.ProcessedCount = len(messages)
 
 				return nil
 			},
