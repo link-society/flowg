@@ -87,9 +87,9 @@ func (ctrl *controller) IngestLogsTextUsecase() usecase.Interactor {
 		),
 	)
 
-	u.SetName("ingest_logs_struct")
-	u.SetTitle("Ingest Structured Logs")
-	u.SetDescription("Run structured logs through a pipeline")
+	u.SetName("ingest_logs_text")
+	u.SetTitle("Ingest Textual Logs")
+	u.SetDescription("Run textual logs through a pipeline")
 	u.SetTags("pipelines")
 
 	u.SetExpectedErrors(status.PermissionDenied, status.Internal)
