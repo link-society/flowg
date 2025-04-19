@@ -63,7 +63,10 @@ func (w *responseWriter) Header() http.Header {
 }
 
 func (w *responseWriter) Write(b []byte) (int, error) {
-	w.buf.Write(b)
+	if VERBOSE_LOGGING {
+		w.buf.Write(b)
+	}
+
 	return w.parent.Write(b)
 }
 
@@ -78,9 +81,8 @@ func (w *responseWriter) Flush() {
 		fmt.Fprintf(os.Stderr, "---begin: %s---\n", correlationId)
 		fmt.Fprintln(os.Stderr, w.buf.String())
 		fmt.Fprintf(os.Stderr, "---end: %s---\n", correlationId)
+		w.buf.Reset()
 	}
-
-	w.buf.Reset()
 
 	if f, ok := w.parent.(http.Flusher); ok {
 		f.Flush()
