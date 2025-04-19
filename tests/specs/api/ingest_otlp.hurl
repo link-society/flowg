@@ -1,5 +1,5 @@
 POST http://localhost:5080/api/v1/pipelines/default/logs/otlp
-Authorization: Bearer pat:{{admin_token}}
+Authorization: Bearer {{admin_token}}
 Content-Type: application/json
 {
   "resource_logs": [{
@@ -32,7 +32,7 @@ jsonpath "$.success" == true
 jsonpath "$.processed_count" == 1
 
 POST http://localhost:5080/api/v1/pipelines/default/logs/otlp
-Authorization: Bearer pat:{{admin_token}}
+Authorization: Bearer {{admin_token}}
 Content-Type: application/x-protobuf
 file,ingest_otlp.pb;
 HTTP 200
