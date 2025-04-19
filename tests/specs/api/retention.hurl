@@ -13,14 +13,16 @@ HTTP 200
 jsonpath "$.success" == true
 
 
-POST http://localhost:5080/api/v1/pipelines/default/logs
+POST http://localhost:5080/api/v1/pipelines/default/logs/struct
 Authorization: Bearer {{admin_token}}
 Content-Type: application/json
 {
-  "record": {
-    "level": "info",
-    "message": "Hello, World!"
-  }
+  "records": [
+    {
+      "level": "info",
+      "message": "Hello, World!"
+    }
+  ]
 }
 HTTP 200
 
