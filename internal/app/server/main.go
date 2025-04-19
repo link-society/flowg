@@ -48,8 +48,10 @@ type Options struct {
 }
 
 func NewServer(opts Options) proctree.Process {
+	isAutomaticClusterformation := isAutomaticClusterformation(opts.ConsulUrl)
+
 	//JoinNode shared between ConsulService and ManagementServer
-	ClusterJoinNode := &models.ClusterJoinNode{}
+	ClusterJoinNode := models.NewClusterJoinNode(isAutomaticClusterformation, opts.ClusterJoinNodeID, opts.ClusterJoinEndpoint)
 
 	// Storage Layer
 	var (
@@ -91,7 +93,7 @@ func NewServer(opts Options) proctree.Process {
 			ClusterCookie:   opts.ClusterCookie,
 			ClusterJoinNode: ClusterJoinNode,
 
-			AutomaticClusterFormation: isAutomaticClusterformation(opts.ConsulUrl),
+			AutomaticClusterFormation: isAutomaticClusterformation,
 		})
 		syslogServer = syslog.NewServer(&syslog.ServerOptions{
 			TcpMode:      opts.SyslogTcpMode,
