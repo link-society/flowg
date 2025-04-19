@@ -1,6 +1,7 @@
 package api
 
 import (
+	"compress/gzip"
 	"context"
 	"fmt"
 	"io"
@@ -33,26 +34,69 @@ func (ior *IngestLogsOTLPRequest) LoadFromHTTPRequest(r *http.Request) error {
 	if ior.Pipeline == "" {
 		return fmt.Errorf("pipeline is required")
 	}
-
 	defer r.Body.Close()
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		return fmt.Errorf("failed to read request body: %w", err)
+
+	slog.InfoContext(
+		r.Context(),
+		"Parsing OpenTelemetry message",
+		slog.String("otlp.content-type", r.Header.Get("Content-Type")),
+		slog.String("otlp.content-encoding", r.Header.Get("Content-Encoding")),
+	)
+
+	var body []byte
+
+	contentEncoding := r.Header.Get("Content-Encoding")
+	switch contentEncoding {
+	case "gzip":
+		// decompress body
+		gz, err := gzip.NewReader(r.Body)
+		if err != nil {
+			return fmt.Errorf("failed to create gzip reader: %w", err)
+		}
+		defer gz.Close()
+
+		data, err := io.ReadAll(gz)
+		if err != nil {
+			return fmt.Errorf("failed to read gzip body: %w", err)
+		}
+
+		body = data
+
+	case "":
+		data, err := io.ReadAll(r.Body)
+		if err != nil {
+			return fmt.Errorf("failed to read raw body: %w", err)
+		}
+
+		body = data
+
+	default:
+		return fmt.Errorf("unsupported content encoding: %s", contentEncoding)
 	}
 
 	contentType := r.Header.Get("Content-Type")
 	switch contentType {
 	case "application/x-protobuf":
-		ior.logRecords, err = otlp.UnmarshalProtobuf(body)
+		logRecords, err := otlp.UnmarshalProtobuf(body)
+		if err != nil {
+			return fmt.Errorf("failed to unmarshal protobuf: %w", err)
+		}
+
+		ior.logRecords = logRecords
 
 	case "application/json":
-		ior.logRecords, err = otlp.UnmarshalJSON(body)
+		logRecords, err := otlp.UnmarshalJSON(body)
+		if err != nil {
+			return fmt.Errorf("failed to unmarshal json: %w", err)
+		}
+
+		ior.logRecords = logRecords
 
 	default:
-		err = fmt.Errorf("unsupported content type: %s", contentType)
+		return fmt.Errorf("unsupported content type: %s", contentType)
 	}
 
-	return err
+	return nil
 }
 
 type IngestLogsOTLPResponse struct {
