@@ -37,11 +37,13 @@ import NodeRouterSyslogUrl from '@site/static/img/guides/pipelines/node-router-s
 ### Direct node
 
 ```json
-POST /api/v1/pipelines/default/logs
+POST /api/v1/pipelines/default/logs/struct
 {
-  "record": {
-    "foo": "bar"
-  }
+  "records": [
+    {
+      "foo": "bar"
+    }
+  ]
 }
 ```
 
@@ -334,11 +336,13 @@ The following are equivalent:
 **OR**
 
 ```json
-POST /api/v1/pipelines/default/logs
+POST /api/v1/pipelines/default/logs/struct
 {
-  "record": {
-    "content": "hello world"
-  }
+  "records": [
+    {
+      "content": "hello world"
+    }
+  ]
 }
 ```
 
