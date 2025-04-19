@@ -20,15 +20,15 @@ import (
 	"link-society.com/flowg/internal/engines/pipelines"
 )
 
-type IngestOTLPRequest struct {
+type IngestLogsOTLPRequest struct {
 	Pipeline   string `path:"pipeline" minLength:"1"`
 	logRecords []*models.LogRecord
 	collectlogs.ExportLogsServiceRequest
 }
 
-var _ request.Loader = (*IngestOTLPRequest)(nil)
+var _ request.Loader = (*IngestLogsOTLPRequest)(nil)
 
-func (ior *IngestOTLPRequest) LoadFromHTTPRequest(r *http.Request) error {
+func (ior *IngestLogsOTLPRequest) LoadFromHTTPRequest(r *http.Request) error {
 	defer r.Body.Close()
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -47,20 +47,20 @@ func (ior *IngestOTLPRequest) LoadFromHTTPRequest(r *http.Request) error {
 	return err
 }
 
-type IngestOTLPResponse struct {
+type IngestLogsOTLPResponse struct {
 	Success        bool `json:"success"`
 	ProcessedCount int  `json:"processed_count"`
 }
 
-func (ctrl *controller) IngestOTLPUsecase() usecase.Interactor {
+func (ctrl *controller) IngestLogsOTLPUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
 			ctrl.deps.AuthStorage,
 			models.SCOPE_SEND_LOGS,
 			func(
 				ctx context.Context,
-				req *IngestOTLPRequest,
-				resp *IngestOTLPResponse,
+				req *IngestLogsOTLPRequest,
+				resp *IngestLogsOTLPResponse,
 			) error {
 				for _, logRecord := range req.logRecords {
 					err := ctrl.deps.PipelineRunner.Run(
@@ -95,10 +95,10 @@ func (ctrl *controller) IngestOTLPUsecase() usecase.Interactor {
 		),
 	)
 
-	u.SetName("ingest_otlp logs")
-	u.SetTitle("Ingest OTLP logs")
+	u.SetName("ingest_logs_otlp")
+	u.SetTitle("Ingest OpenTelemetry logs")
 
-	u.SetDescription("Run otlp logs records through a pipeline")
+	u.SetDescription("Run OpenTelemetry logs through a pipeline")
 	u.SetTags("pipelines")
 
 	u.SetExpectedErrors(status.PermissionDenied, status.Internal)

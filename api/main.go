@@ -80,9 +80,9 @@ func NewHandler(deps *Dependencies) http.Handler {
 		r.Get("/api/v1/pipelines/{pipeline}", ctrl.GetPipelineUsecase())
 		r.Put("/api/v1/pipelines/{pipeline}", ctrl.SavePipelineUsecase())
 		r.Delete("/api/v1/pipelines/{pipeline}", ctrl.DeletePipelineUsecase())
-		r.Post("/api/v1/pipelines/{pipeline}/logs", ctrl.IngestLogUsecase())
 
-		r.Post("/api/v1/pipelines/{pipeline}/logs/otlp", ctrl.IngestOTLPUsecase())
+		r.Post("/api/v1/pipelines/{pipeline}/logs/struct", ctrl.IngestLogsStructUsecase())
+		r.Post("/api/v1/pipelines/{pipeline}/logs/otlp", ctrl.IngestLogsOTLPUsecase())
 
 		r.Get("/api/v1/streams", ctrl.ListStreamsUsecase())
 		r.Get("/api/v1/streams/{stream}", ctrl.GetStreamUsecase())
