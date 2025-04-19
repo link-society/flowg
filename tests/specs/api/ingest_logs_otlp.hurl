@@ -39,3 +39,9 @@ HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 jsonpath "$.processed_count" == 1
+
+DELETE http://localhost:5080/api/v1/streams/default
+Authorization: Bearer {{admin_token}}
+HTTP 200
+[Asserts]
+jsonpath "$.success" == true
