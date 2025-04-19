@@ -6,6 +6,8 @@ import (
 	"os"
 )
 
+var VERBOSE_LOGGING = false
+
 func Setup(verbose bool) {
 	var level slog.Level
 	if verbose {
@@ -14,6 +16,7 @@ func Setup(verbose bool) {
 		level = slog.LevelInfo
 	}
 
+	VERBOSE_LOGGING = verbose
 	opts := &slog.HandlerOptions{Level: level}
 	slog.SetDefault(slog.New(newHandler(os.Stdout, opts)))
 }
