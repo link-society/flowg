@@ -35,7 +35,7 @@ func (ior *IngestOTLPRequest) LoadFromHTTPRequest(r *http.Request) error {
 		return fmt.Errorf("failed to read request body: %w", err)
 	}
 
-	contentType := otlp.ContentType(r.Header.Get("Content-Type"))
+	contentType := r.Header.Get("Content-Type")
 
 	ior.logRecords, err = otlp.UnmarshalLogRecords(body, contentType)
 
