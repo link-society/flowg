@@ -1068,9 +1068,9 @@
      "tags": [
       "pipelines"
      ],
-     "summary": "Ingest Structured Logs",
-     "description": "Run structured logs through a pipeline",
-     "operationId": "ingest_logs_struct2",
+     "summary": "Ingest Textual Logs",
+     "description": "Run textual logs through a pipeline",
+     "operationId": "ingest_logs_text",
      "parameters": [
       {
        "name": "pipeline",
