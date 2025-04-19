@@ -98,7 +98,7 @@ Content-Type: application/json
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true
-jsonpath "$.processed_count" count == 1
+jsonpath "$.processed_count" == 1
 
 GET http://localhost:5080/api/v1/streams/test/logs
 Authorization: Bearer {{admin_token}}
