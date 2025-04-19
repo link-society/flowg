@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+	"io"
 	"log/slog"
 	"net/http"
 
@@ -28,9 +29,15 @@ type IngestOTLPRequest struct {
 var _ request.Loader = (*IngestOTLPRequest)(nil)
 
 func (ior *IngestOTLPRequest) LoadFromHTTPRequest(r *http.Request) error {
-	var err error
+	defer r.Body.Close()
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		return fmt.Errorf("failed to read request body: %w", err)
+	}
 
-	ior.logRecords, err = otlp.UnmarshalLogRecords(r)
+	contentType := otlp.ContentType(r.Header.Get("Content-Type"))
+
+	ior.logRecords, err = otlp.UnmarshalLogRecords(body, contentType)
 
 	ior.Pipeline = r.PathValue("pipeline")
 	if ior.Pipeline == "" {

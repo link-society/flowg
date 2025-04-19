@@ -3,8 +3,6 @@ package otlp
 import (
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 
 	"google.golang.org/protobuf/proto"
 
@@ -20,14 +18,7 @@ const (
 	JsonContentType  ContentType = "application/json"
 )
 
-func UnmarshalLogRecords(r *http.Request) ([]*models.LogRecord, error) {
-	body, err := io.ReadAll(r.Body)
-	defer r.Body.Close()
-	if err != nil {
-		return nil, err
-	}
-
-	contentType := ContentType(r.Header.Get("Content-Type"))
+func UnmarshalLogRecords(body []byte, contentType ContentType) ([]*models.LogRecord, error) {
 	message := collectlogs.ExportLogsServiceRequest{}
 
 	switch contentType {
