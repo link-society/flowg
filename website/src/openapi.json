@@ -903,14 +903,14 @@
      ]
     }
    },
-   "/api/v1/pipelines/{pipeline}/logs": {
+   "/api/v1/pipelines/{pipeline}/logs/otlp": {
     "post": {
      "tags": [
       "pipelines"
      ],
-     "summary": "Ingest Log",
-     "description": "Run log record through a pipeline",
-     "operationId": "ingest_log",
+     "summary": "Ingest OpenTelemetry logs",
+     "description": "Run OpenTelemetry logs through a pipeline",
+     "operationId": "ingest_logs_otlp",
      "parameters": [
       {
        "name": "pipeline",
@@ -926,7 +926,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/ApiIngestLogRequest"
+         "$ref": "#/components/schemas/ApiIngestLogsOTLPRequest"
         }
        }
       }
@@ -937,7 +937,167 @@
        "content": {
         "application/json": {
          "schema": {
-          "$ref": "#/components/schemas/ApiIngestLogResponse"
+          "$ref": "#/components/schemas/ApiIngestLogsOTLPResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    }
+   },
+   "/api/v1/pipelines/{pipeline}/logs/struct": {
+    "post": {
+     "tags": [
+      "pipelines"
+     ],
+     "summary": "Ingest Structured Logs",
+     "description": "Run structured logs through a pipeline",
+     "operationId": "ingest_logs_struct",
+     "parameters": [
+      {
+       "name": "pipeline",
+       "in": "path",
+       "required": true,
+       "schema": {
+        "minLength": 1,
+        "type": "string"
+       }
+      }
+     ],
+     "requestBody": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ApiIngestLogsStructRequest"
+        }
+       }
+      }
+     },
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiIngestLogsStructResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    }
+   },
+   "/api/v1/pipelines/{pipeline}/logs/text": {
+    "post": {
+     "tags": [
+      "pipelines"
+     ],
+     "summary": "Ingest Structured Logs",
+     "description": "Run structured logs through a pipeline",
+     "operationId": "ingest_logs_struct2",
+     "parameters": [
+      {
+       "name": "pipeline",
+       "in": "path",
+       "required": true,
+       "schema": {
+        "minLength": 1,
+        "type": "string"
+       }
+      }
+     ],
+     "requestBody": {
+      "content": {
+       "text/plain": {
+        "schema": {
+         "type": "string"
+        }
+       }
+      }
+     },
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiIngestLogsTextResponse"
          }
         }
        }
@@ -2910,22 +3070,61 @@
      },
      "type": "object"
     },
-    "ApiIngestLogRequest": {
+    "ApiIngestLogsOTLPRequest": {
      "properties": {
-      "record": {
-       "additionalProperties": {
-        "type": "string"
+      "resource_logs": {
+       "items": {
+        "$ref": "#/components/schemas/V1ResourceLogs"
+       },
+       "type": "array"
+      }
+     },
+     "type": "object"
+    },
+    "ApiIngestLogsOTLPResponse": {
+     "properties": {
+      "processed_count": {
+       "type": "integer"
+      },
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiIngestLogsStructRequest": {
+     "properties": {
+      "records": {
+       "items": {
+        "additionalProperties": {
+         "type": "string"
+        },
+        "type": "object"
        },
        "type": [
-        "object",
+        "array",
         "null"
        ]
       }
      },
      "type": "object"
     },
-    "ApiIngestLogResponse": {
+    "ApiIngestLogsStructResponse": {
      "properties": {
+      "processed_count": {
+       "type": "integer"
+      },
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiIngestLogsTextResponse": {
+     "properties": {
+      "processed_count": {
+       "type": "integer"
+      },
       "success": {
        "type": "boolean"
       }
@@ -3676,6 +3875,141 @@
       }
      },
      "type": "object"
+    },
+    "V1AnyValue": {
+     "type": "object"
+    },
+    "V1InstrumentationScope": {
+     "properties": {
+      "attributes": {
+       "items": {
+        "$ref": "#/components/schemas/V1KeyValue"
+       },
+       "type": "array"
+      },
+      "dropped_attributes_count": {
+       "minimum": 0,
+       "type": "integer"
+      },
+      "name": {
+       "type": "string"
+      },
+      "version": {
+       "type": "string"
+      }
+     },
+     "type": "object"
+    },
+    "V1KeyValue": {
+     "properties": {
+      "key": {
+       "type": "string"
+      },
+      "value": {
+       "$ref": "#/components/schemas/V1AnyValue"
+      }
+     },
+     "type": "object"
+    },
+    "V1LogRecord": {
+     "properties": {
+      "attributes": {
+       "items": {
+        "$ref": "#/components/schemas/V1KeyValue"
+       },
+       "type": "array"
+      },
+      "body": {
+       "$ref": "#/components/schemas/V1AnyValue"
+      },
+      "dropped_attributes_count": {
+       "minimum": 0,
+       "type": "integer"
+      },
+      "event_name": {
+       "type": "string"
+      },
+      "flags": {
+       "minimum": 0,
+       "type": "integer"
+      },
+      "observed_time_unix_nano": {
+       "minimum": 0,
+       "type": "integer"
+      },
+      "severity_number": {
+       "$ref": "#/components/schemas/V1SeverityNumber"
+      },
+      "severity_text": {
+       "type": "string"
+      },
+      "span_id": {
+       "format": "base64",
+       "type": "string"
+      },
+      "time_unix_nano": {
+       "minimum": 0,
+       "type": "integer"
+      },
+      "trace_id": {
+       "format": "base64",
+       "type": "string"
+      }
+     },
+     "type": "object"
+    },
+    "V1Resource": {
+     "properties": {
+      "attributes": {
+       "items": {
+        "$ref": "#/components/schemas/V1KeyValue"
+       },
+       "type": "array"
+      },
+      "dropped_attributes_count": {
+       "minimum": 0,
+       "type": "integer"
+      }
+     },
+     "type": "object"
+    },
+    "V1ResourceLogs": {
+     "properties": {
+      "resource": {
+       "$ref": "#/components/schemas/V1Resource"
+      },
+      "schema_url": {
+       "type": "string"
+      },
+      "scope_logs": {
+       "items": {
+        "$ref": "#/components/schemas/V1ScopeLogs"
+       },
+       "type": "array"
+      }
+     },
+     "type": "object"
+    },
+    "V1ScopeLogs": {
+     "properties": {
+      "log_records": {
+       "items": {
+        "$ref": "#/components/schemas/V1LogRecord"
+       },
+       "type": "array"
+      },
+      "schema_url": {
+       "type": "string"
+      },
+      "scope": {
+       "$ref": "#/components/schemas/V1InstrumentationScope"
+      }
+     },
+     "type": "object"
+    },
+    "V1SeverityNumber": {
+     "format": "int32",
+     "type": "integer"
     }
    },
    "securitySchemes": {
