@@ -2,7 +2,6 @@ package otlp
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"google.golang.org/protobuf/proto"
 
@@ -11,35 +10,24 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
-func UnmarshalLogRecords(body []byte, contentType string) ([]*models.LogRecord, error) {
+func UnmarshalJSON(body []byte) ([]*models.LogRecord, error) {
 	message := collectlogs.ExportLogsServiceRequest{}
-
-	switch contentType {
-	case "application/x-protobuf", "application/protobuf":
-		err := proto.Unmarshal(body, &message)
-		if err != nil {
-			return nil, err
-		}
-
-	case "application/json":
-		err := json.Unmarshal(body, &message)
-		if err != nil {
-			return nil, err
-		}
-	default:
-		return nil, fmt.Errorf("unsupported content type: %s", contentType)
+	err := json.Unmarshal(body, &message)
+	if err != nil {
+		return nil, err
 	}
 
-	var logRecords []*models.LogRecord
+	logRecords := convertToLogRecords(&message)
+	return logRecords, nil
+}
 
-	for _, resourceLogs := range message.GetResourceLogs() {
-		for _, scopeLogs := range resourceLogs.GetScopeLogs() {
-			for _, logRecord := range scopeLogs.GetLogRecords() {
-				logRecordModel := models.NewFromOTLP(logRecord)
-				logRecords = append(logRecords, logRecordModel)
-			}
-		}
+func UnmarshalProtobuf(body []byte) ([]*models.LogRecord, error) {
+	message := collectlogs.ExportLogsServiceRequest{}
+	err := proto.Unmarshal(body, &message)
+	if err != nil {
+		return nil, err
 	}
 
+	logRecords := convertToLogRecords(&message)
 	return logRecords, nil
 }

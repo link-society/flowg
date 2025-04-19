@@ -29,6 +29,11 @@ type IngestLogsOTLPRequest struct {
 var _ request.Loader = (*IngestLogsOTLPRequest)(nil)
 
 func (ior *IngestLogsOTLPRequest) LoadFromHTTPRequest(r *http.Request) error {
+	ior.Pipeline = r.PathValue("pipeline")
+	if ior.Pipeline == "" {
+		return fmt.Errorf("pipeline is required")
+	}
+
 	defer r.Body.Close()
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -36,12 +41,15 @@ func (ior *IngestLogsOTLPRequest) LoadFromHTTPRequest(r *http.Request) error {
 	}
 
 	contentType := r.Header.Get("Content-Type")
+	switch contentType {
+	case "application/x-protobuf":
+		ior.logRecords, err = otlp.UnmarshalProtobuf(body)
 
-	ior.logRecords, err = otlp.UnmarshalLogRecords(body, contentType)
+	case "application/json":
+		ior.logRecords, err = otlp.UnmarshalJSON(body)
 
-	ior.Pipeline = r.PathValue("pipeline")
-	if ior.Pipeline == "" {
-		return fmt.Errorf("pipeline is required")
+	default:
+		err = fmt.Errorf("unsupported content type: %s", contentType)
 	}
 
 	return err
