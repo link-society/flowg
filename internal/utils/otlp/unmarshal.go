@@ -11,24 +11,17 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
-type ContentType string
-
-const (
-	ProtoContentType ContentType = "application/x-protobuf"
-	JsonContentType  ContentType = "application/json"
-)
-
-func UnmarshalLogRecords(body []byte, contentType ContentType) ([]*models.LogRecord, error) {
+func UnmarshalLogRecords(body []byte, contentType string) ([]*models.LogRecord, error) {
 	message := collectlogs.ExportLogsServiceRequest{}
 
 	switch contentType {
-	case ProtoContentType:
+	case "application/x-protobuf", "application/protobuf":
 		err := proto.Unmarshal(body, &message)
 		if err != nil {
 			return nil, err
 		}
 
-	case JsonContentType:
+	case "application/json":
 		err := json.Unmarshal(body, &message)
 		if err != nil {
 			return nil, err
