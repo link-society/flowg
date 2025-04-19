@@ -84,16 +84,21 @@ jsonpath "$.pipelines" count == 2
 jsonpath "$.pipelines" includes "default"
 jsonpath "$.pipelines" includes "test"
 
-POST http://localhost:5080/api/v1/pipelines/test/logs
+POST http://localhost:5080/api/v1/pipelines/test/logs/struct
 Authorization: Bearer {{admin_token}}
 Content-Type: application/json
 {
-  "record": {
-    "level": "info",
-    "message": "test"
-  }
+  "records": [
+    {
+      "level": "info",
+      "message": "test"
+    }
+  ]
 }
 HTTP 200
+[Asserts]
+jsonpath "$.success" == true
+jsonpath "$.processed_count" count == 1
 
 GET http://localhost:5080/api/v1/streams/test/logs
 Authorization: Bearer {{admin_token}}
