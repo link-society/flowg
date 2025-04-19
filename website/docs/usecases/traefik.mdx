@@ -1,0 +1,94 @@
+---
+sidebar_position: 2
+---
+
+# Receiving logs from Traefik
+
+[Traefik](https://traefik.io/) is a modern HTTP reverse proxy and load balancer.
+It supports exporting logs to an [OpenTelemetry](https://opentelemetry.io/)
+endpoint.
+
+[OpenTelemetry](https://opentelemetry.io/) OpenTelemetry is a collection of
+APIs, SDKs, and tools used to instrument, generate, collect, and export
+telemetry data (metrics, logs, and traces) to help you analyze your software's
+performance and behavior.
+
+**FlowG** can be used to gather logs from any OpenTelemetry compatible exporter.
+
+> :warning: **Important Notice**
+>
+> FlowG only supports gathering logs for now, and does not support metrics and
+> traces. There is an on-going discussion on
+> [GitHub](https://github.com/link-society/flowg/discussions/595) regarding the
+> best way to support metrics and traces in the future.
+>
+> Feel free to join the discussion if you have any ideas or suggestions.
+
+In this tutorial, we will setup Traefik to export logs to FlowG using the
+OpenTelemetry protocol (OTLP) over HTTP.
+
+## Setting up Traefik
+
+Run Traefik with the following configuration:
+
+```yaml
+experimental:
+  otlpLogs: true
+
+log:
+  otlp:
+    http:
+      endpoint: http://127.0.0.1:5080/api/v1/pipelines/default/logs/otlp
+      headers:
+        Authorization: Bearer YOUR-PERSONAL-ACCESS-TOKEN
+```
+
+> **NB:** This assumes FlowG is running on the same host as Traefik.
+
+Here is another example using Docker Compose:
+
+```yaml
+services:
+  traefik:
+    image: traefik:latest
+    environment:
+      - TRAEFIK_EXPERIMENTAL_OTLPLOGS=true
+      - TRAEFIK_LOG_LEVEL=DEBUG
+      - TRAEFIK_LOG_OTLP_HTTP_ENDPOINT=http://flowg:5080/api/v1/pipelines/default/logs/otlp
+      - TRAEFIK_LOG_OTLP_HTTP_HEADERS_AUTHORIZATION=Bearer YOUR-PERSONAL-ACCESS-TOKEN
+    ports:
+      - "80:80"
+
+  flowg:
+    image: linksociety/flowg:latest
+    ports:
+      - "5080:5080"
+```
+
+Then run with:
+
+```bash
+docker compose up flowg
+# Create your personal access token and set it in the environment variable
+docker compose up traefik
+```
+
+## Setting up FlowG
+
+import TraefikLogsUrl from '@site/static/img/guides/traefik/traefik-logs.png'
+
+When FlowG starts for the first time, a default pipeline is created which simply
+store the logs in the `default` stream. No further setup is required to receive
+the logs from Traefik:
+
+<div style={{ textAlign: 'center' }} class="with-zoom">
+  <img src={TraefikLogsUrl} alt="Traefik logs in FlowG" />
+</div>
+
+## What's next?
+
+You can then process the logs, refine them, parse the message, and/or forward
+them to a third-party system such as a remote Syslog, Datadog, or even another
+HTTP Webhook.
+
+See the other guides for more ideas.
