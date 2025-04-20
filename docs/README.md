@@ -6,5 +6,3 @@ requiring predefined schemas and relies on
 [BadgerDB](https://dgraph.io/docs/badger/) as its storage backend.
 
 ## Reference
-
-  - [Command Line Interface](./cli.md)
