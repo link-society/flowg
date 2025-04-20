@@ -28,6 +28,14 @@ jobs:
         working-directory: ./website
         run: npm install
 
+      - name: gen@web
+        working-directory: ./web/app
+        run: |
+          npm i
+          npm run build
+          mkdir -p ../public
+          cp -r ./dist/* ../public/
+
       - name: gen@cli
         run: go run scripts/gen_cli_doc.go
 
