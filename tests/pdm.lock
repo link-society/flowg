@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:a990f6bbbfebf552dceda612b2e197e9093c44ca32c40ef6940b4af56bad1625"
+content_hash = "sha256:211be377ddd63f63417b1e9979bc23d4e48fdd583a98a860d6974de9a2add905"
 
 [[metadata.targets]]
 requires_python = "==3.13.*"
@@ -134,13 +134,13 @@ summary = ""
 groups = ["dev"]
 dependencies = [
     "docker>=7.1.0",
+    "opentelemetry-proto>=1.32.1",
     "pytest>=8.3.5",
     "requests>=2.32.3",
     "robotframework-dependencylibrary>=4.0.1",
     "robotframework-requests>=0.9.7",
     "robotframework-seleniumlibrary>=6.3.0",
     "robotframework>=7.2.2",
-    "tenacity>=9.0.0",
     "tqdm>=4.67.1",
 ]
 
@@ -185,7 +185,7 @@ name = "opentelemetry-proto"
 version = "1.32.1"
 requires_python = ">=3.8"
 summary = "OpenTelemetry Python Proto"
-groups = ["default"]
+groups = ["default", "dev"]
 dependencies = [
     "protobuf<6.0,>=5.0",
 ]
@@ -235,7 +235,7 @@ name = "protobuf"
 version = "5.29.4"
 requires_python = ">=3.8"
 summary = ""
-groups = ["default"]
+groups = ["default", "dev"]
 files = [
     {file = "protobuf-5.29.4-cp310-abi3-win32.whl", hash = "sha256:13eb236f8eb9ec34e63fc8b1d6efd2777d062fa6aaa68268fb67cf77f6839ad7"},
     {file = "protobuf-5.29.4-cp310-abi3-win_amd64.whl", hash = "sha256:bcefcdf3976233f8a502d265eb65ea740c989bacc6c30a58290ed0e519eb4b8d"},
@@ -421,17 +421,6 @@ groups = ["default", "dev"]
 files = [
     {file = "sortedcontainers-2.4.0-py2.py3-none-any.whl", hash = "sha256:a163dcaede0f1c021485e957a39245190e74249897e2ae4b2aa38595db237ee0"},
     {file = "sortedcontainers-2.4.0.tar.gz", hash = "sha256:25caa5a06cc30b6b83d11423433f65d1f9d76c4c6a0c90e3379eaa43b9bfdb88"},
-]
-
-[[package]]
-name = "tenacity"
-version = "9.0.0"
-requires_python = ">=3.8"
-summary = "Retry code until it succeeds"
-groups = ["default", "dev"]
-files = [
-    {file = "tenacity-9.0.0-py3-none-any.whl", hash = "sha256:93de0c98785b27fcf659856aa9f54bfbd399e29969b0621bc7f762bd441b4539"},
-    {file = "tenacity-9.0.0.tar.gz", hash = "sha256:807f37ca97d62aa361264d497b0e31e92b8027044942bfa756160d908320d73b"},
 ]
 
 [[package]]
