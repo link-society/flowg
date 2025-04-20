@@ -56,6 +56,16 @@ const newForwarderFactory = (type: ForwarderTypes): ForwarderModel => {
         },
       }
 
+    case 'amqp':
+      return {
+        config: {
+          type,
+          url: '',
+          exchange: '',
+          routing_key: '',
+        },
+      }
+
     default:
       throw new Error(`Unknown forwarder type: ${type}`)
   }
