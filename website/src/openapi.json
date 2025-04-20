@@ -3867,6 +3867,26 @@
      },
      "type": "object"
     },
+    "ModelsForwarderAmqpV2": {
+     "properties": {
+      "exchange": {
+       "type": "string"
+      },
+      "routing_key": {
+       "type": "string"
+      },
+      "type": {
+       "enum": [
+        "amqp"
+       ],
+       "type": "string"
+      },
+      "url": {
+       "type": "string"
+      }
+     },
+     "type": "object"
+    },
     "ModelsForwarderConfigV2": {
      "oneOf": [
       {
@@ -3877,6 +3897,9 @@
       },
       {
        "$ref": "#/components/schemas/ModelsForwarderDatadogV2"
+      },
+      {
+       "$ref": "#/components/schemas/ModelsForwarderAmqpV2"
       }
      ],
      "type": "object"
