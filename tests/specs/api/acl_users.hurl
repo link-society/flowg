@@ -4,10 +4,10 @@ HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 jsonpath "$.users" count == 2
-jsonpath "$.users[*].name" includes "root"
-jsonpath "$.users[*].name" includes "guest"
+jsonpath "$.users[*].name" contains "root"
+jsonpath "$.users[*].name" contains "guest"
 jsonpath "$.users[?(@.name == 'root')].roles[*]" count == 1
-jsonpath "$..users[?(@.name == 'root')].roles[*]" includes "admin"
+jsonpath "$..users[?(@.name == 'root')].roles[*]" contains "admin"
 jsonpath "$.users[?(@.name == 'guest')].roles[*]" count == 0
 
 PUT http://localhost:5080/api/v1/users/test
@@ -27,7 +27,7 @@ HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 jsonpath "$.users" count == 3
-jsonpath "$.users[*].name" includes "test"
+jsonpath "$.users[*].name" contains "test"
 
 DELETE http://localhost:5080/api/v1/users/test
 Authorization: Bearer {{admin_token}}
@@ -39,4 +39,4 @@ HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 jsonpath "$.users" count == 2
-jsonpath "$.users[*].name" not includes "test"
+jsonpath "$.users[*].name" not contains "test"

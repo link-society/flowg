@@ -20,7 +20,7 @@ HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 jsonpath "$.token_uuids" count == 2
-jsonpath "$.token_uuids" includes "{{new_admin_token_uuid}}"
+jsonpath "$.token_uuids" contains "{{new_admin_token_uuid}}"
 
 GET http://localhost:5080/api/v1/auth/whoami
 Authorization: Bearer {{new_admin_token}}
