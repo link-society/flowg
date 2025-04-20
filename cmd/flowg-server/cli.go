@@ -93,7 +93,7 @@ func (opts *options) defineCliOptions(cmd *cobra.Command) {
 		&opts.clusterNodeID,
 		"cluster-node-id",
 		defaultClusterNodeID,
-		"Unique identifier for this node in the cluster",
+		"Unique identifier for this node in the cluster (leave empty to generate one)",
 	)
 
 	cmd.Flags().StringVar(

@@ -10,6 +10,7 @@ import (
 	"net/url"
 
 	"link-society.com/flowg/internal/app/server"
+	"link-society.com/flowg/internal/utils/rnd"
 )
 
 func newServerConfig(opts *options) (server.Options, error) {
@@ -39,6 +40,10 @@ func newServerConfig(opts *options) (server.Options, error) {
 		mgmtTlsConfig = &tls.Config{
 			Certificates: []tls.Certificate{cert},
 		}
+	}
+
+	if opts.clusterNodeID == "" {
+		opts.clusterNodeID = rnd.RandomName()
 	}
 
 	var clusterJoinEndpointUrl *url.URL

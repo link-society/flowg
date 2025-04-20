@@ -5,8 +5,6 @@ import (
 
 	"strconv"
 	"strings"
-
-	"link-society.com/flowg/internal/utils/rnd"
 )
 
 var (
@@ -22,7 +20,7 @@ var (
 	defaultMgmtTlsCert     = getEnvString("FLOWG_MGMT_TLS_CERT", "")
 	defaultMgmtTlsCertKey  = getEnvString("FLOWG_MGMT_TLS_KEY", "")
 
-	defaultClusterNodeID       = getEnvString("FLOWG_CLUSTER_NODE_ID", rnd.RandomName())
+	defaultClusterNodeID       = getEnvString("FLOWG_CLUSTER_NODE_ID", "")
 	defaultClusterJoinNodeID   = getEnvString("FLOWG_CLUSTER_JOIN_NODE_ID", "")
 	defaultClusterJoinEndpoint = getEnvString("FLOWG_CLUSTER_JOIN_ENDPOINT", "")
 	defaultClusterCookie       = getEnvString("FLOWG_CLUSTER_COOKIE", "")
