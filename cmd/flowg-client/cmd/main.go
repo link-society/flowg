@@ -59,6 +59,7 @@ func NewRootCommand() *cobra.Command {
 		NewPipelineCommand(),
 		NewTransformerCommand(),
 		NewAclCommand(),
+		NewTokenCommand(),
 		NewAdminCommand(),
 	)
 
