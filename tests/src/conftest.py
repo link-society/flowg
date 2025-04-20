@@ -130,12 +130,12 @@ def flowg_node0_container(
         wait_for_healthcheck(container)
 
     except RuntimeError as err:
-        teardown_container(container)
+        teardown_container(container, report_dir)
         pytest.fail(f"{err}", pytrace=False)
 
     yield
 
-    teardown_container(container)
+    teardown_container(container, report_dir)
 
 
 @pytest.fixture(scope='module')
@@ -180,12 +180,12 @@ def flowg_node1_container(
         wait_for_healthcheck(container)
 
     except RuntimeError as err:
-        teardown_container(container)
+        teardown_container(container, report_dir)
         pytest.fail(f"{err}", pytrace=False)
 
     yield
 
-    teardown_container(container)
+    teardown_container(container, report_dir)
 
 
 @pytest.fixture(scope='module')
@@ -230,12 +230,12 @@ def flowg_node2_container(
         wait_for_healthcheck(container)
 
     except RuntimeError as err:
-        teardown_container(container)
+        teardown_container(container, report_dir)
         pytest.fail(f"{err}", pytrace=False)
 
     yield
 
-    teardown_container(container)
+    teardown_container(container, report_dir)
 
 
 @pytest.fixture(scope='module')
@@ -298,15 +298,12 @@ def wait_for_healthcheck(container):
             break
 
         elif container.health == "unhealthy":
-            raise RuntimeError(
-                f"Node {container.name} was not healthy",
-                pytrace=False,
-            )
+            raise RuntimeError(f"Node {container.name} was not healthy")
 
         sleep(1)
 
 
-def teardown_container(container):
+def teardown_container(container, report_dir):
     print(f"Stopping container: {container.name}")
     container.stop()
 
