@@ -1,5 +1,6 @@
 import { ForwarderConfigModel, ForwarderModel } from '@/lib/models/forwarder'
 
+import { AmqpForwarderEditor } from './amqp'
 import { DatadogForwarderEditor } from './datadog'
 import { HttpForwarderEditor } from './http'
 import { SyslogForwarderEditor } from './syslog'
@@ -40,6 +41,14 @@ export const ForwarderEditor = ({
     case 'datadog':
       return (
         <DatadogForwarderEditor
+          config={forwarder.config}
+          onConfigChange={onConfigChange}
+        />
+      )
+
+    case 'amqp':
+      return (
+        <AmqpForwarderEditor
           config={forwarder.config}
           onConfigChange={onConfigChange}
         />
