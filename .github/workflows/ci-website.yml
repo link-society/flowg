@@ -19,14 +19,23 @@ jobs:
         with:
           ref: "${{ github.event.pull_request.head.sha }}"
 
+      - name: setup@go
+        uses: actions/setup-go@v5
+
       - name: setup@node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
+      - name: install@go
+        run: go get ./...
+
       - name: install@node
         working-directory: ./website
         run: npm install
+
+      - name: gen@cli
+        run: go run scripts/gen_cli_doc.go
 
       - name: build@node
         working-directory: ./website
