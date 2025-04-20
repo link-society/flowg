@@ -1411,6 +1411,75 @@
     }
    },
    "/api/v1/roles/{role}": {
+    "get": {
+     "tags": [
+      "acls"
+     ],
+     "summary": "Get Role",
+     "description": "Get Role",
+     "operationId": "get_role",
+     "parameters": [
+      {
+       "name": "role",
+       "in": "path",
+       "required": true,
+       "schema": {
+        "minLength": 1,
+        "type": "string"
+       }
+      }
+     ],
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiGetRoleResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "404": {
+       "description": "Not Found",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    },
     "put": {
      "tags": [
       "acls"
@@ -2778,6 +2847,75 @@
     }
    },
    "/api/v1/users/{user}": {
+    "get": {
+     "tags": [
+      "acls"
+     ],
+     "summary": "Get User",
+     "description": "Get User",
+     "operationId": "get_user",
+     "parameters": [
+      {
+       "name": "user",
+       "in": "path",
+       "required": true,
+       "schema": {
+        "minLength": 1,
+        "type": "string"
+       }
+      }
+     ],
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiGetUserResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "404": {
+       "description": "Not Found",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    },
     "put": {
      "tags": [
       "acls"
@@ -2881,6 +3019,84 @@
         "application/json": {
          "schema": {
           "$ref": "#/components/schemas/ApiDeleteUserResponse"
+         }
+        }
+       }
+      },
+      "401": {
+       "description": "Unauthorized",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "403": {
+       "description": "Forbidden",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/RestErrResponse"
+         }
+        }
+       }
+      }
+     },
+     "security": [
+      {
+       "jwtAuth": []
+      },
+      {
+       "patAuth": []
+      }
+     ]
+    },
+    "patch": {
+     "tags": [
+      "acls"
+     ],
+     "summary": "Patch User Roles",
+     "description": "Patch User Roles",
+     "operationId": "patch_user_roles",
+     "parameters": [
+      {
+       "name": "user",
+       "in": "path",
+       "required": true,
+       "schema": {
+        "minLength": 1,
+        "type": "string"
+       }
+      }
+     ],
+     "requestBody": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ApiPatchUserRolesRequest"
+        }
+       }
+      }
+     },
+     "responses": {
+      "200": {
+       "description": "OK",
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/ApiPatchUserRolesResponse"
          }
         }
        }
@@ -3048,6 +3264,17 @@
      },
      "type": "object"
     },
+    "ApiGetRoleResponse": {
+     "properties": {
+      "role": {
+       "$ref": "#/components/schemas/ModelsRole"
+      },
+      "success": {
+       "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
     "ApiGetStreamResponse": {
      "properties": {
       "config": {
@@ -3066,6 +3293,17 @@
       },
       "success": {
        "type": "boolean"
+      }
+     },
+     "type": "object"
+    },
+    "ApiGetUserResponse": {
+     "properties": {
+      "success": {
+       "type": "boolean"
+      },
+      "user": {
+       "$ref": "#/components/schemas/ModelsUser"
       }
      },
      "type": "object"
@@ -3285,6 +3523,28 @@
       },
       "token": {
        "type": "string"
+      }
+     },
+     "type": "object"
+    },
+    "ApiPatchUserRolesRequest": {
+     "properties": {
+      "roles": {
+       "items": {
+        "type": "string"
+       },
+       "type": [
+        "array",
+        "null"
+       ]
+      }
+     },
+     "type": "object"
+    },
+    "ApiPatchUserRolesResponse": {
+     "properties": {
+      "success": {
+       "type": "boolean"
       }
      },
      "type": "object"
