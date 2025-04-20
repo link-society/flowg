@@ -1,0 +1,64 @@
+---
+sidebar_position: 6
+---
+
+# Forwarding logs to RabbitMQ
+
+## Introduction
+
+[RabbitMQ](https://www.rabbitmq.com/) is a reliable and mature messaging and
+streaming broker.
+
+It supports the [AMQP 0-9-1](https://www.rabbitmq.com/amqp-0-9-1-protocol)
+protocol, which FlowG can use to send logs to RabbitMQ.
+
+## Setting up RabbitMQ
+
+You need to declare an *exchange* to receive logs. You can do this using the
+[Management CLI](https://www.rabbitmq.com/docs/management-cli):
+
+```bash
+rabbitmqadmin --vhost flowg declare exchange \
+  --name "flowg.default" \
+  --type "topic" \
+  --durable "true"
+```
+
+## Setting up the FlowG pipeline
+
+import ForwarderAmqpUrl from '@site/static/img/guides/rabbitmq/forwarder-amqp.png'
+import PipelineWithAmqpUrl from '@site/static/img/guides/rabbitmq/pipeline-with-amqp.png'
+
+
+First, let's create an "AMQP Forwarder" named `rabbitmq`, with the following
+configuration:
+
+| Property | Value | Comment |
+| --- | --- | --- |
+| URL | `amqp://user:password@1.2.3.4:5672/flowg` | Adjust the URL according to your setup, the path correspond to the Virtual Host in which we created the exchange above |
+| Exchange | `flowg.default` | This is the exchange we created above |
+| Routing Key | `a.b.c` | You can use any value you want actually |
+
+<div
+  style={{
+    textAlign: 'center',
+    border: '1px solid #CCCCCC',
+    margin: '2rem 0',
+    padding: '0.25rem',
+  }}
+>
+  <img src={ForwarderAmqpUrl} alt="AMQP Forwarder Configuration" />
+</div>
+
+Then, create a pipeline that forwards logs to the `rabbitmq` forwarder:
+
+<div style={{ textAlign: 'center' }}>
+  <img src={PipelineWithAmqpUrl} alt="Pipeline with AMQP Forwarder" />
+</div>
+
+And that's it!
+
+## What's next?
+
+Messages will be sent with the content-type `application/json`, you can then
+consume them using any AMQP client.
