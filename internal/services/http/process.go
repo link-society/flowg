@@ -8,12 +8,12 @@ import (
 	"time"
 
 	"net"
+	"net/http"
 	gohttp "net/http"
 
 	"github.com/vladopajic/go-actor/actor"
 
 	"link-society.com/flowg/api"
-	"link-society.com/flowg/health"
 	"link-society.com/flowg/web"
 
 	"link-society.com/flowg/internal/app/logging"
@@ -39,12 +39,16 @@ func (h *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 		PipelineRunner: h.opts.PipelineRunner,
 	})
 	webHandler := web.NewHandler()
-	healthHandler := health.NewHandler()
 
 	rootHandler := gohttp.NewServeMux()
 	rootHandler.Handle("/api/", apiHandler)
 	rootHandler.Handle("/web/", webHandler)
-	rootHandler.Handle("/health", healthHandler)
+	rootHandler.HandleFunc(
+		"/health",
+		func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("OK\r\n"))
+		})
 
 	rootHandler.HandleFunc(
 		"GET /{$}",
