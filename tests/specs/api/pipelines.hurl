@@ -81,8 +81,8 @@ HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 jsonpath "$.pipelines" count == 2
-jsonpath "$.pipelines" includes "default"
-jsonpath "$.pipelines" includes "test"
+jsonpath "$.pipelines" contains "default"
+jsonpath "$.pipelines" contains "test"
 
 POST http://localhost:5080/api/v1/pipelines/test/logs/struct
 Authorization: Bearer {{admin_token}}
@@ -102,7 +102,7 @@ jsonpath "$.processed_count" == 1
 
 GET http://localhost:5080/api/v1/streams/test/logs
 Authorization: Bearer {{admin_token}}
-[QueryStringParams]
+[Query]
 from: {{timewindow_begin}}
 to: {{timewindow_end}}
 
@@ -134,4 +134,4 @@ Authorization: Bearer {{admin_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true
-jsonpath "$.pipelines" not includes "test"
+jsonpath "$.pipelines" not contains "test"
