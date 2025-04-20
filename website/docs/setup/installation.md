@@ -33,7 +33,7 @@ flowg-server \
 > **NB:** All the options are optional and default to the values shown above.
 
 For more informations about the command line interface, please consult
-[this document](https://github.com/link-society/flowg/blob/main/docs/cli.md).
+[this document](/docs/cli/flowg-server).
 
 ### From Sources
 
