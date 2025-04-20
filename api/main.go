@@ -197,8 +197,6 @@ func NewHandler(deps *Dependencies) http.Handler {
 		r.Post("/api/v1/restore/auth", ctrl.RestoreAuthUsecase())
 		r.Post("/api/v1/restore/logs", ctrl.RestoreLogsUsecase())
 		r.Post("/api/v1/restore/config", ctrl.RestoreConfigUsecase())
-
-		r.Get("/health", ctrl.HealthUsecase())
 	})
 
 	return service
