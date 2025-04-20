@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"math/rand/v2"
+	"net"
 	"net/url"
 	"strconv"
 	"time"
@@ -51,14 +52,15 @@ func (h *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 	// Set the JoinNode in ClusterJoinNode
 	err := h.setJoinNodes(ctx)
 	if err != nil {
+		/* Log the error but don't terminate the process
+		because the first node that starts up in the cluster
+		will never find any other nodes */
 		h.logger.WarnContext(
 			ctx,
 			"failed to get service nodes from consul",
 			slog.Any("error", err),
 		)
 	}
-
-	// Form cluster using memberlist
 
 	return proctree.Continue()
 }
@@ -105,12 +107,34 @@ func (h *procHandler) registerNode(ctx actor.Context) error {
 		)
 		return err
 	}
-	var port int
-	port, err = strconv.Atoi(localEndpoint.Port())
+	var healthCheckHttpPort int
+	healthCheckHttpPort, err = strconv.Atoi(localEndpoint.Port())
 	if err != nil {
 		h.logger.ErrorContext(
 			ctx,
-			"error converting port from string to int",
+			"failed to convert health check http port from string to int",
+			slog.Any("error", err),
+		)
+		return err
+	}
+
+	var mgmtPortString string
+	_, mgmtPortString, err = net.SplitHostPort(h.opts.MgmtBindAddress)
+	if err != nil {
+		h.logger.ErrorContext(
+			ctx,
+			"failed to split manegemnt bind address",
+			slog.Any("error", err),
+		)
+		return err
+	}
+
+	var mgmtPort int
+	mgmtPort, err = strconv.Atoi(mgmtPortString)
+	if err != nil {
+		h.logger.ErrorContext(
+			ctx,
+			"failed to convert management port from string to int",
 			slog.Any("error", err),
 		)
 		return err
@@ -120,11 +144,11 @@ func (h *procHandler) registerNode(ctx actor.Context) error {
 	registration := &api.AgentServiceRegistration{
 		ID:      h.opts.NodeId,
 		Name:    h.opts.ServiceName,
-		Address: localEndpoint.Host,
-		Port:    port,
+		Address: localEndpoint.Hostname(),
+		Port:    mgmtPort,
 		Check: &api.AgentServiceCheck{
 			Interval: healthCheckInterval.String(),
-			HTTP:     fmt.Sprintf("%s://%s:%d%s", localEndpoint.Scheme, localEndpoint.Host, port, healthCheckPath),
+			HTTP:     fmt.Sprintf("%s://%s:%d%s", localEndpoint.Scheme, localEndpoint.Hostname(), healthCheckHttpPort, healthCheckPath),
 			Timeout:  healthCheckTimeout.String(),
 		},
 	}
@@ -150,7 +174,7 @@ func (h *procHandler) setJoinNodes(ctx actor.Context) error {
 	delay := 100 * time.Millisecond
 
 	for retryCount <= getNodesMaxRetries {
-		nodes, _, err := h.consulClient.Health().Service(h.opts.ServiceName, "", false, nil)
+		serviceEntries, _, err := h.consulClient.Health().Service(h.opts.ServiceName, "", false, nil)
 		if err != nil {
 			h.logger.ErrorContext(
 				ctx,
@@ -160,12 +184,12 @@ func (h *procHandler) setJoinNodes(ctx actor.Context) error {
 			return err
 		}
 
-		for _, node := range nodes {
-			if node.Node.ID != h.opts.NodeId {
-				h.opts.ClusterJoinNode.JoinNodeID = node.Node.ID
-				h.opts.ClusterJoinNode.JoinNodeEndpoint, err = url.Parse(node.Node.Address)
-				if err != nil {
-					return fmt.Errorf("failed to parse join node address")
+		for _, serviceEntry := range serviceEntries {
+			if serviceEntry.Service.ID != h.opts.NodeId {
+				h.opts.ClusterJoinNode.JoinNodeID = serviceEntry.Service.ID
+				h.opts.ClusterJoinNode.JoinNodeEndpoint = &url.URL{
+					Scheme: "http",
+					Host:   net.JoinHostPort(serviceEntry.Service.Address, strconv.Itoa(serviceEntry.Service.Port)),
 				}
 				return nil
 			}
@@ -175,8 +199,6 @@ func (h *procHandler) setJoinNodes(ctx actor.Context) error {
 		if retryCount <= getNodesMaxRetries {
 			h.logger.InfoContext(ctx, "did not find other nodes, will try again with a delay")
 			time.Sleep(delay)
-			// Exponential backoff
-			delay = delay * 2
 			// Add jitter to the delay
 			delay += time.Duration(rand.IntN(int(delay / 4)))
 		}

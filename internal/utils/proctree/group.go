@@ -14,7 +14,7 @@ type ProcessGroupOptions struct {
 
 func DefaultProcessGroupOptions() ProcessGroupOptions {
 	return ProcessGroupOptions{
-		InitTimeout: 5 * time.Second,
+		InitTimeout: 1 * time.Minute, // Automatic cluster formation may not be possible in default 5 seconds timeout
 		JoinTimeout: 5 * time.Second,
 	}
 }
