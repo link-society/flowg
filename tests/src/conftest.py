@@ -2,8 +2,8 @@ import pytest
 
 from pathlib import Path
 from shutil import rmtree
+from time import sleep
 
-from tenacity import retry, stop_after_attempt, wait_fixed
 import requests
 import docker
 
@@ -124,21 +124,18 @@ def flowg_node0_container(
         },
         detach=True,
     )
-    print("Waiting for healthcheck: test-flowg-node0")
-    wait_for_healthcheck("test-flowg-node0", "http://localhost:9113/health")
+
+    try:
+        print("Waiting for healthcheck: test-flowg-node0")
+        wait_for_healthcheck(container)
+
+    except RuntimeError as err:
+        teardown_container(container)
+        pytest.fail(f"{err}", pytrace=False)
 
     yield
 
-    print("Stopping container: test-flowg-node0")
-    container.stop()
-
-    print("Writing logs: test-flowg-node0")
-    with open(report_dir / "docker-node0.log", "wb") as f:
-        for data in container.logs(stream=True):
-            f.write(data)
-
-    print("Removing container: test-flowg-node0")
-    container.remove(force=True)
+    teardown_container(container)
 
 
 @pytest.fixture(scope='module')
@@ -177,21 +174,18 @@ def flowg_node1_container(
         },
         detach=True,
     )
-    print("Waiting for healthcheck: test-flowg-node1")
-    wait_for_healthcheck("test-flowg-node1", "http://localhost:9114/health")
+
+    try:
+        print("Waiting for healthcheck: test-flowg-node1")
+        wait_for_healthcheck(container)
+
+    except RuntimeError as err:
+        teardown_container(container)
+        pytest.fail(f"{err}", pytrace=False)
 
     yield
 
-    print("Stopping container: test-flowg-node1")
-    container.stop()
-
-    print("Writing logs: test-flowg-node1")
-    with open(report_dir / "docker-node1.log", "wb") as f:
-        for data in container.logs(stream=True):
-            f.write(data)
-
-    print("Removing container: test-flowg-node1")
-    container.remove(force=True)
+    teardown_container(container)
 
 
 @pytest.fixture(scope='module')
@@ -230,21 +224,18 @@ def flowg_node2_container(
         },
         detach=True,
     )
-    print("Waiting for healthcheck: test-flowg-node2")
-    wait_for_healthcheck("test-flowg-node2", "http://localhost:9115/health")
+
+    try:
+        print("Waiting for healthcheck: test-flowg-node2")
+        wait_for_healthcheck(container)
+
+    except RuntimeError as err:
+        teardown_container(container)
+        pytest.fail(f"{err}", pytrace=False)
 
     yield
 
-    print("Stopping container: test-flowg-node2")
-    container.stop()
-
-    print("Writing logs: test-flowg-node2")
-    with open(report_dir / "docker-node2.log", "wb") as f:
-        for data in container.logs(stream=True):
-            f.write(data)
-
-    print("Removing container: test-flowg-node2")
-    container.remove(force=True)
+    teardown_container(container)
 
 
 @pytest.fixture(scope='module')
@@ -299,20 +290,33 @@ def flowg_guest_token(flowg_admin_token):
     return data["token"]
 
 
-def wait_for_healthcheck(nodename, endpoint):
-    @retry(
-        stop=stop_after_attempt(5),
-        wait=wait_fixed(1),
-    )
-    def impl():
-        resp = requests.get(endpoint)
-        resp.raise_for_status()
+def wait_for_healthcheck(container):
+    while True:
+        container.reload()
 
-    try:
-        impl()
+        if container.health == "healthy":
+            break
 
-    except Exception:
-        pytest.fail(f"Node {nodename} was not healthy", pytrace=False)
+        elif container.health == "unhealthy":
+            raise RuntimeError(
+                f"Node {container.name} was not healthy",
+                pytrace=False,
+            )
+
+        sleep(1)
+
+
+def teardown_container(container):
+    print(f"Stopping container: {container.name}")
+    container.stop()
+
+    print(f"Writing logs: {container.name}")
+    with open(report_dir / f"docker-{container.name}.log", "wb") as f:
+        for data in container.logs(stream=True):
+            f.write(data)
+
+    print(f"Removing container: {container.name}")
+    container.remove(force=True)
 
 
 def pytest_report_teststatus(report, config):
