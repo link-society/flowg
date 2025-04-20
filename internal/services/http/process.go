@@ -13,6 +13,7 @@ import (
 	"github.com/vladopajic/go-actor/actor"
 
 	"link-society.com/flowg/api"
+	"link-society.com/flowg/health"
 	"link-society.com/flowg/web"
 
 	"link-society.com/flowg/internal/app/logging"
@@ -38,10 +39,12 @@ func (h *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 		PipelineRunner: h.opts.PipelineRunner,
 	})
 	webHandler := web.NewHandler()
+	healthHandler := health.NewHandler()
 
 	rootHandler := gohttp.NewServeMux()
 	rootHandler.Handle("/api/", apiHandler)
 	rootHandler.Handle("/web/", webHandler)
+	rootHandler.Handle("/health", healthHandler)
 
 	rootHandler.HandleFunc(
 		"GET /{$}",
