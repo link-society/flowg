@@ -60,7 +60,7 @@ tasks:
   doc:
     desc: "Generate documentation"
     cmds:
-      - sh scripts/gen_cli_doc.sh
+      - go run scripts/gen_cli_doc.go
 
   www:
     desc: "Serve website"
