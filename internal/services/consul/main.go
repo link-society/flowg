@@ -47,8 +47,6 @@ func NewConsulService(opts *ConsulServiceOptions) proctree.Process {
 				}
 
 				host = ip
-			} else if host == "" {
-				host = "localhost"
 			}
 
 			localEndpoint := &url.URL{
