@@ -21,32 +21,25 @@ jobs:
 
       - name: setup@go
         uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
 
       - name: setup@node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: install@go
-        run: |
-          go get ./...
-          go generate ./...
+      - name: setup@rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
 
-      - name: install@node
+      - name: setup@task
+        uses: arduino/setup-task@v2
+
+      - name: gen@clidoc
+        run: task build doc
+
+      - name: build@website
         working-directory: ./website
-        run: npm install
-
-      - name: gen@web
-        working-directory: ./web/app
         run: |
           npm i
           npm run build
-          mkdir -p ../public
-          cp -r ./dist/* ../public/
-
-      - name: gen@cli
-        run: go run scripts/gen_cli_doc.go
-
-      - name: build@node
-        working-directory: ./website
-        run: npm run build
