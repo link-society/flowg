@@ -16,6 +16,7 @@ type ForwarderConfigV2 struct {
 	Http    *ForwarderHttpV2    `json:"-"`
 	Syslog  *ForwarderSyslogV2  `json:"-"`
 	Datadog *ForwarderDatadogV2 `json:"-"`
+	Amqp    *ForwarderAmqpV2    `json:"-"`
 }
 
 func (ForwarderConfigV2) JSONSchemaOneOf() []any {
@@ -23,6 +24,7 @@ func (ForwarderConfigV2) JSONSchemaOneOf() []any {
 		ForwarderHttpV2{},
 		ForwarderSyslogV2{},
 		ForwarderDatadogV2{},
+		ForwarderAmqpV2{},
 	}
 }
 
@@ -36,6 +38,9 @@ func (f *ForwarderV2) Call(ctx context.Context, record *LogRecord) error {
 
 	case f.Config.Datadog != nil:
 		return f.Config.Datadog.call(ctx, record)
+
+	case f.Config.Amqp != nil:
+		return f.Config.Amqp.call(ctx, record)
 
 	default:
 		return fmt.Errorf("unsupported forwarder type")
@@ -52,6 +57,9 @@ func (cfg *ForwarderConfigV2) MarshalJSON() ([]byte, error) {
 
 	case cfg.Datadog != nil:
 		return json.Marshal(&cfg.Datadog)
+
+	case cfg.Amqp != nil:
+		return json.Marshal(&cfg.Amqp)
 
 	default:
 		return nil, fmt.Errorf("unsupported forwarder type")
@@ -76,6 +84,9 @@ func (cfg *ForwarderConfigV2) UnmarshalJSON(data []byte) error {
 
 	case "datadog":
 		return json.Unmarshal(data, &cfg.Datadog)
+
+	case "amqp":
+		return json.Unmarshal(data, &cfg.Amqp)
 
 	default:
 		return fmt.Errorf("unsupported forwarder type: %s", typeInfo.Type)
