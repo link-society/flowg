@@ -189,7 +189,7 @@ func (h *procHandler) setJoinNodes(ctx actor.Context) error {
 				h.opts.ClusterJoinNode.JoinNodeID = serviceEntry.Service.ID
 				h.opts.ClusterJoinNode.JoinNodeEndpoint = &url.URL{
 					Scheme: "http",
-					Host:   net.JoinHostPort(serviceEntry.Service.Address, strconv.Itoa(serviceEntry.Service.Port)),
+					Host:   net.JoinHostPort(serviceEntry.Service.ID, strconv.Itoa(serviceEntry.Service.Port)),
 				}
 				return nil
 			}

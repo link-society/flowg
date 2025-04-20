@@ -36,7 +36,7 @@ def docker_client():
 
     print("Cleaning up old containers")
     for container in client.containers.list(all=True):
-        if container.name.startswith("test-flowg-node"):
+        if container.name.startswith("test-flowg-node") or container.name.startswith("consul"):
             container.remove(force=True)
 
     print("Cleaning up old volumes")

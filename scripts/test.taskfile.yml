@@ -26,6 +26,15 @@ tasks:
       - pdm run pytest
     env:
       FLOWG_TEST_SUITES: web
+  
+  "e2e:consul":
+    desc: "Run Consul end-to-end tests"
+    dir: ./tests
+    cmds:
+      - pdm install
+      - pdm run pytest
+    env:
+      FLOWG_TEST_SUITES: consul
 
   bench:
     desc: "Run benchmark"
