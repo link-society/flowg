@@ -4,4 +4,10 @@ tasks:
   "gen:cli":
     desc: "Generate CLI documentation"
     cmds:
-      - go run scripts/gen_cli_doc.go
+      - go run scripts/gen/cli/main.go
+
+  "gen:openapi":
+    desc: "Generate OpenAPI documentation"
+    cmds:
+      - go run scripts/gen/openapi/main.go
+

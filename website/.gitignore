@@ -8,6 +8,7 @@
 .docusaurus
 .cache-loader
 docs/cli/**/*.md
+src/openapi.json
 
 # Misc
 .DS_Store
