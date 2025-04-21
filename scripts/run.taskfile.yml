@@ -1,0 +1,45 @@
+version: '3'
+
+tasks:
+  node0:
+    desc: "Run the project (node0)"
+    cmds:
+      - ./bin/flowg-server
+    env:
+      FLOWG_SECRET_KEY: "s3cr3!"
+      FLOWG_CLUSTER_NODE_ID: "flowg-node0"
+      FLOWG_AUTH_DIR: "./data/node0/auth"
+      FLOWG_CONFIG_DIR: "./data/node0/config"
+      FLOWG_LOG_DIR: "./data/node0/logs"
+
+  node1:
+    desc: "Run the project (node1)"
+    cmds:
+      - ./bin/flowg-server
+    env:
+      FLOWG_SECRET_KEY: "s3cr3!"
+      FLOWG_CLUSTER_NODE_ID: "flowg-node1"
+      FLOWG_CLUSTER_JOIN_NODE_ID: "flowg-node0"
+      FLOWG_CLUSTER_JOIN_ENDPOINT: "http://localhost:9113"
+      FLOWG_HTTP_BIND_ADDRESS: ":5081"
+      FLOWG_MGMT_BIND_ADDRESS: ":9114"
+      FLOWG_SYSLOG_BIND_ADDRESS: ":5515"
+      FLOWG_AUTH_DIR: "./data/node1/auth"
+      FLOWG_CONFIG_DIR: "./data/node1/config"
+      FLOWG_LOG_DIR: "./data/node1/logs"
+
+  node2:
+    desc: "Run the project (node2)"
+    cmds:
+      - ./bin/flowg-server
+    env:
+      FLOWG_SECRET_KEY: "s3cr3!"
+      FLOWG_CLUSTER_NODE_ID: "flowg-node2"
+      FLOWG_CLUSTER_JOIN_NODE_ID: "flowg-node1"
+      FLOWG_CLUSTER_JOIN_ENDPOINT: "http://localhost:9114"
+      FLOWG_HTTP_BIND_ADDRESS: ":5082"
+      FLOWG_MGMT_BIND_ADDRESS: ":9115"
+      FLOWG_SYSLOG_BIND_ADDRESS: ":5516"
+      FLOWG_AUTH_DIR: "./data/node2/auth"
+      FLOWG_CONFIG_DIR: "./data/node2/config"
+      FLOWG_LOG_DIR: "./data/node2/logs"

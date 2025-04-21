@@ -1,73 +1,19 @@
 version: '3'
 
 includes:
-  test: scripts/Taskfile.test.yml
-  backend: scripts/Taskfile.backend.yml
-  frontend: scripts/Taskfile.frontend.yml
-  docker: scripts/Taskfile.docker.yml
-  k8s: scripts/Taskfile.k8s.yml
+  build: scripts/build.taskfile.yml
+  test: scripts/test.taskfile.yml
+  run: scripts/run.taskfile.yml
+  docker: scripts/docker.taskfile.yml
+  k8s: scripts/k8s.taskfile.yml
+  doc: scripts/doc.taskfile.yml
+  www: scripts/www.taskfile.yml
 
 tasks:
-  build:
-    desc: "Build the project"
+  default:
+    desc: "Print help"
     cmds:
-      - task: "frontend:build"
-      - task: "backend:build"
-
-  "run:node0":
-    desc: "Run the project"
-    cmds:
-      - ./bin/flowg-server
-    env:
-      FLOWG_SECRET_KEY: "s3cr3!"
-      FLOWG_CLUSTER_NODE_ID: "flowg-node0"
-      FLOWG_AUTH_DIR: "./data/node0/auth"
-      FLOWG_CONFIG_DIR: "./data/node0/config"
-      FLOWG_LOG_DIR: "./data/node0/logs"
-
-  "run:node1":
-    desc: "Run the project"
-    cmds:
-      - ./bin/flowg-server
-    env:
-      FLOWG_SECRET_KEY: "s3cr3!"
-      FLOWG_CLUSTER_NODE_ID: "flowg-node1"
-      FLOWG_CLUSTER_JOIN_NODE_ID: "flowg-node0"
-      FLOWG_CLUSTER_JOIN_ENDPOINT: "http://localhost:9113"
-      FLOWG_HTTP_BIND_ADDRESS: ":5081"
-      FLOWG_MGMT_BIND_ADDRESS: ":9114"
-      FLOWG_SYSLOG_BIND_ADDRESS: ":5515"
-      FLOWG_AUTH_DIR: "./data/node1/auth"
-      FLOWG_CONFIG_DIR: "./data/node1/config"
-      FLOWG_LOG_DIR: "./data/node1/logs"
-
-  "run:node2":
-    desc: "Run the project"
-    cmds:
-      - ./bin/flowg-server
-    env:
-      FLOWG_SECRET_KEY: "s3cr3!"
-      FLOWG_CLUSTER_NODE_ID: "flowg-node2"
-      FLOWG_CLUSTER_JOIN_NODE_ID: "flowg-node1"
-      FLOWG_CLUSTER_JOIN_ENDPOINT: "http://localhost:9114"
-      FLOWG_HTTP_BIND_ADDRESS: ":5082"
-      FLOWG_MGMT_BIND_ADDRESS: ":9115"
-      FLOWG_SYSLOG_BIND_ADDRESS: ":5516"
-      FLOWG_AUTH_DIR: "./data/node2/auth"
-      FLOWG_CONFIG_DIR: "./data/node2/config"
-      FLOWG_LOG_DIR: "./data/node2/logs"
-
-  doc:
-    desc: "Generate documentation"
-    cmds:
-      - go run scripts/gen_cli_doc.go
-
-  www:
-    desc: "Serve website"
-    dir: ./website
-    cmds:
-      - npm i
-      - npm start
+      - task -a
 
   release:
     desc: "Update version number"

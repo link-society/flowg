@@ -1,0 +1,16 @@
+version: '3'
+
+tasks:
+  serve:
+    desc: "Serve website"
+    dir: ./website
+    cmds:
+      - npm i
+      - npm start
+
+  build:
+    desc: "Build website"
+    dir: ./website
+    cmds:
+      - npm i
+      - npm run build
