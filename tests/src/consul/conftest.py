@@ -3,9 +3,6 @@ import pytest
 from pathlib import Path
 from shutil import rmtree
 
-from tenacity import retry, stop_after_attempt, wait_fixed
-import requests
-
 @pytest.fixture(scope="module")
 def cache_dir():
     cache_dir = Path.cwd() / "cache" / "api"
@@ -213,17 +210,14 @@ def flowg_node2_container(
 def flowg_cluster(consul_container, flowg_node0_container, flowg_node1_container, flowg_node2_container):
     yield
 
-def wait_for_healthcheck(nodename, endpoint):
-    @retry(
-        stop=stop_after_attempt(5),
-        wait=wait_fixed(1),
-    )
-    def impl():
-        resp = requests.get(endpoint)
-        resp.raise_for_status()
+def wait_for_healthcheck(container):
+    while True:
+        container.reload()
 
-    try:
-        impl()
+        if container.health == "healthy":
+            break
 
-    except Exception:
-        pytest.fail(f"Node {nodename} was not healthy", pytrace=False)
+        elif container.health == "unhealthy":
+            raise RuntimeError(f"Node {container.name} was not healthy")
+
+        sleep(1)
