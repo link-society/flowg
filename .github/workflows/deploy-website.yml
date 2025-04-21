@@ -13,30 +13,11 @@ jobs:
       - name: checkout@scm
         uses: actions/checkout@v4
 
-      - name: setup@go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.24'
-
-      - name: setup@node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: setup@rust
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-
-      - name: setup@task
-        uses: arduino/setup-task@v2
-
-      - name: gen@clidoc
-        run: task build doc
+      - name: setup@buildchain
+        uses: ./.github/actions/setup-buildchain
 
       - name: build@website
-        working-directory: ./website
-        run: |
-          npm i
-          npm run build
+        run: task build:all doc:gen:cli www:build
 
       - name: upload@artifact
         uses: actions/upload-pages-artifact@v3

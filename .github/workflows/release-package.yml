@@ -77,46 +77,17 @@ jobs:
       - name: checkout@scm
         uses: actions/checkout@v4
 
-      - name: setup@go
-        uses: actions/setup-go@v5
+      - name: setup@buildchain
+        uses: ./.github/actions/setup-buildchain
         with:
-          go-version: "1.24"
+          rstarget: ${{ matrix.rstarget }}
 
-      - name: setup@node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 23
-
-      - name: setup@rust
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: 1.85.0
-          target: ${{ matrix.rstarget }}
-
-      - name: frontend@build
-        working-directory: ./web/app
-        run: |
-          npm i
-          NODE_ENV=production npm run build
-          mkdir -p ../public
-          cp -r ./dist/* ../public/
-
-      - name: backend-ffi-vrl@build
-        working-directory: ./internal/utils/ffi/vrl/rust-crate
-        run: cargo build --release
-
-      - name: backend-ffi-filterdsl@build
-        working-directory: ./internal/utils/ffi/filterdsl/rust-crate
-        run: cargo build --release
-
-      - name: backend@build
-        run: |
-          go get ./...
-          go generate ./...
-          go build -ldflags="-s -w" -o bin/ ./...
+      - name: build@binary
+        run: task build:all
         env:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
+          NODE_ENV: "production"
 
       - name: compress@binary
         if: matrix.goos != 'darwin'
