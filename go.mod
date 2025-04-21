@@ -7,7 +7,7 @@ toolchain go1.24.0
 require (
 	github.com/dgraph-io/badger/v4 v4.7.0
 	github.com/go-chi/chi/v5 v5.2.1
-	github.com/go-logfmt/logfmt v0.5.0
+	github.com/go-logfmt/logfmt v0.6.0
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/google/uuid v1.6.0
