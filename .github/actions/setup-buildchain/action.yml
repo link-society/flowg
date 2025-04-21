@@ -1,0 +1,28 @@
+---
+name: Setup FlowG build chain
+description: Installs Go, Rust, Node and Task
+inputs:
+  rstarget:
+    description: Rust target triple
+    required: false
+    default: x86_64-unknown-linux-gnu
+runs:
+  using: composite
+  steps:
+    - name: setup@go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.24'
+
+    - name: setup@node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '23'
+
+    - name: setup@rust
+      uses: actions-rust-lang/setup-rust-toolchain@v1
+      with:
+        target: ${{ inputs.rstarget }}
+
+    - name: setup@task
+      uses: arduino/setup-task@v2
