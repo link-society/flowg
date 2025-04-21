@@ -84,7 +84,7 @@ Rate:          3748.76 req/s
 
 ```bash
 go install github.com/go-task/task/v3/cmd/task@latest
-task build
+task build:all
 ```
 
 Then, start the server with:

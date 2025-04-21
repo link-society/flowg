@@ -55,7 +55,7 @@ Then run the build system:
 
 ```bash
 go install github.com/go-task/task/v3/cmd/task@latest
-task build
+task build:all
 sudo install -m 755 ./bin/flowg-server /usr/local/bin/flowg-server
 ```
 
