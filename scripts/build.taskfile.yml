@@ -11,13 +11,11 @@ tasks:
     desc: "Build frontend"
     dir: ./web/app
     cmds:
-      - npm i
+      - NODE_ENV=dev npm i
       - rm -rf ../public ./dist
       - npm run build
       - mkdir -p ../public
       - cp -r ./dist/* ../public/
-    env:
-      NODE_ENV: dev
 
   backend:
     desc: "Build backend"
