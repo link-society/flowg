@@ -20,7 +20,7 @@ require (
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.6
 	github.com/swaggest/openapi-go v0.2.57
-	github.com/swaggest/rest v0.2.73
+	github.com/swaggest/rest v0.2.74
 	github.com/swaggest/swgui v1.8.3
 	github.com/swaggest/usecase v1.3.1
 	github.com/vladopajic/go-actor v0.9.6
