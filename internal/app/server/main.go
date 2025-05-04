@@ -86,6 +86,7 @@ func NewServer(opts Options) proctree.Process {
 			ConsulUrl:       opts.ConsulUrl,
 			ClusterJoinNode: ClusterJoinNode,
 			MgmtBindAddress: opts.MgmtBindAddress,
+			MgmtTlsEnabled:  opts.MgmtTlsConfig != nil,
 		})
 		mgmtServer = mgmt.NewServer(&mgmt.ServerOptions{
 			BindAddress: opts.MgmtBindAddress,

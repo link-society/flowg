@@ -19,6 +19,7 @@ type ConsulServiceOptions struct {
 	ConsulUrl       string
 	ClusterJoinNode *cluster.ClusterJoinNode
 	MgmtBindAddress string
+	MgmtTlsEnabled  bool
 }
 
 func NewConsulService(opts *ConsulServiceOptions) proctree.Process {
