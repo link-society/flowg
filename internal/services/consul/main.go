@@ -7,7 +7,7 @@ import (
 	"net/url"
 
 	"github.com/hashicorp/go-sockaddr"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/cluster"
 	"link-society.com/flowg/internal/utils/proctree"
 )
 
@@ -16,7 +16,7 @@ type ConsulServiceOptions struct {
 	NodeId          string
 	ServiceName     string
 	ConsulUrl       string
-	ClusterJoinNode *models.ClusterJoinNode
+	ClusterJoinNode *cluster.ClusterJoinNode
 	MgmtBindAddress string
 }
 

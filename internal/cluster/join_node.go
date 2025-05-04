@@ -1,4 +1,4 @@
-package models
+package cluster
 
 import "net/url"
 

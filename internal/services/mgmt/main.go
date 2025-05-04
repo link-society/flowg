@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/go-sockaddr"
 
 	"link-society.com/flowg/internal/cluster"
-	"link-society.com/flowg/internal/models"
 
 	"link-society.com/flowg/internal/utils/proctree"
 )
@@ -23,7 +22,7 @@ type ServerOptions struct {
 	ClusterNodeID string
 	ClusterCookie string
 
-	ClusterJoinNode *models.ClusterJoinNode
+	ClusterJoinNode *cluster.ClusterJoinNode
 
 	AutomaticClusterFormation bool
 }

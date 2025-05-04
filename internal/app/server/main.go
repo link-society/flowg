@@ -6,7 +6,7 @@ import (
 
 	"crypto/tls"
 
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/cluster"
 	"link-society.com/flowg/internal/storage/auth"
 	"link-society.com/flowg/internal/storage/config"
 	"link-society.com/flowg/internal/storage/log"
@@ -51,7 +51,7 @@ func NewServer(opts Options) proctree.Process {
 	isAutomaticClusterFormation := isAutomaticClusterFormation(opts.ConsulUrl)
 
 	// ClusterJoinNode shared between ConsulService and ManagementServer
-	ClusterJoinNode := models.NewClusterJoinNode(isAutomaticClusterFormation, opts.ClusterJoinNodeID, opts.ClusterJoinEndpoint)
+	ClusterJoinNode := cluster.NewClusterJoinNode(isAutomaticClusterFormation, opts.ClusterJoinNodeID, opts.ClusterJoinEndpoint)
 
 	// Storage Layer
 	var (
