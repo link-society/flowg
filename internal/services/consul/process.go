@@ -140,6 +140,8 @@ func (h *procHandler) registerNode(ctx actor.Context) error {
 		return err
 	}
 
+	mgmtEndpoint := h.getManagementEndpointUrl(ctx, localEndpoint.Hostname(), mgmtPortString)
+
 	// Define the service registration
 	registration := &api.AgentServiceRegistration{
 		ID:      h.opts.NodeId,
@@ -150,6 +152,9 @@ func (h *procHandler) registerNode(ctx actor.Context) error {
 			Interval: healthCheckInterval.String(),
 			HTTP:     fmt.Sprintf("%s://%s:%d%s", localEndpoint.Scheme, localEndpoint.Hostname(), healthCheckHttpPort, healthCheckPath),
 			Timeout:  healthCheckTimeout.String(),
+		},
+		Meta: map[string]string{
+			"mgmtEndpoint": mgmtEndpoint,
 		},
 	}
 
@@ -187,8 +192,21 @@ func (h *procHandler) setJoinNodes(ctx actor.Context) error {
 		for _, serviceEntry := range serviceEntries {
 			if serviceEntry.Service.ID != h.opts.NodeId {
 				h.opts.ClusterJoinNode.JoinNodeID = serviceEntry.Service.ID
+
+				var mgmtEndpointUrl *url.URL
+				mgmtEndpointUrl, err = url.Parse(serviceEntry.Service.Meta["mgmtEndpoint"])
+
+				if err != nil {
+					h.logger.ErrorContext(
+						ctx,
+						"failed to parse management endpoint",
+						slog.Any("error", err),
+					)
+					return err
+				}
+
 				h.opts.ClusterJoinNode.JoinNodeEndpoint = &url.URL{
-					Scheme: "http",
+					Scheme: mgmtEndpointUrl.Scheme,
 					Host:   net.JoinHostPort(serviceEntry.Service.ID, strconv.Itoa(serviceEntry.Service.Port)),
 				}
 				return nil
@@ -205,4 +223,20 @@ func (h *procHandler) setJoinNodes(ctx actor.Context) error {
 	}
 
 	return fmt.Errorf("failed to find other nodes")
+}
+
+func (h *procHandler) getManagementEndpointUrl(ctx actor.Context, hostname, port string) string {
+	var mgmtEndpointUrl url.URL
+	if h.opts.MgmtTlsEnabled {
+		mgmtEndpointUrl = url.URL{
+			Scheme: "https",
+			Host:   net.JoinHostPort(hostname, port),
+		}
+	} else {
+		mgmtEndpointUrl = url.URL{
+			Scheme: "http",
+			Host:   net.JoinHostPort(hostname, port),
+		}
+	}
+	return mgmtEndpointUrl.String()
 }
