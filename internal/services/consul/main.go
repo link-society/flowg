@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"net"
 	"net/url"
+	"time"
 
 	"github.com/hashicorp/go-sockaddr"
 	"link-society.com/flowg/internal/cluster"
@@ -21,7 +22,7 @@ type ConsulServiceOptions struct {
 }
 
 func NewConsulService(opts *ConsulServiceOptions) proctree.Process {
-	return proctree.NewProcess(&procHandler{
+	consulService := proctree.NewProcess(&procHandler{
 		logger: slog.Default().With(
 			slog.String("channel", "consul"),
 			slog.Group("consul",
@@ -56,4 +57,15 @@ func NewConsulService(opts *ConsulServiceOptions) proctree.Process {
 			return localEndpoint, nil
 		},
 	})
+
+	return proctree.NewProcessGroup(
+		proctree.ProcessGroupOptions{
+			// Longer init timeout because discovering other nodes
+			// could take longer than the default 5 seconds
+			InitTimeout: 1 * time.Minute,
+			JoinTimeout: 5 * time.Second,
+		},
+		consulService,
+	)
+
 }
