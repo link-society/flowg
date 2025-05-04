@@ -6,7 +6,7 @@ sidebar_position: 2
 
 One **FlowG** node can discover other **FlowG** nodes automatically if Consul is configured to be used.
 
-In order to enable automatic cluster formation, have a instance of Consul running on the network.
+In order to enable automatic cluster formation, have an instance of Consul running on the network.
 
 Start the **FlowG** server with `--consul-url` flag set to the address of the Consul node. For example:
 
