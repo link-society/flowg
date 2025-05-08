@@ -3,6 +3,9 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"strings"
+
+	"encoding/base64"
 
 	"github.com/vladopajic/go-actor/actor"
 	"link-society.com/flowg/internal/utils/proctree"
@@ -10,12 +13,17 @@ import (
 
 type migratorProcH struct {
 	baseDir string
+	storage *Storage
 }
 
 var _ proctree.ProcessHandler = (*migratorProcH)(nil)
 
 func (p *migratorProcH) Init(ctx actor.Context) proctree.ProcessResult {
 	if err := p.migrateAlerts(ctx); err != nil {
+		return proctree.Terminate(err)
+	}
+
+	if err := p.migrateToBadger(ctx); err != nil {
 		return proctree.Terminate(err)
 	}
 
@@ -58,6 +66,76 @@ func (p *migratorProcH) migrateAlerts(ctx actor.Context) error {
 			)
 			if err != nil {
 				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func (p *migratorProcH) migrateToBadger(ctx actor.Context) error {
+	fileStorages := []struct {
+		dir       string
+		extension string
+		converter func(string, []byte) error
+	}{
+		{
+			dir:       "transformers",
+			extension: ".vrl",
+			converter: func(name string, content []byte) error {
+				return p.storage.writeItem(ctx, transformerItemType, name, content)
+			},
+		},
+		{
+			dir:       "pipelines",
+			extension: ".json",
+			converter: func(name string, content []byte) error {
+				return p.storage.writeItem(ctx, pipelineItemType, name, content)
+			},
+		},
+		{
+			dir:       "forwarders",
+			extension: ".json.b64",
+			converter: func(name string, b64content []byte) error {
+				content := make([]byte, base64.StdEncoding.DecodedLen(len(b64content)))
+				n, err := base64.StdEncoding.Decode(content, b64content)
+				if err != nil {
+					return err
+				}
+
+				return p.storage.writeItem(ctx, forwarderItemType, name, content[:n])
+			},
+		},
+	}
+
+	for _, storage := range fileStorages {
+		dir := filepath.Join(p.baseDir, storage.dir)
+		if _, err := os.Stat(dir); os.IsNotExist(err) {
+			continue
+		}
+
+		files, err := os.ReadDir(dir)
+		if err != nil {
+			return err
+		}
+
+		for _, file := range files {
+			if !file.IsDir() && strings.HasSuffix(file.Name(), storage.extension) {
+				path := filepath.Join(dir, file.Name())
+				itemName := strings.TrimSuffix(file.Name(), storage.extension)
+
+				content, err := os.ReadFile(path)
+				if err != nil {
+					return err
+				}
+
+				if err := storage.converter(itemName, content); err != nil {
+					return err
+				}
+
+				if err := os.Remove(path); err != nil {
+					return err
+				}
 			}
 		}
 	}
