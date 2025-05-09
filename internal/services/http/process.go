@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"net"
-	"net/http"
 	gohttp "net/http"
 
 	"github.com/vladopajic/go-actor/actor"
@@ -43,12 +42,6 @@ func (h *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 	rootHandler := gohttp.NewServeMux()
 	rootHandler.Handle("/api/", apiHandler)
 	rootHandler.Handle("/web/", webHandler)
-	rootHandler.HandleFunc(
-		"/health",
-		func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("OK\r\n"))
-		})
 
 	rootHandler.HandleFunc(
 		"GET /{$}",
