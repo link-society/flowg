@@ -107,16 +107,6 @@ func (h *procHandler) registerNode(ctx actor.Context) error {
 		)
 		return err
 	}
-	var healthCheckHttpPort int
-	healthCheckHttpPort, err = strconv.Atoi(localEndpoint.Port())
-	if err != nil {
-		h.logger.ErrorContext(
-			ctx,
-			"failed to convert health check http port from string to int",
-			slog.Any("error", err),
-		)
-		return err
-	}
 
 	var mgmtPortString string
 	_, mgmtPortString, err = net.SplitHostPort(h.opts.MgmtBindAddress)
@@ -150,7 +140,7 @@ func (h *procHandler) registerNode(ctx actor.Context) error {
 		Port:    mgmtPort,
 		Check: &api.AgentServiceCheck{
 			Interval: healthCheckInterval.String(),
-			HTTP:     fmt.Sprintf("%s://%s:%d%s", localEndpoint.Scheme, localEndpoint.Hostname(), healthCheckHttpPort, healthCheckPath),
+			HTTP:     fmt.Sprintf("%s://%s:%d%s", localEndpoint.Scheme, localEndpoint.Hostname(), mgmtPort, healthCheckPath),
 			Timeout:  healthCheckTimeout.String(),
 		},
 		Meta: map[string]string{
