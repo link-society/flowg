@@ -96,6 +96,10 @@ func NewServer(opts Options) proctree.Process {
 			ClusterJoinNode: ClusterJoinNode,
 
 			AutomaticClusterFormation: isAutomaticClusterFormation,
+
+			AuthStorage:   authStorage,
+			ConfigStorage: configStorage,
+			LogStorage:    logStorage,
 		})
 		syslogServer = syslog.NewServer(&syslog.ServerOptions{
 			TcpMode:      opts.SyslogTcpMode,

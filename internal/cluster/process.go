@@ -63,6 +63,10 @@ func (p *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 
 		connM:   p.connM,
 		packetM: p.packetM,
+
+		authStorage:   p.opts.AuthStorage,
+		configStorage: p.opts.ConfigStorage,
+		logStorage:    p.opts.LogStorage,
 	}
 
 	p.mlistConfig = memberlist.DefaultLocalConfig()
@@ -71,6 +75,7 @@ func (p *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 	p.mlistConfig.Transport = transport
 	p.mlistConfig.Delegate = d
 	p.mlistConfig.Events = d
+	p.mlistConfig.PushPullInterval = time.Second
 	p.mlistConfig.Logger = newMemberlistLogger(logger)
 
 	p.mlist, err = memberlist.Create(p.mlistConfig)

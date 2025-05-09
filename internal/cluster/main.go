@@ -6,10 +6,13 @@ import (
 	"net/url"
 
 	"github.com/vladopajic/go-actor/actor"
-
 	"link-society.com/flowg/internal/utils/proctree"
 
 	"github.com/hashicorp/memberlist"
+
+	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage/config"
+	"link-society.com/flowg/internal/storage/log"
 )
 
 type ManagerOptions struct {
@@ -21,6 +24,10 @@ type ManagerOptions struct {
 	AutomaticClusterFormation bool
 
 	LocalEndpointResolver func() (*url.URL, error)
+
+	AuthStorage   *auth.Storage
+	ConfigStorage *config.Storage
+	LogStorage    *log.Storage
 }
 
 type Manager struct {

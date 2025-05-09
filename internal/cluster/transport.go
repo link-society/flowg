@@ -19,6 +19,11 @@ import (
 
 	"github.com/vladopajic/go-actor/actor"
 
+	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage/config"
+	"link-society.com/flowg/internal/storage/log"
+	"link-society.com/flowg/internal/utils/replication"
+
 	"github.com/hashicorp/memberlist"
 )
 
@@ -30,6 +35,10 @@ type httpTransport struct {
 
 	connM   actor.Mailbox[net.Conn]
 	packetM actor.Mailbox[*memberlist.Packet]
+
+	authStorage   *auth.Storage
+	configStorage *config.Storage
+	logStorage    *log.Storage
 }
 
 var _ memberlist.Transport = (*httpTransport)(nil)
@@ -198,6 +207,9 @@ func (t *httpTransport) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	mux.HandleFunc("GET /cluster/nodes", t.handleStatus)
 	mux.HandleFunc("POST /cluster/gossip", t.handleGossip)
+	mux.HandleFunc("GET /cluster/sync/auth", t.handleSync(t.authStorage))
+	mux.HandleFunc("GET /cluster/sync/config", t.handleSync(t.configStorage))
+	mux.HandleFunc("GET /cluster/sync/log", t.handleSync(t.logStorage))
 
 	mux.ServeHTTP(w, r)
 }
@@ -221,7 +233,8 @@ func (t *httpTransport) handleStatus(w http.ResponseWriter, r *http.Request) {
 
 	body, err := json.Marshal(payload)
 	if err != nil {
-		http.Error(w, "failed to marshal response", http.StatusInternalServerError)
+		message := fmt.Sprintf("failed to marshal response: %v", err)
+		http.Error(w, message, http.StatusInternalServerError)
 		return
 	}
 
@@ -296,19 +309,22 @@ func (t *httpTransport) handleGossipPacket(w http.ResponseWriter, r *http.Reques
 
 	originUrl, err := url.Parse(origin)
 	if err != nil {
-		http.Error(w, "failed to parse Origin header", http.StatusBadRequest)
+		message := fmt.Sprintf("failed to parse Origin header: %v", err)
+		http.Error(w, message, http.StatusBadRequest)
 		return
 	}
 
 	originAddr, err := net.ResolveTCPAddr("tcp", originUrl.Host)
 	if err != nil {
-		http.Error(w, "failed to resolve Origin address", http.StatusInternalServerError)
+		message := fmt.Sprintf("failed to resolve Origin address: %v", err)
+		http.Error(w, message, http.StatusInternalServerError)
 		return
 	}
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		http.Error(w, "failed to read body", http.StatusInternalServerError)
+		message := fmt.Sprintf("failed to read body: %v", err)
+		http.Error(w, message, http.StatusInternalServerError)
 		return
 	}
 
@@ -319,9 +335,29 @@ func (t *httpTransport) handleGossipPacket(w http.ResponseWriter, r *http.Reques
 	}
 
 	if err := t.packetM.Send(r.Context(), packet); err != nil {
-		http.Error(w, "failed to send packet", http.StatusInternalServerError)
+		message := fmt.Sprintf("failed to send packet: %v", err)
+		http.Error(w, message, http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusAccepted)
+}
+
+func (t *httpTransport) handleSync(s replication.Storage) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
+		if t.cookie != "" && r.Header.Get(COOKIE_HEADER_NAME) != t.cookie {
+			http.Error(w, "invalid cluster key", http.StatusUnauthorized)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/octet-stream")
+
+		since, _ := strconv.ParseUint(r.Header.Get("X-FlowG-Since"), 10, 64)
+		if err := s.Dump(r.Context(), w, since); err != nil {
+			message := fmt.Sprintf("failed to dump data: %v", err)
+			http.Error(w, message, http.StatusInternalServerError)
+		}
+	}
 }
