@@ -6,6 +6,9 @@ inputs:
     description: Rust target triple
     required: false
     default: x86_64-unknown-linux-gnu
+  ghtoken:
+    description: GitHub Token
+    required: true
 runs:
   using: composite
   steps:
@@ -26,3 +29,5 @@ runs:
 
     - name: setup@task
       uses: arduino/setup-task@v2
+      with:
+        repo-token: ${{ inputs.ghtoken }}

@@ -80,6 +80,7 @@ jobs:
       - name: setup@buildchain
         uses: ./.github/actions/setup-buildchain
         with:
+          ghtoken: ${{ secrets.GITHUB_TOKEN }}
           rstarget: ${{ matrix.rstarget }}
 
       - name: build@binary
