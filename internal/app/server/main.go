@@ -81,7 +81,6 @@ func NewServer(opts Options) proctree.Process {
 		})
 		consulService = consul.NewConsulService(&consul.ConsulServiceOptions{
 			NodeId:          opts.ClusterNodeID,
-			BindAddress:     opts.HttpBindAddress,
 			ServiceName:     opts.ServiceName,
 			ConsulUrl:       opts.ConsulUrl,
 			ClusterJoinNode: ClusterJoinNode,

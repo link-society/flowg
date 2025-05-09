@@ -13,7 +13,6 @@ import (
 )
 
 type ConsulServiceOptions struct {
-	BindAddress     string
 	NodeId          string
 	ServiceName     string
 	ConsulUrl       string
@@ -34,7 +33,7 @@ func NewConsulService(opts *ConsulServiceOptions) proctree.Process {
 		opts: opts,
 
 		LocalEndpointResolver: func() (*url.URL, error) {
-			host, port, err := net.SplitHostPort(opts.BindAddress)
+			host, port, err := net.SplitHostPort(opts.MgmtBindAddress)
 			if err != nil {
 				return nil, fmt.Errorf("failed to bind address: %w", err)
 			}
@@ -51,11 +50,19 @@ func NewConsulService(opts *ConsulServiceOptions) proctree.Process {
 				host = ip
 			}
 
-			localEndpoint := &url.URL{
-				Scheme: "http",
-				Host:   net.JoinHostPort(host, port),
+			var localEndpoint url.URL
+			if opts.MgmtTlsEnabled {
+				localEndpoint = url.URL{
+					Scheme: "https",
+					Host:   net.JoinHostPort(host, port),
+				}
+			} else {
+				localEndpoint = url.URL{
+					Scheme: "http",
+					Host:   net.JoinHostPort(host, port),
+				}
 			}
-			return localEndpoint, nil
+			return &localEndpoint, nil
 		},
 	})
 
