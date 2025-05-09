@@ -16,7 +16,8 @@ type operation interface {
 }
 
 type backupOperation struct {
-	w io.Writer
+	w     io.Writer
+	since uint64
 }
 
 type restoreOperation struct {
@@ -37,7 +38,7 @@ var _ operation = (*viewOperation)(nil)
 var _ operation = (*updateOperation)(nil)
 
 func (m *backupOperation) Handle(db *badger.DB) error {
-	_, err := db.Backup(m.w, 0)
+	_, err := db.Backup(m.w, m.since)
 	return err
 }
 
