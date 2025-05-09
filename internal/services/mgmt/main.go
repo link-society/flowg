@@ -11,6 +11,9 @@ import (
 	"github.com/hashicorp/go-sockaddr"
 
 	"link-society.com/flowg/internal/cluster"
+	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage/config"
+	"link-society.com/flowg/internal/storage/log"
 
 	"link-society.com/flowg/internal/utils/proctree"
 )
@@ -25,6 +28,10 @@ type ServerOptions struct {
 	ClusterJoinNode *cluster.ClusterJoinNode
 
 	AutomaticClusterFormation bool
+
+	AuthStorage   *auth.Storage
+	ConfigStorage *config.Storage
+	LogStorage    *log.Storage
 }
 
 func NewServer(opts *ServerOptions) proctree.Process {
@@ -77,6 +84,10 @@ func NewServer(opts *ServerOptions) proctree.Process {
 
 			return localEndpoint, nil
 		},
+
+		AuthStorage:   opts.AuthStorage,
+		ConfigStorage: opts.ConfigStorage,
+		LogStorage:    opts.LogStorage,
 	})
 
 	serverH := &serverHandler{
