@@ -14,6 +14,7 @@ import (
 
 	"link-society.com/flowg/internal/utils/kvstore"
 	"link-society.com/flowg/internal/utils/proctree"
+	"link-society.com/flowg/internal/utils/replication"
 
 	"link-society.com/flowg/internal/storage/config/transactions"
 )
@@ -55,6 +56,7 @@ type Storage struct {
 }
 
 var _ proctree.Process = (*Storage)(nil)
+var _ replication.Storage = (*Storage)(nil)
 
 func NewStorage(opts ...func(*options)) *Storage {
 	options := options{
@@ -95,6 +97,14 @@ func (s *Storage) Backup(ctx context.Context, w io.Writer) error {
 }
 
 func (s *Storage) Restore(ctx context.Context, r io.Reader) error {
+	return s.kvStore.Restore(ctx, r)
+}
+
+func (s *Storage) Dump(ctx context.Context, w io.Writer, since uint64) error {
+	return s.kvStore.Backup(ctx, w, since)
+}
+
+func (s *Storage) Load(ctx context.Context, r io.Reader) error {
 	return s.kvStore.Restore(ctx, r)
 }
 
