@@ -98,6 +98,7 @@ func NewStorage(opts ...func(*options)) *Storage {
 func (kv *Storage) Backup(
 	ctx context.Context,
 	w io.Writer,
+	since uint64,
 ) error {
 	replyTo := make(chan error, 1)
 
@@ -105,7 +106,7 @@ func (kv *Storage) Backup(
 		ctx,
 		message{
 			replyTo:   replyTo,
-			operation: &backupOperation{w: w},
+			operation: &backupOperation{w: w, since: since},
 		},
 	)
 	if err != nil {

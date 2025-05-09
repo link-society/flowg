@@ -93,7 +93,7 @@ func NewStorage(opts ...func(*options)) *Storage {
 }
 
 func (s *Storage) Backup(ctx context.Context, w io.Writer) error {
-	return s.kvStore.Backup(ctx, w)
+	return s.kvStore.Backup(ctx, w, 0)
 }
 
 func (s *Storage) Restore(ctx context.Context, r io.Reader) error {
