@@ -38,7 +38,8 @@ var _ operation = (*viewOperation)(nil)
 var _ operation = (*updateOperation)(nil)
 
 func (m *backupOperation) Handle(db *badger.DB) error {
-	_, err := db.Backup(m.w, m.since)
+	var err error
+	m.since, err = db.Backup(m.w, m.since)
 	return err
 }
 

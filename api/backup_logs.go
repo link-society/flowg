@@ -33,7 +33,7 @@ func (ctrl *controller) BackupLogsUsecase() usecase.Interactor {
 				resp.Writer.(http.ResponseWriter).Header().Set("Content-Disposition", "attachment; filename=logs.db")
 				resp.Writer.(http.ResponseWriter).Header().Set("Cache-Control", "no-cache")
 
-				err := ctrl.deps.LogStorage.Dump(ctx, resp.Writer, 0)
+				_, err := ctrl.deps.LogStorage.Dump(ctx, resp.Writer, 0)
 				resp.Writer.(http.Flusher).Flush()
 				if err != nil {
 					ctrl.logger.ErrorContext(
