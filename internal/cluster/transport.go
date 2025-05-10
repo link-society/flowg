@@ -286,7 +286,7 @@ func (t *httpTransport) handleGossipStream(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	t.delegate.logger.InfoContext(
+	t.delegate.logger.DebugContext(
 		r.Context(),
 		"accepted connection",
 		slog.String("remote", conn.RemoteAddr().String()),
