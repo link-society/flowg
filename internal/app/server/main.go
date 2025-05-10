@@ -33,6 +33,7 @@ type Options struct {
 	ClusterJoinNodeID   string
 	ClusterJoinEndpoint *url.URL
 	ClusterCookie       string
+	ClusterStateDir     string
 
 	SyslogTcpMode      bool
 	SyslogBindAddress  string
@@ -94,6 +95,7 @@ func NewServer(opts Options) proctree.Process {
 			ClusterNodeID:   opts.ClusterNodeID,
 			ClusterCookie:   opts.ClusterCookie,
 			ClusterJoinNode: ClusterJoinNode,
+			ClusterStateDir: opts.ClusterStateDir,
 
 			AutomaticClusterFormation: isAutomaticClusterFormation,
 

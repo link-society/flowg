@@ -41,9 +41,10 @@ var (
 	defaultSyslogTlsCertKey     = getEnvString("FLOWG_SYSLOG_TLS_KEY", "")
 	defaultSyslogTlsAuthEnabled = getEnvBool("FLOWG_SYSLOG_TLS_AUTH", false)
 
-	defaultAuthDir   = getEnvString("FLOWG_AUTH_DIR", "./data/auth")
-	defaultConfigDir = getEnvString("FLOWG_CONFIG_DIR", "./data/config")
-	defaultLogDir    = getEnvString("FLOWG_LOG_DIR", "./data/logs")
+	defaultAuthDir         = getEnvString("FLOWG_AUTH_DIR", "./data/auth")
+	defaultConfigDir       = getEnvString("FLOWG_CONFIG_DIR", "./data/config")
+	defaultLogDir          = getEnvString("FLOWG_LOG_DIR", "./data/logs")
+	defaultClusterStateDir = getEnvString("FLOWG_CLUSTER_STATE_DIR", "./data/state")
 
 	defaultServiceName = getEnvString("FLOWG_SERVICE_NAME", "FlowG")
 	defaultConsulUrl   = getEnvString("CONSUL_URL", "")
