@@ -19,10 +19,10 @@ import (
 
 	"github.com/vladopajic/go-actor/actor"
 
+	"link-society.com/flowg/internal/storage"
 	"link-society.com/flowg/internal/storage/auth"
 	"link-society.com/flowg/internal/storage/config"
 	"link-society.com/flowg/internal/storage/log"
-	"link-society.com/flowg/internal/utils/replication"
 
 	"github.com/hashicorp/memberlist"
 )
@@ -343,7 +343,7 @@ func (t *httpTransport) handleGossipPacket(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusAccepted)
 }
 
-func (t *httpTransport) handleSync(s replication.Storage) http.HandlerFunc {
+func (t *httpTransport) handleSync(s storage.Streamable) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 

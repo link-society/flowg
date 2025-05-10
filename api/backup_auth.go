@@ -33,7 +33,7 @@ func (ctrl *controller) BackupAuthUsecase() usecase.Interactor {
 				resp.Writer.(http.ResponseWriter).Header().Set("Content-Disposition", "attachment; filename=auth.db")
 				resp.Writer.(http.ResponseWriter).Header().Set("Cache-Control", "no-cache")
 
-				err := ctrl.deps.AuthStorage.Backup(ctx, resp.Writer)
+				err := ctrl.deps.AuthStorage.Dump(ctx, resp.Writer, 0)
 				resp.Writer.(http.Flusher).Flush()
 				if err != nil {
 					ctrl.logger.ErrorContext(

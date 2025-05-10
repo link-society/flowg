@@ -7,11 +7,9 @@ import (
 	"github.com/dgraph-io/badger/v4"
 
 	"link-society.com/flowg/internal/models"
-
-	"link-society.com/flowg/internal/utils/kvstore"
-	"link-society.com/flowg/internal/utils/replication"
-
+	"link-society.com/flowg/internal/storage"
 	"link-society.com/flowg/internal/storage/auth/transactions"
+	"link-society.com/flowg/internal/utils/kvstore"
 
 	"link-society.com/flowg/internal/utils/proctree"
 )
@@ -47,7 +45,7 @@ type Storage struct {
 }
 
 var _ proctree.Process = (*Storage)(nil)
-var _ replication.Storage = (*Storage)(nil)
+var _ storage.Streamable = (*Storage)(nil)
 
 func NewStorage(opts ...func(*options)) *Storage {
 	options := options{
@@ -76,14 +74,6 @@ func NewStorage(opts ...func(*options)) *Storage {
 		Process: process,
 		kvStore: kvStore,
 	}
-}
-
-func (s *Storage) Backup(ctx context.Context, w io.Writer) error {
-	return s.kvStore.Backup(ctx, w, 0)
-}
-
-func (s *Storage) Restore(ctx context.Context, r io.Reader) error {
-	return s.kvStore.Restore(ctx, r)
 }
 
 func (s *Storage) Dump(ctx context.Context, w io.Writer, since uint64) error {
