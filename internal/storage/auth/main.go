@@ -76,7 +76,7 @@ func NewStorage(opts ...func(*options)) *Storage {
 	}
 }
 
-func (s *Storage) Dump(ctx context.Context, w io.Writer, since uint64) error {
+func (s *Storage) Dump(ctx context.Context, w io.Writer, since uint64) (uint64, error) {
 	return s.kvStore.Backup(ctx, w, since)
 }
 

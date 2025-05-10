@@ -99,21 +99,27 @@ func (kv *Storage) Backup(
 	ctx context.Context,
 	w io.Writer,
 	since uint64,
-) error {
+) (uint64, error) {
 	replyTo := make(chan error, 1)
+	op := &backupOperation{w: w, since: since}
 
 	err := kv.mbox.Send(
 		ctx,
 		message{
 			replyTo:   replyTo,
-			operation: &backupOperation{w: w, since: since},
+			operation: op,
 		},
 	)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	return <-replyTo
+	err = <-replyTo
+	if err != nil {
+		return 0, err
+	}
+
+	return op.since, nil
 }
 
 func (kv *Storage) Restore(

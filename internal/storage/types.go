@@ -6,6 +6,6 @@ import (
 )
 
 type Streamable interface {
-	Dump(context.Context, io.Writer, uint64) error
+	Dump(context.Context, io.Writer, uint64) (uint64, error)
 	Load(context.Context, io.Reader) error
 }

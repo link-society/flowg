@@ -353,11 +353,17 @@ func (t *httpTransport) handleSync(s storage.Streamable) http.HandlerFunc {
 		}
 
 		w.Header().Set("Content-Type", "application/octet-stream")
+		w.Header().Set("Transfer-Encoding", "chunked")
+		w.Header().Set("Trailers", "X-FlowG-Since")
 
 		since, _ := strconv.ParseUint(r.Header.Get("X-FlowG-Since"), 10, 64)
-		if err := s.Dump(r.Context(), w, since); err != nil {
+		since, err := s.Dump(r.Context(), w, since)
+		if err != nil {
 			message := fmt.Sprintf("failed to dump data: %v", err)
 			http.Error(w, message, http.StatusInternalServerError)
+			return
 		}
+
+		w.Header().Set("X-FlowG-Since", strconv.FormatUint(since, 10))
 	}
 }
