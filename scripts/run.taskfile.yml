@@ -11,6 +11,7 @@ tasks:
       FLOWG_AUTH_DIR: "./data/node0/auth"
       FLOWG_CONFIG_DIR: "./data/node0/config"
       FLOWG_LOG_DIR: "./data/node0/logs"
+      FLOWG_CLUSTER_STATE_DIR: "./data/node0/state"
 
   node1:
     desc: "Run the project (node1)"
@@ -27,6 +28,7 @@ tasks:
       FLOWG_AUTH_DIR: "./data/node1/auth"
       FLOWG_CONFIG_DIR: "./data/node1/config"
       FLOWG_LOG_DIR: "./data/node1/logs"
+      FLOWG_CLUSTER_STATE_DIR: "./data/node1/state"
 
   node2:
     desc: "Run the project (node2)"
@@ -43,3 +45,4 @@ tasks:
       FLOWG_AUTH_DIR: "./data/node2/auth"
       FLOWG_CONFIG_DIR: "./data/node2/config"
       FLOWG_LOG_DIR: "./data/node2/logs"
+      FLOWG_CLUSTER_STATE_DIR: "./data/node2/state"
