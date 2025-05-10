@@ -37,7 +37,7 @@ func (ctrl *controller) RestoreConfigUsecase() usecase.Interactor {
 			) error {
 				defer req.Backup.Close()
 
-				err := ctrl.deps.ConfigStorage.Restore(ctx, req.Backup)
+				err := ctrl.deps.ConfigStorage.Load(ctx, req.Backup)
 				if err != nil {
 					ctrl.logger.ErrorContext(
 						ctx,

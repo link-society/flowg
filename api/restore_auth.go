@@ -33,7 +33,7 @@ func (ctrl *controller) RestoreAuthUsecase() usecase.Interactor {
 			) error {
 				defer req.Backup.Close()
 
-				err := ctrl.deps.AuthStorage.Restore(ctx, req.Backup)
+				err := ctrl.deps.AuthStorage.Load(ctx, req.Backup)
 				if err != nil {
 					ctrl.logger.ErrorContext(
 						ctx,

@@ -37,7 +37,7 @@ func (ctrl *controller) BackupConfigUsecase() usecase.Interactor {
 				resp.Writer.(http.ResponseWriter).Header().Set("Content-Disposition", "attachment; filename=config.db")
 				resp.Writer.(http.ResponseWriter).Header().Set("Cache-Control", "no-cache")
 
-				err := ctrl.deps.ConfigStorage.Backup(ctx, resp.Writer)
+				err := ctrl.deps.ConfigStorage.Dump(ctx, resp.Writer, 0)
 				resp.Writer.(http.Flusher).Flush()
 				if err != nil {
 					ctrl.logger.ErrorContext(

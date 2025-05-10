@@ -33,7 +33,7 @@ func (ctrl *controller) RestoreLogsUsecase() usecase.Interactor {
 			) error {
 				defer req.Backup.Close()
 
-				err := ctrl.deps.LogStorage.Restore(ctx, req.Backup)
+				err := ctrl.deps.LogStorage.Load(ctx, req.Backup)
 				if err != nil {
 					ctrl.logger.ErrorContext(
 						ctx,
