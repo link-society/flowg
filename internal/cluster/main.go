@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"github.com/vladopajic/go-actor/actor"
+	"link-society.com/flowg/internal/utils/kvstore"
 	"link-society.com/flowg/internal/utils/proctree"
 
 	"github.com/hashicorp/memberlist"
@@ -25,9 +26,10 @@ type ManagerOptions struct {
 
 	LocalEndpointResolver func() (*url.URL, error)
 
-	AuthStorage   *auth.Storage
-	ConfigStorage *config.Storage
-	LogStorage    *log.Storage
+	AuthStorage         *auth.Storage
+	ConfigStorage       *config.Storage
+	LogStorage          *log.Storage
+	ClusterStateStorage *kvstore.Storage
 }
 
 type Manager struct {

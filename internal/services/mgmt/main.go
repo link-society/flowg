@@ -15,6 +15,7 @@ import (
 	"link-society.com/flowg/internal/storage/config"
 	"link-society.com/flowg/internal/storage/log"
 
+	"link-society.com/flowg/internal/utils/kvstore"
 	"link-society.com/flowg/internal/utils/proctree"
 )
 
@@ -22,8 +23,9 @@ type ServerOptions struct {
 	BindAddress string
 	TlsConfig   *tls.Config
 
-	ClusterNodeID string
-	ClusterCookie string
+	ClusterNodeID   string
+	ClusterCookie   string
+	ClusterStateDir string
 
 	ClusterJoinNode *cluster.ClusterJoinNode
 
@@ -41,6 +43,8 @@ func NewServer(opts *ServerOptions) proctree.Process {
 			slog.String("bind", opts.BindAddress),
 		),
 	)
+
+	clusterStateStorage := kvstore.NewStorage(kvstore.OptDirectory(opts.ClusterStateDir))
 
 	listenerH := &listenerHandler{
 		logger:      logger,
@@ -85,9 +89,10 @@ func NewServer(opts *ServerOptions) proctree.Process {
 			return localEndpoint, nil
 		},
 
-		AuthStorage:   opts.AuthStorage,
-		ConfigStorage: opts.ConfigStorage,
-		LogStorage:    opts.LogStorage,
+		AuthStorage:         opts.AuthStorage,
+		ConfigStorage:       opts.ConfigStorage,
+		LogStorage:          opts.LogStorage,
+		ClusterStateStorage: clusterStateStorage,
 	})
 
 	serverH := &serverHandler{
@@ -102,6 +107,7 @@ func NewServer(opts *ServerOptions) proctree.Process {
 
 	return proctree.NewProcessGroup(
 		proctree.DefaultProcessGroupOptions(),
+		clusterStateStorage,
 		proctree.NewProcess(listenerH),
 		clusterManager,
 		proctree.NewProcess(serverH),

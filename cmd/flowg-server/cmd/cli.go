@@ -17,6 +17,7 @@ type options struct {
 	clusterJoinNodeID   string
 	clusterJoinEndpoint string
 	clusterCookie       string
+	clusterStateDir     string
 
 	syslogProtocol       string
 	syslogBindAddr       string
@@ -118,6 +119,13 @@ func (opts *options) defineCliOptions(cmd *cobra.Command) {
 		"cluster-cookie",
 		defaultClusterCookie,
 		"Cookie to use for cluster communication (leave empty to disable)",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.clusterStateDir,
+		"cluster-state-dir",
+		defaultClusterStateDir,
+		"Path to the cluster state directory (for replication)",
 	)
 
 	cmd.Flags().StringVar(
