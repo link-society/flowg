@@ -15,9 +15,9 @@ In terms of the [CAP theorem](https://en.wikipedia.org/wiki/CAP_theorem), *SWIM*
 is "AP", it sacrifices **strong consistency** for **availability** and
 **partitioning tolerance**.
 
-> **NB:** FlowG achieves **eventual consistency** using a
-> [CRDT](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type). For
-> more information, consult [this page](./replication).
+> **NB:** FlowG achieves **eventual consistency** by periodically streaming
+> BadgerDB key/value pairs between nodes. For more information, consult
+> [this page](./replication).
 
 ## Why not Raft?
 
