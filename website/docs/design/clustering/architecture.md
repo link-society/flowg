@@ -27,6 +27,7 @@ flowg-server \
   --auth-dir ./data/node0/auth \
   --log-dir ./data/node0/logs \
   --config-dir ./data/node0/config \
+  --cluster-state-dir ./data/node0/state \
   --http-bind 127.0.0.1:5080 \
   --mgmt-bind 127.0.0.1:9113 \
   --syslog-bind 127.0.0.1:5514 &
@@ -38,6 +39,7 @@ flowg-server \
   --auth-dir ./data/node1/auth \
   --log-dir ./data/node1/logs \
   --config-dir ./data/node1/config \
+  --cluster-state-dir ./data/node1/state \
   --http-bind 127.0.0.1:5081 \
   --mgmt-bind 127.0.0.1:9114 \
   --syslog-bind 127.0.0.1:5515 &
@@ -49,6 +51,7 @@ flowg-server \
   --auth-dir ./data/node2/auth \
   --log-dir ./data/node2/logs \
   --config-dir ./data/node2/config \
+  --cluster-state-dir ./data/node2/state \
   --http-bind 127.0.0.1:5082 \
   --mgmt-bind 127.0.0.1:9115 \
   --syslog-bind 127.0.0.1:5516 &
@@ -68,6 +71,7 @@ flowg-server \
   --auth-dir ./data/node0/auth \
   --log-dir ./data/node0/logs \
   --config-dir ./data/node0/config \
+  --cluster-state-dir ./data/node0/state \
   --http-bind 127.0.0.1:5080 \
   --mgmt-bind 127.0.0.1:9113 \
   --syslog-bind 127.0.0.1:5514 &
@@ -80,6 +84,7 @@ flowg-server \
   --auth-dir ./data/node1/auth \
   --log-dir ./data/node1/logs \
   --config-dir ./data/node1/config \
+  --cluster-state-dir ./data/node1/state \
   --http-bind 127.0.0.1:5081 \
   --mgmt-bind 127.0.0.1:9114 \
   --syslog-bind 127.0.0.1:5515 &
@@ -92,6 +97,7 @@ flowg-server \
   --auth-dir ./data/node2/auth \
   --log-dir ./data/node2/logs \
   --config-dir ./data/node2/config \
+  --cluster-state-dir ./data/node2/state \
   --http-bind 127.0.0.1:5082 \
   --mgmt-bind 127.0.0.1:9115 \
   --syslog-bind 127.0.0.1:5516 &
@@ -208,6 +214,81 @@ X-FlowG-ClusterKey: <optional cluster cookie>
 | 101 Switching Protocols | The connection has been accepted, and the socket will be used for bi-directional exchange |
 | 501 Not Implemented | The server does not support hijacking the socket, maybe there is a Reverse Proxy in between? |
 | 401 Unauthorized | The node requires authentification, and the `X-FlowG-ClusterKey` header was invalid |
+| 500 Internal Server Error | On failure |
+
+</fieldset>
+
+<fieldset>
+<legend>Authentication Database synchronization</legend>
+
+**Description:** Endpoint used to receive incremental backups from other nodes.
+
+```
+POST /cluster/sync/auth
+X-FlowG-ClusterKey: <optional cluster cookie>
+X-FlowG-NodeID: <remote node ID>
+Transfer-Encoding: chunked
+Trailer: X-FlowG-Since
+
+... incremental backup data ...
+
+X-FlowG-Since: <new version>
+```
+
+| Response | When |
+| --- | --- |
+| 401 Unauthorized | The node requires authentification, and the `X-FlowG-ClusterKey` header was invalid |
+| 400 Bad Request | Missing HTTP header `X-FlowG-NodeID` or invalid data in HTTP trailer `X-FlowG-Since` |
+| 500 Internal Server Error | On failure |
+
+</fieldset>
+
+<fieldset>
+<legend>Configuration database synchronization</legend>
+
+**Description:** Endpoint used to receive incremental backups from other nodes.
+
+```
+POST /cluster/sync/config
+X-FlowG-ClusterKey: <optional cluster cookie>
+X-FlowG-NodeID: <remote node ID>
+Transfer-Encoding: chunked
+Trailer: X-FlowG-Since
+
+... incremental backup data ...
+
+X-FlowG-Since: <new version>
+```
+
+| Response | When |
+| --- | --- |
+| 401 Unauthorized | The node requires authentification, and the `X-FlowG-ClusterKey` header was invalid |
+| 400 Bad Request | Missing HTTP header `X-FlowG-NodeID` or invalid data in HTTP trailer `X-FlowG-Since` |
+| 500 Internal Server Error | On failure |
+
+</fieldset>
+
+<fieldset>
+<legend>Log database synchronization</legend>
+
+**Description:** Endpoint used to receive incremental backups from other nodes.
+
+```
+POST /cluster/sync/log
+X-FlowG-ClusterKey: <optional cluster cookie>
+X-FlowG-NodeID: <remote node ID>
+Transfer-Encoding: chunked
+Trailer: X-FlowG-Since
+
+... incremental backup data ...
+
+X-FlowG-Since: <new version>
+```
+
+| Response | When |
+| --- | --- |
+| 401 Unauthorized | The node requires authentification, and the `X-FlowG-ClusterKey` header was invalid |
+| 400 Bad Request | Missing HTTP header `X-FlowG-NodeID` or invalid data in HTTP trailer `X-FlowG-Since` |
 | 500 Internal Server Error | On failure |
 
 </fieldset>

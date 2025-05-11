@@ -25,6 +25,7 @@ flowg-server \
   --auth-dir /var/lib/flowg/data/auth \
   --log-dir /var/lib/flowg/logs \
   --config-dir /var/lib/flowg/config \
+  --cluster-state-dir /var/lib/flowg/state \
   --http-bind 127.0.0.1:5080 \
   --mgmt-bind 127.0.0.1:9113 \
   --syslog-bind 127.0.0.1:5514
