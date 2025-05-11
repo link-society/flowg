@@ -27,7 +27,11 @@ import (
 	"github.com/hashicorp/memberlist"
 )
 
-const COOKIE_HEADER_NAME = "X-FlowG-ClusterKey"
+const (
+	COOKIE_HEADER_NAME = "X-FlowG-ClusterKey"
+	NODEID_HEADER_NAME = "X-FlowG-NodeID"
+	SINCE_HEADER_NAME  = "X-FlowG-Since"
+)
 
 type httpTransport struct {
 	delegate *delegate
@@ -207,9 +211,9 @@ func (t *httpTransport) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	mux.HandleFunc("GET /cluster/nodes", t.handleStatus)
 	mux.HandleFunc("POST /cluster/gossip", t.handleGossip)
-	mux.HandleFunc("GET /cluster/sync/auth", t.handleSync(t.authStorage))
-	mux.HandleFunc("GET /cluster/sync/config", t.handleSync(t.configStorage))
-	mux.HandleFunc("GET /cluster/sync/log", t.handleSync(t.logStorage))
+	mux.HandleFunc("POST /cluster/sync/auth", t.handleSync(t.authStorage, "auth"))
+	mux.HandleFunc("POST /cluster/sync/config", t.handleSync(t.configStorage, "config"))
+	mux.HandleFunc("POST /cluster/sync/log", t.handleSync(t.logStorage, "log"))
 
 	mux.ServeHTTP(w, r)
 }
@@ -343,27 +347,46 @@ func (t *httpTransport) handleGossipPacket(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusAccepted)
 }
 
-func (t *httpTransport) handleSync(s storage.Streamable) http.HandlerFunc {
+func (t *httpTransport) handleSync(s storage.Streamable, dbType string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		defer r.Body.Close()
-
 		if t.cookie != "" && r.Header.Get(COOKIE_HEADER_NAME) != t.cookie {
 			http.Error(w, "invalid cluster key", http.StatusUnauthorized)
 			return
 		}
 
-		w.Header().Set("Content-Type", "application/octet-stream")
-		w.Header().Set("Transfer-Encoding", "chunked")
-		w.Header().Set("Trailers", "X-FlowG-Since")
+		remoteNodeID := r.Header.Get(NODEID_HEADER_NAME)
+		if remoteNodeID == "" {
+			message := fmt.Sprintf("missing %s header", NODEID_HEADER_NAME)
+			http.Error(w, message, http.StatusBadRequest)
+			return
+		}
 
-		since, _ := strconv.ParseUint(r.Header.Get("X-FlowG-Since"), 10, 64)
-		since, err := s.Dump(r.Context(), w, since)
-		if err != nil {
-			message := fmt.Sprintf("failed to dump data: %v", err)
+		if err := s.Load(r.Context(), r.Body); err != nil {
+			message := fmt.Sprintf("failed to load data: %v", err)
 			http.Error(w, message, http.StatusInternalServerError)
 			return
 		}
 
-		w.Header().Set("X-FlowG-Since", strconv.FormatUint(since, 10))
+		since, err := strconv.ParseUint(r.Trailer.Get(SINCE_HEADER_NAME), 10, 64)
+		if err != nil {
+			message := fmt.Sprintf("failed to parse %s header: %v", SINCE_HEADER_NAME, err)
+			http.Error(w, message, http.StatusBadRequest)
+			return
+		}
+
+		err = updateLocalState(
+			r.Context(),
+			t.delegate.clusterStateStorage,
+			remoteNodeID,
+			dbType,
+			since,
+		)
+		if err != nil {
+			message := fmt.Sprintf("failed to update local state: %v", err)
+			http.Error(w, message, http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
 	}
 }
