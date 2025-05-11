@@ -49,8 +49,28 @@ func (p *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 	d := &delegate{
 		logger: logger,
 
+		localNodeID:   p.opts.NodeID,
 		localEndpoint: localEndpoint,
 		endpoints:     make(map[string]*url.URL),
+
+		clusterStateStorage: p.opts.ClusterStateStorage,
+
+		syncPool: &syncPool{
+			logger: slog.Default().With(
+				slog.String("channel", "cluster.replication"),
+				slog.String("cluster.local.node", p.opts.NodeID),
+				slog.String("cluster.local.endpoint", localEndpoint.String()),
+			),
+
+			nodeID: p.opts.NodeID,
+			cookie: p.opts.Cookie,
+
+			authStorage:   p.opts.AuthStorage,
+			configStorage: p.opts.ConfigStorage,
+			logStorage:    p.opts.LogStorage,
+
+			workers: make(map[string]*syncActor),
+		},
 	}
 
 	if p.opts.ClusterJoinNode.JoinNodeID != "" && p.opts.ClusterJoinNode.JoinNodeEndpoint != nil {
@@ -120,6 +140,11 @@ func (p *procHandler) DoWork(ctx actor.Context) proctree.ProcessResult {
 }
 
 func (p *procHandler) Terminate(ctx actor.Context, parentErr error) error {
+	if p.mlistConfig.Delegate != nil {
+		d := p.mlistConfig.Delegate.(*delegate)
+		d.syncPool.RemoveAll()
+	}
+
 	if p.mlist != nil {
 		if err := p.mlist.Leave(5 * time.Second); err != nil {
 			return errors.Join(parentErr, err)
