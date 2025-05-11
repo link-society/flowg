@@ -34,7 +34,7 @@ func (l *BadgerLogger) Infof(format string, v ...interface{}) {
 	content := fmt.Sprintf(format, v...)
 	lines := strings.FieldsFunc(content, func(c rune) bool { return c == '\n' || c == '\r' })
 	for _, line := range lines {
-		slog.Info(line, "channel", l.Channel)
+		slog.Debug(line, "channel", l.Channel)
 	}
 }
 
