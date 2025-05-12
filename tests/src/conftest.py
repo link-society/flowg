@@ -2,10 +2,9 @@ import pytest
 
 from pathlib import Path
 from shutil import rmtree
-from time import sleep
-
-import requests
 import docker
+
+from ._lib import docker_utils, flowg_utils
 
 
 @pytest.fixture(scope='module', autouse=True)
@@ -33,59 +32,32 @@ def report_dir(request):
 @pytest.fixture(scope='module')
 def docker_client():
     client = docker.from_env()
-
-    print("Cleaning up old containers")
-    for container in client.containers.list(all=True):
-        if container.name.startswith("test-flowg-node") or container.name.startswith("consul"):
-            container.remove(force=True)
-
-    print("Cleaning up old volumes")
-    for volume in client.volumes.list():
-        if volume.name.startswith("test-flowg-node"):
-            volume.remove(force=True)
-
-    print("Cleaning up old networks")
-    for network in client.networks.list():
-        if network.name.startswith("test-flowg"):
-            network.remove()
-
+    docker_utils.cleanup(client)
     yield client
 
 
 @pytest.fixture(scope='module')
 def flowg_network(docker_client):
-    print("Creating network: test-flowg")
-    network = docker_client.networks.create(name="test-flowg", driver="bridge")
-    yield network
-    print("Removing network: test-flowg")
-    network.remove()
+    with flowg_utils.network(docker_client, name="test-flowg") as network:
+        yield network
 
 
 @pytest.fixture(scope='module')
 def flowg_node0_volume(docker_client):
-    print("Creating volume: test-flowg-node0")
-    volume = docker_client.volumes.create(name="test-flowg-node0")
-    yield volume
-    print("Removing volume: test-flowg-node0")
-    volume.remove()
+    with flowg_utils.volume(docker_client, name="test-flowg-node0") as volume:
+        yield volume
 
 
 @pytest.fixture(scope='module')
 def flowg_node1_volume(docker_client):
-    print("Creating volume: test-flowg-node1")
-    volume = docker_client.volumes.create(name="test-flowg-node1")
-    yield volume
-    print("Removing volume: test-flowg-node1")
-    volume.remove()
+    with flowg_utils.volume(docker_client, name="test-flowg-node1") as volume:
+        yield volume
 
 
 @pytest.fixture(scope='module')
 def flowg_node2_volume(docker_client):
-    print("Creating volume: test-flowg-node2")
-    volume = docker_client.volumes.create(name="test-flowg-node2")
-    yield volume
-    print("Removing volume: test-flowg-node2")
-    volume.remove()
+    with flowg_utils.volume(docker_client, name="test-flowg-node2") as volume:
+        yield volume
 
 
 @pytest.fixture(scope='module')
@@ -101,41 +73,21 @@ def flowg_node0_container(
     flowg_node0_volume,
     flowg_image,
 ):
-    print("Creating container: test-flowg-node0")
-    container = docker_client.containers.run(
-        image=flowg_image,
+    with flowg_utils.container(
+        docker_client,
         name="test-flowg-node0",
-        environment={
-            "FLOWG_SECRET_KEY": "s3cr3!",
-            "FLOWG_CLUSTER_NODE_ID": "test-flowg-node0",
-            "FLOWG_AUTH_DIR": "/data/auth",
-            "FLOWG_CONFIG_DIR": "/data/config",
-            "FLOWG_LOG_DIR": "/data/logs",
-        },
-        network=flowg_network.name,
-        hostname="test-flowg-node0",
+        network=flowg_network,
+        volume=flowg_node0_volume,
+        image=flowg_image,
+        environment={},
         ports={
             "5080/tcp": 5080,
             "9113/tcp": 9113,
             "5514/udp": 5514,
         },
-        volumes={
-            flowg_node0_volume.name: {"bind": "/data", "mode": "rw"}
-        },
-        detach=True,
-    )
-
-    try:
-        print("Waiting for healthcheck: test-flowg-node0")
-        wait_for_healthcheck(container)
-
-    except RuntimeError as err:
-        teardown_container(container, report_dir)
-        pytest.fail(f"{err}", pytrace=False)
-
-    yield
-
-    teardown_container(container, report_dir)
+        report_dir=report_dir,
+    ):
+        yield
 
 
 @pytest.fixture(scope='module')
@@ -146,46 +98,27 @@ def flowg_node1_container(
     flowg_node1_volume,
     flowg_image,
 ):
-    print("Creating container: test-flowg-node1")
-    container = docker_client.containers.run(
-        image=flowg_image,
+    with flowg_utils.container(
+        docker_client,
         name="test-flowg-node1",
+        network=flowg_network,
+        volume=flowg_node1_volume,
+        image=flowg_image,
         environment={
-            "FLOWG_SECRET_KEY": "s3cr3!",
-            "FLOWG_CLUSTER_NODE_ID": "test-flowg-node1",
             "FLOWG_CLUSTER_JOIN_NODE_ID": "test-flowg-node0",
             "FLOWG_CLUSTER_JOIN_ENDPOINT": "http://test-flowg-node0:9113",
             "FLOWG_HTTP_BIND_ADDRESS": ":5081",
             "FLOWG_MGMT_BIND_ADDRESS": ":9114",
             "FLOWG_SYSLOG_BIND_ADDRESS": ":5515",
-            "FLOWG_AUTH_DIR": "/data/auth",
-            "FLOWG_CONFIG_DIR": "/data/config",
-            "FLOWG_LOG_DIR": "/data/logs",
         },
-        network=flowg_network.name,
-        hostname="test-flowg-node1",
         ports={
             "5081/tcp": 5081,
             "9114/tcp": 9114,
             "5515/udp": 5515,
         },
-        volumes={
-            flowg_node1_volume.name: {"bind": "/data", "mode": "rw"}
-        },
-        detach=True,
-    )
-
-    try:
-        print("Waiting for healthcheck: test-flowg-node1")
-        wait_for_healthcheck(container)
-
-    except RuntimeError as err:
-        teardown_container(container, report_dir)
-        pytest.fail(f"{err}", pytrace=False)
-
-    yield
-
-    teardown_container(container, report_dir)
+        report_dir=report_dir,
+    ):
+        yield
 
 
 @pytest.fixture(scope='module')
@@ -196,124 +129,55 @@ def flowg_node2_container(
     flowg_node2_volume,
     flowg_image,
 ):
-    print("Creating container: test-flowg-node2")
-    container = docker_client.containers.run(
-        image=flowg_image,
+    with flowg_utils.container(
+        docker_client,
         name="test-flowg-node2",
+        network=flowg_network,
+        volume=flowg_node2_volume,
+        image=flowg_image,
         environment={
-            "FLOWG_SECRET_KEY": "s3cr3!",
-            "FLOWG_CLUSTER_NODE_ID": "test-flowg-node2",
             "FLOWG_CLUSTER_JOIN_NODE_ID": "test-flowg-node1",
             "FLOWG_CLUSTER_JOIN_ENDPOINT": "http://test-flowg-node1:9114",
             "FLOWG_HTTP_BIND_ADDRESS": ":5082",
             "FLOWG_MGMT_BIND_ADDRESS": ":9115",
             "FLOWG_SYSLOG_BIND_ADDRESS": ":5516",
-            "FLOWG_AUTH_DIR": "/data/auth",
-            "FLOWG_CONFIG_DIR": "/data/config",
-            "FLOWG_LOG_DIR": "/data/logs",
         },
-        network=flowg_network.name,
-        hostname="test-flowg-node2",
         ports={
             "5082/tcp": 5082,
             "9115/tcp": 9115,
             "5516/udp": 5516,
         },
-        volumes={
-            flowg_node2_volume.name: {"bind": "/data", "mode": "rw"}
-        },
-        detach=True,
-    )
-
-    try:
-        print("Waiting for healthcheck: test-flowg-node2")
-        wait_for_healthcheck(container)
-
-    except RuntimeError as err:
-        teardown_container(container, report_dir)
-        pytest.fail(f"{err}", pytrace=False)
-
-    yield
-
-    teardown_container(container, report_dir)
+        report_dir=report_dir,
+    ):
+        yield
 
 
 @pytest.fixture(scope='module')
-def flowg_cluster(flowg_node0_container, flowg_node1_container, flowg_node2_container):
+def flowg_cluster(
+    flowg_node0_container,
+    flowg_node1_container,
+    flowg_node2_container,
+):
     yield
 
 
 @pytest.fixture(scope='module')
 def flowg_admin_token(flowg_cluster):
-    print("Creating admin token")
-    resp = requests.post(
-        "http://localhost:5080/api/v1/auth/login",
-        json={"username": "root", "password": "root"},
-    )
-    resp.raise_for_status()
-    data = resp.json()
-    admin_jwt = data["token"]
-
-    resp = requests.post(
-        "http://localhost:5080/api/v1/token",
-        headers={"Authorization": f"Bearer {admin_jwt}"},
-    )
-    resp.raise_for_status()
-    data = resp.json()
-    return data["token"]
+    return flowg_utils.create_token(username="root", password="root")
 
 
 @pytest.fixture(scope='module')
 def flowg_guest_token(flowg_admin_token):
-    print("Creating guest token")
-    resp = requests.put(
-        "http://localhost:5080/api/v1/users/guest",
-        headers={"Authorization": f"Bearer {flowg_admin_token}"},
-        json={"password": "guest", "roles": []},
+    flowg_utils.create_user(
+        token=flowg_admin_token,
+        username="guest",
+        password="guest",
     )
-    resp.raise_for_status()
 
-    resp = requests.post(
-        "http://localhost:5080/api/v1/auth/login",
-        json={"username": "guest", "password": "guest"},
+    return flowg_utils.create_token(
+        username="guest",
+        password="guest",
     )
-    resp.raise_for_status()
-    data = resp.json()
-    guest_jwt = data["token"]
-
-    resp = requests.post(
-        "http://localhost:5080/api/v1/token",
-        headers={"Authorization": f"Bearer {guest_jwt}"},
-    )
-    resp.raise_for_status()
-    data = resp.json()
-    return data["token"]
-
-
-def wait_for_healthcheck(container):
-    while True:
-        container.reload()
-
-        if container.health == "healthy":
-            break
-
-        elif container.health == "unhealthy":
-            raise RuntimeError(f"Node {container.name} was not healthy")
-
-        sleep(1)
-
-
-def teardown_container(container, report_dir):
-    print(f"Stopping container: {container.name}")
-    container.stop()
-
-    print(f"Writing logs: {container.name}")
-    with open(report_dir / f"docker-{container.name}.log", "wb") as f:
-        for data in container.logs(stream=True):
-            f.write(data)
-
-    print(f"Removing container: {container.name}")
-    container.remove(force=True)
 
 
 def pytest_report_teststatus(report, config):
