@@ -147,6 +147,7 @@ ENV FLOWG_SYSLOG_TLS_AUTH=false
 ENV FLOWG_AUTH_DIR="/data/auth"
 ENV FLOWG_CONFIG_DIR="/data/config"
 ENV FLOWG_LOG_DIR="/data/logs"
+ENV FLOWG_CLUSTER_STATE_DIR="/data/state"
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD []
