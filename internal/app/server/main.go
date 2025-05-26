@@ -46,6 +46,9 @@ type Options struct {
 
 	ServiceName string
 	ConsulUrl   string
+
+	AuthInitialUser     string
+	AuthInitialPassword string
 }
 
 func NewServer(opts Options) proctree.Process {
@@ -114,12 +117,14 @@ func NewServer(opts Options) proctree.Process {
 		})
 	)
 
-	bootstrap := proctree.NewProcess(&bootstrapProcHandler{
-		logger: slog.Default().With("channel", "server"),
-
-		authStorage:   authStorage,
-		configStorage: configStorage,
-	})
+	// Bootstrap Process
+	bootstrapProc := &bootstrapProcHandler{
+		logger:          slog.Default().With(slog.String("channel", "bootstrap")),
+		authStorage:     authStorage,
+		configStorage:   configStorage,
+		initialUser:     opts.AuthInitialUser,
+		initialPassword: opts.AuthInitialPassword,
+	}
 
 	return proctree.NewProcessGroup(
 		proctree.DefaultProcessGroupOptions(),
@@ -141,7 +146,7 @@ func NewServer(opts Options) proctree.Process {
 			mgmtServer,
 			syslogServer,
 		),
-		bootstrap,
+		proctree.NewProcess(bootstrapProc),
 	)
 }
 

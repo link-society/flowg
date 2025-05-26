@@ -18,12 +18,18 @@ type bootstrapProcHandler struct {
 
 	authStorage   *auth.Storage
 	configStorage *config.Storage
+
+	initialUser     string
+	initialPassword string
 }
 
 var _ proctree.ProcessHandler = (*bootstrapProcHandler)(nil)
 
 func (h *bootstrapProcHandler) Init(ctx actor.Context) proctree.ProcessResult {
-	err := bootstrap.DefaultRolesAndUsers(ctx, h.authStorage)
+	err := bootstrap.DefaultRolesAndUsers(ctx, h.authStorage, bootstrap.BootstrapOptions{
+		InitialUser:     h.initialUser,
+		InitialPassword: h.initialPassword,
+	})
 	if err != nil {
 		h.logger.ErrorContext(
 			ctx,

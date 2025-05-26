@@ -123,6 +123,9 @@ func newServerConfig(opts *options) (server.Options, error) {
 
 		ServiceName: opts.serviceName,
 		ConsulUrl:   opts.consulUrl,
+
+		AuthInitialUser:     opts.authInitialUser,
+		AuthInitialPassword: opts.authInitialPassword,
 	}
 
 	return config, nil

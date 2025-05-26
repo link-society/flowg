@@ -47,7 +47,10 @@ var (
 	defaultClusterStateDir = getEnvString("FLOWG_CLUSTER_STATE_DIR", "./data/state")
 
 	defaultServiceName = getEnvString("FLOWG_SERVICE_NAME", "FlowG")
-	defaultConsulUrl   = getEnvString("CONSUL_URL", "")
+	defaultConsulUrl   = getEnvString("FLOWG_CONSUL_URL", "")
+
+	defaultAuthInitialUser     = getEnvString("FLOWG_AUTH_INITIAL_USER", "root")
+	defaultAuthInitialPassword = getEnvString("FLOWG_AUTH_INITIAL_PASSWORD", "root")
 )
 
 func getEnvString(key string, defaultValue string) string {
