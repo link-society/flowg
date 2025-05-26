@@ -99,19 +99,6 @@ Then, start the server with:
   --syslog-bind 127.0.0.1:5514
 ```
 
-You can customize the initial admin user credentials using:
-- Command line flags:
-  ```bash
-  ./bin/flowg-server --auth-initial-user=admin --auth-initial-password=secret
-  ```
-- Environment variables:
-  ```bash
-  export FLOWG_AUTH_INITIAL_USER=admin
-  export FLOWG_AUTH_INITIAL_PASSWORD=secret
-  ./bin/flowg-server
-  ```
-If neither is specified, it defaults to username "root" with password "root".
-
 Now, you can access:
 
  - the WebUI at http://localhost:5080
