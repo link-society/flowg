@@ -48,6 +48,6 @@
     "typescript": "^5.8.2",
     "typescript-eslint": "^8.31.0",
     "vite": "^6.3.4",
-    "vite-plugin-compression2": "^1.3.3"
+    "vite-plugin-compression2": "^1.4.0"
   }
 }
