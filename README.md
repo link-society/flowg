@@ -99,6 +99,19 @@ Then, start the server with:
   --syslog-bind 127.0.0.1:5514
 ```
 
+You can customize the initial admin user credentials using:
+- Command line flags:
+  ```bash
+  ./bin/flowg-server --auth-initial-user=admin --auth-initial-password=secret
+  ```
+- Environment variables:
+  ```bash
+  export FLOWG_AUTH_INITIAL_USER=admin
+  export FLOWG_AUTH_INITIAL_PASSWORD=secret
+  ./bin/flowg-server
+  ```
+If neither is specified, it defaults to username "root" with password "root".
+
 Now, you can access:
 
  - the WebUI at http://localhost:5080
@@ -139,35 +152,3 @@ helm install flowg ./k8s/charts/flowg -n flowg-system --create-namespace
 ## :memo: License
 
 This software is released under the terms of the [MIT License](./LICENSE.txt)
-
-## Initial Admin User Credentials
-
-When starting FlowG for the first time (i.e., when no users exist), you can configure the initial admin user credentials in two ways:
-
-### 1. Command Line Flags (Recommended)
-
-Specify the initial admin username and password directly:
-
-```bash
-flowg-server --auth-initial-user=admin --auth-initial-password=secret
-```
-
-### 2. Environment Variables (Advanced/For Docker/K8s)
-
-Set environment variables **before** starting the server.  
-**Note:** This only works if you do NOT specify the CLI flags.
-
-```bash
-export FLOWG_AUTH_INITIAL_USER=admin
-export FLOWG_AUTH_INITIAL_PASSWORD=secret
-flowg-server
-```
-
-- If neither the flags nor the environment variables are set, the default credentials will be `root` / `root`.
-- The initial user is only created if no users exist in the system.
-- For Docker or Kubernetes deployments, set these environment variables in your container or deployment spec.
-
-**Troubleshooting:**  
-If you set the environment variables but still see `Key not found` errors, make sure:
-- You are not also passing the CLI flags (CLI flags take precedence).
-- You have deleted any previous authentication data (`rm -rf ./data/auth/*`) before starting the server.
