@@ -237,4 +237,8 @@ func (opts *options) defineCliOptions(cmd *cobra.Command) {
 		defaultAuthInitialPassword,
 		"Password for the initial admin user (defaults to FLOWG_AUTH_INITIAL_PASSWORD or 'root')",
 	)
+
+	// Bind environment variables to flags
+	cmd.Flags().Set("auth-initial-user", defaultAuthInitialUser)
+	cmd.Flags().Set("auth-initial-password", defaultAuthInitialPassword)
 }
