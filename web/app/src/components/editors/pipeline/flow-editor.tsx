@@ -7,6 +7,7 @@ import React, {
   useEffect,
   useMemo,
   useState,
+  KeyboardEvent,
 } from 'react'
 
 import Chip from '@mui/material/Chip'
@@ -50,7 +51,7 @@ export const FlowEditor: React.FC<FlowEditorProps> = ({
   flow,
   onFlowChange,
 }) => {
-  const { screenToFlowPosition } = useReactFlow()
+  const { screenToFlowPosition, getNodes, getEdges, deleteElements } = useReactFlow()
 
   const nodeTypes = useMemo(
     () => ({
@@ -179,6 +180,22 @@ export const FlowEditor: React.FC<FlowEditorProps> = ({
     [screenToFlowPosition]
   )
 
+  const onKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.key === 'Delete' || event.key === 'Backspace') {
+        const selectedNodes = getNodes().filter((node) => node.selected && node.deletable !== false)
+        if (selectedNodes.length > 0) {
+          const selectedNodeIds = selectedNodes.map((node) => node.id)
+          const edgesToDelete = getEdges().filter(
+            (edge) => selectedNodeIds.includes(edge.source) || selectedNodeIds.includes(edge.target)
+          )
+          deleteElements({ nodes: selectedNodes, edges: edgesToDelete })
+        }
+      }
+    },
+    [getNodes, getEdges, deleteElements]
+  )
+
   return (
     <Paper className="w-full h-full">
       <ReactFlow
@@ -190,6 +207,7 @@ export const FlowEditor: React.FC<FlowEditorProps> = ({
         onConnect={onConnect}
         onDrop={onDrop}
         onDragOver={onDragOver}
+        onKeyDown={onKeyDown}
         fitView
         snapToGrid
         defaultEdgeOptions={{ animated: true, type: 'smoothstep' }}
