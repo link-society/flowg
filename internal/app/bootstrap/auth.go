@@ -9,7 +9,12 @@ import (
 	"link-society.com/flowg/internal/storage/auth"
 )
 
-func DefaultRolesAndUsers(ctx context.Context, authStorage *auth.Storage) error {
+type BootstrapOptions struct {
+	InitialUser     string
+	InitialPassword string
+}
+
+func DefaultRolesAndUsers(ctx context.Context, authStorage *auth.Storage, opts BootstrapOptions) error {
 	roles, err := authStorage.ListRoles(ctx)
 	if err != nil {
 		return err
@@ -41,11 +46,11 @@ func DefaultRolesAndUsers(ctx context.Context, authStorage *auth.Storage) error 
 
 	if len(users) == 0 {
 		rootUser := models.User{
-			Name:  "root",
+			Name:  opts.InitialUser,
 			Roles: []string{"admin"},
 		}
 
-		err := authStorage.SaveUser(ctx, rootUser, "root")
+		err := authStorage.SaveUser(ctx, rootUser, opts.InitialPassword)
 		if err != nil {
 			return fmt.Errorf("failed to bootstrap root user: %w", err)
 		}

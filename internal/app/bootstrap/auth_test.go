@@ -26,7 +26,10 @@ func TestDefaultRolesAndUsers(t *testing.T) {
 		t.Fatalf("unexpected error at startup: %v", err)
 	}
 
-	err = bootstrap.DefaultRolesAndUsers(ctx, authStorage)
+	err = bootstrap.DefaultRolesAndUsers(ctx, authStorage, bootstrap.BootstrapOptions{
+		InitialUser:     "root",
+		InitialPassword: "root",
+	})
 	if err != nil {
 		t.Fatalf("failed to bootstrap roles and users: %v", err)
 	}

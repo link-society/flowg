@@ -34,6 +34,9 @@ type options struct {
 
 	serviceName string
 	consulUrl   string
+
+	authInitialUser     string
+	authInitialPassword string
 }
 
 func (opts *options) defineCliOptions(cmd *cobra.Command) {
@@ -220,4 +223,22 @@ func (opts *options) defineCliOptions(cmd *cobra.Command) {
 		defaultConsulUrl,
 		"URL to local consul instance",
 	)
+
+	cmd.Flags().StringVar(
+		&opts.authInitialUser,
+		"auth-initial-user",
+		defaultAuthInitialUser,
+		"Username for the initial admin user (defaults to FLOWG_AUTH_INITIAL_USER or 'root')",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.authInitialPassword,
+		"auth-initial-password",
+		defaultAuthInitialPassword,
+		"Password for the initial admin user (defaults to FLOWG_AUTH_INITIAL_PASSWORD or 'root')",
+	)
+
+	// Bind environment variables to flags
+	cmd.Flags().Set("auth-initial-user", defaultAuthInitialUser)
+	cmd.Flags().Set("auth-initial-password", defaultAuthInitialPassword)
 }
