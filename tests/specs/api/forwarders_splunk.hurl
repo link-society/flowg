@@ -1,0 +1,63 @@
+GET http://localhost:5080/api/v1/forwarders
+Authorization: Bearer {{admin_token}}
+HTTP 200
+[Asserts]
+jsonpath "$.success" == true
+jsonpath "$.forwarders" count == 0
+
+PUT http://localhost:5080/api/v1/forwarders/splunk-test
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+{
+  "forwarder": {
+    "version": 2,
+    "config": {
+      "type": "splunk",
+      "endpoint": "http://localhost:8088/services/collector/event",
+      "token": "test-token"
+    }
+  }
+}
+HTTP 200
+[Asserts]
+jsonpath "$.success" == true
+
+GET http://localhost:5080/api/v1/forwarders
+Authorization: Bearer {{admin_token}}
+HTTP 200
+[Asserts]
+jsonpath "$.success" == true
+jsonpath "$.forwarders" count == 1
+jsonpath "$.forwarders[0]" == "splunk-test"
+
+GET http://localhost:5080/api/v1/forwarders/splunk-test
+Authorization: Bearer {{admin_token}}
+HTTP 200
+[Asserts]
+jsonpath "$.success" == true
+jsonpath "$.forwarder.config.type" == "splunk"
+jsonpath "$.forwarder.config.endpoint" == "http://localhost:8088/services/collector/event"
+jsonpath "$.forwarder.config.token" == "test-token"
+
+POST http://localhost:5080/api/v1/test/forwarders/splunk-test
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+{
+  "record": {
+    "message": "Test log message",
+    "host": "test-host"
+  }
+}
+HTTP 200
+[Asserts]
+jsonpath "$.success" == true
+
+DELETE http://localhost:5080/api/v1/forwarders/splunk-test
+Authorization: Bearer {{admin_token}}
+HTTP 200
+[Asserts]
+jsonpath "$.success" == true
+
+GET http://localhost:5080/api/v1/forwarders/splunk-test
+Authorization: Bearer {{admin_token}}
+HTTP 404 
