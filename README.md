@@ -6,6 +6,7 @@
 
   [![Build Status](https://github.com/link-society/flowg/actions/workflows/ci-package.yml/badge.svg)](https://github.com/link-society/flowg/actions/workflows/ci-package.yml)
   [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=link-society_flowg&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=link-society_flowg)
+  [![Discord](https://img.shields.io/discord/1377785473363345540)](https://discord.gg/r6fvz7K3)
 
 </div>
 
