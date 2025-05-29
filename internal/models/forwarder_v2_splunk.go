@@ -6,8 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
-	"time"
 )
 
 type ForwarderSplunkV2 struct {
@@ -34,7 +32,7 @@ func (f *ForwarderSplunkV2) call(ctx context.Context, record *LogRecord) error {
 		Event:      eventFields,
 		Sourcetype: "json",
 		Source:     "flowg",
-		Host:       record.Fields["host"], // or get from system
+		Host:       getHost(record.Fields),
 		Time:       record.Timestamp.Unix(),
 	}
 
@@ -54,30 +52,40 @@ func (f *ForwarderSplunkV2) call(ctx context.Context, record *LogRecord) error {
 	req.Header.Add("Content-Type", "application/json")
 
 	// Send request
-	client := http.Client{
-		Timeout: 5 * time.Second,
-	}
+	client := http.DefaultClient
 	resp, err := client.Do(req)
 	if err != nil {
-		// In test environments, we want to be more lenient with connection errors
-		if os.Getenv("FLOWG_TEST") == "1" {
-			return nil
-		}
-		if os.IsTimeout(err) {
-			return fmt.Errorf("request to Splunk HEC timed out: %w", err)
-		}
-		return fmt.Errorf("failed to connect to Splunk HEC: %w", err)
+		return fmt.Errorf("failed to send request to Splunk: %w", err)
 	}
 	defer resp.Body.Close()
 
-	// Check response
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		// In test environments, we want to be more lenient with status codes
-		if os.Getenv("FLOWG_TEST") == "1" {
-			return nil
-		}
-		return fmt.Errorf("Splunk HEC returned unexpected status code: %d", resp.StatusCode)
+	// Check response status
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status code from Splunk: %d", resp.StatusCode)
+	}
+
+	// Parse response
+	var result struct {
+		Text string `json:"text"`
+		Code int    `json:"code"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return fmt.Errorf("failed to decode Splunk response: %w", err)
+	}
+
+	// Check response code
+	if result.Code != 0 {
+		return fmt.Errorf("Splunk returned error: %s", result.Text)
 	}
 
 	return nil
+}
+
+// getHost returns the host from fields or a default value
+func getHost(fields map[string]string) string {
+	host, ok := fields["host"]
+	if !ok || host == "" {
+		return "flowg"
+	}
+	return host
 }
