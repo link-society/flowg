@@ -21,6 +21,9 @@ Content-Type: application/json
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true
+jsonpath "$.forwarder.config.type" == "splunk"
+jsonpath "$.forwarder.config.endpoint" == "http://httpbin.org/anything"
+jsonpath "$.forwarder.config.token" == "test-token"
 
 GET http://localhost:5080/api/v1/forwarders
 Authorization: Bearer {{admin_token}}
@@ -30,22 +33,12 @@ jsonpath "$.success" == true
 jsonpath "$.forwarders" count == 1
 jsonpath "$.forwarders[0]" == "splunk-test"
 
-GET http://localhost:5080/api/v1/forwarders/splunk-test
-Authorization: Bearer {{admin_token}}
-HTTP 200
-[Asserts]
-jsonpath "$.success" == true
-jsonpath "$.forwarder.config.type" == "splunk"
-jsonpath "$.forwarder.config.endpoint" == "http://httpbin.org/anything"
-jsonpath "$.forwarder.config.token" == "test-token"
-
 POST http://localhost:5080/api/v1/test/forwarders/splunk-test
 Authorization: Bearer {{admin_token}}
 Content-Type: application/json
 {
   "record": {
-    "message": "Test log message",
-    "host": "test-host"
+    "message": "Hello, World!"
   }
 }
 HTTP 200
