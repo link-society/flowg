@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -58,13 +59,16 @@ func (f *ForwarderSplunkV2) call(ctx context.Context, record *LogRecord) error {
 	}
 	resp, err := client.Do(req)
 	if err != nil {
-		return fmt.Errorf("failed to send request: %w", err)
+		if os.IsTimeout(err) {
+			return fmt.Errorf("request to Splunk HEC timed out: %w", err)
+		}
+		return fmt.Errorf("failed to connect to Splunk HEC: %w", err)
 	}
 	defer resp.Body.Close()
 
 	// Check response
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return fmt.Errorf("Splunk HEC returned unexpected status code: %d", resp.StatusCode)
 	}
 
 	return nil
