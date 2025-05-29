@@ -13,7 +13,7 @@ Content-Type: application/json
     "version": 2,
     "config": {
       "type": "splunk",
-      "endpoint": "http://localhost:8088/services/collector/event",
+      "endpoint": "http://mock-server:8080/services/collector/event",
       "token": "test-token"
     }
   }
@@ -36,7 +36,7 @@ HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 jsonpath "$.forwarder.config.type" == "splunk"
-jsonpath "$.forwarder.config.endpoint" == "http://localhost:8088/services/collector/event"
+jsonpath "$.forwarder.config.endpoint" == "http://mock-server:8080/services/collector/event"
 jsonpath "$.forwarder.config.token" == "test-token"
 
 POST http://localhost:5080/api/v1/test/forwarders/splunk-test
