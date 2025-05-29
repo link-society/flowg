@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 )
 
 type ForwarderSplunkV2 struct {
@@ -15,11 +16,11 @@ type ForwarderSplunkV2 struct {
 }
 
 func (f *ForwarderSplunkV2) call(ctx context.Context, record *LogRecord) error {
-	 // Convert map[string]string to map[string]interface{}
-	 eventFields := make(map[string]interface{})
-	 for k, v := range record.Fields {
-		 eventFields[k] = v
-	 }
+	// Convert map[string]string to map[string]interface{}
+	eventFields := make(map[string]interface{})
+	for k, v := range record.Fields {
+		eventFields[k] = v
+	}
 
 	// Create Splunk HEC payload
 	payload := struct {
@@ -52,7 +53,9 @@ func (f *ForwarderSplunkV2) call(ctx context.Context, record *LogRecord) error {
 	req.Header.Add("Content-Type", "application/json")
 
 	// Send request
-	client := http.Client{}
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
 	resp, err := client.Do(req)
 	if err != nil {
 		return fmt.Errorf("failed to send request: %w", err)
