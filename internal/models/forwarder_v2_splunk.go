@@ -54,7 +54,7 @@ func (f *ForwarderSplunkV2) call(ctx context.Context, record *LogRecord) error {
 
 	// Send request
 	client := &http.Client{
-		Timeout: 100 * time.Millisecond, // Short timeout for tests
+		Timeout: 500 * time.Millisecond, // Increased timeout for better reliability
 	}
 	resp, err := client.Do(req)
 	if err != nil {
