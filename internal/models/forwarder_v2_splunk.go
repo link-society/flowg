@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 )
 
 type ForwarderSplunkV2 struct {
@@ -52,7 +53,9 @@ func (f *ForwarderSplunkV2) call(ctx context.Context, record *LogRecord) error {
 	req.Header.Add("Content-Type", "application/json")
 
 	// Send request
-	client := http.DefaultClient
+	client := &http.Client{
+		Timeout: 100 * time.Millisecond, // Short timeout for tests
+	}
 	resp, err := client.Do(req)
 	if err != nil {
 		return fmt.Errorf("failed to send request to Splunk: %w", err)
