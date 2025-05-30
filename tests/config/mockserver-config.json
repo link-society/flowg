@@ -1,0 +1,30 @@
+[
+  {
+    "id": "flowg_forwarder_http_success",
+    "httpRequest": {
+      "method": "POST",
+      "path": "/test/flowg/forwarder/http/success"
+    },
+    "httpResponse": {
+      "statusCode": 200,
+      "body": "OK"
+    },
+    "times": {
+      "unlimited": true
+    }
+  },
+  {
+    "id": "flowg_forwarder_http_fail",
+    "httpRequest": {
+      "method": "POST",
+      "path": "/test/flowg/forwarder/http/fail"
+    },
+    "httpResponse": {
+      "statusCode": 500,
+      "body": "Internal Server Error"
+    },
+    "times": {
+      "unlimited": true
+    }
+  }
+]

@@ -4,7 +4,7 @@ from pathlib import Path
 from shutil import rmtree
 import docker
 
-from ._lib import docker_utils, flowg_utils
+from ._lib import docker_utils, flowg_utils, mockserver_utils
 
 
 @pytest.fixture(scope='module', autouse=True)
@@ -13,6 +13,12 @@ def log_separator(request):
     print("--- Running test:", request.node.path)
     yield
     print("-" * 80)
+
+
+@pytest.fixture(scope="module")
+def config_dir():
+    config_dir = Path.cwd() / "config"
+    yield config_dir
 
 
 @pytest.fixture(scope="module")
@@ -178,6 +184,23 @@ def flowg_guest_token(flowg_admin_token):
         username="guest",
         password="guest",
     )
+
+
+@pytest.fixture(scope='module')
+def mockserver_container(
+    config_dir,
+    report_dir,
+    docker_client,
+    flowg_network,
+):
+    with mockserver_utils.container(
+        docker_client,
+        name="test-flowg-mockserver",
+        network=flowg_network,
+        config_dir=config_dir,
+        report_dir=report_dir,
+    ):
+        yield
 
 
 def pytest_report_teststatus(report, config):

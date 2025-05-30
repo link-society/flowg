@@ -11,6 +11,7 @@ def test_hurl(
     spec_dir,
     report_dir,
     cache_dir,
+    mockserver_container,
     flowg_admin_token,
     flowg_guest_token,
     otlp_pb,
