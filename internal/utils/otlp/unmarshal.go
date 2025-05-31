@@ -1,8 +1,7 @@
 package otlp
 
 import (
-	"encoding/json"
-
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 
 	collectlogs "go.opentelemetry.io/proto/otlp/collector/logs/v1"
@@ -12,7 +11,7 @@ import (
 
 func UnmarshalJSON(body []byte) ([]*models.LogRecord, error) {
 	message := collectlogs.ExportLogsServiceRequest{}
-	err := json.Unmarshal(body, &message)
+	err := protojson.Unmarshal(body, &message)
 	if err != nil {
 		return nil, err
 	}
