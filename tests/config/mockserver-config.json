@@ -26,5 +26,33 @@
     "times": {
       "unlimited": true
     }
+  },
+  {
+    "id": "flowg_forwarder_splunk_success",
+    "httpRequest": {
+      "method": "POST",
+      "path": "/services/collector/event"
+    },
+    "httpResponse": {
+      "statusCode": 200,
+      "body": "{\"text\":\"Success\",\"code\":0}"
+    },
+    "times": {
+      "unlimited": true
+    }
+  },
+  {
+    "id": "flowg_forwarder_splunk_fail",
+    "httpRequest": {
+      "method": "POST",
+      "path": "/services/collector/fail"
+    },
+    "httpResponse": {
+      "statusCode": 500,
+      "body": "Internal Server Error"
+    },
+    "times": {
+      "unlimited": true
+    }
   }
 ]
