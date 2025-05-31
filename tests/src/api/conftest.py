@@ -27,7 +27,7 @@ def otlp_pb(cache_dir):
 
     # resource attributes
     res = Resource()
-    res.attributes.add(key="service.name", value=AnyValue(string_value="my‑service"))
+    res.attributes.add(key="service.name", value=AnyValue(string_value="my-service"))
     rl.resource.CopyFrom(res)
 
     # one scopeLogs + one logRecord
