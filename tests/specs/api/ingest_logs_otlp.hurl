@@ -1,23 +1,34 @@
+###############################################################################
+# DESCRIPTION: Test OpenTelemetry Logs Ingestion
+###############################################################################
+
+# -----------------------------------------------------------------------------
+# TEST:
+#  - Send OpenTelemetry logs in JSON format to the default pipeline
+#  - Send OpenTelemetry logs in Protobuf format to the default pipeline
+#  - Verify logs have been ingested
+#  - Purge the stream
+
 POST http://localhost:5080/api/v1/pipelines/default/logs/otlp
 Authorization: Bearer {{admin_token}}
 Content-Type: application/json
 {
-  "resource_logs": [{
+  "resourceLogs": [{
     "resource": {
       "attributes": [{
         "key": "service.name",
         "value": { "stringValue": "demo-service" }
       }]
     },
-    "scope_logs": [{
+    "scopeLogs": [{
       "scope": {
         "name": "demo-logger"
       },
-      "log_records": [{
-        "time_unix_nano": 1713300000000000000,
-        "severity_number": 9,
-        "severity_text": "INFO",
-        "body": { "stringValue": "Hello depuis curl !" },
+      "logRecords": [{
+        "timeUnixNano": 1713300000000000000,
+        "severityNumber": 9,
+        "severityText": "INFO",
+        "body": { "stringValue": "Hello from Hurl" },
         "attributes": [{
           "key": "env",
           "value": { "stringValue": "dev" }
@@ -39,6 +50,19 @@ HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 jsonpath "$.processed_count" == 1
+
+GET http://localhost:5080/api/v1/streams/default/logs
+Authorization: Bearer {{admin_token}}
+[Query]
+from: {{timewindow_begin}}
+to: {{timewindow_end}}
+
+HTTP 200
+[Asserts]
+jsonpath "$.success" == true
+jsonpath "$.records" count == 2
+jsonpath "$.records[0].fields.body" == "Hello from Python"
+jsonpath "$.records[1].fields.body" == "Hello from Hurl"
 
 DELETE http://localhost:5080/api/v1/streams/default
 Authorization: Bearer {{admin_token}}

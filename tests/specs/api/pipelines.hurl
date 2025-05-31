@@ -1,3 +1,11 @@
+###############################################################################
+# DESCRIPTION: Test pipeline management through API
+###############################################################################
+
+# -----------------------------------------------------------------------------
+# TEST:
+#  - Verify that the default pipeline exists
+
 GET http://localhost:5080/api/v1/pipelines
 Authorization: Bearer {{admin_token}}
 HTTP 200
@@ -12,6 +20,12 @@ HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 jsonpath "$.flow" exists
+
+# -----------------------------------------------------------------------------
+# TEST:
+#  - Verify the a pipeline "test" does not exist
+#  - Create a new pipeline "test" that route logs to the stream "test"
+#  - Verify it appears in the list of pipelines
 
 GET http://localhost:5080/api/v1/pipelines/test
 Authorization: Bearer {{admin_token}}
@@ -84,6 +98,12 @@ jsonpath "$.pipelines" count == 2
 jsonpath "$.pipelines" contains "default"
 jsonpath "$.pipelines" contains "test"
 
+# -----------------------------------------------------------------------------
+# TEST:
+#  - Send structured logs to the "test" pipeline
+#  - Verify logs have been ingested in the "test" stream
+#  - Purge the stream
+
 POST http://localhost:5080/api/v1/pipelines/test/logs/struct
 Authorization: Bearer {{admin_token}}
 Content-Type: application/json
@@ -118,6 +138,11 @@ Authorization: Bearer {{admin_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true
+
+# -----------------------------------------------------------------------------
+# TEST:
+#  - Delete the "test" pipeline
+#  - Verify it no longer appears in the list of pipelines
 
 DELETE http://localhost:5080/api/v1/pipelines/test
 Authorization: Bearer {{admin_token}}

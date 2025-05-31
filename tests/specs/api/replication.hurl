@@ -1,3 +1,12 @@
+###############################################################################
+# DESCRIPTION: Test replication in a cluster
+###############################################################################
+
+# -----------------------------------------------------------------------------
+# TEST:
+#  - Send structured logs to the default pipeline
+#  - Verify logs have been ingested in the default stream on all nodes
+
 POST http://localhost:5080/api/v1/pipelines/default/logs/struct
 Authorization: Bearer {{admin_token}}
 Content-Type: application/json
@@ -65,7 +74,10 @@ jsonpath "$.records" count == 1
 jsonpath "$.records[0].fields.level" == "info"
 jsonpath "$.records[0].fields.message" == "test"
 
-# --- Cleanup -----------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# TEST:
+#  - Purge the default stream
+#  - Verify the stream is empty on all nodes
 
 DELETE http://localhost:5080/api/v1/streams/default
 Authorization: Bearer {{admin_token}}

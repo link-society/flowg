@@ -1,3 +1,13 @@
+###############################################################################
+# DESCRIPTION: Test Splunk Forwarder
+###############################################################################
+
+# -----------------------------------------------------------------------------
+# TEST:
+#  - Create Splunk Forwarder with success response
+#  - Send a record to the forwarder and verify it succeeds
+#  - Delete the forwarder
+
 PUT http://localhost:5080/api/v1/forwarders/splunk-success
 Authorization: Bearer {{admin_token}}
 Content-Type: application/json
@@ -33,6 +43,12 @@ Authorization: Bearer {{admin_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true
+
+# -----------------------------------------------------------------------------
+# TEST:
+#  - Create Splunk Forwarder with failure response
+#  - Send a record to the forwarder and verify it fails
+#  - Delete the forwarder
 
 PUT http://localhost:5080/api/v1/forwarders/splunk-fail
 Authorization: Bearer {{admin_token}}
