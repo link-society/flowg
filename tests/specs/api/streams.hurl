@@ -1,3 +1,14 @@
+###############################################################################
+# DESCRIPTION: Test stream management through API
+###############################################################################
+
+# -----------------------------------------------------------------------------
+# TEST:
+#  - Verify that no streams exist
+#  - Create a stream "test" with indexed field "level", ttl 3600, and size 1024
+#  - Verify the stream appears in the list of streams
+#  - Verify the stream configuration
+
 GET http://localhost:5080/api/v1/streams
 Authorization: Bearer {{admin_token}}
 HTTP 200
@@ -40,6 +51,14 @@ jsonpath "$.config.indexed_fields[0]" == "level"
 jsonpath "$.config.ttl" == 3600
 jsonpath "$.config.size" == 1024
 
+# -----------------------------------------------------------------------------
+# TEST:
+#  - Verify that a stream is automatically created if it does not exist
+#  - Verify the stream configuration is default (no indexed fields, ttl 0, size 0)
+#  - Verify the stream appears in the list of streams
+#  - Delete the stream
+#  - Verify the stream is no longer in the list of streams
+
 GET http://localhost:5080/api/v1/streams/test_getorcreate
 Authorization: Bearer {{admin_token}}
 HTTP 200
@@ -70,6 +89,11 @@ HTTP 200
 jsonpath "$.success" == true
 jsonpath "$.streams.test" exists
 jsonpath "$.streams.test_getorcreate" not exists
+
+# -----------------------------------------------------------------------------
+# TEST:
+#  - Delete the "test" stream
+#  - Verify the stream is no longer in the list of streams
 
 DELETE http://localhost:5080/api/v1/streams/test
 Authorization: Bearer {{admin_token}}

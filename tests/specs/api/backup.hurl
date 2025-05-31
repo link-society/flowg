@@ -1,3 +1,13 @@
+###############################################################################
+# DESCRIPTION: Test backup and restore
+###############################################################################
+
+# -----------------------------------------------------------------------------
+# TEST:
+#  - Backup Authentication Database
+#  - Backup Configuration Database
+#  - Backup Logs Database
+
 GET http://localhost:5080/api/v1/backup/auth
 Authorization: Bearer {{admin_token}}
 [Options]
@@ -15,6 +25,12 @@ Authorization: Bearer {{admin_token}}
 [Options]
 output: backup/logs.db
 HTTP 200
+
+# -----------------------------------------------------------------------------
+# TEST:
+#  - Restore Authentication Database
+#  - Restore Configuration Database
+#  - Restore Logs Database
 
 POST http://localhost:5080/api/v1/restore/auth
 Authorization: Bearer {{admin_token}}
