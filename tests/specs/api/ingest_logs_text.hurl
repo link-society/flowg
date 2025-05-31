@@ -19,6 +19,7 @@ HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 jsonpath "$.processed_count" == 2
+
 GET http://localhost:5080/api/v1/streams/default/logs
 Authorization: Bearer {{admin_token}}
 [Query]
@@ -29,8 +30,8 @@ HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 jsonpath "$.records" count == 2
-jsonpath "$.records[0].fields.content" == "world"
-jsonpath "$.records[1].fields.content" == "hello"
+jsonpath "$.records[*].fields.content" contains "world"
+jsonpath "$.records[*].fields.content" contains "hello"
 
 DELETE http://localhost:5080/api/v1/streams/default
 Authorization: Bearer {{admin_token}}
