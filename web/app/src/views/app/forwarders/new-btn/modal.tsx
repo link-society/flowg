@@ -56,6 +56,15 @@ const newForwarderFactory = (type: ForwarderTypes): ForwarderModel => {
         },
       }
 
+    case 'splunk':
+      return {
+        config: {
+          type,
+          endpoint: '',
+          token: '',
+        },
+      }
+
     case 'amqp':
       return {
         config: {

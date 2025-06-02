@@ -3,6 +3,7 @@ import { ForwarderConfigModel, ForwarderModel } from '@/lib/models/forwarder'
 import { AmqpForwarderEditor } from './amqp'
 import { DatadogForwarderEditor } from './datadog'
 import { HttpForwarderEditor } from './http'
+import { SplunkForwarderEditor } from './splunk'
 import { SyslogForwarderEditor } from './syslog'
 
 type ForwarderEditorProps = {
@@ -41,6 +42,14 @@ export const ForwarderEditor = ({
     case 'datadog':
       return (
         <DatadogForwarderEditor
+          config={forwarder.config}
+          onConfigChange={onConfigChange}
+        />
+      )
+
+    case 'splunk':
+      return (
+        <SplunkForwarderEditor
           config={forwarder.config}
           onConfigChange={onConfigChange}
         />
