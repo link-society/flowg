@@ -110,7 +110,7 @@ RUN upx bin/*
 ## FINAL ARTIFACT
 ##############################
 
-FROM alpine:3.21 AS runner
+FROM alpine:3.22 AS runner
 
 RUN apk add --no-cache libgcc su-exec
 
