@@ -47,7 +47,7 @@ ADD internal/utils/ffi/vrl/rust-crate /src/internal/utils/ffi/vrl/rust-crate
 ##############################
 
 ## FilterDSL
-FROM rust:1.87-alpine3.21 AS builder-rust-filterdsl
+FROM rust:1.87-alpine3.22 AS builder-rust-filterdsl
 RUN apk add --no-cache musl-dev
 
 COPY --from=sources-rust-filterdsl /src /workspace
@@ -57,7 +57,7 @@ RUN cargo build --release
 RUN cargo test
 
 ## VRL
-FROM rust:1.87-alpine3.21 AS builder-rust-vrl
+FROM rust:1.87-alpine3.22 AS builder-rust-vrl
 RUN apk add --no-cache musl-dev
 
 COPY --from=sources-rust-vrl /src /workspace
@@ -70,7 +70,7 @@ RUN cargo test
 ## BUILD JS DEPENDENCIES
 ##############################
 
-FROM node:24-alpine3.21 AS builder-js
+FROM node:24-alpine3.22 AS builder-js
 COPY --from=sources-js /src /workspace
 WORKDIR /workspace/web/app
 
@@ -82,7 +82,7 @@ RUN NODE_ENV="production" npm run build
 ## BUILD GO CODE
 ##############################
 
-FROM golang:1.24-alpine3.21 AS builder-go
+FROM golang:1.24-alpine3.22 AS builder-go
 ARG UPX_VERSION
 ARG UPX_ARCH
 ARG UPX_OS
@@ -110,7 +110,7 @@ RUN upx bin/*
 ## FINAL ARTIFACT
 ##############################
 
-FROM alpine:3.21 AS runner
+FROM alpine:3.22 AS runner
 
 RUN apk add --no-cache libgcc su-exec
 
