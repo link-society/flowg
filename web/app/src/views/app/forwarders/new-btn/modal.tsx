@@ -75,6 +75,15 @@ const newForwarderFactory = (type: ForwarderTypes): ForwarderModel => {
         },
       }
 
+    case 'otlp':
+      return {
+        config: {
+          type,
+          endpoint: 'http://localhost:4318',
+          headers: {},
+        },
+      }
+
     default:
       throw new Error(`Unknown forwarder type: ${type}`)
   }

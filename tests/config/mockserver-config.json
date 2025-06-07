@@ -54,5 +54,42 @@
     "times": {
       "unlimited": true
     }
+  },{
+    "id": "flowg_forwarder_otlp_success",
+    "httpRequest": {
+      "method": "POST",
+      "path": "/v1/logs",
+      "headers": {
+        "Content-Type": ["application/x-protobuf"],
+        "X-Custom-Header": ["test-value"],
+        "X-Test-Mode": ["success"]
+      }
+    },
+    "httpResponse": {
+      "statusCode": 200,
+      "body": ""
+    },
+    "times": {
+      "unlimited": true
+    }
+  },
+  {
+    "id": "flowg_forwarder_otlp_fail",
+    "httpRequest": {
+      "method": "POST",
+      "path": "/v1/logs",
+      "headers": {
+        "Content-Type": ["application/x-protobuf"],
+        "X-Custom-Header": ["test-value"],
+        "X-Test-Mode": ["fail"]
+      }
+    },
+    "httpResponse": {
+      "statusCode": 500,
+      "body": "Internal Server Error"
+    },
+    "times": {
+      "unlimited": true
+    }
   }
 ]
