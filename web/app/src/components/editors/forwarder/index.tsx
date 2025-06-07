@@ -3,6 +3,7 @@ import { ForwarderConfigModel, ForwarderModel } from '@/lib/models/forwarder'
 import { AmqpForwarderEditor } from './amqp'
 import { DatadogForwarderEditor } from './datadog'
 import { HttpForwarderEditor } from './http'
+import { OtlpForwarderEditor } from './otlp'
 import { SplunkForwarderEditor } from './splunk'
 import { SyslogForwarderEditor } from './syslog'
 
@@ -58,6 +59,14 @@ export const ForwarderEditor = ({
     case 'amqp':
       return (
         <AmqpForwarderEditor
+          config={forwarder.config}
+          onConfigChange={onConfigChange}
+        />
+      )
+
+    case 'otlp':
+      return (
+        <OtlpForwarderEditor
           config={forwarder.config}
           onConfigChange={onConfigChange}
         />

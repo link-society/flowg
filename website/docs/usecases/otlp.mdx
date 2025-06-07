@@ -1,0 +1,47 @@
+---
+sidebar_position: 7
+---
+
+# Forwarding logs to OpenTelemetry
+
+## Introduction
+
+[OpenTelemetry](https://opentelemetry.io/) is an open-source observability framework that provides a standardized way to collect, process, and export telemetry data. FlowG allows you to forward logs to any OpenTelemetry-compatible system using the OTLP (OpenTelemetry Protocol) HTTP endpoint.
+
+## Setting up OpenTelemetry
+
+To receive logs from FlowG, you need an OpenTelemetry Collector or any system that supports the OTLP HTTP protocol. The default OTLP HTTP endpoint for logs is typically:
+
+```
+http://localhost:4318/v1/logs
+```
+
+## Setting up the FlowG pipeline
+
+First, let's create an "OpenTelemetry Forwarder" named `otlp`, with the following configuration:
+
+| Property | Value | Comment |
+| --- | --- | --- |
+| Endpoint | `http://localhost:4318/v1/logs` | The OTLP HTTP endpoint for logs |
+| Headers | `{}` | Optional headers to send with the request |
+
+Then, create a pipeline that forwards logs to the `otlp` forwarder.
+
+And that's it!
+
+## Testing
+
+You can test the setup by sending a log to the pipeline using the `logger` command:
+
+```bash
+logger -n localhost -P 5514 -t my-app 'hello world'
+```
+
+The log will be forwarded to your OpenTelemetry endpoint in the OTLP format.
+
+## What's next?
+
+Once the logs are received by your OpenTelemetry system, you can:
+- View them in your preferred observability platform
+- Process them using OpenTelemetry processors
+- Export them to other systems using OpenTelemetry exporters 
