@@ -43,6 +43,19 @@ updates:
       - "deps: rust"
   - package-ecosystem: "npm"
     directory: "/web/app"
+    groups:
+      mui:
+        patterns:
+          - "@mui/*"
+          - "@toolpad/*"
+          - "@emotion/*"
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "react-router"
+          - "@types/react"
+          - "@types/react-dom"
     schedule:
       interval: "weekly"
     commit-message:
@@ -51,6 +64,14 @@ updates:
       - "deps: javascript"
   - package-ecosystem: "npm"
     directory: "/website"
+    groups:
+      docusaurus:
+        patterns:
+          - "@docusaurus/*"
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
     schedule:
       interval: "weekly"
     commit-message:
