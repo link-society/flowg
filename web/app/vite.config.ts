@@ -14,6 +14,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
     compression({
+      algorithms: ['gzip'],
       include: [
         /\.(html|css|js|map|ico|png)$/,
       ],
