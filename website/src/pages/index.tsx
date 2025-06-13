@@ -42,6 +42,14 @@ function HomepageHeader() {
             Bug Tracker
           </Link>
         </div>
+        <div className={styles.news}>
+          <a href="https://osmc.de/talks/easy-logging-refinement-with-flowg/">
+            🚩
+            FlowG will be presented at the <b>OpenSource Monitoring Conference</b> in
+            Nuremberg, Germany this November.
+            🚩
+          </a>
+        </div>
       </div>
     </header>
   )
