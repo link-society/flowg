@@ -36,6 +36,15 @@ tasks:
     env:
       FLOWG_TEST_SUITES: consul
 
+  "e2e:dns":
+    desc: "Run cluster formation using CoreDNS end-to-end tests"
+    dir: ./tests
+    cmds:
+      - pdm install
+      - pdm run pytest
+    env:
+      FLOWG_TEST_SUITES: dns
+
   bench:
     desc: "Run benchmark"
     dir: ./tests
