@@ -3,6 +3,7 @@ package bootstrap
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"link-society.com/flowg/internal/models"
 
@@ -12,6 +13,11 @@ import (
 type BootstrapOptions struct {
 	InitialUser     string
 	InitialPassword string
+}
+
+type ResetUserOptions struct {
+	User     string
+	Password string
 }
 
 func DefaultRolesAndUsers(ctx context.Context, authStorage *auth.Storage, opts BootstrapOptions) error {
@@ -54,6 +60,30 @@ func DefaultRolesAndUsers(ctx context.Context, authStorage *auth.Storage, opts B
 		if err != nil {
 			return fmt.Errorf("failed to bootstrap root user: %w", err)
 		}
+	}
+
+	return nil
+}
+
+func ResetUser(ctx context.Context, authStorage *auth.Storage, opts ResetUserOptions) error {
+	if opts.User == "" || opts.Password == "" {
+		return nil
+	}
+
+	slog.InfoContext(
+		ctx,
+		"Resetting user password",
+		slog.String("user", opts.User),
+	)
+
+	user, err := authStorage.FetchUser(ctx, opts.User)
+	if err != nil {
+		return fmt.Errorf("failed to get user %s: %w", opts.User, err)
+	}
+
+	err = authStorage.SaveUser(ctx, *user, opts.Password)
+	if err != nil {
+		return fmt.Errorf("failed to reset password for user %s: %w", opts.User, err)
 	}
 
 	return nil

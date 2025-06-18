@@ -21,6 +21,9 @@ type bootstrapProcHandler struct {
 
 	initialUser     string
 	initialPassword string
+
+	resetUser     string
+	resetPassword string
 }
 
 var _ proctree.ProcessHandler = (*bootstrapProcHandler)(nil)
@@ -48,6 +51,11 @@ func (h *bootstrapProcHandler) Init(ctx actor.Context) proctree.ProcessResult {
 		)
 		return proctree.Terminate(err)
 	}
+
+	err = bootstrap.ResetUser(ctx, h.authStorage, bootstrap.ResetUserOptions{
+		User:     h.resetUser,
+		Password: h.resetPassword,
+	})
 
 	return proctree.Continue()
 }

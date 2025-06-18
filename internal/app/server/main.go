@@ -49,6 +49,9 @@ type Options struct {
 
 	AuthInitialUser     string
 	AuthInitialPassword string
+
+	AuthResetUser     string
+	AuthResetPassword string
 }
 
 func NewServer(opts Options) proctree.Process {
@@ -124,6 +127,8 @@ func NewServer(opts Options) proctree.Process {
 		configStorage:   configStorage,
 		initialUser:     opts.AuthInitialUser,
 		initialPassword: opts.AuthInitialPassword,
+		resetUser:       opts.AuthResetUser,
+		resetPassword:   opts.AuthResetPassword,
 	}
 
 	return proctree.NewProcessGroup(

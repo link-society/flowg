@@ -126,6 +126,9 @@ func newServerConfig(opts *options) (server.Options, error) {
 
 		AuthInitialUser:     opts.authInitialUser,
 		AuthInitialPassword: opts.authInitialPassword,
+
+		AuthResetUser:     opts.authResetUser,
+		AuthResetPassword: opts.authResetPassword,
 	}
 
 	return config, nil
