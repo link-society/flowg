@@ -37,6 +37,9 @@ type options struct {
 
 	authInitialUser     string
 	authInitialPassword string
+
+	authResetUser     string
+	authResetPassword string
 }
 
 func (opts *options) defineCliOptions(cmd *cobra.Command) {
@@ -228,17 +231,27 @@ func (opts *options) defineCliOptions(cmd *cobra.Command) {
 		&opts.authInitialUser,
 		"auth-initial-user",
 		defaultAuthInitialUser,
-		"Username for the initial admin user (defaults to FLOWG_AUTH_INITIAL_USER or 'root')",
+		"Username for the initial admin user",
 	)
 
 	cmd.Flags().StringVar(
 		&opts.authInitialPassword,
 		"auth-initial-password",
 		defaultAuthInitialPassword,
-		"Password for the initial admin user (defaults to FLOWG_AUTH_INITIAL_PASSWORD or 'root')",
+		"Password for the initial admin user",
 	)
 
-	// Bind environment variables to flags
-	cmd.Flags().Set("auth-initial-user", defaultAuthInitialUser)
-	cmd.Flags().Set("auth-initial-password", defaultAuthInitialPassword)
+	cmd.Flags().StringVar(
+		&opts.authResetUser,
+		"auth-reset-user",
+		defaultAuthResetUser,
+		"If set, this is the username for the user to reset the password for",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.authResetPassword,
+		"auth-reset-password",
+		defaultAuthResetPassword,
+		"If set, this is the new password for the user to reset",
+	)
 }

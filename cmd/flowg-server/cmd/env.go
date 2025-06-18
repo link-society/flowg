@@ -51,6 +51,9 @@ var (
 
 	defaultAuthInitialUser     = getEnvString("FLOWG_AUTH_INITIAL_USER", "root")
 	defaultAuthInitialPassword = getEnvString("FLOWG_AUTH_INITIAL_PASSWORD", "root")
+
+	defaultAuthResetUser     = getEnvString("FLOWG_AUTH_RESET_USER", "")
+	defaultAuthResetPassword = getEnvString("FLOWG_AUTH_RESET_PASSWORD", "")
 )
 
 func getEnvString(key string, defaultValue string) string {
