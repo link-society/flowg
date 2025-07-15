@@ -40,6 +40,7 @@ import { RouterNode } from './nodes/router'
 import { SourceNode } from './nodes/source'
 import { SwitchNode } from './nodes/switch'
 import { TransformNode } from './nodes/transform'
+import * as shortcuts from './shortcuts'
 
 type FlowEditorProps = Readonly<{
   flow: PipelineModel
@@ -193,6 +194,7 @@ export const FlowEditor: React.FC<FlowEditorProps> = ({
         fitView
         snapToGrid
         defaultEdgeOptions={{ animated: true, type: 'smoothstep' }}
+        {...shortcuts}
       >
         <Background />
         <Controls />
