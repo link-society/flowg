@@ -13,10 +13,20 @@ spec:
       port: 5080
       targetPort: 5080
       protocol: TCP
+      {{- if .Values.flowg.https.enabled }}
+      appProtocol: https
+      {{- else }}
+      appProtocol: http
+      {{- end }}
     - name: mgmt
       port: 9113
       targetPort: 9113
       protocol: TCP
+      {{- if .Values.flowg.https.mgmt.enabled }}
+      appProtocol: https
+      {{- else }}
+      appProtocol: http
+      {{- end }}
     - name: syslog
       port: 5514
       targetPort: 5514

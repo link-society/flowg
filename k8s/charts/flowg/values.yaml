@@ -4,10 +4,6 @@ nameOverride: ""
 fullnameOverride: ""
 
 flowg:
-  # FlowG does not support yet clustering
-  # You must specify which Kubernetes node to run it on
-  nodeName: ""
-
   image:
     repository: linksociety/flowg
     tag: ""

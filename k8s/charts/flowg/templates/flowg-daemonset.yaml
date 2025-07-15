@@ -1,11 +1,10 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
   name: {{ include "flowg.fullname" . }}
   labels:
     {{- include "flowg.labels" . | nindent 4 }}
 spec:
-  replicas: 1
   selector:
     matchLabels:
       {{- include "flowg.selectorLabels" . | nindent 6 }}
@@ -19,15 +18,6 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "flowg.serviceAccountName" . }}
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: kubernetes.io/hostname
-                    operator: In
-                    values:
-                      - {{ include "flowg.nodeName" . }}
       containers:
         - name: flowg
           image: "{{ .Values.flowg.image.repository }}:{{ .Values.flowg.image.tag | default .Chart.AppVersion }}"
@@ -44,6 +34,19 @@ spec:
             - --mgmt-tls-cert=/data/ssl/mgmt/tls.crt
             - --mgmt-tls-key=/data/ssl/mgmt/tls.key
           {{- end }}
+          env:
+            - name: FLOWG_CLUSTER_NODE_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: FLOWG_CLUSTER_FORMATION_STRATEGY
+              value: "k8s"
+            - name: FLOWG_CLUSTER_FORMATION_K8S_SERVICE_NAMESPACE
+              value: {{ .Release.Namespace }}
+            - name: FLOWG_CLUSTER_FORMATION_K8S_SERVICE_NAME
+              value: {{ include "flowg.fullname" . }}
+            - name: FLOWG_CLUSTER_FORMATION_K8S_SERVICE_PORT_NAME
+              value: mgmt
           ports:
             - containerPort: 5080
               hostPort: 5080

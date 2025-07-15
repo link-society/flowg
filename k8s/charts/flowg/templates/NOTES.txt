@@ -1,5 +1,1 @@
 FlowG {{ .Chart.AppVersion }} has been deployed! 🚀
-
-Running on node: {{ include "flowg.nodeName" . }}
-Data stored at:  {{ .Values.flowg.storage.hostPath }}
-Reserved space:  {{ .Values.flowg.storage.size }}
