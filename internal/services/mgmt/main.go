@@ -3,9 +3,10 @@ package mgmt
 import (
 	"fmt"
 	"log/slog"
-	"net"
+	"time"
 
 	"crypto/tls"
+	"net"
 	"net/url"
 
 	"github.com/hashicorp/go-sockaddr"
@@ -101,7 +102,12 @@ func NewServer(opts *ServerOptions) proctree.Process {
 	}
 
 	return proctree.NewProcessGroup(
-		proctree.DefaultProcessGroupOptions(),
+		proctree.ProcessGroupOptions{
+			// Longer init timeout because discovering other nodes
+			// could take longer than the default 5 seconds
+			InitTimeout: 1 * time.Minute,
+			JoinTimeout: 5 * time.Second,
+		},
 		clusterStateStorage,
 		proctree.NewProcess(listenerH),
 		clusterManager,

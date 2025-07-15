@@ -96,6 +96,7 @@ func (s *ConsulClusterFormationStrategy) Join(ctx context.Context, resolver Loca
 
 	joinNode, err := retry.DoWithData(
 		func() (*ClusterJoinNode, error) {
+			logger.InfoContext(ctx, "discover available nodes from Consul")
 			entries, _, err := s.client.Health().Service(s.ServiceName, "", false, nil)
 			if err != nil {
 				return nil, fmt.Errorf("failed to get nodes from Consul: %w", err)
@@ -108,6 +109,12 @@ func (s *ConsulClusterFormationStrategy) Join(ctx context.Context, resolver Loca
 						return nil, fmt.Errorf("failed to parse service endpoint URL: %w", err)
 					}
 
+					logger.InfoContext(
+						ctx,
+						"found join node in Consul",
+						slog.String("node_id", entry.Service.ID),
+						slog.String("endpoint", endpoint.String()),
+					)
 					return &ClusterJoinNode{
 						JoinNodeID:       entry.Service.ID,
 						JoinNodeEndpoint: endpoint,
@@ -124,6 +131,14 @@ func (s *ConsulClusterFormationStrategy) Join(ctx context.Context, resolver Loca
 			delay := retry.FixedDelay(n, err, config)
 			delay += retry.RandomDelay(n, err, config)
 			return delay
+		}),
+		retry.OnRetry(func(n uint, err error) {
+			logger.WarnContext(
+				ctx,
+				"retrying to discover nodes from Consul",
+				slog.Uint64("attempt", uint64(n)),
+				slog.String("error", err.Error()),
+			)
 		}),
 	)
 	if err != nil {
@@ -143,6 +158,9 @@ func (s *ConsulClusterFormationStrategy) Join(ctx context.Context, resolver Loca
 
 func (s *ConsulClusterFormationStrategy) Leave(ctx context.Context, node *ClusterJoinNode) error {
 	if s.client != nil {
+		logger := slog.Default().With(slog.String("channel", "cluster.consul"))
+
+		logger.InfoContext(ctx, "deregistering service from Consul")
 		err := s.client.Agent().ServiceDeregister(s.NodeID)
 		if err != nil {
 			return fmt.Errorf("failed to deregister service from Consul: %w", err)
