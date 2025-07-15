@@ -12,7 +12,7 @@ export const StreamView = () => {
 
   useEffect(() => {
     if (streams.length > 0) {
-      navigate(`/web/streams/${streams[0]}`)
+      navigate(`/web/streams/${streams[0]}`, { replace: true })
     }
   }, [])
 

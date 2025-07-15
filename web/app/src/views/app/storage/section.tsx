@@ -15,7 +15,7 @@ export const StreamView = () => {
 
   useEffect(() => {
     if (streamNames.length > 0) {
-      navigate(`/web/storage/${streamNames[0]}`)
+      navigate(`/web/storage/${streamNames[0]}`, { replace: true })
     }
   }, [])
 
