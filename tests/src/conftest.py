@@ -111,8 +111,9 @@ def flowg_node1_container(
         volume=flowg_node1_volume,
         image=flowg_image,
         environment={
-            "FLOWG_CLUSTER_JOIN_NODE_ID": "test-flowg-node0",
-            "FLOWG_CLUSTER_JOIN_ENDPOINT": "http://test-flowg-node0:9113",
+            "FLOWG_CLUSTER_FORMATION_STRATEGY": "manual",
+            "FLOWG_CLUSTER_FORMATION_MANUAL_JOIN_NODE_ID": "test-flowg-node0",
+            "FLOWG_CLUSTER_FORMATION_MANUAL_JOIN_ENDPOINT": "http://test-flowg-node0:9113",
             "FLOWG_HTTP_BIND_ADDRESS": ":5081",
             "FLOWG_MGMT_BIND_ADDRESS": ":9114",
             "FLOWG_SYSLOG_BIND_ADDRESS": ":5515",
@@ -142,8 +143,9 @@ def flowg_node2_container(
         volume=flowg_node2_volume,
         image=flowg_image,
         environment={
-            "FLOWG_CLUSTER_JOIN_NODE_ID": "test-flowg-node1",
-            "FLOWG_CLUSTER_JOIN_ENDPOINT": "http://test-flowg-node1:9114",
+            "FLOWG_CLUSTER_FORMATION_STRATEGY": "manual",
+            "FLOWG_CLUSTER_FORMATION_MANUAL_JOIN_NODE_ID": "test-flowg-node1",
+            "FLOWG_CLUSTER_FORMATION_MANUAL_JOIN_ENDPOINT": "http://test-flowg-node1:9114",
             "FLOWG_HTTP_BIND_ADDRESS": ":5082",
             "FLOWG_MGMT_BIND_ADDRESS": ":9115",
             "FLOWG_SYSLOG_BIND_ADDRESS": ":5516",
