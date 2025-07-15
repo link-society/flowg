@@ -21,6 +21,8 @@ jobs:
 
       - name: setup@buildchain
         uses: ./.github/actions/setup-buildchain
+        with:
+          ghtoken: ${{ secrets.GITHUB_TOKEN }}
 
       - name: build@website
         run: task build:all doc:gen:cli doc:gen:openapi www:build
