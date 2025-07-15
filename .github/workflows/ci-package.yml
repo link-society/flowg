@@ -172,7 +172,7 @@ jobs:
       - name: report@fail
         if: ${{ github.event_name == 'pull_request_target' && failure() }}
         run: exit 1
-  
+
   test-e2e-consul:
     runs-on: ubuntu-latest
     needs: build
@@ -253,4 +253,4 @@ jobs:
             --chart-dirs ./k8s/charts \
             --charts ./k8s/charts/flowg \
             --namespace flowg-system \
-            --helm-extra-set-args '--set=flowg.image.tag=latest --set=flowg.image.pullPolicy=Never --set=flowg.nodeName=flowg-control-plane'
+            --helm-extra-set-args '--set=flowg.image.tag=latest --set=flowg.image.pullPolicy=Never
