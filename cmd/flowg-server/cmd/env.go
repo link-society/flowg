@@ -20,10 +20,15 @@ var (
 	defaultMgmtTlsCert     = getEnvString("FLOWG_MGMT_TLS_CERT", "")
 	defaultMgmtTlsCertKey  = getEnvString("FLOWG_MGMT_TLS_KEY", "")
 
-	defaultClusterNodeID       = getEnvString("FLOWG_CLUSTER_NODE_ID", "")
-	defaultClusterJoinNodeID   = getEnvString("FLOWG_CLUSTER_JOIN_NODE_ID", "")
-	defaultClusterJoinEndpoint = getEnvString("FLOWG_CLUSTER_JOIN_ENDPOINT", "")
-	defaultClusterCookie       = getEnvString("FLOWG_CLUSTER_COOKIE", "")
+	defaultClusterNodeID = getEnvString("FLOWG_CLUSTER_NODE_ID", "")
+	defaultClusterCookie = getEnvString("FLOWG_CLUSTER_COOKIE", "")
+
+	defaultClusterFormationStrategy           = getEnvString("FLOWG_CLUSTER_FORMATION_STRATEGY", "manual")
+	defaultClusterFormationManualJoinNodeID   = getEnvString("FLOWG_CLUSTER_FORMATION_MANUAL_JOIN_NODE_ID", "")
+	defaultClusterFormationManualJoinEndpoint = getEnvString("FLOWG_CLUSTER_FORMATION_MANUAL_JOIN_ENDPOINT", "")
+
+	defaultClusterFormationConsulServiceName = getEnvString("FLOWG_CLUSTER_FORMATION_CONSUL_SERVICE_NAME", "FlowG")
+	defaultClusterFormationConsulUrl         = getEnvString("FLOWG_CLUSTER_FORMATION_CONSUL_URL", "")
 
 	defaultSyslogProtocol     = getEnvString("FLOWG_SYSLOG_PROTOCOL", "udp")
 	defaultSyslogBindAddr     = getEnvString("FLOWG_SYSLOG_BIND_ADDRESS", ":5514")
@@ -45,9 +50,6 @@ var (
 	defaultConfigDir       = getEnvString("FLOWG_CONFIG_DIR", "./data/config")
 	defaultLogDir          = getEnvString("FLOWG_LOG_DIR", "./data/logs")
 	defaultClusterStateDir = getEnvString("FLOWG_CLUSTER_STATE_DIR", "./data/state")
-
-	defaultServiceName = getEnvString("FLOWG_SERVICE_NAME", "FlowG")
-	defaultConsulUrl   = getEnvString("FLOWG_CONSUL_URL", "")
 
 	defaultAuthInitialUser     = getEnvString("FLOWG_AUTH_INITIAL_USER", "root")
 	defaultAuthInitialPassword = getEnvString("FLOWG_AUTH_INITIAL_PASSWORD", "root")

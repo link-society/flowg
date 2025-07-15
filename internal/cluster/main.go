@@ -1,6 +1,8 @@
 package cluster
 
 import (
+	"time"
+
 	"net"
 	"net/http"
 	"net/url"
@@ -20,9 +22,7 @@ type ManagerOptions struct {
 	NodeID string
 	Cookie string
 
-	ClusterJoinNode *ClusterJoinNode
-
-	AutomaticClusterFormation bool
+	ClusterFormationStrategy ClusterFormationStrategy
 
 	LocalEndpointResolver func() (*url.URL, error)
 
@@ -51,7 +51,12 @@ func NewManager(opts *ManagerOptions) *Manager {
 	}
 
 	process := proctree.NewProcessGroup(
-		proctree.DefaultProcessGroupOptions(),
+		proctree.ProcessGroupOptions{
+			// Longer init timeout because discovering other nodes
+			// could take longer than the default 5 seconds
+			InitTimeout: 1 * time.Minute,
+			JoinTimeout: 5 * time.Second,
+		},
 		proctree.NewActorProcess(connM),
 		proctree.NewActorProcess(packetM),
 		proctree.NewProcess(handler),

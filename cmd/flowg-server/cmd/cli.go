@@ -1,6 +1,8 @@
 package cmd
 
-import "github.com/spf13/cobra"
+import (
+	"github.com/spf13/cobra"
+)
 
 type options struct {
 	httpBindAddress string
@@ -13,11 +15,15 @@ type options struct {
 	mgmtTlsCert     string
 	mgmtTlsCertKey  string
 
-	clusterNodeID       string
-	clusterJoinNodeID   string
-	clusterJoinEndpoint string
-	clusterCookie       string
-	clusterStateDir     string
+	clusterNodeID   string
+	clusterCookie   string
+	clusterStateDir string
+
+	clusterFormationStrategy           string
+	clusterFormationManualJoinNodeID   string
+	clusterFormationManualJoinEndpoint string
+	clusterFormationConsulServiceName  string
+	clusterFormationConsulUrl          string
 
 	syslogProtocol       string
 	syslogBindAddr       string
@@ -31,9 +37,6 @@ type options struct {
 	logDir    string
 	configDir string
 	verbose   bool
-
-	serviceName string
-	consulUrl   string
 
 	authInitialUser     string
 	authInitialPassword string
@@ -107,20 +110,6 @@ func (opts *options) defineCliOptions(cmd *cobra.Command) {
 	)
 
 	cmd.Flags().StringVar(
-		&opts.clusterJoinNodeID,
-		"cluster-join-node-id",
-		defaultClusterJoinNodeID,
-		"Unique identifier of the node to join in the cluster",
-	)
-
-	cmd.Flags().StringVar(
-		&opts.clusterJoinEndpoint,
-		"cluster-join-endpoint",
-		defaultClusterJoinEndpoint,
-		"Management endpoint of the node to join the cluster",
-	)
-
-	cmd.Flags().StringVar(
 		&opts.clusterCookie,
 		"cluster-cookie",
 		defaultClusterCookie,
@@ -132,6 +121,41 @@ func (opts *options) defineCliOptions(cmd *cobra.Command) {
 		"cluster-state-dir",
 		defaultClusterStateDir,
 		"Path to the cluster state directory (for replication)",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.clusterFormationStrategy,
+		"cluster-formation-strategy",
+		defaultClusterFormationStrategy,
+		"Strategy to use for cluster formation",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.clusterFormationManualJoinNodeID,
+		"cluster-formation-manual-join-node-id",
+		defaultClusterFormationManualJoinNodeID,
+		"Unique identifier of the node to join in the cluster, ignored if not using 'manual' strategy",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.clusterFormationManualJoinEndpoint,
+		"cluster-formation-manual-join-endpoint",
+		defaultClusterFormationManualJoinEndpoint,
+		"Management endpoint of the node to join the cluster, ignored if not using 'manual' strategy",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.clusterFormationConsulServiceName,
+		"cluster-formation-consul-service-name",
+		defaultClusterFormationConsulServiceName,
+		"Name of the Consul service, ignored if not using 'consul' strategy",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.clusterFormationConsulUrl,
+		"cluster-formation-consul-url",
+		defaultClusterFormationConsulUrl,
+		"URL to local consul instance, ignored if not using 'consul' strategy",
 	)
 
 	cmd.Flags().StringVar(
@@ -211,20 +235,6 @@ func (opts *options) defineCliOptions(cmd *cobra.Command) {
 		"verbose",
 		defaultVerbose,
 		"Enable verbose logging",
-	)
-
-	cmd.Flags().StringVar(
-		&opts.serviceName,
-		"service-name",
-		defaultServiceName,
-		"Name of the service",
-	)
-
-	cmd.Flags().StringVar(
-		&opts.consulUrl,
-		"consul-url",
-		defaultConsulUrl,
-		"URL to local consul instance",
 	)
 
 	cmd.Flags().StringVar(

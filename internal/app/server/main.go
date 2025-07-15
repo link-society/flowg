@@ -2,7 +2,6 @@ package server
 
 import (
 	"log/slog"
-	"net/url"
 
 	"crypto/tls"
 
@@ -14,7 +13,6 @@ import (
 	"link-society.com/flowg/internal/engines/lognotify"
 	"link-society.com/flowg/internal/engines/pipelines"
 
-	"link-society.com/flowg/internal/services/consul"
 	"link-society.com/flowg/internal/services/http"
 	"link-society.com/flowg/internal/services/mgmt"
 	"link-society.com/flowg/internal/services/syslog"
@@ -29,11 +27,10 @@ type Options struct {
 	MgmtBindAddress string
 	MgmtTlsConfig   *tls.Config
 
-	ClusterNodeID       string
-	ClusterJoinNodeID   string
-	ClusterJoinEndpoint *url.URL
-	ClusterCookie       string
-	ClusterStateDir     string
+	ClusterNodeID            string
+	ClusterCookie            string
+	ClusterStateDir          string
+	ClusterFormationStrategy cluster.ClusterFormationStrategy
 
 	SyslogTcpMode      bool
 	SyslogBindAddress  string
@@ -55,11 +52,6 @@ type Options struct {
 }
 
 func NewServer(opts Options) proctree.Process {
-	isAutomaticClusterFormation := isAutomaticClusterFormation(opts.ConsulUrl)
-
-	// ClusterJoinNode shared between ConsulService and ManagementServer
-	ClusterJoinNode := cluster.NewClusterJoinNode(isAutomaticClusterFormation, opts.ClusterJoinNodeID, opts.ClusterJoinEndpoint)
-
 	// Storage Layer
 	var (
 		authStorage   = auth.NewStorage(auth.OptDirectory(opts.AuthStorageDir))
@@ -86,24 +78,14 @@ func NewServer(opts Options) proctree.Process {
 			LogNotifier:    logNotifier,
 			PipelineRunner: pipelineRunner,
 		})
-		consulService = consul.NewConsulService(&consul.ConsulServiceOptions{
-			NodeId:          opts.ClusterNodeID,
-			ServiceName:     opts.ServiceName,
-			ConsulUrl:       opts.ConsulUrl,
-			ClusterJoinNode: ClusterJoinNode,
-			MgmtBindAddress: opts.MgmtBindAddress,
-			MgmtTlsEnabled:  opts.MgmtTlsConfig != nil,
-		})
 		mgmtServer = mgmt.NewServer(&mgmt.ServerOptions{
 			BindAddress: opts.MgmtBindAddress,
 			TlsConfig:   opts.MgmtTlsConfig,
 
-			ClusterNodeID:   opts.ClusterNodeID,
-			ClusterCookie:   opts.ClusterCookie,
-			ClusterJoinNode: ClusterJoinNode,
-			ClusterStateDir: opts.ClusterStateDir,
-
-			AutomaticClusterFormation: isAutomaticClusterFormation,
+			ClusterNodeID:            opts.ClusterNodeID,
+			ClusterCookie:            opts.ClusterCookie,
+			ClusterStateDir:          opts.ClusterStateDir,
+			ClusterFormationStrategy: opts.ClusterFormationStrategy,
 
 			AuthStorage:   authStorage,
 			ConfigStorage: configStorage,
@@ -147,14 +129,9 @@ func NewServer(opts Options) proctree.Process {
 		proctree.NewProcessGroup(
 			proctree.DefaultProcessGroupOptions(),
 			httpServer,
-			consulService,
 			mgmtServer,
 			syslogServer,
 		),
 		proctree.NewProcess(bootstrapProc),
 	)
-}
-
-func isAutomaticClusterFormation(consulUrl string) bool {
-	return consulUrl != ""
 }
