@@ -19,11 +19,17 @@ type options struct {
 	clusterCookie   string
 	clusterStateDir string
 
-	clusterFormationStrategy           string
+	clusterFormationStrategy string
+
 	clusterFormationManualJoinNodeID   string
 	clusterFormationManualJoinEndpoint string
-	clusterFormationConsulServiceName  string
-	clusterFormationConsulUrl          string
+
+	clusterFormationConsulServiceName string
+	clusterFormationConsulUrl         string
+
+	clusterFormationKubernetesServiceNamespace string
+	clusterFormationKubernetesServiceName      string
+	clusterFormationKubernetesServicePortName  string
 
 	syslogProtocol       string
 	syslogBindAddr       string
@@ -158,6 +164,27 @@ func (opts *options) defineCliOptions(cmd *cobra.Command) {
 		"cluster-formation-consul-url",
 		defaultClusterFormationConsulUrl,
 		"URL to local consul instance, ignored if not using 'consul' strategy",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.clusterFormationKubernetesServiceNamespace,
+		"cluster-formation-k8s-service-namespace",
+		defaultClusterFormationKubernetesServiceNamespace,
+		"Namespace of the Kubernetes service, ignored if not using 'k8s' strategy",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.clusterFormationKubernetesServiceName,
+		"cluster-formation-k8s-service-name",
+		defaultClusterFormationKubernetesServiceName,
+		"Name of the Kubernetes service, ignored if not using 'k8s' strategy",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.clusterFormationKubernetesServicePortName,
+		"cluster-formation-k8s-service-port-name",
+		defaultClusterFormationKubernetesServicePortName,
+		"Name of the port in the Kubernetes service to use for cluster formation, ignored if not using 'k8s' strategy",
 	)
 
 	cmd.Flags().StringVar(

@@ -85,6 +85,24 @@ func newServerConfig(opts *options) (server.Options, error) {
 			ConsulUrl:      opts.clusterFormationConsulUrl,
 		}
 
+	case "k8s":
+		if opts.clusterFormationKubernetesServiceNamespace == "" {
+			return server.Options{}, fmt.Errorf("kubernetes service namespace is required for 'k8s' cluster formation")
+		}
+		if opts.clusterFormationKubernetesServiceName == "" {
+			return server.Options{}, fmt.Errorf("kubernetes service name is required for 'k8s' cluster formation")
+		}
+		if opts.clusterFormationKubernetesServicePortName == "" {
+			return server.Options{}, fmt.Errorf("kubernetes service port name is required for 'k8s' cluster formation")
+		}
+
+		clusterFormationStrategy = &cluster.KubernetesClusterFormationStrategy{
+			NodeID:           opts.clusterNodeID,
+			ServiceNamespace: opts.clusterFormationKubernetesServiceNamespace,
+			ServiceName:      opts.clusterFormationKubernetesServiceName,
+			ServicePortName:  opts.clusterFormationKubernetesServicePortName,
+		}
+
 	default:
 		return server.Options{}, fmt.Errorf("invalid cluster formation strategy: %s", opts.clusterFormationStrategy)
 	}

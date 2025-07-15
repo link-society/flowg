@@ -2,6 +2,7 @@ package server
 
 import (
 	"log/slog"
+	"time"
 
 	"crypto/tls"
 
@@ -114,7 +115,12 @@ func NewServer(opts Options) proctree.Process {
 	}
 
 	return proctree.NewProcessGroup(
-		proctree.DefaultProcessGroupOptions(),
+		proctree.ProcessGroupOptions{
+			// Longer init timeout because discovering other nodes
+			// could take longer than the default 5 seconds
+			InitTimeout: 1 * time.Minute,
+			JoinTimeout: 5 * time.Second,
+		},
 		proctree.NewProcessGroup(
 			proctree.DefaultProcessGroupOptions(),
 			authStorage,
@@ -127,7 +133,12 @@ func NewServer(opts Options) proctree.Process {
 			pipelineRunner,
 		),
 		proctree.NewProcessGroup(
-			proctree.DefaultProcessGroupOptions(),
+			proctree.ProcessGroupOptions{
+				// Longer init timeout because discovering other nodes
+				// could take longer than the default 5 seconds
+				InitTimeout: 1 * time.Minute,
+				JoinTimeout: 5 * time.Second,
+			},
 			httpServer,
 			mgmtServer,
 			syslogServer,

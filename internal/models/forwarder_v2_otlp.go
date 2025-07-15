@@ -63,9 +63,7 @@ func (f *ForwarderOtlpV2) call(ctx context.Context, record *LogRecord) error {
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		body, _ := io.ReadAll(resp.Body)
-		errMsg := fmt.Sprintf("unexpected status code: %d, body: %s", resp.StatusCode, string(body))
-		fmt.Println("OTLP forwarder error:", errMsg)
-		return fmt.Errorf(errMsg)
+		return fmt.Errorf("unexpected status code: %d, body: %s", resp.StatusCode, string(body))
 	}
 
 	return nil

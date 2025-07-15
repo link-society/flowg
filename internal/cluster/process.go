@@ -132,7 +132,7 @@ func (p *procHandler) DoWork(ctx actor.Context) proctree.ProcessResult {
 }
 
 func (p *procHandler) Terminate(ctx actor.Context, parentErr error) error {
-	if p.mlistConfig.Delegate != nil {
+	if p.mlistConfig != nil && p.mlistConfig.Delegate != nil {
 		d := p.mlistConfig.Delegate.(*delegate)
 		d.syncPool.RemoveAll()
 	}
