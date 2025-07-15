@@ -12,11 +12,4 @@ spec:
     - ReadWriteOnce
   hostPath:
     path: {{ .Values.flowg.storage.hostPath }}
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: kubernetes.io/hostname
-              operator: In
-              values:
-                - {{ include "flowg.nodeName" . }}
+

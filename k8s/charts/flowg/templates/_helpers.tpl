@@ -67,17 +67,6 @@ Create the name of the service account to use for FlowG
 {{- end }}
 
 {{/*
-Lookup the Kubernetes node for the FlowG deployment
-*/}}
-{{- define "flowg.nodeName" -}}
-{{- if or (not .Values.flowg.nodeName) (eq .Values.flowg.nodeName "") -}}
-{{- fail "Missing value 'flowg.nodeName', it is required because FlowG does not support clustering yet" -}}
-{{- else -}}
-{{- .Values.flowg.nodeName -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
 Fluentd component variables
 */}}
 {{- define "fluentd.name" -}}
