@@ -13,7 +13,7 @@ export const TransformerView = () => {
 
   useEffect(() => {
     if (transformers.length > 0) {
-      navigate(`/web/transformers/${transformers[0]}`)
+      navigate(`/web/transformers/${transformers[0]}`, { replace: true })
     }
   }, [])
 

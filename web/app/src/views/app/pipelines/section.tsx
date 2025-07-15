@@ -13,7 +13,7 @@ export const PipelineView = () => {
 
   useEffect(() => {
     if (pipelines.length > 0) {
-      navigate(`/web/pipelines/${pipelines[0]}`)
+      navigate(`/web/pipelines/${pipelines[0]}`, { replace: true })
     }
   }, [])
 

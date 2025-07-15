@@ -13,7 +13,7 @@ export const ForwarderView = () => {
 
   useEffect(() => {
     if (forwarders.length > 0) {
-      navigate(`/web/forwarders/${forwarders[0]}`)
+      navigate(`/web/forwarders/${forwarders[0]}`, { replace: true })
     }
   }, [])
 
