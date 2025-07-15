@@ -1,6 +1,9 @@
 package cluster
 
-import "net/url"
+import (
+	"fmt"
+	"net/url"
+)
 
 type ClusterJoinNode struct {
 	JoinNodeID       string
@@ -15,4 +18,12 @@ func NewClusterJoinNode(isAutomaticClusterformation bool, defaultJoinNodeId stri
 		JoinNodeID:       defaultJoinNodeId,
 		JoinNodeEndpoint: defaultJoinNodeEndpoint,
 	}
+}
+
+func (c *ClusterJoinNode) IsEmpty() bool {
+	return c.JoinNodeID == "" || c.JoinNodeEndpoint == nil
+}
+
+func (c *ClusterJoinNode) Address() string {
+	return fmt.Sprintf("%s/%s", c.JoinNodeID, c.JoinNodeEndpoint.Host)
 }

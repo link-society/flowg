@@ -26,6 +26,7 @@ type procHandler struct {
 
 	mlistConfig *memberlist.Config
 	mlist       *memberlist.Memberlist
+	joinNode    *ClusterJoinNode
 
 	httpHandler http.Handler
 }
@@ -73,8 +74,13 @@ func (p *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 		},
 	}
 
-	if p.opts.ClusterJoinNode.JoinNodeID != "" && p.opts.ClusterJoinNode.JoinNodeEndpoint != nil {
-		d.endpoints[p.opts.ClusterJoinNode.JoinNodeID] = p.opts.ClusterJoinNode.JoinNodeEndpoint
+	p.joinNode, err = p.opts.ClusterFormationStrategy.Join(ctx, p.opts.LocalEndpointResolver)
+	if err != nil {
+		return proctree.Terminate(fmt.Errorf("failed to join cluster: %w", err))
+	}
+
+	if !p.joinNode.IsEmpty() {
+		d.endpoints[p.joinNode.JoinNodeID] = p.joinNode.JoinNodeEndpoint
 	}
 
 	transport := &httpTransport{
@@ -103,29 +109,15 @@ func (p *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 		return proctree.Terminate(err)
 	}
 
-	/* If automatic cluster formation is enabled,
-	then ConsulService already discovered nodes and set them in ClusterNodeNode.
-	ConsulService starts before MagementServer therefore ManagementServer need not
-	wait here for ConsulService to finish discovering nodes */
-	if p.opts.ClusterJoinNode.JoinNodeID != "" && p.opts.ClusterJoinNode.JoinNodeEndpoint != nil {
-		joinAddr := fmt.Sprintf("%s/%s", p.opts.ClusterJoinNode.JoinNodeID, p.opts.ClusterJoinNode.JoinNodeEndpoint.Host)
-		_, err = p.mlist.Join([]string{joinAddr})
+	if !p.joinNode.IsEmpty() {
+		_, err = p.mlist.Join([]string{p.joinNode.Address()})
 		if err != nil {
-			if !p.opts.AutomaticClusterFormation {
-				/* Terminate the process only when AutomaticClusterFormation is disabled
-				because otherwise the first node in the cluster will never know other nodes to connect to
-				therefore we cannot terminate the process for the very first node in the cluster */
-				logger.ErrorContext(ctx,
-					"memberlist join failed",
-					slog.Any("error", err),
-				)
-				return proctree.Terminate(err)
-			} else {
-				logger.WarnContext(ctx,
-					"memberlist join failed",
-					slog.Any("error", err),
-				)
-			}
+			logger.ErrorContext(
+				ctx,
+				"memberlist join failed",
+				slog.Any("error", err),
+			)
+			return proctree.Terminate(err)
 		}
 	}
 
@@ -152,6 +144,12 @@ func (p *procHandler) Terminate(ctx actor.Context, parentErr error) error {
 
 		if err := p.mlist.Shutdown(); err != nil {
 			return errors.Join(parentErr, err)
+		}
+	}
+
+	if p.joinNode != nil {
+		if err := p.opts.ClusterFormationStrategy.Leave(ctx, p.joinNode); err != nil {
+			return errors.Join(parentErr, fmt.Errorf("failed to leave cluster: %w", err))
 		}
 	}
 

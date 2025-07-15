@@ -23,13 +23,10 @@ type ServerOptions struct {
 	BindAddress string
 	TlsConfig   *tls.Config
 
-	ClusterNodeID   string
-	ClusterCookie   string
-	ClusterStateDir string
-
-	ClusterJoinNode *cluster.ClusterJoinNode
-
-	AutomaticClusterFormation bool
+	ClusterNodeID            string
+	ClusterCookie            string
+	ClusterStateDir          string
+	ClusterFormationStrategy cluster.ClusterFormationStrategy
 
 	AuthStorage   *auth.Storage
 	ConfigStorage *config.Storage
@@ -55,9 +52,7 @@ func NewServer(opts *ServerOptions) proctree.Process {
 		NodeID: opts.ClusterNodeID,
 		Cookie: opts.ClusterCookie,
 
-		ClusterJoinNode: opts.ClusterJoinNode,
-
-		AutomaticClusterFormation: opts.AutomaticClusterFormation,
+		ClusterFormationStrategy: opts.ClusterFormationStrategy,
 
 		LocalEndpointResolver: func() (*url.URL, error) {
 			host, port, err := net.SplitHostPort(listenerH.listener.Addr().String())
