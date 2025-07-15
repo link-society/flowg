@@ -24,6 +24,7 @@ Here is an example of how to start a 3-nodes cluster:
 ```bash
 flowg-server \
   --cluster-node-id flowg-node0 \
+  --cluster-formation-strategy="manual" \
   --auth-dir ./data/node0/auth \
   --log-dir ./data/node0/logs \
   --config-dir ./data/node0/config \
@@ -34,8 +35,9 @@ flowg-server \
 
 flowg-server \
   --cluster-node-id flowg-node1 \
-  --cluster-join-node-id flowg-node0 \
-  --cluster-join-endpoint http://localhost:9113 \
+  --cluster-formation-strategy="manual" \
+  --cluster-formation-manual-join-node-id flowg-node0 \
+  --cluster-formation-manual-join-endpoint http://localhost:9113 \
   --auth-dir ./data/node1/auth \
   --log-dir ./data/node1/logs \
   --config-dir ./data/node1/config \
@@ -46,8 +48,9 @@ flowg-server \
 
 flowg-server \
   --cluster-node-id flowg-node2 \
-  --cluster-join-node-id flowg-node1 \
-  --cluster-join-endpoint http://localhost:9114 \
+  --cluster-formation-strategy="manual" \
+  --cluster-formation-manual-join-node-id flowg-node1 \
+  --cluster-formation-manual-join-endpoint http://localhost:9114 \
   --auth-dir ./data/node2/auth \
   --log-dir ./data/node2/logs \
   --config-dir ./data/node2/config \
@@ -68,6 +71,7 @@ cookie=$(openssl rand -hex 32)
 flowg-server \
   --cluster-node-id flowg-node0 \
   --cluster-cookie ${cookie} \
+  --cluster-formation-strategy="manual" \
   --auth-dir ./data/node0/auth \
   --log-dir ./data/node0/logs \
   --config-dir ./data/node0/config \
@@ -79,8 +83,9 @@ flowg-server \
 flowg-server \
   --cluster-node-id flowg-node1 \
   --cluster-cookie ${cookie} \
-  --cluster-join-node-id flowg-node0 \
-  --cluster-join-endpoint http://localhost:9113 \
+  --cluster-formation-strategy="manual" \
+  --cluster-formation-manual-join-node-id flowg-node0 \
+  --cluster-formation-manual-join-endpoint http://localhost:9113 \
   --auth-dir ./data/node1/auth \
   --log-dir ./data/node1/logs \
   --config-dir ./data/node1/config \
@@ -92,8 +97,9 @@ flowg-server \
 flowg-server \
   --cluster-node-id flowg-node2 \
   --cluster-cookie ${cookie} \
-  --cluster-join-node-id flowg-node1 \
-  --cluster-join-endpoint http://localhost:9114 \
+  --cluster-formation-strategy="manual" \
+  --cluster-formation-manual-join-node-id flowg-node1 \
+  --cluster-formation-manual-join-endpoint http://localhost:9114 \
   --auth-dir ./data/node2/auth \
   --log-dir ./data/node2/logs \
   --config-dir ./data/node2/config \

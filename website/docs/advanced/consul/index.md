@@ -17,7 +17,14 @@ flowg-server \
   --syslog-tls-cert="/path/to/cert.pem" \
   --syslog-tls-key="/path/to/cert.key" \
   --syslog-tls-auth \
-  --consul-url="localhost:8500"
+  --cluster-formation-strategy="consul" \
+  --cluster-formation-consul-url="localhost:8500"
 ```
 
-Alternatively, automatic cluster formation can also be enabled by using an environment variable. Set an environment variable `CONSUL_URL` to the address of the Consul node.
+Alternatively, automatic cluster formation can also be enabled by using the
+following environment variables:
+
+```bash
+export FLOWG_CLUSTER_FORMATION_STRATEGY="consul"
+export FLOWG_CLUSTER_FORMATION_CONSUL_URL="localhost:8500"
+```
