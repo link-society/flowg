@@ -10,6 +10,7 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
+	"link-society.com/flowg/internal/app/logging"
 	apiUtils "link-society.com/flowg/internal/utils/api"
 
 	"link-society.com/flowg/internal/models"
@@ -36,6 +37,8 @@ func (ctrl *controller) IngestLogsTextUsecase() usecase.Interactor {
 				req IngestLogsTextRequest,
 				resp *IngestLogsTextResponse,
 			) error {
+				logging.MarkSensitive(ctx)
+
 				lines := strings.Split(strings.ReplaceAll(req.TextBody, "\r\n", "\n"), "\n")
 				messages := []string{}
 
@@ -61,7 +64,7 @@ func (ctrl *controller) IngestLogsTextUsecase() usecase.Interactor {
 						record,
 					)
 					if err != nil {
-						ctrl.logger.ErrorContext(
+						ctrl.logger.DebugContext(
 							ctx,
 							"Failed to process log entry",
 							slog.String("pipeline", req.Pipeline),
@@ -72,7 +75,7 @@ func (ctrl *controller) IngestLogsTextUsecase() usecase.Interactor {
 						return status.Wrap(err, status.Internal)
 					}
 
-					ctrl.logger.InfoContext(
+					ctrl.logger.DebugContext(
 						ctx,
 						"Log entry processed",
 						slog.String("pipeline", req.Pipeline),

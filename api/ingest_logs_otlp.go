@@ -12,6 +12,7 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
+	"link-society.com/flowg/internal/app/logging"
 	apiUtils "link-society.com/flowg/internal/utils/api"
 	"link-society.com/flowg/internal/utils/otlp"
 
@@ -114,6 +115,8 @@ func (ctrl *controller) IngestLogsOTLPUsecase() usecase.Interactor {
 				req *IngestLogsOTLPRequest,
 				resp *IngestLogsOTLPResponse,
 			) error {
+				logging.MarkSensitive(ctx)
+
 				for _, logRecord := range req.logRecords {
 					err := ctrl.deps.PipelineRunner.Run(
 						ctx,
@@ -122,7 +125,7 @@ func (ctrl *controller) IngestLogsOTLPUsecase() usecase.Interactor {
 						logRecord,
 					)
 					if err != nil {
-						ctrl.logger.ErrorContext(
+						ctrl.logger.DebugContext(
 							ctx,
 							"Failed to process log entry",
 							slog.String("pipeline", req.Pipeline),
@@ -132,7 +135,7 @@ func (ctrl *controller) IngestLogsOTLPUsecase() usecase.Interactor {
 						resp.Success = false
 						return status.Wrap(err, status.Internal)
 					}
-					ctrl.logger.InfoContext(
+					ctrl.logger.DebugContext(
 						ctx,
 						"Log entry processed",
 						slog.String("pipeline", req.Pipeline),

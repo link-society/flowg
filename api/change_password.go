@@ -8,6 +8,7 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
+	"link-society.com/flowg/internal/app/logging"
 	apiUtils "link-society.com/flowg/internal/utils/api"
 )
 
@@ -27,6 +28,8 @@ func (ctrl *controller) ChangePasswordUsecase() usecase.Interactor {
 			req ChangePasswordRequest,
 			resp *ChangePasswordResponse,
 		) error {
+			logging.MarkSensitive(ctx)
+
 			user := apiUtils.GetContextUser(ctx)
 
 			switch valid, err := ctrl.deps.AuthStorage.VerifyUserPassword(ctx, user.Name, req.OldPassword); {
