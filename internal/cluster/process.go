@@ -2,7 +2,6 @@ package cluster
 
 import (
 	"errors"
-	"fmt"
 	"log/slog"
 
 	"time"
@@ -23,10 +22,11 @@ type procHandler struct {
 
 	connM   actor.Mailbox[net.Conn]
 	packetM actor.Mailbox[*memberlist.Packet]
+	joinM   actor.MailboxReceiver[*ClusterJoinNode]
 
+	delegate    *delegate
 	mlistConfig *memberlist.Config
 	mlist       *memberlist.Memberlist
-	joinNode    *ClusterJoinNode
 
 	httpHandler http.Handler
 }
@@ -47,7 +47,7 @@ func (p *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 		slog.String("cluster.local.endpoint", localEndpoint.String()),
 	)
 
-	d := &delegate{
+	p.delegate = &delegate{
 		logger: logger,
 
 		localNodeID:   p.opts.NodeID,
@@ -74,17 +74,8 @@ func (p *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 		},
 	}
 
-	p.joinNode, err = p.opts.ClusterFormationStrategy.Join(ctx, p.opts.LocalEndpointResolver)
-	if err != nil {
-		return proctree.Terminate(fmt.Errorf("failed to join cluster: %w", err))
-	}
-
-	if !p.joinNode.IsEmpty() {
-		d.endpoints[p.joinNode.JoinNodeID] = p.joinNode.JoinNodeEndpoint
-	}
-
 	transport := &httpTransport{
-		delegate: d,
+		delegate: p.delegate,
 		cookie:   p.opts.Cookie,
 
 		connM:   p.connM,
@@ -99,8 +90,8 @@ func (p *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 	p.mlistConfig.Name = p.opts.NodeID
 	p.mlistConfig.RequireNodeNames = true
 	p.mlistConfig.Transport = transport
-	p.mlistConfig.Delegate = d
-	p.mlistConfig.Events = d
+	p.mlistConfig.Delegate = p.delegate
+	p.mlistConfig.Events = p.delegate
 	p.mlistConfig.PushPullInterval = time.Second
 	p.mlistConfig.Logger = newMemberlistLogger(logger)
 
@@ -109,26 +100,29 @@ func (p *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 		return proctree.Terminate(err)
 	}
 
-	if !p.joinNode.IsEmpty() {
-		_, err = p.mlist.Join([]string{p.joinNode.Address()})
-		if err != nil {
-			logger.ErrorContext(
-				ctx,
-				"memberlist join failed",
-				slog.Any("error", err),
-			)
-			return proctree.Terminate(err)
-		}
-	}
-
 	p.httpHandler = transport
 
 	return proctree.Continue()
 }
 
 func (p *procHandler) DoWork(ctx actor.Context) proctree.ProcessResult {
-	<-ctx.Done()
-	return proctree.Terminate(ctx.Err())
+	select {
+	case <-ctx.Done():
+		return proctree.Terminate(ctx.Err())
+
+	case joinNode, ok := <-p.joinM.ReceiveC():
+		if !ok {
+			return proctree.Terminate(nil)
+		}
+
+		p.delegate.endpoints[joinNode.JoinNodeID] = joinNode.JoinNodeEndpoint
+		_, err := p.mlist.Join([]string{joinNode.Address()})
+		if err != nil {
+			return proctree.Terminate(err)
+		}
+
+		return proctree.Continue()
+	}
 }
 
 func (p *procHandler) Terminate(ctx actor.Context, parentErr error) error {
@@ -144,12 +138,6 @@ func (p *procHandler) Terminate(ctx actor.Context, parentErr error) error {
 
 		if err := p.mlist.Shutdown(); err != nil {
 			return errors.Join(parentErr, err)
-		}
-	}
-
-	if p.joinNode != nil {
-		if err := p.opts.ClusterFormationStrategy.Leave(ctx, p.joinNode); err != nil {
-			return errors.Join(parentErr, fmt.Errorf("failed to leave cluster: %w", err))
 		}
 	}
 

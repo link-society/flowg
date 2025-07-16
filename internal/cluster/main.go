@@ -1,7 +1,7 @@
 package cluster
 
 import (
-	"time"
+	"log/slog"
 
 	"net"
 	"net/http"
@@ -43,22 +43,29 @@ var _ proctree.Process = (*Manager)(nil)
 func NewManager(opts *ManagerOptions) *Manager {
 	connM := actor.NewMailbox[net.Conn]()
 	packetM := actor.NewMailbox[*memberlist.Packet]()
+	joinM := actor.NewMailbox[*ClusterJoinNode]()
+
 	handler := &procHandler{
 		opts: opts,
 
 		connM:   connM,
 		packetM: packetM,
+		joinM:   joinM,
 	}
 
+	formationController := actor.New(&clusterFormationController{
+		logger:   slog.Default().With(slog.String("channel", "cluster.formation")),
+		joinM:    joinM,
+		resolver: opts.LocalEndpointResolver,
+		strategy: opts.ClusterFormationStrategy,
+	})
+
 	process := proctree.NewProcessGroup(
-		proctree.ProcessGroupOptions{
-			// Longer init timeout because discovering other nodes
-			// could take longer than the default 5 seconds
-			InitTimeout: 1 * time.Minute,
-			JoinTimeout: 5 * time.Second,
-		},
+		proctree.DefaultProcessGroupOptions(),
 		proctree.NewActorProcess(connM),
 		proctree.NewActorProcess(packetM),
+		proctree.NewActorProcess(joinM),
+		proctree.NewActorProcess(formationController),
 		proctree.NewProcess(handler),
 	)
 

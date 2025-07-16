@@ -3,7 +3,6 @@ package mgmt
 import (
 	"fmt"
 	"log/slog"
-	"time"
 
 	"crypto/tls"
 	"net"
@@ -102,12 +101,7 @@ func NewServer(opts *ServerOptions) proctree.Process {
 	}
 
 	return proctree.NewProcessGroup(
-		proctree.ProcessGroupOptions{
-			// Longer init timeout because discovering other nodes
-			// could take longer than the default 5 seconds
-			InitTimeout: 1 * time.Minute,
-			JoinTimeout: 5 * time.Second,
-		},
+		proctree.DefaultProcessGroupOptions(),
 		clusterStateStorage,
 		proctree.NewProcess(listenerH),
 		clusterManager,
