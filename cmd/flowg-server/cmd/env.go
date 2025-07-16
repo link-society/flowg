@@ -8,7 +8,8 @@ import (
 )
 
 var (
-	defaultVerbose = getEnvBool("FLOWG_VERBOSE", false)
+	defaultVerbose  = getEnvBool("FLOWG_VERBOSE", false)
+	defaultLogLevel = getEnvString("FLOWG_LOGLEVEL", "info")
 
 	defaultHttpBindAddress = getEnvString("FLOWG_HTTP_BIND_ADDRESS", ":5080")
 	defaultHttpTlsEnabled  = getEnvBool("FLOWG_HTTP_TLS_ENABLED", false)

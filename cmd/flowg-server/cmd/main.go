@@ -27,7 +27,7 @@ func NewRootCommand() *cobra.Command {
 		Short: "Low-Code log management solution",
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			syscall.Umask(0077)
-			logging.Setup(opts.verbose)
+			logging.Setup(opts.verbose, opts.loglevel)
 			metrics.Setup()
 		},
 		Run: func(cmd *cobra.Command, args []string) {
