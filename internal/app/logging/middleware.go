@@ -32,7 +32,7 @@ func NewMiddleware(handler http.Handler) http.Handler {
 
 func (m *middleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	correlationId := r.Header.Get("X-Correlation-Id")
-	ctx := WithCorrelationId(r.Context(), correlationId)
+	ctx := WithSensitiveMarker(WithCorrelationId(r.Context(), correlationId))
 	req := r.WithContext(ctx)
 	resp := &responseWriter{
 		ctx:        ctx,
@@ -42,7 +42,12 @@ func (m *middleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	m.handler.ServeHTTP(resp, req)
 
-	slog.InfoContext(
+	logFn := slog.InfoContext
+	if IsMarkedSensitive(req.Context()) {
+		logFn = slog.DebugContext
+	}
+
+	logFn(
 		req.Context(),
 		"http request",
 		slog.String("channel", "accesslog"),
