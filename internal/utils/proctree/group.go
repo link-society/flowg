@@ -122,7 +122,6 @@ func (g *group) run() {
 	errs := g.stopChildren(len(g.children) - 1)
 	err := errors.Join(errs...)
 	g.joinCond.Broadcast(err)
-	close(g.shutdownC)
 }
 
 func (g *group) stopChildren(last int) []error {
