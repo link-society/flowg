@@ -12,8 +12,6 @@ import (
 	"net/url"
 
 	"github.com/hashicorp/consul/api"
-
-	retry "github.com/avast/retry-go/v4"
 )
 
 type ConsulClusterFormationStrategy struct {
@@ -28,16 +26,13 @@ type ConsulClusterFormationStrategy struct {
 
 var _ ClusterFormationStrategy = (*ConsulClusterFormationStrategy)(nil)
 
-func (s *ConsulClusterFormationStrategy) Join(ctx context.Context, resolver LocalEndpointResolverCallback) (*ClusterJoinNode, error) {
+func (s *ConsulClusterFormationStrategy) Join(ctx context.Context, resolver LocalEndpointResolverCallback) ([]*ClusterJoinNode, error) {
 	const (
-		getNodesMaxRetries  = 10
-		getNodesDelay       = 100 * time.Millisecond
-		getNodesMaxJitter   = getNodesDelay / 4
 		healthCheckInterval = 5 * time.Second
 		healthCheckTimeout  = 1 * time.Second
 	)
 
-	logger := slog.Default().With(slog.String("channel", "cluster.consul"))
+	logger := slog.Default().With(slog.String("channel", "cluster.formation.consul"))
 
 	localEndpoint, err := resolver()
 	if err != nil {
@@ -94,69 +89,38 @@ func (s *ConsulClusterFormationStrategy) Join(ctx context.Context, resolver Loca
 		return nil, fmt.Errorf("failed to register service with Consul: %w", err)
 	}
 
-	joinNode, err := retry.DoWithData(
-		func() (*ClusterJoinNode, error) {
-			logger.InfoContext(ctx, "discover available nodes from Consul")
-			entries, _, err := s.client.Health().Service(s.ServiceName, "", false, nil)
-			if err != nil {
-				return nil, fmt.Errorf("failed to get nodes from Consul: %w", err)
-			}
-
-			for _, entry := range entries {
-				if entry.Service.ID != s.NodeID {
-					endpoint, err := url.Parse(entry.Service.Meta["endpoint"])
-					if err != nil {
-						return nil, fmt.Errorf("failed to parse service endpoint URL: %w", err)
-					}
-
-					logger.InfoContext(
-						ctx,
-						"found join node in Consul",
-						slog.String("node_id", entry.Service.ID),
-						slog.String("endpoint", endpoint.String()),
-					)
-					return &ClusterJoinNode{
-						JoinNodeID:       entry.Service.ID,
-						JoinNodeEndpoint: endpoint,
-					}, nil
-				}
-			}
-
-			return nil, fmt.Errorf("no other nodes found in the cluster")
-		},
-		retry.Attempts(getNodesMaxRetries),
-		retry.Delay(getNodesDelay),
-		retry.MaxJitter(getNodesMaxJitter),
-		retry.DelayType(func(n uint, err error, config *retry.Config) time.Duration {
-			delay := retry.FixedDelay(n, err, config)
-			delay += retry.RandomDelay(n, err, config)
-			return delay
-		}),
-		retry.OnRetry(func(n uint, err error) {
-			logger.WarnContext(
-				ctx,
-				"retrying to discover nodes from Consul",
-				slog.Uint64("attempt", uint64(n)),
-				slog.String("error", err.Error()),
-			)
-		}),
-	)
+	logger.InfoContext(ctx, "discover available nodes from Consul")
+	entries, _, err := s.client.Health().Service(s.ServiceName, "", false, nil)
 	if err != nil {
-		logger.WarnContext(
-			ctx,
-			"failed to get join nodes from Consul",
-			slog.String("error", err.Error()),
-		)
+		return nil, fmt.Errorf("failed to get nodes from Consul: %w", err)
 	}
 
-	if joinNode == nil {
-		joinNode = &ClusterJoinNode{}
+	joinNodes := []*ClusterJoinNode{}
+
+	for _, entry := range entries {
+		if entry.Service.ID != s.NodeID {
+			endpoint, err := url.Parse(entry.Service.Meta["endpoint"])
+			if err != nil {
+				return nil, fmt.Errorf("failed to parse service endpoint URL: %w", err)
+			}
+
+			logger.InfoContext(
+				ctx,
+				"found join node in Consul",
+				slog.String("node_id", entry.Service.ID),
+				slog.String("endpoint", endpoint.String()),
+			)
+			joinNodes = append(joinNodes, &ClusterJoinNode{
+				JoinNodeID:       entry.Service.ID,
+				JoinNodeEndpoint: endpoint,
+			})
+		}
 	}
 
-	return joinNode, nil
+	return joinNodes, nil
 }
 
-func (s *ConsulClusterFormationStrategy) Leave(ctx context.Context, node *ClusterJoinNode) error {
+func (s *ConsulClusterFormationStrategy) Leave(ctx context.Context) error {
 	if s.client != nil {
 		logger := slog.Default().With(slog.String("channel", "cluster.consul"))
 
