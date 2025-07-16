@@ -5,7 +5,7 @@ tasks:
     desc: "Recreate FlowG KinD cluster"
     cmds:
       - kind delete cluster --name flowg
-      - kind create cluster --name flowg
+      - kind create cluster --name flowg --config ./tests/config/kind-config.yml
       - kind load docker-image linksociety/flowg:latest --name flowg
       - kubectl create ns flowg-system
 
@@ -17,4 +17,4 @@ tasks:
           --chart-dirs ./k8s/charts \
           --charts ./k8s/charts/flowg \
           --namespace flowg-system \
-          --helm-extra-set-args '--set=flowg.image.tag=latest --set=flowg.image.pullPolicy=Never'
+          --helm-extra-set-args '--set=flowg.image.tag=latest --set=flowg.image.pullPolicy=Never --wait'
