@@ -99,7 +99,6 @@ Then deploy the Helm chart:
 helm install flowg ./k8s/charts/flowg \
   --create-namespace \
   --namespace flowg-system \
-  --set flowg.nodeName="<the k8s node>" \
   --wait
 ```
 
