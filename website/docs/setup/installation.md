@@ -84,42 +84,6 @@ docker run \
   linksociety/flowg:latest-linux-arm
 ```
 
-### Using Kubernetes
-
-First fetch the source code:
-
-```bash
-git clone https://github.com/link-society/flowg
-cd flowg
-```
-
-Then deploy the Helm chart:
-
-```bash
-helm install flowg ./k8s/charts/flowg \
-  --create-namespace \
-  --namespace flowg-system \
-  --wait
-```
-
-> **NB:** FlowG does not support yet clustering. Therefore it **MUST** run on a
-> single Kubernetes node. This must be configured via the `flowg.nodeName`
-> value. An empty/undefined/incorrect node name will result in a failure to
-> start FlowG.
-
-This will automatically deploy [Fluentd](https://www.fluentd.org) alongside
-**FlowG** in order to collect logs from all pods.
-
-Once deployed, you can forward the port of the WebUI and API to your localhost:
-
-```bash
-kubectl port-forward svc/flowg 5080:5080 --namespace flowg-system
-```
-
-```bash
-kubectl port-forward svc/flowg 9113:9113 --namespace flowg-system
-```
-
 ## Security considerations
 
 By default, the Syslog endpoint is open to everyone. If that behavior is

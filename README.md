@@ -131,7 +131,7 @@ docker run \
   linksociety/flowg:latest
 ```
 
-Using Kubernetes (and Helm):
+**:warning: EXPERIMENTAL :warning:** Using Kubernetes (and Helm):
 
 ```bash
 helm install flowg ./k8s/charts/flowg -n flowg-system --create-namespace

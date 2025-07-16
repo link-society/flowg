@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 # Architecture
@@ -10,104 +10,9 @@ When starting FlowG, it sets up a single-node cluster automatically. Every node
 in the cluster needs a unique identifier. If none is given, a random one will be
 generated.
 
-You can tell your instance to join an existing cluster by indicating the name of
-the node to join, and its management endpoint.
-
-> **NB:** Automatic cluster formation is planned via:
->
-> - Kubernetes headless `Service` resource
-> - Consul's service mesh
-> - DNS discovery
-
-Here is an example of how to start a 3-nodes cluster:
-
-```bash
-flowg-server \
-  --cluster-node-id flowg-node0 \
-  --cluster-formation-strategy="manual" \
-  --auth-dir ./data/node0/auth \
-  --log-dir ./data/node0/logs \
-  --config-dir ./data/node0/config \
-  --cluster-state-dir ./data/node0/state \
-  --http-bind 127.0.0.1:5080 \
-  --mgmt-bind 127.0.0.1:9113 \
-  --syslog-bind 127.0.0.1:5514 &
-
-flowg-server \
-  --cluster-node-id flowg-node1 \
-  --cluster-formation-strategy="manual" \
-  --cluster-formation-manual-join-node-id flowg-node0 \
-  --cluster-formation-manual-join-endpoint http://localhost:9113 \
-  --auth-dir ./data/node1/auth \
-  --log-dir ./data/node1/logs \
-  --config-dir ./data/node1/config \
-  --cluster-state-dir ./data/node1/state \
-  --http-bind 127.0.0.1:5081 \
-  --mgmt-bind 127.0.0.1:9114 \
-  --syslog-bind 127.0.0.1:5515 &
-
-flowg-server \
-  --cluster-node-id flowg-node2 \
-  --cluster-formation-strategy="manual" \
-  --cluster-formation-manual-join-node-id flowg-node1 \
-  --cluster-formation-manual-join-endpoint http://localhost:9114 \
-  --auth-dir ./data/node2/auth \
-  --log-dir ./data/node2/logs \
-  --config-dir ./data/node2/config \
-  --cluster-state-dir ./data/node2/state \
-  --http-bind 127.0.0.1:5082 \
-  --mgmt-bind 127.0.0.1:9115 \
-  --syslog-bind 127.0.0.1:5516 &
-```
-
-> **NB:** Don't use `&` to run FlowG in the background, this is just an example.
-
-You can also enable authentication between nodes by using a secret key that
-each node requires:
-
-```bash
-cookie=$(openssl rand -hex 32)
-
-flowg-server \
-  --cluster-node-id flowg-node0 \
-  --cluster-cookie ${cookie} \
-  --cluster-formation-strategy="manual" \
-  --auth-dir ./data/node0/auth \
-  --log-dir ./data/node0/logs \
-  --config-dir ./data/node0/config \
-  --cluster-state-dir ./data/node0/state \
-  --http-bind 127.0.0.1:5080 \
-  --mgmt-bind 127.0.0.1:9113 \
-  --syslog-bind 127.0.0.1:5514 &
-
-flowg-server \
-  --cluster-node-id flowg-node1 \
-  --cluster-cookie ${cookie} \
-  --cluster-formation-strategy="manual" \
-  --cluster-formation-manual-join-node-id flowg-node0 \
-  --cluster-formation-manual-join-endpoint http://localhost:9113 \
-  --auth-dir ./data/node1/auth \
-  --log-dir ./data/node1/logs \
-  --config-dir ./data/node1/config \
-  --cluster-state-dir ./data/node1/state \
-  --http-bind 127.0.0.1:5081 \
-  --mgmt-bind 127.0.0.1:9114 \
-  --syslog-bind 127.0.0.1:5515 &
-
-flowg-server \
-  --cluster-node-id flowg-node2 \
-  --cluster-cookie ${cookie} \
-  --cluster-formation-strategy="manual" \
-  --cluster-formation-manual-join-node-id flowg-node1 \
-  --cluster-formation-manual-join-endpoint http://localhost:9114 \
-  --auth-dir ./data/node2/auth \
-  --log-dir ./data/node2/logs \
-  --config-dir ./data/node2/config \
-  --cluster-state-dir ./data/node2/state \
-  --http-bind 127.0.0.1:5082 \
-  --mgmt-bind 127.0.0.1:9115 \
-  --syslog-bind 127.0.0.1:5516 &
-```
+Once a node joins the cluster, the cluster mesh is updated on every node of the
+cluster. Replication then happens in the background via the management
+interface.
 
 Here is a diagram of the bootstrap process:
 
