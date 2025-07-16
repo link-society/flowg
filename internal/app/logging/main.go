@@ -4,16 +4,28 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"strings"
 )
 
 var VERBOSE_LOGGING = false
 
-func Setup(verbose bool) {
+func Setup(verbose bool, levelName string) {
 	var level slog.Level
 	if verbose {
 		level = slog.LevelDebug
 	} else {
-		level = slog.LevelInfo
+		switch strings.ToLower(levelName) {
+		case "debug":
+			level = slog.LevelDebug
+		case "info":
+			level = slog.LevelInfo
+		case "warn":
+			level = slog.LevelWarn
+		case "error":
+			level = slog.LevelError
+		default:
+			level = slog.LevelInfo
+		}
 	}
 
 	VERBOSE_LOGGING = verbose

@@ -36,7 +36,9 @@ type options struct {
 	authDir   string
 	logDir    string
 	configDir string
-	verbose   bool
+
+	verbose  bool
+	loglevel string
 
 	authInitialUser     string
 	authInitialPassword string
@@ -235,6 +237,13 @@ func (opts *options) defineCliOptions(cmd *cobra.Command) {
 		"verbose",
 		defaultVerbose,
 		"Enable verbose logging",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.loglevel,
+		"loglevel",
+		defaultLogLevel,
+		"Set the logging level (one of \"debug\", \"info\", \"warn\", \"error\"), ignored if 'verbose' is set",
 	)
 
 	cmd.Flags().StringVar(
