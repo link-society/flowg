@@ -17,6 +17,7 @@ flowg-server \
   --syslog-tls-cert="/path/to/cert.pem" \
   --syslog-tls-key="/path/to/cert.key" \
   --syslog-tls-auth \
+  --cluster-node-id="flowg-0" \
   --cluster-formation-strategy="consul" \
   --cluster-formation-consul-url="localhost:8500"
 ```
