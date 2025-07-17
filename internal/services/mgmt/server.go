@@ -9,6 +9,7 @@ import (
 
 	"crypto/tls"
 	"net/http"
+	"net/http/pprof"
 
 	"github.com/vladopajic/go-actor/actor"
 
@@ -49,6 +50,12 @@ func (h *serverHandler) Init(ctx actor.Context) proctree.ProcessResult {
 	)
 	rootHandler.Handle("/metrics", metricsHandler)
 	rootHandler.Handle("/cluster/", clusterHandler)
+
+	rootHandler.Handle("/debug/pprof/", http.HandlerFunc(pprof.Index))
+	rootHandler.Handle("/debug/pprof/cmdline", http.HandlerFunc(pprof.Cmdline))
+	rootHandler.Handle("/debug/pprof/profile", http.HandlerFunc(pprof.Profile))
+	rootHandler.Handle("/debug/pprof/symbol", http.HandlerFunc(pprof.Symbol))
+	rootHandler.Handle("/debug/pprof/trace", http.HandlerFunc(pprof.Trace))
 
 	h.server = &http.Server{
 		Addr:      h.bindAddress,
