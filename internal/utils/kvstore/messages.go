@@ -39,7 +39,11 @@ var _ operation = (*updateOperation)(nil)
 
 func (m *backupOperation) Handle(db *badger.DB) error {
 	var err error
-	m.since, err = db.Backup(m.w, m.since)
+	stream := db.NewStream()
+	stream.NumGo = 1
+	stream.LogPrefix = "DB.Backup"
+	stream.SinceTs = m.since
+	m.since, err = stream.Backup(m.w, m.since)
 	return err
 }
 
