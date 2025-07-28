@@ -20,7 +20,7 @@ require (
 	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.6
-	github.com/swaggest/openapi-go v0.2.58
+	github.com/swaggest/openapi-go v0.2.59
 	github.com/swaggest/rest v0.2.74
 	github.com/swaggest/swgui v1.8.4
 	github.com/swaggest/usecase v1.3.1
