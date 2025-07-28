@@ -20,8 +20,8 @@ require (
 	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.6
-	github.com/swaggest/openapi-go v0.2.58
-	github.com/swaggest/rest v0.2.74
+	github.com/swaggest/openapi-go v0.2.59
+	github.com/swaggest/rest v0.2.75
 	github.com/swaggest/swgui v1.8.4
 	github.com/swaggest/usecase v1.3.1
 	github.com/vladopajic/go-actor v0.9.6
@@ -93,8 +93,8 @@ require (
 	github.com/santhosh-tekuri/jsonschema/v3 v3.1.0 // indirect
 	github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529 // indirect
 	github.com/swaggest/form/v5 v5.1.1 // indirect
-	github.com/swaggest/jsonschema-go v0.3.74 // indirect
-	github.com/swaggest/refl v1.3.1 // indirect
+	github.com/swaggest/jsonschema-go v0.3.78 // indirect
+	github.com/swaggest/refl v1.4.0 // indirect
 	github.com/vearutop/statigz v1.4.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
