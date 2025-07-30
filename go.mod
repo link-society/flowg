@@ -6,6 +6,7 @@ toolchain go1.24.2
 
 require (
 	github.com/dgraph-io/badger/v4 v4.8.0
+	github.com/elastic/go-elasticsearch/v9 v9.0.0
 	github.com/go-chi/chi/v5 v5.2.2
 	github.com/go-logfmt/logfmt v0.6.0
 	github.com/golang-jwt/jwt/v5 v5.3.0
@@ -57,6 +58,7 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dgraph-io/ristretto/v2 v2.2.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
+	github.com/elastic/elastic-transport-go/v8 v8.7.0 // indirect
 	github.com/emicklei/go-restful/v3 v3.11.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.7.0 // indirect
 	github.com/gammazero/deque v1.0.0 // indirect
