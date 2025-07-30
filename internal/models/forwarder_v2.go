@@ -19,6 +19,7 @@ type ForwarderConfigV2 struct {
 	Amqp    *ForwarderAmqpV2    `json:"-"`
 	Splunk  *ForwarderSplunkV2  `json:"-"`
 	Otlp    *ForwarderOtlpV2    `json:"-"`
+	Elastic *ForwarderElasticV2 `json:"-"`
 }
 
 func (ForwarderConfigV2) JSONSchemaOneOf() []any {
@@ -29,7 +30,7 @@ func (ForwarderConfigV2) JSONSchemaOneOf() []any {
 		ForwarderAmqpV2{},
 		ForwarderSplunkV2{},
 		ForwarderOtlpV2{},
-
+		ForwarderElasticV2{},
 	}
 }
 
@@ -48,6 +49,8 @@ func (f *ForwarderV2) Call(ctx context.Context, record *LogRecord) error {
 		return f.Config.Amqp.call(ctx, record)
 	case f.Config.Otlp != nil:
 		return f.Config.Otlp.call(ctx, record)
+	case f.Config.Elastic != nil:
+		return f.Config.Elastic.call(ctx, record)
 	default:
 		return fmt.Errorf("unsupported forwarder type")
 	}
@@ -72,6 +75,9 @@ func (cfg *ForwarderConfigV2) MarshalJSON() ([]byte, error) {
 
 	case cfg.Otlp != nil:
 		return json.Marshal(&cfg.Otlp)
+
+	case cfg.Elastic != nil:
+		return json.Marshal(&cfg.Elastic)
 
 	default:
 		return nil, fmt.Errorf("unsupported forwarder type")
@@ -105,6 +111,9 @@ func (cfg *ForwarderConfigV2) UnmarshalJSON(data []byte) error {
 
 	case "otlp":
 		return json.Unmarshal(data, &cfg.Otlp)
+
+	case "elastic":
+		return json.Unmarshal(data, &cfg.Elastic)
 
 	default:
 		return fmt.Errorf("unsupported forwarder type: %s", typeInfo.Type)
