@@ -221,6 +221,54 @@ jobs:
           updateComment: true
           fail_on_failure: true
 
+  test-e2e-dns:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: checkout@scm
+        uses: actions/checkout@v4
+        with:
+          ref: "${{ github.event.pull_request.head.sha }}"
+
+      - name: download@artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: oci-flowg
+          path: /tmp
+
+      - name: load@docker
+        run: docker load --input /tmp/oci-flowg.tar
+
+      - name: setup@pdm
+        uses: pdm-project/setup-pdm@v4
+        with:
+          python-version: '3.13'
+
+      - name: setup@sys-deps
+        uses: gacts/install-hurl@v1
+
+      - name: setup@env
+        working-directory: ./tests
+        run: pdm install
+
+      - name: run@test
+        working-directory: ./tests
+        run: pdm run pytest
+        env:
+          FLOWG_TEST_SUITES: dns
+
+      - name: report@test
+        uses: mikepenz/action-junit-report@v5
+        if: ${{ github.event_name == 'pull_request_target' && (success() || failure()) }}
+        with:
+          report_paths: "./tests/reports/dns/junit.xml"
+          include_passed: true
+          check_name: "DNS End-To-End Test Report"
+          job_summary: true
+          comment: true
+          updateComment: true
+          fail_on_failure: true
+
   test-k8s:
     runs-on: ubuntu-latest
     needs: build
