@@ -15,7 +15,7 @@ require (
 	github.com/hashicorp/go-sockaddr v1.0.7
 	github.com/hashicorp/memberlist v0.5.3
 	github.com/jarcoal/httpmock v1.4.0
-	github.com/prometheus/client_golang v1.22.0
+	github.com/prometheus/client_golang v1.23.0
 	github.com/prometheus/procfs v0.17.0
 	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/spf13/cobra v1.9.1
@@ -87,8 +87,8 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/prometheus/client_model v0.6.1 // indirect
-	github.com/prometheus/common v0.62.0 // indirect
+	github.com/prometheus/client_model v0.6.2 // indirect
+	github.com/prometheus/common v0.65.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/santhosh-tekuri/jsonschema/v3 v3.1.0 // indirect
 	github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529 // indirect
