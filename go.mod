@@ -8,7 +8,7 @@ require (
 	github.com/dgraph-io/badger/v4 v4.8.0
 	github.com/go-chi/chi/v5 v5.2.2
 	github.com/go-logfmt/logfmt v0.6.0
-	github.com/golang-jwt/jwt/v5 v5.2.3
+	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/consul/api v1.32.1
