@@ -84,6 +84,17 @@ const newForwarderFactory = (type: ForwarderTypes): ForwarderModel => {
         },
       }
 
+    case 'elastic':
+      return {
+        config: {
+          type,
+          index: 'default',
+          addresses: ['http://localhost:9200'],
+          ca: undefined,
+          token: undefined,
+        }
+      }
+
     default:
       throw new Error(`Unknown forwarder type: ${type}`)
   }
