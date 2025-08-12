@@ -2,7 +2,7 @@ import Divider from '@mui/material/Divider'
 import InputAdornment from '@mui/material/InputAdornment'
 import TextField from '@mui/material/TextField'
 
-import HttpIcon from '@mui/icons-material/Http'
+import { DatadogIcon } from '@/components/icons/datadog'
 
 import { ForwarderTypeLabelMap } from '@/lib/models/forwarder'
 import { DatadogForwarderModel } from '@/lib/models/forwarder/datadog'
@@ -33,7 +33,7 @@ export const DatadogForwarderEditor = ({
             input: {
               startAdornment: (
                 <InputAdornment position="start">
-                  <HttpIcon />
+                  <DatadogIcon />
                 </InputAdornment>
               ),
             },

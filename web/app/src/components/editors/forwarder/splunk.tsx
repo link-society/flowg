@@ -2,7 +2,7 @@ import Divider from '@mui/material/Divider'
 import InputAdornment from '@mui/material/InputAdornment'
 import TextField from '@mui/material/TextField'
 
-import HttpIcon from '@mui/icons-material/Http'
+import { SplunkIcon } from '@/components/icons/splunk'
 
 import { ForwarderTypeLabelMap } from '@/lib/models/forwarder'
 import { SplunkForwarderModel } from '@/lib/models/forwarder/splunk'
@@ -33,7 +33,7 @@ export const SplunkForwarderEditor = ({
             input: {
               startAdornment: (
                 <InputAdornment position="start">
-                  <HttpIcon />
+                  <SplunkIcon />
                 </InputAdornment>
               ),
             },
