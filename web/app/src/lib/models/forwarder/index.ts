@@ -1,5 +1,6 @@
 import { AmqpForwarderModel } from '@/lib/models/forwarder/amqp'
 import { DatadogForwarderModel } from '@/lib/models/forwarder/datadog'
+import { ElasticForwarderModel } from '@/lib/models/forwarder/elastic'
 import { HttpForwarderModel } from '@/lib/models/forwarder/http'
 import { OtlpForwarderModel } from '@/lib/models/forwarder/otlp'
 import { SplunkForwarderModel } from '@/lib/models/forwarder/splunk'
@@ -16,6 +17,7 @@ export const ForwarderTypeValues = [
   { key: 'splunk', label: 'Splunk' },
   { key: 'amqp', label: 'AMQP' },
   { key: 'otlp', label: 'OpenTelemetry' },
+  { key: 'elastic', label: 'Elastic Search' },
 ] as const
 
 export const ForwarderTypeLabelMap = ForwarderTypeValues.reduce(
@@ -33,5 +35,6 @@ export type ForwarderConfigModel =
   | SplunkForwarderModel
   | AmqpForwarderModel
   | OtlpForwarderModel
+  | ElasticForwarderModel
 
 export type ForwarderTypes = ForwarderConfigModel['type']
