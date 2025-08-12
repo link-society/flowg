@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
@@ -13,34 +13,46 @@ type ListEditorProps = {
   onChange: (items: string[]) => void
 }
 
-export const ListEditor = (props: ListEditorProps) => {
-  const [items, setItems] = useState(props.items)
+type Row = {
+  id: string
+  value: string
+}
 
+const genId = () => `id_${Date.now()}_${Math.random().toString(36).slice(2)}`
+
+
+export const ListEditor = (props: ListEditorProps) => {
+  const propRows = useMemo<Row[]>(
+    () => props.items.map((item) => ({ id: genId(), value: item })),
+    [props.items],
+  )
+
+  const [rows, setRows] = useState(propRows)
   const [newItem, setNewItem] = useState('')
 
   useEffect(() => {
-    props.onChange(items)
-  }, [items])
+    props.onChange(rows.map((row) => row.value))
+  }, [rows])
 
   return (
     <div
       id={props.id ?? 'field:generic.list-editor'}
       className="flex flex-col items-stretch gap-2"
     >
-      {items.map((item, index) => (
+      {rows.map((row, index) => (
         <div
-          data-ref={`entry:generic.list-editor.item.${index}`}
-          key={index}
+          data-ref={`entry:generic.list-editor.item.${row.id}`}
+          key={row.id}
           className="flex flex-row items-stretch gap-2"
         >
           <TextField
             data-ref="input:generic.list-editor.item"
             label={props.itemLabel ?? 'Item'}
-            value={item}
+            value={row.value}
             onChange={(e) => {
-              setItems((prev) => {
+              setRows((prev) => {
                 const next = [...prev]
-                next[index] = e.target.value
+                next[index] = {...next[index], value: e.target.value }
                 return next
               })
             }}
@@ -55,7 +67,7 @@ export const ListEditor = (props: ListEditorProps) => {
             variant="contained"
             size="small"
             onClick={() => {
-              setItems((prev) => {
+              setRows((prev) => {
                 const next = [...prev]
                 next.splice(index, 1)
                 return next
@@ -71,8 +83,8 @@ export const ListEditor = (props: ListEditorProps) => {
         className="flex flex-row items-stretch gap-2"
         onSubmit={(e) => {
           e.preventDefault()
-          setItems((prev) => {
-            const next = [...prev, newItem]
+          setRows((prev) => {
+            const next = [...prev, {id: genId(), value: newItem}]
             setNewItem('')
             return next
           })
