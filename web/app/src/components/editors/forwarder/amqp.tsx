@@ -2,10 +2,10 @@ import Divider from '@mui/material/Divider'
 import InputAdornment from '@mui/material/InputAdornment'
 import TextField from '@mui/material/TextField'
 
-import { AmqpIcon } from '@/components/icons/amqp'
-
 import { ForwarderTypeLabelMap } from '@/lib/models/forwarder'
 import { AmqpForwarderModel } from '@/lib/models/forwarder/amqp'
+
+import { AmqpIcon } from '@/components/icons/amqp'
 
 type AmqpForwarderEditorProps = {
   config: AmqpForwarderModel

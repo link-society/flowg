@@ -92,7 +92,7 @@ const newForwarderFactory = (type: ForwarderTypes): ForwarderModel => {
           addresses: ['http://localhost:9200'],
           ca: undefined,
           token: undefined,
-        }
+        },
       }
 
     default:

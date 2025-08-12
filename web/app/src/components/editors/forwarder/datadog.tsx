@@ -2,10 +2,10 @@ import Divider from '@mui/material/Divider'
 import InputAdornment from '@mui/material/InputAdornment'
 import TextField from '@mui/material/TextField'
 
-import { DatadogIcon } from '@/components/icons/datadog'
-
 import { ForwarderTypeLabelMap } from '@/lib/models/forwarder'
 import { DatadogForwarderModel } from '@/lib/models/forwarder/datadog'
+
+import { DatadogIcon } from '@/components/icons/datadog'
 
 type DatadogForwarderEditorProps = {
   config: DatadogForwarderModel

@@ -13,7 +13,6 @@ type ListEditorProps = {
   onChange: (items: string[]) => void
 }
 
-
 export const ListEditor = (props: ListEditorProps) => {
   const [items, setItems] = useState(props.items)
 

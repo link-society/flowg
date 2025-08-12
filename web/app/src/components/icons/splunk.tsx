@@ -1,10 +1,7 @@
 import SvgIcon from '@mui/material/SvgIcon'
 
 export const SplunkIcon = () => (
-  <SvgIcon
-    viewBox="0 0 48 48"
-    xmlns="http://www.w3.org/2000/svg"
-  >
+  <SvgIcon viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
     <g id="Layer_2" data-name="Layer 2">
       <g id="invisible_box" data-name="invisible box">
         <rect width="48" height="48" fill="none"></rect>

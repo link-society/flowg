@@ -1,12 +1,11 @@
 import InputAdornment from '@mui/material/InputAdornment'
 import TextField from '@mui/material/TextField'
 
-import { OpenTelemetryIcon } from '@/components/icons/otlp'
-
 import { ForwarderTypeLabelMap } from '@/lib/models/forwarder'
 import { OtlpForwarderModel } from '@/lib/models/forwarder/otlp'
 
 import { KeyValueEditor } from '@/components/form/kv-editor'
+import { OpenTelemetryIcon } from '@/components/icons/otlp'
 
 type OtlpForwarderEditorProps = {
   config: OtlpForwarderModel

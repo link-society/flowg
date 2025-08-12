@@ -5,8 +5,6 @@ import MenuItem from '@mui/material/MenuItem'
 import Select from '@mui/material/Select'
 import TextField from '@mui/material/TextField'
 
-import { SyslogIcon } from '@/components/icons/syslog'
-
 import { ForwarderTypeLabelMap } from '@/lib/models/forwarder'
 import {
   SyslogFacility,
@@ -17,6 +15,8 @@ import {
   SyslogSeverity,
   SyslogSeverityValues,
 } from '@/lib/models/forwarder/syslog'
+
+import { SyslogIcon } from '@/components/icons/syslog'
 
 type SyslogForwarderEditorProps = {
   config: SyslogForwarderModel

@@ -2,10 +2,10 @@ import Divider from '@mui/material/Divider'
 import InputAdornment from '@mui/material/InputAdornment'
 import TextField from '@mui/material/TextField'
 
-import { SplunkIcon } from '@/components/icons/splunk'
-
 import { ForwarderTypeLabelMap } from '@/lib/models/forwarder'
 import { SplunkForwarderModel } from '@/lib/models/forwarder/splunk'
+
+import { SplunkIcon } from '@/components/icons/splunk'
 
 type SplunkForwarderEditorProps = {
   config: SplunkForwarderModel
