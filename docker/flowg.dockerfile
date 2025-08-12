@@ -47,7 +47,7 @@ ADD internal/utils/ffi/vrl/rust-crate /src/internal/utils/ffi/vrl/rust-crate
 ##############################
 
 ## FilterDSL
-FROM rust:1.88-alpine3.22 AS builder-rust-filterdsl
+FROM rust:1.89-alpine3.22 AS builder-rust-filterdsl
 RUN apk add --no-cache musl-dev
 
 COPY --from=sources-rust-filterdsl /src /workspace
@@ -57,7 +57,7 @@ RUN cargo build --release
 RUN cargo test
 
 ## VRL
-FROM rust:1.88-alpine3.22 AS builder-rust-vrl
+FROM rust:1.89-alpine3.22 AS builder-rust-vrl
 RUN apk add --no-cache musl-dev
 
 COPY --from=sources-rust-vrl /src /workspace
