@@ -20,11 +20,10 @@ type Row = {
 
 const genId = () => `id_${Date.now()}_${Math.random().toString(36).slice(2)}`
 
-
 export const ListEditor = (props: ListEditorProps) => {
   const propRows = useMemo<Row[]>(
     () => props.items.map((item) => ({ id: genId(), value: item })),
-    [props.items],
+    [props.items]
   )
 
   const [rows, setRows] = useState(propRows)
@@ -52,7 +51,7 @@ export const ListEditor = (props: ListEditorProps) => {
             onChange={(e) => {
               setRows((prev) => {
                 const next = [...prev]
-                next[index] = {...next[index], value: e.target.value }
+                next[index] = { ...next[index], value: e.target.value }
                 return next
               })
             }}
@@ -84,7 +83,7 @@ export const ListEditor = (props: ListEditorProps) => {
         onSubmit={(e) => {
           e.preventDefault()
           setRows((prev) => {
-            const next = [...prev, {id: genId(), value: newItem}]
+            const next = [...prev, { id: genId(), value: newItem }]
             setNewItem('')
             return next
           })

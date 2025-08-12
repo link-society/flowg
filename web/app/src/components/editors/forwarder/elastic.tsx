@@ -17,8 +17,6 @@ export const ElasticForwarderEditor = ({
   config,
   onConfigChange,
 }: ElasticForwarderEditorProps) => {
-  console.log(config, onConfigChange)
-
   return (
     <div
       id="container:editor.forwarders.elastic"
