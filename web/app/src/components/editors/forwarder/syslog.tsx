@@ -5,7 +5,7 @@ import MenuItem from '@mui/material/MenuItem'
 import Select from '@mui/material/Select'
 import TextField from '@mui/material/TextField'
 
-import TextSnippetIcon from '@mui/icons-material/TextSnippet'
+import { SyslogIcon } from '@/components/icons/syslog'
 
 import { ForwarderTypeLabelMap } from '@/lib/models/forwarder'
 import {
@@ -44,7 +44,7 @@ export const SyslogForwarderEditor = ({
             input: {
               startAdornment: (
                 <InputAdornment position="start">
-                  <TextSnippetIcon />
+                  <SyslogIcon />
                 </InputAdornment>
               ),
             },

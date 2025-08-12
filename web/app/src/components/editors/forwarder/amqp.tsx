@@ -2,7 +2,7 @@ import Divider from '@mui/material/Divider'
 import InputAdornment from '@mui/material/InputAdornment'
 import TextField from '@mui/material/TextField'
 
-import ListIcon from '@mui/icons-material/List'
+import { AmqpIcon } from '@/components/icons/amqp'
 
 import { ForwarderTypeLabelMap } from '@/lib/models/forwarder'
 import { AmqpForwarderModel } from '@/lib/models/forwarder/amqp'
@@ -33,7 +33,7 @@ export const AmqpForwarderEditor = ({
             input: {
               startAdornment: (
                 <InputAdornment position="start">
-                  <ListIcon />
+                  <AmqpIcon />
                 </InputAdornment>
               ),
             },

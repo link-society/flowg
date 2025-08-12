@@ -1,5 +1,9 @@
+import InputAdornment from '@mui/material/InputAdornment'
 import TextField from '@mui/material/TextField'
 
+import { OpenTelemetryIcon } from '@/components/icons/otlp'
+
+import { ForwarderTypeLabelMap } from '@/lib/models/forwarder'
 import { OtlpForwarderModel } from '@/lib/models/forwarder/otlp'
 
 import { KeyValueEditor } from '@/components/form/kv-editor'
@@ -41,9 +45,32 @@ export const OtlpForwarderEditor = ({
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div
+      id="container:editor.forwarders.otlp"
+      className="flex flex-col items-stretch gap-3"
+    >
+      <div className="mb-6 shadow">
+        <TextField
+          label="Forwarder Type"
+          variant="outlined"
+          className="w-full"
+          type="text"
+          value={ForwarderTypeLabelMap.otlp}
+          disabled
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <OpenTelemetryIcon />
+                </InputAdornment>
+              ),
+            },
+          }}
+        />
+      </div>
+
       <TextField
-        id="input:forwarder.otlp.endpoint"
+        id="input:editor.forwarders.otlp.endpoint"
         label="Endpoint"
         value={config.endpoint}
         onChange={(e) =>
@@ -59,7 +86,7 @@ export const OtlpForwarderEditor = ({
       />
 
       <KeyValueEditor
-        id="input:forwarder.otlp.headers"
+        id="input:editor.forwarders.otlp.headers"
         keyLabel="Header Name"
         valueLabel="Header Value"
         keyValues={headerPairs}
