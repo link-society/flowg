@@ -2,12 +2,11 @@ import Divider from '@mui/material/Divider'
 import InputAdornment from '@mui/material/InputAdornment'
 import TextField from '@mui/material/TextField'
 
-import { ElasticSearchIcon } from '@/components/icons/elastic'
-
 import { ForwarderTypeLabelMap } from '@/lib/models/forwarder'
 import { ElasticForwarderModel } from '@/lib/models/forwarder/elastic'
 
 import { ListEditor } from '@/components/form/list-editor'
+import { ElasticSearchIcon } from '@/components/icons/elastic'
 
 type ElasticForwarderEditorProps = {
   config: ElasticForwarderModel
