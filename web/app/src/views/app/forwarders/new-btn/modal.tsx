@@ -89,9 +89,10 @@ const newForwarderFactory = (type: ForwarderTypes): ForwarderModel => {
         config: {
           type,
           index: 'default',
-          addresses: ['http://localhost:9200'],
+          username: '',
+          password: '',
+          addresses: ['https://localhost:9200'],
           ca: undefined,
-          token: undefined,
         },
       }
 
