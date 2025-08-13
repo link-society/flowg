@@ -57,15 +57,29 @@ export const ElasticForwarderEditor = ({
       />
 
       <TextField
-        id="input:editor.forwarders.elastic.token"
-        label="Token"
+        id="input:editor.forwarders.elastic.username"
+        label="Username"
         variant="outlined"
-        type="password"
-        value={config.token}
+        type="text"
+        value={config.username}
         onChange={(e) => {
           onConfigChange({
             ...config,
-            token: e.target.value,
+            username: e.target.value,
+          })
+        }}
+      />
+
+      <TextField
+        id="input:editor.forwarders.elastic.password"
+        label="Password"
+        variant="outlined"
+        type="password"
+        value={config.password}
+        onChange={(e) => {
+          onConfigChange({
+            ...config,
+            password: e.target.value,
           })
         }}
       />

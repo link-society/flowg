@@ -13,13 +13,17 @@ import (
 type ForwarderElasticV2 struct {
 	Type      string   `json:"type" enum:"elastic"`
 	Index     string   `json:"index"`
+	Username  string   `json:"username"`
+	Password  string   `json:"password"`
 	Addresses []string `json:"addresses"`
 	CACert    string   `json:"ca,omitempty"`
-	Token     string   `json:"token,omitempty"`
 }
 
 func (f *ForwarderElasticV2) call(ctx context.Context, record *LogRecord) error {
 	cfg := elasticsearch.Config{
+		Username:  f.Username,
+		Password:  f.Password,
+		Addresses: f.Addresses,
 		CACert:    []byte(f.CACert),
 	}
 	client, err := elasticsearch.NewClient(cfg)
