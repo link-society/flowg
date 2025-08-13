@@ -2,7 +2,7 @@
 sidebar_position: 2
 ---
 
-# Forwarding logs
+# Syslog Server
 
 *FlowG* provides an UDP endpoint capable of receiving Syslog events.
 
