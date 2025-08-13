@@ -20,11 +20,16 @@ type ForwarderElasticV2 struct {
 }
 
 func (f *ForwarderElasticV2) call(ctx context.Context, record *LogRecord) error {
+	var caBytes []byte
+	if f.CACert != "" {
+		caBytes = []byte(f.CACert)
+	}
+
 	cfg := elasticsearch.Config{
 		Username:  f.Username,
 		Password:  f.Password,
 		Addresses: f.Addresses,
-		CACert:    []byte(f.CACert),
+		CACert:    caBytes,
 	}
 	client, err := elasticsearch.NewClient(cfg)
 	if err != nil {

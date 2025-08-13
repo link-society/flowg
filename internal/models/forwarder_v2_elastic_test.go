@@ -172,7 +172,7 @@ func TestForwarderElastic_Call_InvalidCACert(t *testing.T) {
 				Type:      "elastic",
 				Index:     "test-index",
 				Addresses: []string{"http://localhost:9200"},
-				CACert:    "not-base64",
+				CACert:    "not-pem",
 			},
 		},
 	}
