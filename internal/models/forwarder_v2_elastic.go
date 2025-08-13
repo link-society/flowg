@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"bytes"
-	"encoding/base64"
 	"encoding/json"
 
 	"github.com/elastic/go-elasticsearch/v9"
@@ -20,19 +19,8 @@ type ForwarderElasticV2 struct {
 }
 
 func (f *ForwarderElasticV2) call(ctx context.Context, record *LogRecord) error {
-	var caBytes []byte
-	if f.CACert != "" {
-		var err error
-		caBytes, err = base64.StdEncoding.DecodeString(f.CACert)
-		if err != nil {
-			return fmt.Errorf("failed to decode CA certificate: %w", err)
-		}
-	}
-
 	cfg := elasticsearch.Config{
-		Addresses:    f.Addresses,
-		CACert:       caBytes,
-		ServiceToken: f.Token,
+		CACert:    []byte(f.CACert),
 	}
 	client, err := elasticsearch.NewClient(cfg)
 	if err != nil {
