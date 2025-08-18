@@ -13,6 +13,7 @@ import (
 	"github.com/swaggest/swgui/v5emb"
 	"github.com/swaggest/usecase"
 
+	"link-society.com/flowg/api/middlewares"
 	"link-society.com/flowg/internal/app"
 
 	apiUtils "link-society.com/flowg/internal/utils/api"
@@ -198,6 +199,15 @@ func NewHandler(deps *Dependencies) http.Handler {
 		r.Post("/api/v1/restore/logs", ctrl.RestoreLogsUsecase())
 		r.Post("/api/v1/restore/config", ctrl.RestoreConfigUsecase())
 	})
+
+	service.Mount("/api/v1/middlewares/", middlewares.NewHandler(&middlewares.Dependencies{
+		AuthStorage:   deps.AuthStorage,
+		LogStorage:    deps.LogStorage,
+		ConfigStorage: deps.ConfigStorage,
+
+		LogNotifier:    deps.LogNotifier,
+		PipelineRunner: deps.PipelineRunner,
+	}))
 
 	return service
 }
