@@ -15,7 +15,7 @@ type Pipeline struct {
 	Entrypoints map[string]Node
 }
 
-func Build(ctx context.Context, configStorage *config.Storage, name string) (*Pipeline, error) {
+func Build(ctx context.Context, configStorage config.Storage, name string) (*Pipeline, error) {
 	flowGraph, err := configStorage.ReadPipeline(ctx, name)
 	if err != nil {
 		return nil, err

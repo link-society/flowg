@@ -7,7 +7,7 @@ import (
 	"link-society.com/flowg/internal/storage/config"
 )
 
-func DefaultPipeline(ctx context.Context, configStorage *config.Storage) error {
+func DefaultPipeline(ctx context.Context, configStorage config.Storage) error {
 	pipelines, err := configStorage.ListPipelines(ctx)
 	if err != nil {
 		return err

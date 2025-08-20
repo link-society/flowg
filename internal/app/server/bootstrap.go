@@ -16,8 +16,8 @@ import (
 type bootstrapProcHandler struct {
 	logger *slog.Logger
 
-	authStorage   *auth.Storage
-	configStorage *config.Storage
+	authStorage   auth.Storage
+	configStorage config.Storage
 
 	initialUser     string
 	initialPassword string

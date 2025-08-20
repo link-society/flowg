@@ -26,9 +26,9 @@ import (
 )
 
 type Dependencies struct {
-	AuthStorage   *auth.Storage
-	LogStorage    *log.Storage
-	ConfigStorage *config.Storage
+	AuthStorage   auth.Storage
+	LogStorage    log.Storage
+	ConfigStorage config.Storage
 
 	LogNotifier    *lognotify.LogNotifier
 	PipelineRunner *pipelines.Runner

@@ -40,9 +40,9 @@ type httpTransport struct {
 	connM   actor.Mailbox[net.Conn]
 	packetM actor.Mailbox[*memberlist.Packet]
 
-	authStorage   *auth.Storage
-	configStorage *config.Storage
-	logStorage    *log.Storage
+	authStorage   auth.Storage
+	configStorage config.Storage
+	logStorage    log.Storage
 }
 
 var _ memberlist.Transport = (*httpTransport)(nil)

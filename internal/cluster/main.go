@@ -26,9 +26,9 @@ type ManagerOptions struct {
 
 	LocalEndpointResolver func() (*url.URL, error)
 
-	AuthStorage         *auth.Storage
-	ConfigStorage       *config.Storage
-	LogStorage          *log.Storage
+	AuthStorage         auth.Storage
+	ConfigStorage       config.Storage
+	LogStorage          log.Storage
 	ClusterStateStorage *kvstore.Storage
 }
 

@@ -18,6 +18,27 @@ import (
 	"link-society.com/flowg/internal/utils/proctree"
 )
 
+type Storage interface {
+	proctree.Process
+	storage.Streamable
+
+	ListTransformers(ctx context.Context) ([]string, error)
+	ReadTransformer(ctx context.Context, name string) (string, error)
+	WriteTransformer(ctx context.Context, name string, content string) error
+	DeleteTransformer(ctx context.Context, name string) error
+
+	ListPipelines(ctx context.Context) ([]string, error)
+	ReadPipeline(ctx context.Context, name string) (*models.FlowGraphV2, error)
+	WritePipeline(ctx context.Context, name string, flow *models.FlowGraphV2) error
+	WriteRawPipeline(ctx context.Context, name string, content string) error
+	DeletePipeline(ctx context.Context, name string) error
+
+	ListForwarders(ctx context.Context) ([]string, error)
+	ReadForwarder(ctx context.Context, name string) (*models.ForwarderV2, error)
+	WriteForwarder(ctx context.Context, name string, forwarder *models.ForwarderV2) error
+	DeleteForwarder(ctx context.Context, name string) error
+}
+
 const (
 	transformerItemType = "transformer"
 	pipelineItemType    = "pipeline"
@@ -48,16 +69,15 @@ func OptReadOnly(readOnly bool) func(*options) {
 	}
 }
 
-type Storage struct {
+type storageImpl struct {
 	proctree.Process
 
 	kvStore *kvstore.Storage
 }
 
-var _ proctree.Process = (*Storage)(nil)
-var _ storage.Streamable = (*Storage)(nil)
+var _ Storage = (*storageImpl)(nil)
 
-func NewStorage(opts ...func(*options)) *Storage {
+func NewStorage(opts ...func(*options)) Storage {
 	options := options{
 		dir:      "./data/config",
 		inMemory: false,
@@ -80,30 +100,30 @@ func NewStorage(opts ...func(*options)) *Storage {
 		kvStore,
 		proctree.NewProcess(&migratorProcH{
 			baseDir: options.dir,
-			storage: &Storage{kvStore: kvStore},
+			storage: &storageImpl{kvStore: kvStore},
 		}),
 	)
 
-	return &Storage{
+	return &storageImpl{
 		Process: process,
 
 		kvStore: kvStore,
 	}
 }
 
-func (s *Storage) Dump(ctx context.Context, w io.Writer, since uint64) (uint64, error) {
+func (s *storageImpl) Dump(ctx context.Context, w io.Writer, since uint64) (uint64, error) {
 	return s.kvStore.Backup(ctx, w, since)
 }
 
-func (s *Storage) Load(ctx context.Context, r io.Reader) error {
+func (s *storageImpl) Load(ctx context.Context, r io.Reader) error {
 	return s.kvStore.Restore(ctx, r)
 }
 
-func (s *Storage) ListTransformers(ctx context.Context) ([]string, error) {
+func (s *storageImpl) ListTransformers(ctx context.Context) ([]string, error) {
 	return s.listItems(ctx, transformerItemType)
 }
 
-func (s *Storage) ReadTransformer(ctx context.Context, name string) (string, error) {
+func (s *storageImpl) ReadTransformer(ctx context.Context, name string) (string, error) {
 	content, err := s.readItem(ctx, transformerItemType, name)
 	if err != nil {
 		return "", err
@@ -112,19 +132,19 @@ func (s *Storage) ReadTransformer(ctx context.Context, name string) (string, err
 	return string(content), nil
 }
 
-func (s *Storage) WriteTransformer(ctx context.Context, name string, content string) error {
+func (s *storageImpl) WriteTransformer(ctx context.Context, name string, content string) error {
 	return s.writeItem(ctx, transformerItemType, name, []byte(content))
 }
 
-func (s *Storage) DeleteTransformer(ctx context.Context, name string) error {
+func (s *storageImpl) DeleteTransformer(ctx context.Context, name string) error {
 	return s.deleteItem(ctx, transformerItemType, name)
 }
 
-func (s *Storage) ListPipelines(ctx context.Context) ([]string, error) {
+func (s *storageImpl) ListPipelines(ctx context.Context) ([]string, error) {
 	return s.listItems(ctx, pipelineItemType)
 }
 
-func (s *Storage) ReadPipeline(ctx context.Context, name string) (*models.FlowGraphV2, error) {
+func (s *storageImpl) ReadPipeline(ctx context.Context, name string) (*models.FlowGraphV2, error) {
 	content, err := s.readItem(ctx, pipelineItemType, name)
 	if err != nil {
 		return nil, err
@@ -144,7 +164,7 @@ func (s *Storage) ReadPipeline(ctx context.Context, name string) (*models.FlowGr
 	return flowGraph, nil
 }
 
-func (s *Storage) WritePipeline(ctx context.Context, name string, flow *models.FlowGraphV2) error {
+func (s *storageImpl) WritePipeline(ctx context.Context, name string, flow *models.FlowGraphV2) error {
 	content, err := json.Marshal(flow)
 	if err != nil {
 		return fmt.Errorf("failed to marshal flow: %w", err)
@@ -153,19 +173,19 @@ func (s *Storage) WritePipeline(ctx context.Context, name string, flow *models.F
 	return s.writeItem(ctx, pipelineItemType, name, content)
 }
 
-func (s *Storage) WriteRawPipeline(ctx context.Context, name string, content string) error {
+func (s *storageImpl) WriteRawPipeline(ctx context.Context, name string, content string) error {
 	return s.writeItem(ctx, pipelineItemType, name, []byte(content))
 }
 
-func (s *Storage) DeletePipeline(ctx context.Context, name string) error {
+func (s *storageImpl) DeletePipeline(ctx context.Context, name string) error {
 	return s.deleteItem(ctx, pipelineItemType, name)
 }
 
-func (s *Storage) ListForwarders(ctx context.Context) ([]string, error) {
+func (s *storageImpl) ListForwarders(ctx context.Context) ([]string, error) {
 	return s.listItems(ctx, forwarderItemType)
 }
 
-func (s *Storage) ReadForwarder(ctx context.Context, name string) (*models.ForwarderV2, error) {
+func (s *storageImpl) ReadForwarder(ctx context.Context, name string) (*models.ForwarderV2, error) {
 	content, err := s.readItem(ctx, forwarderItemType, name)
 	if err != nil {
 		return nil, err
@@ -185,7 +205,7 @@ func (s *Storage) ReadForwarder(ctx context.Context, name string) (*models.Forwa
 	return webhook, nil
 }
 
-func (s *Storage) WriteForwarder(ctx context.Context, name string, forwarder *models.ForwarderV2) error {
+func (s *storageImpl) WriteForwarder(ctx context.Context, name string, forwarder *models.ForwarderV2) error {
 	content, err := json.Marshal(forwarder)
 	if err != nil {
 		return fmt.Errorf("failed to marshal forwarder: %w", err)
@@ -194,11 +214,11 @@ func (s *Storage) WriteForwarder(ctx context.Context, name string, forwarder *mo
 	return s.writeItem(ctx, forwarderItemType, name, content)
 }
 
-func (s *Storage) DeleteForwarder(ctx context.Context, name string) error {
+func (s *storageImpl) DeleteForwarder(ctx context.Context, name string) error {
 	return s.deleteItem(ctx, forwarderItemType, name)
 }
 
-func (s *Storage) listItems(ctx context.Context, itemType string) ([]string, error) {
+func (s *storageImpl) listItems(ctx context.Context, itemType string) ([]string, error) {
 	var items []string
 
 	err := s.kvStore.View(
@@ -216,7 +236,7 @@ func (s *Storage) listItems(ctx context.Context, itemType string) ([]string, err
 	return items, nil
 }
 
-func (s *Storage) readItem(
+func (s *storageImpl) readItem(
 	ctx context.Context,
 	itemType string,
 	name string,
@@ -238,7 +258,7 @@ func (s *Storage) readItem(
 	return content, nil
 }
 
-func (s *Storage) writeItem(
+func (s *storageImpl) writeItem(
 	ctx context.Context,
 	itemType string,
 	name string,
@@ -252,7 +272,7 @@ func (s *Storage) writeItem(
 	)
 }
 
-func (s *Storage) deleteItem(ctx context.Context, itemType string, name string) error {
+func (s *storageImpl) deleteItem(ctx context.Context, itemType string, name string) error {
 	return s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {

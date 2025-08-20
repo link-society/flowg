@@ -19,9 +19,9 @@ type ServerOptions struct {
 	BindAddress string
 	TlsConfig   *tls.Config
 
-	AuthStorage   *auth.Storage
-	ConfigStorage *config.Storage
-	LogStorage    *log.Storage
+	AuthStorage   auth.Storage
+	ConfigStorage config.Storage
+	LogStorage    log.Storage
 
 	LogNotifier    *lognotify.LogNotifier
 	PipelineRunner *pipelines.Runner

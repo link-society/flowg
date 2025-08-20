@@ -19,7 +19,7 @@ import (
 	"link-society.com/flowg/internal/storage/auth"
 )
 
-func ApiMiddleware(authStorage *auth.Storage) func(http.Handler) http.Handler {
+func ApiMiddleware(authStorage auth.Storage) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		serveError := func(w http.ResponseWriter, r *http.Request, err error) {
 			code, payload := rest.Err(status.Wrap(err, status.Unauthenticated))

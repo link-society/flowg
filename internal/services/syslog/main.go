@@ -18,7 +18,7 @@ type ServerOptions struct {
 	TlsConfig    *tls.Config
 	AllowOrigins []string
 
-	ConfigStorage  *config.Storage
+	ConfigStorage  config.Storage
 	PipelineRunner *pipelines.Runner
 }
 

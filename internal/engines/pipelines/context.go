@@ -16,12 +16,12 @@ const (
 	logNotifierKey   pipelineCtxKey = "logNotifier"
 )
 
-func getConfigStorage(ctx context.Context) *config.Storage {
-	return ctx.Value(configStorageKey).(*config.Storage)
+func getConfigStorage(ctx context.Context) config.Storage {
+	return ctx.Value(configStorageKey).(config.Storage)
 }
 
-func getLogStorage(ctx context.Context) *log.Storage {
-	return ctx.Value(logStorageKey).(*log.Storage)
+func getLogStorage(ctx context.Context) log.Storage {
+	return ctx.Value(logStorageKey).(log.Storage)
 }
 
 func getLogNotifier(ctx context.Context) *lognotify.LogNotifier {

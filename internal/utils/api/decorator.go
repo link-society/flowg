@@ -12,7 +12,7 @@ import (
 )
 
 func RequireScopeApiDecorator[Req any, Resp any](
-	authStorage *auth.Storage,
+	authStorage auth.Storage,
 	scope models.Scope,
 	next func(context.Context, Req, *Resp) error,
 ) func(context.Context, Req, *Resp) error {
@@ -50,7 +50,7 @@ func RequireScopeApiDecorator[Req any, Resp any](
 }
 
 func RequireScopesApiDecorator[Req any, Resp any](
-	authStorage *auth.Storage,
+	authStorage auth.Storage,
 	scopes []models.Scope,
 	next func(context.Context, Req, *Resp) error,
 ) func(context.Context, Req, *Resp) error {

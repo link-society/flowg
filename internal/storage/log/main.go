@@ -19,6 +19,29 @@ import (
 	"link-society.com/flowg/internal/utils/proctree"
 )
 
+type Storage interface {
+	proctree.Process
+	storage.Streamable
+
+	ListStreamConfigs(ctx context.Context) (map[string]models.StreamConfig, error)
+	ListStreamFields(ctx context.Context, stream string) ([]string, error)
+	GetOrCreateStreamConfig(ctx context.Context, stream string) (models.StreamConfig, error)
+	ConfigureStream(ctx context.Context, stream string, config models.StreamConfig) error
+	DeleteStream(ctx context.Context, stream string) error
+
+	IndexField(ctx context.Context, stream, field string) error
+	UnindexField(ctx context.Context, stream, field string) error
+
+	Ingest(ctx context.Context, stream string, logRecord *models.LogRecord) ([]byte, error)
+
+	FetchLogs(
+		ctx context.Context,
+		stream string,
+		from, to time.Time,
+		filter filterdsl.Filter,
+	) ([]models.LogRecord, error)
+}
+
 type options struct {
 	dir        string
 	inMemory   bool
@@ -50,16 +73,15 @@ func OptGCInterval(interval time.Duration) func(*options) {
 	}
 }
 
-type Storage struct {
+type storageImpl struct {
 	proctree.Process
 
 	kvStore *kvstore.Storage
 }
 
-var _ proctree.Process = (*Storage)(nil)
-var _ storage.Streamable = (*Storage)(nil)
+var _ Storage = (*storageImpl)(nil)
 
-func NewStorage(opts ...func(*options)) *Storage {
+func NewStorage(opts ...func(*options)) Storage {
 	options := options{
 		dir:        "",
 		inMemory:   false,
@@ -87,21 +109,21 @@ func NewStorage(opts ...func(*options)) *Storage {
 		proctree.NewActorProcess(gc),
 	)
 
-	return &Storage{
+	return &storageImpl{
 		Process: process,
 		kvStore: kvStore,
 	}
 }
 
-func (s *Storage) Dump(ctx context.Context, w io.Writer, since uint64) (uint64, error) {
+func (s *storageImpl) Dump(ctx context.Context, w io.Writer, since uint64) (uint64, error) {
 	return s.kvStore.Backup(ctx, w, since)
 }
 
-func (s *Storage) Load(ctx context.Context, r io.Reader) error {
+func (s *storageImpl) Load(ctx context.Context, r io.Reader) error {
 	return s.kvStore.Restore(ctx, r)
 }
 
-func (s *Storage) ListStreamConfigs(ctx context.Context) (map[string]models.StreamConfig, error) {
+func (s *storageImpl) ListStreamConfigs(ctx context.Context) (map[string]models.StreamConfig, error) {
 	var streams map[string]models.StreamConfig
 
 	err := s.kvStore.View(
@@ -119,7 +141,7 @@ func (s *Storage) ListStreamConfigs(ctx context.Context) (map[string]models.Stre
 	return streams, nil
 }
 
-func (s *Storage) ListStreamFields(ctx context.Context, stream string) ([]string, error) {
+func (s *storageImpl) ListStreamFields(ctx context.Context, stream string) ([]string, error) {
 	var fields []string
 
 	err := s.kvStore.View(
@@ -136,7 +158,7 @@ func (s *Storage) ListStreamFields(ctx context.Context, stream string) ([]string
 	return fields, nil
 }
 
-func (s *Storage) GetOrCreateStreamConfig(ctx context.Context, stream string) (models.StreamConfig, error) {
+func (s *storageImpl) GetOrCreateStreamConfig(ctx context.Context, stream string) (models.StreamConfig, error) {
 	var streamConfig models.StreamConfig
 
 	err := s.kvStore.Update(ctx,
@@ -154,7 +176,7 @@ func (s *Storage) GetOrCreateStreamConfig(ctx context.Context, stream string) (m
 	return streamConfig, nil
 }
 
-func (s *Storage) ConfigureStream(ctx context.Context, stream string, config models.StreamConfig) error {
+func (s *storageImpl) ConfigureStream(ctx context.Context, stream string, config models.StreamConfig) error {
 	return s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
@@ -163,7 +185,7 @@ func (s *Storage) ConfigureStream(ctx context.Context, stream string, config mod
 	)
 }
 
-func (s *Storage) DeleteStream(ctx context.Context, stream string) error {
+func (s *storageImpl) DeleteStream(ctx context.Context, stream string) error {
 	return s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
@@ -172,7 +194,7 @@ func (s *Storage) DeleteStream(ctx context.Context, stream string) error {
 	)
 }
 
-func (s *Storage) IndexField(ctx context.Context, stream, field string) error {
+func (s *storageImpl) IndexField(ctx context.Context, stream, field string) error {
 	return s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
@@ -181,7 +203,7 @@ func (s *Storage) IndexField(ctx context.Context, stream, field string) error {
 	)
 }
 
-func (s *Storage) UnindexField(ctx context.Context, stream, field string) error {
+func (s *storageImpl) UnindexField(ctx context.Context, stream, field string) error {
 	return s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
@@ -190,7 +212,7 @@ func (s *Storage) UnindexField(ctx context.Context, stream, field string) error 
 	)
 }
 
-func (s *Storage) Ingest(ctx context.Context, stream string, logRecord *models.LogRecord) ([]byte, error) {
+func (s *storageImpl) Ingest(ctx context.Context, stream string, logRecord *models.LogRecord) ([]byte, error) {
 	key := logRecord.NewDbKey(stream)
 	err := s.kvStore.Update(
 		ctx,
@@ -205,7 +227,7 @@ func (s *Storage) Ingest(ctx context.Context, stream string, logRecord *models.L
 	return key, nil
 }
 
-func (s *Storage) FetchLogs(
+func (s *storageImpl) FetchLogs(
 	ctx context.Context,
 	stream string,
 	from, to time.Time,

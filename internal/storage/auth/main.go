@@ -14,6 +14,31 @@ import (
 	"link-society.com/flowg/internal/utils/proctree"
 )
 
+type Storage interface {
+	proctree.Process
+	storage.Streamable
+
+	ListRoles(ctx context.Context) ([]models.Role, error)
+	FetchRole(ctx context.Context, name string) (*models.Role, error)
+	SaveRole(ctx context.Context, role models.Role) error
+	DeleteRole(ctx context.Context, name string) error
+
+	ListUsers(ctx context.Context) ([]models.User, error)
+	FetchUser(ctx context.Context, name string) (*models.User, error)
+	ListUserScopes(ctx context.Context, name string) ([]models.Scope, error)
+	SaveUser(ctx context.Context, user models.User, password string) error
+	PatchUserRoles(ctx context.Context, user models.User) error
+	DeleteUser(ctx context.Context, name string) error
+
+	VerifyUserPassword(ctx context.Context, name, password string) (bool, error)
+	VerifyUserPermission(ctx context.Context, username string, scope models.Scope) (bool, error)
+
+	CreateToken(ctx context.Context, username string) (string, string, error)
+	VerifyToken(ctx context.Context, token string) (*models.User, error)
+	ListTokens(ctx context.Context, username string) ([]string, error)
+	DeleteToken(ctx context.Context, username string, tokenUUID string) error
+}
+
 type options struct {
 	dir      string
 	inMemory bool
@@ -38,16 +63,15 @@ func OptReadOnly(readOnly bool) func(*options) {
 	}
 }
 
-type Storage struct {
+type storageImpl struct {
 	proctree.Process
 
 	kvStore *kvstore.Storage
 }
 
-var _ proctree.Process = (*Storage)(nil)
-var _ storage.Streamable = (*Storage)(nil)
+var _ Storage = (*storageImpl)(nil)
 
-func NewStorage(opts ...func(*options)) *Storage {
+func NewStorage(opts ...func(*options)) Storage {
 	options := options{
 		dir:      "",
 		inMemory: false,
@@ -70,21 +94,21 @@ func NewStorage(opts ...func(*options)) *Storage {
 		proctree.NewProcess(&migratorProcH{kvStore: kvStore}),
 	)
 
-	return &Storage{
+	return &storageImpl{
 		Process: process,
 		kvStore: kvStore,
 	}
 }
 
-func (s *Storage) Dump(ctx context.Context, w io.Writer, since uint64) (uint64, error) {
+func (s *storageImpl) Dump(ctx context.Context, w io.Writer, since uint64) (uint64, error) {
 	return s.kvStore.Backup(ctx, w, since)
 }
 
-func (s *Storage) Load(ctx context.Context, r io.Reader) error {
+func (s *storageImpl) Load(ctx context.Context, r io.Reader) error {
 	return s.kvStore.Restore(ctx, r)
 }
 
-func (s *Storage) ListRoles(ctx context.Context) ([]models.Role, error) {
+func (s *storageImpl) ListRoles(ctx context.Context) ([]models.Role, error) {
 	var roles []models.Role
 
 	err := s.kvStore.View(
@@ -102,7 +126,7 @@ func (s *Storage) ListRoles(ctx context.Context) ([]models.Role, error) {
 	return roles, nil
 }
 
-func (s *Storage) FetchRole(ctx context.Context, name string) (*models.Role, error) {
+func (s *storageImpl) FetchRole(ctx context.Context, name string) (*models.Role, error) {
 	var role *models.Role
 
 	err := s.kvStore.View(
@@ -120,7 +144,7 @@ func (s *Storage) FetchRole(ctx context.Context, name string) (*models.Role, err
 	return role, nil
 }
 
-func (s *Storage) SaveRole(ctx context.Context, role models.Role) error {
+func (s *storageImpl) SaveRole(ctx context.Context, role models.Role) error {
 	return s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
@@ -129,7 +153,7 @@ func (s *Storage) SaveRole(ctx context.Context, role models.Role) error {
 	)
 }
 
-func (s *Storage) DeleteRole(ctx context.Context, name string) error {
+func (s *storageImpl) DeleteRole(ctx context.Context, name string) error {
 	return s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
@@ -138,7 +162,7 @@ func (s *Storage) DeleteRole(ctx context.Context, name string) error {
 	)
 }
 
-func (s *Storage) ListUsers(ctx context.Context) ([]models.User, error) {
+func (s *storageImpl) ListUsers(ctx context.Context) ([]models.User, error) {
 	var users []models.User
 
 	err := s.kvStore.View(
@@ -156,7 +180,7 @@ func (s *Storage) ListUsers(ctx context.Context) ([]models.User, error) {
 	return users, nil
 }
 
-func (s *Storage) FetchUser(ctx context.Context, name string) (*models.User, error) {
+func (s *storageImpl) FetchUser(ctx context.Context, name string) (*models.User, error) {
 	var user *models.User
 
 	err := s.kvStore.View(
@@ -174,7 +198,7 @@ func (s *Storage) FetchUser(ctx context.Context, name string) (*models.User, err
 	return user, nil
 }
 
-func (s *Storage) ListUserScopes(ctx context.Context, name string) ([]models.Scope, error) {
+func (s *storageImpl) ListUserScopes(ctx context.Context, name string) ([]models.Scope, error) {
 	var scopes []models.Scope
 
 	err := s.kvStore.View(
@@ -192,7 +216,7 @@ func (s *Storage) ListUserScopes(ctx context.Context, name string) ([]models.Sco
 	return scopes, nil
 }
 
-func (s *Storage) SaveUser(ctx context.Context, user models.User, password string) error {
+func (s *storageImpl) SaveUser(ctx context.Context, user models.User, password string) error {
 	return s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
@@ -201,7 +225,7 @@ func (s *Storage) SaveUser(ctx context.Context, user models.User, password strin
 	)
 }
 
-func (s *Storage) PatchUserRoles(ctx context.Context, user models.User) error {
+func (s *storageImpl) PatchUserRoles(ctx context.Context, user models.User) error {
 	return s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
@@ -210,7 +234,7 @@ func (s *Storage) PatchUserRoles(ctx context.Context, user models.User) error {
 	)
 }
 
-func (s *Storage) DeleteUser(ctx context.Context, name string) error {
+func (s *storageImpl) DeleteUser(ctx context.Context, name string) error {
 	return s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
@@ -219,7 +243,7 @@ func (s *Storage) DeleteUser(ctx context.Context, name string) error {
 	)
 }
 
-func (s *Storage) VerifyUserPassword(ctx context.Context, name, password string) (bool, error) {
+func (s *storageImpl) VerifyUserPassword(ctx context.Context, name, password string) (bool, error) {
 	var verified bool
 
 	err := s.kvStore.View(
@@ -237,7 +261,7 @@ func (s *Storage) VerifyUserPassword(ctx context.Context, name, password string)
 	return verified, nil
 }
 
-func (s *Storage) VerifyUserPermission(ctx context.Context, username string, scope models.Scope) (bool, error) {
+func (s *storageImpl) VerifyUserPermission(ctx context.Context, username string, scope models.Scope) (bool, error) {
 	var authorized bool
 
 	err := s.kvStore.View(
@@ -255,7 +279,7 @@ func (s *Storage) VerifyUserPermission(ctx context.Context, username string, sco
 	return authorized, nil
 }
 
-func (s *Storage) CreateToken(ctx context.Context, username string) (string, string, error) {
+func (s *storageImpl) CreateToken(ctx context.Context, username string) (string, string, error) {
 	var token, tokenUuid string
 
 	err := s.kvStore.Update(
@@ -273,7 +297,7 @@ func (s *Storage) CreateToken(ctx context.Context, username string) (string, str
 	return token, tokenUuid, nil
 }
 
-func (s *Storage) VerifyToken(ctx context.Context, token string) (*models.User, error) {
+func (s *storageImpl) VerifyToken(ctx context.Context, token string) (*models.User, error) {
 	var user *models.User
 
 	err := s.kvStore.View(
@@ -291,7 +315,7 @@ func (s *Storage) VerifyToken(ctx context.Context, token string) (*models.User, 
 	return user, nil
 }
 
-func (s *Storage) ListTokens(ctx context.Context, username string) ([]string, error) {
+func (s *storageImpl) ListTokens(ctx context.Context, username string) ([]string, error) {
 	var tokens []string
 
 	err := s.kvStore.View(
@@ -308,7 +332,7 @@ func (s *Storage) ListTokens(ctx context.Context, username string) ([]string, er
 	return tokens, nil
 }
 
-func (s *Storage) DeleteToken(ctx context.Context, username string, tokenUUID string) error {
+func (s *storageImpl) DeleteToken(ctx context.Context, username string, tokenUUID string) error {
 	return s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
