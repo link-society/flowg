@@ -19,7 +19,7 @@ type ServerOptions struct {
 	AllowOrigins []string
 
 	ConfigStorage  config.Storage
-	PipelineRunner *pipelines.Runner
+	PipelineRunner pipelines.Runner
 }
 
 func NewServer(opts *ServerOptions) proctree.Process {

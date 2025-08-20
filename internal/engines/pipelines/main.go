@@ -15,19 +15,25 @@ import (
 	"link-society.com/flowg/internal/engines/lognotify"
 )
 
-type Runner struct {
+type Runner interface {
+	proctree.Process
+
+	Run(ctx context.Context, pipelineName string, entrypoint string, record *models.LogRecord) error
+}
+
+type runnerImpl struct {
 	proctree.Process
 
 	mbox actor.MailboxSender[message]
 }
 
-var _ proctree.Process = (*Runner)(nil)
+var _ Runner = (*runnerImpl)(nil)
 
 func NewRunner(
 	configStorage config.Storage,
 	logStorage log.Storage,
-	logNotifier *lognotify.LogNotifier,
-) *Runner {
+	logNotifier lognotify.LogNotifier,
+) Runner {
 	mbox := actor.NewMailbox[message]()
 	handler := &procHandler{
 		mbox: mbox,
@@ -43,13 +49,13 @@ func NewRunner(
 		proctree.NewProcess(handler),
 	)
 
-	return &Runner{
+	return &runnerImpl{
 		Process: process,
 		mbox:    mbox,
 	}
 }
 
-func (r *Runner) Run(
+func (r *runnerImpl) Run(
 	ctx context.Context,
 	pipelineName string,
 	entrypoint string,

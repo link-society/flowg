@@ -24,6 +24,6 @@ func getLogStorage(ctx context.Context) log.Storage {
 	return ctx.Value(logStorageKey).(log.Storage)
 }
 
-func getLogNotifier(ctx context.Context) *lognotify.LogNotifier {
-	return ctx.Value(logNotifierKey).(*lognotify.LogNotifier)
+func getLogNotifier(ctx context.Context) lognotify.LogNotifier {
+	return ctx.Value(logNotifierKey).(lognotify.LogNotifier)
 }

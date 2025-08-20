@@ -30,8 +30,8 @@ type Dependencies struct {
 	LogStorage    log.Storage
 	ConfigStorage config.Storage
 
-	LogNotifier    *lognotify.LogNotifier
-	PipelineRunner *pipelines.Runner
+	LogNotifier    lognotify.LogNotifier
+	PipelineRunner pipelines.Runner
 }
 
 type controller struct {
