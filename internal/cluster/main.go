@@ -35,7 +35,7 @@ type ManagerOptions struct {
 	AuthStorage         auth.Storage
 	ConfigStorage       config.Storage
 	LogStorage          log.Storage
-	ClusterStateStorage *kvstore.Storage
+	ClusterStateStorage kvstore.Storage
 }
 
 type managerImpl struct {

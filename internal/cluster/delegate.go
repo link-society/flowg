@@ -21,7 +21,7 @@ type delegate struct {
 	localEndpoint *url.URL
 	endpoints     map[string]*url.URL
 
-	clusterStateStorage *kvstore.Storage
+	clusterStateStorage kvstore.Storage
 	syncPool            *syncPool
 }
 

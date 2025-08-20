@@ -22,7 +22,7 @@ type nodeSyncState struct {
 
 func fetchLocalState(
 	ctx context.Context,
-	storage *kvstore.Storage,
+	storage kvstore.Storage,
 	nodeID string,
 	endpoints []string,
 ) (*nodeState, error) {
@@ -86,7 +86,7 @@ func fetchLocalState(
 
 func updateLocalState(
 	ctx context.Context,
-	storage *kvstore.Storage,
+	storage kvstore.Storage,
 	nodeID string,
 	dbType string,
 	since uint64,

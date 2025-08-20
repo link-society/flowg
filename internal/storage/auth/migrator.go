@@ -13,7 +13,7 @@ import (
 )
 
 type migratorProcH struct {
-	kvStore *kvstore.Storage
+	kvStore kvstore.Storage
 }
 
 var _ proctree.ProcessHandler = (*migratorProcH)(nil)
