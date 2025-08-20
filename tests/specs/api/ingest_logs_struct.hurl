@@ -27,6 +27,7 @@ HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 jsonpath "$.processed_count" == 2
+
 GET http://localhost:5080/api/v1/streams/default/logs
 Authorization: Bearer {{admin_token}}
 [Query]
