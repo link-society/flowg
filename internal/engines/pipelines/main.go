@@ -24,8 +24,8 @@ type Runner struct {
 var _ proctree.Process = (*Runner)(nil)
 
 func NewRunner(
-	configStorage *config.Storage,
-	logStorage *log.Storage,
+	configStorage config.Storage,
+	logStorage log.Storage,
 	logNotifier *lognotify.LogNotifier,
 ) *Runner {
 	mbox := actor.NewMailbox[message]()

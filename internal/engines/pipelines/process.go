@@ -15,8 +15,8 @@ import (
 type procHandler struct {
 	mbox actor.MailboxReceiver[message]
 
-	configStorage *config.Storage
-	logStorage    *log.Storage
+	configStorage config.Storage
+	logStorage    log.Storage
 	logNotifier   *lognotify.LogNotifier
 }
 

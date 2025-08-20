@@ -13,7 +13,7 @@ import (
 
 type migratorProcH struct {
 	baseDir string
-	storage *Storage
+	storage *storageImpl
 }
 
 var _ proctree.ProcessHandler = (*migratorProcH)(nil)

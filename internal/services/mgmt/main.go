@@ -28,9 +28,9 @@ type ServerOptions struct {
 	ClusterStateDir          string
 	ClusterFormationStrategy cluster.ClusterFormationStrategy
 
-	AuthStorage   *auth.Storage
-	ConfigStorage *config.Storage
-	LogStorage    *log.Storage
+	AuthStorage   auth.Storage
+	ConfigStorage config.Storage
+	LogStorage    log.Storage
 }
 
 func NewServer(opts *ServerOptions) proctree.Process {

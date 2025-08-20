@@ -20,7 +20,7 @@ type ResetUserOptions struct {
 	Password string
 }
 
-func DefaultRolesAndUsers(ctx context.Context, authStorage *auth.Storage, opts BootstrapOptions) error {
+func DefaultRolesAndUsers(ctx context.Context, authStorage auth.Storage, opts BootstrapOptions) error {
 	roles, err := authStorage.ListRoles(ctx)
 	if err != nil {
 		return err
@@ -65,7 +65,7 @@ func DefaultRolesAndUsers(ctx context.Context, authStorage *auth.Storage, opts B
 	return nil
 }
 
-func ResetUser(ctx context.Context, authStorage *auth.Storage, opts ResetUserOptions) error {
+func ResetUser(ctx context.Context, authStorage auth.Storage, opts ResetUserOptions) error {
 	if opts.User == "" || opts.Password == "" {
 		return nil
 	}
