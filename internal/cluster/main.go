@@ -18,6 +18,12 @@ import (
 	"link-society.com/flowg/internal/storage/log"
 )
 
+type Manager interface {
+	proctree.Process
+
+	HttpHandler() http.Handler
+}
+
 type ManagerOptions struct {
 	NodeID string
 	Cookie string
@@ -32,15 +38,15 @@ type ManagerOptions struct {
 	ClusterStateStorage *kvstore.Storage
 }
 
-type Manager struct {
+type managerImpl struct {
 	proctree.Process
 
 	handler *procHandler
 }
 
-var _ proctree.Process = (*Manager)(nil)
+var _ Manager = (*managerImpl)(nil)
 
-func NewManager(opts *ManagerOptions) *Manager {
+func NewManager(opts *ManagerOptions) Manager {
 	connM := actor.NewMailbox[net.Conn]()
 	packetM := actor.NewMailbox[*memberlist.Packet]()
 	joinM := actor.NewMailbox[*ClusterJoinNode]()
@@ -69,12 +75,12 @@ func NewManager(opts *ManagerOptions) *Manager {
 		proctree.NewProcess(handler),
 	)
 
-	return &Manager{
+	return &managerImpl{
 		Process: process,
 		handler: handler,
 	}
 }
 
-func (m *Manager) HttpHandler() http.Handler {
+func (m *managerImpl) HttpHandler() http.Handler {
 	return m.handler.httpHandler
 }
