@@ -23,8 +23,8 @@ type ServerOptions struct {
 	ConfigStorage config.Storage
 	LogStorage    log.Storage
 
-	LogNotifier    *lognotify.LogNotifier
-	PipelineRunner *pipelines.Runner
+	LogNotifier    lognotify.LogNotifier
+	PipelineRunner pipelines.Runner
 }
 
 func NewServer(opts *ServerOptions) proctree.Process {

@@ -10,16 +10,23 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
-type LogNotifier struct {
+type LogNotifier interface {
+	proctree.Process
+
+	Subscribe(ctx context.Context, stream string) (actor.MailboxReceiver[LogMessage], error)
+	Notify(ctx context.Context, stream string, logKey string, logRecord models.LogRecord) error
+}
+
+type logNotifierImpl struct {
 	proctree.Process
 
 	subMbox actor.MailboxSender[SubscribeMessage]
 	logMbox actor.MailboxSender[LogMessage]
 }
 
-var _ proctree.Process = (*LogNotifier)(nil)
+var _ LogNotifier = (*logNotifierImpl)(nil)
 
-func NewLogNotifier() *LogNotifier {
+func NewLogNotifier() LogNotifier {
 	subMbox := actor.NewMailbox[SubscribeMessage]()
 	logMbox := actor.NewMailbox[LogMessage]()
 	handler := &procHandler{
@@ -35,7 +42,7 @@ func NewLogNotifier() *LogNotifier {
 		proctree.NewProcess(handler),
 	)
 
-	return &LogNotifier{
+	return &logNotifierImpl{
 		Process: process,
 
 		subMbox: subMbox,
@@ -43,7 +50,7 @@ func NewLogNotifier() *LogNotifier {
 	}
 }
 
-func (n *LogNotifier) Subscribe(ctx context.Context, stream string) (actor.MailboxReceiver[LogMessage], error) {
+func (n *logNotifierImpl) Subscribe(ctx context.Context, stream string) (actor.MailboxReceiver[LogMessage], error) {
 	logM := actor.NewMailbox[LogMessage]()
 	logM.Start()
 
@@ -70,7 +77,7 @@ func (n *LogNotifier) Subscribe(ctx context.Context, stream string) (actor.Mailb
 	return logM, nil
 }
 
-func (n *LogNotifier) Notify(ctx context.Context, stream string, logKey string, logRecord models.LogRecord) error {
+func (n *logNotifierImpl) Notify(ctx context.Context, stream string, logKey string, logRecord models.LogRecord) error {
 	msg := LogMessage{
 		Stream:    stream,
 		LogKey:    logKey,

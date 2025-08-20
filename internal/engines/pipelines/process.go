@@ -17,7 +17,7 @@ type procHandler struct {
 
 	configStorage config.Storage
 	logStorage    log.Storage
-	logNotifier   *lognotify.LogNotifier
+	logNotifier   lognotify.LogNotifier
 }
 
 var _ proctree.ProcessHandler = (*procHandler)(nil)
