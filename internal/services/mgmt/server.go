@@ -26,7 +26,7 @@ type serverHandler struct {
 	tlsConfig   *tls.Config
 
 	listenerH      *listenerHandler
-	clusterManager *cluster.Manager
+	clusterManager cluster.Manager
 
 	server *http.Server
 }
