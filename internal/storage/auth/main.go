@@ -66,7 +66,7 @@ func OptReadOnly(readOnly bool) func(*options) {
 type storageImpl struct {
 	proctree.Process
 
-	kvStore *kvstore.Storage
+	kvStore kvstore.Storage
 }
 
 var _ Storage = (*storageImpl)(nil)

@@ -76,7 +76,7 @@ func OptGCInterval(interval time.Duration) func(*options) {
 type storageImpl struct {
 	proctree.Process
 
-	kvStore *kvstore.Storage
+	kvStore kvstore.Storage
 }
 
 var _ Storage = (*storageImpl)(nil)

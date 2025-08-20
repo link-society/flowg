@@ -14,6 +14,15 @@ import (
 	"link-society.com/flowg/internal/utils/proctree"
 )
 
+type Storage interface {
+	proctree.Process
+
+	Backup(ctx context.Context, w io.Writer, since uint64) (uint64, error)
+	Restore(ctx context.Context, r io.Reader) error
+	View(ctx context.Context, txnFn func(txn *badger.Txn) error) error
+	Update(ctx context.Context, txnFn func(txn *badger.Txn) error) error
+}
+
 type options struct {
 	logChannel string
 	dir        string
@@ -45,15 +54,15 @@ func OptReadOnly(readOnly bool) func(*options) {
 	}
 }
 
-type Storage struct {
+type storageImpl struct {
 	proctree.Process
 
 	mbox actor.Mailbox[message]
 }
 
-var _ proctree.Process = (*Storage)(nil)
+var _ Storage = (*storageImpl)(nil)
 
-func NewStorage(opts ...func(*options)) *Storage {
+func NewStorage(opts ...func(*options)) Storage {
 	options := options{
 		logChannel: "kv",
 		dir:        "",
@@ -88,14 +97,14 @@ func NewStorage(opts ...func(*options)) *Storage {
 		proctree.NewProcess(handler),
 	)
 
-	return &Storage{
+	return &storageImpl{
 		Process: process,
 
 		mbox: mbox,
 	}
 }
 
-func (kv *Storage) Backup(
+func (kv *storageImpl) Backup(
 	ctx context.Context,
 	w io.Writer,
 	since uint64,
@@ -122,7 +131,7 @@ func (kv *Storage) Backup(
 	return op.since, nil
 }
 
-func (kv *Storage) Restore(
+func (kv *storageImpl) Restore(
 	ctx context.Context,
 	r io.Reader,
 ) error {
@@ -142,7 +151,7 @@ func (kv *Storage) Restore(
 	return <-replyTo
 }
 
-func (kv *Storage) View(
+func (kv *storageImpl) View(
 	ctx context.Context,
 	txnFn func(txn *badger.Txn) error,
 ) error {
@@ -162,7 +171,7 @@ func (kv *Storage) View(
 	return <-replyTo
 }
 
-func (kv *Storage) Update(
+func (kv *storageImpl) Update(
 	ctx context.Context,
 	txnFn func(txn *badger.Txn) error,
 ) error {

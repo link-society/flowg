@@ -13,7 +13,7 @@ import (
 )
 
 type gcWorker struct {
-	kvStore    *kvstore.Storage
+	kvStore    kvstore.Storage
 	gcInterval time.Duration
 }
 
