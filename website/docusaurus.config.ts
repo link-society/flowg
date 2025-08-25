@@ -32,6 +32,11 @@ const config: Config = {
         docs: {
           sidebarPath: './sidebars.ts',
         },
+        blog: {
+          blogTitle: 'FlowG Blog',
+          blogDescription: 'Updates and news about FlowG',
+          postsPerPage: 'ALL',
+        },
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -75,6 +80,11 @@ const config: Config = {
           sidebarId: 'docSidebar',
           position: 'left',
           label: 'Documentation',
+        },
+        {
+          to: 'blog',
+          label: 'Blog',
+          position: 'left',
         },
         {
           href: 'https://github.com/link-society/flowg',
