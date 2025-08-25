@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: checkout@scm
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: setup@docker
         uses: docker/setup-buildx-action@v3
@@ -75,7 +75,7 @@ jobs:
 
     steps:
       - name: checkout@scm
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: setup@buildchain
         uses: ./.github/actions/setup-buildchain

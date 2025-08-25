@@ -24,7 +24,7 @@ jobs:
           private-key: ${{ secrets.CIBOT_PRIVKEY }}
 
       - name: checkout@scm
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ steps.app-token.outputs.token }}
           ref: main
