@@ -12,13 +12,11 @@ Content-Type: application/json
     "version": 2,
     "config": {
       "type": "otlp",
-      "config": {
-        "endpoint": "http://test-flowg-mockserver:1080/v1/logs",
-        "headers": {
-          "X-Custom-Header": "test-value",
-          "X-Test-Mode": "success",
-          "Content-Type": "application/x-protobuf"
-        }
+      "endpoint": "http://test-flowg-mockserver:1080/v1/logs",
+      "headers": {
+        "X-Custom-Header": "test-value",
+        "X-Test-Mode": "success",
+        "Content-Type": "application/x-protobuf"
       }
     }
   }
@@ -83,13 +81,11 @@ Content-Type: application/json
     "version": 2,
     "config": {
       "type": "otlp",
-      "config": {
-        "endpoint": "http://test-flowg-mockserver:1080/v1/logs",
-        "headers": {
-          "X-Custom-Header": "test-value",
-          "X-Test-Mode": "fail",
-          "Content-Type": "application/x-protobuf"
-        }
+      "endpoint": "http://test-flowg-mockserver:1080/v1/logs",
+      "headers": {
+        "X-Custom-Header": "test-value",
+        "X-Test-Mode": "fail",
+        "Content-Type": "application/x-protobuf"
       }
     }
   }
