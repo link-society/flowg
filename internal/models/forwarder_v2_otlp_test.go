@@ -39,12 +39,10 @@ func TestForwarderOtlpV2_Call_Success(t *testing.T) {
 		Version: 2,
 		Config: &models.ForwarderConfigV2{
 			Otlp: &models.ForwarderOtlpV2{
-				Type: "otlp",
-				Config: models.OtlpForwarderConfig{
-					Endpoint: testServer.URL,
-					Headers: map[string]string{
-						"X-Test-Header": "test-value",
-					},
+				Type:     "otlp",
+				Endpoint: testServer.URL,
+				Headers: map[string]string{
+					"X-Test-Header": "test-value",
 				},
 			},
 		},
@@ -72,10 +70,8 @@ func TestForwarderOtlpV2_Call_Failure(t *testing.T) {
 		Version: 2,
 		Config: &models.ForwarderConfigV2{
 			Otlp: &models.ForwarderOtlpV2{
-				Type: "otlp",
-				Config: models.OtlpForwarderConfig{
-					Endpoint: testServer.URL,
-				},
+				Type:     "otlp",
+				Endpoint: testServer.URL,
 			},
 		},
 	}
