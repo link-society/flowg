@@ -22,7 +22,7 @@ jobs:
         run: task build:all doc:gen:cli doc:gen:openapi www:build
 
       - name: upload@artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: ./website/build
 
