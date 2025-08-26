@@ -15,7 +15,7 @@ require (
 	github.com/hashicorp/consul/api v1.32.1
 	github.com/hashicorp/go-sockaddr v1.0.7
 	github.com/hashicorp/memberlist v0.5.3
-	github.com/jarcoal/httpmock v1.4.0
+	github.com/jarcoal/httpmock v1.4.1
 	github.com/prometheus/client_golang v1.23.0
 	github.com/prometheus/procfs v0.17.0
 	github.com/rabbitmq/amqp091-go v1.10.0
