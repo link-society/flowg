@@ -30,7 +30,7 @@ require (
 	go.opentelemetry.io/proto/otlp v1.7.1
 	golang.org/x/crypto v0.41.0
 	golang.org/x/term v0.34.0
-	google.golang.org/protobuf v1.36.7
+	google.golang.org/protobuf v1.36.8
 	gopkg.in/mcuadros/go-syslog.v2 v2.3.0
 	k8s.io/api v0.33.4
 	k8s.io/apimachinery v0.33.4
