@@ -6,7 +6,7 @@ toolchain go1.24.2
 
 require (
 	github.com/dgraph-io/badger/v4 v4.8.0
-	github.com/elastic/go-elasticsearch/v9 v9.0.0
+	github.com/elastic/go-elasticsearch/v9 v9.1.0
 	github.com/go-chi/chi/v5 v5.2.3
 	github.com/go-logfmt/logfmt v0.6.0
 	github.com/golang-jwt/jwt/v5 v5.3.0
