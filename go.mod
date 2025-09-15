@@ -26,7 +26,7 @@ require (
 	github.com/swaggest/rest v0.2.75
 	github.com/swaggest/swgui v1.8.4
 	github.com/swaggest/usecase v1.3.1
-	github.com/vladopajic/go-actor v0.9.6
+	github.com/vladopajic/go-actor v1.1.0
 	go.opentelemetry.io/proto/otlp v1.8.0
 	golang.org/x/crypto v0.41.0
 	golang.org/x/term v0.35.0
