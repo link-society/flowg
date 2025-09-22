@@ -1,9 +1,9 @@
 ---
 apiVersion: v2
 name: flowg
-version: "v0.45.4"
+version: "v0.45.5"
 type: application
-appVersion: "v0.45.4"
+appVersion: "v0.45.5"
 kubeVersion: ">=1.30.0-0"
 description: Flowg is a low-code log processing platform.
 home: https://github.com/link-society/flowg
