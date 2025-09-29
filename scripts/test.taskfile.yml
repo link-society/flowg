@@ -37,7 +37,7 @@ tasks:
       FLOWG_TEST_SUITES: consul
 
   "e2e:dns":
-    desc: "Run cluster formation using CoreDNS end-to-end tests"
+    desc: "Run cluster formation using Technitium DNS end-to-end tests"
     dir: ./tests
     cmds:
       - pdm install
