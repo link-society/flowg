@@ -9,41 +9,28 @@ from contextlib import contextmanager
 from . import docker_utils
 
 
-COREDNS_IMAGE = "coredns/coredns:latest"
+TECHNITIUM_IMAGE = "technitium/dns-server:latest"
 
 @contextmanager
 def container(docker_client, *, name, network, report_dir):
-    print("Pulling the CoreDNS image")
+    print("Pulling the Technitium DNS Server image")
     try:
-        docker_client.images.pull(COREDNS_IMAGE)
+        docker_client.images.pull(TECHNITIUM_IMAGE)
 
     except Exception as err:
         pytest.fail(f"{err}", pytrace=False)
 
-    local_corefile_path = Path(__file__).parent / "Corefile"
-    container_corefile_path = "/etc/coredns"
-
-    command = ["-conf", f"{container_corefile_path}/Corefile"]
-
     try:
         print(f"Creating Container: {name}")
         container = docker_client.containers.run(
-            image=COREDNS_IMAGE,
+            image=TECHNITIUM_IMAGE,
             name=name,
             network=network.name,
             hostname=name,
             ports={
-                "53/tcp": 54,
-                "53/udp": 54,
-                "8080/tcp":8080
+                "53/tcp": 5300,
+                '5380/tcp': 5380
             },
-            volumes={
-                str(local_corefile_path.parent): {
-                    "bind": container_corefile_path,
-                    "mode": "ro"
-                }
-            },
-            command=command,
             detach=True,
         )
 
@@ -71,7 +58,7 @@ def wait_for_healthcheck(container):
 
     while True:
         try:
-            resp = requests.get("http://localhost:8080/health")
+            resp = requests.get("http://localhost:5380/")
             resp.raise_for_status()
 
             print(f"Health check for {container.name} successful!")

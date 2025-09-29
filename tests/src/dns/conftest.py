@@ -3,12 +3,12 @@ import pytest
 from pathlib import Path
 from shutil import rmtree
 
-from .._lib import flowg_utils, coredns_utils
+from .._lib import flowg_utils, technitium_utils
 
 
 @pytest.fixture(scope="module")
 def cache_dir():
-    cache_dir = Path.cwd() / "cache" / "coredns"
+    cache_dir = Path.cwd() / "cache" / "technitium-dns"
     rmtree(cache_dir, ignore_errors=True)
     cache_dir.mkdir(parents=True)
     (cache_dir / "backup").mkdir()
@@ -17,14 +17,14 @@ def cache_dir():
 
 
 @pytest.fixture(scope='module')
-def coredns_container(
+def technitium_dns_container(
     docker_client,
     flowg_network,
     report_dir,
 ):
-    with coredns_utils.container(
+    with technitium_utils.container(
         docker_client,
-        name="test-flowg-coredns",
+        name="test-flowg-technitium-dns",
         network=flowg_network,
         report_dir=report_dir,
     ):
@@ -46,7 +46,7 @@ def flowg_node0_container(
         volume=flowg_node0_volume,
         image=flowg_image,
         environment={
-            "COREDNS_URL": "http://test-flowg-coredns",
+            "FLOWG_DNS_SERVER_ADDRESS": "0.0.0.0:5300",
         },
         ports={
             "5080/tcp": 5080,
@@ -73,8 +73,7 @@ def flowg_node1_container(
         volume=flowg_node1_volume,
         image=flowg_image,
         environment={
-            "FLOWG_CLUSTER_JOIN_NODE_ID": "test-flowg-node0",
-            "FLOWG_CLUSTER_JOIN_ENDPOINT": "http://test-flowg-node0:9113",
+            "FLOWG_DNS_SERVER_ADDRESS": "0.0.0.0:5300",
             "FLOWG_HTTP_BIND_ADDRESS": ":5081",
             "FLOWG_MGMT_BIND_ADDRESS": ":9114",
             "FLOWG_SYSLOG_BIND_ADDRESS": ":5515"
@@ -104,8 +103,7 @@ def flowg_node2_container(
         volume=flowg_node2_volume,
         image=flowg_image,
         environment={
-            "FLOWG_CLUSTER_JOIN_NODE_ID": "test-flowg-node1",
-            "FLOWG_CLUSTER_JOIN_ENDPOINT": "http://test-flowg-node1:9114",
+            "FLOWG_DNS_SERVER_ADDRESS": "0.0.0.0:5300",
             "FLOWG_HTTP_BIND_ADDRESS": ":5082",
             "FLOWG_MGMT_BIND_ADDRESS": ":9115",
             "FLOWG_SYSLOG_BIND_ADDRESS": ":5516"
@@ -122,7 +120,7 @@ def flowg_node2_container(
 
 @pytest.fixture(scope='module')
 def flowg_cluster(
-    coredns_container,
+    technitium_dns_container,
     flowg_node0_container,
     flowg_node1_container,
     flowg_node2_container,

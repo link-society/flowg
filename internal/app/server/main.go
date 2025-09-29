@@ -13,6 +13,11 @@ import (
 	"link-society.com/flowg/internal/engines/lognotify"
 	"link-society.com/flowg/internal/engines/pipelines"
 
+<<<<<<< HEAD
+=======
+	"link-society.com/flowg/internal/services/consul"
+	"link-society.com/flowg/internal/services/dns"
+>>>>>>> 423c06f (:white_check_mark: Use technitium dns)
 	"link-society.com/flowg/internal/services/http"
 	"link-society.com/flowg/internal/services/mgmt"
 	"link-society.com/flowg/internal/services/syslog"
@@ -43,6 +48,9 @@ type Options struct {
 
 	ServiceName string
 	ConsulUrl   string
+
+	DnsDomainName    string
+	DnsServerAddress string
 
 	AuthInitialUser     string
 	AuthInitialPassword string
@@ -78,6 +86,7 @@ func NewServer(opts Options) proctree.Process {
 			LogNotifier:    logNotifier,
 			PipelineRunner: pipelineRunner,
 		})
+
 		mgmtServer = mgmt.NewServer(&mgmt.ServerOptions{
 			BindAddress: opts.MgmtBindAddress,
 			TlsConfig:   opts.MgmtTlsConfig,
@@ -129,6 +138,11 @@ func NewServer(opts Options) proctree.Process {
 		proctree.NewProcessGroup(
 			proctree.DefaultProcessGroupOptions(),
 			httpServer,
+<<<<<<< HEAD
+=======
+			consulService,
+			dnsService,
+>>>>>>> 423c06f (:white_check_mark: Use technitium dns)
 			mgmtServer,
 			syslogServer,
 		),
