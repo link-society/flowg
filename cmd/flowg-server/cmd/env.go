@@ -46,8 +46,11 @@ var (
 	defaultLogDir          = getEnvString("FLOWG_LOG_DIR", "./data/logs")
 	defaultClusterStateDir = getEnvString("FLOWG_CLUSTER_STATE_DIR", "./data/state")
 
-	defaultServiceName = getEnvString("FLOWG_SERVICE_NAME", "FlowG")
+	defaultServiceName = getEnvString("FLOWG_SERVICE_NAME", "servi")
 	defaultConsulUrl   = getEnvString("FLOWG_CONSUL_URL", "")
+
+	defaultDnsDomainName    = getEnvString("FLOWG_DNS_DOMAIN_NAME", "flowg.com")
+	defaultDnsServerAddress = getEnvString("FLOWG_DNS_SERVER_ADDRESS", "")
 
 	defaultAuthInitialUser     = getEnvString("FLOWG_AUTH_INITIAL_USER", "root")
 	defaultAuthInitialPassword = getEnvString("FLOWG_AUTH_INITIAL_PASSWORD", "root")

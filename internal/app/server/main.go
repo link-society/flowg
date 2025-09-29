@@ -15,6 +15,7 @@ import (
 	"link-society.com/flowg/internal/engines/pipelines"
 
 	"link-society.com/flowg/internal/services/consul"
+	"link-society.com/flowg/internal/services/dns"
 	"link-society.com/flowg/internal/services/http"
 	"link-society.com/flowg/internal/services/mgmt"
 	"link-society.com/flowg/internal/services/syslog"
@@ -46,6 +47,9 @@ type Options struct {
 
 	ServiceName string
 	ConsulUrl   string
+
+	DnsDomainName    string
+	DnsServerAddress string
 
 	AuthInitialUser     string
 	AuthInitialPassword string
@@ -93,6 +97,15 @@ func NewServer(opts Options) proctree.Process {
 			ClusterJoinNode: ClusterJoinNode,
 			MgmtBindAddress: opts.MgmtBindAddress,
 			MgmtTlsEnabled:  opts.MgmtTlsConfig != nil,
+		})
+		dnsService = dns.NewDnsService(&dns.DnsServiceOptions{
+			NodeId:           opts.ClusterNodeID,
+			ServiceName:      opts.ServiceName,
+			DomainName:       opts.DnsDomainName,
+			DnsServerAddress: opts.DnsServerAddress,
+			ClusterJoinNode:  ClusterJoinNode,
+			MgmtBindAddress:  opts.MgmtBindAddress,
+			MgmtTlsEnabled:   opts.MgmtTlsConfig != nil,
 		})
 		mgmtServer = mgmt.NewServer(&mgmt.ServerOptions{
 			BindAddress: opts.MgmtBindAddress,
@@ -148,6 +161,7 @@ func NewServer(opts Options) proctree.Process {
 			proctree.DefaultProcessGroupOptions(),
 			httpServer,
 			consulService,
+			dnsService,
 			mgmtServer,
 			syslogServer,
 		),

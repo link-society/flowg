@@ -62,6 +62,7 @@ func NewConsulService(opts *ConsulServiceOptions) proctree.Process {
 					Host:   net.JoinHostPort(host, port),
 				}
 			}
+
 			return &localEndpoint, nil
 		},
 	})

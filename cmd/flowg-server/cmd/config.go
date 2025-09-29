@@ -124,6 +124,9 @@ func newServerConfig(opts *options) (server.Options, error) {
 		ServiceName: opts.serviceName,
 		ConsulUrl:   opts.consulUrl,
 
+		DnsDomainName:    opts.dnsDomainName,
+		DnsServerAddress: opts.dnsServerAddress,
+
 		AuthInitialUser:     opts.authInitialUser,
 		AuthInitialPassword: opts.authInitialPassword,
 
