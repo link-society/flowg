@@ -1,0 +1,40 @@
+---
+name: security-snyk
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  snyk:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: checkout@scm
+        uses: actions/checkout@v5
+
+      - name: setup@snyk
+        uses: snyk/actions/setup@master
+
+      - name: login@snyk
+        run: |
+          snyk auth ${{ secrets.SNYK_TOKEN }}
+          snyk config set org=${{ secrets.SNYK_ORGANIZATION }}
+
+      # Dependency vulns
+      - name: deps-backend@snyk
+        run: snyk test --file=go.mod --sarif-file-output=deps-backend.sarif || true
+
+      - name: deps-frontend@snyk
+        run: snyk test --file=web/app/package.json --sarif-file-output=deps-frontend.sarif || true
+
+      - name: code@snyk
+        run: snyk code test --sarif-file-output=code.sarif || true
+
+      - name: upload-sarif@github
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: .
