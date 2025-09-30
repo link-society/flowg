@@ -30,7 +30,7 @@ jobs:
           snyk config set org=${{ secrets.SNYK_ORGANIZATION }}
 
       - name: prepare@code
-        run: task www:build
+        run: task build:frontend
 
       - name: deps-backend@snyk
         run: snyk test --file=go.mod --sarif-file-output=deps-backend.sarif || true
