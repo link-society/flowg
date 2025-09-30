@@ -16,6 +16,11 @@ jobs:
       - name: checkout@scm
         uses: actions/checkout@v5
 
+      - name: setup@buildchain
+        uses: ./.github/actions/setup-buildchain
+        with:
+          ghtoken: ${{ secrets.GITHUB_TOKEN }}
+
       - name: setup@snyk
         uses: snyk/actions/setup@master
 
@@ -24,7 +29,9 @@ jobs:
           snyk auth ${{ secrets.SNYK_TOKEN }}
           snyk config set org=${{ secrets.SNYK_ORGANIZATION }}
 
-      # Dependency vulns
+      - name: prepare@code
+        run: task www:build
+
       - name: deps-backend@snyk
         run: snyk test --file=go.mod --sarif-file-output=deps-backend.sarif || true
 
