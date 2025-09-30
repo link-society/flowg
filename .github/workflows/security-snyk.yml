@@ -25,9 +25,12 @@ jobs:
         uses: snyk/actions/setup@master
 
       - name: login@snyk
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          SNYK_ORGANIZATION: ${{ secrets.SNYK_ORGANIZATION }}
         run: |
-          snyk auth ${{ secrets.SNYK_TOKEN }}
-          snyk config set org=${{ secrets.SNYK_ORGANIZATION }}
+          snyk auth $SNYK_TOKEN
+          snyk config set org=$SNYK_ORGANIZATION
 
       - name: prepare@code
         run: task build:frontend
