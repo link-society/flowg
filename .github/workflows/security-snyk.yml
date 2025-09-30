@@ -41,7 +41,20 @@ jobs:
       - name: code@snyk
         run: snyk code test --sarif-file-output=code.sarif || true
 
-      - name: upload-sarif@github
+      - name: deps-backend@upload-sarif
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: .
+          sarif_file: deps-backend.sarif
+          category: deps-backend
+
+      - name: deps-frontend@upload-sarif
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: deps-frontend.sarif
+          category: deps-frontend
+
+      - name: code@upload-sarif
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: code.sarif
+          category: code
