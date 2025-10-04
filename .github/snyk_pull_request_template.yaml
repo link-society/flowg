@@ -1,0 +1,4 @@
+---
+
+title: ":lock: :arrow_up: Upgrade {{ package_name }} from {{ package_from }} to {{ package_to }}"
+commitMessage: ":lock: :arrow_up: {{ package_name }} {{ package_to }}"
