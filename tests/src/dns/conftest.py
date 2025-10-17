@@ -46,7 +46,8 @@ def flowg_node0_container(
         volume=flowg_node0_volume,
         image=flowg_image,
         environment={
-            "FLOWG_DNS_SERVER_ADDRESS": "test-flowg-technitium-dns:53",
+            "FLOWG_CLUSTER_FORMATION_STRATEGY": "dns",
+            "FLOWG_CLUSTER_FORMATION_DNS_SERVER_ADDRESS": "test-flowg-technitium-dns:53",
         },
         ports={
             "5080/tcp": 5080,

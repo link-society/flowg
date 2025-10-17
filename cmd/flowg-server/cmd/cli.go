@@ -192,6 +192,28 @@ func (opts *options) defineCliOptions(cmd *cobra.Command) {
 	)
 
 	cmd.Flags().StringVar(
+		&opts.clusterFormationDnsServiceName,
+		"cluster-formation-dns-service-name",
+		defaultClusterFormationDnsServiceName,
+		"Name of the dns service to use for cluster formation, ignored if not using 'dns' strategy",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.clusterFormationDnsDomainName,
+		"cluster-formation-dns-domain-name",
+		defaultClusterFormationDnsDomainName,
+		"Domain name of the your domain to use for cluster formation, ignored if not using 'dns' strategy",
+	)
+	//DnsServerAddress: opts.clusterFormationDnsServerAddress,
+
+	cmd.Flags().StringVar(
+		&opts.clusterFormationDnsServerAddress,
+		"cluster-formation-dns-server-address",
+		defaultClusterFormationDnsServerAddress,
+		"DNS Server address to use for cluster formation, ignored if not using 'dns' strategy",
+	)
+
+	cmd.Flags().StringVar(
 		&opts.syslogProtocol,
 		"syslog-proto",
 		defaultSyslogProtocol,

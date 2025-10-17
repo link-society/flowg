@@ -14,7 +14,7 @@ POWERDNS_IMAGE = "powerdns/pdns-auth-44"
 
 @contextmanager
 def container(docker_client, *, name, network, report_dir):
-    print("Pulling the Technitium DNS Server image")
+    print("Pulling the Power DNS Server image")
     try:
         docker_client.images.pull(POWERDNS_IMAGE)
 
