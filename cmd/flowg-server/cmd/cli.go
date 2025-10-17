@@ -31,6 +31,10 @@ type options struct {
 	clusterFormationKubernetesServiceName      string
 	clusterFormationKubernetesServicePortName  string
 
+	clusterFormationDnsServiceName   string
+	clusterFormationDnsServerAddress string
+	clusterFormationDnsDomainName    string
+
 	syslogProtocol       string
 	syslogBindAddr       string
 	syslogTlsEnabled     bool
@@ -45,9 +49,6 @@ type options struct {
 
 	verbose  bool
 	loglevel string
-
-	dnsServerAddress string
-	dnsDomainName    string
 
 	authInitialUser     string
 	authInitialPassword string
@@ -302,19 +303,5 @@ func (opts *options) defineCliOptions(cmd *cobra.Command) {
 		"auth-reset-password",
 		defaultAuthResetPassword,
 		"If set, this is the new password for the user to reset",
-	)
-
-	cmd.Flags().StringVar(
-		&opts.dnsDomainName,
-		"dns-domain-name",
-		defaultDnsDomainName,
-		"Domain name of your business on your local dns zone",
-	)
-
-	cmd.Flags().StringVar(
-		&opts.dnsServerAddress,
-		"dns-server-url",
-		defaultDnsServerAddress,
-		"Address of the local dns server",
 	)
 }
