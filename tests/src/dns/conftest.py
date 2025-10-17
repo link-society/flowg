@@ -46,7 +46,7 @@ def flowg_node0_container(
         volume=flowg_node0_volume,
         image=flowg_image,
         environment={
-            "FLOWG_DNS_SERVER_ADDRESS": "0.0.0.0:5300",
+            "FLOWG_DNS_SERVER_ADDRESS": "test-flowg-technitium-dns:53",
         },
         ports={
             "5080/tcp": 5080,
@@ -73,7 +73,7 @@ def flowg_node1_container(
         volume=flowg_node1_volume,
         image=flowg_image,
         environment={
-            "FLOWG_DNS_SERVER_ADDRESS": "0.0.0.0:5300",
+            "FLOWG_DNS_SERVER_ADDRESS": "test-flowg-technitium-dns:53",
             "FLOWG_HTTP_BIND_ADDRESS": ":5081",
             "FLOWG_MGMT_BIND_ADDRESS": ":9114",
             "FLOWG_SYSLOG_BIND_ADDRESS": ":5515"
@@ -103,7 +103,7 @@ def flowg_node2_container(
         volume=flowg_node2_volume,
         image=flowg_image,
         environment={
-            "FLOWG_DNS_SERVER_ADDRESS": "0.0.0.0:5300",
+            "FLOWG_DNS_SERVER_ADDRESS": "test-flowg-technitium-dns:53",
             "FLOWG_HTTP_BIND_ADDRESS": ":5082",
             "FLOWG_MGMT_BIND_ADDRESS": ":9115",
             "FLOWG_SYSLOG_BIND_ADDRESS": ":5516"

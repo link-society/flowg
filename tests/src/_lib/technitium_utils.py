@@ -10,12 +10,13 @@ from . import docker_utils
 
 
 TECHNITIUM_IMAGE = "technitium/dns-server:latest"
+POWERDNS_IMAGE = "powerdns/pdns-auth-44"
 
 @contextmanager
 def container(docker_client, *, name, network, report_dir):
     print("Pulling the Technitium DNS Server image")
     try:
-        docker_client.images.pull(TECHNITIUM_IMAGE)
+        docker_client.images.pull(POWERDNS_IMAGE)
 
     except Exception as err:
         pytest.fail(f"{err}", pytrace=False)
@@ -23,7 +24,7 @@ def container(docker_client, *, name, network, report_dir):
     try:
         print(f"Creating Container: {name}")
         container = docker_client.containers.run(
-            image=TECHNITIUM_IMAGE,
+            image=POWERDNS_IMAGE,
             name=name,
             network=network.name,
             hostname=name,
@@ -39,7 +40,7 @@ def container(docker_client, *, name, network, report_dir):
 
     try:
         print(f"Waiting for healthcheck: {name}")
-        wait_for_healthcheck(container)
+        # wait_for_healthcheck(container)
 
     except RuntimeError as err:
         print(f"Container '{name}' healthcheck failed. Logs:")

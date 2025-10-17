@@ -41,6 +41,8 @@ func (h *procHandler) Init(ctx actor.Context) proctree.ProcessResult {
 		return proctree.Continue()
 	}
 
+	h.logger.InfoContext(ctx, "Initiating registering with a dns server")
+
 	h.client = new(dns.Client)
 	h.client.DialTimeout = 5 * time.Second
 	h.client.ReadTimeout = 5 * time.Second
@@ -154,10 +156,15 @@ func (h *procHandler) registerNode(ctx actor.Context) error {
 	// Construct the FQDN for the service
 	// A trailing dot is needed for FQDN.
 	h.fqdn = fmt.Sprintf("%s.%s.", h.opts.ServiceName, h.opts.DomainName)
+	h.logger.InfoContext(ctx, fmt.Sprintf("Fully qualified domain name fqdn: %s", h.fqdn))
+
+	aRecString := fmt.Sprintf("%s A %s", h.fqdn, ip)
+	h.logger.InfoContext(ctx, fmt.Sprintf("A Record: %s", aRecString))
+
 
 	// Add an A record for the service
 	// This record maps the service name to its IP address
-	aRec, err := dns.NewRR(fmt.Sprintf("%s A %s", h.fqdn, ip))
+	aRec, err := dns.NewRR(aRecString)
 	if err != nil {
 		h.logger.ErrorContext(
 			ctx,
@@ -174,6 +181,7 @@ func (h *procHandler) registerNode(ctx actor.Context) error {
 	// because otherwise every node will have the same domain so you cant use the domian name to find other nodes
 	// h.tpfqdn = fmt.Sprintf("_%s._tcp.%s", h.opts.ServiceName, h.opts.DomainName)
 	h.tpfqdn = fmt.Sprintf("_%s._tcp.%s", h.opts.ServiceName, h.opts.DomainName)
+	h.logger.InfoContext(ctx, fmt.Sprintf("TPFQDN: %s", h.tpfqdn))
 
 	// Add an SRV record for the service
 	// SRV records specify the host and port for specific services.
@@ -187,13 +195,14 @@ func (h *procHandler) registerNode(ctx actor.Context) error {
 		return err
 	}
 	m.Insert([]dns.RR{srvRec})
-	recordsToInsert = append(recordsToInsert, srvRec)
+	// Trying only to insrt the 1st reord and skipping the 2nd one to see if i get the same domain name must be fully qualified error
+	// recordsToInsert = append(recordsToInsert, srvRec)
 
 	record1 := fmt.Sprintf("%+v", recordsToInsert[0])
-	record2 := fmt.Sprintf("%+v", recordsToInsert[1])
+	// record2 := fmt.Sprintf("%+v", recordsToInsert[1])
 
 	h.logger.InfoContext(ctx, record1)
-	h.logger.InfoContext(ctx, record2)
+	// h.logger.InfoContext(ctx, record2)
 
 	_, err = h.exchange(m)
 	if err != nil {
@@ -224,10 +233,10 @@ func (h *procHandler) setJoinNodes(ctx actor.Context) error {
 	if h.opts.MgmtTlsEnabled {
 		scheme = "https"
 	} else {
-		scheme = "https"
+		scheme = "http"
 	}
 
-	h.logger.InfoContext(ctx, "GOing to ask for other nodes")
+	h.logger.InfoContext(ctx, "Going to ask for other nodes")
 
 	m := new(dns.Msg)
 	// Set the question to query for SRV records
