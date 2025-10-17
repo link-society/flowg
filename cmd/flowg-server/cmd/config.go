@@ -115,10 +115,11 @@ func newServerConfig(opts *options) (server.Options, error) {
 		}
 
 		clusterFormationStrategy = &cluster.DnsClusterFormationStrategy{
-			NodeID:            opts.clusterNodeID,
-			ServiceName:       opts.clusterFormationDnsServiceName,
-			DnsDomainName:     opts.clusterFormationDnsDomainName,
-			DnsServiceAddress: opts.clusterFormationDnsServerAddress,
+			NodeID:           opts.clusterNodeID,
+			ServiceName:      opts.clusterFormationDnsServiceName,
+			DnsDomainName:    opts.clusterFormationDnsDomainName,
+			DnsServerAddress: opts.clusterFormationDnsServerAddress,
+			ServiceAddress:   opts.mgmtBindAddress,
 		}
 
 	default:
