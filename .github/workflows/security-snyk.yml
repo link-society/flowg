@@ -29,7 +29,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           SNYK_ORGANIZATION: ${{ secrets.SNYK_ORGANIZATION }}
         run: |
-          snyk auth $SNYK_TOKEN
+          snyk auth --auth-type=token $SNYK_TOKEN
           snyk config set org=$SNYK_ORGANIZATION
 
       - name: prepare@code
