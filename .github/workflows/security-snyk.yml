@@ -29,7 +29,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           SNYK_ORGANIZATION: ${{ secrets.SNYK_ORGANIZATION }}
         run: |
-          snyk auth $SNYK_TOKEN
+          snyk auth --auth-type=token $SNYK_TOKEN
           snyk config set org=$SNYK_ORGANIZATION
 
       - name: prepare@code
@@ -45,19 +45,19 @@ jobs:
         run: snyk code test --sarif-file-output=code.sarif || true
 
       - name: deps-backend@upload-sarif
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: deps-backend.sarif
           category: deps-backend
 
       - name: deps-frontend@upload-sarif
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: deps-frontend.sarif
           category: deps-frontend
 
       - name: code@upload-sarif
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: code.sarif
           category: code
