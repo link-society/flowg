@@ -44,6 +44,9 @@ type Options struct {
 	ServiceName string
 	ConsulUrl   string
 
+	DnsDomainName    string
+	DnsServerAddress string
+
 	AuthInitialUser     string
 	AuthInitialPassword string
 
@@ -78,6 +81,7 @@ func NewServer(opts Options) proctree.Process {
 			LogNotifier:    logNotifier,
 			PipelineRunner: pipelineRunner,
 		})
+
 		mgmtServer = mgmt.NewServer(&mgmt.ServerOptions{
 			BindAddress: opts.MgmtBindAddress,
 			TlsConfig:   opts.MgmtTlsConfig,

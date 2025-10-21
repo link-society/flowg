@@ -36,6 +36,10 @@ var (
 	defaultClusterFormationKubernetesServiceName      = getEnvString("FLOWG_CLUSTER_FORMATION_K8S_SERVICE_NAME", "flowg")
 	defaultClusterFormationKubernetesServicePortName  = getEnvString("FLOWG_CLUSTER_FORMATION_K8S_SERVICE_PORT_NAME", "mgmt")
 
+	defaultClusterFormationDnsServiceName   = getEnvString("FLOWG_CLUSTER_FORMATION_DNS_SERVICE_NAME", "FlowG")
+	defaultClusterFormationDnsDomainName    = getEnvString("FLOWG_CLUSTER_FORMATION_DNS_DOMAIN_NAME", "FlowG.com")
+	defaultClusterFormationDnsServerAddress = getEnvString("FLOWG_CLUSTER_FORMATION_DNS_SERVER_ADDRESS", "")
+
 	defaultSyslogProtocol     = getEnvString("FLOWG_SYSLOG_PROTOCOL", "udp")
 	defaultSyslogBindAddr     = getEnvString("FLOWG_SYSLOG_BIND_ADDRESS", ":5514")
 	defaultSyslogAllowOrigins = (func() []string {
