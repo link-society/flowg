@@ -2,9 +2,10 @@ import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
+import { defineConfig } from 'eslint/config'
 import tseslint from 'typescript-eslint'
 
-export default tseslint.config(
+export default defineConfig(
   {
     ignores: [
       'dist',
@@ -26,6 +27,10 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       '@typescript-eslint/no-explicit-any': ['off'],
       'react-hooks/exhaustive-deps': ['off'],
+      'react-hooks/set-state-in-effect': ['off'],
+      'react-hooks/preserve-manual-memoization': ['off'],
+      'react-hooks/use-memo': ['off'],
+      'react-hooks/immutability': ['off'],
       'react-refresh/only-export-components': ['off'],
     },
   },
