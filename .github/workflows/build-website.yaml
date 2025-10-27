@@ -1,0 +1,44 @@
+---
+name: build-website
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout@scm
+        uses: actions/checkout@v5
+
+      - name: setup@buildchain
+        uses: ./.github/actions/setup-buildchain
+        with:
+          ghtoken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: build@website
+        run: task build:all doc:gen:cli doc:gen:openapi www:build
+
+      - name: upload@artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./website/build
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: deploy@pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,60 @@
+---
+name: build-binary
+
+on:
+  workflow_call:
+
+permissions:
+  contents: write
+
+jobs:
+  binary:
+    strategy:
+      matrix:
+        include:
+          - ghrunner: ubuntu-latest
+            rstarget: x86_64-unknown-linux-gnu
+            goos: linux
+            goarch: amd64
+          - ghrunner: ubuntu-24.04-arm
+            rstarget: aarch64-unknown-linux-gnu
+            goos: linux
+            goarch: arm64
+          - ghrunner: macos-latest
+            rstarget: aarch64-apple-darwin
+            goos: darwin
+            goarch: arm64
+
+    runs-on: ${{ matrix.ghrunner }}
+
+    steps:
+      - name: checkout@scm
+        uses: actions/checkout@v5
+
+      - name: setup@buildchain
+        uses: ./.github/actions/setup-buildchain
+        with:
+          ghtoken: ${{ secrets.GITHUB_TOKEN }}
+          rstarget: ${{ matrix.rstarget }}
+
+      - name: build@binary
+        run: task build:all
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          NODE_ENV: "production"
+
+      - name: compress@binary
+        if: matrix.goos != 'darwin'
+        uses: crazy-max/ghaction-upx@v3
+        with:
+          files: bin/*
+
+      - name: upload@binary
+        run: |
+          tar -czf ${ARCHIVE_NAME} bin/ LICENSE.txt
+          gh release upload ${RELEASE_NAME} ${ARCHIVE_NAME}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ARCHIVE_NAME: flowg-${{ github.event.release.tag_name }}-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
+          RELEASE_NAME: ${{ github.event.release.tag_name }}
