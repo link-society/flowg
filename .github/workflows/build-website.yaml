@@ -2,9 +2,11 @@
 name: build-website
 
 on:
-  push:
-    branches:
-      - main
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
 
 jobs:
   build:
@@ -12,6 +14,8 @@ jobs:
     steps:
       - name: checkout@scm
         uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref }}
 
       - name: setup@buildchain
         uses: ./.github/actions/setup-buildchain

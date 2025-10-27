@@ -3,6 +3,13 @@ name: build-binary
 
 on:
   workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+    secrets:
+      token:
+        required: true
 
 permissions:
   contents: write
@@ -30,11 +37,13 @@ jobs:
     steps:
       - name: checkout@scm
         uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref }}
 
       - name: setup@buildchain
         uses: ./.github/actions/setup-buildchain
         with:
-          ghtoken: ${{ secrets.GITHUB_TOKEN }}
+          ghtoken: ${{ secrets.token }}
           rstarget: ${{ matrix.rstarget }}
 
       - name: build@binary
@@ -55,6 +64,6 @@ jobs:
           tar -czf ${ARCHIVE_NAME} bin/ LICENSE.txt
           gh release upload ${RELEASE_NAME} ${ARCHIVE_NAME}
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.token }}
           ARCHIVE_NAME: flowg-${{ github.event.release.tag_name }}-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
           RELEASE_NAME: ${{ github.event.release.tag_name }}
