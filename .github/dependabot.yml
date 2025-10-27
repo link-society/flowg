@@ -9,6 +9,11 @@ updates:
       prefix: ":arrow_up: :construction_worker: "
     labels:
       - "deps: ci"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
   - package-ecosystem: "docker"
     directory: "/docker"
     schedule:
@@ -17,6 +22,11 @@ updates:
       prefix: ":arrow_up: :whale: "
     labels:
       - "deps: docker"
+    groups:
+      docker:
+        patterns:
+          - "*"
+
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
@@ -25,6 +35,11 @@ updates:
       prefix: ":arrow_up: "
     labels:
       - "deps: go"
+    groups:
+      gomod:
+        patterns:
+          - "*"
+
   - package-ecosystem: "cargo"
     directory: "/internal/utils/ffi/vrl/rust-crate"
     schedule:
@@ -33,6 +48,11 @@ updates:
       prefix: ":arrow_up: "
     labels:
       - "deps: rust"
+    groups:
+      cargo-vrl:
+        patterns:
+          - "*"
+
   - package-ecosystem: "cargo"
     directory: "/internal/utils/ffi/filterdsl/rust-crate"
     schedule:
@@ -41,43 +61,37 @@ updates:
       prefix: ":arrow_up: "
     labels:
       - "deps: rust"
+    groups:
+      cargo-filterdsl:
+        patterns:
+          - "*"
+
   - package-ecosystem: "npm"
     directory: "/web/app"
-    groups:
-      mui:
-        patterns:
-          - "@mui/*"
-          - "@toolpad/*"
-          - "@emotion/*"
-      react:
-        patterns:
-          - "react"
-          - "react-dom"
-          - "react-router"
-          - "@types/react"
-          - "@types/react-dom"
     schedule:
       interval: "weekly"
     commit-message:
       prefix: ":arrow_up: "
     labels:
       - "deps: javascript"
+    groups:
+      webapp:
+        patterns:
+          - "*"
+
   - package-ecosystem: "npm"
     directory: "/website"
-    groups:
-      docusaurus:
-        patterns:
-          - "@docusaurus/*"
-      react:
-        patterns:
-          - "react"
-          - "react-dom"
     schedule:
       interval: "weekly"
     commit-message:
       prefix: ":arrow_up: "
     labels:
       - "deps: javascript"
+    groups:
+      website:
+        patterns:
+          - "*"
+
   - package-ecosystem: "pip"
     directory: "/tests/e2e/web"
     schedule:
@@ -86,3 +100,7 @@ updates:
       prefix: ":arrow_up: :white_check_mark: "
     labels:
       - "deps: tests"
+    groups:
+      pip:
+        patterns:
+          - "*"
