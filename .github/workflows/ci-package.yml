@@ -44,7 +44,7 @@ jobs:
           outputs: type=docker,dest=/tmp/oci-flowg.tar
 
       - name: upload@artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: oci-flowg
           path: /tmp/oci-flowg.tar
@@ -60,7 +60,7 @@ jobs:
           ref: "${{ github.event.pull_request.head.sha }}"
 
       - name: download@artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: oci-flowg
           path: /tmp
@@ -108,7 +108,7 @@ jobs:
           ref: "${{ github.event.pull_request.head.sha }}"
 
       - name: download@artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: oci-flowg
           path: /tmp
@@ -163,7 +163,7 @@ jobs:
 
       - name: upload-logs@artifact
         if: ${{ github.event_name == 'pull_request_target' && failure() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: web-e2e-reports
           path: "./tests/reports/web/"
@@ -183,7 +183,7 @@ jobs:
           ref: "${{ github.event.pull_request.head.sha }}"
 
       - name: download@artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: oci-flowg
           path: /tmp
@@ -231,7 +231,7 @@ jobs:
           ref: "${{ github.event.pull_request.head.sha }}"
 
       - name: download@artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: oci-flowg
           path: /tmp
