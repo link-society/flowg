@@ -1,6 +1,18 @@
 ---
 name: ci-package
 
+on:
+  push:
+    branches:
+      - main
+  pull_request_target:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+
 permissions:
   checks: write
   pull-requests: write

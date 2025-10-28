@@ -1,15 +1,6 @@
 ---
 name: ci-website
 
-on:
-  pull_request_target:
-    branches:
-      - main
-    types:
-      - opened
-      - synchronize
-      - reopened
-
 jobs:
   build:
     runs-on: ubuntu-latest

@@ -1,11 +1,6 @@
 ---
 name: release-package
 
-on:
-  release:
-    types:
-      - published
-
 permissions:
   contents: write
 

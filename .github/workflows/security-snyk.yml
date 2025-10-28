@@ -1,10 +1,6 @@
 ---
 name: security-snyk
 
-on:
-  - push
-  - pull_request
-
 jobs:
   snyk:
     runs-on: ubuntu-latest
