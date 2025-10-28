@@ -1,0 +1,51 @@
+---
+name: release-docker
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+
+jobs:
+  publish:
+    strategy:
+      matrix:
+        include:
+          - tag_suffix: ""
+            arch: "amd64"
+            os: "linux"
+          - tag_suffix: "-linux-arm"
+            arch: "arm64"
+            os: "linux"
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: login-ghcr@docker
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: login-dockerhub@docker
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: publish@docker
+        env:
+          ARTIFACT_ID: ${{ inputs.ref }}-${{ matrix.os }}-${{ matrix.arch }}
+        run: |
+          docker pull ghcr.io/link-society/flowg/ci-artifacts/docker:${ARTIFACT_ID}
+          docker tag ghcr.io/link-society/flowg/ci-artifacts/docker:${ARTIFACT_ID} linksociety/flowg:latest${matrix.tag_suffix}
+          docker tag ghcr.io/link-society/flowg/ci-artifacts/docker:${ARTIFACT_ID} linksociety/flowg:${{ inputs.version }}${matrix.tag_suffix}
+
+          docker push linksociety/flowg:latest${matrix.tag_suffix}
+          docker push linksociety/flowg:${{ inputs.version }}${matrix.tag_suffix}
