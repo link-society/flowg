@@ -1,0 +1,25 @@
+---
+name: ci-release
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  deploy-website:
+    uses: ./.github/workflows/deploy-website.yml
+    with:
+      ref: ${{ github.sha }}
+
+  release-binary:
+    uses: ./.github/workflows/release-binary.yml
+    with:
+      ref: ${{ github.ref_name }}
+      version: ${{ github.event.release.tag_name }}
+
+  release-docker:
+    uses: ./.github/workflows/release-docker.yml
+    with:
+      ref: ${{ github.ref_name }}
+      version: ${{ github.event.release.tag_name }}

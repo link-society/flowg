@@ -2,8 +2,11 @@
 name: security-snyk
 
 on:
-  - push
-  - pull_request
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
 
 jobs:
   snyk:
@@ -15,6 +18,8 @@ jobs:
     steps:
       - name: checkout@scm
         uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref }}
 
       - name: setup@buildchain
         uses: ./.github/actions/setup-buildchain

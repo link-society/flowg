@@ -1,0 +1,76 @@
+---
+name: build-binary
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - ghrunner: ubuntu-latest
+            rstarget: x86_64-unknown-linux-gnu
+            goos: linux
+            goarch: amd64
+          - ghrunner: ubuntu-24.04-arm
+            rstarget: aarch64-unknown-linux-gnu
+            goos: linux
+            goarch: arm64
+          - ghrunner: macos-latest
+            rstarget: aarch64-apple-darwin
+            goos: darwin
+            goarch: arm64
+
+    runs-on: ${{ matrix.ghrunner }}
+
+    steps:
+      - name: checkout@scm
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: setup@buildchain
+        uses: ./.github/actions/setup-buildchain
+        with:
+          ghtoken: ${{ secrets.GITHUB_TOKEN }}
+          rstarget: ${{ matrix.rstarget }}
+
+      - name: setup@oras
+        uses: oras-project/setup-oras@v1
+
+      - name: login@oras
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u $GITHUB_ACTOR --password-stdin
+
+      - name: build@binary
+        run: task build:all doc:gen:cli doc:gen:openapi
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          NODE_ENV: "production"
+
+      - name: compress@binary
+        if: matrix.goos != 'darwin'
+        uses: crazy-max/ghaction-upx@v3
+        with:
+          files: bin/*
+
+      - name: upload@oras
+        env:
+          ARTIFACT_ID: ${{ inputs.ref }}-${{ matrix.goos }}-${{ matrix.goarch }}
+        run: |
+          oras push ghcr.io/link-society/flowg/ci-artifacts/binaries:${ARTIFACT_ID} \
+            bin/* LICENSE.txt
+
+          oras push ghcr.io/link-society/flowg/ci-artifacts/doc-cli:${ARTIFACT_ID} \
+            website/docs/cli/flowg-client/*.md \
+            website/docs/cli/flowg-health/*.md \
+            website/docs/cli/flowg-server/*.md
+
+          oras push ghcr.io/link-society/flowg/ci-artifacts/doc-openapi:${ARTIFACT_ID} \
+            website/src/openapi.json

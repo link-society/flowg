@@ -1,0 +1,35 @@
+---
+name: ci-pr
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-docker:
+    uses: ./.github/workflows/build-docker.yml
+    with:
+      ref: ${{ github.event.pull_request.head.sha }}
+
+  build-binary:
+    uses: ./.github/workflows/build-binary.yml
+    with:
+      ref: ${{ github.event.pull_request.head.sha }}
+
+  build-website:
+    needs: build-binary
+    uses: ./.github/workflows/build-website.yml
+    with:
+      ref: ${{ github.event.pull_request.head.sha }}
+
+  test:
+    needs: build-docker
+    uses: ./.github/workflows/test-e2e.yml
+    with:
+      ref: ${{ github.event.pull_request.head.sha }}
+
+  security-check:
+    uses: ./.github/workflows/security-snyk.yml
+    with:
+      ref: ${{ github.event.pull_request.head.sha }}

@@ -2,33 +2,15 @@
 name: deploy-website
 
 on:
-  push:
-    branches:
-      - main
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    steps:
-      - name: checkout@scm
-        uses: actions/checkout@v5
-
-      - name: setup@buildchain
-        uses: ./.github/actions/setup-buildchain
-        with:
-          ghtoken: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: build@website
-        run: task build:all doc:gen:cli doc:gen:openapi www:build
-
-      - name: upload@artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./website/build
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
 
     permissions:
       pages: write
@@ -39,6 +21,22 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
+      - name: setup@oras
+        uses: oras-project/setup-oras@v1
+
+      - name: login@oras
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u $GITHUB_ACTOR --password-stdin
+
+      - name: download@oras
+        run: |
+          oras pull ghcr.io/link-society/flowg/ci-artifacts/website:${{ inputs.ref }}
+
+      - name: upload@artifacts
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./website/build
+
       - name: deploy@pages
         id: deployment
         uses: actions/deploy-pages@v4

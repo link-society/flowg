@@ -1,0 +1,50 @@
+---
+name: release-binary
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    strategy:
+      matrix:
+        include:
+          - goos: linux
+            goarch: amd64
+          - goos: linux
+            goarch: arm64
+          - goos: darwin
+            goarch: arm64
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: setup@oras
+        uses: oras-project/setup-oras@v1
+
+      - name: login@oras
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u $GITHUB_ACTOR --password-stdin
+
+      - name: download@oras
+        run: |
+          oras pull ghcr.io/link-society/flowg/ci-artifacts/binaries:${{ inputs.ref }}-${{ matrix.goos }}-${{ matrix.goarch }}
+
+      - name: upload@assets
+        run: |
+          tar -czf ${ARCHIVE_NAME} bin/ LICENSE.txt
+          gh release upload ${RELEASE_NAME} ${ARCHIVE_NAME}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ARCHIVE_NAME: flowg-${{ inputs.version }}-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
+          RELEASE_NAME: ${{ inputs.version }}

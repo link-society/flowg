@@ -1,0 +1,46 @@
+---
+name: build-docker
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout@scm
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: setup@buildchain
+        uses: ./.github/actions/setup-buildchain
+        with:
+          ghtoken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: setup@oras
+        uses: oras-project/setup-oras@v1
+
+      - name: login@oras
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u $GITHUB_ACTOR --password-stdin
+
+      - name: download@oras
+        env:
+          ARTIFACT_ID: ${{ inputs.ref }}-linux-amd64
+        run: |
+          oras pull ghcr.io/link-society/flowg/ci-artifacts/doc-cli:${ARTIFACT_ID}
+          oras pull ghcr.io/link-society/flowg/ci-artifacts/doc-openapi:${ARTIFACT_ID}
+
+      - name: build@website
+        run: task www:build
+
+      - name: upload@oras
+        run: |
+          oras push ghcr.io/link-society/flowg/ci-artifacts/website:${{ inputs.ref }} \
+            website/build
