@@ -1,0 +1,30 @@
+---
+name: ci-main
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-docker:
+    uses: ./.github/workflows/build-docker.yml
+    with:
+      ref: ${{ github.event.pull_request.head.sha }}
+
+  test:
+    needs: build-docker
+    uses: ./.github/workflows/test-e2e.yml
+    with:
+      ref: ${{ github.event.pull_request.head.sha }}
+
+  build-binary:
+    uses: ./.github/workflows/build-binary.yml
+    with:
+      ref: ${{ github.event.pull_request.head.sha }}
+
+  build-website:
+    uses: ./.github/workflows/build-website.yml
+    needs: build-binary
+    with:
+      ref: ${{ github.event.pull_request.head.sha }}
