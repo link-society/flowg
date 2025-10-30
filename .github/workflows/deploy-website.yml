@@ -29,8 +29,10 @@ jobs:
           echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u $GITHUB_ACTOR --password-stdin
 
       - name: download@oras
+        env:
+            ARTIFACT_ID: ${{ inputs.ref }}
         run: |
-          oras pull ghcr.io/link-society/flowg/ci-artifacts/website:${{ inputs.ref }}
+          oras pull ghcr.io/link-society/flowg/ci-artifacts/website:${ARTIFACT_ID}
 
       - name: upload@artifacts
         uses: actions/upload-pages-artifact@v3
