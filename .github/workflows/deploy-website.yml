@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: setup@oras
-        uses: oras-project/setup-oras@v1
+        uses: oras-project/setup-oras@22ce207df3b08e061f537244349aac6ae1d214f6
 
       - name: login@oras
         run: |
@@ -35,10 +35,10 @@ jobs:
           oras pull ghcr.io/link-society/flowg/ci-artifacts/website:${ARTIFACT_ID}
 
       - name: upload@artifacts
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b
         with:
           path: ./website/build
 
       - name: deploy@pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e

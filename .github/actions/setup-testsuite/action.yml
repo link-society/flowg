@@ -15,12 +15,12 @@ runs:
   using: composite
   steps:
     - name: setup@pdm
-      uses: pdm-project/setup-pdm@v4
+      uses: pdm-project/setup-pdm@94a823180e06fcde4ad29308721954a521c96ed0
       with:
         python-version: '3.13'
 
     - name: setup@sys-deps
-      uses: gacts/install-hurl@v1
+      uses: gacts/install-hurl@8c80c69c281b4b618858de1e1a9ce931e9e61c97
 
     - name: setup@env
       shell: bash
@@ -28,7 +28,7 @@ runs:
       run: pdm install
 
     - name: login@docker
-      uses: docker/login-action@v3
+      uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef
       with:
         registry: ghcr.io
         username: ${{ inputs.ghactor }}

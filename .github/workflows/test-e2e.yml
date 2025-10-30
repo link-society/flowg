@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: checkout@scm
-        uses: actions/checkout@v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           ref: "${{ inputs.ref }}"
 
@@ -36,7 +36,7 @@ jobs:
           FLOWG_TEST_SUITES: api
 
       - name: report@test
-        uses: mikepenz/action-junit-report@v5
+        uses: mikepenz/action-junit-report@5b7ee5a21e8674b695313d769f3cbdfd5d4d53a4
         if: ${{ success() || failure() }}
         with:
           report_paths: "./tests/reports/api/junit.xml"
@@ -54,7 +54,7 @@ jobs:
     needs: build
     steps:
       - name: checkout@scm
-        uses: actions/checkout@v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           ref: "${{ inputs.ref }}"
 
@@ -72,14 +72,14 @@ jobs:
           FLOWG_TEST_SUITES: web
 
       - name: report@test
-        uses: joonvena/robotframework-reporter-action@v2.5
+        uses: joonvena/robotframework-reporter-action@229b6d4248b20be6e54f4fc32c7414130d1bf200
         if: ${{ success() || failure() }}
         with:
           gh_access_token: ${{ secrets.GITHUB_TOKEN }}
           report_path: "./tests/reports/web/"
 
       - name: report-success@status
-        uses: guibranco/github-status-action-v2@v1
+        uses: guibranco/github-status-action-v2@631f55ea0251f0fb284525ad86c30e9f7a8dd284
         if: ${{ success() }}
         with:
           authToken: ${{ secrets.GITHUB_TOKEN }}
@@ -89,7 +89,7 @@ jobs:
           sha: ${{ inputs.ref }}
 
       - name: report-failure@status
-        uses: guibranco/github-status-action-v2@v1
+        uses: guibranco/github-status-action-v2@631f55ea0251f0fb284525ad86c30e9f7a8dd284
         if: ${{ failure() }}
         with:
           authToken: ${{ secrets.GITHUB_TOKEN }}
@@ -100,7 +100,7 @@ jobs:
 
       - name: upload-logs@artifact
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
         with:
           name: web-e2e-reports
           path: "./tests/reports/web/"
@@ -115,7 +115,7 @@ jobs:
 
     steps:
       - name: checkout@scm
-        uses: actions/checkout@v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           ref: "${{ inputs.ref }}"
 
@@ -129,7 +129,7 @@ jobs:
           FLOWG_TEST_SUITES: consul
 
       - name: report@test
-        uses: mikepenz/action-junit-report@v5
+        uses: mikepenz/action-junit-report@5b7ee5a21e8674b695313d769f3cbdfd5d4d53a4
         if: ${{ success() || failure() }}
         with:
           report_paths: "./tests/reports/consul/junit.xml"
@@ -146,7 +146,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout@scm
-        uses: actions/checkout@v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           ref: "${{ inputs.ref }}"
 
