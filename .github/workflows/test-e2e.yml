@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       pr:
-        required: true
+        required: false
         type: number
 
 permissions:
@@ -36,7 +36,7 @@ jobs:
 
       - name: report@test
         uses: mikepenz/action-junit-report@5b7ee5a21e8674b695313d769f3cbdfd5d4d53a4
-        if: ${{ success() || failure() }}
+        if: ${{ inputs.pr && (success() || failure()) }}
         with:
           report_paths: "./tests/reports/api/junit.xml"
           include_passed: true
