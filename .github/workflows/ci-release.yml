@@ -7,19 +7,38 @@ on:
       - published
 
 jobs:
-  deploy-website:
-    uses: ./.github/workflows/deploy-website.yml
+  build-binary:
+    uses: ./.github/workflows/build-binary.yml
     with:
-      ref: ${{ github.sha }}
+      ref: ${{ github.event.release.tag_name }}
 
   release-binary:
     uses: ./.github/workflows/release-binary.yml
+    needs: build-binary
     with:
-      ref: ${{ github.ref_name }}
+      ref: ${{ github.event.release.tag_name }}
       version: ${{ github.event.release.tag_name }}
+
+  build-docker:
+    uses: ./.github/workflows/build-docker.yml
+    with:
+      ref: ${{ github.event.release.tag_name }}
 
   release-docker:
     uses: ./.github/workflows/release-docker.yml
+    needs: build-docker
     with:
-      ref: ${{ github.ref_name }}
+      ref: ${{ github.event.release.tag_name }}
       version: ${{ github.event.release.tag_name }}
+
+  build-website:
+    uses: ./.github/workflows/build-website.yml
+    needs: build-binary
+    with:
+      ref: ${{ github.event.release.tag_name }}
+
+  deploy-website:
+    uses: ./.github/workflows/deploy-website.yml
+    needs: build-website
+    with:
+      ref: ${{ github.event.release.tag_name }}

@@ -1,0 +1,32 @@
+---
+name: ci-pr-website
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+    branches:
+      - main
+    paths:
+      - 'website/**'
+
+jobs:
+  build-binary:
+    uses: ./.github/workflows/build-binary.yml
+    with:
+      ref: ${{ github.event.pull_request.head.sha }}
+
+  build-website:
+    uses: ./.github/workflows/build-website.yml
+    needs: build-binary
+    with:
+      ref: ${{ github.event.pull_request.head.sha }}
+
+  security-check:
+    if: github.event.pull_request.draft == false
+    uses: ./.github/workflows/security-snyk.yml
+    with:
+      ref: ${{ github.event.pull_request.head.sha }}
