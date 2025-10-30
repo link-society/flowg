@@ -10,21 +10,21 @@ jobs:
   build-docker:
     uses: ./.github/workflows/build-docker.yml
     with:
-      ref: ${{ github.event.pull_request.head.sha }}
+      ref: ${{ github.sha }}
 
   test:
     needs: build-docker
     uses: ./.github/workflows/test-e2e.yml
     with:
-      ref: ${{ github.event.pull_request.head.sha }}
+      ref: ${{ github.sha }}
 
   build-binary:
     uses: ./.github/workflows/build-binary.yml
     with:
-      ref: ${{ github.event.pull_request.head.sha }}
+      ref: ${{ github.sha }}
 
   build-website:
     uses: ./.github/workflows/build-website.yml
     needs: build-binary
     with:
-      ref: ${{ github.event.pull_request.head.sha }}
+      ref: ${{ github.sha }}

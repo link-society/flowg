@@ -139,7 +139,7 @@ jobs:
           commit: ${{ inputs.ref }}
           pr_id: ${{ inputs.pr }}
 
-  test-k8s:
+  k8s:
     runs-on: ubuntu-latest
     steps:
       - name: checkout@scm
