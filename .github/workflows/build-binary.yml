@@ -30,7 +30,7 @@ jobs:
 
     steps:
       - name: checkout@scm
-        uses: actions/checkout@v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           ref: ${{ inputs.ref }}
 
@@ -41,7 +41,7 @@ jobs:
           rstarget: ${{ matrix.rstarget }}
 
       - name: setup@oras
-        uses: oras-project/setup-oras@v1
+        uses: oras-project/setup-oras@22ce207df3b08e061f537244349aac6ae1d214f6
 
       - name: login@oras
         run: |
@@ -56,7 +56,7 @@ jobs:
 
       - name: compress@binary
         if: matrix.goos != 'darwin'
-        uses: crazy-max/ghaction-upx@v3
+        uses: crazy-max/ghaction-upx@db8cc9515a4a7ea1b312cb82fbeae6d716daf777
         with:
           files: bin/*
 

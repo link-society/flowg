@@ -30,7 +30,7 @@ jobs:
 
     steps:
       - name: setup@oras
-        uses: oras-project/setup-oras@v1
+        uses: oras-project/setup-oras@22ce207df3b08e061f537244349aac6ae1d214f6
 
       - name: login@oras
         run: |
