@@ -42,10 +42,12 @@ jobs:
       - name: publish@docker
         env:
           ARTIFACT_ID: ${{ inputs.ref }}-${{ matrix.os }}-${{ matrix.arch }}
+          DOCKERHUB_TAG_LATEST: latest${{ matrix.tag_suffix }}
+          DOCKERHUB_TAG_VERSION: ${{ inputs.version }}${{ matrix.tag_suffix }}
         run: |
           docker pull ghcr.io/link-society/flowg/ci-artifacts/docker:${ARTIFACT_ID}
-          docker tag ghcr.io/link-society/flowg/ci-artifacts/docker:${ARTIFACT_ID} linksociety/flowg:latest${matrix.tag_suffix}
-          docker tag ghcr.io/link-society/flowg/ci-artifacts/docker:${ARTIFACT_ID} linksociety/flowg:${{ inputs.version }}${matrix.tag_suffix}
+          docker tag ghcr.io/link-society/flowg/ci-artifacts/docker:${ARTIFACT_ID} linksociety/flowg:${DOCKERHUB_TAG_LATEST}
+          docker tag ghcr.io/link-society/flowg/ci-artifacts/docker:${ARTIFACT_ID} linksociety/flowg:${DOCKERHUB_TAG_VERSION}
 
-          docker push linksociety/flowg:latest${matrix.tag_suffix}
-          docker push linksociety/flowg:${{ inputs.version }}${matrix.tag_suffix}
+          docker push linksociety/flowg:${DOCKERHUB_TAG_LATEST}
+          docker push linksociety/flowg:${DOCKERHUB_TAG_VERSION}

@@ -41,6 +41,8 @@ jobs:
         run: task www:build
 
       - name: upload@oras
+        env:
+          ARTIFACT_ID: ${{ inputs.ref }}
         run: |
-          oras push ghcr.io/link-society/flowg/ci-artifacts/website:${{ inputs.ref }} \
+          oras push ghcr.io/link-society/flowg/ci-artifacts/website:${ARTIFACT_ID} \
             website/build
