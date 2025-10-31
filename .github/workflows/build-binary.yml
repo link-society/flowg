@@ -27,22 +27,15 @@ on:
 permissions:
   packages: write
 
+env:
+  ARTIFACT_ID: ${{ inputs.ref }}-${{ inputs.goos }}-${{ inputs.goarch }}
+  ARTIFACT_BASENAME: ghcr.io/link-society/flowg/ci-artifacts
+
 jobs:
   build:
     runs-on: ${{ inputs.gh-runner }}
 
     steps:
-      - name: checkout@scm
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
-        with:
-          ref: ${{ inputs.ref }}
-
-      - name: setup@buildchain
-        uses: ./.github/actions/setup-buildchain
-        with:
-          ghtoken: ${{ secrets.GITHUB_TOKEN }}
-          rstarget: ${{ inputs.rust-target }}
-
       - name: setup@oras
         uses: oras-project/setup-oras@22ce207df3b08e061f537244349aac6ae1d214f6
 
@@ -53,7 +46,51 @@ jobs:
         run: |
           printf '%s' "${GITHUB_TOKEN}" | oras login ghcr.io -u ${GITHUB_ACTOR} --password-stdin
 
+      - name: need-binaries@oras
+        id: need-binaries
+        run: |
+          if oras repo tags ${ARTIFACT_BASENAME}/binaries 2>/dev/null | grep -qx "${ARTIFACT_ID}"
+          then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: need-doc-cli@oras
+        id: need-doc-cli
+        run: |
+          if oras repo tags ${ARTIFACT_BASENAME}/doc-cli 2>/dev/null | grep -qx "${ARTIFACT_ID}"
+          then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: need-doc-openapi@oras
+        id: need-doc-openapi
+        run: |
+          if oras repo tags ${ARTIFACT_BASENAME}/doc-openapi 2>/dev/null | grep -qx "${ARTIFACT_ID}"
+          then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: checkout@scm
+        if: steps.need-binaries.outputs.exists == 'false' || steps.need-doc-cli.outputs.exists == 'false' || steps.need-doc-openapi.outputs.exists == 'false'
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: setup@buildchain
+        if: steps.need-binaries.outputs.exists == 'false' || steps.need-doc-cli.outputs.exists == 'false' || steps.need-doc-openapi.outputs.exists == 'false'
+        uses: ./.github/actions/setup-buildchain
+        with:
+          ghtoken: ${{ secrets.GITHUB_TOKEN }}
+          rstarget: ${{ inputs.rust-target }}
+
       - name: build@binary
+        if: steps.need-binaries.outputs.exists == 'false' || steps.need-doc-cli.outputs.exists == 'false' || steps.need-doc-openapi.outputs.exists == 'false'
         run: task build:all doc:gen:cli doc:gen:openapi
         env:
           GOOS: ${{ inputs.goos }}
@@ -61,22 +98,27 @@ jobs:
           NODE_ENV: "production"
 
       - name: compress@binary
-        if: inputs.goos != 'darwin'
+        if: inputs.goos != 'darwin' && (steps.need-binaries.outputs.exists == 'false' || steps.need-doc-cli.outputs.exists == 'false' || steps.need-doc-openapi.outputs.exists == 'false')
         uses: crazy-max/ghaction-upx@db8cc9515a4a7ea1b312cb82fbeae6d716daf777
         with:
           files: bin/*
 
-      - name: upload@oras
-        env:
-          ARTIFACT_ID: ${{ inputs.ref }}-${{ inputs.goos }}-${{ inputs.goarch }}
+      - name: upload-binaries@oras
+        if: steps.need-binaries.outputs.exists == 'false'
         run: |
-          oras push ghcr.io/link-society/flowg/ci-artifacts/binaries:${ARTIFACT_ID} \
+          oras push ${ARTIFACT_BASENAME}/binaries:${ARTIFACT_ID} \
             bin/* LICENSE.txt
 
-          oras push ghcr.io/link-society/flowg/ci-artifacts/doc-cli:${ARTIFACT_ID} \
+      - name: upload-doc-cli
+        if: steps.need-doc-cli.outputs.exists == 'false'
+        run: |
+          oras push ${ARTIFACT_BASENAME}/doc-cli:${ARTIFACT_ID} \
             website/docs/cli/flowg-client/*.md \
             website/docs/cli/flowg-health/*.md \
             website/docs/cli/flowg-server/*.md
 
-          oras push ghcr.io/link-society/flowg/ci-artifacts/doc-openapi:${ARTIFACT_ID} \
+      - name: upload-doc-openapi
+        if: steps.need-doc-openapi.outputs.exists == 'false'
+        run: |
+          oras push ${ARTIFACT_BASENAME}/doc-openapi:${ARTIFACT_ID} \
             website/src/openapi.json

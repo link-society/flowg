@@ -11,21 +11,15 @@ on:
 permissions:
   packages: write
 
+env:
+  ARTIFACT_ID: ${{ inputs.ref }}
+  ARTIFACT_BASENAME: ghcr.io/link-society/flowg/ci-artifacts
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: checkout@scm
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
-        with:
-          ref: ${{ inputs.ref }}
-
-      - name: setup@buildchain
-        uses: ./.github/actions/setup-buildchain
-        with:
-          ghtoken: ${{ secrets.GITHUB_TOKEN }}
-
       - name: setup@oras
         uses: oras-project/setup-oras@22ce207df3b08e061f537244349aac6ae1d214f6
 
@@ -36,19 +30,42 @@ jobs:
         run: |
           printf '%s' "${GITHUB_TOKEN}" | oras login ghcr.io -u ${GITHUB_ACTOR} --password-stdin
 
-      - name: download@oras
-        env:
-          ARTIFACT_ID: ${{ inputs.ref }}-linux-amd64
+      - name: need-website@oras
+        id: need-website
         run: |
-          oras pull ghcr.io/link-society/flowg/ci-artifacts/doc-cli:${ARTIFACT_ID}
-          oras pull ghcr.io/link-society/flowg/ci-artifacts/doc-openapi:${ARTIFACT_ID}
+          if oras repo tags ${ARTIFACT_BASENAME}/website 2>/dev/null | grep -qx "${ARTIFACT_ID}"
+          then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: checkout@scm
+        if: steps.need-website.outputs.exists == 'false'
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: setup@buildchain
+        if: steps.need-website.outputs.exists == 'false'
+        uses: ./.github/actions/setup-buildchain
+        with:
+          ghtoken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: download@oras
+        if: steps.need-website.outputs.exists == 'false'
+        env:
+          DEP_ARTIFACT_ID: ${{ inputs.ref }}-linux-amd64
+        run: |
+          oras pull ${ARTIFACT_BASENAME}/doc-cli:${ARTIFACT_ID}
+          oras pull ${ARTIFACT_BASENAME}/doc-openapi:${ARTIFACT_ID}
 
       - name: build@website
+        if: steps.need-website.outputs.exists == 'false'
         run: task www:build
 
       - name: upload@oras
-        env:
-          ARTIFACT_ID: ${{ inputs.ref }}
+        if: steps.need-website.outputs.exists == 'false'
         run: |
-          oras push ghcr.io/link-society/flowg/ci-artifacts/website:${ARTIFACT_ID} \
+          oras push ${ARTIFACT_BASENAME}/website:${ARTIFACT_ID} \
             website/build

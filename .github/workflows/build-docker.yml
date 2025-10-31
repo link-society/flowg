@@ -23,18 +23,45 @@ on:
 permissions:
   packages: write
 
+env:
+  ARTIFACT_ID: ${{ inputs.ref }}-${{ inputs.os }}-${{ inputs.arch }}
+  ARTIFACT_BASENAME: ghcr.io/link-society/flowg/ci-artifacts
+
 jobs:
   build:
     runs-on: ${{ inputs.gh-runner }}
 
     steps:
+      - name: setup@oras
+        uses: oras-project/setup-oras@22ce207df3b08e061f537244349aac6ae1d214f6
+
+      - name: login@oras
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          printf '%s' "${GITHUB_TOKEN}" | oras login ghcr.io -u ${GITHUB_ACTOR} --password-stdin
+
+      - name: need-docker@oras
+        id: need-docker
+        run: |
+          if oras repo tags ${ARTIFACT_BASENAME}/docker 2>/dev/null | grep -qx "${ARTIFACT_ID}"
+          then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: checkout@scm
+        if: steps.need-docker.outputs.exists == 'false'
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
 
       - name: setup@docker
+        if: steps.need-docker.outputs.exists == 'false'
         uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435
 
       - name: login@docker
+        if: steps.need-docker.outputs.exists == 'false'
         uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef
         with:
           registry: ghcr.io
@@ -42,6 +69,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: build@docker
+        if: steps.need-docker.outputs.exists == 'false'
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83
         with:
           context: .
@@ -49,7 +77,7 @@ jobs:
           build-args: |
             UPX_ARCH=${{ inputs.arch }}
             UPX_OS=${{ inputs.os }}
-          tags: ghcr.io/link-society/flowg/ci-artifacts/docker:${{ inputs.ref }}-${{ inputs.os }}-${{ inputs.arch }}
+          tags: ${{ env.ARTIFACT_BASENAME }}/docker:${{ env.ARTIFACT_ID }}
           push: true
           load: true
           cache-from: type=gha

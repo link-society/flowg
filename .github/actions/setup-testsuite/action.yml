@@ -38,6 +38,7 @@ runs:
       shell: bash
       env:
         ARTIFACT_ID: ${{ inputs.ref }}-linux-amd64
+        ARTIFACT_BASENAME: ghcr.io/link-society/flowg/ci-artifacts
       run: |
-        docker pull ghcr.io/link-society/flowg/ci-artifacts/docker:${ARTIFACT_ID}
-        docker tag ghcr.io/link-society/flowg/ci-artifacts/docker:${ARTIFACT_ID} linksociety/flowg:latest
+        docker pull ${ARTIFACT_BASENAME}/docker:${ARTIFACT_ID}
+        docker tag ${ARTIFACT_BASENAME}/docker:${ARTIFACT_ID} linksociety/flowg:latest
