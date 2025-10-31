@@ -57,8 +57,8 @@ jobs:
         env:
           DEP_ARTIFACT_ID: ${{ inputs.ref }}-linux-amd64
         run: |
-          oras pull ${ARTIFACT_BASENAME}/doc-cli:${ARTIFACT_ID}
-          oras pull ${ARTIFACT_BASENAME}/doc-openapi:${ARTIFACT_ID}
+          oras pull ${ARTIFACT_BASENAME}/doc-cli:${DEP_ARTIFACT_ID}
+          oras pull ${ARTIFACT_BASENAME}/doc-openapi:${DEP_ARTIFACT_ID}
 
       - name: build@website
         if: steps.need-website.outputs.exists == 'false'
