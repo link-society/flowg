@@ -8,13 +8,14 @@ on:
         required: true
         type: string
 
+permissions:
+  packages: read
+  pages: write
+  id-token: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    permissions:
-      pages: write
-      id-token: write
 
     environment:
       name: github-pages

@@ -24,6 +24,9 @@ on:
         type: string
         default: amd64
 
+permissions:
+  packages: write
+
 jobs:
   build:
     runs-on: ${{ inputs.gh-runner }}

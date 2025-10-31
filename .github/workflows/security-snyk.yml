@@ -8,12 +8,14 @@ on:
         required: true
         type: string
 
+permissions:
+  packages: read
+  contents: read
+  security-events: write
+
 jobs:
   snyk:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write
 
     steps:
       - name: checkout@scm

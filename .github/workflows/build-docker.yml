@@ -20,6 +20,9 @@ on:
         type: string
         default: linux
 
+permissions:
+  packages: write
+
 jobs:
   build:
     runs-on: ${{ inputs.gh-runner }}
