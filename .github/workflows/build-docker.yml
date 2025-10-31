@@ -7,20 +7,22 @@ on:
       ref:
         required: true
         type: string
+      gh-runner:
+        required: false
+        type: string
+        default: ubuntu-latest
+      arch:
+        required: false
+        type: string
+        default: amd64
+      os:
+        required: false
+        type: string
+        default: linux
 
 jobs:
   build:
-    strategy:
-      matrix:
-        include:
-          - ghrunner: ubuntu-latest
-            arch: "amd64"
-            os: "linux"
-          - ghrunner: ubuntu-24.04-arm
-            arch: "arm64"
-            os: "linux"
-
-    runs-on: ${{ matrix.ghrunner }}
+    runs-on: ${{ inputs.gh-runner }}
 
     steps:
       - name: checkout@scm
@@ -42,9 +44,9 @@ jobs:
           context: .
           file: ./docker/flowg.dockerfile
           build-args: |
-            UPX_ARCH=${{ matrix.arch }}
-            UPX_OS=${{ matrix.os }}
-          tags: ghcr.io/link-society/flowg/ci-artifacts/docker:${{ inputs.ref }}-${{ matrix.os }}-${{ matrix.arch }}
+            UPX_ARCH=${{ inputs.arch }}
+            UPX_OS=${{ inputs.os }}
+          tags: ghcr.io/link-society/flowg/ci-artifacts/docker:${{ inputs.ref }}-${{ inputs.os }}-${{ inputs.arch }}
           push: true
           load: true
           cache-from: type=gha

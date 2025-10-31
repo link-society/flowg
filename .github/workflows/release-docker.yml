@@ -10,19 +10,21 @@ on:
       version:
         required: true
         type: string
+      arch:
+        required: false
+        type: string
+        default: amd64
+      os:
+        required: false
+        type: string
+        default: linux
+      docker-image-tag-suffix:
+        required: false
+        type: string
+        default: ""
 
 jobs:
   publish:
-    strategy:
-      matrix:
-        include:
-          - tag_suffix: ""
-            arch: "amd64"
-            os: "linux"
-          - tag_suffix: "-linux-arm"
-            arch: "arm64"
-            os: "linux"
-
     runs-on: ubuntu-latest
 
     steps:
@@ -41,9 +43,9 @@ jobs:
 
       - name: publish@docker
         env:
-          ARTIFACT_ID: ${{ inputs.ref }}-${{ matrix.os }}-${{ matrix.arch }}
-          DOCKERHUB_TAG_LATEST: latest${{ matrix.tag_suffix }}
-          DOCKERHUB_TAG_VERSION: ${{ inputs.version }}${{ matrix.tag_suffix }}
+          ARTIFACT_ID: ${{ inputs.ref }}-${{ inputs.os }}-${{ inputs.arch }}
+          DOCKERHUB_TAG_LATEST: latest${{ inputs.docker-image-tag-suffix }}
+          DOCKERHUB_TAG_VERSION: ${{ inputs.version }}${{ inputs.docker-image-tag-suffix }}
         run: |
           docker pull ghcr.io/link-society/flowg/ci-artifacts/docker:${ARTIFACT_ID}
           docker tag ghcr.io/link-society/flowg/ci-artifacts/docker:${ARTIFACT_ID} linksociety/flowg:${DOCKERHUB_TAG_LATEST}

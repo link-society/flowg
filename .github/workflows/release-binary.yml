@@ -10,22 +10,20 @@ on:
       version:
         required: true
         type: string
+      goos:
+        required: false
+        type: string
+        default: linux
+      goarch:
+        required: false
+        type: string
+        default: amd64
 
 permissions:
   contents: write
 
 jobs:
   publish:
-    strategy:
-      matrix:
-        include:
-          - goos: linux
-            goarch: amd64
-          - goos: linux
-            goarch: arm64
-          - goos: darwin
-            goarch: arm64
-
     runs-on: ubuntu-latest
 
     steps:
@@ -41,7 +39,7 @@ jobs:
 
       - name: download@oras
         env:
-          ARTIFACT_ID: ${{ inputs.ref }}-${{ matrix.goos }}-${{ matrix.goarch }}
+          ARTIFACT_ID: ${{ inputs.ref }}-${{ inputs.goos }}-${{ inputs.goarch }}
         run: |
           oras pull ghcr.io/link-society/flowg/ci-artifacts/binaries:${ARTIFACT_ID}
 
@@ -51,5 +49,5 @@ jobs:
           gh release upload ${RELEASE_NAME} ${ARCHIVE_NAME}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ARCHIVE_NAME: flowg-${{ inputs.version }}-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
+          ARCHIVE_NAME: flowg-${{ inputs.version }}-${{ inputs.goos }}-${{ inputs.goarch }}.tar.gz
           RELEASE_NAME: ${{ inputs.version }}

@@ -8,28 +8,86 @@ on:
 
 jobs:
   build-binary:
+    strategy:
+      matrix:
+        include:
+          - gh-runner: ubuntu-latest
+            rust-target: x86_64-unknown-linux-gnu
+            goos: linux
+            goarch: amd64
+          - gh-runner: ubuntu-24.04-arm
+            rust-target: aarch64-unknown-linux-gnu
+            goos: linux
+            goarch: arm64
+          - gh-runner: macos-latest
+            rust-target: aarch64-apple-darwin
+            goos: darwin
+            goarch: arm64
+
     uses: ./.github/workflows/build-binary.yml
     with:
       ref: ${{ github.event.release.tag_name }}
+      gh-runner: ${{ matrix.gh-runner }}
+      rust-target: ${{ matrix.rust-target }}
+      goos: ${{ matrix.goos }}
+      goarch: ${{ matrix.goarch }}
 
   release-binary:
+    strategy:
+      matrix:
+        include:
+          - goos: linux
+            goarch: amd64
+          - goos: linux
+            goarch: arm64
+          - goos: darwin
+            goarch: arm64
+
     uses: ./.github/workflows/release-binary.yml
     needs: build-binary
     with:
       ref: ${{ github.event.release.tag_name }}
       version: ${{ github.event.release.tag_name }}
+      goos: ${{ matrix.goos }}
+      goarch: ${{ matrix.goarch }}
 
   build-docker:
+    strategy:
+      matrix:
+        include:
+          - gh-runner: ubuntu-latest
+            arch: "amd64"
+            os: "linux"
+          - gh-runner: ubuntu-24.04-arm
+            arch: "arm64"
+            os: "linux"
+
     uses: ./.github/workflows/build-docker.yml
     with:
       ref: ${{ github.event.release.tag_name }}
+      gh-runner: ${{ matrix.gh-runner }}
+      arch: ${{ matrix.arch }}
+      os: ${{ matrix.os }}
 
   release-docker:
+    strategy:
+      matrix:
+        include:
+          - docker-image-tag-suffix: ""
+            arch: "amd64"
+            os: "linux"
+          - docker-image-tag-suffix: "-linux-arm"
+            arch: "arm64"
+            os: "linux"
+
     uses: ./.github/workflows/release-docker.yml
     needs: build-docker
     with:
       ref: ${{ github.event.release.tag_name }}
       version: ${{ github.event.release.tag_name }}
+      arch: ${{ matrix.arch }}
+      os: ${{ matrix.os }}
+      docker-image-tag-suffix: ${{ matrix.docker-image-tag-suffix }}
 
   build-website:
     uses: ./.github/workflows/build-website.yml
