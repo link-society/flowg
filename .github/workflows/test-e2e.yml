@@ -9,10 +9,11 @@ on:
         type: string
       pr:
         required: false
-        type: number
+        type: string
 
 permissions:
   packages: read
+  contents: write
   checks: write
   pull-requests: write
   statuses: write
@@ -41,14 +42,14 @@ jobs:
 
       - name: report@test
         uses: mikepenz/action-junit-report@5b7ee5a21e8674b695313d769f3cbdfd5d4d53a4
-        if: ${{ inputs.pr && (success() || failure()) }}
+        if: ${{ success() || failure() }}
         with:
           report_paths: "./tests/reports/api/junit.xml"
           include_passed: true
           check_name: "API End-To-End Test Report"
           job_summary: true
-          comment: true
-          updateComment: true
+          comment: ${{ inputs.pr != '' }}
+          updateComment: ${{ inputs.pr != '' }}
           fail_on_failure: true
           commit: ${{ inputs.ref }}
           pr_id: ${{ inputs.pr }}
@@ -142,8 +143,8 @@ jobs:
           include_passed: true
           check_name: "Consul End-To-End Test Report"
           job_summary: true
-          comment: true
-          updateComment: true
+          comment: ${{ inputs.pr != '' }}
+          updateComment: ${{ inputs.pr != '' }}
           fail_on_failure: true
           commit: ${{ inputs.ref }}
           pr_id: ${{ inputs.pr }}
