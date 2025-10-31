@@ -28,6 +28,10 @@ jobs:
 
       - name: setup@testsuite
         uses: ./.github/actions/setup-testsuite
+        with:
+          ref: ${{ inputs.ref }}
+          ghactor: ${{ github.actor }}
+          ghtoken: ${{ secrets.GITHUB_TOKEN }}
 
       - name: run@test
         working-directory: ./tests
@@ -119,6 +123,10 @@ jobs:
 
       - name: setup@testsuite
         uses: ./.github/actions/setup-testsuite
+        with:
+          ref: ${{ inputs.ref }}
+          ghactor: ${{ github.actor }}
+          ghtoken: ${{ secrets.GITHUB_TOKEN }}
 
       - name: run@test
         working-directory: ./tests
@@ -150,6 +158,10 @@ jobs:
 
       - name: setup@testsuite
         uses: ./.github/actions/setup-testsuite
+        with:
+          ref: ${{ inputs.ref }}
+          ghactor: ${{ github.actor }}
+          ghtoken: ${{ secrets.GITHUB_TOKEN }}
 
       - name: setup@k8s
         uses: ./.github/actions/setup-k8s
