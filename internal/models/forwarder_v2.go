@@ -8,8 +8,8 @@ import (
 )
 
 type ForwarderV2 struct {
-	Version int                `json:"version" default:"2"`
-	Config  *ForwarderConfigV2 `json:"config"`
+	Version int               `json:"version" default:"2"`
+	Config  ForwarderConfigV2 `json:"config"`
 }
 
 type ForwarderConfigV2 struct {

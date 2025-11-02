@@ -18,7 +18,7 @@ func TestForwarderDatadog_Call(t *testing.T) {
 
 	forwarder := &models.ForwarderV2{
 		Version: 2,
-		Config: &models.ForwarderConfigV2{
+		Config: models.ForwarderConfigV2{
 			Datadog: &models.ForwarderDatadogV2{
 				Url:    testServer.URL,
 				ApiKey: "apiKey",
@@ -41,7 +41,7 @@ func TestForwarderDatadog_Call_Failure(t *testing.T) {
 
 	forwarder := &models.ForwarderV2{
 		Version: 2,
-		Config: &models.ForwarderConfigV2{
+		Config: models.ForwarderConfigV2{
 			Datadog: &models.ForwarderDatadogV2{
 				Url:    testServer.URL,
 				ApiKey: "apiKey",

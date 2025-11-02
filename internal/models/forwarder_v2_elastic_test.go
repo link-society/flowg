@@ -31,7 +31,7 @@ func TestForwarderElastic_Call_Success(t *testing.T) {
 
 	forwarder := &models.ForwarderV2{
 		Version: 2,
-		Config: &models.ForwarderConfigV2{
+		Config: models.ForwarderConfigV2{
 			Elastic: &models.ForwarderElasticV2{
 				Type:      "elastic",
 				Index:     "test-index",
@@ -73,7 +73,7 @@ func TestForwarderElastic_Call_IndexNotExists_CreatesIndex(t *testing.T) {
 
 	forwarder := &models.ForwarderV2{
 		Version: 2,
-		Config: &models.ForwarderConfigV2{
+		Config: models.ForwarderConfigV2{
 			Elastic: &models.ForwarderElasticV2{
 				Type:      "elastic",
 				Index:     "test-index",
@@ -112,7 +112,7 @@ func TestForwarderElastic_Call_IndexCreateFails(t *testing.T) {
 
 	forwarder := &models.ForwarderV2{
 		Version: 2,
-		Config: &models.ForwarderConfigV2{
+		Config: models.ForwarderConfigV2{
 			Elastic: &models.ForwarderElasticV2{
 				Type:      "elastic",
 				Index:     "test-index",
@@ -148,7 +148,7 @@ func TestForwarderElastic_Call_IndexFails(t *testing.T) {
 
 	forwarder := &models.ForwarderV2{
 		Version: 2,
-		Config: &models.ForwarderConfigV2{
+		Config: models.ForwarderConfigV2{
 			Elastic: &models.ForwarderElasticV2{
 				Type:      "elastic",
 				Index:     "test-index",
@@ -167,7 +167,7 @@ func TestForwarderElastic_Call_IndexFails(t *testing.T) {
 func TestForwarderElastic_Call_InvalidCACert(t *testing.T) {
 	forwarder := &models.ForwarderV2{
 		Version: 2,
-		Config: &models.ForwarderConfigV2{
+		Config: models.ForwarderConfigV2{
 			Elastic: &models.ForwarderElasticV2{
 				Type:      "elastic",
 				Index:     "test-index",
