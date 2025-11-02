@@ -73,10 +73,12 @@ jobs:
     strategy:
       matrix:
         include:
-          - docker-image-tag-suffix: ""
+          - gh-runner: ubuntu-latest
+            docker-image-tag-suffix: ""
             arch: "amd64"
             os: "linux"
-          - docker-image-tag-suffix: "-linux-arm"
+          - gh-runner: ubuntu-24.04-arm
+            docker-image-tag-suffix: "-linux-arm"
             arch: "arm64"
             os: "linux"
 
@@ -86,6 +88,7 @@ jobs:
     with:
       ref: ${{ github.event.release.tag_name }}
       version: ${{ github.event.release.tag_name }}
+      gh-runner: ${{ matrix.gh-runner }}
       arch: ${{ matrix.arch }}
       os: ${{ matrix.os }}
       docker-image-tag-suffix: ${{ matrix.docker-image-tag-suffix }}

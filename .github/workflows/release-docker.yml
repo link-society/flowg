@@ -10,6 +10,10 @@ on:
       version:
         required: true
         type: string
+      gh-runner:
+        required: false
+        type: string
+        default: ubuntu-latest
       arch:
         required: false
         type: string
@@ -37,7 +41,7 @@ env:
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.gh-runner }}
 
     steps:
       - name: login-ghcr@docker
