@@ -9,9 +9,9 @@ import (
 )
 
 type ForwarderDatadogV2 struct {
-	Type   string `json:"type" enum:"datadog"`
-	Url    string `json:"url"`
-	ApiKey string `json:"apiKey"`
+	Type   string `json:"type" enum:"datadog" required:"true"`
+	Url    string `json:"url" required:"true"`
+	ApiKey string `json:"apiKey" required:"true"`
 }
 
 func (f *ForwarderDatadogV2) call(ctx context.Context, record *LogRecord) error {

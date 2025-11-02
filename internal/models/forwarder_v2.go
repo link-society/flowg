@@ -9,7 +9,7 @@ import (
 
 type ForwarderV2 struct {
 	Version int               `json:"version" default:"2"`
-	Config  ForwarderConfigV2 `json:"config"`
+	Config  ForwarderConfigV2 `json:"config" required:"true"`
 }
 
 type ForwarderConfigV2 struct {
@@ -86,7 +86,7 @@ func (cfg *ForwarderConfigV2) MarshalJSON() ([]byte, error) {
 
 func (cfg *ForwarderConfigV2) UnmarshalJSON(data []byte) error {
 	var typeInfo struct {
-		Type string `json:"type"`
+		Type string `json:"type" required:"true"`
 	}
 
 	if err := json.Unmarshal(data, &typeInfo); err != nil {

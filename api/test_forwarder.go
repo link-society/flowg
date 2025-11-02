@@ -14,7 +14,7 @@ import (
 
 type TestForwarderRequest struct {
 	Forwarder string            `path:"forwarder" minLength:"1"`
-	Record    map[string]string `json:"record"`
+	Record    map[string]string `json:"record" required:"true"`
 }
 
 type TestForwarderResponse struct {

@@ -11,11 +11,11 @@ import (
 )
 
 type ForwarderElasticV2 struct {
-	Type      string   `json:"type" enum:"elastic"`
-	Index     string   `json:"index"`
-	Username  string   `json:"username"`
-	Password  string   `json:"password"`
-	Addresses []string `json:"addresses"`
+	Type      string   `json:"type" enum:"elastic" required:"true"`
+	Index     string   `json:"index" required:"true"`
+	Username  string   `json:"username" required:"true"`
+	Password  string   `json:"password" required:"true"`
+	Addresses []string `json:"addresses" required:"true"`
 	CACert    string   `json:"ca,omitempty"`
 }
 

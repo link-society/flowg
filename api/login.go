@@ -12,8 +12,8 @@ import (
 )
 
 type LoginRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username string `json:"username" required:"true"`
+	Password string `json:"password" required:"true"`
 }
 
 type LoginResponse struct {

@@ -14,7 +14,7 @@ import (
 
 type PatchUserRolesRequest struct {
 	User  string   `path:"user" minLength:"1"`
-	Roles []string `json:"roles"`
+	Roles []string `json:"roles" required:"true"`
 }
 
 type PatchUserRolesResponse struct {

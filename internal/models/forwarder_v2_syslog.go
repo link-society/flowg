@@ -9,12 +9,12 @@ import (
 )
 
 type ForwarderSyslogV2 struct {
-	Type     string `json:"type" enum:"syslog"`
-	Network  string `json:"network" enum:"tcp,udp"`
-	Address  string `json:"address"`
-	Tag      string `json:"tag"`
-	Severity string `json:"severity" enum:"emerg,alert,crit,err,warning,notice,info,debug"`
-	Facility string `json:"facility" enum:"kern,user,mail,daemon,auth,syslog,lpr,news,uucp,cron,authpriv,ftp,local0,local1,local2,local3,local4,local5,local6,local7"`
+	Type     string `json:"type" enum:"syslog" required:"true"`
+	Network  string `json:"network" enum:"tcp,udp" required:"true"`
+	Address  string `json:"address" required:"true"`
+	Tag      string `json:"tag" required:"true"`
+	Severity string `json:"severity" enum:"emerg,alert,crit,err,warning,notice,info,debug" required:"true"`
+	Facility string `json:"facility" enum:"kern,user,mail,daemon,auth,syslog,lpr,news,uucp,cron,authpriv,ftp,local0,local1,local2,local3,local4,local5,local6,local7" required:"true"`
 }
 
 var (

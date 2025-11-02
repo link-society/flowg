@@ -15,8 +15,8 @@ import (
 )
 
 type TestTransformerRequest struct {
-	Code   string            `json:"code"`
-	Record map[string]string `json:"record"`
+	Code   string            `json:"code" required:"true"`
+	Record map[string]string `json:"record" required:"true"`
 }
 
 type TestTransformerResponse struct {

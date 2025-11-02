@@ -14,7 +14,7 @@ import (
 
 type SaveForwarderRequest struct {
 	Forwarder string             `path:"forwarder" minLength:"1"`
-	Config    models.ForwarderV2 `json:"forwarder"`
+	Config    models.ForwarderV2 `json:"forwarder" required:"true"`
 }
 
 type SaveForwarderResponse struct {

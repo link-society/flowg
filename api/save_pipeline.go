@@ -14,7 +14,7 @@ import (
 
 type SavePipelineRequest struct {
 	Pipeline string             `path:"pipeline" minLength:"1"`
-	Flow     models.FlowGraphV2 `json:"flow"`
+	Flow     models.FlowGraphV2 `json:"flow" required:"true"`
 }
 
 type SavePipelineResponse struct {
