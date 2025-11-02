@@ -49,7 +49,7 @@ jobs:
       - name: upload@assets
         run: |
           tar -czf ${ARCHIVE_NAME} bin/ LICENSE.txt
-          gh release upload ${RELEASE_NAME} ${ARCHIVE_NAME}
+          gh release upload ${RELEASE_NAME} ${ARCHIVE_NAME} --repo ${{ github.repository }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ARCHIVE_NAME: flowg-${{ inputs.version }}-${{ inputs.goos }}-${{ inputs.goarch }}.tar.gz
