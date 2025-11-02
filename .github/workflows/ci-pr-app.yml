@@ -24,6 +24,7 @@ jobs:
     uses: ./.github/workflows/test-e2e.yml
     with:
       ref: ${{ github.event.pull_request.head.sha }}
+      pr: ${{ github.event.pull_request.number }}
 
   security-check:
     if: github.event.pull_request.draft == false
