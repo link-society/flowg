@@ -72,6 +72,7 @@ Content-Type: application/json
         "id": "xy-edge____builtin__source_direct-node-1",
         "type": "smoothstep",
         "source": "__builtin__source_direct",
+        "sourceHandle": "",
         "target": "node-1",
         "animated": true
       },
@@ -79,6 +80,7 @@ Content-Type: application/json
         "id": "xy-edge____builtin__source_syslog-node-1",
         "type": "smoothstep",
         "source": "__builtin__source_syslog",
+        "sourceHandle": "",
         "target": "node-1",
         "animated": true
       }
