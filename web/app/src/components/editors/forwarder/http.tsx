@@ -63,7 +63,7 @@ export const HttpForwarderEditor = ({
         id="field:editor.forwarders.http.headers"
         keyLabel="HTTP Header"
         valueLabel="Value"
-        keyValues={Object.entries(config.headers)}
+        keyValues={Object.entries(config.headers ?? {})}
         onChange={(pairs) => {
           onConfigChange({
             ...config,
