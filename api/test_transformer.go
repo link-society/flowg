@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 
 	"github.com/swaggest/usecase"
@@ -24,6 +25,8 @@ type TestTransformerResponse struct {
 }
 
 func (ctrl *controller) TestTransformerUsecase() usecase.Interactor {
+	const UnprocessableEntityCode = 422
+
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
 			ctrl.deps.AuthStorage,
@@ -42,7 +45,16 @@ func (ctrl *controller) TestTransformerUsecase() usecase.Interactor {
 					)
 
 					resp.Success = false
-					return status.Wrap(err, status.Internal)
+
+					if re := new(vrl.RuntimeError); errors.As(err, &re) {
+						return usecase.Error{
+							AppCode:    UnprocessableEntityCode,
+							StatusCode: status.InvalidArgument,
+							Value:      err,
+						}
+					} else {
+						return status.Wrap(err, status.Internal)
+					}
 				}
 
 				resp.Success = true
@@ -58,7 +70,7 @@ func (ctrl *controller) TestTransformerUsecase() usecase.Interactor {
 	u.SetDescription("Test Transformer")
 	u.SetTags("tests")
 
-	u.SetExpectedErrors(status.PermissionDenied, status.Internal)
+	u.SetExpectedErrors(status.PermissionDenied, status.Internal, status.FailedPrecondition)
 
 	return u
 }
