@@ -17,12 +17,8 @@ pub fn process_record(
   let compiled = match vrl::compiler::compile(&script, &fns) {
     Ok(compiled) => compiled,
     Err(diagnostics) => {
-      let messages: Vec<String> = diagnostics.iter()
-        .map(|d| d.message.clone())
-        .collect();
-
       return Err(anyhow::anyhow!("Failed to compile VRL script"))
-        .context(messages.join("\n"))
+        .context(super::report::render_diagnostics(diagnostics, &script))
     }
   };
 
@@ -36,8 +32,10 @@ pub fn process_record(
   let timezone = TimeZone::default();
   let mut ctx = vrl::compiler::Context::new(&mut target, &mut state, &timezone);
 
-  compiled.program.resolve(&mut ctx)
-    .context("Failed to execute VRL script")?;
+  if let Err(expression_error) = compiled.program.resolve(&mut ctx) {
+    return Err(anyhow::anyhow!("Failed to execute VRL script"))
+      .context(super::report::render_error(expression_error, &script));
+  }
 
   let result = if let Value::Object(obj) = target.value {
     flatten_obj(&obj)
