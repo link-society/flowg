@@ -37,7 +37,7 @@ func TestForwarderOtlpV2_Call_Success(t *testing.T) {
 
 	forwarder := &models.ForwarderV2{
 		Version: 2,
-		Config: &models.ForwarderConfigV2{
+		Config: models.ForwarderConfigV2{
 			Otlp: &models.ForwarderOtlpV2{
 				Type:     "otlp",
 				Endpoint: testServer.URL,
@@ -68,7 +68,7 @@ func TestForwarderOtlpV2_Call_Failure(t *testing.T) {
 
 	forwarder := &models.ForwarderV2{
 		Version: 2,
-		Config: &models.ForwarderConfigV2{
+		Config: models.ForwarderConfigV2{
 			Otlp: &models.ForwarderOtlpV2{
 				Type:     "otlp",
 				Endpoint: testServer.URL,

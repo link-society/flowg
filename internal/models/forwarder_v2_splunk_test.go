@@ -32,7 +32,7 @@ func TestForwarderSplunk_Call(t *testing.T) {
 
 	forwarder := &models.ForwarderV2{
 		Version: 2,
-		Config: &models.ForwarderConfigV2{
+		Config: models.ForwarderConfigV2{
 			Splunk: &models.ForwarderSplunkV2{
 				Endpoint: testServer.URL,
 				Token:    "test-token",
@@ -60,7 +60,7 @@ func TestForwarderSplunk_Call_Failure(t *testing.T) {
 
 	forwarder := &models.ForwarderV2{
 		Version: 2,
-		Config: &models.ForwarderConfigV2{
+		Config: models.ForwarderConfigV2{
 			Splunk: &models.ForwarderSplunkV2{
 				Endpoint: testServer.URL,
 				Token:    "test-token",
