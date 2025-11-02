@@ -14,7 +14,7 @@ import (
 
 type SaveRoleRequest struct {
 	Role   string   `path:"role" minLength:"1"`
-	Scopes []string `json:"scopes"`
+	Scopes []string `json:"scopes" required:"true"`
 }
 
 type SaveRoleResponse struct {

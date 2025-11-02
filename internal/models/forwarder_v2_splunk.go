@@ -9,9 +9,9 @@ import (
 )
 
 type ForwarderSplunkV2 struct {
-	Type     string `json:"type" enum:"splunk"`
-	Endpoint string `json:"endpoint"`
-	Token    string `json:"token"`
+	Type     string `json:"type" enum:"splunk" required:"true"`
+	Endpoint string `json:"endpoint" required:"true"`
+	Token    string `json:"token" required:"true"`
 }
 
 func (f *ForwarderSplunkV2) call(ctx context.Context, record *LogRecord) error {

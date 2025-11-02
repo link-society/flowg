@@ -14,7 +14,7 @@ import (
 
 type SaveTransformerRequest struct {
 	Transformer string `path:"transformer" minLength:"1"`
-	Script      string `json:"script"`
+	Script      string `json:"script" required:"true"`
 }
 
 type SaveTransformerResponse struct {

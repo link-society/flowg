@@ -14,8 +14,8 @@ import (
 )
 
 type ForwarderOtlpV2 struct {
-	Type     string            `json:"type" enum:"otlp"`
-	Endpoint string            `json:"endpoint,omitempty"`
+	Type     string            `json:"type" enum:"otlp" required:"true"`
+	Endpoint string            `json:"endpoint" required:"true"`
 	Headers  map[string]string `json:"headers,omitempty"`
 }
 

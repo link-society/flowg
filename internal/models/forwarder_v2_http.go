@@ -11,9 +11,9 @@ import (
 )
 
 type ForwarderHttpV2 struct {
-	Type    string            `json:"type" enum:"http"`
-	Url     string            `json:"url"`
-	Headers map[string]string `json:"headers"`
+	Type    string            `json:"type" enum:"http" required:"true"`
+	Url     string            `json:"url" required:"true"`
+	Headers map[string]string `json:"headers,omitempty"`
 }
 
 func (f *ForwarderHttpV2) call(ctx context.Context, record *LogRecord) error {

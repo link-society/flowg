@@ -14,8 +14,8 @@ import (
 
 type SaveUserRequest struct {
 	User     string   `path:"user" minLength:"1"`
-	Roles    []string `json:"roles"`
-	Password string   `json:"password"`
+	Roles    []string `json:"roles" required:"true"`
+	Password string   `json:"password" required:"true"`
 }
 
 type SaveUserResponse struct {

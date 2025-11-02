@@ -14,7 +14,7 @@ import (
 
 type ConfigureStreamRequest struct {
 	Stream string              `path:"stream" minLength:"1"`
-	Config models.StreamConfig `json:"config"`
+	Config models.StreamConfig `json:"config" required:"true"`
 }
 
 type ConfigureStreamResponse struct {

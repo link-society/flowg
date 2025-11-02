@@ -10,10 +10,10 @@ import (
 )
 
 type ForwarderAmqpV2 struct {
-	Type       string `json:"type" enum:"amqp"`
-	Url        string `json:"url"`
-	Exchange   string `json:"exchange"`
-	RoutingKey string `json:"routing_key"`
+	Type       string `json:"type" enum:"amqp" required:"true"`
+	Url        string `json:"url" required:"true"`
+	Exchange   string `json:"exchange" required:"true"`
+	RoutingKey string `json:"routing_key" required:"true"`
 }
 
 func (f *ForwarderAmqpV2) call(ctx context.Context, record *LogRecord) error {

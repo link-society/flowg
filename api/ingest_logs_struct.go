@@ -17,7 +17,7 @@ import (
 
 type IngestLogsStructRequest struct {
 	Pipeline string              `path:"pipeline" minLength:"1"`
-	Records  []map[string]string `json:"records"`
+	Records  []map[string]string `json:"records" required:"true"`
 }
 type IngestLogsStructResponse struct {
 	Success        bool `json:"success"`
