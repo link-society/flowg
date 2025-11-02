@@ -1,13 +1,9 @@
 import { EventSourcePlus } from 'event-source-plus'
 
 import * as errors from '@/lib/api/errors'
+import { ApiErrorResponse } from '@/lib/api/response'
 
 type ApiMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'
-
-type ApiErrorResponse = {
-  status: string
-  error: string
-}
 
 type ApiRequestResult<R> = {
   body: R
@@ -58,13 +54,16 @@ const request = async <B, R extends { success: boolean }>(
 
     switch (content.status) {
       case 'UNAUTHENTICATED':
-        throw new errors.UnauthenticatedError(content.error)
+        throw new errors.UnauthenticatedError(content)
 
       case 'PERMISSION_DENIED':
-        throw new errors.PermissionDeniedError(content.error)
+        throw new errors.PermissionDeniedError(content)
+
+      case 'INVALID_ARGUMENT':
+        throw new errors.InvalidArgumentError(content)
 
       default:
-        throw new errors.ApiError(content.error)
+        throw new errors.ApplicationError(content)
     }
   }
 
@@ -129,13 +128,16 @@ export const SSE = (options: RequestOptions<never>) => {
 
         switch (content.status) {
           case 'UNAUTHENTICATED':
-            throw new errors.UnauthenticatedError(content.error)
+            throw new errors.UnauthenticatedError(content)
 
           case 'PERMISSION_DENIED':
-            throw new errors.PermissionDeniedError(content.error)
+            throw new errors.PermissionDeniedError(content)
+
+          case 'INVALID_ARGUMENT':
+            throw new errors.InvalidArgumentError(content)
 
           default:
-            throw new errors.ApiError(content.error)
+            throw new errors.ApplicationError(content)
         }
       } catch (error) {
         cancelScope.abort(`${error}`)

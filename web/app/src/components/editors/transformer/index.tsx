@@ -22,7 +22,7 @@ type TransformerEditorProps = Readonly<{
 export const TransformerEditor = (props: TransformerEditorProps) => {
   const [code, setCode] = useState(props.code)
   const [testRecord, setTestRecord] = useState<[string, string][]>([])
-  const [testResult, setTestResult] = useState<Record<string, string>>({})
+  const [testResult, setTestResult] = useState<string>('')
 
   useEffect(() => {
     props.onCodeChange(code)
@@ -31,7 +31,13 @@ export const TransformerEditor = (props: TransformerEditorProps) => {
   const [onTest, testLoading] = useApiOperation(async () => {
     const input = Object.fromEntries(testRecord)
     const output = await testApi.testTransformer(code, input)
-    setTestResult(output)
+
+    if (output.success) {
+      setTestResult(JSON.stringify(output.record, null, 2))
+    }
+    else {
+      setTestResult(output.error)
+    }
   }, [code, testRecord])
 
   return (
@@ -83,11 +89,11 @@ export const TransformerEditor = (props: TransformerEditorProps) => {
                 variant="outlined"
                 className="
                   p-2 grow shrink h-0 overflow-auto
-                  font-mono !bg-gray-100
+                  font-mono bg-gray-100!
                 "
                 component="pre"
               >
-                {JSON.stringify(testResult, null, 2)}
+                {testResult}
               </Paper>
             </Paper>
           </div>
