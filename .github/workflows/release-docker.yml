@@ -22,6 +22,11 @@ on:
         required: false
         type: string
         default: ""
+    secrets:
+      DOCKERHUB_USERNAME:
+        required: true
+      DOCKERHUB_PASSWORD:
+        required: true
 
 permissions:
   packages: read

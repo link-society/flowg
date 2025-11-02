@@ -7,6 +7,11 @@ on:
       ref:
         required: true
         type: string
+    secrets:
+      SNYK_TOKEN:
+        required: true
+      SNYK_ORGANIZATION:
+        required: true
 
 permissions:
   packages: read
