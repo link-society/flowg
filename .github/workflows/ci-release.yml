@@ -95,14 +95,3 @@ jobs:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-  build-website:
-    uses: ./.github/workflows/build-website.yml
-    needs: build-binary
-    with:
-      ref: ${{ github.event.release.tag_name }}
-
-  deploy-website:
-    uses: ./.github/workflows/deploy-website.yml
-    needs: build-website
-    with:
-      ref: ${{ github.event.release.tag_name }}

@@ -28,3 +28,9 @@ jobs:
     needs: build-binary
     with:
       ref: ${{ github.sha }}
+
+  deploy-website:
+    uses: ./.github/workflows/deploy-website.yml
+    needs: build-website
+    with:
+      ref: ${{ github.sha }}
