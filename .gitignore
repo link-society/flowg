@@ -1,5 +1,5 @@
 /bin/
 /data/
 /backup/
-.vscode
+/target/
 .DS_Store
