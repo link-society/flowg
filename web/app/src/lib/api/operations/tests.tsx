@@ -1,9 +1,9 @@
-import * as request from '@/lib/api/request'
 import { InvalidArgumentError } from '@/lib/api/errors'
+import * as request from '@/lib/api/request'
 
 type TestTransformerResult =
-  | { success: true, record: Record<string, string> }
-  | { success: false, error: string }
+  | { success: true; record: Record<string, string> }
+  | { success: false; error: string }
 
 export const testTransformer = async (
   code: string,
@@ -31,12 +31,10 @@ export const testTransformer = async (
       },
     })
     return { success: true, record: body.record }
-  }
-  catch (err) {
+  } catch (err) {
     if (err instanceof InvalidArgumentError && err.appcode === 422) {
       return { success: false, error: err.message }
-    }
-    else {
+    } else {
       throw err
     }
   }

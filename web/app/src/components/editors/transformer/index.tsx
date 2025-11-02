@@ -34,8 +34,7 @@ export const TransformerEditor = (props: TransformerEditorProps) => {
 
     if (output.success) {
       setTestResult(JSON.stringify(output.record, null, 2))
-    }
-    else {
+    } else {
       setTestResult(output.error)
     }
   }, [code, testRecord])
