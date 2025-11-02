@@ -84,7 +84,6 @@ jobs:
 
     uses: ./.github/workflows/release-docker.yml
     needs: build-docker
-    secrets: inherit
     with:
       ref: ${{ github.event.release.tag_name }}
       version: ${{ github.event.release.tag_name }}
@@ -92,6 +91,9 @@ jobs:
       arch: ${{ matrix.arch }}
       os: ${{ matrix.os }}
       docker-image-tag-suffix: ${{ matrix.docker-image-tag-suffix }}
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
 
   build-website:
     uses: ./.github/workflows/build-website.yml

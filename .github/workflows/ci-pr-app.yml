@@ -28,6 +28,8 @@ jobs:
   security-check:
     if: github.event.pull_request.draft == false
     uses: ./.github/workflows/security-snyk.yml
-    secrets: inherit
     with:
       ref: ${{ github.event.pull_request.head.sha }}
+    secrets:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      SNYK_ORGANIZATION: ${{ secrets.SNYK_ORGANIZATION }}
