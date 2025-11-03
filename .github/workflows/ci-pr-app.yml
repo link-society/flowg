@@ -12,6 +12,11 @@ on:
       - main
     paths-ignore:
       - 'website/**'
+      - '.github/**'
+      - '.vscode/**'
+      - 'docs/**'
+      - '*.md'
+      - '*.txt'
 
 jobs:
   build-docker:
