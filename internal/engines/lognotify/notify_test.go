@@ -4,46 +4,28 @@ import (
 	"reflect"
 	"testing"
 
-	"context"
-	"time"
-
+	"go.uber.org/fx"
+	"go.uber.org/fx/fxtest"
 	"link-society.com/flowg/internal/models"
 
 	"link-society.com/flowg/internal/engines/lognotify"
 )
 
 func TestLogNotifier(t *testing.T) {
-	notifier := lognotify.NewLogNotifier()
-	notifier.Start()
+	var notifier lognotify.LogNotifier
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	err := notifier.WaitReady(ctx)
-	defer cancel()
-	if err != nil {
-		t.Fatalf("could not start log notifier: %v", err)
-	}
+	app := fxtest.New(t, fx.Populate(&notifier), fx.NopLogger)
+	app.RequireStart()
+	defer app.RequireStop()
 
-	defer func() {
-		notifier.Stop()
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-		err := notifier.Join(ctx)
-		if err != nil {
-			t.Fatalf("could not stop log notifier: %v", err)
-		}
-	}()
-
-	ctx, cancel = context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	logM, err := notifier.Subscribe(ctx, "test")
+	logM, err := notifier.Subscribe(t.Context(), "test")
 	if err != nil {
 		t.Fatalf("unexpected error while subscribing: %v", err)
 	}
 
 	logRecord := models.NewLogRecord(map[string]string{})
 
-	err = notifier.Notify(ctx, "test", "key", *logRecord)
+	err = notifier.Notify(t.Context(), "test", "key", *logRecord)
 	if err != nil {
 		t.Fatalf("unexpected error while notifying: %v", err)
 	}

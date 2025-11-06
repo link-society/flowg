@@ -4,6 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"go.uber.org/fx"
+	"go.uber.org/fx/fxtest"
+
 	"link-society.com/flowg/internal/storage/config"
 
 	"link-society.com/flowg/internal/app/bootstrap"
@@ -12,16 +15,16 @@ import (
 func TestDefaultPipeline(t *testing.T) {
 	ctx := context.Background()
 
-	configStorage := config.NewStorage(config.OptInMemory(true))
-	configStorage.Start()
-	defer configStorage.Stop()
+	var configStorage config.Storage
 
-	err := configStorage.WaitReady(ctx)
-	if err != nil {
-		t.Fatalf("unexpected error at startup: %v", err)
-	}
+	configOpts := config.DefaultOptions()
+	configOpts.InMemory = true
 
-	err = bootstrap.DefaultPipeline(ctx, configStorage)
+	app := fxtest.New(t, config.NewStorage(configOpts), fx.Populate(&configStorage))
+	app.RequireStart()
+	defer app.RequireStop()
+
+	err := bootstrap.DefaultPipeline(ctx, configStorage)
 	if err != nil {
 		t.Fatalf("failed to bootstrap default pipeline: %v", err)
 	}

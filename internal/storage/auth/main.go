@@ -2,7 +2,11 @@ package auth
 
 import (
 	"context"
+	"fmt"
+
 	"io"
+
+	"go.uber.org/fx"
 
 	"github.com/dgraph-io/badger/v4"
 
@@ -10,12 +14,9 @@ import (
 	"link-society.com/flowg/internal/storage"
 	"link-society.com/flowg/internal/storage/auth/transactions"
 	"link-society.com/flowg/internal/utils/kvstore"
-
-	"link-society.com/flowg/internal/utils/proctree"
 )
 
 type Storage interface {
-	proctree.Process
 	storage.Streamable
 
 	ListRoles(ctx context.Context) ([]models.Role, error)
@@ -39,65 +40,58 @@ type Storage interface {
 	DeleteToken(ctx context.Context, username string, tokenUUID string) error
 }
 
-type options struct {
-	dir      string
-	inMemory bool
-	readOnly bool
-}
-
-func OptDirectory(dir string) func(*options) {
-	return func(o *options) {
-		o.dir = dir
-	}
-}
-
-func OptInMemory(inMemory bool) func(*options) {
-	return func(o *options) {
-		o.inMemory = inMemory
-	}
-}
-
-func OptReadOnly(readOnly bool) func(*options) {
-	return func(o *options) {
-		o.readOnly = readOnly
-	}
+type Options struct {
+	Directory string
+	InMemory  bool
+	ReadOnly  bool
 }
 
 type storageImpl struct {
-	proctree.Process
-
 	kvStore kvstore.Storage
+}
+
+type deps struct {
+	fx.In
+
+	S kvstore.Storage `name:"storage.auth"`
 }
 
 var _ Storage = (*storageImpl)(nil)
 
-func NewStorage(opts ...func(*options)) Storage {
-	options := options{
-		dir:      "",
-		inMemory: false,
-		readOnly: false,
+func DefaultOptions() Options {
+	return Options{
+		Directory: "",
+		InMemory:  false,
+		ReadOnly:  false,
 	}
-	for _, opt := range opts {
-		opt(&options)
-	}
+}
 
-	kvStore := kvstore.NewStorage(
-		kvstore.OptLogChannel("authstorage"),
-		kvstore.OptDirectory(options.dir),
-		kvstore.OptInMemory(options.inMemory),
-		kvstore.OptReadOnly(options.readOnly),
+func NewStorage(opts Options) fx.Option {
+	kvOpts := kvstore.DefaultOptions()
+	kvOpts.LogChannel = "storage.auth"
+	kvOpts.Directory = opts.Directory
+	kvOpts.InMemory = opts.InMemory
+	kvOpts.ReadOnly = opts.ReadOnly
+
+	return fx.Module(
+		"storage.auth",
+		kvstore.NewStorage(kvOpts),
+		fx.Provide(func(lc fx.Lifecycle, d deps) Storage {
+			storage := &storageImpl{kvStore: d.S}
+
+			lc.Append(fx.Hook{
+				OnStart: func(ctx context.Context) error {
+					if err := migrateAlertScopes(ctx, storage.kvStore); err != nil {
+						return fmt.Errorf("failed to migrate alerts: %w", err)
+					}
+
+					return nil
+				},
+			})
+
+			return storage
+		}),
 	)
-
-	process := proctree.NewProcessGroup(
-		proctree.DefaultProcessGroupOptions(),
-		kvStore,
-		proctree.NewProcess(&migratorProcH{kvStore: kvStore}),
-	)
-
-	return &storageImpl{
-		Process: process,
-		kvStore: kvStore,
-	}
 }
 
 func (s *storageImpl) Dump(ctx context.Context, w io.Writer, since uint64) (uint64, error) {

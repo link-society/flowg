@@ -1,9 +1,12 @@
 package server
 
 import (
+	"context"
 	"log/slog"
 
 	"crypto/tls"
+
+	"go.uber.org/fx"
 
 	"link-society.com/flowg/internal/cluster"
 	"link-society.com/flowg/internal/storage/auth"
@@ -16,8 +19,6 @@ import (
 	"link-society.com/flowg/internal/services/http"
 	"link-society.com/flowg/internal/services/mgmt"
 	"link-society.com/flowg/internal/services/syslog"
-
-	"link-society.com/flowg/internal/utils/proctree"
 )
 
 type Options struct {
@@ -51,34 +52,34 @@ type Options struct {
 	AuthResetPassword string
 }
 
-func NewServer(opts Options) proctree.Process {
-	// Storage Layer
-	var (
-		authStorage   = auth.NewStorage(auth.OptDirectory(opts.AuthStorageDir))
-		configStorage = config.NewStorage(config.OptDirectory(opts.ConfigStorageDir))
-		logStorage    = log.NewStorage(log.OptDirectory(opts.LogStorageDir))
-	)
-
-	// Engine Layer
-	var (
-		logNotifier    = lognotify.NewLogNotifier()
-		pipelineRunner = pipelines.NewRunner(configStorage, logStorage, logNotifier)
-	)
-
-	// Service Layer
-	var (
-		httpServer = http.NewServer(&http.ServerOptions{
+func NewServer(opts Options) fx.Option {
+	return fx.Module(
+		"app.server",
+		// Storage Layer
+		auth.NewStorage(func() auth.Options {
+			authOpts := auth.DefaultOptions()
+			authOpts.Directory = opts.AuthStorageDir
+			return authOpts
+		}()),
+		config.NewStorage(func() config.Options {
+			configOpts := config.DefaultOptions()
+			configOpts.Directory = opts.ConfigStorageDir
+			return configOpts
+		}()),
+		log.NewStorage(func() log.Options {
+			logOpts := log.DefaultOptions()
+			logOpts.Directory = opts.LogStorageDir
+			return logOpts
+		}()),
+		// Engine Layer
+		lognotify.NewLogNotifier(),
+		pipelines.NewRunner(),
+		// Service Layer
+		http.NewServer(http.ServerOptions{
 			BindAddress: opts.HttpBindAddress,
 			TlsConfig:   opts.HttpTlsConfig,
-
-			AuthStorage:   authStorage,
-			ConfigStorage: configStorage,
-			LogStorage:    logStorage,
-
-			LogNotifier:    logNotifier,
-			PipelineRunner: pipelineRunner,
-		})
-		mgmtServer = mgmt.NewServer(&mgmt.ServerOptions{
+		}),
+		mgmt.NewServer(mgmt.ServerOptions{
 			BindAddress: opts.MgmtBindAddress,
 			TlsConfig:   opts.MgmtTlsConfig,
 
@@ -86,52 +87,52 @@ func NewServer(opts Options) proctree.Process {
 			ClusterCookie:            opts.ClusterCookie,
 			ClusterStateDir:          opts.ClusterStateDir,
 			ClusterFormationStrategy: opts.ClusterFormationStrategy,
-
-			AuthStorage:   authStorage,
-			ConfigStorage: configStorage,
-			LogStorage:    logStorage,
-		})
-		syslogServer = syslog.NewServer(&syslog.ServerOptions{
+		}),
+		syslog.NewServer(syslog.ServerOptions{
 			TcpMode:      opts.SyslogTcpMode,
 			BindAddress:  opts.SyslogBindAddress,
 			TlsConfig:    opts.SyslogTlsConfig,
 			AllowOrigins: opts.SyslogAllowOrigins,
+		}),
+		fx.Provide(func(
+			lc fx.Lifecycle,
+			authStorage auth.Storage,
+			configStorage config.Storage,
+			logStorage log.Storage,
+		) *bootstrapHandler {
+			h := &bootstrapHandler{
+				logger:          slog.Default().With(slog.String("channel", "bootstrap")),
+				authStorage:     authStorage,
+				configStorage:   configStorage,
+				initialUser:     opts.AuthInitialUser,
+				initialPassword: opts.AuthInitialPassword,
+				resetUser:       opts.AuthResetUser,
+				resetPassword:   opts.AuthResetPassword,
+			}
 
-			ConfigStorage:  configStorage,
-			PipelineRunner: pipelineRunner,
-		})
-	)
+			lc.Append(fx.Hook{
+				OnStart: func(ctx context.Context) error {
+					return h.Run(ctx)
+				},
+			})
 
-	// Bootstrap Process
-	bootstrapProc := &bootstrapProcHandler{
-		logger:          slog.Default().With(slog.String("channel", "bootstrap")),
-		authStorage:     authStorage,
-		configStorage:   configStorage,
-		initialUser:     opts.AuthInitialUser,
-		initialPassword: opts.AuthInitialPassword,
-		resetUser:       opts.AuthResetUser,
-		resetPassword:   opts.AuthResetPassword,
-	}
-
-	return proctree.NewProcessGroup(
-		proctree.DefaultProcessGroupOptions(),
-		proctree.NewProcessGroup(
-			proctree.DefaultProcessGroupOptions(),
-			authStorage,
-			configStorage,
-			logStorage,
-		),
-		proctree.NewProcessGroup(
-			proctree.DefaultProcessGroupOptions(),
-			logNotifier,
-			pipelineRunner,
-		),
-		proctree.NewProcessGroup(
-			proctree.DefaultProcessGroupOptions(),
-			httpServer,
-			mgmtServer,
-			syslogServer,
-		),
-		proctree.NewProcess(bootstrapProc),
+			return h
+		}),
+		fx.Invoke(func(
+			// Storage layer
+			_ auth.Storage,
+			_ config.Storage,
+			_ log.Storage,
+			// Engine layer
+			_ lognotify.LogNotifier,
+			_ pipelines.Runner,
+			// Service layer
+			_ *http.Server,
+			_ *mgmt.Server,
+			_ *syslog.Server,
+			// Bootstrap handler
+			_ *bootstrapHandler,
+		) {
+		}),
 	)
 }

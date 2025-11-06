@@ -1,42 +1,18 @@
 package auth
 
 import (
+	"context"
 	"fmt"
 
 	"strings"
 
-	"github.com/vladopajic/go-actor/actor"
-	"link-society.com/flowg/internal/utils/proctree"
-
 	"github.com/dgraph-io/badger/v4"
+
 	"link-society.com/flowg/internal/utils/kvstore"
 )
 
-type migratorProcH struct {
-	kvStore kvstore.Storage
-}
-
-var _ proctree.ProcessHandler = (*migratorProcH)(nil)
-
-func (p *migratorProcH) Init(ctx actor.Context) proctree.ProcessResult {
-	if err := p.migrateAlertScopes(ctx); err != nil {
-		return proctree.Terminate(err)
-	}
-
-	return proctree.Continue()
-}
-
-func (p *migratorProcH) DoWork(ctx actor.Context) proctree.ProcessResult {
-	<-ctx.Done()
-	return proctree.Terminate(ctx.Err())
-}
-
-func (p *migratorProcH) Terminate(ctx actor.Context, err error) error {
-	return err
-}
-
-func (p *migratorProcH) migrateAlertScopes(ctx actor.Context) error {
-	return p.kvStore.Update(ctx, func(txn *badger.Txn) error {
+func migrateAlertScopes(ctx context.Context, kvStore kvstore.Storage) error {
+	return kvStore.Update(ctx, func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
 		opts.PrefetchValues = false
 		opts.Prefix = []byte("role:")

@@ -8,18 +8,17 @@ import (
 
 	"encoding/json"
 
+	"go.uber.org/fx"
+
 	"github.com/dgraph-io/badger/v4"
 
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage"
 	"link-society.com/flowg/internal/storage/config/transactions"
 	"link-society.com/flowg/internal/utils/kvstore"
-
-	"link-society.com/flowg/internal/utils/proctree"
 )
 
 type Storage interface {
-	proctree.Process
 	storage.Streamable
 
 	ListTransformers(ctx context.Context) ([]string, error)
@@ -45,70 +44,62 @@ const (
 	forwarderItemType   = "forwarder"
 )
 
-type options struct {
-	dir      string
-	inMemory bool
-	readOnly bool
-}
-
-func OptDirectory(dir string) func(*options) {
-	return func(o *options) {
-		o.dir = dir
-	}
-}
-
-func OptInMemory(inMemory bool) func(*options) {
-	return func(o *options) {
-		o.inMemory = inMemory
-	}
-}
-
-func OptReadOnly(readOnly bool) func(*options) {
-	return func(o *options) {
-		o.readOnly = readOnly
-	}
+type Options struct {
+	Directory string
+	InMemory  bool
+	ReadOnly  bool
 }
 
 type storageImpl struct {
-	proctree.Process
-
 	kvStore kvstore.Storage
+}
+
+type deps struct {
+	fx.In
+
+	S kvstore.Storage `name:"storage.config"`
 }
 
 var _ Storage = (*storageImpl)(nil)
 
-func NewStorage(opts ...func(*options)) Storage {
-	options := options{
-		dir:      "./data/config",
-		inMemory: false,
-		readOnly: false,
+func DefaultOptions() Options {
+	return Options{
+		Directory: "",
+		InMemory:  false,
+		ReadOnly:  false,
 	}
+}
 
-	for _, opt := range opts {
-		opt(&options)
-	}
+func NewStorage(opts Options) fx.Option {
+	kvOpts := kvstore.DefaultOptions()
+	kvOpts.LogChannel = "storage.config"
+	kvOpts.Directory = opts.Directory
+	kvOpts.InMemory = opts.InMemory
+	kvOpts.ReadOnly = opts.ReadOnly
 
-	kvStore := kvstore.NewStorage(
-		kvstore.OptLogChannel("configstorage"),
-		kvstore.OptDirectory(options.dir),
-		kvstore.OptInMemory(options.inMemory),
-		kvstore.OptReadOnly(options.readOnly),
-	)
+	return fx.Module(
+		"storage.config",
+		kvstore.NewStorage(kvOpts),
+		fx.Provide(func(lc fx.Lifecycle, d deps) Storage {
+			storage := &storageImpl{kvStore: d.S}
 
-	process := proctree.NewProcessGroup(
-		proctree.DefaultProcessGroupOptions(),
-		kvStore,
-		proctree.NewProcess(&migratorProcH{
-			baseDir: options.dir,
-			storage: &storageImpl{kvStore: kvStore},
+			lc.Append(fx.Hook{
+				OnStart: func(ctx context.Context) error {
+					if err := migrateAlerts(opts.Directory); err != nil {
+						return fmt.Errorf("failed to migrate alerts: %w", err)
+					}
+
+					if err := migrateToBadger(ctx, opts.Directory, storage); err != nil {
+						return fmt.Errorf("failed to migrate to badger: %w", err)
+					}
+
+					return nil
+				},
+			})
+
+			return storage
 		}),
 	)
-
-	return &storageImpl{
-		Process: process,
-
-		kvStore: kvStore,
-	}
 }
 
 func (s *storageImpl) Dump(ctx context.Context, w io.Writer, since uint64) (uint64, error) {

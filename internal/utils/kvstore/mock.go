@@ -27,16 +27,6 @@ func (m *MockStorage) Stop() {
 	m.Called()
 }
 
-func (m *MockStorage) WaitReady(context.Context) error {
-	args := m.Called()
-	return args.Error(0)
-}
-
-func (m *MockStorage) Join(context.Context) error {
-	args := m.Called()
-	return args.Error(0)
-}
-
 func (m *MockStorage) Backup(ctx context.Context, w io.Writer, since uint64) (uint64, error) {
 	args := m.Called(ctx, w, since)
 	return args.Get(0).(uint64), args.Error(1)

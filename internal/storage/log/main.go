@@ -6,6 +6,9 @@ import (
 
 	"time"
 
+	"github.com/vladopajic/go-actor/actor"
+	"go.uber.org/fx"
+
 	"github.com/dgraph-io/badger/v4"
 
 	"link-society.com/flowg/internal/models"
@@ -14,13 +17,9 @@ import (
 	"link-society.com/flowg/internal/utils/kvstore"
 
 	"link-society.com/flowg/internal/utils/ffi/filterdsl"
-
-	"github.com/vladopajic/go-actor/actor"
-	"link-society.com/flowg/internal/utils/proctree"
 )
 
 type Storage interface {
-	proctree.Process
 	storage.Streamable
 
 	ListStreamConfigs(ctx context.Context) (map[string]models.StreamConfig, error)
@@ -42,77 +41,68 @@ type Storage interface {
 	) ([]models.LogRecord, error)
 }
 
-type options struct {
-	dir        string
-	inMemory   bool
-	readOnly   bool
-	gcInterval time.Duration
-}
-
-func OptDirectory(dir string) func(*options) {
-	return func(o *options) {
-		o.dir = dir
-	}
-}
-
-func OptInMemory(inMemory bool) func(*options) {
-	return func(o *options) {
-		o.inMemory = inMemory
-	}
-}
-
-func OptReadOnly(readOnly bool) func(*options) {
-	return func(o *options) {
-		o.readOnly = readOnly
-	}
-}
-
-func OptGCInterval(interval time.Duration) func(*options) {
-	return func(o *options) {
-		o.gcInterval = interval
-	}
+type Options struct {
+	Directory  string
+	InMemory   bool
+	ReadOnly   bool
+	GCInterval time.Duration
 }
 
 type storageImpl struct {
-	proctree.Process
-
 	kvStore kvstore.Storage
+}
+
+type deps struct {
+	fx.In
+
+	S kvstore.Storage `name:"storage.log"`
 }
 
 var _ Storage = (*storageImpl)(nil)
 
-func NewStorage(opts ...func(*options)) Storage {
-	options := options{
-		dir:        "",
-		inMemory:   false,
-		readOnly:   false,
-		gcInterval: 5 * time.Minute,
+func DefaultOptions() Options {
+	return Options{
+		Directory:  "",
+		InMemory:   false,
+		ReadOnly:   false,
+		GCInterval: 5 * time.Minute,
 	}
-	for _, opt := range opts {
-		opt(&options)
-	}
+}
 
-	kvStore := kvstore.NewStorage(
-		kvstore.OptLogChannel("logstorage"),
-		kvstore.OptDirectory(options.dir),
-		kvstore.OptInMemory(options.inMemory),
-		kvstore.OptReadOnly(options.readOnly),
+func NewStorage(opts Options) fx.Option {
+	kvOpts := kvstore.DefaultOptions()
+	kvOpts.LogChannel = "storage.log"
+	kvOpts.Directory = opts.Directory
+	kvOpts.InMemory = opts.InMemory
+	kvOpts.ReadOnly = opts.ReadOnly
+
+	return fx.Module(
+		"storage.log",
+		kvstore.NewStorage(kvOpts),
+		fx.Provide(func(lc fx.Lifecycle, d deps) Storage {
+			storage := &storageImpl{
+				kvStore: d.S,
+			}
+
+			gc := actor.New(&gcWorker{
+				kvStore:    d.S,
+				gcInterval: opts.GCInterval,
+			})
+
+			lc.Append(fx.Hook{
+				OnStart: func(ctx context.Context) error {
+					gc.Start()
+					return nil
+				},
+				OnStop: func(ctx context.Context) error {
+					gc.Stop()
+					return nil
+				},
+			})
+
+			return storage
+		}),
 	)
-	gc := actor.New(&gcWorker{
-		kvStore:    kvStore,
-		gcInterval: options.gcInterval,
-	})
-
-	process := proctree.NewProcessGroup(
-		proctree.DefaultProcessGroupOptions(),
-		kvStore,
-		proctree.NewActorProcess(gc),
-	)
-
-	return &storageImpl{
-		Process: process,
-		kvStore: kvStore,
-	}
 }
 
 func (s *storageImpl) Dump(ctx context.Context, w io.Writer, since uint64) (uint64, error) {

@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	apiService := api.NewHandler(&api.Dependencies{}).(*web.Service)
+	apiService := api.NewHandler(api.Dependencies{}).(*web.Service)
 	reflector := apiService.OpenAPIReflector().(*openapi31.Reflector)
 	schema, err := reflector.Spec.MarshalJSON()
 	if err != nil {

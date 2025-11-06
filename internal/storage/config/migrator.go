@@ -1,47 +1,17 @@
 package config
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"encoding/base64"
-
-	"github.com/vladopajic/go-actor/actor"
-	"link-society.com/flowg/internal/utils/proctree"
 )
 
-type migratorProcH struct {
-	baseDir string
-	storage *storageImpl
-}
-
-var _ proctree.ProcessHandler = (*migratorProcH)(nil)
-
-func (p *migratorProcH) Init(ctx actor.Context) proctree.ProcessResult {
-	if err := p.migrateAlerts(ctx); err != nil {
-		return proctree.Terminate(err)
-	}
-
-	if err := p.migrateToBadger(ctx); err != nil {
-		return proctree.Terminate(err)
-	}
-
-	return proctree.Continue()
-}
-
-func (p *migratorProcH) DoWork(ctx actor.Context) proctree.ProcessResult {
-	<-ctx.Done()
-	return proctree.Terminate(ctx.Err())
-}
-
-func (p *migratorProcH) Terminate(ctx actor.Context, err error) error {
-	return err
-}
-
-func (p *migratorProcH) migrateAlerts(ctx actor.Context) error {
-	alertsDir := filepath.Join(p.baseDir, "alerts")
-	forwardersDir := filepath.Join(p.baseDir, "forwarders")
+func migrateAlerts(baseDir string) error {
+	alertsDir := filepath.Join(baseDir, "alerts")
+	forwardersDir := filepath.Join(baseDir, "forwarders")
 
 	if _, err := os.Stat(alertsDir); os.IsNotExist(err) {
 		return nil
@@ -73,7 +43,7 @@ func (p *migratorProcH) migrateAlerts(ctx actor.Context) error {
 	return nil
 }
 
-func (p *migratorProcH) migrateToBadger(ctx actor.Context) error {
+func migrateToBadger(ctx context.Context, baseDir string, storage *storageImpl) error {
 	fileStorages := []struct {
 		dir       string
 		extension string
@@ -83,14 +53,14 @@ func (p *migratorProcH) migrateToBadger(ctx actor.Context) error {
 			dir:       "transformers",
 			extension: ".vrl",
 			converter: func(name string, content []byte) error {
-				return p.storage.writeItem(ctx, transformerItemType, name, content)
+				return storage.writeItem(ctx, transformerItemType, name, content)
 			},
 		},
 		{
 			dir:       "pipelines",
 			extension: ".json",
 			converter: func(name string, content []byte) error {
-				return p.storage.writeItem(ctx, pipelineItemType, name, content)
+				return storage.writeItem(ctx, pipelineItemType, name, content)
 			},
 		},
 		{
@@ -103,13 +73,13 @@ func (p *migratorProcH) migrateToBadger(ctx actor.Context) error {
 					return err
 				}
 
-				return p.storage.writeItem(ctx, forwarderItemType, name, content[:n])
+				return storage.writeItem(ctx, forwarderItemType, name, content[:n])
 			},
 		},
 	}
 
 	for _, storage := range fileStorages {
-		dir := filepath.Join(p.baseDir, storage.dir)
+		dir := filepath.Join(baseDir, storage.dir)
 		if _, err := os.Stat(dir); os.IsNotExist(err) {
 			continue
 		}
