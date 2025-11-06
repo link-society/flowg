@@ -14,11 +14,12 @@ type RequestOptions<B> = {
   path: string
   searchParams?: URLSearchParams
   body?: B
+  contentType?: string
 }
 
 const request = async <B, R extends { success: boolean }>(
   method: ApiMethod,
-  { path, searchParams, body }: RequestOptions<B>
+  { path, searchParams, body, contentType }: RequestOptions<B>
 ): Promise<ApiRequestResult<R>> => {
   let authHeader = ''
 
@@ -30,10 +31,10 @@ const request = async <B, R extends { success: boolean }>(
   const response = await fetch(`${path}?${searchParams?.toString() ?? ''}`, {
     method,
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': contentType ?? 'application/json',
       Authorization: authHeader,
     },
-    body: JSON.stringify(body),
+    body: contentType === 'json' ? JSON.stringify(body) : (body as BodyInit),
   })
 
   let responseBody: unknown
