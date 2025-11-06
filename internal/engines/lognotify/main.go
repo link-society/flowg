@@ -4,21 +4,18 @@ import (
 	"context"
 
 	"github.com/vladopajic/go-actor/actor"
-
-	"link-society.com/flowg/internal/utils/proctree"
+	"go.uber.org/fx"
 
 	"link-society.com/flowg/internal/models"
 )
 
 type LogNotifier interface {
-	proctree.Process
-
 	Subscribe(ctx context.Context, stream string) (actor.MailboxReceiver[LogMessage], error)
 	Notify(ctx context.Context, stream string, logKey string, logRecord models.LogRecord) error
 }
 
 type logNotifierImpl struct {
-	proctree.Process
+	actor.Actor
 
 	subMbox actor.MailboxSender[SubscribeMessage]
 	logMbox actor.MailboxSender[LogMessage]
@@ -26,28 +23,71 @@ type logNotifierImpl struct {
 
 var _ LogNotifier = (*logNotifierImpl)(nil)
 
-func NewLogNotifier() LogNotifier {
-	subMbox := actor.NewMailbox[SubscribeMessage]()
-	logMbox := actor.NewMailbox[LogMessage]()
-	handler := &procHandler{
-		subscribers: make(map[string]subscriberSet),
-		subMbox:     subMbox,
-		logMbox:     logMbox,
-	}
+func NewLogNotifier() fx.Option {
+	return fx.Module(
+		"lognotifier",
+		fx.Provide(func(lc fx.Lifecycle) actor.Mailbox[SubscribeMessage] {
+			mbox := actor.NewMailbox[SubscribeMessage]()
 
-	process := proctree.NewProcessGroup(
-		proctree.DefaultProcessGroupOptions(),
-		proctree.NewActorProcess(subMbox),
-		proctree.NewActorProcess(logMbox),
-		proctree.NewProcess(handler),
+			lc.Append(fx.Hook{
+				OnStart: func(ctx context.Context) error {
+					mbox.Start()
+					return nil
+				},
+				OnStop: func(ctx context.Context) error {
+					mbox.Stop()
+					return nil
+				},
+			})
+
+			return mbox
+		}),
+		fx.Provide(func(lc fx.Lifecycle) actor.Mailbox[LogMessage] {
+			mbox := actor.NewMailbox[LogMessage]()
+
+			lc.Append(fx.Hook{
+				OnStart: func(ctx context.Context) error {
+					mbox.Start()
+					return nil
+				},
+				OnStop: func(ctx context.Context) error {
+					mbox.Stop()
+					return nil
+				},
+			})
+
+			return mbox
+		}),
+		fx.Provide(func(
+			lc fx.Lifecycle,
+			subMbox actor.Mailbox[SubscribeMessage],
+			logMbox actor.Mailbox[LogMessage],
+		) LogNotifier {
+			logNotifier := &logNotifierImpl{
+				Actor: actor.New(&worker{
+					subscribers: make(map[string]subscriberSet),
+					subMbox:     subMbox,
+					logMbox:     logMbox,
+				}),
+
+				subMbox: subMbox,
+				logMbox: logMbox,
+			}
+
+			lc.Append(fx.Hook{
+				OnStart: func(ctx context.Context) error {
+					logNotifier.Start()
+					return nil
+				},
+				OnStop: func(ctx context.Context) error {
+					logNotifier.Stop()
+					return nil
+				},
+			})
+
+			return logNotifier
+		}),
 	)
-
-	return &logNotifierImpl{
-		Process: process,
-
-		subMbox: subMbox,
-		logMbox: logMbox,
-	}
 }
 
 func (n *logNotifierImpl) Subscribe(ctx context.Context, stream string) (actor.MailboxReceiver[LogMessage], error) {

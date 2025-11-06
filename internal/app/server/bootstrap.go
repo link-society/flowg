@@ -1,11 +1,9 @@
 package server
 
 import (
+	"context"
+	"fmt"
 	"log/slog"
-
-	"github.com/vladopajic/go-actor/actor"
-
-	"link-society.com/flowg/internal/utils/proctree"
 
 	"link-society.com/flowg/internal/storage/auth"
 	"link-society.com/flowg/internal/storage/config"
@@ -13,7 +11,7 @@ import (
 	"link-society.com/flowg/internal/app/bootstrap"
 )
 
-type bootstrapProcHandler struct {
+type bootstrapHandler struct {
 	logger *slog.Logger
 
 	authStorage   auth.Storage
@@ -26,30 +24,18 @@ type bootstrapProcHandler struct {
 	resetPassword string
 }
 
-var _ proctree.ProcessHandler = (*bootstrapProcHandler)(nil)
-
-func (h *bootstrapProcHandler) Init(ctx actor.Context) proctree.ProcessResult {
+func (h *bootstrapHandler) Run(ctx context.Context) error {
 	err := bootstrap.DefaultRolesAndUsers(ctx, h.authStorage, bootstrap.BootstrapOptions{
 		InitialUser:     h.initialUser,
 		InitialPassword: h.initialPassword,
 	})
 	if err != nil {
-		h.logger.ErrorContext(
-			ctx,
-			"Failed to bootstrap default roles and users",
-			slog.String("error", err.Error()),
-		)
-		return proctree.Terminate(err)
+		return fmt.Errorf("failed to bootstrap default roles and users: %w", err)
 	}
 
 	err = bootstrap.DefaultPipeline(ctx, h.configStorage)
 	if err != nil {
-		h.logger.ErrorContext(
-			ctx,
-			"Failed to bootstrap default pipeline",
-			slog.String("error", err.Error()),
-		)
-		return proctree.Terminate(err)
+		return fmt.Errorf("failed to bootstrap default pipeline: %w", err)
 	}
 
 	err = bootstrap.ResetUser(ctx, h.authStorage, bootstrap.ResetUserOptions{
@@ -57,14 +43,5 @@ func (h *bootstrapProcHandler) Init(ctx actor.Context) proctree.ProcessResult {
 		Password: h.resetPassword,
 	})
 
-	return proctree.Continue()
-}
-
-func (h *bootstrapProcHandler) DoWork(ctx actor.Context) proctree.ProcessResult {
-	<-ctx.Done()
-	return proctree.Terminate(ctx.Err())
-}
-
-func (h *bootstrapProcHandler) Terminate(ctx actor.Context, err error) error {
-	return err
+	return nil
 }

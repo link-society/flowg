@@ -4,8 +4,7 @@ import (
 	"context"
 
 	"github.com/vladopajic/go-actor/actor"
-
-	"link-society.com/flowg/internal/utils/proctree"
+	"go.uber.org/fx"
 
 	"link-society.com/flowg/internal/models"
 
@@ -16,43 +15,64 @@ import (
 )
 
 type Runner interface {
-	proctree.Process
-
 	Run(ctx context.Context, pipelineName string, entrypoint string, record *models.LogRecord) error
 }
 
 type runnerImpl struct {
-	proctree.Process
-
 	mbox actor.MailboxSender[message]
+}
+
+type deps struct {
+	fx.In
+
+	ConfigStorage config.Storage
+	LogStorage    log.Storage
+	LogNotifier   lognotify.LogNotifier
 }
 
 var _ Runner = (*runnerImpl)(nil)
 
-func NewRunner(
-	configStorage config.Storage,
-	logStorage log.Storage,
-	logNotifier lognotify.LogNotifier,
-) Runner {
-	mbox := actor.NewMailbox[message]()
-	handler := &procHandler{
-		mbox: mbox,
+func NewRunner() fx.Option {
+	return fx.Module(
+		"pipelineRunner",
+		fx.Provide(func(lc fx.Lifecycle) actor.Mailbox[message] {
+			mbox := actor.NewMailbox[message]()
 
-		configStorage: configStorage,
-		logStorage:    logStorage,
-		logNotifier:   logNotifier,
-	}
+			lc.Append(fx.Hook{
+				OnStart: func(ctx context.Context) error {
+					mbox.Start()
+					return nil
+				},
+				OnStop: func(ctx context.Context) error {
+					mbox.Stop()
+					return nil
+				},
+			})
 
-	process := proctree.NewProcessGroup(
-		proctree.DefaultProcessGroupOptions(),
-		proctree.NewActorProcess(mbox),
-		proctree.NewProcess(handler),
+			return mbox
+		}),
+		fx.Provide(func(lc fx.Lifecycle, d deps, mbox actor.Mailbox[message]) Runner {
+			a := actor.New(&worker{
+				mbox:          mbox,
+				configStorage: d.ConfigStorage,
+				logStorage:    d.LogStorage,
+				logNotifier:   d.LogNotifier,
+			})
+
+			lc.Append(fx.Hook{
+				OnStart: func(ctx context.Context) error {
+					a.Start()
+					return nil
+				},
+				OnStop: func(ctx context.Context) error {
+					a.Stop()
+					return nil
+				},
+			})
+
+			return &runnerImpl{mbox: mbox}
+		}),
 	)
-
-	return &runnerImpl{
-		Process: process,
-		mbox:    mbox,
-	}
 }
 
 func (r *runnerImpl) Run(

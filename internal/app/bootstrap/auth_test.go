@@ -4,6 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"go.uber.org/fx"
+	"go.uber.org/fx/fxtest"
+
 	"link-society.com/flowg/internal/models"
 
 	"link-society.com/flowg/internal/storage/auth"
@@ -17,16 +20,16 @@ func TestDefaultRolesAndUsers(t *testing.T) {
 
 	ctx := context.Background()
 
-	authStorage := auth.NewStorage(auth.OptInMemory(true))
-	authStorage.Start()
-	defer authStorage.Stop()
+	authOpts := auth.DefaultOptions()
+	authOpts.InMemory = true
 
-	err := authStorage.WaitReady(ctx)
-	if err != nil {
-		t.Fatalf("unexpected error at startup: %v", err)
-	}
+	var authStorage auth.Storage
 
-	err = bootstrap.DefaultRolesAndUsers(ctx, authStorage, bootstrap.BootstrapOptions{
+	app := fxtest.New(t, auth.NewStorage(authOpts), fx.Populate(&authStorage))
+	app.RequireStart()
+	defer app.RequireStop()
+
+	err := bootstrap.DefaultRolesAndUsers(ctx, authStorage, bootstrap.BootstrapOptions{
 		InitialUser:     "root",
 		InitialPassword: "root",
 	})

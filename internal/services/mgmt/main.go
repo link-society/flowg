@@ -1,22 +1,17 @@
 package mgmt
 
 import (
-	"fmt"
+	"context"
 	"log/slog"
 
 	"crypto/tls"
-	"net"
-	"net/url"
+	"net/http"
 
-	"github.com/hashicorp/go-sockaddr"
+	"go.uber.org/fx"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"link-society.com/flowg/internal/cluster"
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
-	"link-society.com/flowg/internal/storage/log"
-
-	"link-society.com/flowg/internal/utils/kvstore"
-	"link-society.com/flowg/internal/utils/proctree"
 )
 
 type ServerOptions struct {
@@ -27,13 +22,13 @@ type ServerOptions struct {
 	ClusterCookie            string
 	ClusterStateDir          string
 	ClusterFormationStrategy cluster.ClusterFormationStrategy
-
-	AuthStorage   auth.Storage
-	ConfigStorage config.Storage
-	LogStorage    log.Storage
 }
 
-func NewServer(opts *ServerOptions) proctree.Process {
+type Server struct {
+	httpServer *http.Server
+}
+
+func NewServer(opts ServerOptions) fx.Option {
 	logger := slog.Default().With(
 		slog.String("channel", "mgmt"),
 		slog.Group("mgmt",
@@ -41,70 +36,70 @@ func NewServer(opts *ServerOptions) proctree.Process {
 		),
 	)
 
-	clusterStateStorage := kvstore.NewStorage(kvstore.OptDirectory(opts.ClusterStateDir))
+	return fx.Module(
+		"services.mgmt",
+		fx.Provide(func() (*cluster.Listener, error) {
+			return cluster.NewListener(
+				slog.Default().With(slog.String("channel", "cluster.listener")),
+				opts.BindAddress,
+				opts.TlsConfig,
+			)
+		}),
+		cluster.NewManager(cluster.ManagerOptions{
+			NodeID: opts.ClusterNodeID,
+			Cookie: opts.ClusterCookie,
 
-	listenerH := &listenerHandler{
-		logger:      logger,
-		bindAddress: opts.BindAddress,
-	}
+			ClusterFormationStrategy: opts.ClusterFormationStrategy,
+			ClusterStateDir:          opts.ClusterStateDir,
+		}),
+		fx.Provide(func(
+			lc fx.Lifecycle,
+			listener *cluster.Listener,
+			manager cluster.Manager,
+		) *Server {
+			srv := &Server{}
 
-	clusterManager := cluster.NewManager(&cluster.ManagerOptions{
-		NodeID: opts.ClusterNodeID,
-		Cookie: opts.ClusterCookie,
+			lc.Append(fx.Hook{
+				OnStart: func(ctx context.Context) error {
+					logger.InfoContext(ctx, "Start Management HTTP server")
 
-		ClusterFormationStrategy: opts.ClusterFormationStrategy,
+					metricsHandler := promhttp.Handler()
+					clusterHandler := manager.HttpHandler()
 
-		LocalEndpointResolver: func() (*url.URL, error) {
-			host, port, err := net.SplitHostPort(listenerH.listener.Addr().String())
-			if err != nil {
-				return nil, fmt.Errorf("failed to parse listener address: %w", err)
-			}
+					rootHandler := http.NewServeMux()
+					registerProfiler(rootHandler)
 
-			if host == "0.0.0.0" || host == "::" {
-				ip, err := sockaddr.GetPrivateIP()
-				if err != nil {
-					return nil, fmt.Errorf("failed to get private IP: %w", err)
-				}
-				if ip == "" {
-					return nil, fmt.Errorf("no private IP found")
-				}
+					rootHandler.HandleFunc(
+						"/health",
+						func(w http.ResponseWriter, r *http.Request) {
+							w.WriteHeader(http.StatusOK)
+							w.Write([]byte("OK\r\n"))
+						},
+					)
+					rootHandler.Handle("/metrics", metricsHandler)
+					rootHandler.Handle("/cluster/", clusterHandler)
 
-				host = ip
-			}
+					srv.httpServer = &http.Server{
+						Addr:      opts.BindAddress,
+						Handler:   rootHandler,
+						TLSConfig: opts.TlsConfig,
+					}
 
-			localEndpoint := &url.URL{
-				Scheme: "http",
-				Host:   net.JoinHostPort(host, port),
-			}
+					if opts.TlsConfig != nil {
+						go srv.httpServer.ServeTLS(listener.Socket(), "", "")
+					} else {
+						go srv.httpServer.Serve(listener.Socket())
+					}
 
-			if opts.TlsConfig != nil {
-				localEndpoint.Scheme = "https"
-			}
+					return nil
+				},
+				OnStop: func(ctx context.Context) error {
+					logger.InfoContext(ctx, "Stopping Management HTTP server")
+					return srv.httpServer.Shutdown(ctx)
+				},
+			})
 
-			return localEndpoint, nil
-		},
-
-		AuthStorage:         opts.AuthStorage,
-		ConfigStorage:       opts.ConfigStorage,
-		LogStorage:          opts.LogStorage,
-		ClusterStateStorage: clusterStateStorage,
-	})
-
-	serverH := &serverHandler{
-		logger: logger,
-
-		bindAddress: opts.BindAddress,
-		tlsConfig:   opts.TlsConfig,
-
-		listenerH:      listenerH,
-		clusterManager: clusterManager,
-	}
-
-	return proctree.NewProcessGroup(
-		proctree.DefaultProcessGroupOptions(),
-		clusterStateStorage,
-		proctree.NewProcess(listenerH),
-		clusterManager,
-		proctree.NewProcess(serverH),
+			return srv
+		}),
 	)
 }

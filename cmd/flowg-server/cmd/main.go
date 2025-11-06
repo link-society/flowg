@@ -1,16 +1,12 @@
 package cmd
 
 import (
-	"context"
-	"time"
-
 	"fmt"
 
-	"os"
-	"os/signal"
 	"syscall"
 
 	"github.com/spf13/cobra"
+	"go.uber.org/fx"
 
 	"link-society.com/flowg/internal/app/logging"
 	"link-society.com/flowg/internal/app/metrics"
@@ -31,55 +27,14 @@ func NewRootCommand() *cobra.Command {
 			metrics.Setup()
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			err := func() error {
-				config, err := newServerConfig(opts)
-				if err != nil {
-					return fmt.Errorf("failed to create server configuration: %w", err)
-				}
-
-				srv := server.NewServer(config)
-
-				srv.Start()
-				if err := srv.WaitReady(context.Background()); err != nil {
-					return fmt.Errorf("failed to start server: %w", err)
-				}
-
-				monitorCtx, monitorCancel := context.WithCancel(context.Background())
-				doneC := make(chan error, 1)
-				go func() {
-					err := srv.Join(monitorCtx)
-					doneC <- err
-				}()
-
-				sigC := make(chan os.Signal, 1)
-				signal.Notify(sigC, syscall.SIGINT, syscall.SIGTERM)
-
-				select {
-				case <-sigC:
-					monitorCancel()
-					srv.Stop()
-
-					ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-					defer cancel()
-					err := srv.Join(ctx)
-					if err != nil {
-						return fmt.Errorf("failed to stop server: %w", err)
-					}
-
-				case err := <-doneC:
-					monitorCancel()
-					if err != nil {
-						return fmt.Errorf("server stopped unexpectedly: %w", err)
-					}
-				}
-
-				return nil
-			}()
-
+			opts, err := newServerConfig(opts)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "ERROR: %v\n", err)
+				fmt.Printf("ERROR: %v\n", err)
 				ExitCode = 1
+				return
 			}
+
+			fx.New(fx.NopLogger, server.NewServer(opts)).Run()
 		},
 	}
 

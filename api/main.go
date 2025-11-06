@@ -12,6 +12,7 @@ import (
 	"github.com/swaggest/rest/web"
 	"github.com/swaggest/swgui/v5emb"
 	"github.com/swaggest/usecase"
+	"go.uber.org/fx"
 
 	"link-society.com/flowg/api/middlewares"
 	"link-society.com/flowg/internal/app"
@@ -27,6 +28,8 @@ import (
 )
 
 type Dependencies struct {
+	fx.In
+
 	AuthStorage   auth.Storage
 	LogStorage    log.Storage
 	ConfigStorage config.Storage
@@ -37,10 +40,10 @@ type Dependencies struct {
 
 type controller struct {
 	logger *slog.Logger
-	deps   *Dependencies
+	deps   Dependencies
 }
 
-func NewHandler(deps *Dependencies) http.Handler {
+func NewHandler(deps Dependencies) http.Handler {
 	ctrl := &controller{
 		logger: slog.Default().With(slog.String("channel", "api")),
 		deps:   deps,
