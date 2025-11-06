@@ -28,13 +28,15 @@ const request = async <B, R extends { success: boolean }>(
     authHeader = `Bearer ${token}`
   }
 
+  const ct = contentType ?? 'application/json'
+
   const response = await fetch(`${path}?${searchParams?.toString() ?? ''}`, {
     method,
     headers: {
-      'Content-Type': contentType ?? 'application/json',
+      'Content-Type': ct,
       Authorization: authHeader,
     },
-    body: contentType === 'json' ? JSON.stringify(body) : (body as BodyInit),
+    body: ct === 'application/json' ? JSON.stringify(body) : (body as BodyInit),
   })
 
   let responseBody: unknown
