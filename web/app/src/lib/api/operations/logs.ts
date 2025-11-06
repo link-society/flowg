@@ -43,3 +43,14 @@ export const watchLogs = (stream: string, filter: string) => {
     searchParams: new URLSearchParams({ filter }),
   })
 }
+
+export const uploadTextLogs = async (
+  pipeline: string,
+  content: BodyInit
+): Promise<void> => {
+  await request.POST({
+    path: `/api/v1/pipelines/${pipeline}/logs/text`,
+    body: content,
+    contentType: 'text/plain',
+  })
+}

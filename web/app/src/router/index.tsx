@@ -160,6 +160,16 @@ export default createBrowserRouter([
             },
           },
           {
+            path: 'upload',
+            lazy: async () => {
+              const { UploadView: Component } = await import(
+                '@/views/app/upload'
+              )
+              const { loader } = await import('@/views/app/upload/loader')
+              return { Component, loader }
+            },
+          },
+          {
             path: '',
             lazy: async () => {
               const { HomeView: Component } = await import('@/views/app/home')

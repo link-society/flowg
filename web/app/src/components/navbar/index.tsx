@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography'
 import ApiIcon from '@mui/icons-material/Api'
 import GitHubIcon from '@mui/icons-material/GitHub'
 import StorageIcon from '@mui/icons-material/Storage'
+import UploadFileIcon from '@mui/icons-material/UploadFile'
 
 import { useProfile } from '@/lib/context/profile'
 
@@ -54,6 +55,17 @@ export const NavBar = () => {
               sx={{ textTransform: 'none' }}
             >
               Streams
+            </Button>
+          )}
+          {permissions.can_send_logs && (
+            <Button
+              id="link:navbar.upload"
+              href="/web/upload"
+              color="inherit"
+              startIcon={<UploadFileIcon />}
+              sx={{ textTransform: 'none' }}
+            >
+              Upload
             </Button>
           )}
         </section>
