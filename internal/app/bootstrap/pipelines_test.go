@@ -20,7 +20,12 @@ func TestDefaultPipeline(t *testing.T) {
 	configOpts := config.DefaultOptions()
 	configOpts.InMemory = true
 
-	app := fxtest.New(t, config.NewStorage(configOpts), fx.Populate(&configStorage))
+	app := fxtest.New(
+		t,
+		config.NewStorage(configOpts),
+		fx.Populate(&configStorage),
+		fx.NopLogger,
+	)
 	app.RequireStart()
 	defer app.RequireStop()
 
