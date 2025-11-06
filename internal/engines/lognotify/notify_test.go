@@ -14,7 +14,12 @@ import (
 func TestLogNotifier(t *testing.T) {
 	var notifier lognotify.LogNotifier
 
-	app := fxtest.New(t, fx.Populate(&notifier), fx.NopLogger)
+	app := fxtest.New(
+		t,
+		lognotify.NewLogNotifier(),
+		fx.Populate(&notifier),
+		fx.NopLogger,
+	)
 	app.RequireStart()
 	defer app.RequireStop()
 
