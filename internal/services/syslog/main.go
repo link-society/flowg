@@ -120,5 +120,6 @@ func NewServer(opts ServerOptions) fx.Option {
 
 			return srv
 		}),
+		fx.Invoke(func(*gosyslog.Server) {}),
 	)
 }
