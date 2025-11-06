@@ -195,7 +195,6 @@ func NewManager(opts ManagerOptions) fx.Option {
 			delegate *delegate,
 			transport *httpTransport,
 		) (*memberlist.Memberlist, error) {
-
 			mlistConfig := memberlist.DefaultLocalConfig()
 			mlistConfig.Name = opts.NodeID
 			mlistConfig.RequireNodeNames = true
@@ -270,6 +269,11 @@ func NewManager(opts ManagerOptions) fx.Option {
 			})
 
 			return &managerImpl{handler: transport}
+		}),
+		fx.Invoke(func(_ struct {
+			fx.In
+			C actor.Actor `name:"cluster.manager.formation"`
+		}) {
 		}),
 	)
 }
