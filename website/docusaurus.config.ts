@@ -18,7 +18,6 @@ const config: Config = {
   projectName: 'flowg',
 
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
 
   i18n: {
     defaultLocale: 'en',
@@ -55,6 +54,10 @@ const config: Config = {
 
   markdown: {
     mermaid: true,
+    hooks: {
+      onBrokenMarkdownImages: 'warn',
+      onBrokenMarkdownLinks: 'warn',
+    },
   },
 
   plugins: [
