@@ -1,16 +1,83 @@
 package pipelines
 
-import "link-society.com/flowg/internal/models"
+import (
+	"context"
+	"errors"
+
+	"link-society.com/flowg/internal/models"
+)
 
 const (
 	DIRECT_ENTRYPOINT = "direct"
 	SYSLOG_ENTRYPOINT = "syslog"
 )
 
-type message struct {
+type message interface {
+	handle(ctx context.Context, w *worker)
+}
+
+type logMessage struct {
 	replyTo chan<- error
 
 	pipelineName string
 	entrypoint   string
 	record       *models.LogRecord
+}
+
+type invalidateCacheMessage struct {
+	replyTo      chan<- error
+	pipelineName string
+}
+
+type invalidateAllCacheMessage struct {
+	replyTo chan<- error
+}
+
+func (msg logMessage) handle(ctx context.Context, w *worker) {
+	go func() {
+		defer close(msg.replyTo)
+
+		pipeline, err := w.getOrBuildPipeline(ctx, msg.pipelineName)
+		if err != nil {
+			msg.replyTo <- err
+			return
+		}
+
+		ctx := context.WithValue(ctx, workerKey, w)
+		err = pipeline.Process(ctx, msg.entrypoint, msg.record)
+		msg.replyTo <- err
+	}()
+}
+
+func (msg invalidateCacheMessage) handle(ctx context.Context, w *worker) {
+	w.cacheMu.Lock()
+	defer w.cacheMu.Unlock()
+
+	pipeline, ok := w.cache[msg.pipelineName]
+	if ok {
+		msg.replyTo <- pipeline.Close(ctx)
+		delete(w.cache, msg.pipelineName)
+	} else {
+		msg.replyTo <- nil
+	}
+}
+
+func (msg invalidateAllCacheMessage) handle(ctx context.Context, w *worker) {
+	w.cacheMu.Lock()
+	defer w.cacheMu.Unlock()
+
+	var errs []error
+
+	for name, pipeline := range w.cache {
+		if err := pipeline.Close(ctx); err != nil {
+			errs = append(errs, err)
+		}
+		delete(w.cache, name)
+	}
+
+	if len(errs) > 0 {
+		msg.replyTo <- errors.Join(errs...)
+	} else {
+		msg.replyTo <- nil
+	}
 }

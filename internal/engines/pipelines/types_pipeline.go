@@ -2,6 +2,7 @@ package pipelines
 
 import (
 	"context"
+	"errors"
 
 	"link-society.com/flowg/internal/app/metrics"
 
@@ -13,6 +14,7 @@ import (
 type Pipeline struct {
 	Name        string
 	Entrypoints map[string]Node
+	nodes       map[string]Node
 }
 
 func Build(ctx context.Context, configStorage config.Storage, name string) (*Pipeline, error) {
@@ -80,12 +82,17 @@ func Build(ctx context.Context, configStorage config.Storage, name string) (*Pip
 			pipelineNodes[flowNode.ID] = pipelineNode
 
 		case "forwarder":
-			forwarder, exists := flowNode.Data["forwarder"]
+			forwarderName, exists := flowNode.Data["forwarder"]
 			if !exists {
 				return nil, &MissingFlowNodeDataError{
 					NodeID: flowNode.ID,
 					Key:    "forwarder",
 				}
+			}
+
+			forwarder, err := configStorage.ReadForwarder(ctx, forwarderName)
+			if err != nil {
+				return nil, err
 			}
 
 			pipelineNode := &ForwardNode{
@@ -152,7 +159,40 @@ func Build(ctx context.Context, configStorage config.Storage, name string) (*Pip
 	return &Pipeline{
 		Name:        name,
 		Entrypoints: entrypointNodes,
+		nodes:       pipelineNodes,
 	}, nil
+}
+
+func (p *Pipeline) Init(ctx context.Context) error {
+	var errs []error
+
+	for _, node := range p.nodes {
+		if err := node.Init(ctx); err != nil {
+			errs = append(errs, err)
+		}
+	}
+
+	if len(errs) > 0 {
+		return errors.Join(errs...)
+	}
+
+	return nil
+}
+
+func (p *Pipeline) Close(ctx context.Context) error {
+	var errs []error
+
+	for _, node := range p.nodes {
+		if err := node.Close(ctx); err != nil {
+			errs = append(errs, err)
+		}
+	}
+
+	if len(errs) > 0 {
+		return errors.Join(errs...)
+	}
+
+	return nil
 }
 
 func (p *Pipeline) Process(

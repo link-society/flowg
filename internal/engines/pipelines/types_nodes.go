@@ -14,6 +14,8 @@ import (
 )
 
 type Node interface {
+	Init(ctx context.Context) error
+	Close(ctx context.Context) error
 	Process(ctx context.Context, record *models.LogRecord) error
 }
 
@@ -36,7 +38,7 @@ type PipelineNode struct {
 }
 
 type ForwardNode struct {
-	Forwarder string
+	Forwarder *models.ForwarderV2
 }
 
 type RouterNode struct {
@@ -49,6 +51,15 @@ var _ Node = (*SwitchNode)(nil)
 var _ Node = (*PipelineNode)(nil)
 var _ Node = (*ForwardNode)(nil)
 var _ Node = (*RouterNode)(nil)
+
+// MARK: source
+func (n *SourceNode) Init(context.Context) error {
+	return nil
+}
+
+func (n *SourceNode) Close(context.Context) error {
+	return nil
+}
 
 func (n *SourceNode) Process(ctx context.Context, record *models.LogRecord) error {
 	errC := make(chan error, len(n.Next))
@@ -80,9 +91,18 @@ func (n *SourceNode) Process(ctx context.Context, record *models.LogRecord) erro
 	return nil
 }
 
+// MARK: transform
+func (n *TransformNode) Init(ctx context.Context) error {
+	return nil
+}
+
+func (n *TransformNode) Close(ctx context.Context) error {
+	return nil
+}
+
 func (n *TransformNode) Process(ctx context.Context, record *models.LogRecord) error {
-	configStorage := getConfigStorage(ctx)
-	vrlScript, err := configStorage.ReadTransformer(ctx, n.TransformerName)
+	w := getWorker(ctx)
+	vrlScript, err := w.configStorage.ReadTransformer(ctx, n.TransformerName)
 	if err != nil {
 		return err
 	}
@@ -126,6 +146,15 @@ func (n *TransformNode) Process(ctx context.Context, record *models.LogRecord) e
 	return nil
 }
 
+// MARK: switch
+func (n *SwitchNode) Init(ctx context.Context) error {
+	return nil
+}
+
+func (n *SwitchNode) Close(ctx context.Context) error {
+	return nil
+}
+
 func (n *SwitchNode) Process(ctx context.Context, record *models.LogRecord) error {
 	if n.Condition.Evaluate(record) {
 		errC := make(chan error, len(n.Next))
@@ -158,9 +187,18 @@ func (n *SwitchNode) Process(ctx context.Context, record *models.LogRecord) erro
 	return nil
 }
 
+// MARK: pipeline
+func (n *PipelineNode) Init(ctx context.Context) error {
+	return nil
+}
+
+func (n *PipelineNode) Close(ctx context.Context) error {
+	return nil
+}
+
 func (n *PipelineNode) Process(ctx context.Context, record *models.LogRecord) error {
-	configStorage := getConfigStorage(ctx)
-	pipeline, err := Build(ctx, configStorage, n.Pipeline)
+	w := getWorker(ctx)
+	pipeline, err := w.getOrBuildPipeline(ctx, n.Pipeline)
 	if err != nil {
 		return err
 	}
@@ -168,23 +206,34 @@ func (n *PipelineNode) Process(ctx context.Context, record *models.LogRecord) er
 	return pipeline.Process(ctx, DIRECT_ENTRYPOINT, record)
 }
 
-func (n *ForwardNode) Process(ctx context.Context, record *models.LogRecord) error {
-	configStorage := getConfigStorage(ctx)
-	forwarder, err := configStorage.ReadForwarder(ctx, n.Forwarder)
-	if err != nil {
-		return err
-	}
+// MARK: forward
+func (n *ForwardNode) Init(ctx context.Context) error {
+	return n.Forwarder.Init(ctx)
+}
 
-	return forwarder.Call(ctx, record)
+func (n *ForwardNode) Close(ctx context.Context) error {
+	return n.Forwarder.Close(ctx)
+}
+
+func (n *ForwardNode) Process(ctx context.Context, record *models.LogRecord) error {
+	return n.Forwarder.Call(ctx, record)
+}
+
+// MARK: router
+func (n *RouterNode) Init(ctx context.Context) error {
+	return nil
+}
+
+func (n *RouterNode) Close(ctx context.Context) error {
+	return nil
 }
 
 func (n *RouterNode) Process(ctx context.Context, record *models.LogRecord) error {
-	logStorage := getLogStorage(ctx)
-	logNotifier := getLogNotifier(ctx)
+	w := getWorker(ctx)
 
-	key, err := logStorage.Ingest(ctx, n.Stream, record)
+	key, err := w.logStorage.Ingest(ctx, n.Stream, record)
 	if err == nil {
-		err = logNotifier.Notify(ctx, n.Stream, string(key), *record)
+		err = w.logNotifier.Notify(ctx, n.Stream, string(key), *record)
 	}
 	if err == nil {
 		metrics.IncStreamLogCounter(n.Stream)

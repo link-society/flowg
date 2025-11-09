@@ -34,7 +34,48 @@ func (ForwarderConfigV2) JSONSchemaOneOf() []any {
 	}
 }
 
-// Call sends the log record to the configured forwarder
+func (f *ForwarderV2) Init(ctx context.Context) error {
+	switch {
+	case f.Config.Http != nil:
+		return f.Config.Http.init(ctx)
+	case f.Config.Splunk != nil:
+		return f.Config.Splunk.init(ctx)
+	case f.Config.Syslog != nil:
+		return f.Config.Syslog.init(ctx)
+	case f.Config.Datadog != nil:
+		return f.Config.Datadog.init(ctx)
+	case f.Config.Amqp != nil:
+		return f.Config.Amqp.init(ctx)
+	case f.Config.Otlp != nil:
+		return f.Config.Otlp.init(ctx)
+	case f.Config.Elastic != nil:
+		return f.Config.Elastic.init(ctx)
+	default:
+		return fmt.Errorf("unsupported forwarder type")
+	}
+}
+
+func (f *ForwarderV2) Close(ctx context.Context) error {
+	switch {
+	case f.Config.Http != nil:
+		return f.Config.Http.close(ctx)
+	case f.Config.Splunk != nil:
+		return f.Config.Splunk.close(ctx)
+	case f.Config.Syslog != nil:
+		return f.Config.Syslog.close(ctx)
+	case f.Config.Datadog != nil:
+		return f.Config.Datadog.close(ctx)
+	case f.Config.Amqp != nil:
+		return f.Config.Amqp.close(ctx)
+	case f.Config.Otlp != nil:
+		return f.Config.Otlp.close(ctx)
+	case f.Config.Elastic != nil:
+		return f.Config.Elastic.close(ctx)
+	default:
+		return fmt.Errorf("unsupported forwarder type")
+	}
+}
+
 func (f *ForwarderV2) Call(ctx context.Context, record *LogRecord) error {
 	switch {
 	case f.Config.Http != nil:

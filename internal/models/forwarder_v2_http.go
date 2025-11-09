@@ -10,10 +10,27 @@ import (
 	"net/http"
 )
 
+type forwarderStateHttpV2 struct {
+	client *http.Client
+}
+
 type ForwarderHttpV2 struct {
 	Type    string            `json:"type" enum:"http" required:"true"`
 	Url     string            `json:"url" required:"true"`
 	Headers map[string]string `json:"headers,omitempty"`
+
+	state *forwarderStateHttpV2
+}
+
+func (f *ForwarderHttpV2) init(context.Context) error {
+	f.state = &forwarderStateHttpV2{
+		client: &http.Client{},
+	}
+	return nil
+}
+
+func (f *ForwarderHttpV2) close(context.Context) error {
+	return nil
 }
 
 func (f *ForwarderHttpV2) call(ctx context.Context, record *LogRecord) error {
@@ -32,8 +49,7 @@ func (f *ForwarderHttpV2) call(ctx context.Context, record *LogRecord) error {
 		req.Header.Add(key, value)
 	}
 
-	client := http.Client{}
-	resp, err := client.Do(req)
+	resp, err := f.state.client.Do(req)
 	if err != nil {
 		return fmt.Errorf("failed to send request: %w", err)
 	}

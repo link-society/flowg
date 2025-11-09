@@ -31,11 +31,22 @@ func (ctrl *controller) SavePipelineUsecase() usecase.Interactor {
 				req SavePipelineRequest,
 				resp *SavePipelineResponse,
 			) error {
-				err := ctrl.deps.ConfigStorage.WritePipeline(ctx, req.Pipeline, &req.Flow)
-				if err != nil {
+				if err := ctrl.deps.ConfigStorage.WritePipeline(ctx, req.Pipeline, &req.Flow); err != nil {
 					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to save pipeline",
+						slog.String("pipeline", req.Pipeline),
+						slog.String("error", err.Error()),
+					)
+
+					resp.Success = false
+					return status.Wrap(err, status.Internal)
+				}
+
+				if err := ctrl.deps.PipelineRunner.InvalidateCachedBuild(ctx, req.Pipeline); err != nil {
+					ctrl.logger.ErrorContext(
+						ctx,
+						"Failed to refresh pipeline cache after save",
 						slog.String("pipeline", req.Pipeline),
 						slog.String("error", err.Error()),
 					)

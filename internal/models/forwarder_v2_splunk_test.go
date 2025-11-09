@@ -4,7 +4,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"context"
 	"net/http"
 
 	"link-society.com/flowg/internal/models"
@@ -40,13 +39,20 @@ func TestForwarderSplunk_Call(t *testing.T) {
 		},
 	}
 
+	if err := forwarder.Init(t.Context()); err != nil {
+		t.Fatalf("failed to initialize forwarder: %v", err)
+	}
+
 	record := models.NewLogRecord(map[string]string{
 		"message": "test message",
 		"host":    "test-host",
 	})
-	err := forwarder.Call(context.Background(), record)
-	if err != nil {
+	if err := forwarder.Call(t.Context(), record); err != nil {
 		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if err := forwarder.Close(t.Context()); err != nil {
+		t.Fatalf("failed to close forwarder: %v", err)
 	}
 }
 
@@ -68,9 +74,16 @@ func TestForwarderSplunk_Call_Failure(t *testing.T) {
 		},
 	}
 
+	if err := forwarder.Init(t.Context()); err != nil {
+		t.Fatalf("failed to initialize forwarder: %v", err)
+	}
+
 	record := models.NewLogRecord(map[string]string{})
-	err := forwarder.Call(context.Background(), record)
-	if err == nil {
+	if err := forwarder.Call(t.Context(), record); err == nil {
 		t.Fatalf("expected error")
+	}
+
+	if err := forwarder.Close(t.Context()); err != nil {
+		t.Fatalf("failed to close forwarder: %v", err)
 	}
 }
