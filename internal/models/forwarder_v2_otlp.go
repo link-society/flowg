@@ -13,10 +13,27 @@ import (
 	proto "google.golang.org/protobuf/proto"
 )
 
+type forwarderStateOtlpV2 struct {
+	client *http.Client
+}
+
 type ForwarderOtlpV2 struct {
 	Type     string            `json:"type" enum:"otlp" required:"true"`
 	Endpoint string            `json:"endpoint" required:"true"`
 	Headers  map[string]string `json:"headers,omitempty"`
+
+	state *forwarderStateOtlpV2
+}
+
+func (f *ForwarderOtlpV2) init(ctx context.Context) error {
+	f.state = &forwarderStateOtlpV2{
+		client: &http.Client{},
+	}
+	return nil
+}
+
+func (f *ForwarderOtlpV2) close(context.Context) error {
+	return nil
 }
 
 func (f *ForwarderOtlpV2) call(ctx context.Context, record *LogRecord) error {
@@ -79,7 +96,7 @@ func (f *ForwarderOtlpV2) call(ctx context.Context, record *LogRecord) error {
 		req.Header.Set(k, v)
 	}
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := f.state.client.Do(req)
 	if err != nil {
 		return fmt.Errorf("failed to send request: %w", err)
 	}

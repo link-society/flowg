@@ -8,10 +8,27 @@ import (
 	"net/http"
 )
 
+type forwarderStateDatadogV2 struct {
+	client *http.Client
+}
+
 type ForwarderDatadogV2 struct {
 	Type   string `json:"type" enum:"datadog" required:"true"`
 	Url    string `json:"url" required:"true"`
 	ApiKey string `json:"apiKey" required:"true"`
+
+	state *forwarderStateDatadogV2
+}
+
+func (f *ForwarderDatadogV2) init(ctx context.Context) error {
+	f.state = &forwarderStateDatadogV2{
+		client: &http.Client{},
+	}
+	return nil
+}
+
+func (f *ForwarderDatadogV2) close(context.Context) error {
+	return nil
 }
 
 func (f *ForwarderDatadogV2) call(ctx context.Context, record *LogRecord) error {
@@ -30,8 +47,7 @@ func (f *ForwarderDatadogV2) call(ctx context.Context, record *LogRecord) error 
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("DD-API-KEY", f.ApiKey)
 
-	client := http.Client{}
-	resp, err := client.Do(req)
+	resp, err := f.state.client.Do(req)
 	if err != nil {
 		return fmt.Errorf("failed to send request: %w", err)
 	}

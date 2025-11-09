@@ -21,3 +21,13 @@ func (m *MockRunner) Run(ctx context.Context, pipelineName string, entrypoint st
 	args := m.Called(ctx, pipelineName, entrypoint, record)
 	return args.Error(0)
 }
+
+func (m *MockRunner) InvalidateCachedBuild(ctx context.Context, pipelineName string) error {
+	args := m.Called(ctx, pipelineName)
+	return args.Error(0)
+}
+
+func (m *MockRunner) InvalidateAllCachedBuilds(ctx context.Context) error {
+	args := m.Called(ctx)
+	return args.Error(0)
+}

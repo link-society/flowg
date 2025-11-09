@@ -44,9 +44,31 @@ func (ctrl *controller) TestForwarderUsecase() usecase.Interactor {
 					return status.Wrap(err, status.NotFound)
 				}
 
+				if err := forwarder.Init(ctx); err != nil {
+					ctrl.logger.ErrorContext(
+						ctx,
+						"Failed to initialize forwarder",
+						slog.String("forwarder", req.Forwarder),
+						slog.String("error", err.Error()),
+					)
+
+					resp.Success = false
+					return status.Wrap(err, status.Internal)
+				}
+
+				defer func() {
+					if err := forwarder.Close(ctx); err != nil {
+						ctrl.logger.WarnContext(
+							ctx,
+							"Failed to shutdown forwarder",
+							slog.String("forwarder", req.Forwarder),
+							slog.String("error", err.Error()),
+						)
+					}
+				}()
+
 				logRecord := models.NewLogRecord(req.Record)
-				err = forwarder.Call(ctx, logRecord)
-				if err != nil {
+				if err := forwarder.Call(ctx, logRecord); err != nil {
 					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to call forwarder",

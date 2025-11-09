@@ -8,10 +8,27 @@ import (
 	"net/http"
 )
 
+type forwarderStateSplunkV2 struct {
+	client *http.Client
+}
+
 type ForwarderSplunkV2 struct {
 	Type     string `json:"type" enum:"splunk" required:"true"`
 	Endpoint string `json:"endpoint" required:"true"`
 	Token    string `json:"token" required:"true"`
+
+	state *forwarderStateSplunkV2
+}
+
+func (f *ForwarderSplunkV2) init(ctx context.Context) error {
+	f.state = &forwarderStateSplunkV2{
+		client: &http.Client{},
+	}
+	return nil
+}
+
+func (f *ForwarderSplunkV2) close(context.Context) error {
+	return nil
 }
 
 func (f *ForwarderSplunkV2) call(ctx context.Context, record *LogRecord) error {
@@ -52,7 +69,7 @@ func (f *ForwarderSplunkV2) call(ctx context.Context, record *LogRecord) error {
 	req.Header.Add("Content-Type", "application/json")
 
 	// Send request
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := f.state.client.Do(req)
 	if err != nil {
 		return err
 	}

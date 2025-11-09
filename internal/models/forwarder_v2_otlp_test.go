@@ -1,7 +1,6 @@
 package models_test
 
 import (
-	"context"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -48,13 +47,20 @@ func TestForwarderOtlpV2_Call_Success(t *testing.T) {
 		},
 	}
 
+	if err := forwarder.Init(t.Context()); err != nil {
+		t.Fatalf("failed to initialize forwarder: %v", err)
+	}
+
 	record := models.NewLogRecord(map[string]string{
 		"body": "test log body",
 		"foo":  "bar",
 	})
-	err := forwarder.Call(context.Background(), record)
-	if err != nil {
+	if err := forwarder.Call(t.Context(), record); err != nil {
 		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if err := forwarder.Close(t.Context()); err != nil {
+		t.Fatalf("failed to close forwarder: %v", err)
 	}
 }
 
@@ -76,11 +82,18 @@ func TestForwarderOtlpV2_Call_Failure(t *testing.T) {
 		},
 	}
 
+	if err := forwarder.Init(t.Context()); err != nil {
+		t.Fatalf("failed to initialize forwarder: %v", err)
+	}
+
 	record := models.NewLogRecord(map[string]string{
 		"body": "test log body",
 	})
-	err := forwarder.Call(context.Background(), record)
-	if err == nil {
+	if err := forwarder.Call(t.Context(), record); err == nil {
 		t.Fatalf("expected error on failure response, got nil")
+	}
+
+	if err := forwarder.Close(t.Context()); err != nil {
+		t.Fatalf("failed to close forwarder: %v", err)
 	}
 }

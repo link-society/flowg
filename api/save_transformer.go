@@ -31,12 +31,22 @@ func (ctrl *controller) SaveTransformerUsecase() usecase.Interactor {
 				req SaveTransformerRequest,
 				resp *SaveTransformerResponse,
 			) error {
-				err := ctrl.deps.ConfigStorage.WriteTransformer(ctx, req.Transformer, req.Script)
-				if err != nil {
+				if err := ctrl.deps.ConfigStorage.WriteTransformer(ctx, req.Transformer, req.Script); err != nil {
 					ctrl.logger.ErrorContext(
 						ctx,
 						"Failed to save transformer",
 						slog.String("transformer", req.Transformer),
+						slog.String("error", err.Error()),
+					)
+
+					resp.Success = false
+					return status.Wrap(err, status.Internal)
+				}
+
+				if err := ctrl.deps.PipelineRunner.InvalidateAllCachedBuilds(ctx); err != nil {
+					ctrl.logger.ErrorContext(
+						ctx,
+						"Failed to refresh pipeline cache after save",
 						slog.String("error", err.Error()),
 					)
 

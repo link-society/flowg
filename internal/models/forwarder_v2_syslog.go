@@ -8,6 +8,10 @@ import (
 	"log/syslog"
 )
 
+type forwarderStateSyslogV2 struct {
+	writer *syslog.Writer
+}
+
 type ForwarderSyslogV2 struct {
 	Type     string `json:"type" enum:"syslog" required:"true"`
 	Network  string `json:"network" enum:"tcp,udp" required:"true"`
@@ -15,6 +19,8 @@ type ForwarderSyslogV2 struct {
 	Tag      string `json:"tag" required:"true"`
 	Severity string `json:"severity" enum:"emerg,alert,crit,err,warning,notice,info,debug" required:"true"`
 	Facility string `json:"facility" enum:"kern,user,mail,daemon,auth,syslog,lpr,news,uucp,cron,authpriv,ftp,local0,local1,local2,local3,local4,local5,local6,local7" required:"true"`
+
+	state *forwarderStateSyslogV2
 }
 
 var (
@@ -53,7 +59,7 @@ var (
 	}
 )
 
-func (f *ForwarderSyslogV2) call(ctx context.Context, record *LogRecord) error {
+func (f *ForwarderSyslogV2) init(ctx context.Context) error {
 	reply := make(chan error, 1)
 	defer close(reply)
 
@@ -65,11 +71,37 @@ func (f *ForwarderSyslogV2) call(ctx context.Context, record *LogRecord) error {
 		writer, err := syslog.Dial(f.Network, f.Address, priority, f.Tag)
 		if err != nil {
 			reply <- fmt.Errorf("failed to dial syslog: %w", err)
-			return
 		}
-		defer writer.Close()
 
-		if err := json.NewEncoder(writer).Encode(record); err != nil {
+		f.state = &forwarderStateSyslogV2{
+			writer: writer,
+		}
+
+		reply <- nil
+	}()
+
+	select {
+	case <-ctx.Done():
+		return nil
+
+	case err := <-reply:
+		return err
+	}
+}
+
+func (f *ForwarderSyslogV2) close(context.Context) error {
+	if f.state != nil && f.state.writer != nil {
+		return f.state.writer.Close()
+	}
+	return nil
+}
+
+func (f *ForwarderSyslogV2) call(ctx context.Context, record *LogRecord) error {
+	reply := make(chan error, 1)
+	defer close(reply)
+
+	go func() {
+		if err := json.NewEncoder(f.state.writer).Encode(record); err != nil {
 			reply <- fmt.Errorf("failed to send log record to syslog: %w", err)
 			return
 		}
