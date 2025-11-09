@@ -1,7 +1,6 @@
 package bootstrap_test
 
 import (
-	"context"
 	"testing"
 
 	"go.uber.org/fx"
@@ -18,7 +17,7 @@ import (
 func TestDefaultRolesAndUsers(t *testing.T) {
 	logging.Discard()
 
-	ctx := context.Background()
+	ctx := t.Context()
 
 	authOpts := auth.DefaultOptions()
 	authOpts.InMemory = true

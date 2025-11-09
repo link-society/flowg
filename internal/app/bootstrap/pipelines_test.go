@@ -1,7 +1,6 @@
 package bootstrap_test
 
 import (
-	"context"
 	"testing"
 
 	"go.uber.org/fx"
@@ -13,7 +12,7 @@ import (
 )
 
 func TestDefaultPipeline(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 
 	var configStorage config.Storage
 

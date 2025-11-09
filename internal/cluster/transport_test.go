@@ -232,7 +232,7 @@ func TestGossipStream(t *testing.T) {
 	}
 
 	defer func() {
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		ctx, cancel := context.WithTimeout(t.Context(), time.Second)
 		defer cancel()
 		server.Shutdown(ctx)
 	}()
@@ -317,7 +317,7 @@ func TestGossipPacket(t *testing.T) {
 	}
 
 	defer func() {
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		ctx, cancel := context.WithTimeout(t.Context(), time.Second)
 		defer cancel()
 		server.Shutdown(ctx)
 	}()

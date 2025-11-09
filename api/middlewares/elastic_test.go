@@ -7,8 +7,6 @@ import (
 
 	"github.com/stretchr/testify/mock"
 
-	"context"
-
 	"bytes"
 	"fmt"
 
@@ -75,7 +73,7 @@ func TestElasticEndpoint(t *testing.T) {
 		t.Fatalf("failed to create ElasticSearch client: %v", err)
 	}
 
-	ctx := context.Background()
+	ctx := t.Context()
 
 	resp, err := client.Indices.Exists([]string{"test"}, client.Indices.Exists.WithContext(ctx))
 	if err != nil {
