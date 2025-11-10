@@ -5,6 +5,7 @@ import { HttpForwarderModel } from '@/lib/models/forwarder/http'
 import { OtlpForwarderModel } from '@/lib/models/forwarder/otlp'
 import { SplunkForwarderModel } from '@/lib/models/forwarder/splunk'
 import { SyslogForwarderModel } from '@/lib/models/forwarder/syslog'
+import { ClickhouseForwarderModel } from '@/lib/models/forwarder/clickhouse';
 
 export type ForwarderModel = {
   config: ForwarderConfigModel
@@ -18,6 +19,7 @@ export const ForwarderTypeValues = [
   { key: 'amqp', label: 'AMQP' },
   { key: 'otlp', label: 'OpenTelemetry' },
   { key: 'elastic', label: 'Elastic Search' },
+  { key: 'clickhouse', label: 'Clickhouse' },
 ] as const
 
 export const ForwarderTypeLabelMap = ForwarderTypeValues.reduce(
@@ -36,5 +38,6 @@ export type ForwarderConfigModel =
   | AmqpForwarderModel
   | OtlpForwarderModel
   | ElasticForwarderModel
+  | ClickhouseForwarderModel
 
 export type ForwarderTypes = ForwarderConfigModel['type']
