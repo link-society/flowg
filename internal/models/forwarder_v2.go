@@ -13,13 +13,14 @@ type ForwarderV2 struct {
 }
 
 type ForwarderConfigV2 struct {
-	Http    *ForwarderHttpV2    `json:"-"`
-	Syslog  *ForwarderSyslogV2  `json:"-"`
-	Datadog *ForwarderDatadogV2 `json:"-"`
-	Amqp    *ForwarderAmqpV2    `json:"-"`
-	Splunk  *ForwarderSplunkV2  `json:"-"`
-	Otlp    *ForwarderOtlpV2    `json:"-"`
-	Elastic *ForwarderElasticV2 `json:"-"`
+	Http       *ForwarderHttpV2       `json:"-"`
+	Syslog     *ForwarderSyslogV2     `json:"-"`
+	Datadog    *ForwarderDatadogV2    `json:"-"`
+	Amqp       *ForwarderAmqpV2       `json:"-"`
+	Splunk     *ForwarderSplunkV2     `json:"-"`
+	Otlp       *ForwarderOtlpV2       `json:"-"`
+	Elastic    *ForwarderElasticV2    `json:"-"`
+	Clickhouse *ForwarderClickhouseV2 `json:"-"`
 }
 
 func (ForwarderConfigV2) JSONSchemaOneOf() []any {
@@ -31,6 +32,7 @@ func (ForwarderConfigV2) JSONSchemaOneOf() []any {
 		ForwarderSplunkV2{},
 		ForwarderOtlpV2{},
 		ForwarderElasticV2{},
+		ForwarderClickhouseV2{},
 	}
 }
 
@@ -92,6 +94,8 @@ func (f *ForwarderV2) Call(ctx context.Context, record *LogRecord) error {
 		return f.Config.Otlp.call(ctx, record)
 	case f.Config.Elastic != nil:
 		return f.Config.Elastic.call(ctx, record)
+	case f.Config.Clickhouse != nil:
+		return f.Config.Clickhouse.call(ctx, record)
 	default:
 		return fmt.Errorf("unsupported forwarder type")
 	}
@@ -119,6 +123,9 @@ func (cfg *ForwarderConfigV2) MarshalJSON() ([]byte, error) {
 
 	case cfg.Elastic != nil:
 		return json.Marshal(&cfg.Elastic)
+
+	case cfg.Clickhouse != nil:
+		return json.Marshal(&cfg.Clickhouse)
 
 	default:
 		return nil, fmt.Errorf("unsupported forwarder type")
@@ -155,6 +162,9 @@ func (cfg *ForwarderConfigV2) UnmarshalJSON(data []byte) error {
 
 	case "elastic":
 		return json.Unmarshal(data, &cfg.Elastic)
+
+	case "clickhouse":
+		return json.Unmarshal(data, &cfg.Clickhouse)
 
 	default:
 		return fmt.Errorf("unsupported forwarder type: %s", typeInfo.Type)
