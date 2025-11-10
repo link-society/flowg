@@ -7,6 +7,7 @@ import { HttpForwarderEditor } from './http'
 import { OtlpForwarderEditor } from './otlp'
 import { SplunkForwarderEditor } from './splunk'
 import { SyslogForwarderEditor } from './syslog'
+import { ClickhouseForwarderEditor } from './clickhouse'
 
 type ForwarderEditorProps = {
   forwarder: ForwarderModel
@@ -76,6 +77,14 @@ export const ForwarderEditor = ({
     case 'elastic':
       return (
         <ElasticForwarderEditor
+          config={forwarder.config}
+          onConfigChange={onConfigChange}
+        />
+      )
+
+    case 'clickhouse':
+      return (
+        <ClickhouseForwarderEditor
           config={forwarder.config}
           onConfigChange={onConfigChange}
         />
