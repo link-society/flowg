@@ -8,15 +8,19 @@ import (
 )
 
 func TestProcessRecord(t *testing.T) {
-	input := map[string]string{}
-	script := `
+	runner, err := vrl.NewScriptRunner(`
 		.foo = "bar"
 		.bar.baz = [1, 2, 3, "a"]
-	`
-
-	output, err := vrl.ProcessRecord(input, script)
+	`)
 	if err != nil {
-		t.Errorf("ProcessRecord() failed: %v", err)
+		t.Fatalf("NewScriptRunner() failed: %v", err)
+	}
+	defer runner.Close()
+
+	input := map[string]string{}
+	output, err := runner.Eval(input)
+	if err != nil {
+		t.Errorf("Eval() failed: %v", err)
 	}
 
 	expected := map[string]string{
@@ -27,22 +31,27 @@ func TestProcessRecord(t *testing.T) {
 		"bar.baz.3": "a",
 	}
 	if !reflect.DeepEqual(output, expected) {
-		t.Errorf("ProcessRecord() = %v, want %v", output, expected)
+		t.Errorf("Eval() = %v, want %v", output, expected)
 	}
 }
 
 func TestProcessRecord_EmptyScript(t *testing.T) {
+	runner, err := vrl.NewScriptRunner(``)
+	if err != nil {
+		t.Fatalf("NewScriptRunner() failed: %v", err)
+	}
+	defer runner.Close()
+
 	input := map[string]string{
 		"foo": "bar",
 	}
-	script := ""
 
-	output, err := vrl.ProcessRecord(input, script)
+	output, err := runner.Eval(input)
 	if err != nil {
-		t.Errorf("ProcessRecord() failed: %v", err)
+		t.Errorf("Eval() failed: %v", err)
 	}
 
 	if !reflect.DeepEqual(output, input) {
-		t.Errorf("ProcessRecord() = %v, want %v", output, input)
+		t.Errorf("Eval() = %v, want %v", output, input)
 	}
 }

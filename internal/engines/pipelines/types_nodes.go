@@ -24,8 +24,10 @@ type SourceNode struct {
 }
 
 type TransformNode struct {
-	TransformerName string
-	Next            []Node
+	Transformer string
+	Next        []Node
+
+	runner *vrl.ScriptRunner
 }
 
 type SwitchNode struct {
@@ -93,21 +95,18 @@ func (n *SourceNode) Process(ctx context.Context, record *models.LogRecord) erro
 
 // MARK: transform
 func (n *TransformNode) Init(ctx context.Context) error {
-	return nil
+	var err error
+	n.runner, err = vrl.NewScriptRunner(n.Transformer)
+	return err
 }
 
 func (n *TransformNode) Close(ctx context.Context) error {
+	n.runner.Close()
 	return nil
 }
 
 func (n *TransformNode) Process(ctx context.Context, record *models.LogRecord) error {
-	w := getWorker(ctx)
-	vrlScript, err := w.configStorage.ReadTransformer(ctx, n.TransformerName)
-	if err != nil {
-		return err
-	}
-
-	output, err := vrl.ProcessRecord(record.Fields, vrlScript)
+	output, err := n.runner.Eval(record.Fields)
 	if err != nil {
 		return err
 	}

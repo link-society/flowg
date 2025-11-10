@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"errors"
 	"log/slog"
 
 	"github.com/swaggest/usecase"
@@ -36,7 +35,24 @@ func (ctrl *controller) TestTransformerUsecase() usecase.Interactor {
 				req TestTransformerRequest,
 				resp *TestTransformerResponse,
 			) error {
-				output, err := vrl.ProcessRecord(req.Record, req.Code)
+				runner, err := vrl.NewScriptRunner(req.Code)
+				if err != nil {
+					ctrl.logger.ErrorContext(
+						ctx,
+						"Failed to compile transformer",
+						slog.String("error", err.Error()),
+					)
+
+					resp.Success = false
+					return usecase.Error{
+						AppCode:    UnprocessableEntityCode,
+						StatusCode: status.InvalidArgument,
+						Value:      err,
+					}
+				}
+				defer runner.Close()
+
+				output, err := runner.Eval(req.Record)
 				if err != nil {
 					ctrl.logger.ErrorContext(
 						ctx,
@@ -46,14 +62,10 @@ func (ctrl *controller) TestTransformerUsecase() usecase.Interactor {
 
 					resp.Success = false
 
-					if re := new(vrl.RuntimeError); errors.As(err, &re) {
-						return usecase.Error{
-							AppCode:    UnprocessableEntityCode,
-							StatusCode: status.InvalidArgument,
-							Value:      err,
-						}
-					} else {
-						return status.Wrap(err, status.Internal)
+					return usecase.Error{
+						AppCode:    UnprocessableEntityCode,
+						StatusCode: status.InvalidArgument,
+						Value:      err,
 					}
 				}
 

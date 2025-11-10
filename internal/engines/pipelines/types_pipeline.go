@@ -8,6 +8,7 @@ import (
 
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage/config"
+
 	"link-society.com/flowg/internal/utils/ffi/filterdsl"
 )
 
@@ -35,7 +36,7 @@ func Build(ctx context.Context, configStorage config.Storage, name string) (*Pip
 
 		switch flowNode.Type {
 		case "transform":
-			transformer, exists := flowNode.Data["transformer"]
+			transformerName, exists := flowNode.Data["transformer"]
 			if !exists {
 				return nil, &MissingFlowNodeDataError{
 					NodeID: flowNode.ID,
@@ -43,8 +44,13 @@ func Build(ctx context.Context, configStorage config.Storage, name string) (*Pip
 				}
 			}
 
+			transformer, err := configStorage.ReadTransformer(ctx, transformerName)
+			if err != nil {
+				return nil, err
+			}
+
 			pipelineNode := &TransformNode{
-				TransformerName: transformer,
+				Transformer: transformer,
 			}
 			pipelineNodes[flowNode.ID] = pipelineNode
 

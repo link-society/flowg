@@ -1,19 +1,21 @@
 package vrl
 
-type NullPointerError struct{}
-
-var _ error = (*NullPointerError)(nil)
-
-func (e NullPointerError) Error() string {
-	return "received null pointer"
-}
-
-type RuntimeError struct {
+type CompileError struct {
 	Message string
 }
 
-var _ error = (*RuntimeError)(nil)
+var _ error = (*CompileError)(nil)
 
-func (e RuntimeError) Error() string {
+func (e CompileError) Error() string {
+	return e.Message
+}
+
+type EvalError struct {
+	Message string
+}
+
+var _ error = (*EvalError)(nil)
+
+func (e EvalError) Error() string {
 	return e.Message
 }

@@ -2,35 +2,7 @@ package vrl
 
 /*
 #cgo LDFLAGS: -L./rust-crate/target/release -lflowg_vrl -lm
-#include <stdlib.h>
-
-typedef struct {
-	char* key;
-	char* value;
-} hmap_entry;
-
-typedef struct {
-	size_t count;
-	hmap_entry* entries;
-} hmap;
-
-typedef enum {
-	vrl_result_ok,
-	vrl_result_err
-} vrl_result_tag;
-
-typedef struct {
-	hmap* ok_data;
-	char* err_data;
-} vrl_result_data;
-
-typedef struct {
-	vrl_result_tag tag;
-	vrl_result_data data;
-} vrl_result;
-
-extern vrl_result* process_record(hmap* input, const char* script);
-extern void vrl_result_free(vrl_result* result);
+#include "ffi.h"
 */
 import "C"
 
@@ -38,23 +10,79 @@ import (
 	"unsafe"
 )
 
-func ProcessRecord(
-	record map[string]string,
-	script string,
-) (map[string]string, error) {
+type ScriptRunner struct {
+	ffiObject C.script_runner
+}
+
+func NewScriptRunner(source string) (*ScriptRunner, error) {
+	cSource := C.CString(source)
+	defer C.free(unsafe.Pointer(cSource))
+
+	var err *C.char
+	obj := C.script_runner_new(cSource, &err)
+	if obj == nil {
+		defer C.free(unsafe.Pointer(err))
+		return nil, &CompileError{Message: C.GoString(err)}
+	}
+
+	return &ScriptRunner{ffiObject: obj}, nil
+}
+
+func (sr *ScriptRunner) Close() {
+	if sr.ffiObject != nil {
+		C.script_runner_free(sr.ffiObject)
+		sr.ffiObject = nil
+	}
+}
+
+func (sr *ScriptRunner) Eval(input map[string]string) (map[string]string, error) {
+	cInput := mapToHmap(input)
+	defer freeHmap(cInput)
+
+	var err *C.char
+	cOutput := C.script_runner_eval(sr.ffiObject, cInput, &err)
+	defer C.hmap_free(cOutput)
+
+	if cOutput == nil {
+		defer C.free(unsafe.Pointer(err))
+		return nil, &EvalError{Message: C.GoString(err)}
+	}
+
+	return hmapToMap(cOutput), nil
+}
+
+func hmapToMap(cHmap *C.hmap) map[string]string {
+	result := make(map[string]string)
+
+	if cHmap != nil && cHmap.count > 0 {
+		count := int(cHmap.count)
+		cEntries := unsafe.Pointer(cHmap.entries)
+
+		if cEntries != nil {
+			cSlice := (*[1 << 30]C.hmap_entry)(cEntries)[:count:count]
+			for _, entry := range cSlice {
+				key := C.GoString(entry.key)
+				value := C.GoString(entry.value)
+				result[key] = value
+			}
+		}
+	}
+
+	return result
+}
+
+func mapToHmap(input map[string]string) *C.hmap {
 	var (
 		cEntries    unsafe.Pointer
 		cEntrySlice []C.hmap_entry
 	)
 
-	recordLen := len(record)
+	if len(input) > 0 {
+		cEntries = C.malloc(C.size_t(len(input)) * C.size_t(unsafe.Sizeof(C.hmap_entry{})))
 
-	if recordLen > 0 {
-		cEntries = C.malloc(C.size_t(len(record)) * C.size_t(unsafe.Sizeof(C.hmap_entry{})))
-
-		cEntrySlice = (*[1 << 30]C.hmap_entry)(cEntries)[:recordLen:recordLen]
+		cEntrySlice = (*[1 << 30]C.hmap_entry)(cEntries)[:len(input):len(input)]
 		i := 0
-		for key, value := range record {
+		for key, value := range input {
 			cKey := C.CString(key)
 			cValue := C.CString(value)
 			cEntrySlice[i] = C.hmap_entry{key: cKey, value: cValue}
@@ -62,44 +90,26 @@ func ProcessRecord(
 		}
 	}
 
-	cInput := (*C.hmap)(C.malloc(C.size_t(unsafe.Sizeof(C.hmap{}))))
-	cInput.count = C.size_t(len(record))
-	cInput.entries = (*C.hmap_entry)(cEntries)
+	cHmap := (*C.hmap)(C.malloc(C.size_t(unsafe.Sizeof(C.hmap{}))))
+	cHmap.count = C.size_t(len(input))
+	cHmap.entries = (*C.hmap_entry)(cEntries)
 
-	cScript := C.CString(script)
-	defer C.free(unsafe.Pointer(cScript))
+	return cHmap
+}
 
-	cResult := C.process_record(cInput, cScript)
-	defer C.vrl_result_free(cResult)
+func freeHmap(cHmap *C.hmap) {
+	if cHmap != nil {
+		count := int(cHmap.count)
+		cEntries := unsafe.Pointer(cHmap.entries)
 
-	result := make(map[string]string)
-	if cResult == nil {
-		return nil, &NullPointerError{}
-	}
-
-	switch cResult.tag {
-	case C.vrl_result_ok:
-		if cResult.data.ok_data != nil && cResult.data.ok_data.count > 0 {
-			outputCount := int(cResult.data.ok_data.count)
-			cResultEntries := unsafe.Pointer(cResult.data.ok_data.entries)
-
-			if cResultEntries != nil {
-				cResultSlice := (*[1 << 30]C.hmap_entry)(cResultEntries)[:outputCount:outputCount]
-				for _, entry := range cResultSlice {
-					key := C.GoString(entry.key)
-					value := C.GoString(entry.value)
-					result[key] = value
-				}
+		if cEntries != nil {
+			cSlice := (*[1 << 30]C.hmap_entry)(cEntries)[:count:count]
+			for _, entry := range cSlice {
+				C.free(unsafe.Pointer(entry.key))
+				C.free(unsafe.Pointer(entry.value))
 			}
+			C.free(cEntries)
 		}
-
-		return result, nil
-
-	case C.vrl_result_err:
-		err := C.GoString(cResult.data.err_data)
-		return nil, &RuntimeError{Message: err}
-
-	default:
-		return nil, &RuntimeError{Message: "unknown error"}
+		C.free(unsafe.Pointer(cHmap))
 	}
 }
