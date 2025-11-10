@@ -16,7 +16,7 @@ type FlowNodeV2 struct {
 type FlowEdgeV2 struct {
 	ID           string `json:"id" required:"true"`
 	Source       string `json:"source" required:"true"`
-	SourceHandle string `json:"sourceHandle" required:"true"`
+	SourceHandle string `json:"sourceHandle" default:""`
 	Target       string `json:"target" required:"true"`
 }
 
