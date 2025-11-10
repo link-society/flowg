@@ -38,16 +38,16 @@ pub fn hmap_new_from_hashmap(map: &HashMap<String, String>) -> hmap {
   hmap { count, entries }
 }
 
-pub unsafe fn hmap_to_hashmap(this: *mut hmap) -> HashMap<String, String> {
+pub fn hmap_to_hashmap(this: *mut hmap) -> HashMap<String, String> {
   let mut map = HashMap::new();
 
   if !this.is_null() {
-    let hmap = &*this;
-    let entries = std::slice::from_raw_parts(hmap.entries, hmap.count);
+    let hmap = unsafe { &*this };
+    let entries = unsafe { std::slice::from_raw_parts(hmap.entries, hmap.count) };
 
     for entry in entries {
-      let key = CStr::from_ptr(entry.key).to_string_lossy().into_owned();
-      let value = CStr::from_ptr(entry.value).to_string_lossy().into_owned();
+      let key = unsafe { CStr::from_ptr(entry.key) }.to_string_lossy().into_owned();
+      let value = unsafe { CStr::from_ptr(entry.value) }.to_string_lossy().into_owned();
       map.insert(key, value);
     }
   }

@@ -1,52 +1,9 @@
 use std::collections::{BTreeMap, HashMap};
 
-use anyhow::{Context, Result};
 use vrl::prelude::*;
 
 
-pub fn process_record(
-  record: HashMap<String, String>,
-  script: String,
-) -> Result<HashMap<String, String>> {
-  let mut vrl_record = ObjectMap::new();
-  for (key, value) in record.iter() {
-    vrl_record.insert(key.clone().into(), Value::from(value.clone()));
-  }
-
-  let fns = vrl::stdlib::all();
-  let compiled = match vrl::compiler::compile(&script, &fns) {
-    Ok(compiled) => compiled,
-    Err(diagnostics) => {
-      return Err(anyhow::anyhow!("Failed to compile VRL script"))
-        .context(super::report::render_diagnostics(diagnostics, &script))
-    }
-  };
-
-  let mut target = vrl::compiler::TargetValue {
-    value: Value::Object(vrl_record),
-    metadata: Value::Object(ObjectMap::new()),
-    secrets: vrl::value::Secrets::default(),
-  };
-
-  let mut state = state::RuntimeState::default();
-  let timezone = TimeZone::default();
-  let mut ctx = vrl::compiler::Context::new(&mut target, &mut state, &timezone);
-
-  if let Err(expression_error) = compiled.program.resolve(&mut ctx) {
-    return Err(anyhow::anyhow!("Failed to execute VRL script"))
-      .context(super::report::render_error(expression_error, &script));
-  }
-
-  let result = if let Value::Object(obj) = target.value {
-    flatten_obj(&obj)
-  } else {
-    HashMap::new()
-  };
-
-  Ok(result)
-}
-
-fn flatten_obj(obj: &BTreeMap<KeyString, Value>) -> HashMap<String, String> {
+pub fn flatten_obj(obj: &BTreeMap<KeyString, Value>) -> HashMap<String, String> {
   let mut result = HashMap::new();
 
   for (key, value) in obj.iter() {
@@ -146,27 +103,4 @@ fn flatten_array(array: &Vec<Value>) -> HashMap<String, String> {
   }
 
   result
-}
-
-#[cfg(test)]
-mod tests {
-  use super::*;
-
-  #[test]
-  fn test_process_record() {
-    let input = HashMap::new();
-    let script = String::from(r#"
-      .foo = "x"
-      .bar.baz = [1, 2, 3, "a"]
-      .
-    "#);
-
-    let output = process_record(input, script).unwrap();
-
-    assert_eq!(output.get("foo"), Some(&"x".to_string()));
-    assert_eq!(output.get("bar.baz.0"), Some(&"1".to_string()));
-    assert_eq!(output.get("bar.baz.1"), Some(&"2".to_string()));
-    assert_eq!(output.get("bar.baz.2"), Some(&"3".to_string()));
-    assert_eq!(output.get("bar.baz.3"), Some(&"a".to_string()));
-  }
 }
