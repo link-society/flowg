@@ -57,7 +57,7 @@ Run with (see *Build* section bellow):
 
 ```bash
 export BENCHMARK_ITERATIONS="1000000"
-export BENCHMARK_JOBS="24"  # usually, number of CPUs
+cargo install oha
 task docker:build test:bench
 ```
 
@@ -69,9 +69,17 @@ System:
 Result:
 
 ```
-Requests sent: 1000000
-Total time:    266.75s
-Rate:          3748.76 req/s
+Summary:
+  Success rate: 100.00%
+  Total:        23015.2540 ms
+  Slowest:      363.5206 ms
+  Fastest:      0.1003 ms
+  Average:      1.1477 ms
+  Requests/sec: 43449.4445
+
+  Total data:   35.29 MiB
+  Size/request: 37 B
+  Size/sec:     1.53 MiB
 ```
 
 ## :building_construction: Build
