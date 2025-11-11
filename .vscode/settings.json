@@ -1,6 +1,5 @@
 {
   "rust-analyzer.linkedProjects": [
-    "internal/utils/langs/filterdsl/rust-crate/Cargo.toml",
     "internal/utils/langs/vrl/rust-crate/Cargo.toml"
   ]
 }

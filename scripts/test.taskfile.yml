@@ -5,7 +5,6 @@ tasks:
     desc: "Run unit tests"
     cmds:
       - task: "test:unit:go"
-      - task: "test:unit:rust:filterdsl"
       - task: "test:unit:rust:vrl"
 
   "e2e:api":
@@ -49,12 +48,6 @@ tasks:
     internal: true
     cmds:
       - go test -timeout 500ms -v -bench=. ./...
-
-  "test:unit:rust:filterdsl":
-    internal: true
-    dir: ./internal/utils/langs/filterdsl/rust-crate
-    cmds:
-      - cargo test
 
   "test:unit:rust:vrl":
     internal: true
