@@ -56,7 +56,7 @@ dynamically structured logs, as well as log compression.
 Run with (see *Build* section bellow):
 
 ```bash
-export BENCHMARK_ITERATIONS="1000000"
+export BENCHMARK_ITERATIONS="100000"
 cargo install oha
 task docker:build test:bench
 ```
@@ -71,15 +71,15 @@ Result:
 ```
 Summary:
   Success rate: 100.00%
-  Total:        23015.2540 ms
-  Slowest:      363.5206 ms
-  Fastest:      0.1003 ms
-  Average:      1.1477 ms
-  Requests/sec: 43449.4445
+  Total:        6138.2936 ms
+  Slowest:      269.7329 ms
+  Fastest:      0.1843 ms
+  Average:      3.0651 ms
+  Requests/sec: 16291.1726
 
-  Total data:   35.29 MiB
+  Total data:   3.53 MiB
   Size/request: 37 B
-  Size/sec:     1.53 MiB
+  Size/sec:     588.65 KiB
 ```
 
 ## :building_construction: Build
