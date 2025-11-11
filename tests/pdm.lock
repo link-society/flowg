@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:211be377ddd63f63417b1e9979bc23d4e48fdd583a98a860d6974de9a2add905"
+content_hash = "sha256:8052bee269b211aac0a5e891fdc39d633ac36690dae7e48784a52c0f1e6ff04c"
 
 [[metadata.targets]]
 requires_python = "==3.13.*"
@@ -129,7 +129,7 @@ name = "flowg-test-runner"
 version = "0.0.0"
 requires_python = "==3.13.*"
 editable = true
-path = "./."
+path = "."
 summary = ""
 groups = ["dev"]
 dependencies = [
@@ -141,7 +141,6 @@ dependencies = [
     "robotframework-requests>=0.9.7",
     "robotframework-seleniumlibrary>=6.3.0",
     "robotframework>=7.2.2",
-    "tqdm>=4.67.1",
 ]
 
 [[package]]
@@ -421,20 +420,6 @@ groups = ["default", "dev"]
 files = [
     {file = "sortedcontainers-2.4.0-py2.py3-none-any.whl", hash = "sha256:a163dcaede0f1c021485e957a39245190e74249897e2ae4b2aa38595db237ee0"},
     {file = "sortedcontainers-2.4.0.tar.gz", hash = "sha256:25caa5a06cc30b6b83d11423433f65d1f9d76c4c6a0c90e3379eaa43b9bfdb88"},
-]
-
-[[package]]
-name = "tqdm"
-version = "4.67.1"
-requires_python = ">=3.7"
-summary = "Fast, Extensible Progress Meter"
-groups = ["default", "dev"]
-dependencies = [
-    "colorama; platform_system == \"Windows\"",
-]
-files = [
-    {file = "tqdm-4.67.1-py3-none-any.whl", hash = "sha256:26445eca388f82e72884e0d580d5464cd801a3ea01e63e5601bdff9ba6a48de2"},
-    {file = "tqdm-4.67.1.tar.gz", hash = "sha256:f8aef9c52c08c13a65f30ea34f4e5aac3fd1a34959879d7e59e63027286627f2"},
 ]
 
 [[package]]
