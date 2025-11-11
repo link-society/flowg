@@ -4,7 +4,6 @@ version = "0.0.0"
 dependencies = [
     "docker>=7.1.0",
     "requests>=2.32.3",
-    "tqdm>=4.67.1",
     "robotframework>=7.2.2",
     "robotframework-dependencylibrary>=4.0.1",
     "robotframework-requests>=0.9.7",
