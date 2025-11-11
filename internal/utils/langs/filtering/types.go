@@ -25,6 +25,7 @@ func newFilterImpl(input string) (Filter, error) {
 		expr.Env(map[string]string{}),
 		expr.AllowUndefinedVariables(),
 		expr.AsBool(),
+		expr.WarnOnAny(),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to compile expression: %w", err)
