@@ -53,19 +53,6 @@ updates:
         patterns:
           - "*"
 
-  - package-ecosystem: "cargo"
-    directory: "/internal/utils/langs/filterdsl/rust-crate"
-    schedule:
-      interval: "weekly"
-    commit-message:
-      prefix: ":arrow_up: "
-    labels:
-      - "deps: rust"
-    groups:
-      cargo-filterdsl:
-        patterns:
-          - "*"
-
   - package-ecosystem: "npm"
     directory: "/web/app"
     schedule:
