@@ -9,8 +9,8 @@ import (
 
 	"link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/internal/utils/ffi/filterdsl"
-	"link-society.com/flowg/internal/utils/ffi/vrl"
+	"link-society.com/flowg/internal/utils/langs/filterdsl"
+	"link-society.com/flowg/internal/utils/langs/vrl"
 )
 
 type Node interface {

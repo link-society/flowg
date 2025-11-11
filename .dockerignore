@@ -1,8 +1,8 @@
 /bin/
 /data/
 /internal/app/gen_version.go
-/internal/utils/ffi/filterdsl/rust-crate/target/
-/internal/utils/ffi/vrl/rust-crate/target/
+/internal/utils/langs/filterdsl/rust-crate/target/
+/internal/utils/langs/vrl/rust-crate/target/
 /web/public/
 /web/app/node_modules/
 /web/app/dist/

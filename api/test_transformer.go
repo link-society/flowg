@@ -10,7 +10,7 @@ import (
 	apiUtils "link-society.com/flowg/internal/utils/api"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/utils/ffi/vrl"
+	"link-society.com/flowg/internal/utils/langs/vrl"
 )
 
 type TestTransformerRequest struct {

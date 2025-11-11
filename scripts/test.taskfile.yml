@@ -26,7 +26,7 @@ tasks:
       - pdm run pytest
     env:
       FLOWG_TEST_SUITES: web
-  
+
   "e2e:consul":
     desc: "Run Consul end-to-end tests"
     dir: ./tests
@@ -52,12 +52,12 @@ tasks:
 
   "test:unit:rust:filterdsl":
     internal: true
-    dir: ./internal/utils/ffi/filterdsl/rust-crate
+    dir: ./internal/utils/langs/filterdsl/rust-crate
     cmds:
       - cargo test
 
   "test:unit:rust:vrl":
     internal: true
-    dir: ./internal/utils/ffi/vrl/rust-crate
+    dir: ./internal/utils/langs/vrl/rust-crate
     cmds:
       - cargo test
