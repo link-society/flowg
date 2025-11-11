@@ -1,7 +1,6 @@
 import pytest
 
 import subprocess
-import json
 
 from ..settings import has_test_suite
 
