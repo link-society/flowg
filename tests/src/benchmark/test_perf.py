@@ -1,29 +1,28 @@
 import pytest
 
-import multiprocessing
+import subprocess
+import json
 
-from tqdm import tqdm
-
-from .utils import iteration, timeit
 from ..settings import has_test_suite
 
 
 @pytest.mark.skipif(not has_test_suite("bench"), reason="Benchmark excluded")
-def test_perf(testdata, iteration_count, job_count, flowg_config, flowg_admin_token):
+def test_perf(iteration_count, flowg_admin_token):
     print("Running performance benchmark:\n")
 
-    with timeit(iteration_count):
-        with multiprocessing.Pool(job_count) as pool:
-            params = [
-                (flowg_admin_token, testdata)
-                for _ in range(iteration_count)
-            ]
-            iterable = tqdm(
-                pool.imap_unordered(iteration, params),
-                total=iteration_count,
-                desc="Sending logs",
-                unit="req",
-            )
+    payload = json.dumps({"records": [
+        {"message": "hello world"}
+    ]})
 
-            for _ in iterable:
-                pass
+    subprocess.check_call(
+        f"""
+        oha \
+            -n {iteration_count} \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer {flowg_admin_token}" \
+            "http://localhost:5080/api/v1/pipelines/default/logs/struct" \
+            -m "POST" \
+            -d '{payload}'
+        """,
+        shell=True,
+    )
