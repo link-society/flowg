@@ -1,9 +1,10 @@
 package models
 
 type FlowGraphV2 struct {
-	Version int           `json:"version" default:"2"`
-	Nodes   []*FlowNodeV2 `json:"nodes" required:"true"`
-	Edges   []*FlowEdgeV2 `json:"edges" required:"true"`
+	MajorVersion int           `json:"version" default:"2"`
+	MinorVersion int           `json:"version.minor" default:"1"`
+	Nodes        []*FlowNodeV2 `json:"nodes" required:"true"`
+	Edges        []*FlowEdgeV2 `json:"edges" required:"true"`
 }
 
 type FlowNodeV2 struct {
