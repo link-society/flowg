@@ -1,11 +1,11 @@
 import { AmqpForwarderModel } from '@/lib/models/forwarder/amqp'
+import { ClickhouseForwarderModel } from '@/lib/models/forwarder/clickhouse'
 import { DatadogForwarderModel } from '@/lib/models/forwarder/datadog'
 import { ElasticForwarderModel } from '@/lib/models/forwarder/elastic'
 import { HttpForwarderModel } from '@/lib/models/forwarder/http'
 import { OtlpForwarderModel } from '@/lib/models/forwarder/otlp'
 import { SplunkForwarderModel } from '@/lib/models/forwarder/splunk'
 import { SyslogForwarderModel } from '@/lib/models/forwarder/syslog'
-import { ClickhouseForwarderModel } from '@/lib/models/forwarder/clickhouse';
 
 export type ForwarderModel = {
   config: ForwarderConfigModel
