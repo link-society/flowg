@@ -112,6 +112,17 @@ export const PipelineView = () => {
             >
               Documentation
             </Button>
+
+            <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              href="https://expr-lang.org/docs/language-definition"
+              target="_blank"
+              startIcon={<HelpIcon />}
+            >
+              Switch Expression Documentation
+            </Button>
           </div>
 
           {permissions.can_edit_pipelines && (
