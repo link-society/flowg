@@ -7,6 +7,7 @@ import (
 
 	"github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/google/uuid"
+	"link-society.com/flowg/internal/app"
 )
 
 type ForwarderClickhouseV2 struct {
@@ -52,7 +53,7 @@ func (f *ForwarderClickhouseV2) call(ctx context.Context, record *LogRecord) err
 				Name    string
 				Version string
 			}{
-				{Name: "TODO", Version: "TODO"},
+				{Name: "FlowG", Version: app.FLOWG_VERSION},
 			},
 		},
 		TLS: tlscfg,
