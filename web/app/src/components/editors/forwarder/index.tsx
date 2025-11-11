@@ -1,13 +1,13 @@
 import { ForwarderConfigModel, ForwarderModel } from '@/lib/models/forwarder'
 
 import { AmqpForwarderEditor } from './amqp'
+import { ClickhouseForwarderEditor } from './clickhouse'
 import { DatadogForwarderEditor } from './datadog'
 import { ElasticForwarderEditor } from './elastic'
 import { HttpForwarderEditor } from './http'
 import { OtlpForwarderEditor } from './otlp'
 import { SplunkForwarderEditor } from './splunk'
 import { SyslogForwarderEditor } from './syslog'
-import { ClickhouseForwarderEditor } from './clickhouse'
 
 type ForwarderEditorProps = {
   forwarder: ForwarderModel
