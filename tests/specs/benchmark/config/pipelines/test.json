@@ -41,7 +41,7 @@
         "y": -30
       },
       "data": {
-        "condition": "appname  = \"iam01\""
+        "condition": "appname == \"iam01\""
       }
     },
     {
@@ -52,7 +52,7 @@
         "y": 105
       },
       "data": {
-        "condition": "appname = \"iam02\""
+        "condition": "appname == \"iam02\""
       }
     },
     {
@@ -63,7 +63,7 @@
         "y": 240
       },
       "data": {
-        "condition": "appname = \"db\""
+        "condition": "appname == \"db\""
       }
     },
     {
@@ -107,7 +107,7 @@
         "y": 375
       },
       "data": {
-        "condition": "appname = \"apache2\""
+        "condition": "appname == \"apache2\""
       }
     },
     {
