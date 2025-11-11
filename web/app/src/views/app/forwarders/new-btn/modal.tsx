@@ -105,6 +105,7 @@ const newForwarderFactory = (type: ForwarderTypes): ForwarderModel => {
           table: 'default',
           user: 'default',
           pass: '',
+          tls: true,
         },
       }
 

@@ -5,4 +5,5 @@ export type ClickhouseForwarderModel = {
 	table: string
 	user: string
 	pass: string
+	tls: boolean
 }
