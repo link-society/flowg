@@ -28,12 +28,12 @@ tasks:
 
   "backend:vrl":
     desc: "Build libvrl Rust crate"
-    dir: ./internal/utils/ffi/vrl/rust-crate
+    dir: ./internal/utils/langs/vrl/rust-crate
     cmds:
       - cargo build --release
 
   "backend:filterdsl":
     desc: "Build libfilterdsl Rust crate"
-    dir: ./internal/utils/ffi/filterdsl/rust-crate
+    dir: ./internal/utils/langs/filterdsl/rust-crate
     cmds:
       - cargo build --release

@@ -13,7 +13,7 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	apiUtils "link-society.com/flowg/internal/utils/api"
-	"link-society.com/flowg/internal/utils/ffi/filterdsl"
+	"link-society.com/flowg/internal/utils/langs/filterdsl"
 
 	"link-society.com/flowg/internal/models"
 )

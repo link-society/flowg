@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"link-society.com/flowg/internal/utils/ffi/vrl"
+	"link-society.com/flowg/internal/utils/langs/vrl"
 )
 
 func TestProcessRecord(t *testing.T) {

@@ -16,7 +16,7 @@ import (
 	"link-society.com/flowg/internal/storage/log/transactions"
 	"link-society.com/flowg/internal/utils/kvstore"
 
-	"link-society.com/flowg/internal/utils/ffi/filterdsl"
+	"link-society.com/flowg/internal/utils/langs/filterdsl"
 )
 
 type Storage interface {

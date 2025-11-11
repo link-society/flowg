@@ -16,8 +16,8 @@ ADD api /src/api
 ADD cmd /src/cmd
 
 ADD \
-  --exclude=internal/utils/ffi/filterdsl/rust-crate \
-  --exclude=internal/utils/ffi/vrl/rust-crate \
+  --exclude=internal/utils/langs/filterdsl/rust-crate \
+  --exclude=internal/utils/langs/vrl/rust-crate \
   internal/ /src/internal/
 
 ADD \
@@ -35,12 +35,12 @@ ADD web/app /src/web/app
 ## FilterDSL sources
 FROM scratch AS sources-rust-filterdsl
 
-ADD internal/utils/ffi/filterdsl/rust-crate /src/internal/utils/ffi/filterdsl/rust-crate
+ADD internal/utils/langs/filterdsl/rust-crate /src/internal/utils/langs/filterdsl/rust-crate
 
 ## VRL sources
 FROM scratch AS sources-rust-vrl
 
-ADD internal/utils/ffi/vrl/rust-crate /src/internal/utils/ffi/vrl/rust-crate
+ADD internal/utils/langs/vrl/rust-crate /src/internal/utils/langs/vrl/rust-crate
 
 ##############################
 ## BUILD RUST DEPENDENCIES
@@ -51,7 +51,7 @@ FROM rust:1.91-alpine3.22 AS builder-rust-filterdsl
 RUN apk add --no-cache musl-dev
 
 COPY --from=sources-rust-filterdsl /src /workspace
-WORKDIR /workspace/internal/utils/ffi/filterdsl/rust-crate
+WORKDIR /workspace/internal/utils/langs/filterdsl/rust-crate
 
 RUN cargo build --release
 RUN cargo test
@@ -61,7 +61,7 @@ FROM rust:1.91-alpine3.22 AS builder-rust-vrl
 RUN apk add --no-cache musl-dev
 
 COPY --from=sources-rust-vrl /src /workspace
-WORKDIR /workspace/internal/utils/ffi/vrl/rust-crate
+WORKDIR /workspace/internal/utils/langs/vrl/rust-crate
 
 RUN cargo build --release
 RUN cargo test
@@ -96,8 +96,8 @@ RUN set -ex && \
     rm -rf /tmp/upx.tar.xz upx-${UPX_VERSION}-${UPX_ARCH}_${UPX_OS}
 
 COPY --from=sources-go /src /workspace
-COPY --from=builder-rust-filterdsl /workspace/internal/utils/ffi/filterdsl/rust-crate/target/release/libflowg_filterdsl.a /workspace/internal/utils/ffi/filterdsl/rust-crate/target/release/libflowg_filterdsl.a
-COPY --from=builder-rust-vrl /workspace/internal/utils/ffi/vrl/rust-crate/target/release/libflowg_vrl.a /workspace/internal/utils/ffi/vrl/rust-crate/target/release/libflowg_vrl.a
+COPY --from=builder-rust-filterdsl /workspace/internal/utils/langs/filterdsl/rust-crate/target/release/libflowg_filterdsl.a /workspace/internal/utils/langs/filterdsl/rust-crate/target/release/libflowg_filterdsl.a
+COPY --from=builder-rust-vrl /workspace/internal/utils/langs/vrl/rust-crate/target/release/libflowg_vrl.a /workspace/internal/utils/langs/vrl/rust-crate/target/release/libflowg_vrl.a
 COPY --from=builder-js /workspace/web/app/dist /workspace/web/public
 WORKDIR /workspace
 

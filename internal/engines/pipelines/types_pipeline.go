@@ -9,7 +9,7 @@ import (
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage/config"
 
-	"link-society.com/flowg/internal/utils/ffi/filterdsl"
+	"link-society.com/flowg/internal/utils/langs/filterdsl"
 )
 
 type Pipeline struct {
