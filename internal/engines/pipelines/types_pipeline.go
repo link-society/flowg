@@ -8,8 +8,6 @@ import (
 
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage/config"
-
-	"link-society.com/flowg/internal/utils/langs/filterdsl"
 )
 
 type Pipeline struct {
@@ -55,17 +53,12 @@ func Build(ctx context.Context, configStorage config.Storage, name string) (*Pip
 			pipelineNodes[flowNode.ID] = pipelineNode
 
 		case "switch":
-			conditionSource, exists := flowNode.Data["condition"]
+			condition, exists := flowNode.Data["condition"]
 			if !exists {
 				return nil, &MissingFlowNodeDataError{
 					NodeID: flowNode.ID,
 					Key:    "condition",
 				}
-			}
-
-			condition, err := filterdsl.Compile(conditionSource)
-			if err != nil {
-				return nil, err
 			}
 
 			pipelineNode := &SwitchNode{

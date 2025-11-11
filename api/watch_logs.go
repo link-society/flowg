@@ -13,7 +13,7 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	apiUtils "link-society.com/flowg/internal/utils/api"
-	"link-society.com/flowg/internal/utils/langs/filterdsl"
+	"link-society.com/flowg/internal/utils/langs/filtering"
 
 	"link-society.com/flowg/internal/models"
 )
@@ -37,12 +37,12 @@ func (ctrl *controller) WatchLogsUsecase() usecase.Interactor {
 				req WatchLogsRequest,
 				resp *WatchLogsResponse,
 			) error {
-				var filter filterdsl.Filter
+				var filter filtering.Filter
 
 				if req.Filter != nil && *req.Filter != "" {
 					var err error
 
-					filter, err = filterdsl.Compile(*req.Filter)
+					filter, err = filtering.Compile(*req.Filter)
 					if err != nil {
 						ctrl.logger.ErrorContext(
 							ctx,
@@ -87,7 +87,28 @@ func (ctrl *controller) WatchLogsUsecase() usecase.Interactor {
 				)
 
 				for log := range logM.ReceiveC() {
-					if filter == nil || filter.Evaluate(&log.LogRecord) {
+					matches := false
+
+					if filter == nil {
+						matches = true
+					} else {
+						var err error
+						matches, err = filter.Evaluate(&log.LogRecord)
+						if err != nil {
+							fmt.Fprintf(resp, "event: error\n")
+							fmt.Fprintf(
+								resp,
+								"data: failed to evaluate filter for log entry '%s': %s\n\n",
+								log.LogKey,
+								err.Error(),
+							)
+							resp.Writer.(http.Flusher).Flush()
+
+							return nil
+						}
+					}
+
+					if matches {
 						payload, err := json.Marshal(log.LogRecord)
 						if err != nil {
 							fmt.Fprintf(resp, "event: error\n")

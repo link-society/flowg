@@ -10,26 +10,18 @@ import (
 
 	"link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/internal/utils/langs/filterdsl"
+	"link-society.com/flowg/internal/utils/langs/filtering"
 )
 
 func FetchLogs(
 	txn *badger.Txn,
 	stream string,
 	from, to time.Time,
-	filter filterdsl.Filter,
+	filter filtering.Filter,
 ) ([]models.LogRecord, error) {
 	results := []models.LogRecord{}
 
-	streamConfig, err := GetOrCreateStreamConfig(txn, stream)
-	if err != nil {
-		return nil, err
-	}
-
 	keys := fetchKeysByTime(txn, stream, from, to)
-	if filter != nil {
-		keys = filterKeysByIndex(txn, stream, streamConfig, keys, filter)
-	}
 	sort.Sort(sort.Reverse(sort.StringSlice(keys)))
 
 	for _, key := range keys {
@@ -38,8 +30,20 @@ func FetchLogs(
 			return nil, err
 		}
 
-		if filter == nil || filter.Evaluate(&entry) {
+		if filter == nil {
 			results = append(results, entry)
+		} else {
+			matches, err := filter.Evaluate(&entry)
+			if err != nil {
+				return nil, fmt.Errorf(
+					"failed to evaluate filter for log entry '%s': %w",
+					key, err,
+				)
+			}
+
+			if matches {
+				results = append(results, entry)
+			}
 		}
 	}
 
@@ -71,106 +75,6 @@ func fetchKeysByTime(txn *badger.Txn, stream string, from, to time.Time) []strin
 	}
 
 	return keys
-}
-
-func filterKeysByIndex(
-	txn *badger.Txn,
-	stream string,
-	streamConfig models.StreamConfig,
-	allKeys []string,
-	filter filterdsl.Filter,
-) []string {
-	allKeysMap := sliceToMap(allKeys)
-
-	var evaluate func(f filterdsl.Filter) map[string]struct{}
-	evaluate = func(f filterdsl.Filter) map[string]struct{} {
-		switch f := f.(type) {
-		case *filterdsl.FilterAnd:
-			keys := evaluate(f.Filters[0])
-
-			for _, subFilter := range f.Filters[1:] {
-				subKeys := evaluate(subFilter)
-				keys = intersectKeysMap(keys, subKeys)
-			}
-
-			return keys
-
-		case *filterdsl.FilterOr:
-			keys := map[string]struct{}{}
-
-			for _, subFilter := range f.Filters {
-				subKeys := evaluate(subFilter)
-				keys = unionKeysMap(keys, subKeys)
-			}
-
-			return keys
-
-		case *filterdsl.FilterNot:
-			switch sub := f.Filter.(type) {
-			case *filterdsl.FilterMatchField:
-				if streamConfig.IsFieldIndexed(sub.Field) {
-					keys := evaluate(f.Filter)
-					return differenceKeysMap(allKeysMap, keys)
-				} else {
-					return allKeysMap
-				}
-
-			case *filterdsl.FilterMatchFieldList:
-				if streamConfig.IsFieldIndexed(sub.Field) {
-					keys := evaluate(f.Filter)
-					return differenceKeysMap(allKeysMap, keys)
-				} else {
-					return allKeysMap
-				}
-
-			default:
-				keys := evaluate(f.Filter)
-				return differenceKeysMap(allKeysMap, keys)
-			}
-
-		case *filterdsl.FilterMatchField:
-			if streamConfig.IsFieldIndexed(f.Field) {
-				fieldIndex := newFieldIndex(txn, stream, f.Field, f.Value)
-
-				keys := map[string]struct{}{}
-
-				fieldIndex.IterKeys(func(key string) {
-					if _, found := allKeysMap[key]; found {
-						keys[key] = struct{}{}
-					}
-				})
-
-				return keys
-			} else {
-				return allKeysMap
-			}
-
-		case *filterdsl.FilterMatchFieldList:
-			if streamConfig.IsFieldIndexed(f.Field) {
-				keys := map[string]struct{}{}
-
-				for _, value := range f.Values {
-					fieldIndex := newFieldIndex(txn, stream, f.Field, value)
-
-					fieldIndex.IterKeys(func(key string) {
-						if _, found := allKeysMap[key]; found {
-							keys[key] = struct{}{}
-						}
-					})
-				}
-
-				return keys
-			} else {
-				return allKeysMap
-			}
-
-		default:
-			return map[string]struct{}{}
-		}
-	}
-
-	keys := evaluate(filter)
-	return mapToSlice(keys)
 }
 
 func fetchRecord(txn *badger.Txn, stream string, key string) (models.LogRecord, error) {
