@@ -2,8 +2,13 @@ package models
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
 	"encoding/json"
+
+	"github.com/expr-lang/expr/file"
+	"github.com/expr-lang/expr/parser/lexer"
 )
 
 func ConvertFlowGraph(content []byte) (*FlowGraphV2, bool, error) {
@@ -12,19 +17,38 @@ func ConvertFlowGraph(content []byte) (*FlowGraphV2, bool, error) {
 		return nil, false, fmt.Errorf("failed to unmarshal flow: %w", err)
 	}
 
-	version, ok := data["version"].(float64)
-	if !ok || version == 0 {
-		version = 1
+	majorVersion, ok := data["version"].(float64)
+	if !ok || majorVersion == 0 {
+		majorVersion = 1
 	}
 
-	switch int(version) {
+	minorVersion, ok := data["version.minor"].(float64)
+	if !ok {
+		minorVersion = 0
+	}
+
+	switch int(majorVersion) {
 	case 2:
-		objV2 := &FlowGraphV2{Version: 2}
+		objV2 := &FlowGraphV2{MajorVersion: 2, MinorVersion: 0}
 		if err := json.Unmarshal(content, objV2); err != nil {
 			return nil, false, fmt.Errorf("failed to unmarshal flow: %w", err)
 		}
 
-		return objV2, false, nil
+		switch int(minorVersion) {
+		case 1:
+			return objV2, false, nil
+
+		case 0:
+			objV2_1, err := flowGraph_V2__V2_1(objV2)
+			if err != nil {
+				return nil, false, err
+			}
+
+			return objV2_1, true, nil
+
+		default:
+			return nil, false, fmt.Errorf("unsupported flow version: %d.%d", int(majorVersion), int(minorVersion))
+		}
 
 	case 1:
 		objV1 := &FlowGraphV1{Version: 1}
@@ -32,17 +56,40 @@ func ConvertFlowGraph(content []byte) (*FlowGraphV2, bool, error) {
 			return nil, false, fmt.Errorf("failed to unmarshal flow: %w", err)
 		}
 
-		objV2 := flowGraph_V1_V2(objV1)
+		objV2 := flowGraph_V1__V2(objV1)
+		objV2_1, err := flowGraph_V2__V2_1(objV2)
+		if err != nil {
+			return nil, false, err
+		}
 
-		return objV2, true, nil
+		return objV2_1, true, nil
 
 	default:
-		return nil, false, fmt.Errorf("unsupported flow version: %d", int(version))
+		return nil, false, fmt.Errorf("unsupported flow version: %d", int(majorVersion))
 	}
 }
 
-func flowGraph_V1_V2(objV1 *FlowGraphV1) *FlowGraphV2 {
-	objV2 := &FlowGraphV2{Version: 2}
+func flowGraph_V2__V2_1(objV2 *FlowGraphV2) (*FlowGraphV2, error) {
+	objV2.MajorVersion = 2
+	objV2.MinorVersion = 1
+
+	for _, nodeV2 := range objV2.Nodes {
+		if nodeV2.Type == "switch" {
+			if condition, exists := nodeV2.Data["condition"]; exists {
+				translated, err := convert_filterdsl_to_exprlang(condition)
+				if err != nil {
+					return nil, err
+				}
+				nodeV2.Data["condition"] = translated
+			}
+		}
+	}
+
+	return objV2, nil
+}
+
+func flowGraph_V1__V2(objV1 *FlowGraphV1) *FlowGraphV2 {
+	objV2 := &FlowGraphV2{MajorVersion: 2, MinorVersion: 0}
 
 	for _, nodeV1 := range objV1.Nodes {
 		var nodeV2 *FlowNodeV2
@@ -87,4 +134,30 @@ func flowGraph_V1_V2(objV1 *FlowGraphV1) *FlowGraphV2 {
 	}
 
 	return objV2
+}
+
+func convert_filterdsl_to_exprlang(input string) (string, error) {
+	tokens, err := lexer.Lex(file.NewSource(input))
+	if err != nil {
+		return "", fmt.Errorf("failed to parse expression: %v", err)
+	}
+
+	for i, token := range tokens {
+		if token.Kind == lexer.Operator && token.Value == "=" {
+			tokens[i].Value = "=="
+		}
+	}
+
+	var values []string
+	for _, token := range tokens {
+		switch token.Kind {
+		case lexer.EOF:
+			continue
+		case lexer.String:
+			values = append(values, strconv.Quote(token.Value))
+		default:
+			values = append(values, token.Value)
+		}
+	}
+	return strings.Join(values, " "), nil
 }
