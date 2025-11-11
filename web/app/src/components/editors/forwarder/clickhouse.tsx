@@ -1,6 +1,9 @@
 import Divider from '@mui/material/Divider'
 import InputAdornment from '@mui/material/InputAdornment'
 import TextField from '@mui/material/TextField'
+import Checkbox from '@mui/material/Checkbox'
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 import { ForwarderTypeLabelMap } from '@/lib/models/forwarder'
 import { ClickhouseForwarderModel } from '@/lib/models/forwarder/clickhouse'
@@ -118,6 +121,21 @@ export const ClickhouseForwarderEditor = ({
           })
         }}
       />
+
+      <Divider />
+
+      <FormGroup>
+        <FormControlLabel control={<Checkbox
+          id="input:editor.forwarders.clickhouse.tsl"
+          checked={config.tls}
+          onChange={(e) => {
+            onConfigChange({
+              ...config,
+              tls: e.target.checked,
+            })
+          }}
+        />} label="Use TLS" />
+      </FormGroup>
 
     </div>
   )

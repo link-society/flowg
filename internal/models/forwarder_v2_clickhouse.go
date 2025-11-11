@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 
 	"github.com/ClickHouse/clickhouse-go/v2"
@@ -15,6 +16,7 @@ type ForwarderClickhouseV2 struct {
 	Table    string `json:"table" required:"true" pattern:"^[a-zA-Z_][a-zA-Z0-9_]*$" minLength:"1" maxLength:"64"`
 	Username string `json:"user" required:"true"`
 	Password string `json:"pass" required:"true"`
+	UseTls   bool   `json:"tls" required:"true"`
 }
 
 var createDbQuery = `
@@ -31,6 +33,13 @@ VALUES (?, ?, ?)
 `
 
 func (f *ForwarderClickhouseV2) call(ctx context.Context, record *LogRecord) error {
+	var tlscfg *tls.Config
+	if f.UseTls {
+		tlscfg = &tls.Config{}
+	} else {
+		tlscfg = nil
+	}
+
 	var conn, err = clickhouse.Open(&clickhouse.Options{
 		Addr: []string{f.Url},
 		Auth: clickhouse.Auth{
@@ -46,7 +55,7 @@ func (f *ForwarderClickhouseV2) call(ctx context.Context, record *LogRecord) err
 				{Name: "TODO", Version: "TODO"},
 			},
 		},
-		TLS: nil,
+		TLS: tlscfg,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to initialize connection: %w", err)
