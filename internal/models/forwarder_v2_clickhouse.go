@@ -20,7 +20,7 @@ type ForwarderClickhouseV2 struct {
 	UseTls   bool   `json:"tls" required:"true"`
 }
 
-var createDbQuery = `
+const createDbQuery = `
 CREATE TABLE IF NOT EXISTS %s (
 	id         UUID                 NOT NULL PRIMARY KEY,
 	timestamp  DateTime64(3, 'UTC') NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS %s (
 ) ENGINE = MergeTree
 `
 
-var insertLogQuery = `
+const insertLogQuery = `
 INSERT INTO %s
 VALUES (?, ?, ?)
 `
