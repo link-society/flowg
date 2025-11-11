@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/utils/langs/filterdsl"
+	"link-society.com/flowg/internal/utils/langs/filtering"
 )
 
 type MockStorage struct {
@@ -90,7 +90,7 @@ func (m *MockStorage) Ingest(ctx context.Context, stream string, logRecord *mode
 	return args.Get(0).([]byte), args.Error(1)
 }
 
-func (m *MockStorage) FetchLogs(ctx context.Context, stream string, from time.Time, to time.Time, filter filterdsl.Filter) ([]models.LogRecord, error) {
+func (m *MockStorage) FetchLogs(ctx context.Context, stream string, from time.Time, to time.Time, filter filtering.Filter) ([]models.LogRecord, error) {
 	args := m.Called(ctx, stream, from, to, filter)
 	return args.Get(0).([]models.LogRecord), args.Error(1)
 }

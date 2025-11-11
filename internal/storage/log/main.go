@@ -16,7 +16,7 @@ import (
 	"link-society.com/flowg/internal/storage/log/transactions"
 	"link-society.com/flowg/internal/utils/kvstore"
 
-	"link-society.com/flowg/internal/utils/langs/filterdsl"
+	"link-society.com/flowg/internal/utils/langs/filtering"
 )
 
 type Storage interface {
@@ -37,7 +37,7 @@ type Storage interface {
 		ctx context.Context,
 		stream string,
 		from, to time.Time,
-		filter filterdsl.Filter,
+		filter filtering.Filter,
 	) ([]models.LogRecord, error)
 }
 
@@ -221,7 +221,7 @@ func (s *storageImpl) FetchLogs(
 	ctx context.Context,
 	stream string,
 	from, to time.Time,
-	filter filterdsl.Filter,
+	filter filtering.Filter,
 ) ([]models.LogRecord, error) {
 	var results []models.LogRecord
 

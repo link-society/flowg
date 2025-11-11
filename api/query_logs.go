@@ -12,7 +12,7 @@ import (
 	apiUtils "link-society.com/flowg/internal/utils/api"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/utils/langs/filterdsl"
+	"link-society.com/flowg/internal/utils/langs/filtering"
 )
 
 type QueryStreamRequest struct {
@@ -37,11 +37,11 @@ func (ctrl *controller) QueryStreamUsecase() usecase.Interactor {
 				req QueryStreamRequest,
 				resp *QueryStreamResponse,
 			) error {
-				var filter filterdsl.Filter
+				var filter filtering.Filter
 
 				if req.Filter != nil {
 					var err error
-					filter, err = filterdsl.Compile(*req.Filter)
+					filter, err = filtering.Compile(*req.Filter)
 					if err != nil {
 						ctrl.logger.ErrorContext(
 							ctx,

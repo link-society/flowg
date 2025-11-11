@@ -9,7 +9,7 @@ import (
 
 	"link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/internal/utils/langs/filterdsl"
+	"link-society.com/flowg/internal/utils/langs/filtering"
 	"link-society.com/flowg/internal/utils/langs/vrl"
 )
 
@@ -31,8 +31,10 @@ type TransformNode struct {
 }
 
 type SwitchNode struct {
-	Condition filterdsl.Filter
+	Condition string
 	Next      []Node
+
+	runner filtering.Filter
 }
 
 type PipelineNode struct {
@@ -147,7 +149,9 @@ func (n *TransformNode) Process(ctx context.Context, record *models.LogRecord) e
 
 // MARK: switch
 func (n *SwitchNode) Init(ctx context.Context) error {
-	return nil
+	var err error
+	n.runner, err = filtering.Compile(n.Condition)
+	return err
 }
 
 func (n *SwitchNode) Close(ctx context.Context) error {
@@ -155,7 +159,12 @@ func (n *SwitchNode) Close(ctx context.Context) error {
 }
 
 func (n *SwitchNode) Process(ctx context.Context, record *models.LogRecord) error {
-	if n.Condition.Evaluate(record) {
+	matches, err := n.runner.Evaluate(record)
+	if err != nil {
+		return err
+	}
+
+	if matches {
 		errC := make(chan error, len(n.Next))
 		wg := sync.WaitGroup{}
 
