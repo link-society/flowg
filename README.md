@@ -71,15 +71,15 @@ Result:
 ```
 Summary:
   Success rate: 100.00%
-  Total:        6138.2936 ms
-  Slowest:      269.7329 ms
-  Fastest:      0.1843 ms
-  Average:      3.0651 ms
-  Requests/sec: 16291.1726
+  Total:        5702.4524 ms
+  Slowest:      150.2867 ms
+  Fastest:      0.1578 ms
+  Average:      2.8478 ms
+  Requests/sec: 17536.3148
 
   Total data:   3.53 MiB
   Size/request: 37 B
-  Size/sec:     588.65 KiB
+  Size/sec:     633.64 KiB
 ```
 
 ## :building_construction: Build
