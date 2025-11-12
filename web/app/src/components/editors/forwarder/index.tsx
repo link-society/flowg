@@ -1,6 +1,7 @@
 import { ForwarderConfigModel, ForwarderModel } from '@/lib/models/forwarder'
 
 import { AmqpForwarderEditor } from './amqp'
+import { ClickhouseForwarderEditor } from './clickhouse'
 import { DatadogForwarderEditor } from './datadog'
 import { ElasticForwarderEditor } from './elastic'
 import { HttpForwarderEditor } from './http'
@@ -76,6 +77,14 @@ export const ForwarderEditor = ({
     case 'elastic':
       return (
         <ElasticForwarderEditor
+          config={forwarder.config}
+          onConfigChange={onConfigChange}
+        />
+      )
+
+    case 'clickhouse':
+      return (
+        <ClickhouseForwarderEditor
           config={forwarder.config}
           onConfigChange={onConfigChange}
         />

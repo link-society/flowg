@@ -1,4 +1,5 @@
 import { AmqpForwarderModel } from '@/lib/models/forwarder/amqp'
+import { ClickhouseForwarderModel } from '@/lib/models/forwarder/clickhouse'
 import { DatadogForwarderModel } from '@/lib/models/forwarder/datadog'
 import { ElasticForwarderModel } from '@/lib/models/forwarder/elastic'
 import { HttpForwarderModel } from '@/lib/models/forwarder/http'
@@ -18,6 +19,7 @@ export const ForwarderTypeValues = [
   { key: 'amqp', label: 'AMQP' },
   { key: 'otlp', label: 'OpenTelemetry' },
   { key: 'elastic', label: 'Elastic Search' },
+  { key: 'clickhouse', label: 'Clickhouse' },
 ] as const
 
 export const ForwarderTypeLabelMap = ForwarderTypeValues.reduce(
@@ -36,5 +38,6 @@ export type ForwarderConfigModel =
   | AmqpForwarderModel
   | OtlpForwarderModel
   | ElasticForwarderModel
+  | ClickhouseForwarderModel
 
 export type ForwarderTypes = ForwarderConfigModel['type']

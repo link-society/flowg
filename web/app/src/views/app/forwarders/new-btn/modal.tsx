@@ -96,6 +96,19 @@ const newForwarderFactory = (type: ForwarderTypes): ForwarderModel => {
         },
       }
 
+    case 'clickhouse':
+      return {
+        config: {
+          type,
+          url: '',
+          db: 'default',
+          table: 'default',
+          user: 'default',
+          pass: '',
+          tls: true,
+        },
+      }
+
     default:
       throw new Error(`Unknown forwarder type: ${type}`)
   }
