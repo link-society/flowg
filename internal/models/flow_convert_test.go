@@ -25,7 +25,7 @@ func TestConvert_FilterDSL_to_ExprLang(t *testing.T) {
 		t.Run(tc.input, func(t *testing.T) {
 			t.Parallel()
 
-			got, err := convert_filterdsl_to_exprlang(tc.input)
+			got, err := convertFilterdslToExprlang(tc.input)
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}
