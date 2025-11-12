@@ -39,12 +39,12 @@ func ConvertFlowGraph(content []byte) (*FlowGraphV2, bool, error) {
 			return objV2, false, nil
 
 		case 0:
-			objV2_1, err := flowGraph_V2__V2_1(objV2)
+			objV2m1, err := flowGraphFromV2ToV2m1(objV2)
 			if err != nil {
 				return nil, false, err
 			}
 
-			return objV2_1, true, nil
+			return objV2m1, true, nil
 
 		default:
 			return nil, false, fmt.Errorf("unsupported flow version: %d.%d", int(majorVersion), int(minorVersion))
@@ -56,27 +56,27 @@ func ConvertFlowGraph(content []byte) (*FlowGraphV2, bool, error) {
 			return nil, false, fmt.Errorf("failed to unmarshal flow: %w", err)
 		}
 
-		objV2 := flowGraph_V1__V2(objV1)
-		objV2_1, err := flowGraph_V2__V2_1(objV2)
+		objV2 := flowGraphFromV1ToV2(objV1)
+		objV2m1, err := flowGraphFromV2ToV2m1(objV2)
 		if err != nil {
 			return nil, false, err
 		}
 
-		return objV2_1, true, nil
+		return objV2m1, true, nil
 
 	default:
 		return nil, false, fmt.Errorf("unsupported flow version: %d", int(majorVersion))
 	}
 }
 
-func flowGraph_V2__V2_1(objV2 *FlowGraphV2) (*FlowGraphV2, error) {
+func flowGraphFromV2ToV2m1(objV2 *FlowGraphV2) (*FlowGraphV2, error) {
 	objV2.MajorVersion = 2
 	objV2.MinorVersion = 1
 
 	for _, nodeV2 := range objV2.Nodes {
 		if nodeV2.Type == "switch" {
 			if condition, exists := nodeV2.Data["condition"]; exists {
-				translated, err := convert_filterdsl_to_exprlang(condition)
+				translated, err := convertFilterdslToExprlang(condition)
 				if err != nil {
 					return nil, err
 				}
@@ -88,7 +88,7 @@ func flowGraph_V2__V2_1(objV2 *FlowGraphV2) (*FlowGraphV2, error) {
 	return objV2, nil
 }
 
-func flowGraph_V1__V2(objV1 *FlowGraphV1) *FlowGraphV2 {
+func flowGraphFromV1ToV2(objV1 *FlowGraphV1) *FlowGraphV2 {
 	objV2 := &FlowGraphV2{MajorVersion: 2, MinorVersion: 0}
 
 	for _, nodeV1 := range objV1.Nodes {
@@ -136,7 +136,7 @@ func flowGraph_V1__V2(objV1 *FlowGraphV1) *FlowGraphV2 {
 	return objV2
 }
 
-func convert_filterdsl_to_exprlang(input string) (string, error) {
+func convertFilterdslToExprlang(input string) (string, error) {
 	tokens, err := lexer.Lex(file.NewSource(input))
 	if err != nil {
 		return "", fmt.Errorf("failed to parse expression: %v", err)
