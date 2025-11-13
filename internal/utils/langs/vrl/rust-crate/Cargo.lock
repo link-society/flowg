@@ -3523,9 +3523,9 @@ checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
 name = "vrl"
-version = "0.28.0"
+version = "0.28.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a00427df1a5af971424054933850c6aa6ed13c6e1c6fc35e9f373d3ab5d071f8"
+checksum = "12a9c23805030543c5f2c1f44e1963976fa0ef069ff91b93eda35b399161b492"
 dependencies = [
  "aes",
  "aes-siv",
