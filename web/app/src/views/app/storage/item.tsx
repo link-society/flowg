@@ -18,6 +18,7 @@ import * as configApi from '@/lib/api/operations/config'
 import { useProfile } from '@/lib/context/profile'
 import { useApiOperation } from '@/lib/hooks/api'
 import { useNotify } from '@/lib/hooks/notify'
+import { useFeatureFlags } from '@/lib/hooks/featureflags'
 
 import { StreamEditor } from '@/components/editors/stream'
 
@@ -25,6 +26,7 @@ import { LoaderData } from './loader'
 import { NewStreamButton } from './new-btn'
 
 export const StreamView = () => {
+  const featureFlags = useFeatureFlags()
   const navigate = useNavigate()
   const location = useLocation()
   const notify = useNotify()
@@ -75,6 +77,9 @@ export const StreamView = () => {
           >
             Documentation
           </Button>
+          {featureFlags.demoMode && (
+            <span className="italic">Demo Mode Active, changes will be ignored.</span>
+          )}
         </div>
 
         {permissions.can_edit_streams && (
