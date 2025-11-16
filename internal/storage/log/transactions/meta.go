@@ -7,8 +7,16 @@ import (
 
 	"github.com/dgraph-io/badger/v4"
 
+	"link-society.com/flowg/internal/app/featureflags"
+
 	"link-society.com/flowg/internal/models"
 )
+
+var demoStreamConfig = models.StreamConfig{
+	RetentionTime: 15 * 60, // 15 minutes
+	RetentionSize: 10,
+	IndexedFields: []string{},
+}
 
 func FetchStreamConfigs(txn *badger.Txn) (map[string]models.StreamConfig, error) {
 	streams := map[string]models.StreamConfig{}
@@ -23,16 +31,20 @@ func FetchStreamConfigs(txn *badger.Txn) (map[string]models.StreamConfig, error)
 		stream := string(it.Item().Key()[len(opts.Prefix):])
 
 		var streamConfig models.StreamConfig
-		err := it.Item().Value(func(val []byte) error {
-			if len(val) > 0 {
-				if err := json.Unmarshal(val, &streamConfig); err != nil {
-					return fmt.Errorf("could not unmarshal stream config '%s': %w", stream, err)
+		if featureflags.GetDemoMode() {
+			streamConfig = demoStreamConfig
+		} else {
+			err := it.Item().Value(func(val []byte) error {
+				if len(val) > 0 {
+					if err := json.Unmarshal(val, &streamConfig); err != nil {
+						return fmt.Errorf("could not unmarshal stream config '%s': %w", stream, err)
+					}
 				}
+				return nil
+			})
+			if err != nil {
+				return nil, err
 			}
-			return nil
-		})
-		if err != nil {
-			return nil, err
 		}
 
 		if streamConfig.IndexedFields == nil {
@@ -67,6 +79,10 @@ func FetchStreamFields(txn *badger.Txn, stream string) []string {
 }
 
 func GetOrCreateStreamConfig(txn *badger.Txn, stream string) (models.StreamConfig, error) {
+	if featureflags.GetDemoMode() {
+		return demoStreamConfig, nil
+	}
+
 	var streamConfig models.StreamConfig
 
 	streamKey := []byte(fmt.Sprintf("stream:config:%s", stream))
