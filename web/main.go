@@ -1,12 +1,18 @@
 package web
 
 import (
+	"compress/gzip"
 	"embed"
 
+	"html/template"
+	"strings"
+
 	"encoding/base64"
+
 	"io"
 	"net/http"
-	"strings"
+
+	"link-society.com/flowg/internal/app/featureflags"
 )
 
 //go:embed public/**/*.css
@@ -30,15 +36,40 @@ func NewHandler() http.Handler {
 
 				http.FileServer(http.FS(staticfiles)).ServeHTTP(w, r)
 			} else {
-				html, err := staticfiles.Open("public/index.html")
+				htmlTemplateFile, err := staticfiles.Open("public/index.html")
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+				defer htmlTemplateFile.Close()
+
+				htmlTemplateReader, err := gzip.NewReader(htmlTemplateFile)
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+				defer htmlTemplateReader.Close()
+
+				htmlTemplateSource, err := io.ReadAll(htmlTemplateReader)
 				if err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 					return
 				}
 
-				w.Header().Set("Content-Encoding", "gzip")
+				htmlTemplate, err := template.New("index").Parse(string(htmlTemplateSource))
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+
+				data := map[string]any{
+					"FeatureFlags": map[string]bool{
+						"DemoMode": featureflags.GetDemoMode(),
+					},
+				}
+
 				w.WriteHeader(http.StatusOK)
-				io.Copy(w, html)
+				htmlTemplate.Execute(w, data)
 			}
 		}),
 	)
