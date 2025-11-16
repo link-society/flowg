@@ -1,0 +1,20 @@
+<section>
+  <p>Each application have distinct formats...</p>
+
+  <small><b>and countless others:</b></small>
+  <pre><code data-trim data-noescape>
+2025-11-12 04:42:10,070 INFO  [api.user] User fetched email=john@example.com
+2025-11-12 04:42:20,002 INFO  [api.user] Updating user id=42 email=john.doe@example.com
+2025-11-12 04:42:20,030 WARNING [validation] Deprecated field detected: 'nickname'
+  </code></pre>
+
+  <pre><code data-trim data-noescape>
+Nov 12, 2025 4:45:01 AM com.example.auth.LoginService authenticate
+WARNING: Invalid credentials for user=john@example.com
+  </code></pre>
+
+  <pre><code data-trim data-noescape>
+D, [2025-11-12T04:48:01.010000 #12345] DEBUG -- : Fetching user id=42
+W, [2025-11-12T04:48:02.550000 #12345]  WARN -- : Invalid email format user_id=42
+  </code></pre>
+</section>

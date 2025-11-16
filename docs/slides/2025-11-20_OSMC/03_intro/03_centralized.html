@@ -1,0 +1,40 @@
+<section>
+  <p>
+    With many applications, on many servers, those files are collected,
+    and centralized.
+  </p>
+
+  <p><small>Often using SysLog:</small></p>
+
+  <div class="mermaid">
+    <pre>
+      flowchart LR
+        subgraph Server
+          PROC[[Process]]
+          STDOUT[stdout]
+          STDERR[stderr]
+          FILE1[(app.log)]
+          FILE2[(app_error.log)]
+          SYSLOG_SERVER[[syslog]]
+
+          PROC --> STDOUT
+          PROC --> STDERR
+          STDOUT -- "1>>" --> FILE1
+          STDERR -- "2>>" --> FILE2
+
+          FILE1 --> SYSLOG_SERVER
+          FILE2 --> SYSLOG_SERVER
+        end
+
+        subgraph Central
+          SYSLOG_CENTRAL[[syslog]]
+          DB[("Third-Party
+          Log Storage")]
+
+          SYSLOG_CENTRAL --> DB
+        end
+
+        SYSLOG_SERVER -- forward --> SYSLOG_CENTRAL
+    </pre>
+  </div>
+</section>

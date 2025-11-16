@@ -1,0 +1,19 @@
+<section>
+  <p>System Operators redirect it to files.</p>
+
+  <div class="mermaid">
+    <pre>
+      flowchart LR
+        PROC[[Process]]
+        STDOUT[stdout]
+        STDERR[stderr]
+        FILE1[(app.log)]
+        FILE2[(app_error.log)]
+
+        PROC --> STDOUT
+        PROC --> STDERR
+        STDOUT -- "1>>" --> FILE1
+        STDERR -- "2>>" --> FILE2
+    </pre>
+  </div>
+</section>

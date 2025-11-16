@@ -1,0 +1,43 @@
+<section>
+  <p>Visual pipeline-based processing:</p>
+
+  <div class="r-stack">
+    <div class="fragment fade-in-then-out">
+      <img src="./assets/node-transformer.png" />
+      <p>Transform logs using the <a>Vector Remap Language</a>:</p>
+      <pre><code data-trim data-noescape>
+. = parse_json!(.content)
+      </code></pre>
+    </div>
+    <div class="fragment fade-in-then-out">
+      <img src="./assets/node-switch.png" />
+      <p>Filter logs using the <a>Expr</a> language:</p>
+      <pre><code class="language-text" data-trim data-noescape>
+(
+  tag == "myapp" &&
+  hasPrefix(host, "192.168.")
+)
+      </code></pre>
+    </div>
+    <div class="fragment fade-in-then-out">
+      <img src="./assets/node-stream.png" />
+      <p>Store logs in a specific "stream".</p>
+      <p>Database is backed by <a>BadgerDB</a>.</p>
+    </div>
+    <div class="fragment fade-in-then-out">
+      <img src="./assets/node-forwarder.png" />
+      <p>Forward logs to third-party services:</p>
+      <ul>
+        <li>HTTP, SysLog, OpenTelemetry</li>
+        <li>ElasticSearch, Datadog, Splunk</li>
+        <li>ClickHouse (in progress)</li>
+        <li>AMQP</li>
+      </ul>
+    </div>
+    <div class="fragment fade-in-then-out">
+      <img src="./assets/node-pipeline.png" />
+      <p>Reuse pipelines by forwarding logs to others.</p>
+    </div>
+    <img class="fragment" src="./assets/screenshot-pipelines.png" />
+  </div>
+</section>

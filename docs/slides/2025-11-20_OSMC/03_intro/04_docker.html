@@ -1,0 +1,39 @@
+<section>
+  <p>It's no different with Docker.</p>
+
+  <div class="mermaid">
+    <pre>
+      flowchart LR
+        subgraph Server
+          direction LR
+
+          subgraph Container
+            direction LR
+
+            PROC[[Process]]
+            STDOUT[stdout]
+            STDERR[stderr]
+
+            PROC --> STDOUT
+            PROC --> STDERR
+          end
+
+          DOCKER[[Docker Daemon]]
+          SYSLOG[[syslog]]
+
+          Container --> DOCKER
+          DOCKER --> SYSLOG
+        end
+
+        subgraph Central
+          SYSLOG_CENTRAL[[syslog]]
+          DB[("Third-Party
+          Log Storage")]
+
+          SYSLOG_CENTRAL --> DB
+        end
+
+        SYSLOG -- forward --> SYSLOG_CENTRAL
+    </pre>
+  </div>
+</section>

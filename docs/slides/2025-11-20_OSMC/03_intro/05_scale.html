@@ -1,0 +1,35 @@
+<section>
+  <p>At scale, the number of loggers can grow exponentially:</p>
+
+  <div class="mermaid">
+    <pre>
+      architecture-beta
+        group server1(server)[Server 1]
+        group server2(server)[Server 2]
+        group central(server)[Centralized Logging]
+
+        service app1(logos:docker-icon)[App 1] in server1
+        service app2(logos:docker-icon)[App 2] in server1
+        service app3(logos:docker-icon)[App 3] in server1
+        service syslog-srv1(database)[Syslog] in server1
+
+        service app4(logos:docker-icon)[App 5] in server2
+        service app5(logos:docker-icon)[App 6] in server2
+        service app6(logos:docker-icon)[App 7] in server2
+        service syslog-srv2(database)[Syslog] in server2
+
+        service log-collector(database)[Log Collector] in central
+
+        app1:T -- B:syslog-srv1
+        app2:L -- R:syslog-srv1
+        app3:B -- T:syslog-srv1
+
+        app4:T -- B:syslog-srv2
+        app5:R -- L:syslog-srv2
+        app6:B -- T:syslog-srv2
+
+        syslog-srv1:L -- R:log-collector
+        syslog-srv2:R -- L:log-collector
+    </pre>
+  </div>
+</section>
