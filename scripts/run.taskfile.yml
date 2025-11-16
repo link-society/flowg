@@ -1,6 +1,19 @@
 version: '3'
 
 tasks:
+  demo:
+    desc: "Run the project in demo mode"
+    cmds:
+      - ./bin/flowg-server
+    env:
+      FLOWG_DEMO_MODE: "true"
+      FLOWG_SECRET_KEY: "s3cr3!"
+      FLOWG_CLUSTER_NODE_ID: "flowg-node0"
+      FLOWG_AUTH_DIR: "./data/node0/auth"
+      FLOWG_CONFIG_DIR: "./data/node0/config"
+      FLOWG_LOG_DIR: "./data/node0/logs"
+      FLOWG_CLUSTER_STATE_DIR: "./data/node0/state"
+
   node0:
     desc: "Run the project (node0)"
     cmds:
