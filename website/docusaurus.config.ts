@@ -90,7 +90,6 @@ const config: Config = {
           position: 'left',
         },
         {
-          type: 'docSidebar',
           to: 'presentations',
           label: 'Presentations',
           position: 'left',

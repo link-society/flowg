@@ -20,7 +20,7 @@ runs:
     - name: setup@node
       uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903
       with:
-        node-version: '25'
+        node-version: '24'
 
     - name: setup@rust
       uses: actions-rust-lang/setup-rust-toolchain@1780873c7b576612439a134613cc4cc74ce5538c

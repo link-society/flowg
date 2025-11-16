@@ -5,7 +5,7 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
-    "build": "NODE_OPTIONS=\"--no-webstorage\" docusaurus build",
+    "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
@@ -45,6 +45,6 @@
     ]
   },
   "engines": {
-    "node": ">=18.0"
+    "node": ">=18.0 <25"
   }
 }
