@@ -10,6 +10,7 @@ import { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 
 import * as aclApi from '@/lib/api/operations/acls'
+import { useProfile } from '@/lib/context/profile'
 import { useApiOperation } from '@/lib/hooks/api'
 import { useNotify } from '@/lib/hooks/notify'
 import { UserModel } from '@/lib/models/auth'
@@ -25,6 +26,7 @@ type UserListProps = Readonly<{
 }>
 
 export const UserList = ({ roles, users }: UserListProps) => {
+  const { permissions } = useProfile()
   const notify = useNotify()
 
   const gridRef = useRef<AgGridReact<UserModel>>(null!)
@@ -57,11 +59,12 @@ export const UserList = ({ roles, users }: UserListProps) => {
   const [rowData] = useState<UserModel[]>(users)
   const [columnDefs] = useState<ColDef<UserModel>[]>([
     {
+      hide: !permissions.can_edit_acls,
       headerName: 'Actions',
       headerClass: 'flowg-actions-header',
       cellRenderer: Actions,
       cellRendererParams: {
-        onDelete,
+        onDelete: permissions.can_edit_acls ? onDelete : undefined,
       },
       suppressMovable: true,
       sortable: false,
@@ -89,7 +92,9 @@ export const UserList = ({ roles, users }: UserListProps) => {
           <div className="flex items-center gap-3">
             <AccountCircleIcon />
             <span className="grow">Users</span>
-            <CreateUserButton roles={roles} onUserCreated={onNewUser} />
+            {permissions.can_edit_acls && (
+              <CreateUserButton roles={roles} onUserCreated={onNewUser} />
+            )}
           </div>
         }
         className="bg-blue-400 text-white shadow-lg z-20"
