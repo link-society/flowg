@@ -17,8 +17,8 @@ import SaveIcon from '@mui/icons-material/Save'
 import * as configApi from '@/lib/api/operations/config'
 import { useProfile } from '@/lib/context/profile'
 import { useApiOperation } from '@/lib/hooks/api'
-import { useNotify } from '@/lib/hooks/notify'
 import { useFeatureFlags } from '@/lib/hooks/featureflags'
+import { useNotify } from '@/lib/hooks/notify'
 
 import { StreamEditor } from '@/components/editors/stream'
 
@@ -78,7 +78,9 @@ export const StreamView = () => {
             Documentation
           </Button>
           {featureFlags.demoMode && (
-            <span className="italic">Demo Mode Active, changes will be ignored.</span>
+            <span className="italic">
+              Demo Mode Active, changes will be ignored.
+            </span>
           )}
         </div>
 

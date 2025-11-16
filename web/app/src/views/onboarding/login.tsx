@@ -16,8 +16,8 @@ import LoginIcon from '@mui/icons-material/Login'
 import { UnauthenticatedError } from '@/lib/api/errors'
 import * as authApi from '@/lib/api/operations/auth'
 import { useApiOperation } from '@/lib/hooks/api'
-import { useNotify } from '@/lib/hooks/notify'
 import { useFeatureFlags } from '@/lib/hooks/featureflags'
+import { useNotify } from '@/lib/hooks/notify'
 
 export const LoginView = () => {
   const featureFlags = useFeatureFlags()
@@ -69,7 +69,10 @@ export const LoginView = () => {
                 <>
                   <Divider />
 
-                  <p>Demo Mode Enabled, login with <code>demo</code> / <code>demo</code>.</p>
+                  <p>
+                    Demo Mode Enabled, login with <code>demo</code> /{' '}
+                    <code>demo</code>.
+                  </p>
                 </>
               )}
 
