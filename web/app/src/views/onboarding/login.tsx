@@ -17,8 +17,10 @@ import { UnauthenticatedError } from '@/lib/api/errors'
 import * as authApi from '@/lib/api/operations/auth'
 import { useApiOperation } from '@/lib/hooks/api'
 import { useNotify } from '@/lib/hooks/notify'
+import { useFeatureFlags } from '@/lib/hooks/featureflags'
 
 export const LoginView = () => {
+  const featureFlags = useFeatureFlags()
   const navigate = useNavigate()
   const notify = useNotify()
 
@@ -62,6 +64,14 @@ export const LoginView = () => {
                   Sign In with your account
                 </h1>
               </header>
+
+              {featureFlags.demoMode && (
+                <>
+                  <Divider />
+
+                  <p>Demo Mode Enabled, login with <code>demo</code> / <code>demo</code>.</p>
+                </>
+              )}
 
               <Divider />
 
