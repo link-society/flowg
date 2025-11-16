@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"link-society.com/flowg/internal/app/featureflags"
 	"link-society.com/flowg/internal/models"
 
 	"link-society.com/flowg/internal/storage/auth"
@@ -39,8 +40,7 @@ func DefaultRolesAndUsers(ctx context.Context, authStorage auth.Storage, opts Bo
 			},
 		}
 
-		err := authStorage.SaveRole(ctx, adminRole)
-		if err != nil {
+		if err := authStorage.SaveRole(ctx, adminRole); err != nil {
 			return fmt.Errorf("failed to bootstrap admin role: %w", err)
 		}
 	}
@@ -56,9 +56,35 @@ func DefaultRolesAndUsers(ctx context.Context, authStorage auth.Storage, opts Bo
 			Roles: []string{"admin"},
 		}
 
-		err := authStorage.SaveUser(ctx, rootUser, opts.InitialPassword)
-		if err != nil {
+		if err := authStorage.SaveUser(ctx, rootUser, opts.InitialPassword); err != nil {
 			return fmt.Errorf("failed to bootstrap root user: %w", err)
+		}
+	}
+
+	if featureflags.GetDemoMode() {
+		demoRole := models.Role{
+			Name: "demo",
+			Scopes: []models.Scope{
+				models.SCOPE_SEND_LOGS,
+				models.SCOPE_READ_ACLS,
+				models.SCOPE_WRITE_PIPELINES,
+				models.SCOPE_WRITE_TRANSFORMERS,
+				models.SCOPE_WRITE_STREAMS,
+				models.SCOPE_WRITE_FORWARDERS,
+			},
+		}
+
+		demoUser := models.User{
+			Name:  "demo",
+			Roles: []string{"demo"},
+		}
+
+		if err := authStorage.SaveRole(ctx, demoRole); err != nil {
+			return fmt.Errorf("failed to bootstrap demo role: %w", err)
+		}
+
+		if err := authStorage.SaveUser(ctx, demoUser, "demo"); err != nil {
+			return fmt.Errorf("failed to bootstrap demo user: %w", err)
 		}
 	}
 
