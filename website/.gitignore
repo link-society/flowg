@@ -9,6 +9,7 @@
 .cache-loader
 docs/cli/**/*.md
 src/openapi.json
+static/slides
 
 # Misc
 .DS_Store

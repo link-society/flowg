@@ -90,6 +90,12 @@ const config: Config = {
           position: 'left',
         },
         {
+          type: 'docSidebar',
+          to: 'presentations',
+          label: 'Presentations',
+          position: 'left',
+        },
+        {
           href: 'https://github.com/link-society/flowg',
           html: `
             <div style="display: flex; align-items: center;">

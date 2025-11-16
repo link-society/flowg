@@ -5,12 +5,33 @@ tasks:
     desc: "Serve website"
     dir: ./website
     cmds:
+      - task: build:slides
+      - task: copy:slides
       - npm i
       - npm start
 
   build:
     desc: "Build website"
+    cmds:
+      - task: build:slides
+      - task: build:docusaurus
+
+  build:slides:
+    internal: true
+    dir: ./docs/slides
+    cmds:
+      - npm i
+
+  copy:slides:
+    internal: true
+    cmds:
+      - rm -rf ./website/static/slides
+      - cp -r ./docs/slides ./website/static/slides
+
+  build:docusaurus:
+    internal: true
     dir: ./website
     cmds:
+      - task: copy:slides
       - npm i
       - npm run build
