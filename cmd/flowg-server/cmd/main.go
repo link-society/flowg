@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 	"go.uber.org/fx"
 
+	"link-society.com/flowg/internal/app/featureflags"
 	"link-society.com/flowg/internal/app/logging"
 	"link-society.com/flowg/internal/app/metrics"
 	"link-society.com/flowg/internal/app/server"
@@ -24,6 +25,7 @@ func NewRootCommand() *cobra.Command {
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			syscall.Umask(0077)
 			logging.Setup(opts.verbose, opts.loglevel)
+			featureflags.SetDemoMode(opts.demoMode)
 			metrics.Setup()
 		},
 		Run: func(cmd *cobra.Command, args []string) {

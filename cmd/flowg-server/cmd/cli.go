@@ -5,6 +5,8 @@ import (
 )
 
 type options struct {
+	demoMode bool
+
 	httpBindAddress string
 	httpTlsEnabled  bool
 	httpTlsCert     string
@@ -54,6 +56,13 @@ type options struct {
 }
 
 func (opts *options) defineCliOptions(cmd *cobra.Command) {
+	cmd.Flags().BoolVar(
+		&opts.demoMode,
+		"demo-mode",
+		defaultDemoMode,
+		"Enable demo mode (add demo account and limit storage usage)",
+	)
+
 	cmd.Flags().StringVar(
 		&opts.httpBindAddress,
 		"http-bind",
