@@ -10,6 +10,7 @@ import { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 
 import * as aclApi from '@/lib/api/operations/acls'
+import { useProfile } from '@/lib/context/profile'
 import { useApiOperation } from '@/lib/hooks/api'
 import { useNotify } from '@/lib/hooks/notify'
 import { RoleModel } from '@/lib/models/auth'
@@ -24,6 +25,7 @@ type RoleListProps = Readonly<{
 }>
 
 export const RoleList = ({ roles }: RoleListProps) => {
+  const { permissions } = useProfile()
   const notify = useNotify()
 
   const gridRef = useRef<AgGridReact<RoleModel>>(null!)
@@ -56,11 +58,12 @@ export const RoleList = ({ roles }: RoleListProps) => {
   const [rowData] = useState<RoleModel[]>(roles)
   const [columnDefs] = useState<ColDef<RoleModel>[]>([
     {
+      hide: !permissions.can_edit_acls,
       headerName: 'Actions',
       headerClass: 'flowg-actions-header',
       cellRenderer: Actions,
       cellRendererParams: {
-        onDelete,
+        onDelete: permissions.can_edit_acls ? onDelete : undefined,
       },
       suppressMovable: true,
       sortable: false,
@@ -88,7 +91,9 @@ export const RoleList = ({ roles }: RoleListProps) => {
           <div className="flex items-center gap-3">
             <AdminPanelSettingsIcon />
             <span className="grow">Roles</span>
-            <CreateRoleButton onRoleCreated={onNewRole} />
+            {permissions.can_edit_acls && (
+              <CreateRoleButton onRoleCreated={onNewRole} />
+            )}
           </div>
         }
         className="bg-blue-400 text-white shadow-lg z-20"
