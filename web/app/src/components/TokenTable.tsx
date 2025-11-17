@@ -7,8 +7,7 @@ import CardHeader from '@mui/material/CardHeader'
 import KeyIcon from '@mui/icons-material/Key'
 
 import { ColDef } from 'ag-grid-community'
-import { AgGridReact } from 'ag-grid-react'
-import { CustomCellRendererProps } from 'ag-grid-react'
+import { AgGridReact, CustomCellRendererProps } from 'ag-grid-react'
 
 import * as tokenApi from '@/lib/api/operations/token'
 

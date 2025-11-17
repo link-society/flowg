@@ -12,4 +12,4 @@ export const ScopeLabels = {
   send_logs: 'Send Logs',
 }
 
-export const Scopes = Object.keys(ScopeLabels) as string[]
+export const Scopes = Object.keys(ScopeLabels)

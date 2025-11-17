@@ -6,16 +6,13 @@ type CatchErrorProps<E extends Error> = {
   fallback: ReactNode
 }
 
-function CatchError<E extends Error>({
-  errorType,
-  fallback,
-}: CatchErrorProps<E>) {
+const CatchError = <E extends Error>(props: CatchErrorProps<E>) => {
   const error = useAsyncError()
 
-  if (error instanceof errorType) {
+  if (error instanceof props.errorType) {
     return <Navigate to="/web/login" />
-  } else if (fallback) {
-    return <>{fallback}</>
+  } else if (props.fallback) {
+    return <>{props.fallback}</>
   } else {
     throw error
   }
