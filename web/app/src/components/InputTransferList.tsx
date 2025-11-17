@@ -14,7 +14,11 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft'
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight'
 
-const not = <T,>(a: readonly T[], b: readonly T[], getItemId: (item: T) => any) => {
+const not = <T,>(
+  a: readonly T[],
+  b: readonly T[],
+  getItemId: (item: T) => any
+) => {
   return a.filter(
     (value) => !b.some((item) => getItemId(item) === getItemId(value))
   )
@@ -97,11 +101,9 @@ const InputTransferList = <T,>(props: InputTransferListProps<T>) => {
               <ListItemIcon>
                 <Checkbox
                   id={inputId}
-                  checked={
-                    checked.some((v) => {
-                      return props.getItemId(v) === props.getItemId(value)
-                    })
-                  }
+                  checked={checked.some((v) => {
+                    return props.getItemId(v) === props.getItemId(value)
+                  })}
                   tabIndex={-1}
                   disableRipple
                   slotProps={{
