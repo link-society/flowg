@@ -8,7 +8,7 @@ import TextField from '@mui/material/TextField'
 import { ForwarderTypeLabelMap } from '@/lib/models/forwarder'
 import { ClickhouseForwarderModel } from '@/lib/models/forwarder/clickhouse'
 
-// import { ClickhouseIcon } from '@/components/icons/clickhouse'
+import { ClickhouseIcon } from '@/components/icons/clickhouse'
 
 type ClickhouseForwarderEditorProps = {
   config: ClickhouseForwarderModel
@@ -36,7 +36,7 @@ export const ClickhouseForwarderEditor = ({
             input: {
               startAdornment: (
                 <InputAdornment position="start">
-                  {/* <ClickhouseIcon /> */}
+                  <ClickhouseIcon />
                 </InputAdornment>
               ),
             },
