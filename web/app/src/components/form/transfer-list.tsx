@@ -26,7 +26,7 @@ function intersection<T>(
   getItemId: (item: T) => any
 ) {
   return a.filter((value) =>
-    b.some((item) => getItemId(item) === getItemId(value))
+    !b.some((item) => getItemId(item) === getItemId(value))
   )
 }
 
