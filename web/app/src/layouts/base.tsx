@@ -6,7 +6,7 @@ import { Outlet } from 'react-router'
 import { DialogsProvider } from '@toolpad/core/useDialogs'
 import { NotificationsProvider } from '@toolpad/core/useNotifications'
 
-export const BaseLayout = () => {
+const BaseLayout = () => {
   return (
     <div className="h-full flex flex-col overflow-hidden">
       <DialogsProvider>
@@ -19,3 +19,5 @@ export const BaseLayout = () => {
     </div>
   )
 }
+
+export default BaseLayout

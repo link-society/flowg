@@ -1,5 +1,7 @@
 import * as request from '@/lib/api/request'
-import { RoleModel, UserModel } from '@/lib/models/auth'
+
+import RoleModel from '@/lib/models/RoleModel'
+import UserModel from '@/lib/models/UserModel'
 
 export const listUsers = async (): Promise<UserModel[]> => {
   type ListUsersResponse = {

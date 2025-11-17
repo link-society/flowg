@@ -1,5 +1,6 @@
 import * as request from '@/lib/api/request'
-import { TokenModel } from '@/lib/models/auth'
+
+import TokenModel from '@/lib/models/TokenModel'
 
 export const listTokens = async (): Promise<string[]> => {
   type ListTokensResponse = {

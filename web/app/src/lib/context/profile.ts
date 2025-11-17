@@ -1,11 +1,7 @@
-import { createContext, useContext } from 'react'
+import { createContext } from 'react'
 
-import { ProfileModel } from '@/lib/models/auth'
+import ProfileModel from '@/lib/models/ProfileModel'
 
 const ProfileContext = createContext<ProfileModel>(null!)
 
-export const ProfileProvider = ProfileContext.Provider
-
-export const useProfile = () => {
-  return useContext(ProfileContext)
-}
+export default ProfileContext
