@@ -1,0 +1,17 @@
+<section>
+  <p>Our central logging platform also uses FlowG:</p>
+  <img class="r-stretch" src="./assets/diagram-central.png">
+</section>
+
+<section>
+  <p>
+    Receive logs from every cluster's FlowG instance,<br>
+    here the pipeline does:
+  </p>
+  <ul>
+    <li class="fragment">Parse content as JSON</li>
+    <li class="fragment">Filter out logs bellow <code>WARN</code> level</li>
+    <li class="fragment">Anonymize sensitive data</li>
+    <li class="fragment">Forward logs to Splunk</li>
+  </ul>
+</section>

@@ -1,0 +1,18 @@
+<section>
+  <p>Typical cluster in our infrastructure:</p>
+  <img class="r-stretch" src="./assets/diagram-cluster.png">
+</section>
+
+<section>
+  <p>
+    Docker containers use the Syslog Logging Driver<br>
+    and forward logs to FlowG
+  </p>
+  <ul>
+    <li class="fragment">Parse content based on container name</li>
+    <li class="fragment">Add <code>service</code> field based on container name and VM name</li>
+    <li class="fragment">Add <code>cluster</code> field with static value</li>
+    <li class="fragment">Store logs with 1 day retention policy</li>
+    <li class="fragment">Forward logs to centralized logging platform</li>
+  </ul>
+</section>
