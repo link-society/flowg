@@ -52,6 +52,8 @@ func (f *ForwarderV2) Init(ctx context.Context) error {
 		return f.Config.Otlp.init(ctx)
 	case f.Config.Elastic != nil:
 		return f.Config.Elastic.init(ctx)
+	case f.Config.Clickhouse != nil:
+		return f.Config.Clickhouse.init(ctx)
 	default:
 		return fmt.Errorf("unsupported forwarder type")
 	}
@@ -73,6 +75,8 @@ func (f *ForwarderV2) Close(ctx context.Context) error {
 		return f.Config.Otlp.close(ctx)
 	case f.Config.Elastic != nil:
 		return f.Config.Elastic.close(ctx)
+	case f.Config.Clickhouse != nil:
+		return f.Config.Clickhouse.close(ctx)
 	default:
 		return fmt.Errorf("unsupported forwarder type")
 	}
