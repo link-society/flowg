@@ -1,4 +1,4 @@
-import { LogEntryModel } from '@/lib/models/log'
+import LogEntryModel from '@/lib/models/LogEntryModel'
 
 const INTERVAL_OPTIONS = [
   5 * 1000, // 5 seconds

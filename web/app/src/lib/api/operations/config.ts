@@ -1,7 +1,8 @@
 import * as request from '@/lib/api/request'
-import { ForwarderModel } from '@/lib/models/forwarder'
-import { PipelineModel } from '@/lib/models/pipeline'
-import { StreamConfigModel } from '@/lib/models/storage'
+
+import ForwarderModel from '@/lib/models/ForwarderModel'
+import PipelineModel from '@/lib/models/PipelineModel'
+import StreamConfigModel from '@/lib/models/StreamConfigModel'
 
 export const listTransformers = async (): Promise<string[]> => {
   type ListTransformersResponse = {

@@ -1,18 +1,20 @@
 import { Outlet, useLoaderData } from 'react-router'
 
 import * as authApi from '@/lib/api/operations/auth'
-import { ProfileProvider } from '@/lib/context/profile'
-import { loginRequired } from '@/lib/decorators/loaders'
-import { ProfileModel } from '@/lib/models/auth'
 
-import { Footer } from '@/components/footer'
-import { NavBar } from '@/components/navbar'
+import ProfileModel from '@/lib/models/ProfileModel'
+
+import { loginRequired } from '@/lib/decorators/loaders'
+
+import NavBar from '@/components/NavBar'
+import PageFooter from '@/components/PageFooter'
+import ProfileProvider from '@/components/ProfileProvider'
 
 export const loader = async () => {
   return await loginRequired(authApi.whoami)()
 }
 
-export const AppLayout = () => {
+const AppLayout = () => {
   const profile = useLoaderData() as ProfileModel
 
   return (
@@ -24,8 +26,10 @@ export const AppLayout = () => {
           <Outlet />
         </main>
 
-        <Footer />
+        <PageFooter />
       </div>
     </ProfileProvider>
   )
 }
+
+export default AppLayout

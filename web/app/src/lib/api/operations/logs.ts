@@ -1,5 +1,6 @@
 import * as request from '@/lib/api/request'
-import { LogEntryModel } from '@/lib/models/log'
+
+import LogEntryModel from '@/lib/models/LogEntryModel'
 
 export const queryLogs = async (
   stream: string,

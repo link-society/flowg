@@ -1,5 +1,8 @@
 import * as request from '@/lib/api/request'
-import { PermissionsModel, ProfileModel, UserModel } from '@/lib/models/auth'
+
+import PermissionsModel from '@/lib/models/PermissionsModel'
+import ProfileModel from '@/lib/models/ProfileModel'
+import UserModel from '@/lib/models/UserModel'
 
 export const whoami = async (): Promise<ProfileModel> => {
   type WhoamiResponse = {
