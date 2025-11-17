@@ -4,7 +4,7 @@ import { UnauthenticatedError } from '@/lib/api/errors'
 
 import CatchError from '@/components/CatchError'
 
-function AuthenticatedAwait<T>(props: AwaitProps<T>) {
+const AuthenticatedAwait = <T,>(props: AwaitProps<T>) => {
   return (
     <Await
       resolve={props.resolve}

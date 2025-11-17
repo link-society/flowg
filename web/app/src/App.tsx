@@ -19,10 +19,10 @@ const theme = createTheme({
   },
 })
 
-export default function App() {
-  return (
-    <ThemeProvider theme={theme}>
-      <RouterProvider router={router} />
-    </ThemeProvider>
-  )
-}
+const App = () => (
+  <ThemeProvider theme={theme}>
+    <RouterProvider router={router} />
+  </ThemeProvider>
+)
+
+export default App

@@ -14,17 +14,17 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft'
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight'
 
-function not<T>(a: readonly T[], b: readonly T[], getItemId: (item: T) => any) {
+const not = <T,>(a: readonly T[], b: readonly T[], getItemId: (item: T) => any) => {
   return a.filter(
     (value) => !b.some((item) => getItemId(item) === getItemId(value))
   )
 }
 
-function intersection<T>(
+const intersection = <T,>(
   a: readonly T[],
   b: readonly T[],
   getItemId: (item: T) => any
-) {
+) => {
   return a.filter((value) =>
     b.some((item) => getItemId(item) === getItemId(value))
   )
@@ -37,7 +37,7 @@ type InputTransferListProps<T> = Readonly<{
   onChoiceUpdate: (choices: readonly T[]) => void
 }>
 
-function InputTransferList<T>(props: InputTransferListProps<T>) {
+const InputTransferList = <T,>(props: InputTransferListProps<T>) => {
   const [checked, setChecked] = useState<T[]>([])
   const [left, setLeft] = useState<T[]>(props.choices)
   const [right, setRight] = useState<T[]>([])
@@ -98,14 +98,16 @@ function InputTransferList<T>(props: InputTransferListProps<T>) {
                 <Checkbox
                   id={inputId}
                   checked={
-                    checked.find((v) => {
+                    checked.some((v) => {
                       return props.getItemId(v) === props.getItemId(value)
-                    }) !== undefined
+                    })
                   }
                   tabIndex={-1}
                   disableRipple
-                  inputProps={{
-                    'aria-labelledby': labelId,
+                  slotProps={{
+                    input: {
+                      'aria-labelledby': labelId,
+                    },
                   }}
                 />
               </ListItemIcon>

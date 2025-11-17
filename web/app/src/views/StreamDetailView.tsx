@@ -74,7 +74,7 @@ const StreamDetailView = () => {
   const [rowData, setRowData] = useState<LogEntryModel[]>([])
   const [columnDefs, setColumnDefs] = useState<ColDef<LogEntryModel>[]>([
     timestampColumnDef(),
-    ...fields!.map(fieldToColumnDef),
+    ...fields.map(fieldToColumnDef),
   ])
 
   const [fetchLogs, loading] = useApiOperation(
@@ -123,7 +123,7 @@ const StreamDetailView = () => {
         }
         incomingState.rowData.push(logEntry)
 
-        const allFields = [...fields!]
+        const allFields = [...fields]
 
         for (const field of Object.keys(logEntry.fields)) {
           if (!allFields.includes(field)) {
