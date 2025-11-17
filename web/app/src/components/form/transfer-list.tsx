@@ -98,9 +98,9 @@ export function TransferList<T>(props: TransferListProps<T>) {
                 <Checkbox
                   id={inputId}
                   checked={
-                    checked.find((v) => {
+                    checked.some((v) => {
                       return props.getItemId(v) === props.getItemId(value)
-                    }) !== undefined
+                    })
                   }
                   tabIndex={-1}
                   disableRipple
