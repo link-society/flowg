@@ -31,11 +31,7 @@ func (l *BadgerLogger) Warningf(format string, v ...interface{}) {
 }
 
 func (l *BadgerLogger) Infof(format string, v ...interface{}) {
-	content := fmt.Sprintf(format, v...)
-	lines := strings.FieldsFunc(content, func(c rune) bool { return c == '\n' || c == '\r' })
-	for _, line := range lines {
-		slog.Debug(line, "channel", l.Channel)
-	}
+	l.Debugf(format, v...)
 }
 
 func (l *BadgerLogger) Debugf(format string, v ...interface{}) {
