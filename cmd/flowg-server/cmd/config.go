@@ -29,6 +29,7 @@ func newServerConfig(opts *options) (server.Options, error) {
 
 		httpTlsConfig = &tls.Config{
 			Certificates: []tls.Certificate{cert},
+			MinVersion:   tls.VersionTLS13,
 		}
 	}
 
@@ -40,6 +41,7 @@ func newServerConfig(opts *options) (server.Options, error) {
 
 		mgmtTlsConfig = &tls.Config{
 			Certificates: []tls.Certificate{cert},
+			MinVersion:   tls.VersionTLS13,
 		}
 	}
 
@@ -129,6 +131,7 @@ func newServerConfig(opts *options) (server.Options, error) {
 		syslogTlsConfig = &tls.Config{
 			Certificates: []tls.Certificate{cert},
 			ClientAuth:   clientAuth,
+			MinVersion:   tls.VersionTLS13,
 		}
 	}
 
