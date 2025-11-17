@@ -30,7 +30,7 @@ export const ForwarderList = ({ className }: ForwarderListProps) => {
       itemColor="green"
       className={className}
       onItemOpen={(forwarder) => {
-        window.location.pathname = `/web/forwarders/${forwarder}`
+        globalThis.location.pathname = `/web/forwarders/${forwarder}`
       }}
     />
   )

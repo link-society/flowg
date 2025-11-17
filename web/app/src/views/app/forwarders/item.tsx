@@ -115,16 +115,16 @@ export const ForwarderView = () => {
                   component="a"
                   href={`/web/forwarders/${forwarder}`}
                   sx={
-                    forwarder !== currentForwarder!.name
+                    forwarder === currentForwarder!.name
                       ? {
-                          color: 'secondary.main',
-                        }
-                      : {
                           backgroundColor: 'secondary.main',
                           '&:hover': {
                             backgroundColor: 'secondary.main',
                           },
                           color: 'white',
+                        }
+                      : {
+                          color: 'secondary.main',
                         }
                   }
                 >

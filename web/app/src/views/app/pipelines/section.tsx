@@ -31,7 +31,7 @@ export const PipelineView = () => {
 
           <NewPipelineButton
             onPipelineCreated={(name) => {
-              window.location.pathname = `/web/pipelines/${name}`
+              globalThis.location.pathname = `/web/pipelines/${name}`
             }}
           />
         </div>

@@ -33,7 +33,7 @@ export const KeyValueEditor = (props: KeyValueEditorProps) => {
     >
       {pairs.map(([key, value], index) => (
         <div
-          data-ref={`entry:generic.kv-editor.item.${key.toLowerCase().replace(/\s+/g, '-')}`}
+          data-ref={`entry:generic.kv-editor.item.${key.toLowerCase().replaceAll(/\s+/g, '-')}`}
           key={key}
           className="flex flex-row items-stretch gap-2"
         >

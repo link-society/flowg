@@ -35,7 +35,7 @@ export const StreamView = () => {
   const { streams, currentStream } = useLoaderData() as LoaderData
   const streamNames = Object.keys(streams)
 
-  const [streamConfig, setStreamConfig] = useState(streams[currentStream!]!)
+  const [streamConfig, setStreamConfig] = useState(streams[currentStream!])
 
   useEffect(() => {
     setStreamConfig(streams[currentStream!])
@@ -124,17 +124,17 @@ export const StreamView = () => {
                   component="a"
                   href={`/web/storage/${stream}`}
                   sx={
-                    stream !== currentStream!
-                      ? {
-                          color: 'secondary.main',
-                        }
-                      : {
+                    stream === currentStream!
+                    ? {
+                        backgroundColor: 'secondary.main',
+                        '&:hover': {
                           backgroundColor: 'secondary.main',
-                          '&:hover': {
-                            backgroundColor: 'secondary.main',
-                          },
-                          color: 'white',
-                        }
+                        },
+                        color: 'white',
+                      }
+                    : {
+                        color: 'secondary.main',
+                      }
                   }
                 >
                   <ListItemText

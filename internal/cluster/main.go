@@ -274,6 +274,7 @@ func NewManager(opts ManagerOptions) fx.Option {
 			fx.In
 			C actor.Actor `name:"cluster.manager.formation"`
 		}) {
+			// No-op, just to force the creation of all components
 		}),
 	)
 }

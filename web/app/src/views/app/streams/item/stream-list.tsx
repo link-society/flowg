@@ -16,16 +16,16 @@ export const StreamList = (props: StreamListProps) => {
           component="a"
           href={`/web/streams/${stream}`}
           sx={
-            stream !== props.currentStream
+            stream === props.currentStream
               ? {
-                  color: 'secondary.main',
-                }
-              : {
                   backgroundColor: 'secondary.main',
                   '&:hover': {
                     backgroundColor: 'secondary.main',
                   },
                   color: 'white',
+                }
+              : {
+                  color: 'secondary.main',
                 }
           }
         >

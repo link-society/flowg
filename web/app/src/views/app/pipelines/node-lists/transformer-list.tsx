@@ -29,7 +29,7 @@ export const TransformerList = ({ className }: TransformerListProps) => {
       itemIcon={<FilterAltIcon />}
       itemColor="blue"
       onItemOpen={(transformer) => {
-        window.location.pathname = `/web/transformers/${transformer}`
+        globalThis.location.pathname = `/web/transformers/${transformer}`
       }}
       className={className}
     />

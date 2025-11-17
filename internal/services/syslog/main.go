@@ -120,6 +120,8 @@ func NewServer(opts ServerOptions) fx.Option {
 
 			return srv
 		}),
-		fx.Invoke(func(*gosyslog.Server) {}),
+		fx.Invoke(func(*gosyslog.Server) {
+			// No-op, just to force the creation of all components
+		}),
 	)
 }

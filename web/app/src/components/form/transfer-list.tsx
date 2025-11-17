@@ -16,7 +16,7 @@ import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArro
 
 function not<T>(a: readonly T[], b: readonly T[], getItemId: (item: T) => any) {
   return a.filter(
-    (value) => !b.find((item) => getItemId(item) === getItemId(value))
+    (value) => b.some((item) => getItemId(item) === getItemId(value))
   )
 }
 
@@ -26,7 +26,7 @@ function intersection<T>(
   getItemId: (item: T) => any
 ) {
   return a.filter((value) =>
-    b.find((item) => getItemId(item) === getItemId(value))
+    b.some((item) => getItemId(item) === getItemId(value))
   )
 }
 

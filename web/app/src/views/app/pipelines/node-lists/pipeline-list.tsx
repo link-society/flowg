@@ -30,7 +30,7 @@ export const PipelineList = ({ className }: PipelineListProps) => {
       itemColor="lime"
       className={className}
       onItemOpen={(pipeline) => {
-        window.location.pathname = `/web/pipelines/${pipeline}`
+        globalThis.location.pathname = `/web/pipelines/${pipeline}`
       }}
     />
   )

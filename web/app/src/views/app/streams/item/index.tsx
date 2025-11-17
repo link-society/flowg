@@ -67,7 +67,7 @@ export const StreamView = () => {
         currentStream!,
         from,
         to,
-        filter ? filter : undefined
+        filter === '' ? undefined : filter
       )
       setRowData(logs)
       setTimeWindow({ from, to })

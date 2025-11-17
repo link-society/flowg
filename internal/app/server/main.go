@@ -118,21 +118,24 @@ func NewServer(opts Options) fx.Option {
 
 			return h
 		}),
-		fx.Invoke(func(
+		fx.Invoke(func(_ struct {
+			fx.In
+
 			// Storage layer
-			_ auth.Storage,
-			_ config.Storage,
-			_ log.Storage,
+			AuthStorage   auth.Storage
+			ConfigStorage config.Storage
+			LogStorage    log.Storage
 			// Engine layer
-			_ lognotify.LogNotifier,
-			_ pipelines.Runner,
+			LogNotifier     lognotify.LogNotifier
+			PipelinesRunner pipelines.Runner
 			// Service layer
-			_ *http.Server,
-			_ *mgmt.Server,
-			_ *syslog.Server,
+			HttpServer       *http.Server
+			ManagementServer *mgmt.Server
+			SyslogServer     *syslog.Server
 			// Bootstrap handler
-			_ *bootstrapHandler,
-		) {
+			BootstrapHandler *bootstrapHandler
+		}) {
+			// No-op, just to force the creation of all components
 		}),
 	)
 }

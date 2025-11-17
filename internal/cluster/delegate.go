@@ -32,6 +32,7 @@ func (d *delegate) NodeMeta(int) []byte {
 }
 
 func (d *delegate) NotifyMsg([]byte) {
+	// No-op
 }
 
 func (d *delegate) GetBroadcasts(overhead, limit int) [][]byte {

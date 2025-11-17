@@ -3,7 +3,7 @@ import type { Config } from '@docusaurus/types'
 import type * as Preset from '@docusaurus/preset-classic'
 import type * as Redocusaurus from 'redocusaurus'
 
-import path from 'path'
+import path from 'node:path'
 
 const config: Config = {
   title: 'FlowG',

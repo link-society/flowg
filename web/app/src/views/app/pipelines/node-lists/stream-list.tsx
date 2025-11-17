@@ -33,7 +33,7 @@ export const StreamList = ({ className }: StreamListProps) => {
       itemColor="purple"
       className={className}
       onItemOpen={(stream) => {
-        window.location.pathname = `/web/storage/${stream}`
+        globalThis.location.pathname = `/web/storage/${stream}`
       }}
     />
   )

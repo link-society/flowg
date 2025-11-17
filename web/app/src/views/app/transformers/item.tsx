@@ -116,16 +116,16 @@ export const TransformerView = () => {
                   component="a"
                   href={`/web/transformers/${transformer}`}
                   sx={
-                    transformer !== currentTransformer!.name
+                    transformer === currentTransformer!.name
                       ? {
-                          color: 'secondary.main',
-                        }
-                      : {
                           backgroundColor: 'secondary.main',
                           '&:hover': {
                             backgroundColor: 'secondary.main',
                           },
                           color: 'white',
+                        }
+                      : {
+                          color: 'secondary.main',
                         }
                   }
                 >
