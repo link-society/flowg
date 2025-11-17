@@ -125,16 +125,16 @@ export const StreamView = () => {
                   href={`/web/storage/${stream}`}
                   sx={
                     stream === currentStream!
-                    ? {
-                        backgroundColor: 'secondary.main',
-                        '&:hover': {
+                      ? {
                           backgroundColor: 'secondary.main',
-                        },
-                        color: 'white',
-                      }
-                    : {
-                        color: 'secondary.main',
-                      }
+                          '&:hover': {
+                            backgroundColor: 'secondary.main',
+                          },
+                          color: 'white',
+                        }
+                      : {
+                          color: 'secondary.main',
+                        }
                   }
                 >
                   <ListItemText

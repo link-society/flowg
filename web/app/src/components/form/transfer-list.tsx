@@ -15,8 +15,8 @@ import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrow
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight'
 
 function not<T>(a: readonly T[], b: readonly T[], getItemId: (item: T) => any) {
-  return a.filter(
-    (value) => b.some((item) => getItemId(item) === getItemId(value))
+  return a.filter((value) =>
+    b.some((item) => getItemId(item) === getItemId(value))
   )
 }
 
@@ -25,8 +25,8 @@ function intersection<T>(
   b: readonly T[],
   getItemId: (item: T) => any
 ) {
-  return a.filter((value) =>
-    !b.some((item) => getItemId(item) === getItemId(value))
+  return a.filter(
+    (value) => !b.some((item) => getItemId(item) === getItemId(value))
   )
 }
 
@@ -97,11 +97,9 @@ export function TransferList<T>(props: TransferListProps<T>) {
               <ListItemIcon>
                 <Checkbox
                   id={inputId}
-                  checked={
-                    checked.some((v) => {
-                      return props.getItemId(v) === props.getItemId(value)
-                    })
-                  }
+                  checked={checked.some((v) => {
+                    return props.getItemId(v) === props.getItemId(value)
+                  })}
                   tabIndex={-1}
                   disableRipple
                   inputProps={{
