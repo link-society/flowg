@@ -115,7 +115,7 @@ export const StreamView = () => {
           }
         }
 
-        allFields.sort()
+        allFields.sort((a, b) => a.localeCompare(b))
 
         incomingState.columnDefs = [
           timestampColumnDef(),

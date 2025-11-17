@@ -10,7 +10,7 @@ export type LoaderData = {
 
 export const loader: LoaderFunction = loginRequired(async ({ params }) => {
   const streams = Object.keys(await configApi.listStreams())
-  streams.sort()
+  streams.sort((a, b) => a.localeCompare(b))
 
   if (params.stream !== undefined) {
     const fields = await configApi.listStreamFields(params.stream)
