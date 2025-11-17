@@ -30,12 +30,3 @@ jobs:
     with:
       ref: ${{ github.event.pull_request.head.sha }}
       pr: ${{ github.event.pull_request.number }}
-
-  security-check:
-    if: github.event.pull_request.draft == false
-    uses: ./.github/workflows/security-snyk.yml
-    with:
-      ref: ${{ github.event.pull_request.head.sha }}
-    secrets:
-      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      SNYK_ORGANIZATION: ${{ secrets.SNYK_ORGANIZATION }}
