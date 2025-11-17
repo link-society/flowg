@@ -30,27 +30,33 @@ jobs:
           ref: main
 
       - name: setup@scm
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
           git config --global user.name "link-society[bot]"
           git config --global user.email "noreply@link-society.com"
-          git remote set-url origin https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ github.repository }}.git
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
 
       - name: tag@scm
+        env:
+          VERSION: ${{ github.event.inputs.tag }}
         run: |
-          echo "${{ github.event.inputs.tag }}" > VERSION.txt
-          sed -i -E 's/^(version|appVersion): "v[0-9]+\.[0-9]+\.[0-9]+"/\1: "${{ github.event.inputs.tag }}"/' k8s/charts/flowg/Chart.yaml
+          echo "${VERSION}" > VERSION.txt
+          sed -i -E 's/^(version|appVersion): "v[0-9]+\.[0-9]+\.[0-9]+"/\1: "${VERSION}"/' k8s/charts/flowg/Chart.yaml
           git add VERSION.txt k8s/charts/flowg/Chart.yaml
-          git commit -m ":bookmark: ${{ github.event.inputs.tag }}"
+          git commit -m ":bookmark: ${VERSION}"
           git push origin main
 
-          git tag ${{ github.event.inputs.tag }}
-          git push origin ${{ github.event.inputs.tag }}
+          git tag ${VERSION}
+          git push origin ${VERSION}
 
       - name: publish@release
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          VERSION: ${{ github.event.inputs.tag }}
         run: |
-          gh release create ${{ github.event.inputs.tag }} \
+          gh release create ${VERSION} \
             --generate-notes \
             --latest \
             --discussion-category "Announcements"
-        env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
