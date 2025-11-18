@@ -13,7 +13,6 @@ import (
 
 type forwarderStateClickhouseV2 struct {
 	conn        driver.Conn
-	createQuery string
 	insertQuery string
 }
 
@@ -81,9 +80,13 @@ func (f *ForwarderClickhouseV2) init(ctx context.Context) error {
 		return fmt.Errorf("failed to ping server: %w", err)
 	}
 
+	createQuery := fmt.Sprintf(createDbQuery, f.Table)
+	if err := conn.Exec(ctx, createQuery); err != nil {
+		return fmt.Errorf("failed to create table: %w", err)
+	}
+
 	f.state = &forwarderStateClickhouseV2{
 		conn:        conn,
-		createQuery: fmt.Sprintf(createDbQuery, f.Table),
 		insertQuery: fmt.Sprintf(insertLogQuery, f.Table),
 	}
 
@@ -101,10 +104,6 @@ func (f *ForwarderClickhouseV2) close(ctx context.Context) error {
 func (f *ForwarderClickhouseV2) call(ctx context.Context, record *LogRecord) error {
 	if f.state == nil || f.state.conn == nil {
 		return fmt.Errorf("clickhouse state hasn't been properly initialized")
-	}
-
-	if err := f.state.conn.Exec(ctx, f.state.createQuery); err != nil {
-		return fmt.Errorf("failed to create table: %w", err)
 	}
 
 	pk, err := uuid.NewRandom()
