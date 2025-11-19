@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import * as validators from '@/lib/validators'
+
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
@@ -10,6 +12,7 @@ type InputListProps = {
   id?: string
   itemLabel?: string
   items: string[]
+  itemValidators?: Array<validators.Validator<string>>
   onChange: (items: string[]) => void
 }
 
@@ -29,6 +32,28 @@ const InputList = (props: InputListProps) => {
   const [rows, setRows] = useState(propRows)
   const [newItem, setNewItem] = useState('')
 
+  const rowsValidity = useMemo(
+    () =>
+      rows.map((row) => {
+        for (const validator of props.itemValidators ?? []) {
+          if (!validator(row.value)) {
+            return false
+          }
+        }
+
+        return true
+      }),
+    [rows, props.itemValidators]
+  )
+
+  const onNewItemSubmit = useCallback(() => {
+    setRows((prev) => {
+      const next = [...prev, { id: genId(), value: newItem }]
+      setNewItem('')
+      return next
+    })
+  }, [newItem])
+
   useEffect(() => {
     props.onChange(rows.map((row) => row.value))
   }, [rows])
@@ -47,6 +72,7 @@ const InputList = (props: InputListProps) => {
           <TextField
             data-ref="input:generic.list-editor.item"
             label={props.itemLabel ?? 'Item'}
+            error={!rowsValidity[index]}
             value={row.value}
             onChange={(e) => {
               setRows((prev) => {
@@ -78,24 +104,12 @@ const InputList = (props: InputListProps) => {
         </div>
       ))}
 
-      <form
-        className="flex flex-row items-stretch gap-2"
-        onSubmit={(e) => {
-          e.preventDefault()
-          setRows((prev) => {
-            const next = [...prev, { id: genId(), value: newItem }]
-            setNewItem('')
-            return next
-          })
-        }}
-      >
+      <div className="flex flex-row items-stretch gap-2">
         <TextField
           data-ref="input:generic.list-editor.new"
           label={props.itemLabel ?? 'Item'}
           value={newItem}
-          onChange={(e) => {
-            setNewItem(e.target.value)
-          }}
+          onChange={(e) => { setNewItem(e.target.value) }}
           variant="outlined"
           size="small"
           className="grow"
@@ -107,11 +121,11 @@ const InputList = (props: InputListProps) => {
           color="primary"
           variant="contained"
           size="small"
-          type="submit"
+          onClick={onNewItemSubmit}
         >
           <AddIcon />
         </Button>
-      </form>
+      </div>
     </div>
   )
 }

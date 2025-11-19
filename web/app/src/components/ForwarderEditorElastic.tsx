@@ -1,58 +1,94 @@
+import * as validators from '@/lib/validators'
+
+import { useEffect } from 'react'
+
 import Divider from '@mui/material/Divider'
-import InputAdornment from '@mui/material/InputAdornment'
 import TextField from '@mui/material/TextField'
 
-import ForwarderConfigElasticModel from '@/lib/models/ForwarderConfigElasticModel'
-import { ForwarderConfigTypeLabelMap } from '@/lib/models/ForwarderConfigModel'
+import { useInput } from '@/lib/hooks/input'
 
-import ForwarderIconElastic from '@/components/ForwarderIconElastic'
+import ForwarderConfigElasticModel from '@/lib/models/ForwarderConfigElasticModel'
+
 import InputList from '@/components/InputList'
 
 type ForwarderEditorElasticProps = {
   config: ForwarderConfigElasticModel
   onConfigChange: (config: ForwarderConfigElasticModel) => void
+  onValidationChange: (valid: boolean) => void
 }
 
 const ForwarderEditorElastic = ({
   config,
   onConfigChange,
+  onValidationChange,
 }: ForwarderEditorElasticProps) => {
+  const [index, setIndex] = useInput(config.index, [validators.minLength(1)])
+  const [username, setUsername] = useInput(config.username, [
+    validators.minLength(1),
+  ])
+  const [password, setPassword] = useInput(config.password, [
+    validators.minLength(1),
+  ])
+  const [addresses, setAddresses] = useInput(config.addresses, [
+    validators.minItems(1),
+    validators.items([
+      validators.minLength(1),
+      validators.formatUri,
+    ]),
+  ])
+  const [ca, setCa] = useInput<string | undefined>(config.ca, [
+    (value) => {
+      if (value === undefined || value === '') {
+        return true
+      }
+
+      return validators.minLength(1)(value)
+    },
+  ])
+
+  useEffect(() => {
+    const valid =
+      index.valid &&
+      username.valid &&
+      password.valid &&
+      addresses.valid &&
+      ca.valid
+    onValidationChange(valid)
+
+    if (valid) {
+      onConfigChange({
+        type: 'elastic',
+        index: index.value,
+        username: username.value,
+        password: password.value,
+        addresses: addresses.value,
+        ca: ca.value || undefined,
+      })
+    }
+  }, [
+    index,
+    username,
+    password,
+    addresses,
+    ca,
+    onValidationChange,
+    onConfigChange,
+  ])
+
   return (
     <div
       id="container:editor.forwarders.elastic"
       className="flex flex-col items-stretch gap-3"
     >
-      <div className="mb-6 shadow">
-        <TextField
-          label="Forwarder Type"
-          variant="outlined"
-          className="w-full"
-          type="text"
-          value={ForwarderConfigTypeLabelMap.elastic}
-          disabled
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <ForwarderIconElastic />
-                </InputAdornment>
-              ),
-            },
-          }}
-        />
-      </div>
-
       <TextField
         id="input:editor.forwarders.elastic.index"
         label="Index"
         variant="outlined"
         type="text"
-        value={config.index}
+        error={!index.valid}
+        value={index.value}
         onChange={(e) => {
-          onConfigChange({
-            ...config,
-            index: e.target.value,
-          })
+          setIndex(e.target.value)
         }}
       />
 
@@ -61,12 +97,10 @@ const ForwarderEditorElastic = ({
         label="Username"
         variant="outlined"
         type="text"
-        value={config.username}
+        error={!username.valid}
+        value={username.value}
         onChange={(e) => {
-          onConfigChange({
-            ...config,
-            username: e.target.value,
-          })
+          setUsername(e.target.value)
         }}
       />
 
@@ -75,12 +109,10 @@ const ForwarderEditorElastic = ({
         label="Password"
         variant="outlined"
         type="password"
-        value={config.password}
+        error={!password.valid}
+        value={password.value}
         onChange={(e) => {
-          onConfigChange({
-            ...config,
-            password: e.target.value,
-          })
+          setPassword(e.target.value)
         }}
       />
 
@@ -90,12 +122,11 @@ const ForwarderEditorElastic = ({
         id="editor.forwarders.elastic.addresses"
         itemLabel="Address"
         items={config.addresses}
-        onChange={(addresses) => {
-          onConfigChange({
-            ...config,
-            addresses,
-          })
-        }}
+        itemValidators={[
+          validators.minLength(1),
+          validators.formatUri,
+        ]}
+        onChange={setAddresses}
       />
 
       <Divider />
@@ -108,12 +139,10 @@ const ForwarderEditorElastic = ({
         multiline
         maxRows={8}
         rows={8}
-        value={config.ca ?? ''}
+        error={!ca.valid}
+        value={ca.value}
         onChange={(e) => {
-          onConfigChange({
-            ...config,
-            ca: e.target.value || undefined,
-          })
+          setCa(e.target.value)
         }}
       />
     </div>

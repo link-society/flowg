@@ -1,60 +1,71 @@
+import { useEffect } from 'react'
+
 import Checkbox from '@mui/material/Checkbox'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import FormGroup from '@mui/material/FormGroup'
-import InputAdornment from '@mui/material/InputAdornment'
 import TextField from '@mui/material/TextField'
 
-import ForwarderConfigClickhouseModel from '@/lib/models/ForwarderConfigClickhouseModel'
-import { ForwarderConfigTypeLabelMap } from '@/lib/models/ForwarderConfigModel'
+import { useInput } from '@/lib/hooks/input'
 
-import ForwarderIconClickhouse from '@/components/ForwarderIconClickhouse'
+import * as validators from '@/lib/validators'
+
+import ForwarderConfigClickhouseModel from '@/lib/models/ForwarderConfigClickhouseModel'
 
 type ForwarderEditorClickhouseProps = {
   config: ForwarderConfigClickhouseModel
   onConfigChange: (config: ForwarderConfigClickhouseModel) => void
+  onValidationChange: (valid: boolean) => void
 }
 
 const ForwarderEditorClickhouse = ({
   config,
   onConfigChange,
+  onValidationChange,
 }: ForwarderEditorClickhouseProps) => {
+  const [address, setAddress] = useInput(config.address, [
+    validators.pattern(/^(([a-zA-Z0-9.-]+)|(\[[0-9A-Fa-f:]+\])):[0-9]{1,5}$/)
+  ])
+  const [db, setDb] = useInput(config.db, [validators.minLength(1)])
+  const [table, setTable] = useInput(config.table, [
+    validators.minLength(1),
+    validators.maxLength(64),
+    validators.pattern(/^[a-zA-Z_][a-zA-Z0-9_]*$/),
+  ])
+  const [user, setUser] = useInput(config.user, [validators.minLength(1)])
+  const [pass, setPass] = useInput(config.pass, [validators.minLength(1)])
+  const [tls, setTls] = useInput(config.tls, [])
+
+  useEffect(() => {
+    const valid =
+      address.valid && db.valid && table.valid && user.valid && pass.valid
+    onValidationChange(valid)
+
+    if (valid) {
+      onConfigChange({
+        type: 'clickhouse',
+        address: address.value,
+        db: db.value,
+        table: table.value,
+        user: user.value,
+        pass: pass.value,
+        tls: tls.value,
+      })
+    }
+  }, [address, db, table, user, pass, tls, onValidationChange, onConfigChange])
+
   return (
     <div
       id="container:editor.forwarders.clickhouse"
       className="flex flex-col items-stretch gap-3"
     >
-      <div className="mb-6 shadow">
-        <TextField
-          label="Forwarder Type"
-          variant="outlined"
-          className="w-full"
-          type="text"
-          value={ForwarderConfigTypeLabelMap.clickhouse}
-          disabled
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <ForwarderIconClickhouse />
-                </InputAdornment>
-              ),
-            },
-          }}
-        />
-      </div>
-
       <TextField
         id="input:editor.forwarders.clickhouse.address"
         label="Clickhouse Connection Address"
         variant="outlined"
         type="text"
-        value={config.address}
-        onChange={(e) => {
-          onConfigChange({
-            ...config,
-            address: e.target.value,
-          })
-        }}
+        error={!address.valid}
+        value={address.value}
+        onChange={(e) => { setAddress(e.target.value) }}
       />
 
       <TextField
@@ -62,13 +73,9 @@ const ForwarderEditorClickhouse = ({
         label="Database Name"
         variant="outlined"
         type="text"
-        value={config.db}
-        onChange={(e) => {
-          onConfigChange({
-            ...config,
-            db: e.target.value,
-          })
-        }}
+        error={!db.valid}
+        value={db.value}
+        onChange={(e) => { setDb(e.target.value) }}
       />
 
       <TextField
@@ -76,13 +83,9 @@ const ForwarderEditorClickhouse = ({
         label="Table Name"
         variant="outlined"
         type="text"
-        value={config.table}
-        onChange={(e) => {
-          onConfigChange({
-            ...config,
-            table: e.target.value,
-          })
-        }}
+        error={!table.valid}
+        value={table.value}
+        onChange={(e) => { setTable(e.target.value) }}
       />
 
       <TextField
@@ -90,13 +93,9 @@ const ForwarderEditorClickhouse = ({
         label="Database Username"
         variant="outlined"
         type="text"
-        value={config.user}
-        onChange={(e) => {
-          onConfigChange({
-            ...config,
-            user: e.target.value,
-          })
-        }}
+        error={!user.valid}
+        value={user.value}
+        onChange={(e) => { setUser(e.target.value) }}
       />
 
       <TextField
@@ -104,13 +103,9 @@ const ForwarderEditorClickhouse = ({
         label="Database Password"
         variant="outlined"
         type="password"
-        value={config.pass}
-        onChange={(e) => {
-          onConfigChange({
-            ...config,
-            pass: e.target.value,
-          })
-        }}
+        error={!pass.valid}
+        value={pass.value}
+        onChange={(e) => { setPass(e.target.value) }}
       />
 
       <FormGroup>
@@ -118,13 +113,8 @@ const ForwarderEditorClickhouse = ({
           control={
             <Checkbox
               id="input:editor.forwarders.clickhouse.tsl"
-              checked={config.tls}
-              onChange={(e) => {
-                onConfigChange({
-                  ...config,
-                  tls: e.target.checked,
-                })
-              }}
+              checked={tls.value}
+              onChange={(e) => { setTls(e.target.checked) }}
             />
           }
           label="Use TLS"

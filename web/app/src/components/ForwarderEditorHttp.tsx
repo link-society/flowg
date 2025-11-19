@@ -1,60 +1,62 @@
+import { useEffect } from 'react'
+
 import Divider from '@mui/material/Divider'
-import InputAdornment from '@mui/material/InputAdornment'
 import TextField from '@mui/material/TextField'
 
-import HttpIcon from '@mui/icons-material/Http'
-
 import ForwarderConfigHttpModel from '@/lib/models/ForwarderConfigHttpModel'
-import { ForwarderConfigTypeLabelMap } from '@/lib/models/ForwarderConfigModel'
+
+import { useInput } from '@/lib/hooks/input'
+
+import * as validators from '@/lib/validators'
 
 import InputKeyValue from '@/components/InputKeyValue'
 
 type ForwarderEditorHttpProps = {
   config: ForwarderConfigHttpModel
   onConfigChange: (config: ForwarderConfigHttpModel) => void
+  onValidationChange: (valid: boolean) => void
 }
 
 const ForwarderEditorHttp = ({
   config,
   onConfigChange,
+  onValidationChange,
 }: ForwarderEditorHttpProps) => {
+  const [url, setUrl] = useInput<string>(config.url, [
+    validators.minLength(1),
+    validators.formatUri,
+  ])
+  const [headers, setHeaders] = useInput<Record<string, string>>(
+    config.headers ?? {},
+    []
+  )
+
+  useEffect(() => {
+    const valid = url.valid && headers.valid
+    onValidationChange(valid)
+
+    if (valid) {
+      onConfigChange({
+        type: 'http',
+        url: url.value,
+        headers: headers.value,
+      })
+    }
+  }, [url, headers, onValidationChange, onConfigChange])
+
   return (
     <div
       id="container:editor.forwarders.http"
       className="flex flex-col items-stretch gap-3"
     >
-      <div className="mb-6 shadow">
-        <TextField
-          label="Forwarder Type"
-          variant="outlined"
-          className="w-full"
-          type="text"
-          value={ForwarderConfigTypeLabelMap.http}
-          disabled
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <HttpIcon />
-                </InputAdornment>
-              ),
-            },
-          }}
-        />
-      </div>
-
       <TextField
         id="input:editor.forwarders.http.webhook_url"
         label="Webhook URL"
         variant="outlined"
         type="text"
-        value={config.url}
-        onChange={(e) => {
-          onConfigChange({
-            ...config,
-            url: e.target.value,
-          })
-        }}
+        error={!url.valid}
+        value={url.value}
+        onChange={(e) => { setUrl(e.target.value) }}
       />
 
       <Divider />
@@ -63,13 +65,8 @@ const ForwarderEditorHttp = ({
         id="field:editor.forwarders.http.headers"
         keyLabel="HTTP Header"
         valueLabel="Value"
-        keyValues={Object.entries(config.headers ?? {})}
-        onChange={(pairs) => {
-          onConfigChange({
-            ...config,
-            headers: Object.fromEntries(pairs),
-          })
-        }}
+        keyValues={Object.entries(headers.value ?? {})}
+        onChange={(pairs) => { setHeaders(Object.fromEntries(pairs)) }}
       />
     </div>
   )

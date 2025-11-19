@@ -43,6 +43,7 @@ const DialogForwarderEditor = ({
 
   const [open, setOpen] = useState(false)
 
+  const [valid, setValid] = useState(false)
   const [forwarder, setForwarder] = useState<ForwarderModel>(undefined!)
   const [forwarderPromise, setForwarderPromise] =
     useState<Promise<void> | null>(null)
@@ -126,7 +127,7 @@ const DialogForwarderEditor = ({
               color="secondary"
               size="small"
               onClick={onSave}
-              disabled={saveLoading}
+              disabled={saveLoading || !valid}
               startIcon={!saveLoading && <SaveIcon />}
             >
               {saveLoading ? <CircularProgress size={24} /> : <>Save</>}
@@ -146,6 +147,7 @@ const DialogForwarderEditor = ({
                 <ForwarderEditor
                   forwarder={forwarder}
                   onForwarderChange={setForwarder}
+                  onValidationChange={setValid}
                 />
               </AuthenticatedAwait>
             )}

@@ -67,6 +67,7 @@ const ForwarderDetailView = () => {
   const { permissions } = useProfile()
   const { forwarders, currentForwarder } = useLoaderData() as LoaderData
   const [forwarder, setForwarder] = useState(currentForwarder.forwarder)
+  const [valid, setValid] = useState(false)
 
   useEffect(() => {
     setForwarder(currentForwarder.forwarder)
@@ -132,7 +133,7 @@ const ForwarderDetailView = () => {
               color="secondary"
               size="small"
               onClick={onSave}
-              disabled={saveLoading}
+              disabled={saveLoading || !valid}
               startIcon={!saveLoading && <SaveIcon />}
             >
               {saveLoading ? <CircularProgress size={24} /> : <>Save</>}
@@ -154,6 +155,7 @@ const ForwarderDetailView = () => {
             <ForwarderEditor
               forwarder={forwarder}
               onForwarderChange={setForwarder}
+              onValidationChange={setValid}
             />
           </Paper>
         </Grid>
