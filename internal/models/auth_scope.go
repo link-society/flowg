@@ -46,3 +46,19 @@ func ParseScope(s string) (Scope, error) {
 		return "", fmt.Errorf("invalid scope: %s", s)
 	}
 }
+
+func (s Scope) Enum() []any {
+	return []any{
+		SCOPE_READ_PIPELINES,
+		SCOPE_WRITE_PIPELINES,
+		SCOPE_READ_TRANSFORMERS,
+		SCOPE_WRITE_TRANSFORMERS,
+		SCOPE_READ_STREAMS,
+		SCOPE_WRITE_STREAMS,
+		SCOPE_READ_FORWARDERS,
+		SCOPE_WRITE_FORWARDERS,
+		SCOPE_READ_ACLS,
+		SCOPE_WRITE_ACLS,
+		SCOPE_SEND_LOGS,
+	}
+}

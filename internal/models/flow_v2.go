@@ -8,17 +8,17 @@ type FlowGraphV2 struct {
 }
 
 type FlowNodeV2 struct {
-	ID       string            `json:"id" required:"true"`
-	Type     string            `json:"type" required:"true"`
+	ID       string            `json:"id" required:"true" minLength:"1"`
+	Type     string            `json:"type" required:"true" enum:"source,transform,switch,forwarder,pipeline"`
 	Position FlowPositionV2    `json:"position" required:"true"`
 	Data     map[string]string `json:"data" required:"true"`
 }
 
 type FlowEdgeV2 struct {
-	ID           string `json:"id" required:"true"`
-	Source       string `json:"source" required:"true"`
+	ID           string `json:"id" required:"true" minLength:"1"`
+	Source       string `json:"source" required:"true" minLength:"1"`
 	SourceHandle string `json:"sourceHandle" default:""`
-	Target       string `json:"target" required:"true"`
+	Target       string `json:"target" required:"true" minLength:"1"`
 }
 
 type FlowPositionV2 struct {

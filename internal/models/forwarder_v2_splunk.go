@@ -14,13 +14,13 @@ type forwarderStateSplunkV2 struct {
 
 type ForwarderSplunkV2 struct {
 	Type     string `json:"type" enum:"splunk" required:"true"`
-	Endpoint string `json:"endpoint" required:"true"`
-	Token    string `json:"token" required:"true"`
+	Endpoint string `json:"endpoint" required:"true" format:"uri"`
+	Token    string `json:"token" required:"true" minLength:"1"`
 
 	state *forwarderStateSplunkV2
 }
 
-func (f *ForwarderSplunkV2) init(ctx context.Context) error {
+func (f *ForwarderSplunkV2) init(context.Context) error {
 	f.state = &forwarderStateSplunkV2{
 		client: &http.Client{},
 	}

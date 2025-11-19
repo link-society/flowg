@@ -1,8 +1,8 @@
 package models
 
 type Role struct {
-	Name   string  `json:"name"`
-	Scopes []Scope `json:"scopes"`
+	Name   string  `json:"name" required:"true" minLength:"1"`
+	Scopes []Scope `json:"scopes" required:"true"`
 }
 
 func (r Role) HasScope(scope Scope) bool {

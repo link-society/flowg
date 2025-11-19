@@ -14,8 +14,8 @@ type forwarderStateDatadogV2 struct {
 
 type ForwarderDatadogV2 struct {
 	Type   string `json:"type" enum:"datadog" required:"true"`
-	Url    string `json:"url" required:"true"`
-	ApiKey string `json:"apiKey" required:"true"`
+	Url    string `json:"url" required:"true" format:"uri"`
+	ApiKey string `json:"apiKey" required:"true" minLength:"1"`
 
 	state *forwarderStateDatadogV2
 }

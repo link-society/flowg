@@ -13,8 +13,8 @@ import (
 )
 
 type ChangePasswordRequest struct {
-	OldPassword string `json:"old_password" required:"true"`
-	NewPassword string `json:"new_password" required:"true"`
+	OldPassword string `json:"old_password" required:"true" minLength:"1"`
+	NewPassword string `json:"new_password" required:"true" minLength:"1"`
 }
 
 type ChangePasswordResponse struct {

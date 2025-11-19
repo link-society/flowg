@@ -19,7 +19,7 @@ type forwarderStateOtlpV2 struct {
 
 type ForwarderOtlpV2 struct {
 	Type     string            `json:"type" enum:"otlp" required:"true"`
-	Endpoint string            `json:"endpoint" required:"true"`
+	Endpoint string            `json:"endpoint" required:"true" format:"uri"`
 	Headers  map[string]string `json:"headers,omitempty"`
 
 	state *forwarderStateOtlpV2

@@ -12,8 +12,8 @@ import (
 )
 
 type LogRecord struct {
-	Timestamp time.Time         `json:"timestamp"`
-	Fields    map[string]string `json:"fields"`
+	Timestamp time.Time         `json:"timestamp" required:"true" format:"date-time"`
+	Fields    map[string]string `json:"fields" required:"true"`
 }
 
 func NewLogRecord(fields map[string]string) *LogRecord {

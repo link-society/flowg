@@ -16,9 +16,9 @@ type forwarderStateAmqpV2 struct {
 
 type ForwarderAmqpV2 struct {
 	Type       string `json:"type" enum:"amqp" required:"true"`
-	Url        string `json:"url" required:"true"`
-	Exchange   string `json:"exchange" required:"true"`
-	RoutingKey string `json:"routing_key" required:"true"`
+	Url        string `json:"url" required:"true" format:"uri"`
+	Exchange   string `json:"exchange" required:"true" minLength:"1"`
+	RoutingKey string `json:"routing_key" default:""`
 
 	state *forwarderStateAmqpV2
 }
