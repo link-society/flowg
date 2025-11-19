@@ -46,7 +46,7 @@ export const ClickhouseForwarderEditor = ({
 
       <TextField
         id="input:editor.forwarders.clickhouse.url"
-        label="Clickhouse connection URL"
+        label="Clickhouse Connection URL"
         variant="outlined"
         type="text"
         value={config.url}
@@ -62,7 +62,7 @@ export const ClickhouseForwarderEditor = ({
 
       <TextField
         id="input:editor.forwarders.clickhouse.db"
-        label="Database name"
+        label="Database Name"
         variant="outlined"
         type="text"
         value={config.db}
@@ -78,7 +78,7 @@ export const ClickhouseForwarderEditor = ({
 
       <TextField
         id="input:editor.forwarders.clickhouse.table"
-        label="Table name"
+        label="Table Name"
         variant="outlined"
         type="text"
         value={config.table}
@@ -94,7 +94,7 @@ export const ClickhouseForwarderEditor = ({
 
       <TextField
         id="input:editor.forwarders.clickhouse.user"
-        label="Database username"
+        label="Database Username"
         variant="outlined"
         type="text"
         value={config.user}
@@ -110,7 +110,7 @@ export const ClickhouseForwarderEditor = ({
 
       <TextField
         id="input:editor.forwarders.clickhouse.pass"
-        label="Database password"
+        label="Database Password"
         variant="outlined"
         type="password"
         value={config.pass}
