@@ -9,7 +9,7 @@ type FlowGraphV2 struct {
 
 type FlowNodeV2 struct {
 	ID       string            `json:"id" required:"true" minLength:"1"`
-	Type     string            `json:"type" required:"true" enum:"source,transform,switch,forwarder,pipeline"`
+	Type     string            `json:"type" required:"true" enum:"source,transform,switch,forwarder,pipeline,router"`
 	Position FlowPositionV2    `json:"position" required:"true"`
 	Data     map[string]string `json:"data" required:"true"`
 }
