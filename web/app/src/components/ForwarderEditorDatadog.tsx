@@ -1,57 +1,58 @@
+import * as validators from '@/lib/validators'
+
+import { useEffect } from 'react'
+
 import Divider from '@mui/material/Divider'
-import InputAdornment from '@mui/material/InputAdornment'
 import TextField from '@mui/material/TextField'
 
-import ForwarderConfigDatadogModel from '@/lib/models/ForwarderConfigDatadogModel'
-import { ForwarderConfigTypeLabelMap } from '@/lib/models/ForwarderConfigModel'
+import { useInput } from '@/lib/hooks/input'
 
-import ForwarderIconDatadog from '@/components/ForwarderIconDatadog'
+import ForwarderConfigDatadogModel from '@/lib/models/ForwarderConfigDatadogModel'
 
 type ForwarderEditorDatadogProps = {
   config: ForwarderConfigDatadogModel
   onConfigChange: (config: ForwarderConfigDatadogModel) => void
+  onValidationChange: (valid: boolean) => void
 }
 
 const ForwarderEditorDatadog = ({
   config,
   onConfigChange,
+  onValidationChange,
 }: ForwarderEditorDatadogProps) => {
+  const [url, setUrl] = useInput(config.url, [
+    validators.minLength(1),
+    validators.formatUri,
+  ])
+  const [apiKey, setApiKey] = useInput(config.apiKey, [validators.minLength(1)])
+
+  useEffect(() => {
+    const valid = url.valid && apiKey.valid
+    onValidationChange(valid)
+
+    if (valid) {
+      onConfigChange({
+        type: 'datadog',
+        url: url.value,
+        apiKey: apiKey.value,
+      })
+    }
+  }, [url, apiKey, onValidationChange, onConfigChange])
+
   return (
     <div
       id="container:editor.forwarders.datadog"
       className="flex flex-col items-stretch gap-3"
     >
-      <div className="mb-6 shadow">
-        <TextField
-          label="Forwarder Type"
-          variant="outlined"
-          className="w-full"
-          type="text"
-          value={ForwarderConfigTypeLabelMap.datadog}
-          disabled
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <ForwarderIconDatadog />
-                </InputAdornment>
-              ),
-            },
-          }}
-        />
-      </div>
-
       <TextField
         id="input:editor.forwarders.datadog.url"
         label="URL"
         variant="outlined"
         type="text"
-        value={config.url}
+        error={!url.valid}
+        value={url.value}
         onChange={(e) => {
-          onConfigChange({
-            ...config,
-            url: e.target.value,
-          })
+          setUrl(e.target.value)
         }}
       />
 
@@ -62,12 +63,10 @@ const ForwarderEditorDatadog = ({
         label="ApiKey"
         variant="outlined"
         type="password"
-        value={config.apiKey}
+        error={!apiKey.valid}
+        value={apiKey.value}
         onChange={(e) => {
-          onConfigChange({
-            ...config,
-            apiKey: e.target.value,
-          })
+          setApiKey(e.target.value)
         }}
       />
     </div>

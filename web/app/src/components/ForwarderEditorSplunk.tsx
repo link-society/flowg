@@ -1,58 +1,59 @@
+import { useEffect } from 'react'
+
 import Divider from '@mui/material/Divider'
-import InputAdornment from '@mui/material/InputAdornment'
 import TextField from '@mui/material/TextField'
 
-import { ForwarderConfigTypeLabelMap } from '@/lib/models/ForwarderConfigModel'
 import ForwarderConfigSplunkModel from '@/lib/models/ForwarderConfigSplunkModel'
 
-import ForwarderIconSplunk from '@/components/ForwarderIconSplunk'
+import { useInput } from '@/lib/hooks/input'
+
+import * as validators from '@/lib/validators'
 
 type ForwarderEditorSplunkProps = {
   config: ForwarderConfigSplunkModel
   onConfigChange: (config: ForwarderConfigSplunkModel) => void
+  onValidationChange: (valid: boolean) => void
 }
 
 const ForwarderEditorSplunk = ({
   config,
   onConfigChange,
+  onValidationChange,
 }: ForwarderEditorSplunkProps) => {
+  const [endpoint, setEndpoint] = useInput<string>(config.endpoint, [
+    validators.minLength(1),
+    validators.formatUri,
+  ])
+  const [token, setToken] = useInput<string>(config.token, [
+    validators.minLength(1),
+  ])
+
+  useEffect(() => {
+    const valid = endpoint.valid && token.valid
+    onValidationChange(valid)
+
+    if (valid) {
+      onConfigChange({
+        type: 'splunk',
+        endpoint: endpoint.value,
+        token: token.value,
+      })
+    }
+  }, [endpoint, token, onValidationChange, onConfigChange])
+
   return (
     <div
       id="container:editor.forwarders.splunk"
       className="flex flex-col items-stretch gap-3"
     >
-      <div className="mb-6 shadow">
-        <TextField
-          label="Forwarder Type"
-          variant="outlined"
-          className="w-full"
-          type="text"
-          value={ForwarderConfigTypeLabelMap.splunk}
-          disabled
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <ForwarderIconSplunk />
-                </InputAdornment>
-              ),
-            },
-          }}
-        />
-      </div>
-
       <TextField
         id="input:editor.forwarders.splunk.endpoint"
         label="HTTP Event Collector Endpoint"
         variant="outlined"
         type="text"
-        value={config.endpoint}
-        onChange={(e) => {
-          onConfigChange({
-            ...config,
-            endpoint: e.target.value,
-          })
-        }}
+        error={!endpoint.valid}
+        value={endpoint.value}
+        onChange={(e) => { setEndpoint(e.target.value) }}
       />
 
       <Divider />
@@ -62,13 +63,9 @@ const ForwarderEditorSplunk = ({
         label="Token"
         variant="outlined"
         type="password"
-        value={config.token}
-        onChange={(e) => {
-          onConfigChange({
-            ...config,
-            token: e.target.value,
-          })
-        }}
+        error={!token.valid}
+        value={token.value}
+        onChange={(e) => { setToken(e.target.value) }}
       />
     </div>
   )

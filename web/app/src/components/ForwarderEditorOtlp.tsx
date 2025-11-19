@@ -1,83 +1,59 @@
-import InputAdornment from '@mui/material/InputAdornment'
+import { useEffect } from 'react'
+
 import TextField from '@mui/material/TextField'
 
-import { ForwarderConfigTypeLabelMap } from '@/lib/models/ForwarderConfigModel'
 import ForwarderConfigOtlpModel from '@/lib/models/ForwarderConfigOtlpModel'
 
-import ForwarderIconOtlp from '@/components/ForwarderIconOtlp'
+import { useInput } from '@/lib/hooks/input'
+
+import * as validators from '@/lib/validators'
+
 import InputKeyValue from '@/components/InputKeyValue'
 
 type ForwarderEditorOtlpProps = {
   config: ForwarderConfigOtlpModel
   onConfigChange: (config: ForwarderConfigOtlpModel) => void
+  onValidationChange: (valid: boolean) => void
 }
 
 const ForwarderEditorOtlp = ({
   config,
   onConfigChange,
+  onValidationChange,
 }: ForwarderEditorOtlpProps) => {
-  const headerPairs = Object.entries(config.headers || {}).map(
-    ([key, value]) => [key, value] as [string, string]
+  const [endpoint, setEndpoint] = useInput<string>(config.endpoint, [
+    validators.minLength(1),
+    validators.formatUri,
+  ])
+  const [headers, setHeaders] = useInput<Record<string, string>>(
+    config.headers ?? {},
+    []
   )
 
-  const onHeadersChange = (pairs: [string, string][]) => {
-    const newHeaders = pairs.reduce(
-      (acc, [key, value]) => ({
-        ...acc,
-        [key]: value,
-      }),
-      {} as Record<string, string>
-    )
+  useEffect(() => {
+    const valid = endpoint.valid && headers.valid
+    onValidationChange(valid)
 
-    // Only include headers if there are any
-    const updatedConfig = {
-      ...config,
-      endpoint: config.endpoint,
+    if (valid) {
+      onConfigChange({
+        type: 'otlp',
+        endpoint: endpoint.value,
+        headers: headers.value,
+      })
     }
-    if (Object.keys(newHeaders).length > 0) {
-      updatedConfig.headers = newHeaders
-    } else {
-      delete updatedConfig.headers
-    }
-
-    onConfigChange(updatedConfig)
-  }
+  }, [endpoint, headers, onValidationChange, onConfigChange])
 
   return (
     <div
       id="container:editor.forwarders.otlp"
       className="flex flex-col items-stretch gap-3"
     >
-      <div className="mb-6 shadow">
-        <TextField
-          label="Forwarder Type"
-          variant="outlined"
-          className="w-full"
-          type="text"
-          value={ForwarderConfigTypeLabelMap.otlp}
-          disabled
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <ForwarderIconOtlp />
-                </InputAdornment>
-              ),
-            },
-          }}
-        />
-      </div>
-
       <TextField
         id="input:editor.forwarders.otlp.endpoint"
         label="Endpoint"
-        value={config.endpoint}
-        onChange={(e) =>
-          onConfigChange({
-            ...config,
-            endpoint: e.target.value,
-          })
-        }
+        error={!endpoint.valid}
+        value={endpoint.value}
+        onChange={(e) => setEndpoint(e.target.value)}
         type="text"
         variant="outlined"
         required
@@ -88,8 +64,8 @@ const ForwarderEditorOtlp = ({
         id="input:editor.forwarders.otlp.headers"
         keyLabel="Header Name"
         valueLabel="Header Value"
-        keyValues={headerPairs}
-        onChange={onHeadersChange}
+        keyValues={Object.entries(headers.value ?? {})}
+        onChange={(pairs) => { setHeaders(Object.fromEntries(pairs)) }}
       />
     </div>
   )

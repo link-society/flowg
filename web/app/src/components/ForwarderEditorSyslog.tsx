@@ -1,11 +1,15 @@
+import { useEffect } from 'react'
+
 import FormControl from '@mui/material/FormControl'
-import InputAdornment from '@mui/material/InputAdornment'
 import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
 import Select from '@mui/material/Select'
 import TextField from '@mui/material/TextField'
 
-import { ForwarderConfigTypeLabelMap } from '@/lib/models/ForwarderConfigModel'
+import { useInput } from '@/lib/hooks/input'
+
+import * as validators from '@/lib/validators'
+
 import ForwarderConfigSyslogModel, {
   SyslogFacility,
   SyslogFacilityValues,
@@ -15,42 +19,53 @@ import ForwarderConfigSyslogModel, {
   SyslogSeverityValues,
 } from '@/lib/models/ForwarderConfigSyslogModel'
 
-import ForwarderIconSyslog from '@/components/ForwarderIconSyslog'
-
 type ForwarderEditorSyslogProps = {
   config: ForwarderConfigSyslogModel
   onConfigChange: (config: ForwarderConfigSyslogModel) => void
+  onValidationChange: (valid: boolean) => void
 }
 
 const ForwarderEditorSyslog = ({
   config,
   onConfigChange,
+  onValidationChange,
 }: ForwarderEditorSyslogProps) => {
+  const [network, setNetwork] = useInput<SyslogNetwork>(config.network, [])
+  const [address, setAddress] = useInput<string>(config.address, [
+    validators.pattern(/^(([a-zA-Z0-9.-]+)|(\[[0-9A-Fa-f:]+\])):[0-9]{1,5}$/)
+  ])
+  const [tag, setTag] = useInput<string>(config.tag, [
+    validators.minLength(1),
+  ])
+  const [severity, setSeverity] = useInput<SyslogSeverity>(config.severity, [])
+  const [facility, setFacility] = useInput<SyslogFacility>(config.facility, [])
+
+  useEffect(() => {
+    const valid =
+      network.valid &&
+      address.valid &&
+      tag.valid &&
+      severity.valid &&
+      facility.valid
+    onValidationChange(valid)
+
+    if (valid) {
+      onConfigChange({
+        type: 'syslog',
+        network: network.value,
+        address: address.value,
+        tag: tag.value,
+        severity: severity.value,
+        facility: facility.value,
+      })
+    }
+  }, [network, address, tag, severity, facility, onValidationChange, onConfigChange])
+
   return (
     <div
       id="container:editor.forwarders.syslog"
       className="flex flex-col items-stretch gap-3"
     >
-      <div className="mb-6 shadow">
-        <TextField
-          label="Forwarder Type"
-          variant="outlined"
-          className="w-full"
-          type="text"
-          value={ForwarderConfigTypeLabelMap.syslog}
-          disabled
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <ForwarderIconSyslog />
-                </InputAdornment>
-              ),
-            },
-          }}
-        />
-      </div>
-
       <div className="flex flex-row items-center gap-3">
         <FormControl>
           <InputLabel id="label:editor.forwarders.syslog.network">
@@ -59,14 +74,9 @@ const ForwarderEditorSyslog = ({
           <Select<SyslogNetwork>
             labelId="label:editor.forwarders.syslog.network"
             id="select:editor.forwarders.syslog.network"
-            value={config.network}
+            value={network.value}
             label="Network"
-            onChange={(e) => {
-              onConfigChange({
-                ...config,
-                network: e.target.value as SyslogNetwork,
-              })
-            }}
+            onChange={(e) => { setNetwork(e.target.value as SyslogNetwork) }}
           >
             {SyslogNetworkValues.map((t) => (
               <MenuItem
@@ -86,13 +96,9 @@ const ForwarderEditorSyslog = ({
           label="Server Address"
           variant="outlined"
           type="text"
-          value={config.address}
-          onChange={(e) => {
-            onConfigChange({
-              ...config,
-              address: e.target.value,
-            })
-          }}
+          error={!address.valid}
+          value={address.value}
+          onChange={(e) => { setAddress(e.target.value) }}
         />
       </div>
 
@@ -101,13 +107,9 @@ const ForwarderEditorSyslog = ({
         label="Tag"
         variant="outlined"
         type="text"
-        value={config.tag}
-        onChange={(e) => {
-          onConfigChange({
-            ...config,
-            tag: e.target.value,
-          })
-        }}
+        error={!tag.valid}
+        value={tag.value}
+        onChange={(e) => { setTag(e.target.value) }}
       />
 
       <div className="flex flex-row gap-3">
@@ -118,14 +120,9 @@ const ForwarderEditorSyslog = ({
           <Select<SyslogSeverity>
             labelId="label:editor.forwarders.syslog.severity"
             id="select:editor.forwarders.syslog.severity"
-            value={config.severity}
+            value={severity.value}
             label="Severity"
-            onChange={(e) => {
-              onConfigChange({
-                ...config,
-                severity: e.target.value as SyslogSeverity,
-              })
-            }}
+            onChange={(e) => { setSeverity(e.target.value as SyslogSeverity) }}
           >
             {SyslogSeverityValues.map((t) => (
               <MenuItem
@@ -146,14 +143,9 @@ const ForwarderEditorSyslog = ({
           <Select<SyslogFacility>
             labelId="label:editor.forwarders.syslog.facility"
             id="select:editor.forwarders.syslog.facility"
-            value={config.facility}
+            value={facility.value}
             label="Facility"
-            onChange={(e) => {
-              onConfigChange({
-                ...config,
-                facility: e.target.value as SyslogFacility,
-              })
-            }}
+            onChange={(e) => { setFacility(e.target.value as SyslogFacility) }}
           >
             {SyslogFacilityValues.map((t) => (
               <MenuItem
