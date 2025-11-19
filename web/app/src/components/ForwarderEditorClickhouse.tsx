@@ -5,8 +5,8 @@ import FormGroup from '@mui/material/FormGroup'
 import InputAdornment from '@mui/material/InputAdornment'
 import TextField from '@mui/material/TextField'
 
-import { ForwarderConfigTypeLabelMap } from '@/lib/models/ForwarderConfigModel'
 import ForwarderConfigClickhouseModel from '@/lib/models/ForwarderConfigClickhouseModel'
+import { ForwarderConfigTypeLabelMap } from '@/lib/models/ForwarderConfigModel'
 
 import ForwarderIconClickhouse from '@/components/ForwarderIconClickhouse'
 
