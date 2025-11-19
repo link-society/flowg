@@ -1,9 +1,6 @@
 import ForwarderConfigAmqpModel, {
   factory as ForwarderConfigAmqpFactory,
 } from '@/lib/models/ForwarderConfigAmqpModel'
-import ForwarderConfigClickhouseModel, {
-  factory as ForwarderConfigClickhouseFactory,
-} from './ForwarderConfigClickhouseModel'
 import ForwarderConfigDatadogModel, {
   factory as ForwarderConfigDatadogFactory,
 } from '@/lib/models/ForwarderConfigDatadogModel'
@@ -22,6 +19,10 @@ import ForwarderConfigSplunkModel, {
 import ForwarderConfigSyslogModel, {
   factory as ForwarderConfigSyslogFactory,
 } from '@/lib/models/ForwarderConfigSyslogModel'
+
+import ForwarderConfigClickhouseModel, {
+  factory as ForwarderConfigClickhouseFactory,
+} from './ForwarderConfigClickhouseModel'
 
 type ForwarderConfigModel =
   | ForwarderConfigHttpModel
