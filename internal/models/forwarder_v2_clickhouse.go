@@ -18,7 +18,7 @@ type forwarderStateClickhouseV2 struct {
 
 type ForwarderClickhouseV2 struct {
 	Type     string `json:"type" enum:"clickhouse" required:"true"`
-	Url      string `json:"url" required:"true"`
+	Address  string `json:"address" required:"true"`
 	Database string `json:"db" required:"true"`
 	Table    string `json:"table" required:"true" pattern:"^[a-zA-Z_][a-zA-Z0-9_]*$" minLength:"1" maxLength:"64"`
 	Username string `json:"user" required:"true"`
@@ -54,7 +54,7 @@ func (f *ForwarderClickhouseV2) init(ctx context.Context) error {
 	}
 
 	var conn, err = clickhouse.Open(&clickhouse.Options{
-		Addr: []string{f.Url},
+		Addr: []string{f.Address},
 		Auth: clickhouse.Auth{
 			Database: f.Database,
 			Username: f.Username,

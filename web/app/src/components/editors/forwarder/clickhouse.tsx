@@ -45,15 +45,15 @@ export const ClickhouseForwarderEditor = ({
       </div>
 
       <TextField
-        id="input:editor.forwarders.clickhouse.url"
-        label="Clickhouse Connection URL"
+        id="input:editor.forwarders.clickhouse.address"
+        label="Clickhouse Connection Address"
         variant="outlined"
         type="text"
-        value={config.url}
+        value={config.address}
         onChange={(e) => {
           onConfigChange({
             ...config,
-            url: e.target.value,
+            address: e.target.value,
           })
         }}
       />
