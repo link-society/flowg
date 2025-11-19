@@ -1,6 +1,6 @@
-import { Validator } from '@/lib/validators'
-
 import { Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react'
+
+import { Validator } from '@/lib/validators'
 
 type InputData<T> = {
   value: T

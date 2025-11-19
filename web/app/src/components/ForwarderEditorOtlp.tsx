@@ -2,9 +2,9 @@ import { useEffect } from 'react'
 
 import TextField from '@mui/material/TextField'
 
-import ForwarderConfigOtlpModel from '@/lib/models/ForwarderConfigOtlpModel'
-
 import { useInput } from '@/lib/hooks/input'
+
+import ForwarderConfigOtlpModel from '@/lib/models/ForwarderConfigOtlpModel'
 
 import * as validators from '@/lib/validators'
 
@@ -65,7 +65,9 @@ const ForwarderEditorOtlp = ({
         keyLabel="Header Name"
         valueLabel="Header Value"
         keyValues={Object.entries(headers.value ?? {})}
-        onChange={(pairs) => { setHeaders(Object.fromEntries(pairs)) }}
+        onChange={(pairs) => {
+          setHeaders(Object.fromEntries(pairs))
+        }}
       />
     </div>
   )

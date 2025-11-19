@@ -1,11 +1,11 @@
+import { useEffect, useState } from 'react'
+
+import Editor, { useMonaco } from '@monaco-editor/react'
+
 import {
   vrlLanguageDefinition,
   vrlThemeDefinition,
 } from '@/lib/vrl-highlighter'
-
-import { useEffect, useState } from 'react'
-
-import Editor, { useMonaco } from '@monaco-editor/react'
 
 type VrlCodeEditorProps = Readonly<{
   id?: string

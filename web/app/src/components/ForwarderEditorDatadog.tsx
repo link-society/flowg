@@ -1,5 +1,3 @@
-import * as validators from '@/lib/validators'
-
 import { useEffect } from 'react'
 
 import Divider from '@mui/material/Divider'
@@ -8,6 +6,8 @@ import TextField from '@mui/material/TextField'
 import { useInput } from '@/lib/hooks/input'
 
 import ForwarderConfigDatadogModel from '@/lib/models/ForwarderConfigDatadogModel'
+
+import * as validators from '@/lib/validators'
 
 type ForwarderEditorDatadogProps = {
   config: ForwarderConfigDatadogModel

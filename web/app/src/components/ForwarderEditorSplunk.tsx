@@ -3,9 +3,9 @@ import { useEffect } from 'react'
 import Divider from '@mui/material/Divider'
 import TextField from '@mui/material/TextField'
 
-import ForwarderConfigSplunkModel from '@/lib/models/ForwarderConfigSplunkModel'
-
 import { useInput } from '@/lib/hooks/input'
+
+import ForwarderConfigSplunkModel from '@/lib/models/ForwarderConfigSplunkModel'
 
 import * as validators from '@/lib/validators'
 
@@ -53,7 +53,9 @@ const ForwarderEditorSplunk = ({
         type="text"
         error={!endpoint.valid}
         value={endpoint.value}
-        onChange={(e) => { setEndpoint(e.target.value) }}
+        onChange={(e) => {
+          setEndpoint(e.target.value)
+        }}
       />
 
       <Divider />
@@ -65,7 +67,9 @@ const ForwarderEditorSplunk = ({
         type="password"
         error={!token.valid}
         value={token.value}
-        onChange={(e) => { setToken(e.target.value) }}
+        onChange={(e) => {
+          setToken(e.target.value)
+        }}
       />
     </div>
   )

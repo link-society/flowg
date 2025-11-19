@@ -3,9 +3,9 @@ import { useEffect } from 'react'
 import Divider from '@mui/material/Divider'
 import TextField from '@mui/material/TextField'
 
-import ForwarderConfigHttpModel from '@/lib/models/ForwarderConfigHttpModel'
-
 import { useInput } from '@/lib/hooks/input'
+
+import ForwarderConfigHttpModel from '@/lib/models/ForwarderConfigHttpModel'
 
 import * as validators from '@/lib/validators'
 
@@ -56,7 +56,9 @@ const ForwarderEditorHttp = ({
         type="text"
         error={!url.valid}
         value={url.value}
-        onChange={(e) => { setUrl(e.target.value) }}
+        onChange={(e) => {
+          setUrl(e.target.value)
+        }}
       />
 
       <Divider />
@@ -66,7 +68,9 @@ const ForwarderEditorHttp = ({
         keyLabel="HTTP Header"
         valueLabel="Value"
         keyValues={Object.entries(headers.value ?? {})}
-        onChange={(pairs) => { setHeaders(Object.fromEntries(pairs)) }}
+        onChange={(pairs) => {
+          setHeaders(Object.fromEntries(pairs))
+        }}
       />
     </div>
   )
