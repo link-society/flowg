@@ -16,11 +16,11 @@ type forwarderStateElasticV2 struct {
 
 type ForwarderElasticV2 struct {
 	Type      string   `json:"type" enum:"elastic" required:"true"`
-	Index     string   `json:"index" required:"true"`
-	Username  string   `json:"username" required:"true"`
-	Password  string   `json:"password" required:"true"`
-	Addresses []string `json:"addresses" required:"true"`
-	CACert    string   `json:"ca,omitempty"`
+	Index     string   `json:"index" required:"true" minLength:"1"`
+	Username  string   `json:"username" required:"true" minLength:"1"`
+	Password  string   `json:"password" required:"true" minLength:"1"`
+	Addresses []string `json:"addresses" required:"true" minItems:"1" items.format:"uri"`
+	CACert    string   `json:"ca,omitempty" format:"pem"`
 
 	state *forwarderStateElasticV2
 }

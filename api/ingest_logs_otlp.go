@@ -23,8 +23,10 @@ import (
 )
 
 type IngestLogsOTLPRequest struct {
-	Pipeline   string `path:"pipeline" minLength:"1"`
-	logRecords []*models.LogRecord
+	Pipeline        string `path:"pipeline" minLength:"1"`
+	ContentEncoding string `header:"Content-Encoding" enum:"gzip" required:"false"`
+	logRecords      []*models.LogRecord
+
 	collectlogs.ExportLogsServiceRequest
 }
 
@@ -46,8 +48,8 @@ func (ior *IngestLogsOTLPRequest) LoadFromHTTPRequest(r *http.Request) error {
 
 	var body []byte
 
-	contentEncoding := r.Header.Get("Content-Encoding")
-	switch contentEncoding {
+	ior.ContentEncoding = r.Header.Get("Content-Encoding")
+	switch ior.ContentEncoding {
 	case "gzip":
 		// decompress body
 		gz, err := gzip.NewReader(r.Body)
@@ -72,7 +74,7 @@ func (ior *IngestLogsOTLPRequest) LoadFromHTTPRequest(r *http.Request) error {
 		body = data
 
 	default:
-		return fmt.Errorf("unsupported content encoding: %s", contentEncoding)
+		return fmt.Errorf("unsupported content encoding: %s", ior.ContentEncoding)
 	}
 
 	contentType := r.Header.Get("Content-Type")

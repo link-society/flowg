@@ -15,8 +15,8 @@ type forwarderStateSyslogV2 struct {
 type ForwarderSyslogV2 struct {
 	Type     string `json:"type" enum:"syslog" required:"true"`
 	Network  string `json:"network" enum:"tcp,udp" required:"true"`
-	Address  string `json:"address" required:"true"`
-	Tag      string `json:"tag" required:"true"`
+	Address  string `json:"address" required:"true" pattern:"^(([a-zA-Z0-9.-]+)|(\\[[0-9A-Fa-f:]+\\])):[0-9]{1,5}$"`
+	Tag      string `json:"tag" required:"true" minLength:"1"`
 	Severity string `json:"severity" enum:"emerg,alert,crit,err,warning,notice,info,debug" required:"true"`
 	Facility string `json:"facility" enum:"kern,user,mail,daemon,auth,syslog,lpr,news,uucp,cron,authpriv,ftp,local0,local1,local2,local3,local4,local5,local6,local7" required:"true"`
 

@@ -1,22 +1,22 @@
 package models
 
 type Permissions struct {
-	CanViewPipelines bool `json:"can_view_pipelines"`
-	CanEditPipelines bool `json:"can_edit_pipelines"`
+	CanViewPipelines bool `json:"can_view_pipelines" required:"true"`
+	CanEditPipelines bool `json:"can_edit_pipelines" required:"true"`
 
-	CanViewTransformers bool `json:"can_view_transformers"`
-	CanEditTransformers bool `json:"can_edit_transformers"`
+	CanViewTransformers bool `json:"can_view_transformers" required:"true"`
+	CanEditTransformers bool `json:"can_edit_transformers" required:"true"`
 
-	CanViewStreams bool `json:"can_view_streams"`
-	CanEditStreams bool `json:"can_edit_streams"`
+	CanViewStreams bool `json:"can_view_streams" required:"true"`
+	CanEditStreams bool `json:"can_edit_streams" required:"true"`
 
-	CanViewForwarders bool `json:"can_view_forwarders"`
-	CanEditForwarders bool `json:"can_edit_forwarders"`
+	CanViewForwarders bool `json:"can_view_forwarders" required:"true"`
+	CanEditForwarders bool `json:"can_edit_forwarders" required:"true"`
 
-	CanViewACLs bool `json:"can_view_acls"`
-	CanEditACLs bool `json:"can_edit_acls"`
+	CanViewACLs bool `json:"can_view_acls" required:"true"`
+	CanEditACLs bool `json:"can_edit_acls" required:"true"`
 
-	CanSendLogs bool `json:"can_send_logs"`
+	CanSendLogs bool `json:"can_send_logs" required:"true"`
 }
 
 func PermissionsFromScopes(scopes []Scope) Permissions {

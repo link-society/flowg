@@ -87,6 +87,19 @@ func NewHandler(deps Dependencies) http.Handler {
 
 		r.Post("/api/v1/pipelines/{pipeline}/logs/struct", ctrl.IngestLogsStructUsecase())
 		r.Post("/api/v1/pipelines/{pipeline}/logs/text", ctrl.IngestLogsTextUsecase())
+
+		service.OpenAPICollector.AnnotateOperation(
+			"POST", "/api/v1/pipelines/{pipeline}/logs/otlp",
+			func(oc openapi.OperationContext) error {
+				oc.AddReqStructure(nil, func(cu *openapi.ContentUnit) {
+					cu.ContentType = "application/x-protobuf"
+					cu.Format = "binary"
+					cu.Description = "OpenTelemetry Export Logs Service Request"
+				})
+
+				return nil
+			},
+		)
 		r.Post("/api/v1/pipelines/{pipeline}/logs/otlp", ctrl.IngestLogsOTLPUsecase())
 
 		r.Get("/api/v1/streams", ctrl.ListStreamsUsecase())

@@ -16,7 +16,7 @@ type forwarderStateHttpV2 struct {
 
 type ForwarderHttpV2 struct {
 	Type    string            `json:"type" enum:"http" required:"true"`
-	Url     string            `json:"url" required:"true"`
+	Url     string            `json:"url" required:"true" format:"uri"`
 	Headers map[string]string `json:"headers,omitempty"`
 
 	state *forwarderStateHttpV2
