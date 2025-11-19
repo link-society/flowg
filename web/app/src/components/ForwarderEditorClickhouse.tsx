@@ -1,5 +1,4 @@
 import Checkbox from '@mui/material/Checkbox'
-import Divider from '@mui/material/Divider'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import FormGroup from '@mui/material/FormGroup'
 import InputAdornment from '@mui/material/InputAdornment'
@@ -58,8 +57,6 @@ const ForwarderEditorClickhouse = ({
         }}
       />
 
-      <Divider />
-
       <TextField
         id="input:editor.forwarders.clickhouse.db"
         label="Database Name"
@@ -73,8 +70,6 @@ const ForwarderEditorClickhouse = ({
           })
         }}
       />
-
-      <Divider />
 
       <TextField
         id="input:editor.forwarders.clickhouse.table"
@@ -90,8 +85,6 @@ const ForwarderEditorClickhouse = ({
         }}
       />
 
-      <Divider />
-
       <TextField
         id="input:editor.forwarders.clickhouse.user"
         label="Database Username"
@@ -106,8 +99,6 @@ const ForwarderEditorClickhouse = ({
         }}
       />
 
-      <Divider />
-
       <TextField
         id="input:editor.forwarders.clickhouse.pass"
         label="Database Password"
@@ -121,8 +112,6 @@ const ForwarderEditorClickhouse = ({
           })
         }}
       />
-
-      <Divider />
 
       <FormGroup>
         <FormControlLabel
