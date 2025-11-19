@@ -1,6 +1,6 @@
 export type ClickhouseForwarderModel = {
   type: 'clickhouse'
-  url: string
+  address: string
   db: string
   table: string
   user: string

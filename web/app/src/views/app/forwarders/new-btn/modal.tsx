@@ -100,7 +100,7 @@ const newForwarderFactory = (type: ForwarderTypes): ForwarderModel => {
       return {
         config: {
           type,
-          url: '',
+          address: 'localhost:9000',
           db: 'default',
           table: 'default',
           user: 'default',
