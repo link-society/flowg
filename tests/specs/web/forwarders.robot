@@ -18,6 +18,8 @@ Create new forwarder
     Click Element                  id=btn:forwarders.create
     Wait Until Element Is Visible  id=input:forwarder.modal.name
     Input Text                     id=input:forwarder.modal.name  test
+    Element Should Be Visible      id=container:editor.forwarders.http
+    Input Text                     id=input:editor.forwarders.http.webhook_url  http://test.com
     Click Button                   id=btn:forwarder.modal.save
     Wait Until Page Contains       Forwarder created  timeout=5s
     Close Browser
