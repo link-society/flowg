@@ -1,5 +1,3 @@
-import * as validators from '@/lib/validators'
-
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import Button from '@mui/material/Button'
@@ -7,6 +5,8 @@ import TextField from '@mui/material/TextField'
 
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
+
+import * as validators from '@/lib/validators'
 
 type InputListProps = {
   id?: string
@@ -109,7 +109,9 @@ const InputList = (props: InputListProps) => {
           data-ref="input:generic.list-editor.new"
           label={props.itemLabel ?? 'Item'}
           value={newItem}
-          onChange={(e) => { setNewItem(e.target.value) }}
+          onChange={(e) => {
+            setNewItem(e.target.value)
+          }}
           variant="outlined"
           size="small"
           className="grow"

@@ -1,4 +1,3 @@
-import { aggregateLogs } from '@/lib/timeserie'
 import type { ApexOptions } from 'apexcharts'
 
 import { useMemo } from 'react'
@@ -7,6 +6,8 @@ import ApexChart from 'react-apexcharts'
 import Box from '@mui/material/Box'
 
 import LogEntryModel from '@/lib/models/LogEntryModel'
+
+import { aggregateLogs } from '@/lib/timeserie'
 
 type LogChartProps = Readonly<{
   rowData: LogEntryModel[]

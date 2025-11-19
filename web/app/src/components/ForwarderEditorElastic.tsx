@@ -1,5 +1,3 @@
-import * as validators from '@/lib/validators'
-
 import { useEffect } from 'react'
 
 import Divider from '@mui/material/Divider'
@@ -8,6 +6,8 @@ import TextField from '@mui/material/TextField'
 import { useInput } from '@/lib/hooks/input'
 
 import ForwarderConfigElasticModel from '@/lib/models/ForwarderConfigElasticModel'
+
+import * as validators from '@/lib/validators'
 
 import InputList from '@/components/InputList'
 
@@ -31,10 +31,7 @@ const ForwarderEditorElastic = ({
   ])
   const [addresses, setAddresses] = useInput(config.addresses, [
     validators.minItems(1),
-    validators.items([
-      validators.minLength(1),
-      validators.formatUri,
-    ]),
+    validators.items([validators.minLength(1), validators.formatUri]),
   ])
   const [ca, setCa] = useInput<string | undefined>(config.ca, [
     (value) => {
@@ -122,10 +119,7 @@ const ForwarderEditorElastic = ({
         id="editor.forwarders.elastic.addresses"
         itemLabel="Address"
         items={config.addresses}
-        itemValidators={[
-          validators.minLength(1),
-          validators.formatUri,
-        ]}
+        itemValidators={[validators.minLength(1), validators.formatUri]}
         onChange={setAddresses}
       />
 

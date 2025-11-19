@@ -1,7 +1,7 @@
 import React from 'react'
 
-import TextField from '@mui/material/TextField'
 import InputAdornment from '@mui/material/InputAdornment'
+import TextField from '@mui/material/TextField'
 
 import ForwarderConfigModel, {
   ForwarderConfigTypeIconMap,
@@ -9,14 +9,14 @@ import ForwarderConfigModel, {
 } from '@/lib/models/ForwarderConfigModel'
 import ForwarderModel from '@/lib/models/ForwarderModel'
 
-import ForwarderEditorAmqp from './ForwarderEditorAmqp'
-import ForwarderEditorClickhouse from './ForwarderEditorClickhouse'
-import ForwarderEditorDatadog from './ForwarderEditorDatadog'
-import ForwarderEditorElastic from './ForwarderEditorElastic'
-import ForwarderEditorHttp from './ForwarderEditorHttp'
-import ForwarderEditorOtlp from './ForwarderEditorOtlp'
-import ForwarderEditorSplunk from './ForwarderEditorSplunk'
-import ForwarderEditorSyslog from './ForwarderEditorSyslog'
+import ForwarderEditorAmqp from '@/components/ForwarderEditorAmqp'
+import ForwarderEditorClickhouse from '@/components/ForwarderEditorClickhouse'
+import ForwarderEditorDatadog from '@/components/ForwarderEditorDatadog'
+import ForwarderEditorElastic from '@/components/ForwarderEditorElastic'
+import ForwarderEditorHttp from '@/components/ForwarderEditorHttp'
+import ForwarderEditorOtlp from '@/components/ForwarderEditorOtlp'
+import ForwarderEditorSplunk from '@/components/ForwarderEditorSplunk'
+import ForwarderEditorSyslog from '@/components/ForwarderEditorSyslog'
 
 const editors = {
   amqp: ForwarderEditorAmqp,

@@ -1,5 +1,3 @@
-import * as validators from '@/lib/validators'
-
 import { useEffect } from 'react'
 
 import Divider from '@mui/material/Divider'
@@ -8,6 +6,8 @@ import TextField from '@mui/material/TextField'
 import { useInput } from '@/lib/hooks/input'
 
 import ForwarderConfigAmqpModel from '@/lib/models/ForwarderConfigAmqpModel'
+
+import * as validators from '@/lib/validators'
 
 type ForwarderEditorAmqpProps = {
   config: ForwarderConfigAmqpModel

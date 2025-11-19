@@ -32,9 +32,11 @@ export const items =
     return true
   }
 
-export const pattern = (regex: RegExp) => (value: string): boolean => {
-  return regex.test(value)
-}
+export const pattern =
+  (regex: RegExp) =>
+  (value: string): boolean => {
+    return regex.test(value)
+  }
 
 export const formatUri = (value: string): boolean => {
   try {

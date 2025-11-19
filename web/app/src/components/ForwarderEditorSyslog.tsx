@@ -8,8 +8,6 @@ import TextField from '@mui/material/TextField'
 
 import { useInput } from '@/lib/hooks/input'
 
-import * as validators from '@/lib/validators'
-
 import ForwarderConfigSyslogModel, {
   SyslogFacility,
   SyslogFacilityValues,
@@ -18,6 +16,8 @@ import ForwarderConfigSyslogModel, {
   SyslogSeverity,
   SyslogSeverityValues,
 } from '@/lib/models/ForwarderConfigSyslogModel'
+
+import * as validators from '@/lib/validators'
 
 type ForwarderEditorSyslogProps = {
   config: ForwarderConfigSyslogModel
@@ -32,11 +32,9 @@ const ForwarderEditorSyslog = ({
 }: ForwarderEditorSyslogProps) => {
   const [network, setNetwork] = useInput<SyslogNetwork>(config.network, [])
   const [address, setAddress] = useInput<string>(config.address, [
-    validators.pattern(/^(([a-zA-Z0-9.-]+)|(\[[0-9A-Fa-f:]+\])):[0-9]{1,5}$/)
+    validators.pattern(/^(([a-zA-Z0-9.-]+)|(\[[0-9A-Fa-f:]+\])):[0-9]{1,5}$/),
   ])
-  const [tag, setTag] = useInput<string>(config.tag, [
-    validators.minLength(1),
-  ])
+  const [tag, setTag] = useInput<string>(config.tag, [validators.minLength(1)])
   const [severity, setSeverity] = useInput<SyslogSeverity>(config.severity, [])
   const [facility, setFacility] = useInput<SyslogFacility>(config.facility, [])
 
@@ -59,7 +57,15 @@ const ForwarderEditorSyslog = ({
         facility: facility.value,
       })
     }
-  }, [network, address, tag, severity, facility, onValidationChange, onConfigChange])
+  }, [
+    network,
+    address,
+    tag,
+    severity,
+    facility,
+    onValidationChange,
+    onConfigChange,
+  ])
 
   return (
     <div
@@ -76,7 +82,9 @@ const ForwarderEditorSyslog = ({
             id="select:editor.forwarders.syslog.network"
             value={network.value}
             label="Network"
-            onChange={(e) => { setNetwork(e.target.value as SyslogNetwork) }}
+            onChange={(e) => {
+              setNetwork(e.target.value as SyslogNetwork)
+            }}
           >
             {SyslogNetworkValues.map((t) => (
               <MenuItem
@@ -98,7 +106,9 @@ const ForwarderEditorSyslog = ({
           type="text"
           error={!address.valid}
           value={address.value}
-          onChange={(e) => { setAddress(e.target.value) }}
+          onChange={(e) => {
+            setAddress(e.target.value)
+          }}
         />
       </div>
 
@@ -109,7 +119,9 @@ const ForwarderEditorSyslog = ({
         type="text"
         error={!tag.valid}
         value={tag.value}
-        onChange={(e) => { setTag(e.target.value) }}
+        onChange={(e) => {
+          setTag(e.target.value)
+        }}
       />
 
       <div className="flex flex-row gap-3">
@@ -122,7 +134,9 @@ const ForwarderEditorSyslog = ({
             id="select:editor.forwarders.syslog.severity"
             value={severity.value}
             label="Severity"
-            onChange={(e) => { setSeverity(e.target.value as SyslogSeverity) }}
+            onChange={(e) => {
+              setSeverity(e.target.value as SyslogSeverity)
+            }}
           >
             {SyslogSeverityValues.map((t) => (
               <MenuItem
@@ -145,7 +159,9 @@ const ForwarderEditorSyslog = ({
             id="select:editor.forwarders.syslog.facility"
             value={facility.value}
             label="Facility"
-            onChange={(e) => { setFacility(e.target.value as SyslogFacility) }}
+            onChange={(e) => {
+              setFacility(e.target.value as SyslogFacility)
+            }}
           >
             {SyslogFacilityValues.map((t) => (
               <MenuItem

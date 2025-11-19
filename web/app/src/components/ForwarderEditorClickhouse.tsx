@@ -7,9 +7,9 @@ import TextField from '@mui/material/TextField'
 
 import { useInput } from '@/lib/hooks/input'
 
-import * as validators from '@/lib/validators'
-
 import ForwarderConfigClickhouseModel from '@/lib/models/ForwarderConfigClickhouseModel'
+
+import * as validators from '@/lib/validators'
 
 type ForwarderEditorClickhouseProps = {
   config: ForwarderConfigClickhouseModel
@@ -23,7 +23,7 @@ const ForwarderEditorClickhouse = ({
   onValidationChange,
 }: ForwarderEditorClickhouseProps) => {
   const [address, setAddress] = useInput(config.address, [
-    validators.pattern(/^(([a-zA-Z0-9.-]+)|(\[[0-9A-Fa-f:]+\])):[0-9]{1,5}$/)
+    validators.pattern(/^(([a-zA-Z0-9.-]+)|(\[[0-9A-Fa-f:]+\])):[0-9]{1,5}$/),
   ])
   const [db, setDb] = useInput(config.db, [validators.minLength(1)])
   const [table, setTable] = useInput(config.table, [
@@ -65,7 +65,9 @@ const ForwarderEditorClickhouse = ({
         type="text"
         error={!address.valid}
         value={address.value}
-        onChange={(e) => { setAddress(e.target.value) }}
+        onChange={(e) => {
+          setAddress(e.target.value)
+        }}
       />
 
       <TextField
@@ -75,7 +77,9 @@ const ForwarderEditorClickhouse = ({
         type="text"
         error={!db.valid}
         value={db.value}
-        onChange={(e) => { setDb(e.target.value) }}
+        onChange={(e) => {
+          setDb(e.target.value)
+        }}
       />
 
       <TextField
@@ -85,7 +89,9 @@ const ForwarderEditorClickhouse = ({
         type="text"
         error={!table.valid}
         value={table.value}
-        onChange={(e) => { setTable(e.target.value) }}
+        onChange={(e) => {
+          setTable(e.target.value)
+        }}
       />
 
       <TextField
@@ -95,7 +101,9 @@ const ForwarderEditorClickhouse = ({
         type="text"
         error={!user.valid}
         value={user.value}
-        onChange={(e) => { setUser(e.target.value) }}
+        onChange={(e) => {
+          setUser(e.target.value)
+        }}
       />
 
       <TextField
@@ -105,7 +113,9 @@ const ForwarderEditorClickhouse = ({
         type="password"
         error={!pass.valid}
         value={pass.value}
-        onChange={(e) => { setPass(e.target.value) }}
+        onChange={(e) => {
+          setPass(e.target.value)
+        }}
       />
 
       <FormGroup>
@@ -114,7 +124,9 @@ const ForwarderEditorClickhouse = ({
             <Checkbox
               id="input:editor.forwarders.clickhouse.tsl"
               checked={tls.value}
-              onChange={(e) => { setTls(e.target.checked) }}
+              onChange={(e) => {
+                setTls(e.target.checked)
+              }}
             />
           }
           label="Use TLS"
