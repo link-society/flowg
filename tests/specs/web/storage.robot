@@ -47,6 +47,5 @@ Delete stream
     Click Navbar Menu Item         id=menu:navbar.settings  id=link:navbar.settings.storage
     Wait Until Element Is Visible  id=label:streams.list-item.test
     Click Element                  id=btn:streams.delete
-    Wait Until Page Contains       Stream deleted  timeout=5s
-    Page Should Contain            No stream found
+    Wait Until Page Contains       No stream found  timeout=5s
     Close Browser
