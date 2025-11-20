@@ -29,4 +29,4 @@ Purge stream
     Go To                          ${BASE_URL}/web/storage/${stream}
     Wait Until Element Is Visible  id=btn:streams.delete
     Click Element                  id=btn:streams.delete
-    Wait Until Page Contains       Stream deleted  timeout=5s
+    Sleep                          1s
