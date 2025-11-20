@@ -1,4 +1,4 @@
-import { LoaderFunction, useNavigate, redirect } from 'react-router'
+import { LoaderFunction, redirect, useNavigate } from 'react-router'
 
 import * as configApi from '@/lib/api/operations/config'
 
@@ -15,13 +15,11 @@ export const loader: LoaderFunction = loginRequired(async () => {
 
 const ForwarderSectionView = () => {
   const navigate = useNavigate()
-  console.log("Rendering ForwarderSectionView")
+  console.log('Rendering ForwarderSectionView')
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center gap-5">
-      <h1 className="text-3xl font-semibold">
-        No forwarder found, create one
-      </h1>
+      <h1 className="text-3xl font-semibold">No forwarder found, create one</h1>
 
       <ButtonNewForwarder
         onForwarderCreated={(name) => {

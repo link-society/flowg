@@ -1,4 +1,4 @@
-import { LoaderFunction, useNavigate, redirect } from 'react-router'
+import { LoaderFunction, redirect, useNavigate } from 'react-router'
 
 import * as configApi from '@/lib/api/operations/config'
 
@@ -18,9 +18,7 @@ const PipelineSectionView = () => {
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center gap-5">
-      <h1 className="text-3xl font-semibold">
-        No pipeline found, create one
-      </h1>
+      <h1 className="text-3xl font-semibold">No pipeline found, create one</h1>
 
       <ButtonNewPipeline
         onPipelineCreated={(name) => {

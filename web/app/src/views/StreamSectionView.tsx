@@ -14,9 +14,7 @@ export const loader: LoaderFunction = loginRequired(async () => {
 
 const StreamSectionView = () => (
   <div className="w-full h-full flex flex-col items-center justify-center gap-5">
-    <h1 className="text-3xl font-semibold">
-      No stream found, send some logs.
-    </h1>
+    <h1 className="text-3xl font-semibold">No stream found, send some logs.</h1>
   </div>
 )
 
