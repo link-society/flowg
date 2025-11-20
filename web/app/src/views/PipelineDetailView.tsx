@@ -1,10 +1,5 @@
-import { useCallback, useEffect, useState } from 'react'
-import {
-  LoaderFunction,
-  useLoaderData,
-  useLocation,
-  useNavigate,
-} from 'react-router'
+import { useCallback, useState } from 'react'
+import { LoaderFunction, useLoaderData } from 'react-router'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -65,8 +60,6 @@ export const loader: LoaderFunction = loginRequired(
 )
 
 const PipelineDetailView = () => {
-  const navigate = useNavigate()
-  const location = useLocation()
   const notify = useNotify()
 
   const { permissions } = useProfile()
@@ -74,10 +67,6 @@ const PipelineDetailView = () => {
   const initialFlow = currentPipeline.flow
 
   const [flow, setFlow] = useState(initialFlow)
-
-  useEffect(() => {
-    setFlow(initialFlow)
-  }, [location])
 
   const onChange = useCallback(
     (newFlow: PipelineModel) => {
@@ -93,7 +82,10 @@ const PipelineDetailView = () => {
 
   const [onDelete, deleteLoading] = useApiOperation(async () => {
     await configApi.deletePipeline(currentPipeline.name)
-    navigate('/web/pipelines')
+
+    queueMicrotask(() => {
+      globalThis.location.pathname = '/web/pipelines'
+    })
   }, [currentPipeline])
 
   const [onSave, saveLoading] = useApiOperation(async () => {

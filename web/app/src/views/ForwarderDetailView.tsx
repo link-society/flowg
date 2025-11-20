@@ -1,10 +1,5 @@
-import { useEffect, useState } from 'react'
-import {
-  LoaderFunction,
-  useLoaderData,
-  useLocation,
-  useNavigate,
-} from 'react-router'
+import { useState } from 'react'
+import { LoaderFunction, useLoaderData } from 'react-router'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -60,8 +55,6 @@ export const loader: LoaderFunction = loginRequired(
 )
 
 const ForwarderDetailView = () => {
-  const navigate = useNavigate()
-  const location = useLocation()
   const notify = useNotify()
 
   const { permissions } = useProfile()
@@ -69,18 +62,17 @@ const ForwarderDetailView = () => {
   const [forwarder, setForwarder] = useState(currentForwarder.forwarder)
   const [valid, setValid] = useState(false)
 
-  useEffect(() => {
-    setForwarder(currentForwarder.forwarder)
-  }, [location])
-
   const onCreate = (name: string) => {
-    navigate(`/web/forwarders/${name}`)
+    queueMicrotask(() => {
+      globalThis.location.pathname = `/web/forwarders/${name}`
+    })
   }
 
   const [onDelete, deleteLoading] = useApiOperation(async () => {
     await configApi.deleteForwarder(currentForwarder.name)
-    notify.success('Forwarder deleted')
-    navigate('/web/forwarders')
+    queueMicrotask(() => {
+      globalThis.location.pathname = '/web/forwarders'
+    })
   }, [currentForwarder])
 
   const [onSave, saveLoading] = useApiOperation(async () => {

@@ -1,10 +1,5 @@
-import { useEffect, useState } from 'react'
-import {
-  LoaderFunction,
-  useLoaderData,
-  useLocation,
-  useNavigate,
-} from 'react-router'
+import { useState } from 'react'
+import { LoaderFunction, useLoaderData } from 'react-router'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -60,8 +55,6 @@ export const loader: LoaderFunction = loginRequired(
 )
 
 const TransformerDetailView = () => {
-  const navigate = useNavigate()
-  const location = useLocation()
   const notify = useNotify()
 
   const { permissions } = useProfile()
@@ -69,18 +62,17 @@ const TransformerDetailView = () => {
 
   const [code, setCode] = useState(currentTransformer.script)
 
-  useEffect(() => {
-    setCode(currentTransformer.script)
-  }, [location])
-
   const onCreate = (name: string) => {
-    navigate(`/web/transformers/${name}`)
+    queueMicrotask(() => {
+      globalThis.location.pathname = `/web/transformers/${name}`
+    })
   }
 
   const [onDelete, deleteLoading] = useApiOperation(async () => {
     await configApi.deleteTransformer(currentTransformer.name)
-    notify.success('Transformer deleted')
-    navigate('/web/transformers')
+    queueMicrotask(() => {
+      globalThis.location.pathname = '/web/transformers'
+    })
   }, [currentTransformer])
 
   const [onSave, saveLoading] = useApiOperation(async () => {
