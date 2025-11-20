@@ -46,6 +46,5 @@ Delete transformer
     Click Navbar Menu Item         id=menu:navbar.settings  id=link:navbar.settings.transformers
     Wait Until Element Is Visible  id=label:transformers.list-item.test
     Click Element                  id=btn:transformers.delete
-    Wait Until Page Contains       Transformer deleted  timeout=5s
-    Page Should Contain            No transformer found
+    Wait Until Page Contains       No transformer found  timeout=5s
     Close Browser

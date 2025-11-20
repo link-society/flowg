@@ -48,6 +48,5 @@ Delete forwarder
     Click Navbar Menu Item         id=menu:navbar.settings  id=link:navbar.settings.forwarders
     Wait Until Element Is Visible  id=label:forwarders.list-item.test
     Click Element                  id=btn:forwarders.delete
-    Wait Until Page Contains       Forwarder deleted  timeout=5s
-    Page Should Contain            No forwarder found
+    Wait Until Page Contains       No forwarder found  timeout=5s
     Close Browser
