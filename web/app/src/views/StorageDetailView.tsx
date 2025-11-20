@@ -1,10 +1,5 @@
-import { useEffect, useState } from 'react'
-import {
-  LoaderFunction,
-  useLoaderData,
-  useLocation,
-  useNavigate,
-} from 'react-router'
+import { useState } from 'react'
+import { LoaderFunction, useLoaderData } from 'react-router'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -49,8 +44,6 @@ export const loader: LoaderFunction = loginRequired(async ({ params }) => {
 
 const StorageDetailView = () => {
   const featureFlags = useFeatureFlags()
-  const navigate = useNavigate()
-  const location = useLocation()
   const notify = useNotify()
 
   const { permissions } = useProfile()
@@ -58,18 +51,17 @@ const StorageDetailView = () => {
 
   const [streamConfig, setStreamConfig] = useState(streams[currentStream])
 
-  useEffect(() => {
-    setStreamConfig(streams[currentStream])
-  }, [location])
-
   const onCreate = (name: string) => {
-    navigate(`/web/storage/${name}`)
+    queueMicrotask(() => {
+      globalThis.location.pathname = `/web/storage/${name}`
+    })
   }
 
   const [onDelete, deleteLoading] = useApiOperation(async () => {
     await configApi.purgeStream(currentStream)
-    notify.success('Stream deleted')
-    navigate('/web/storage')
+    queueMicrotask(() => {
+      globalThis.location.pathname = '/web/storage'
+    })
   }, [currentStream])
 
   const [onSave, saveLoading] = useApiOperation(async () => {

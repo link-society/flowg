@@ -4,7 +4,7 @@ import * as authApi from '@/lib/api/operations/auth'
 
 export const loader = async () => {
   await authApi.logout()
-  return redirect('/web/login')
+  throw redirect('/web/login')
 }
 
 const LogoutView = () => {

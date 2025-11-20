@@ -35,7 +35,7 @@ export function useApiOperation<Args extends unknown[]>(
 
       setLoading(false)
     },
-    [fn, ...deps]
+    [fn, navigate, notify, ...deps]
   )
 
   return [cb, loading]

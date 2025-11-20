@@ -1,4 +1,4 @@
-import { Outlet, useLoaderData } from 'react-router'
+import { Outlet, useLoaderData, useLocation } from 'react-router'
 
 import * as authApi from '@/lib/api/operations/auth'
 
@@ -16,6 +16,7 @@ export const loader = async () => {
 
 const AppLayout = () => {
   const profile = useLoaderData() as ProfileModel
+  const location = useLocation()
 
   return (
     <ProfileProvider value={profile}>
@@ -23,7 +24,7 @@ const AppLayout = () => {
         <NavBar />
 
         <main className="grow shrink h-0">
-          <Outlet />
+          <Outlet key={location.key} />
         </main>
 
         <PageFooter />

@@ -53,6 +53,8 @@ const ErrorBoundary = () => {
     )
   }
 
+  console.error(error)
+
   return (
     <div className="p-3 flex flex-col gap-3">
       <Heading title="An unknown exception has been thrown." />
