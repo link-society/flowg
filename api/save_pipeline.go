@@ -55,6 +55,17 @@ func (ctrl *controller) SavePipelineUsecase() usecase.Interactor {
 					return status.Wrap(err, status.Internal)
 				}
 
+				if err := ctrl.deps.ClusterManager.BroadcastInvalidatePipelineCache(ctx, req.Pipeline); err != nil {
+					ctrl.logger.ErrorContext(
+						ctx,
+						"Failed to broadcast pipeline cache invalidation after save",
+						slog.String("error", err.Error()),
+					)
+
+					resp.Success = false
+					return status.Wrap(err, status.Internal)
+				}
+
 				resp.Success = true
 
 				return nil
