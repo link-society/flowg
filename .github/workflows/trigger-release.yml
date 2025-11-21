@@ -45,7 +45,7 @@ jobs:
         run: |
           echo "${VERSION}" > VERSION.txt
           python scripts/update-security-policy.py --next-release "${VERSION}" > SECURITY.md
-          sed -i -E 's/^(version|appVersion): "v[0-9]+\.[0-9]+\.[0-9]+"/\1: "${VERSION}"/' k8s/charts/flowg/Chart.yaml
+          sed -i -E "s/^(version|appVersion): \"v[0-9]+\\.[0-9]+\\.[0-9]+\"/\\1: \"${VERSION}\"/" k8s/charts/flowg/Chart.yaml
           git add VERSION.txt SECURITY.md k8s/charts/flowg/Chart.yaml
           git commit -m ":bookmark: ${VERSION}"
           git push origin main
