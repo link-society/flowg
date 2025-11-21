@@ -28,6 +28,7 @@ jobs:
         with:
           token: ${{ steps.app-token.outputs.token }}
           ref: main
+          fetch-tags: true
 
       - name: setup@scm
         env:
