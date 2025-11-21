@@ -55,6 +55,17 @@ func (ctrl *controller) SaveForwarderUsecase() usecase.Interactor {
 					return status.Wrap(err, status.Internal)
 				}
 
+				if err := ctrl.deps.ClusterManager.BroadcastInvalidatePipelineCache(ctx, ""); err != nil {
+					ctrl.logger.ErrorContext(
+						ctx,
+						"Failed to broadcast pipeline cache invalidation after forwarder save",
+						slog.String("error", err.Error()),
+					)
+
+					resp.Success = false
+					return status.Wrap(err, status.Internal)
+				}
+
 				resp.Success = true
 
 				return nil
