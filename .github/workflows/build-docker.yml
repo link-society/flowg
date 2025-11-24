@@ -54,7 +54,7 @@ jobs:
 
       - name: checkout@scm
         if: steps.need-docker.outputs.exists == 'false'
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
 
       - name: setup@docker
         if: steps.need-docker.outputs.exists == 'false'
