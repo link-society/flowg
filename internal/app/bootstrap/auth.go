@@ -37,6 +37,8 @@ func DefaultRolesAndUsers(ctx context.Context, authStorage auth.Storage, opts Bo
 				models.SCOPE_WRITE_TRANSFORMERS,
 				models.SCOPE_WRITE_STREAMS,
 				models.SCOPE_WRITE_FORWARDERS,
+				models.SCOPE_READ_SYSTEM_CONFIGURATION,
+				models.SCOPE_WRITE_SYSTEM_CONFIGURATION,
 			},
 		}
 

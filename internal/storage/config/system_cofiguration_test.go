@@ -34,11 +34,11 @@ func TestReadSystemConfig(t *testing.T) {
 		t.Fatal("systemConfig is nil")
 	}
 
-	if len(systemConfig.AllowedOrigins) != 0 {
+	if len(systemConfig.SyslogAllowedOrigins) != 0 {
 		t.Fatal("AllowedOrigins is not empty")
 	}
 
-	systemConfig.AllowedOrigins = append(systemConfig.AllowedOrigins, "192.168.1.1")
+	systemConfig.SyslogAllowedOrigins = append(systemConfig.SyslogAllowedOrigins, "192.168.1.1")
 
 	if err := confStorage.WriteSystemConfig(ctx, systemConfig); err != nil {
 		t.Fatal(err)
@@ -54,11 +54,11 @@ func TestReadSystemConfig(t *testing.T) {
 		t.Fatal("systemConfig is nil")
 	}
 
-	if len(systemConfig.AllowedOrigins) != 1 {
-		t.Fatalf("len(AllowedOrigins) = %d != 1", len(systemConfig.AllowedOrigins))
+	if len(systemConfig.SyslogAllowedOrigins) != 1 {
+		t.Fatalf("len(AllowedOrigins) = %d != 1", len(systemConfig.SyslogAllowedOrigins))
 	}
 
-	if systemConfig.AllowedOrigins[0] != "192.168.1.1" {
+	if systemConfig.SyslogAllowedOrigins[0] != "192.168.1.1" {
 		t.Fatal("systemConfig.AllowedOrigins[0] != 192.168.1.1")
 	}
 }

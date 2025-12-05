@@ -59,7 +59,9 @@ type Options struct {
 }
 
 type storageImpl struct {
-	kvStore kvstore.Storage
+	kvStore               kvstore.Storage
+	lock                  *sync.Mutex
+	configurationInstance *models.SystemConfiguration
 }
 
 type deps struct {
@@ -89,7 +91,11 @@ func NewStorage(opts Options) fx.Option {
 		"storage.config",
 		kvstore.NewStorage(kvOpts),
 		fx.Provide(func(lc fx.Lifecycle, d deps) Storage {
-			storage := &storageImpl{kvStore: d.S}
+			storage := &storageImpl{
+				kvStore:               d.S,
+				lock:                  &sync.Mutex{},
+				configurationInstance: nil,
+			}
 
 			lc.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {
@@ -217,22 +223,19 @@ func (s *storageImpl) DeleteForwarder(ctx context.Context, name string) error {
 	return s.deleteItem(ctx, forwarderItemType, name)
 }
 
-var lock = &sync.Mutex{}
-var configurationInstance *models.SystemConfiguration
-
 func (s *storageImpl) ReadSystemConfig(ctx context.Context) (*models.SystemConfiguration, error) {
-	if configurationInstance != nil {
-		return configurationInstance, nil
+	if s.configurationInstance != nil {
+		return s.configurationInstance, nil
 	}
 
-	lock.Lock()
-	defer lock.Unlock()
+	s.lock.Lock()
+	defer s.lock.Unlock()
 
-	if configurationInstance == nil {
+	if s.configurationInstance == nil {
 		content, err := s.readItem(ctx, systemItemType, "config")
 		if errors.Is(err, badger.ErrKeyNotFound) {
-			configurationInstance = &models.SystemConfiguration{}
-			return configurationInstance, nil
+			s.configurationInstance = &models.SystemConfiguration{}
+			return s.configurationInstance, nil
 		}
 
 		if err != nil {
@@ -244,15 +247,15 @@ func (s *storageImpl) ReadSystemConfig(ctx context.Context) (*models.SystemConfi
 			return nil, err
 		}
 
-		configurationInstance = &config
+		s.configurationInstance = &config
 	}
 
-	return configurationInstance, nil
+	return s.configurationInstance, nil
 }
 
 func (s *storageImpl) WriteSystemConfig(ctx context.Context, config *models.SystemConfiguration) error {
-	if config.AllowedOrigins != nil {
-		for _, origin := range config.AllowedOrigins {
+	if config.SyslogAllowedOrigins != nil {
+		for _, origin := range config.SyslogAllowedOrigins {
 			if strings.Contains(origin, "/") {
 				_, _, err := net.ParseCIDR(origin)
 				if err != nil {
@@ -266,10 +269,10 @@ func (s *storageImpl) WriteSystemConfig(ctx context.Context, config *models.Syst
 		}
 	}
 
-	lock.Lock()
-	defer lock.Unlock()
+	s.lock.Lock()
+	defer s.lock.Unlock()
 
-	configurationInstance = nil
+	s.configurationInstance = nil
 
 	content, err := json.Marshal(config)
 	if err != nil {

@@ -17,6 +17,9 @@ type Permissions struct {
 	CanEditACLs bool `json:"can_edit_acls" required:"true"`
 
 	CanSendLogs bool `json:"can_send_logs" required:"true"`
+
+	CanReadSystemConfiguration  bool `json:"can_read_system_configuration" required:"true"`
+	CanWriteSystemConfiguration bool `json:"can_write_system_configuration" required:"true"`
 }
 
 func PermissionsFromScopes(scopes []Scope) Permissions {
@@ -45,6 +48,10 @@ func PermissionsFromScopes(scopes []Scope) Permissions {
 			permissions.CanEditACLs = true
 		case SCOPE_SEND_LOGS:
 			permissions.CanSendLogs = true
+		case SCOPE_READ_SYSTEM_CONFIGURATION:
+			permissions.CanReadSystemConfiguration = true
+		case SCOPE_WRITE_SYSTEM_CONFIGURATION:
+			permissions.CanWriteSystemConfiguration = true
 		}
 	}
 	return permissions

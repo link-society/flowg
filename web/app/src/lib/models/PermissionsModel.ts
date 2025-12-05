@@ -15,6 +15,9 @@ type PermissionsModel = {
   can_edit_acls: boolean
 
   can_send_logs: boolean
+
+  can_read_system_configuration: boolean
+  can_write_system_configuration: boolean
 }
 
 export default PermissionsModel

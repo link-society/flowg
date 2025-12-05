@@ -44,7 +44,7 @@ func (w *worker) DoWork(ctx actor.Context) actor.WorkerStatus {
 			return actor.WorkerContinue
 		}
 
-		if systemConfig.AllowedOrigins != nil {
+		if systemConfig.SyslogAllowedOrigins != nil {
 			// no logging here to avoid potential performance issues
 
 			client := logParts["client"].(string)
@@ -55,7 +55,7 @@ func (w *worker) DoWork(ctx actor.Context) actor.WorkerStatus {
 
 			allowed := false
 
-			for _, origin := range systemConfig.AllowedOrigins {
+			for _, origin := range systemConfig.SyslogAllowedOrigins {
 				if origin == clientIp {
 					allowed = true
 					break
