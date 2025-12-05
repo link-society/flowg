@@ -214,6 +214,9 @@ func NewHandler(deps Dependencies) http.Handler {
 		r.Post("/api/v1/restore/auth", ctrl.RestoreAuthUsecase())
 		r.Post("/api/v1/restore/logs", ctrl.RestoreLogsUsecase())
 		r.Post("/api/v1/restore/config", ctrl.RestoreConfigUsecase())
+
+		r.Get("/api/v1/system-configuration", ctrl.GetSystemConfigurationUsecase())
+		r.Put("/api/v1/system-configuration", ctrl.UpdateSystemConfigurationUsecase())
 	})
 
 	service.Mount("/api/v1/middlewares/", middlewares.NewHandler(&middlewares.Dependencies{

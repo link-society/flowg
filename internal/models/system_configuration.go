@@ -1,5 +1,5 @@
 package models
 
 type SystemConfiguration struct {
-	AllowedOrigins []string `json:"allowed_origins"`
+	SyslogAllowedOrigins []string `json:"syslog_allowed_origins"`
 }
