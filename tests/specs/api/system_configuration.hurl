@@ -11,7 +11,7 @@ Authorization: Bearer {{admin_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true
-jsonpath "$.configuration.allowed_origins" == null
+jsonpath "$.configuration.syslog_allowed_origins" == null
 
 # -----------------------------------------------------------------------------
 # TEST:
@@ -21,7 +21,7 @@ PUT http://localhost:5080/api/v1/system-configuration
 Authorization: Bearer {{admin_token}}
 Content-Type: application/json
 {
-  "allowed_origins": [
+  "syslog_allowed_origins": [
     "192.168.1.1"
   ]
 }
@@ -38,5 +38,5 @@ Authorization: Bearer {{admin_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true
-jsonpath "$.configuration.allowed_origins" count == 1
-jsonpath "$.configuration.allowed_origins[0]" == "192.168.1.1"
+jsonpath "$.configuration.syslog_allowed_origins" count == 1
+jsonpath "$.configuration.syslog_allowed_origins[0]" == "192.168.1.1"
