@@ -3,10 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"strings"
-
 	"crypto/tls"
-	"net"
 	"net/url"
 
 	"link-society.com/flowg/internal/app/server"
@@ -135,21 +132,6 @@ func newServerConfig(opts *options) (server.Options, error) {
 		}
 	}
 
-	if opts.syslogAllowOrigins != nil {
-		for _, origin := range opts.syslogAllowOrigins {
-			if strings.Contains(origin, "/") {
-				_, _, err := net.ParseCIDR(origin)
-				if err != nil {
-					return server.Options{}, fmt.Errorf("invalid syslog allow origin: %s", origin)
-				}
-			} else {
-				if net.ParseIP(origin) == nil {
-					return server.Options{}, fmt.Errorf("invalid syslog allow origin: %s", origin)
-				}
-			}
-		}
-	}
-
 	config := server.Options{
 		HttpBindAddress: opts.httpBindAddress,
 		HttpTlsConfig:   httpTlsConfig,
@@ -162,10 +144,9 @@ func newServerConfig(opts *options) (server.Options, error) {
 		ClusterStateDir:          opts.clusterStateDir,
 		ClusterFormationStrategy: clusterFormationStrategy,
 
-		SyslogTcpMode:      opts.syslogProtocol == "tcp",
-		SyslogBindAddress:  opts.syslogBindAddr,
-		SyslogTlsConfig:    syslogTlsConfig,
-		SyslogAllowOrigins: opts.syslogAllowOrigins,
+		SyslogTcpMode:     opts.syslogProtocol == "tcp",
+		SyslogBindAddress: opts.syslogBindAddr,
+		SyslogTlsConfig:   syslogTlsConfig,
 
 		ConfigStorageDir: opts.configDir,
 		AuthStorageDir:   opts.authDir,

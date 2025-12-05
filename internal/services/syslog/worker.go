@@ -18,7 +18,6 @@ import (
 type worker struct {
 	logger         *slog.Logger
 	channel        gosyslog.LogPartsChannel
-	allowOrigins   []string
 	configStorage  config.Storage
 	pipelineRunner pipelines.Runner
 }
@@ -35,7 +34,17 @@ func (w *worker) DoWork(ctx actor.Context) actor.WorkerStatus {
 			return actor.WorkerEnd
 		}
 
-		if w.allowOrigins != nil {
+		systemConfig, err := w.configStorage.ReadSystemConfig(ctx)
+		if err != nil {
+			w.logger.ErrorContext(
+				ctx,
+				"Failed to get allowed origins for syslog",
+				slog.String("error", err.Error()),
+			)
+			return actor.WorkerContinue
+		}
+
+		if systemConfig.AllowedOrigins != nil {
 			// no logging here to avoid potential performance issues
 
 			client := logParts["client"].(string)
@@ -46,7 +55,7 @@ func (w *worker) DoWork(ctx actor.Context) actor.WorkerStatus {
 
 			allowed := false
 
-			for _, origin := range w.allowOrigins {
+			for _, origin := range systemConfig.AllowedOrigins {
 				if origin == clientIp {
 					allowed = true
 					break

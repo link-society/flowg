@@ -1,6 +1,7 @@
 package transactions
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/dgraph-io/badger/v4"
@@ -26,8 +27,8 @@ func ListItems(txn *badger.Txn, itemType string) ([]string, error) {
 func ReadItem(txn *badger.Txn, itemType string, name string) ([]byte, error) {
 	item, err := txn.Get(fmt.Appendf(nil, "%s:%s", itemType, name))
 	if err != nil {
-		if err == badger.ErrKeyNotFound {
-			return nil, fmt.Errorf("%s '%s' not found", itemType, name)
+		if errors.Is(err, badger.ErrKeyNotFound) {
+			return nil, fmt.Errorf("%s '%s': %w", itemType, name, err)
 		}
 
 		return nil, fmt.Errorf("failed to get %s '%s': %w", itemType, name, err)
