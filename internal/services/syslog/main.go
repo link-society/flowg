@@ -18,10 +18,9 @@ import (
 )
 
 type ServerOptions struct {
-	TcpMode      bool
-	BindAddress  string
-	TlsConfig    *tls.Config
-	AllowOrigins []string
+	TcpMode     bool
+	BindAddress string
+	TlsConfig   *tls.Config
 }
 
 type Server struct {
@@ -101,7 +100,6 @@ func NewServer(opts ServerOptions) fx.Option {
 				Actor: actor.New(&worker{
 					logger:         logger,
 					channel:        channel,
-					allowOrigins:   opts.AllowOrigins,
 					configStorage:  configStorage,
 					pipelineRunner: pipelineRunner,
 				}),

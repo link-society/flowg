@@ -93,3 +93,13 @@ func (m *MockStorage) DeleteForwarder(ctx context.Context, name string) error {
 	args := m.Called(ctx, name)
 	return args.Error(0)
 }
+
+func (m *MockStorage) ReadSystemConfig(ctx context.Context) (*models.SystemConfiguration, error) {
+	args := m.Called(ctx)
+	return args.Get(0).(*models.SystemConfiguration), args.Error(0)
+}
+
+func (m *MockStorage) WriteSystemConfig(ctx context.Context, config *models.SystemConfiguration) error {
+	args := m.Called(ctx, config)
+	return args.Error(0)
+}

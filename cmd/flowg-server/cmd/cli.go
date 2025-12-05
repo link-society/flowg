@@ -39,7 +39,6 @@ type options struct {
 	syslogTlsCert        string
 	syslogTlsCertKey     string
 	syslogTlsAuthEnabled bool
-	syslogAllowOrigins   []string
 
 	authDir   string
 	logDir    string
@@ -236,13 +235,6 @@ func (opts *options) defineCliOptions(cmd *cobra.Command) {
 		"syslog-tls-auth",
 		defaultSyslogTlsAuthEnabled,
 		"Require clients to authenticate against the Syslog server with a client certificate",
-	)
-
-	cmd.Flags().StringArrayVar(
-		&opts.syslogAllowOrigins,
-		"syslog-allow-origin",
-		defaultSyslogAllowOrigins,
-		"Allowed origin (IP address or CIDR range) for Syslog server (default: all)",
 	)
 
 	cmd.Flags().StringVar(

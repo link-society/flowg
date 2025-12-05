@@ -33,10 +33,9 @@ type Options struct {
 	ClusterStateDir          string
 	ClusterFormationStrategy cluster.ClusterFormationStrategy
 
-	SyslogTcpMode      bool
-	SyslogBindAddress  string
-	SyslogTlsConfig    *tls.Config
-	SyslogAllowOrigins []string
+	SyslogTcpMode     bool
+	SyslogBindAddress string
+	SyslogTlsConfig   *tls.Config
 
 	AuthStorageDir   string
 	ConfigStorageDir string
@@ -89,10 +88,9 @@ func NewServer(opts Options) fx.Option {
 			ClusterFormationStrategy: opts.ClusterFormationStrategy,
 		}),
 		syslog.NewServer(syslog.ServerOptions{
-			TcpMode:      opts.SyslogTcpMode,
-			BindAddress:  opts.SyslogBindAddress,
-			TlsConfig:    opts.SyslogTlsConfig,
-			AllowOrigins: opts.SyslogAllowOrigins,
+			TcpMode:     opts.SyslogTcpMode,
+			BindAddress: opts.SyslogBindAddress,
+			TlsConfig:   opts.SyslogTlsConfig,
 		}),
 		fx.Provide(func(
 			lc fx.Lifecycle,
