@@ -39,6 +39,7 @@ jobs:
         run: pdm run pytest
         env:
           FLOWG_TEST_SUITES: api
+          FLOWG_TEST_DOCKER_IMAGE_NAME: ghcr.io/link-society/flowg/ci-artifacts/docker:${{ inputs.ref }}-linux-amd64
 
       - name: report@test
         uses: mikepenz/action-junit-report@e08919a3b1fb83a78393dfb775a9c37f17d8eea6
@@ -134,6 +135,7 @@ jobs:
         run: pdm run pytest
         env:
           FLOWG_TEST_SUITES: consul
+          FLOWG_TEST_DOCKER_IMAGE_NAME: ghcr.io/link-society/flowg/ci-artifacts/docker:${{ inputs.ref }}-linux-amd64
 
       - name: report@test
         uses: mikepenz/action-junit-report@e08919a3b1fb83a78393dfb775a9c37f17d8eea6
