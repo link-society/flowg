@@ -46,7 +46,7 @@ def container(
     env.update(environment)
 
     print(f"Creating container: {name}")
-    container = docker_client.containers.run(
+    container = docker_client.containers.create(
         image=image,
         name=name,
         environment=env,
@@ -58,6 +58,8 @@ def container(
         },
         detach=True,
     )
+    print(f"Starting container: {name}")
+    container.start()
 
     try:
         print(f"Waiting for healthcheck: {name}")
