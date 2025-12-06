@@ -2,6 +2,8 @@ import pytest
 
 from pathlib import Path
 from shutil import rmtree
+import os
+
 import docker
 
 from ._lib import docker_utils, flowg_utils, mockserver_utils
@@ -68,7 +70,9 @@ def flowg_node2_volume(docker_client):
 
 @pytest.fixture(scope='module')
 def flowg_image():
-    return "linksociety/flowg:latest"
+    img = os.getenv("FLOWG_TEST_DOCKER_IMAGE_NAME", "linksociety/flowg:latest")
+    print(f"Using Flowg Docker image: {img}")
+    return img
 
 
 @pytest.fixture(scope='module')
