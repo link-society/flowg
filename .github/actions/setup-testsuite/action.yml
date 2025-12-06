@@ -41,4 +41,3 @@ runs:
         ARTIFACT_BASENAME: ghcr.io/link-society/flowg/ci-artifacts
       run: |
         docker pull ${ARTIFACT_BASENAME}/docker:${ARTIFACT_ID}
-        docker tag ${ARTIFACT_BASENAME}/docker:${ARTIFACT_ID} linksociety/flowg:latest
