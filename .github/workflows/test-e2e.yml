@@ -83,6 +83,7 @@ jobs:
         run: pdm run pytest
         env:
           FLOWG_TEST_SUITES: web
+          FLOWG_TEST_DOCKER_IMAGE_NAME: ghcr.io/link-society/flowg/ci-artifacts/docker:${{ inputs.ref }}-linux-amd64
 
       - name: report@test
         uses: joonvena/robotframework-reporter-action@229b6d4248b20be6e54f4fc32c7414130d1bf200
