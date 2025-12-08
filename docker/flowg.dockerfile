@@ -41,7 +41,7 @@ ADD internal/utils/langs/vrl/rust-crate /src/internal/utils/langs/vrl/rust-crate
 ##############################
 
 ## VRL
-FROM rust:1.91-alpine3.22 AS builder-rust-vrl
+FROM rust:1.91-alpine3.23 AS builder-rust-vrl
 RUN apk add --no-cache musl-dev
 
 COPY --from=sources-rust-vrl /src /workspace
@@ -54,7 +54,7 @@ RUN cargo test
 ## BUILD JS DEPENDENCIES
 ##############################
 
-FROM node:25-alpine3.22 AS builder-js
+FROM node:25-alpine3.23 AS builder-js
 COPY --from=sources-js /src /workspace
 WORKDIR /workspace/web/app
 
@@ -66,7 +66,7 @@ RUN NODE_ENV="production" npm run build
 ## BUILD GO CODE
 ##############################
 
-FROM golang:1.25-alpine3.22 AS builder-go
+FROM golang:1.25-alpine3.23 AS builder-go
 ARG UPX_VERSION
 ARG UPX_ARCH
 ARG UPX_OS
@@ -93,7 +93,7 @@ RUN upx bin/*
 ## FINAL ARTIFACT
 ##############################
 
-FROM alpine:3.22 AS runner
+FROM alpine:3.23 AS runner
 
 RUN apk add --no-cache libgcc su-exec
 
