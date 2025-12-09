@@ -3,6 +3,7 @@ import * as request from '@/lib/api/request'
 import ForwarderModel from '@/lib/models/ForwarderModel'
 import PipelineModel from '@/lib/models/PipelineModel'
 import StreamConfigModel from '@/lib/models/StreamConfigModel'
+import SystemConfigurationModel from '@/lib/models/SystemConfigurationModel.ts'
 
 export const listTransformers = async (): Promise<string[]> => {
   type ListTransformersResponse = {
@@ -232,5 +233,31 @@ export const deletePipeline = async (pipeline: string): Promise<void> => {
 
   await request.DELETE<DeletePipelineResponse>({
     path: `/api/v1/pipelines/${pipeline}`,
+  })
+}
+
+export const getSystemConfiguration =
+  async (): Promise<SystemConfigurationModel> => {
+    type getSystemConfigurationResponse = {
+      success: boolean
+      configuration: SystemConfigurationModel
+    }
+
+    const { body } = await request.GET<getSystemConfigurationResponse>({
+      path: `/api/v1/system-configuration`,
+    })
+    return body.configuration
+  }
+
+export const saveSystemConfiguration = async (
+  config: SystemConfigurationModel
+): Promise<void> => {
+  type saveSystemConfigurationResponse = {
+    success: boolean
+  }
+
+  await request.PUT<SystemConfigurationModel, saveSystemConfigurationResponse>({
+    path: `/api/v1/system-configuration`,
+    body: config,
   })
 }

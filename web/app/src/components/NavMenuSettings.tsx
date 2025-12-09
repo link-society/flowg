@@ -102,6 +102,19 @@ const NavMenuSettings = () => {
             </Button>
           </MenuItem>
         )}
+
+        {permissions.can_read_system_configuration && (
+          <MenuItem onClick={handleClose}>
+            <Button
+              id="link:navbar.settings.configuration"
+              href="/web/system-configuration"
+              color="secondary"
+              startIcon={<SettingsIcon />}
+            >
+              System configuration
+            </Button>
+          </MenuItem>
+        )}
       </Menu>
     </>
   )
