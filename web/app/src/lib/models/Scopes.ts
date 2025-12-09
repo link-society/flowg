@@ -10,6 +10,8 @@ export const ScopeLabels = {
   read_acls: 'View ACLs',
   write_acls: 'View & Edit ACLs',
   send_logs: 'Send Logs',
+  read_system_configuration: 'View System Configuration',
+  write_system_configuration: 'View & Edit System Configuration',
 }
 
 export const Scopes = Object.keys(ScopeLabels)

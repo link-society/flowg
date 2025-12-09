@@ -119,6 +119,14 @@ export default createBrowserRouter([
             },
           },
           {
+            path: 'system-configuration',
+            lazy: async () => {
+              const { default: Component, loader } =
+                await import('@/views/SystemConfiguration.tsx')
+              return { Component, loader }
+            },
+          },
+          {
             path: 'streams',
             lazy: async () => {
               const { default: Component, loader } =
