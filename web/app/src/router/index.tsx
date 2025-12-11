@@ -26,9 +26,8 @@ export default createBrowserRouter([
       {
         path: 'logout',
         lazy: async () => {
-          const { default: Component, loader } = await import(
-            '@/views/LogoutView'
-          )
+          const { default: Component, loader } =
+            await import('@/views/LogoutView')
           return { Component, loader }
         },
       },
@@ -42,117 +41,104 @@ export default createBrowserRouter([
           {
             path: 'account',
             lazy: async () => {
-              const { default: Component, loader } = await import(
-                '@/views/AccountView'
-              )
+              const { default: Component, loader } =
+                await import('@/views/AccountView')
               return { Component, loader }
             },
           },
           {
             path: 'admin',
             lazy: async () => {
-              const { default: Component, loader } = await import(
-                '@/views/AdminView'
-              )
+              const { default: Component, loader } =
+                await import('@/views/AdminView')
               return { Component, loader }
             },
           },
           {
             path: 'transformers',
             lazy: async () => {
-              const { default: Component, loader } = await import(
-                '@/views/TransformerSectionView'
-              )
+              const { default: Component, loader } =
+                await import('@/views/TransformerSectionView')
               return { Component, loader }
             },
           },
           {
             path: 'transformers/:transformer',
             lazy: async () => {
-              const { default: Component, loader } = await import(
-                '@/views/TransformerDetailView'
-              )
+              const { default: Component, loader } =
+                await import('@/views/TransformerDetailView')
               return { Component, loader }
             },
           },
           {
             path: 'storage',
             lazy: async () => {
-              const { default: Component, loader } = await import(
-                '@/views/StorageSectionView'
-              )
+              const { default: Component, loader } =
+                await import('@/views/StorageSectionView')
               return { Component, loader }
             },
           },
           {
             path: 'storage/:stream',
             lazy: async () => {
-              const { default: Component, loader } = await import(
-                '@/views/StorageDetailView'
-              )
+              const { default: Component, loader } =
+                await import('@/views/StorageDetailView')
               return { Component, loader }
             },
           },
           {
             path: 'forwarders',
             lazy: async () => {
-              const { default: Component, loader } = await import(
-                '@/views/ForwarderSectionView'
-              )
+              const { default: Component, loader } =
+                await import('@/views/ForwarderSectionView')
               return { Component, loader }
             },
           },
           {
             path: 'forwarders/:forwarder',
             lazy: async () => {
-              const { default: Component, loader } = await import(
-                '@/views/ForwarderDetailView'
-              )
+              const { default: Component, loader } =
+                await import('@/views/ForwarderDetailView')
               return { Component, loader }
             },
           },
           {
             path: 'pipelines',
             lazy: async () => {
-              const { default: Component, loader } = await import(
-                '@/views/PipelineSectionView'
-              )
+              const { default: Component, loader } =
+                await import('@/views/PipelineSectionView')
               return { Component, loader }
             },
           },
           {
             path: 'pipelines/:pipeline',
             lazy: async () => {
-              const { default: Component, loader } = await import(
-                '@/views/PipelineDetailView'
-              )
+              const { default: Component, loader } =
+                await import('@/views/PipelineDetailView')
               return { Component, loader }
             },
           },
           {
             path: 'streams',
             lazy: async () => {
-              const { default: Component, loader } = await import(
-                '@/views/StreamSectionView'
-              )
+              const { default: Component, loader } =
+                await import('@/views/StreamSectionView')
               return { Component, loader }
             },
           },
           {
             path: 'streams/:stream',
             lazy: async () => {
-              const { default: Component, loader } = await import(
-                '@/views/StreamDetailView'
-              )
+              const { default: Component, loader } =
+                await import('@/views/StreamDetailView')
               return { Component, loader }
             },
           },
           {
             path: 'upload',
             lazy: async () => {
-              const { default: Component, loader } = await import(
-                '@/views/UploadView'
-              )
+              const { default: Component, loader } =
+                await import('@/views/UploadView')
               return { Component, loader }
             },
           },
