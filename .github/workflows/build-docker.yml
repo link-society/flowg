@@ -55,6 +55,8 @@ jobs:
       - name: checkout@scm
         if: steps.need-docker.outputs.exists == 'false'
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
+        with:
+          ref: ${{ inputs.ref }}
 
       - name: setup@docker
         if: steps.need-docker.outputs.exists == 'false'
