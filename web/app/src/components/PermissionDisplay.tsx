@@ -79,6 +79,23 @@ const PermissionDisplay = () => {
 
         <FormGroup>
           <FormControlLabel
+            label={<span className="text-sm">Read system configuration</span>}
+            disabled
+            control={
+              <Checkbox checked={permissions.can_read_system_configuration} />
+            }
+          />
+          <FormControlLabel
+            label={<span className="text-sm">Write system configuration</span>}
+            disabled
+            control={
+              <Checkbox checked={permissions.can_write_system_configuration} />
+            }
+          />
+        </FormGroup>
+
+        <FormGroup>
+          <FormControlLabel
             label={<span className="text-sm">Send Logs</span>}
             disabled
             control={<Checkbox checked={permissions.can_send_logs} />}

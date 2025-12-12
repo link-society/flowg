@@ -2,7 +2,11 @@ package config
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"net"
+	"strings"
+	"sync"
 
 	"io"
 
@@ -36,12 +40,16 @@ type Storage interface {
 	ReadForwarder(ctx context.Context, name string) (*models.ForwarderV2, error)
 	WriteForwarder(ctx context.Context, name string, forwarder *models.ForwarderV2) error
 	DeleteForwarder(ctx context.Context, name string) error
+
+	ReadSystemConfig(ctx context.Context) (*models.SystemConfiguration, error)
+	WriteSystemConfig(ctx context.Context, config *models.SystemConfiguration) error
 }
 
 const (
 	transformerItemType = "transformer"
 	pipelineItemType    = "pipeline"
 	forwarderItemType   = "forwarder"
+	systemItemType      = "system"
 )
 
 type Options struct {
@@ -51,7 +59,9 @@ type Options struct {
 }
 
 type storageImpl struct {
-	kvStore kvstore.Storage
+	kvStore               kvstore.Storage
+	lock                  *sync.Mutex
+	configurationInstance *models.SystemConfiguration
 }
 
 type deps struct {
@@ -81,7 +91,11 @@ func NewStorage(opts Options) fx.Option {
 		"storage.config",
 		kvstore.NewStorage(kvOpts),
 		fx.Provide(func(lc fx.Lifecycle, d deps) Storage {
-			storage := &storageImpl{kvStore: d.S}
+			storage := &storageImpl{
+				kvStore:               d.S,
+				lock:                  &sync.Mutex{},
+				configurationInstance: nil,
+			}
 
 			lc.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {
@@ -207,6 +221,65 @@ func (s *storageImpl) WriteForwarder(ctx context.Context, name string, forwarder
 
 func (s *storageImpl) DeleteForwarder(ctx context.Context, name string) error {
 	return s.deleteItem(ctx, forwarderItemType, name)
+}
+
+func (s *storageImpl) ReadSystemConfig(ctx context.Context) (*models.SystemConfiguration, error) {
+	if s.configurationInstance != nil {
+		return s.configurationInstance, nil
+	}
+
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
+	if s.configurationInstance == nil {
+		content, err := s.readItem(ctx, systemItemType, "config")
+		if errors.Is(err, badger.ErrKeyNotFound) {
+			s.configurationInstance = &models.SystemConfiguration{}
+			return s.configurationInstance, nil
+		}
+
+		if err != nil {
+			return nil, err
+		}
+
+		var config models.SystemConfiguration
+		if err := json.Unmarshal(content, &config); err != nil {
+			return nil, err
+		}
+
+		s.configurationInstance = &config
+	}
+
+	return s.configurationInstance, nil
+}
+
+func (s *storageImpl) WriteSystemConfig(ctx context.Context, config *models.SystemConfiguration) error {
+	if config.SyslogAllowedOrigins != nil {
+		for _, origin := range config.SyslogAllowedOrigins {
+			if strings.Contains(origin, "/") {
+				_, _, err := net.ParseCIDR(origin)
+				if err != nil {
+					return fmt.Errorf("invalid syslog allow origin: %s", origin)
+				}
+			} else {
+				if net.ParseIP(origin) == nil {
+					return fmt.Errorf("invalid syslog allow origin: %s", origin)
+				}
+			}
+		}
+	}
+
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
+	s.configurationInstance = nil
+
+	content, err := json.Marshal(config)
+	if err != nil {
+		return fmt.Errorf("failed to marshal config: %w", err)
+	}
+
+	return s.writeItem(ctx, systemItemType, "config", content)
 }
 
 func (s *storageImpl) listItems(ctx context.Context, itemType string) ([]string, error) {
