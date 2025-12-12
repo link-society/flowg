@@ -10,3 +10,5 @@
  - [@b3j0f](https://github.com/b3j0f)
  - [@n4vxn](https://github.com/n4vxn)
  - [@minnerlas](https://github.com/minnerlas)
+ - [@glooopsies](https://github.com/glooopsies)
+
