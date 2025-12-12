@@ -42,11 +42,19 @@ ADD internal/utils/langs/vrl/rust-crate /src/internal/utils/langs/vrl/rust-crate
 
 ## VRL
 FROM rust:1.91-alpine3.23 AS builder-rust-vrl
+
 RUN apk add --no-cache musl-dev
 
-COPY --from=sources-rust-vrl /src /workspace
+RUN mkdir -p /workspace/internal/utils/langs/vrl/rust-crate
 WORKDIR /workspace/internal/utils/langs/vrl/rust-crate
 
+COPY --from=sources-rust-vrl /src/internal/utils/langs/vrl/rust-crate/Cargo.toml .
+COPY --from=sources-rust-vrl /src/internal/utils/langs/vrl/rust-crate/Cargo.lock .
+RUN mkdir src \
+    && echo "// dummy file" > src/lib.rs \
+    && cargo build
+
+COPY --from=sources-rust-vrl /src /workspace
 RUN cargo build --release
 RUN cargo test
 
@@ -55,10 +63,14 @@ RUN cargo test
 ##############################
 
 FROM node:25-alpine3.23 AS builder-js
-COPY --from=sources-js /src /workspace
+
+RUN mkdir -p /workspace/web/app
 WORKDIR /workspace/web/app
 
+COPY --from=sources-js /src/web/app/package.json /workspace/web/app
 RUN npm i
+
+COPY --from=sources-js /src /workspace
 RUN npm run lint
 RUN NODE_ENV="production" npm run build
 
@@ -79,10 +91,16 @@ RUN set -ex && \
     mv upx-${UPX_VERSION}-${UPX_ARCH}_${UPX_OS}/upx /usr/local/bin/ && \
     rm -rf /tmp/upx.tar.xz upx-${UPX_VERSION}-${UPX_ARCH}_${UPX_OS}
 
+RUN mkdir -p /workspace
+WORKDIR /workspace
+
+COPY --from=sources-go /src/go.mod .
+COPY --from=sources-go /src/go.sum .
+RUN go mod download
+
 COPY --from=sources-go /src /workspace
 COPY --from=builder-rust-vrl /workspace/internal/utils/langs/vrl/rust-crate/target/release/libflowg_vrl.a /workspace/internal/utils/langs/vrl/rust-crate/target/release/libflowg_vrl.a
 COPY --from=builder-js /workspace/web/app/dist /workspace/web/public
-WORKDIR /workspace
 
 RUN go generate ./...
 RUN go test -timeout 500ms -v ./...
