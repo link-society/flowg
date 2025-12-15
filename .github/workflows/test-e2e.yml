@@ -43,7 +43,7 @@ jobs:
 
       - name: upload-logs@artifact
         if: ${{ failure() }}
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
           name: api-e2e-reports
           path: "./tests/reports/api/"
@@ -114,7 +114,7 @@ jobs:
 
       - name: upload-logs@artifact
         if: ${{ failure() }}
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
           name: web-e2e-reports
           path: "./tests/reports/web/"
@@ -148,7 +148,7 @@ jobs:
 
       - name: upload-logs@artifact
         if: ${{ failure() }}
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
           name: consul-e2e-reports
           path: "./tests/reports/consul/"
