@@ -41,7 +41,7 @@ ADD internal/utils/langs/vrl/rust-crate /src/internal/utils/langs/vrl/rust-crate
 ##############################
 
 ## VRL
-FROM rust:1.91-alpine3.23 AS builder-rust-vrl
+FROM rust:1.92-alpine3.23 AS builder-rust-vrl
 
 RUN apk add --no-cache musl-dev
 
