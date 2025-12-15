@@ -3,9 +3,9 @@ module link-society.com/flowg
 go 1.25.3
 
 require (
-	github.com/ClickHouse/clickhouse-go/v2 v2.41.0
+	github.com/ClickHouse/clickhouse-go/v2 v2.42.0
 	github.com/dgraph-io/badger/v4 v4.8.0
-	github.com/elastic/go-elasticsearch/v9 v9.2.0
+	github.com/elastic/go-elasticsearch/v9 v9.2.1
 	github.com/expr-lang/expr v1.17.6
 	github.com/go-chi/chi/v5 v5.2.3
 	github.com/go-logfmt/logfmt v0.6.1
@@ -29,13 +29,13 @@ require (
 	github.com/vladopajic/go-actor v1.1.0
 	go.opentelemetry.io/proto/otlp v1.9.0
 	go.uber.org/fx v1.24.0
-	golang.org/x/crypto v0.45.0
-	golang.org/x/term v0.37.0
-	google.golang.org/protobuf v1.36.10
+	golang.org/x/crypto v0.46.0
+	golang.org/x/term v0.38.0
+	google.golang.org/protobuf v1.36.11
 	gopkg.in/mcuadros/go-syslog.v2 v2.3.0
-	k8s.io/api v0.34.2
-	k8s.io/apimachinery v0.34.2
-	k8s.io/client-go v0.34.2
+	k8s.io/api v0.34.3
+	k8s.io/apimachinery v0.34.3
+	k8s.io/client-go v0.34.3
 )
 
 require (
@@ -60,7 +60,7 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dgraph-io/ristretto/v2 v2.2.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
-	github.com/elastic/elastic-transport-go/v8 v8.7.0 // indirect
+	github.com/elastic/elastic-transport-go/v8 v8.8.0 // indirect
 	github.com/emicklei/go-restful/v3 v3.12.2 // indirect
 	github.com/fxamacker/cbor/v2 v2.9.0 // indirect
 	github.com/gammazero/deque v1.0.0 // indirect
@@ -109,19 +109,19 @@ require (
 	github.com/swaggest/refl v1.4.0 // indirect
 	github.com/vearutop/statigz v1.4.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
-	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
-	go.opentelemetry.io/otel v1.38.0 // indirect
-	go.opentelemetry.io/otel/metric v1.38.0 // indirect
-	go.opentelemetry.io/otel/trace v1.38.0 // indirect
+	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
+	go.opentelemetry.io/otel v1.39.0 // indirect
+	go.opentelemetry.io/otel/metric v1.39.0 // indirect
+	go.opentelemetry.io/otel/trace v1.39.0 // indirect
 	go.uber.org/dig v1.19.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/net v0.47.0 // indirect
+	golang.org/x/net v0.48.0 // indirect
 	golang.org/x/oauth2 v0.30.0 // indirect
-	golang.org/x/sys v0.38.0 // indirect
-	golang.org/x/text v0.31.0 // indirect
+	golang.org/x/sys v0.39.0 // indirect
+	golang.org/x/text v0.32.0 // indirect
 	golang.org/x/time v0.9.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250825161204-c5933d9347a5 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250825161204-c5933d9347a5 // indirect
