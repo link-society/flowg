@@ -8,12 +8,11 @@ on:
         description: 'Release version'
         required: true
 
-permissions:
-  contents: write
-
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: cibot@auth

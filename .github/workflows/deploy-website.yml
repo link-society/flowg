@@ -8,11 +8,6 @@ on:
         required: true
         type: string
 
-permissions:
-  packages: read
-  pages: write
-  id-token: write
-
 env:
   ARTIFACT_ID: ${{ inputs.ref }}
   ARTIFACT_BASENAME: ghcr.io/link-society/flowg/ci-artifacts
@@ -20,6 +15,10 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      packages: read
+      pages: write
+      id-token: write
 
     environment:
       name: github-pages

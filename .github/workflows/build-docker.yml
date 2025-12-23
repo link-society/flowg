@@ -20,9 +20,6 @@ on:
         type: string
         default: linux
 
-permissions:
-  packages: write
-
 env:
   ARTIFACT_ID: ${{ inputs.ref }}-${{ inputs.os }}-${{ inputs.arch }}
   ARTIFACT_BASENAME: ghcr.io/link-society/flowg/ci-artifacts
@@ -30,6 +27,8 @@ env:
 jobs:
   build:
     runs-on: ${{ inputs.gh-runner }}
+    permissions:
+      packages: write
 
     steps:
       - name: setup@oras

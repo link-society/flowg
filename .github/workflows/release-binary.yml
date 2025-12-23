@@ -19,10 +19,6 @@ on:
         type: string
         default: amd64
 
-permissions:
-  packages: read
-  contents: write
-
 env:
   ARTIFACT_ID: ${{ inputs.ref }}-${{ inputs.goos }}-${{ inputs.goarch }}
   ARTIFACT_BASENAME: ghcr.io/link-society/flowg/ci-artifacts
@@ -30,6 +26,9 @@ env:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      packages: read
+      contents: write
 
     steps:
       - name: setup@oras

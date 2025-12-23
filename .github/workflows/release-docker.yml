@@ -32,9 +32,6 @@ on:
       DOCKERHUB_PASSWORD:
         required: true
 
-permissions:
-  packages: read
-
 env:
   ARTIFACT_ID: ${{ inputs.ref }}-${{ inputs.os }}-${{ inputs.arch }}
   ARTIFACT_BASENAME: ghcr.io/link-society/flowg/ci-artifacts
@@ -42,6 +39,8 @@ env:
 jobs:
   publish:
     runs-on: ${{ inputs.gh-runner }}
+    permissions:
+      packages: read
 
     steps:
       - name: login-ghcr@docker

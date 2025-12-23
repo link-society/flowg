@@ -11,16 +11,16 @@ on:
         required: false
         type: string
 
-permissions:
-  packages: read
-  contents: write
-  checks: write
-  pull-requests: write
-  statuses: write
-
 jobs:
   api:
     runs-on: ubuntu-latest
+    permissions:
+      packages: read
+      contents: write
+      checks: write
+      pull-requests: write
+      statuses: write
+
     steps:
       - name: checkout@scm
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
@@ -34,37 +34,24 @@ jobs:
           ghactor: ${{ github.actor }}
           ghtoken: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: run@test
-        working-directory: ./tests
-        run: pdm run pytest
-        env:
-          FLOWG_TEST_SUITES: api
-          FLOWG_TEST_DOCKER_IMAGE_NAME: ghcr.io/link-society/flowg/ci-artifacts/docker:${{ inputs.ref }}-linux-amd64
-
-      - name: upload-logs@artifact
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+      - name: run@testsuite
+        uses: ./.github/actions/run-hurl-testsuite
         with:
-          name: api-e2e-reports
-          path: "./tests/reports/api/"
-          retention-days: 1
-
-      - name: report@test
-        uses: mikepenz/action-junit-report@e08919a3b1fb83a78393dfb775a9c37f17d8eea6
-        if: ${{ success() || failure() }}
-        with:
-          report_paths: "./tests/reports/api/junit.xml"
-          include_passed: true
-          check_name: "API End-To-End Test Report"
-          job_summary: true
-          comment: ${{ inputs.pr != '' }}
-          updateComment: ${{ inputs.pr != '' }}
-          fail_on_failure: true
-          commit: ${{ inputs.ref }}
-          pr_id: ${{ inputs.pr }}
+          ref: ${{ inputs.ref }}
+          pr: ${{ inputs.pr }}
+          ghtoken: ${{ secrets.GITHUB_TOKEN }}
+          testsuite: api
+          checkname: "API End-To-End Test Report"
 
   web:
     runs-on: ubuntu-latest
+    permissions:
+      packages: read
+      contents: write
+      checks: write
+      pull-requests: write
+      statuses: write
+
     steps:
       - name: checkout@scm
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
@@ -78,54 +65,24 @@ jobs:
           ghactor: ${{ github.actor }}
           ghtoken: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: run@test
-        working-directory: ./tests
-        run: pdm run pytest
-        env:
-          FLOWG_TEST_SUITES: web
-          FLOWG_TEST_DOCKER_IMAGE_NAME: ghcr.io/link-society/flowg/ci-artifacts/docker:${{ inputs.ref }}-linux-amd64
-
-      - name: report@test
-        uses: joonvena/robotframework-reporter-action@229b6d4248b20be6e54f4fc32c7414130d1bf200
-        if: ${{ success() || failure() }}
+      - name: run@testsuite
+        uses: ./.github/actions/run-robotframework-testsuite
         with:
-          gh_access_token: ${{ secrets.GITHUB_TOKEN }}
-          report_path: "./tests/reports/web/"
-
-      - name: report-success@status
-        uses: guibranco/github-status-action-v2@631f55ea0251f0fb284525ad86c30e9f7a8dd284
-        if: ${{ success() }}
-        with:
-          authToken: ${{ secrets.GITHUB_TOKEN }}
-          context: 'Web End-To-End Test Report'
-          description: 'Passed'
-          state: 'success'
-          sha: ${{ inputs.ref }}
-
-      - name: report-failure@status
-        uses: guibranco/github-status-action-v2@631f55ea0251f0fb284525ad86c30e9f7a8dd284
-        if: ${{ failure() }}
-        with:
-          authToken: ${{ secrets.GITHUB_TOKEN }}
-          context: 'Web End-To-End Test Report'
-          description: 'Failure'
-          state: 'failure'
-          sha: ${{ inputs.ref }}
-
-      - name: upload-logs@artifact
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
-        with:
-          name: web-e2e-reports
-          path: "./tests/reports/web/"
-          retention-days: 1
-
-      - name: report@fail
-        if: ${{ failure() }}
-        run: exit 1
+          ref: ${{ inputs.ref }}
+          pr: ${{ inputs.pr }}
+          ghtoken: ${{ secrets.GITHUB_TOKEN }}
+          testsuite: web
+          checkname: "Web End-To-End Test Report"
 
   consul:
     runs-on: ubuntu-latest
+    permissions:
+      packages: read
+      contents: write
+      checks: write
+      pull-requests: write
+      statuses: write
+
     steps:
       - name: checkout@scm
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
@@ -139,37 +96,24 @@ jobs:
           ghactor: ${{ github.actor }}
           ghtoken: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: run@test
-        working-directory: ./tests
-        run: pdm run pytest
-        env:
-          FLOWG_TEST_SUITES: consul
-          FLOWG_TEST_DOCKER_IMAGE_NAME: ghcr.io/link-society/flowg/ci-artifacts/docker:${{ inputs.ref }}-linux-amd64
-
-      - name: upload-logs@artifact
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+      - name: run@testsuite
+        uses: ./.github/actions/run-hurl-testsuite
         with:
-          name: consul-e2e-reports
-          path: "./tests/reports/consul/"
-          retention-days: 1
-
-      - name: report@test
-        uses: mikepenz/action-junit-report@e08919a3b1fb83a78393dfb775a9c37f17d8eea6
-        if: ${{ success() || failure() }}
-        with:
-          report_paths: "./tests/reports/consul/junit.xml"
-          include_passed: true
-          check_name: "Consul End-To-End Test Report"
-          job_summary: true
-          comment: ${{ inputs.pr != '' }}
-          updateComment: ${{ inputs.pr != '' }}
-          fail_on_failure: true
-          commit: ${{ inputs.ref }}
-          pr_id: ${{ inputs.pr }}
+          ref: ${{ inputs.ref }}
+          pr: ${{ inputs.pr }}
+          ghtoken: ${{ secrets.GITHUB_TOKEN }}
+          testsuite: consul
+          checkname: "Consul End-To-End Test Report"
 
   k8s:
     runs-on: ubuntu-latest
+    permissions:
+      packages: read
+      contents: write
+      checks: write
+      pull-requests: write
+      statuses: write
+
     steps:
       - name: checkout@scm
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
@@ -186,24 +130,10 @@ jobs:
       - name: setup@k8s
         uses: ./.github/actions/setup-k8s
 
-      - name: load@k8s
-        run: kind load docker-image ${DOCKER_IMAGE} --name flowg
-        env:
-          DOCKER_IMAGE: ghcr.io/link-society/flowg/ci-artifacts/docker:${{ inputs.ref }}-linux-amd64
-
-      - name: lint@helm
-        run: ct lint --chart-dirs ./k8s/charts --charts ./k8s/charts/flowg --validate-maintainers=false
-
-      - name: test@helm
-        run: |
-          set -ex
-          kubectl get ns flowg-system || kubectl create ns flowg-system
-          ct install \
-            --chart-dirs ./k8s/charts \
-            --charts ./k8s/charts/flowg \
-            --namespace flowg-system \
-            --helm-extra-set-args "--set=flowg.image.repository=${DOCKER_IMAGE_REPOSITORY} --set=flowg.image.tag=${DOCKER_IMAGE_TAG} --set=flowg.image.pullPolicy=Never --wait"
-        env:
-          DOCKER_IMAGE_REPOSITORY: ghcr.io/link-society/flowg/ci-artifacts/docker
-          DOCKER_IMAGE_TAG: ${{ inputs.ref }}-linux-amd64
-
+      - name: run@testsuite
+        uses: ./.github/actions/run-k8s-testsuite
+        with:
+          ref: ${{ inputs.ref }}
+          pr: ${{ inputs.pr }}
+          ghtoken: ${{ secrets.GITHUB_TOKEN }}
+          checkname: "Kubernetes End-To-End Test Report"

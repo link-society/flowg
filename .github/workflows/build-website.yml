@@ -8,9 +8,6 @@ on:
         required: true
         type: string
 
-permissions:
-  packages: write
-
 env:
   ARTIFACT_ID: ${{ inputs.ref }}
   ARTIFACT_BASENAME: ghcr.io/link-society/flowg/ci-artifacts
@@ -18,6 +15,8 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
 
     steps:
       - name: setup@oras
