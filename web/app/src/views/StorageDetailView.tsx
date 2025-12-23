@@ -11,6 +11,7 @@ import HelpIcon from '@mui/icons-material/Help'
 import SaveIcon from '@mui/icons-material/Save'
 
 import * as configApi from '@/lib/api/operations/config'
+import * as logApi from '@/lib/api/operations/logs.ts'
 
 import { useApiOperation } from '@/lib/hooks/api'
 import { useFeatureFlags } from '@/lib/hooks/featureflags'
@@ -27,6 +28,7 @@ import StreamEditor from '@/components/StreamEditor'
 
 export type LoaderData = {
   streams: Record<string, StreamConfigModel>
+  usage: number
   currentStream: string
 }
 
@@ -36,8 +38,11 @@ export const loader: LoaderFunction = loginRequired(async ({ params }) => {
     throw new Response(`Stream ${params.stream} not found`, { status: 404 })
   }
 
+  const usage = await logApi.getStreamUsage(params.stream!)
+
   return {
     streams,
+    usage,
     currentStream: params.stream!,
   }
 })
@@ -47,7 +52,7 @@ const StorageDetailView = () => {
   const notify = useNotify()
 
   const { permissions } = useProfile()
-  const { streams, currentStream } = useLoaderData() as LoaderData
+  const { streams, usage, currentStream } = useLoaderData() as LoaderData
 
   const [streamConfig, setStreamConfig] = useState(streams[currentStream])
 
@@ -139,6 +144,7 @@ const StorageDetailView = () => {
         <Grid size={{ xs: 10 }} className="h-full">
           <StreamEditor
             streamConfig={streamConfig}
+            storageUsage={usage}
             onStreamConfigChange={setStreamConfig}
           />
         </Grid>

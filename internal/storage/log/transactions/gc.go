@@ -6,6 +6,23 @@ import (
 	"github.com/dgraph-io/badger/v4"
 )
 
+func EstimateStorage(txn *badger.Txn, stream string) (int64, error) {
+	storage := int64(0)
+
+	opts := badger.DefaultIteratorOptions
+	opts.PrefetchValues = true
+	opts.Prefix = []byte(fmt.Sprintf("entry:%s:", stream))
+	it := txn.NewIterator(opts)
+	defer it.Close()
+
+	for it.Rewind(); it.Valid(); it.Next() {
+		item := it.Item()
+		storage += item.EstimatedSize()
+	}
+
+	return storage, nil
+}
+
 func CollectGarbage(txn *badger.Txn) error {
 	streams, err := FetchStreamConfigs(txn)
 	if err != nil {
@@ -26,13 +43,13 @@ func CollectGarbage(txn *badger.Txn) error {
 
 			for it.Rewind(); it.Valid(); it.Next() {
 				item := it.Item()
-				streamSize += int64(item.EstimatedSize())
+				streamSize += item.EstimatedSize()
 			}
 
 			if streamSize > retentionSize {
 				for it.Rewind(); it.Valid(); it.Next() {
 					item := it.Item()
-					streamSize -= int64(item.EstimatedSize())
+					streamSize -= item.EstimatedSize()
 
 					key := item.KeyCopy(nil)
 
