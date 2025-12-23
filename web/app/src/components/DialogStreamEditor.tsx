@@ -16,6 +16,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import SaveIcon from '@mui/icons-material/Save'
 
 import * as configApi from '@/lib/api/operations/config'
+import * as logApi from '@/lib/api/operations/logs.ts'
 
 import { useApiOperation } from '@/lib/hooks/api'
 import { useNotify } from '@/lib/hooks/notify'
@@ -48,11 +49,15 @@ const DialogStreamEditor = ({ stream }: DialogStreamEditorProps) => {
   })
   const [streamConfigPromise, setStreamConfigPromise] =
     useState<Promise<void> | null>(null)
+  const [usage, setUsage] = useState<number>(0)
 
   const [onFetch] = useApiOperation(
     async (stream: string) => {
       const streamConfig = await configApi.getStreamConfig(stream)
       setStreamConfig(streamConfig)
+
+      const estimated = await logApi.getStreamUsage(stream)
+      setUsage(estimated)
     },
     [stream]
   )
@@ -147,6 +152,7 @@ const DialogStreamEditor = ({ stream }: DialogStreamEditorProps) => {
               <AuthenticatedAwait resolve={streamConfigPromise}>
                 <StreamEditor
                   streamConfig={streamConfig}
+                  storageUsage={usage}
                   onStreamConfigChange={setStreamConfig}
                 />
               </AuthenticatedAwait>

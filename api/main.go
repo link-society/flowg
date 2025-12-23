@@ -105,6 +105,7 @@ func NewHandler(deps Dependencies) http.Handler {
 		r.Get("/api/v1/streams", ctrl.ListStreamsUsecase())
 		r.Get("/api/v1/streams/{stream}", ctrl.GetStreamUsecase())
 		r.Put("/api/v1/streams/{stream}", ctrl.ConfigureStreamUsecase())
+		r.Get("/api/v1/streams/{stream}/usage", ctrl.GetStreamUsageUsecase())
 		r.Get("/api/v1/streams/{stream}/logs", ctrl.QueryStreamUsecase())
 		r.Get("/api/v1/streams/{stream}/fields", ctrl.ListStreamFieldsUsecase())
 		r.Delete("/api/v1/streams/{stream}", ctrl.PurgeStreamUsecase())

@@ -27,6 +27,7 @@ type Storage interface {
 	GetOrCreateStreamConfig(ctx context.Context, stream string) (models.StreamConfig, error)
 	ConfigureStream(ctx context.Context, stream string, config models.StreamConfig) error
 	DeleteStream(ctx context.Context, stream string) error
+	StreamUsage(ctx context.Context, stream string) (int64, error)
 
 	IndexField(ctx context.Context, stream, field string) error
 	UnindexField(ctx context.Context, stream, field string) error
@@ -182,6 +183,21 @@ func (s *storageImpl) DeleteStream(ctx context.Context, stream string) error {
 			return transactions.DeleteStream(txn, stream)
 		},
 	)
+}
+
+func (s *storageImpl) StreamUsage(ctx context.Context, stream string) (int64, error) {
+	var usage int64
+
+	err := s.kvStore.View(
+		ctx,
+		func(txn *badger.Txn) error {
+			var err error
+			usage, err = transactions.EstimateStorage(txn, stream)
+			return err
+		},
+	)
+
+	return usage, err
 }
 
 func (s *storageImpl) IndexField(ctx context.Context, stream, field string) error {
