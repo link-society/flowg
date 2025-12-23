@@ -1,0 +1,66 @@
+---
+name: Run FlowG Kubernetes test suite
+description: Run the test-suite and send reports
+
+inputs:
+  ref:
+    description: Git reference (commit, branch or tag)
+    required: true
+  ghtoken:
+    description: GitHub Token
+    required: true
+  checkname:
+    description: Name of the check
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: load@k8s
+      shell: bash
+      run: kind load docker-image ${DOCKER_IMAGE} --name flowg
+      env:
+        DOCKER_IMAGE: ghcr.io/link-society/flowg/ci-artifacts/docker:${{ inputs.ref }}-linux-amd64
+
+    - name: lint@helm
+      shell: bash
+      run: ct lint --chart-dirs ./k8s/charts --charts ./k8s/charts/flowg --validate-maintainers=false
+
+    - name: test@helm
+      shell: bash
+      run: |
+        set -ex
+        kubectl get ns flowg-system || kubectl create ns flowg-system
+        ct install \
+          --chart-dirs ./k8s/charts \
+          --charts ./k8s/charts/flowg \
+          --namespace flowg-system \
+          --helm-extra-set-args "--set=flowg.image.repository=${DOCKER_IMAGE_REPOSITORY} --set=flowg.image.tag=${DOCKER_IMAGE_TAG} --set=flowg.image.pullPolicy=Never --wait"
+      env:
+        DOCKER_IMAGE_REPOSITORY: ghcr.io/link-society/flowg/ci-artifacts/docker
+        DOCKER_IMAGE_TAG: ${{ inputs.ref }}-linux-amd64
+
+    - name: report-success@status
+      uses: guibranco/github-status-action-v2@631f55ea0251f0fb284525ad86c30e9f7a8dd284
+      if: ${{ success() }}
+      with:
+        authToken: ${{ inputs.ghtoken }}
+        context: '${{ inputs.checkname }}'
+        description: 'Passed'
+        state: 'success'
+        sha: ${{ inputs.ref }}
+
+    - name: report-failure@status
+      uses: guibranco/github-status-action-v2@631f55ea0251f0fb284525ad86c30e9f7a8dd284
+      if: ${{ failure() }}
+      with:
+        authToken: ${{ inputs.ghtoken }}
+        context: '${{ inputs.checkname }}'
+        description: 'Failure'
+        state: 'failure'
+        sha: ${{ inputs.ref }}
+
+    - name: report@fail
+      shell: bash
+      if: ${{ failure() }}
+      run: exit 1

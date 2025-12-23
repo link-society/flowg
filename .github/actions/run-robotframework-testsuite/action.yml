@@ -1,0 +1,71 @@
+---
+name: Run FlowG RobotFramework test suite
+description: Run the test-suite and send reports
+
+inputs:
+  ref:
+    description: Git reference (commit, branch or tag)
+    required: true
+  pr:
+    description: Pull Request ID
+    required: false
+  ghtoken:
+    description: GitHub Token
+    required: true
+  testsuite:
+    description: Test suite to run (api, web, consul, k8s)
+    required: true
+  checkname:
+    description: Name of the check
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: run@test
+      shell: bash
+      working-directory: ./tests
+      run: pdm run pytest
+      env:
+        FLOWG_TEST_SUITES: ${{ inputs.testsuite }}
+        FLOWG_TEST_DOCKER_IMAGE_NAME: ghcr.io/link-society/flowg/ci-artifacts/docker:${{ inputs.ref }}-linux-amd64
+
+    - name: report@test
+      uses: joonvena/robotframework-reporter-action@229b6d4248b20be6e54f4fc32c7414130d1bf200
+      if: ${{ success() || failure() }}
+      with:
+        gh_access_token: ${{ inputs.ghtoken }}
+        report_path: "./tests/reports/${{ inputs.testsuite }}/"
+
+    - name: report-success@status
+      uses: guibranco/github-status-action-v2@631f55ea0251f0fb284525ad86c30e9f7a8dd284
+      if: ${{ success() }}
+      with:
+        authToken: ${{ inputs.ghtoken }}
+        context: '${{ inputs.checkname }}'
+        description: 'Passed'
+        state: 'success'
+        sha: ${{ inputs.ref }}
+
+    - name: report-failure@status
+      uses: guibranco/github-status-action-v2@631f55ea0251f0fb284525ad86c30e9f7a8dd284
+      if: ${{ failure() }}
+      with:
+        authToken: ${{ inputs.ghtoken }}
+        context: '${{ inputs.checkname }}'
+        description: 'Failure'
+        state: 'failure'
+        sha: ${{ inputs.ref }}
+
+    - name: upload-logs@artifact
+      if: ${{ failure() }}
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+      with:
+        name: ${{ inputs.testsuite }}-e2e-reports
+        path: "./tests/reports/${{ inputs.testsuite }}/"
+        retention-days: 1
+
+    - name: report@fail
+      shell: bash
+      if: ${{ failure() }}
+      run: exit 1
