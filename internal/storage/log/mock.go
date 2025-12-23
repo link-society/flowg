@@ -75,6 +75,11 @@ func (m *MockStorage) DeleteStream(ctx context.Context, stream string) error {
 	return args.Error(0)
 }
 
+func (m *MockStorage) StreamUsage(ctx context.Context, stream string) (int64, error) {
+	args := m.Called(ctx, stream)
+	return args.Get(0).(int64), args.Error(1)
+}
+
 func (m *MockStorage) IndexField(ctx context.Context, stream string, field string) error {
 	args := m.Called(ctx, stream, field)
 	return args.Error(0)

@@ -72,6 +72,7 @@ const StreamDetailView = () => {
   })
 
   const [rowData, setRowData] = useState<LogEntryModel[]>([])
+  const [usage, setUsage] = useState<number>(0)
   const [columnDefs, setColumnDefs] = useState<ColDef<LogEntryModel>[]>([
     timestampColumnDef(),
     ...fields.map(fieldToColumnDef),
@@ -88,6 +89,9 @@ const StreamDetailView = () => {
       setRowData(logs)
       setTimeWindow({ from, to })
       setWatcher({ enabled: live, filter })
+
+      const estimated = await logApi.getStreamUsage(currentStream)
+      setUsage(estimated)
     },
     [currentStream, setRowData]
   )
@@ -177,6 +181,9 @@ const StreamDetailView = () => {
       <Grid size={{ xs: 10 }} className="flex flex-col items-stretch gap-2">
         <Paper>
           <LogQueryPanel loading={loading} onFetchRequested={fetchLogs} />
+          <div className="p-3">
+            Estimated storage usage: {(usage / (1024 * 1024)).toFixed(2)}MB
+          </div>
           <Divider />
           <LogChart
             rowData={rowData}
