@@ -55,3 +55,16 @@ export const uploadTextLogs = async (
     contentType: 'text/plain',
   })
 }
+
+export const getStreamUsage = async (stream: string): Promise<number> => {
+  type GetStreamUsageResponse = {
+    success: boolean
+    usage: number
+  }
+
+  const { body } = await request.GET<GetStreamUsageResponse>({
+    path: `/api/v1/streams/${stream}/usage`,
+  })
+
+  return body.usage
+}
