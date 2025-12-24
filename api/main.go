@@ -25,6 +25,8 @@ import (
 
 	"link-society.com/flowg/internal/engines/lognotify"
 	"link-society.com/flowg/internal/engines/pipelines"
+
+	"link-society.com/flowg/internal/cluster"
 )
 
 type Dependencies struct {
@@ -36,6 +38,8 @@ type Dependencies struct {
 
 	LogNotifier    lognotify.LogNotifier
 	PipelineRunner pipelines.Runner
+
+	ClusterManager cluster.Manager
 }
 
 type controller struct {

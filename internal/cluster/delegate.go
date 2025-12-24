@@ -11,6 +11,7 @@ import (
 
 	"github.com/hashicorp/memberlist"
 
+	"link-society.com/flowg/internal/engines/pipelines"
 	"link-society.com/flowg/internal/utils/kvstore"
 )
 
@@ -23,6 +24,11 @@ type delegate struct {
 
 	clusterStateStorage kvstore.Storage
 	syncPool            *syncPool
+
+	broadcasts     *memberlist.TransmitLimitedQueue
+	broadcastInbox chan broadcastMessage
+
+	pipelineRunner pipelines.Runner
 }
 
 var _ memberlist.Delegate = (*delegate)(nil)
@@ -31,12 +37,19 @@ func (d *delegate) NodeMeta(int) []byte {
 	return []byte(d.localEndpoint.String())
 }
 
-func (d *delegate) NotifyMsg([]byte) {
-	// No-op
+func (d *delegate) NotifyMsg(payload []byte) {
+	if msg, err := parseBroadcastMessage(payload); err != nil {
+		d.logger.Error(
+			"failed to parse broadcast message",
+			slog.String("error", err.Error()),
+		)
+	} else {
+		d.broadcastInbox <- msg
+	}
 }
 
 func (d *delegate) GetBroadcasts(overhead, limit int) [][]byte {
-	return [][]byte{}
+	return d.broadcasts.GetBroadcasts(overhead, limit)
 }
 
 func (d *delegate) LocalState(join bool) []byte {
