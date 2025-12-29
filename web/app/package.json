@@ -16,7 +16,7 @@
     "@monaco-editor/react": "^4.7.0",
     "@mui/icons-material": "^7.3.6",
     "@mui/material": "^7.1.1",
-    "@mui/x-date-pickers": "^8.22.1",
+    "@mui/x-date-pickers": "^8.23.0",
     "@toolpad/core": "^0.16.0",
     "@xyflow/react": "^12.10.0",
     "ag-grid-react": "^35.0.0",
@@ -45,7 +45,7 @@
     "prettier-plugin-organize-imports": "^4.3.0",
     "tailwindcss": "^4.1.15",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.50.0",
+    "typescript-eslint": "^8.50.1",
     "vite": "^7.3.0",
     "vite-plugin-compression2": "^2.4.0"
   }
