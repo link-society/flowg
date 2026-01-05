@@ -146,7 +146,16 @@ func (f *ForwarderSyslogV2) call(ctx context.Context, record *LogRecord) error {
 			return
 		}
 
-		priority := severityMap[severity] | facilityMap[facility]
+		severityValue, ok := severityMap[severity]
+		if !ok {
+			severityValue = syslog.LOG_INFO
+		}
+		facilityValue, ok := facilityMap[facility]
+		if !ok {
+			facilityValue = syslog.LOG_USER
+		}
+		priority := severityValue | facilityValue
+
 		writer, err := syslog.Dial(f.Network, f.Address, priority, tag)
 		if err != nil {
 			replyC <- fmt.Errorf("failed to dial syslog with evaluated parameters: %w", err)
