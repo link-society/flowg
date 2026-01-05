@@ -4,21 +4,27 @@ import (
 	"context"
 	"fmt"
 
-	"encoding/json"
 	"log/syslog"
+
+	"github.com/expr-lang/expr"
+	"github.com/expr-lang/expr/vm"
 )
 
 type forwarderStateSyslogV2 struct {
-	writer *syslog.Writer
+	tagProg      *vm.Program
+	severityProg *vm.Program
+	facilityProg *vm.Program
+	messageProg  *vm.Program
 }
 
 type ForwarderSyslogV2 struct {
-	Type     string `json:"type" enum:"syslog" required:"true"`
-	Network  string `json:"network" enum:"tcp,udp" required:"true"`
-	Address  string `json:"address" required:"true" pattern:"^(([a-zA-Z0-9.-]+)|(\\[[0-9A-Fa-f:]+\\])):[0-9]{1,5}$"`
-	Tag      string `json:"tag" required:"true" minLength:"1"`
-	Severity string `json:"severity" enum:"emerg,alert,crit,err,warning,notice,info,debug" required:"true"`
-	Facility string `json:"facility" enum:"kern,user,mail,daemon,auth,syslog,lpr,news,uucp,cron,authpriv,ftp,local0,local1,local2,local3,local4,local5,local6,local7" required:"true"`
+	Type     string                         `json:"type" enum:"syslog" required:"true"`
+	Network  string                         `json:"network" enum:"tcp,udp" required:"true"`
+	Address  string                         `json:"address" required:"true" pattern:"^(([a-zA-Z0-9.-]+)|(\\[[0-9A-Fa-f:]+\\])):[0-9]{1,5}$"`
+	Tag      ForwarderSyslogV2TagField      `json:"tag" required:"true"`
+	Severity ForwarderSyslogV2SeverityField `json:"severity" required:"true"`
+	Facility ForwarderSyslogV2FacilityField `json:"facility" required:"true"`
+	Message  ForwarderSyslogV2MessageField  `json:"message" required:"false"`
 
 	state *forwarderStateSyslogV2
 }
@@ -59,61 +65,108 @@ var (
 	}
 )
 
-func (f *ForwarderSyslogV2) init(ctx context.Context) error {
-	reply := make(chan error, 1)
-	defer close(reply)
+func (f *ForwarderSyslogV2) init(context.Context) error {
+	var err error
+	f.state = &forwarderStateSyslogV2{}
 
-	go func() {
-		severity := severityMap[f.Severity]
-		facility := facilityMap[f.Facility]
-		priority := severity | facility
-
-		writer, err := syslog.Dial(f.Network, f.Address, priority, f.Tag)
-		if err != nil {
-			reply <- fmt.Errorf("failed to dial syslog: %w", err)
-		}
-
-		f.state = &forwarderStateSyslogV2{
-			writer: writer,
-		}
-
-		reply <- nil
-	}()
-
-	select {
-	case <-ctx.Done():
-		return nil
-
-	case err := <-reply:
-		return err
+	f.state.tagProg, err = CompileDynamicField(string(f.Tag))
+	if err != nil {
+		return fmt.Errorf("failed to compile tag field: %w", err)
 	}
+
+	f.state.severityProg, err = CompileDynamicField(string(f.Severity))
+	if err != nil {
+		return fmt.Errorf("failed to compile severity field: %w", err)
+	}
+
+	f.state.facilityProg, err = CompileDynamicField(string(f.Facility))
+	if err != nil {
+		return fmt.Errorf("failed to compile facility field: %w", err)
+	}
+
+	msg := string(f.Message)
+	if msg == "" {
+		msg = "toJSON(log)"
+	}
+	f.state.messageProg, err = CompileDynamicField(msg)
+	if err != nil {
+		return fmt.Errorf("failed to compile message field: %w", err)
+	}
+
+	return nil
 }
 
 func (f *ForwarderSyslogV2) close(context.Context) error {
-	if f.state != nil && f.state.writer != nil {
-		return f.state.writer.Close()
-	}
 	return nil
 }
 
 func (f *ForwarderSyslogV2) call(ctx context.Context, record *LogRecord) error {
-	reply := make(chan error, 1)
-	defer close(reply)
+	replyC := make(chan error, 1)
+	defer close(replyC)
 
 	go func() {
-		if err := json.NewEncoder(f.state.writer).Encode(record); err != nil {
-			reply <- fmt.Errorf("failed to send log record to syslog: %w", err)
+		env := map[string]any{
+			"timestamp": record.Timestamp,
+			"log":       record.Fields,
+		}
+
+		eval := func(prog *vm.Program, field string) (string, error) {
+			out, err := expr.Run(prog, env)
+			if err != nil {
+				return "", fmt.Errorf("failed to evaluate %s expression: %w", field, err)
+			}
+			str, ok := out.(string)
+			if !ok {
+				return "", fmt.Errorf("%s expression did not evaluate to string", field)
+			}
+			return str, nil
+		}
+
+		tag, err := eval(f.state.tagProg, "tag")
+		if err != nil {
+			replyC <- err
 			return
 		}
 
-		reply <- nil
+		severity, err := eval(f.state.severityProg, "severity")
+		if err != nil {
+			replyC <- err
+			return
+		}
+
+		facility, err := eval(f.state.facilityProg, "facility")
+		if err != nil {
+			replyC <- err
+			return
+		}
+
+		message, err := eval(f.state.messageProg, "message")
+		if err != nil {
+			replyC <- err
+			return
+		}
+
+		priority := severityMap[severity] | facilityMap[facility]
+		writer, err := syslog.Dial(f.Network, f.Address, priority, tag)
+		if err != nil {
+			replyC <- fmt.Errorf("failed to dial syslog with evaluated parameters: %w", err)
+			return
+		}
+		defer writer.Close()
+
+		if _, err := writer.Write([]byte(message)); err != nil {
+			replyC <- fmt.Errorf("failed to write syslog message: %w", err)
+			return
+		}
+
+		replyC <- nil
 	}()
 
 	select {
 	case <-ctx.Done():
 		return nil
 
-	case err := <-reply:
+	case err := <-replyC:
 		return err
 	}
 }
