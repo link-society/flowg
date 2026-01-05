@@ -9,4 +9,4 @@ Please open a `Security Bug Report` on the
 
 | Version | Supported |
 | --- | --- |
-| [0.49.1](https://github.com/link-society/flowg/releases/tag/v0.49.1) | :white_check_mark: |
+| [0.49.2](https://github.com/link-society/flowg/releases/tag/v0.49.2) | :white_check_mark: |
