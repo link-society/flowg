@@ -22,6 +22,7 @@ require (
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
 	github.com/stretchr/testify v1.11.1
+	github.com/swaggest/jsonschema-go v0.3.78
 	github.com/swaggest/openapi-go v0.2.60
 	github.com/swaggest/rest v0.2.75
 	github.com/swaggest/swgui v1.8.5
@@ -103,7 +104,6 @@ require (
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/swaggest/form/v5 v5.1.1 // indirect
-	github.com/swaggest/jsonschema-go v0.3.78 // indirect
 	github.com/swaggest/refl v1.4.0 // indirect
 	github.com/vearutop/statigz v1.4.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
