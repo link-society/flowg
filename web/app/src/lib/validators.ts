@@ -1,4 +1,22 @@
+import { DynamicField } from '@/lib/models/DynamicField'
+
 export type Validator<T> = (value: T) => boolean
+
+export const dynamicField =
+  <T extends string>(fieldValidators: Array<Validator<T>>) =>
+  (value: DynamicField<T>): boolean => {
+    if (typeof value === 'string' && value.startsWith('@expr:')) {
+      return value.length > 6
+    } else {
+      for (const fieldValidator of fieldValidators) {
+        if (!fieldValidator(value as T)) {
+          return false
+        }
+      }
+
+      return true
+    }
+  }
 
 export const minLength =
   (length: number) =>
