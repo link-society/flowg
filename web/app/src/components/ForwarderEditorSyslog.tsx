@@ -8,6 +8,7 @@ import TextField from '@mui/material/TextField'
 
 import { useInput } from '@/lib/hooks/input'
 
+import { DynamicField } from '@/lib/models/DynamicField'
 import ForwarderConfigSyslogModel, {
   SyslogFacility,
   SyslogFacilityValues,
@@ -18,6 +19,8 @@ import ForwarderConfigSyslogModel, {
 } from '@/lib/models/ForwarderConfigSyslogModel'
 
 import * as validators from '@/lib/validators'
+
+import DynamicFieldControl from '@/components/DynamicFieldControl'
 
 type ForwarderEditorSyslogProps = {
   config: ForwarderConfigSyslogModel
@@ -34,9 +37,18 @@ const ForwarderEditorSyslog = ({
   const [address, setAddress] = useInput<string>(config.address, [
     validators.pattern(/^(([a-zA-Z0-9.-]+)|(\[[0-9A-Fa-f:]+\])):[0-9]{1,5}$/),
   ])
-  const [tag, setTag] = useInput<string>(config.tag, [validators.minLength(1)])
-  const [severity, setSeverity] = useInput<SyslogSeverity>(config.severity, [])
-  const [facility, setFacility] = useInput<SyslogFacility>(config.facility, [])
+  const [tag, setTag] = useInput<DynamicField<string>>(config.tag, [
+    validators.dynamicField([validators.minLength(1)]),
+  ])
+  const [severity, setSeverity] = useInput<SyslogSeverity>(config.severity, [
+    validators.dynamicField([]),
+  ])
+  const [facility, setFacility] = useInput<SyslogFacility>(config.facility, [
+    validators.dynamicField([]),
+  ])
+  const [message, setMessage] = useInput<DynamicField<string>>(config.message, [
+    validators.dynamicField([]),
+  ])
 
   useEffect(() => {
     const valid =
@@ -44,7 +56,8 @@ const ForwarderEditorSyslog = ({
       address.valid &&
       tag.valid &&
       severity.valid &&
-      facility.valid
+      facility.valid &&
+      message.valid
     onValidationChange(valid)
 
     if (valid) {
@@ -55,6 +68,7 @@ const ForwarderEditorSyslog = ({
         tag: tag.value,
         severity: severity.value,
         facility: facility.value,
+        message: message.value,
       })
     }
   }, [
@@ -112,30 +126,29 @@ const ForwarderEditorSyslog = ({
         />
       </div>
 
-      <TextField
+      <DynamicFieldControl
         id="input:editor.forwarders.syslog.tag"
         label="Tag"
         variant="outlined"
         type="text"
         error={!tag.valid}
         value={tag.value}
-        onChange={(e) => {
-          setTag(e.target.value)
+        onChange={(value) => {
+          setTag(value)
         }}
       />
 
       <div className="flex flex-row gap-3">
         <FormControl className="grow">
-          <InputLabel id="label:editor.forwarders.syslog.severity">
-            Severity
-          </InputLabel>
-          <Select<SyslogSeverity>
-            labelId="label:editor.forwarders.syslog.severity"
+          <DynamicFieldControl
             id="select:editor.forwarders.syslog.severity"
-            value={severity.value}
             label="Severity"
-            onChange={(e) => {
-              setSeverity(e.target.value as SyslogSeverity)
+            variant="outlined"
+            select
+            error={!severity.valid}
+            value={severity.value}
+            onChange={(value) => {
+              setSeverity(value)
             }}
           >
             {SyslogSeverityValues.map((t) => (
@@ -147,20 +160,19 @@ const ForwarderEditorSyslog = ({
                 {t.toUpperCase()}
               </MenuItem>
             ))}
-          </Select>
+          </DynamicFieldControl>
         </FormControl>
 
         <FormControl className="grow">
-          <InputLabel id="label:editor.forwarders.syslog.facility">
-            Facility
-          </InputLabel>
-          <Select<SyslogFacility>
-            labelId="label:editor.forwarders.syslog.facility"
+          <DynamicFieldControl
             id="select:editor.forwarders.syslog.facility"
-            value={facility.value}
             label="Facility"
-            onChange={(e) => {
-              setFacility(e.target.value as SyslogFacility)
+            variant="outlined"
+            select
+            error={!facility.valid}
+            value={facility.value}
+            onChange={(value) => {
+              setFacility(value)
             }}
           >
             {SyslogFacilityValues.map((t) => (
@@ -172,9 +184,20 @@ const ForwarderEditorSyslog = ({
                 {t.toUpperCase()}
               </MenuItem>
             ))}
-          </Select>
+          </DynamicFieldControl>
         </FormControl>
       </div>
+
+      <DynamicFieldControl
+        id="input:editor.forwarders.syslog.message"
+        label="Message"
+        variant="outlined"
+        error={!message.valid}
+        value={message.value}
+        onChange={(value) => {
+          setMessage(value)
+        }}
+      />
     </div>
   )
 }

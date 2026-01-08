@@ -1,10 +1,13 @@
+import { DynamicField } from '@/lib/models/DynamicField'
+
 type ForwarderConfigSyslogModel = {
   type: 'syslog'
   network: SyslogNetwork
   address: string
-  tag: string
-  severity: SyslogSeverity
-  facility: SyslogFacility
+  tag: DynamicField<string>
+  severity: DynamicField<SyslogSeverity>
+  facility: DynamicField<SyslogFacility>
+  message: DynamicField<string>
 }
 
 export const SyslogNetworkValues = ['tcp', 'udp'] as const
@@ -58,4 +61,5 @@ export const factory = (): ForwarderConfigSyslogModel => ({
   tag: '',
   severity: 'info',
   facility: 'user',
+  message: '@expr:toJSON(log)',
 })
