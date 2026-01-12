@@ -13,33 +13,6 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
-func TestEnumField_JSONSchemaShape(t *testing.T) {
-	enumField := models.EnumField{"value1", "value2", "value3"}
-
-	var s jsonschema.Schema
-	s.AddType(jsonschema.String)
-	s.Enum = enumField.Enum()
-
-	raw, err := json.Marshal(&s)
-	if err != nil {
-		t.Fatalf("failed to marshal schema: %v", err)
-	}
-
-	var got map[string]any
-	if err := json.Unmarshal(raw, &got); err != nil {
-		t.Fatalf("failed to unmarshal schema: %v", err)
-	}
-
-	expected := map[string]any{
-		"type": "string",
-		"enum": []any{"value1", "value2", "value3"},
-	}
-
-	if !reflect.DeepEqual(got, expected) {
-		t.Fatalf("unexpected schema shape.\nGot:      %+v\nExpected: %+v", got, expected)
-	}
-}
-
 func TestDynamicField_JSONSchemaShape(t *testing.T) {
 	dynField := models.DynamicField{}
 

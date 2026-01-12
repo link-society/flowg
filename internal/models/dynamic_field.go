@@ -9,24 +9,9 @@ import (
 	"github.com/swaggest/jsonschema-go"
 )
 
-type EnumField []string
-type DynamicField struct{}
-
-var (
-	_ jsonschema.Enum     = (EnumField)(nil)
-	_ jsonschema.Preparer = DynamicField{}
-)
-
-func (e EnumField) Enum() []any {
-	variants := make([]any, len(e))
-	for i, v := range e {
-		variants[i] = v
-	}
-	return variants
-}
+type DynamicField string
 
 func (DynamicField) PrepareJSONSchema(schema *jsonschema.Schema) error {
-	schema.AddType(jsonschema.String)
 	schema.WithPattern(`^@expr:`)
 	return nil
 }
