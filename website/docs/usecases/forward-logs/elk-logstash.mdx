@@ -88,9 +88,10 @@ configuration:
 | --- | --- | --- |
 | Network | `TCP` | UDP works as well, Logstash starts a listener for each protocol |
 | Server Address | `127.0.0.1:50000` | Assuming your FlowG is running on the same host as the ELK stack we started above |
-| Tag | `flowg` | You can use any value you want actually |
-| Severity | `INFO` | You can use any value you want |
-| Facility | `LOCAL0` | You can use any value you want |
+| Tag | (static) `flowg` | You can use any static value or expression you want actually |
+| Severity | (static) `INFO` | You can use any static value or expression you want |
+| Facility | (static) `LOCAL0` | You can use any static value or expression you want |
+| Message | (expression) `toJSON(log)` | The output must be a JSON because of how we configured Logstash |
 
 <div style={{ textAlign: 'center' }}>
   <img src={ForwarderElkUrl} alt="ELK Forwarder Configuration" />
