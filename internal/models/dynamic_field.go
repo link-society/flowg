@@ -12,6 +12,7 @@ import (
 type DynamicField string
 
 func (DynamicField) PrepareJSONSchema(schema *jsonschema.Schema) error {
+	schema.AddType(jsonschema.String)
 	schema.WithPattern(`^@expr:`)
 	return nil
 }

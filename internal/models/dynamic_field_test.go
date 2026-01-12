@@ -14,7 +14,7 @@ import (
 )
 
 func TestDynamicField_JSONSchemaShape(t *testing.T) {
-	dynField := models.DynamicField{}
+	dynField := models.DynamicField("")
 
 	var s jsonschema.Schema
 	if err := dynField.PrepareJSONSchema(&s); err != nil {
