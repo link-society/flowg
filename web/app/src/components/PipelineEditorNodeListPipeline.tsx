@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router'
+
 import AccountTreeIcon from '@mui/icons-material/AccountTree'
 
 import * as configApi from '@/lib/api/operations/config'
@@ -15,6 +17,7 @@ const PipelineEditorNodeListPipeline = ({
   className,
 }: PipelineEditorNodeListPipelineProps) => {
   const { permissions } = useProfile()
+  const navigate = useNavigate()
 
   return (
     <PipelineEditorNodeList
@@ -32,7 +35,7 @@ const PipelineEditorNodeListPipeline = ({
       itemColor="lime"
       className={className}
       onItemOpen={(pipeline) => {
-        globalThis.location.pathname = `/web/pipelines/${pipeline}`
+        navigate(`/web/pipelines/${pipeline}`)
       }}
     />
   )

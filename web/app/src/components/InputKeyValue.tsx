@@ -98,7 +98,6 @@ const InputKeyValue = (props: InputKeyValueProps) => {
           variant="outlined"
           size="small"
           className="grow"
-          required
         />
 
         <TextField
@@ -111,7 +110,6 @@ const InputKeyValue = (props: InputKeyValueProps) => {
           variant="outlined"
           size="small"
           className="grow"
-          required
         />
 
         <Button
@@ -119,6 +117,7 @@ const InputKeyValue = (props: InputKeyValueProps) => {
           color="primary"
           variant="contained"
           size="small"
+          disabled={newKey === '' || newValue === ''}
           onClick={() => {
             setPairs((prev) => {
               const newEntry: [string, string] = [newKey, newValue]

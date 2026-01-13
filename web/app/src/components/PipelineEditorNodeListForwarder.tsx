@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router'
+
 import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox'
 
 import * as configApi from '@/lib/api/operations/config'
@@ -15,6 +17,7 @@ const PipelineEditorNodeListForwarder = ({
   className,
 }: PipelineEditorNodeListForwarderProps) => {
   const { permissions } = useProfile()
+  const navigate = useNavigate()
 
   return (
     <PipelineEditorNodeList
@@ -32,7 +35,7 @@ const PipelineEditorNodeListForwarder = ({
       itemColor="green"
       className={className}
       onItemOpen={(forwarder) => {
-        globalThis.location.pathname = `/web/forwarders/${forwarder}`
+        navigate(`/web/forwarders/${forwarder}`)
       }}
     />
   )

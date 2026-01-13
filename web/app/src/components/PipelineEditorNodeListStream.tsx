@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router'
+
 import StorageIcon from '@mui/icons-material/Storage'
 
 import * as configApi from '@/lib/api/operations/config'
@@ -15,6 +17,7 @@ const PipelineEditorNodeListStream = ({
   className,
 }: PipelineEditorNodeListStreamProps) => {
   const { permissions } = useProfile()
+  const navigate = useNavigate()
 
   return (
     <PipelineEditorNodeList
@@ -35,7 +38,7 @@ const PipelineEditorNodeListStream = ({
       itemColor="purple"
       className={className}
       onItemOpen={(stream) => {
-        globalThis.location.pathname = `/web/storage/${stream}`
+        navigate(`/web/storage/${stream}`)
       }}
     />
   )
