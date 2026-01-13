@@ -1,0 +1,44 @@
+---
+sidebar_position: 5
+---
+
+# Router
+
+Router nodes are used to route log records to a specific
+[stream](/docs/user/guides/streams) for storage and indexing.
+
+> **NB:** Router nodes references streams by their unique name. If the stream
+> does not exist, it will be created automatically.
+
+## Example
+
+import NodeStreamDefaultUrl from '@site/static/img/guides/pipelines/node-stream-default.png'
+
+This will store the log record into the `default` stream storage:
+
+<div
+  style={{
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'start',
+    gap: '2rem',
+  }}
+>
+  <div>
+    ```json
+    {
+      "timestamp": "...",
+      "fields": {
+        "content": "hello world"
+      }
+    }
+    ```
+  </div>
+  <div style={{ fontSize: '4rem' }}>
+    &rArr;
+  </div>
+  <div>
+    <img src={NodeStreamDefaultUrl} alt="Router node" />
+  </div>
+</div>

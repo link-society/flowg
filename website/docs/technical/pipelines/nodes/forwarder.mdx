@@ -1,0 +1,67 @@
+---
+sidebar_position: 4
+---
+
+# Forwarder
+
+Forwarder nodes are used to transmit the log record to a third-party service,
+allowing interoperability with external systems.
+
+For a complete list of available forwarders, refer to the [Forwarders
+Documentation](/docs/technical/forwarders).
+
+> **NB:** Forwarder nodes references forwarders by their unique name. If a
+> forwarder is updated, all forwarder nodes referencing it will be
+> invalidated.
+
+## Example
+
+import NodeForwarderHttpZapierUrl from '@site/static/img/guides/pipelines/node-forwarder-http-zapier.png'
+
+Let's assume we have configured a Webhook Forwarder named ``zapier`` with the
+following webhook URL:
+
+```
+http://example-zapier-webhook.com
+```
+
+The following are equivalent:
+
+<div
+  style={{
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'start',
+    gap: '2rem',
+  }}
+>
+  <div>
+    ```json
+    {
+      "timestamp": "...",
+      "fields": {
+        "content": "hello world"
+      }
+    }
+    ```
+  </div>
+  <div style={{ fontSize: '4rem' }}>
+    &rArr;
+  </div>
+  <div>
+    <img src={NodeForwarderHttpZapierUrl} alt="Forwarder node" />
+  </div>
+</div>
+
+**OR**
+
+```json
+POST http://example-zapier-webhook.com
+{
+  "timestamp": "...",
+  "fields": {
+    "content": "hello world"
+  }
+}
+```
