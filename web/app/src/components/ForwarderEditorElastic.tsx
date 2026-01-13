@@ -62,13 +62,7 @@ const ForwarderEditorElastic = ({
         ca: ca.value || undefined,
       })
     }
-  }, [
-    index,
-    username,
-    password,
-    addresses,
-    ca,
-  ])
+  }, [index, username, password, addresses, ca])
 
   return (
     <div
