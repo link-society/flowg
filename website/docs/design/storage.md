@@ -112,43 +112,5 @@ entry:<stream name>:<to timestamp>:
 
 Because of the internal structure of *BadgerDB*, this operation is fast.
 
-Then, if a [filter](/docs/guides/filtering) is given:
-
-For `foo = "bar"` filters, we fetch all keys within the time-window with the
-following prefix:
-
-```
-index:<stream name>:field:foo:YmFy:
-```
-
-If the field is not indexed, all keys in the time-window are returned.
-
-For `foo in ["bar", "baz"]` filters, we fetch all keys the time-window with
-the following prefixes:
-
-```
-# base64(bar) = YmFy
-# base64(baz) = YmF6
-
-index:<stream name>:field:foo:YmFy:
-index:<stream name>:field:foo:YmF6:
-```
-
-If the field is not indexed, all keys in the time-window are returned.
-
-For `not <sub-filter>` filters, we select all keys in the time-window that do
-not appear in the `<sub-filter>` result.
-
-> **NB:**
->  - `field != value` is desugared into `not (field = value)`
->  - `field not in [value, value]` is desugared into `not (field in [value, value])`
-
-For `<lhs> or <rhs>` filters, we select the union of `<lhs>` and `<rhs>`
-results.
-
-For `<lhs> and <rhs>` filters, we select the intersection of `<lhs>` and `<rhs>`
-results.
-
-Once the set of keys to fetch is determined, we load the values and run them
-through the filter once again (to account for unindexed fields), and return the
-final set of log entries.
+Then, if a [filter](/docs/guides/filtering) is given, we match the log record
+to the filter expression to determine if it should be returned.

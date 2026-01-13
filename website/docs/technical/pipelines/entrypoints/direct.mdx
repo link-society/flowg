@@ -1,0 +1,220 @@
+---
+sidebar_position: 1
+---
+
+# Direct
+
+import NodeRouterDirectUrl from '@site/static/img/guides/pipelines/node-router-direct.png'
+
+A `DIRECT` entrypoint will receive log records sent to the pipeline
+**directly**:
+
+ - via the FlowG API (using structured format, OpenTelemetry format, or Textual format)
+ - via a [Pipeline Node](../nodes/pipeline/) in another pipeline
+
+## Structured format
+
+```json
+POST /api/v1/pipelines/default/logs/struct
+Content-Type: application/json
+{
+  "records": [
+    {
+      "foo": "bar"
+    }
+  ]
+}
+```
+
+<div
+  style={{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'start',
+    gap: '2rem',
+  }}
+>
+  <div>
+    <img src={NodeRouterDirectUrl} alt="Direct node" />
+  </div>
+  <div style={{ fontSize: '4rem' }}>
+    &rArr;
+  </div>
+  <div>
+    ```json
+    {
+      "timestamp": "...",
+      "fields": {
+        "foo": "bar"
+      }
+    }
+    ```
+  </div>
+</div>
+
+## Textual format
+
+```text
+POST /api/v1/pipelines/default/logs/text
+Content-Type: text/plain
+hello
+world
+```
+
+<div
+  style={{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'start',
+    gap: '2rem',
+  }}
+>
+  <div>
+    <img src={NodeRouterDirectUrl} alt="Direct node" />
+  </div>
+  <div style={{ fontSize: '4rem' }}>
+    &rArr;
+  </div>
+  <div>
+    ```json
+    {
+      "timestamp": "...",
+      "fields": {
+        "content": "hello"
+      }
+    }
+    ```
+  </div>
+  <div>
+    ```json
+    {
+      "timestamp": "...",
+      "fields": {
+        "content": "world"
+      }
+    }
+    ```
+  </div>
+</div>
+
+## OpenTelemetry JSON format
+
+```json
+POST /api/v1/pipelines/default/logs/otlp
+Content-Type: application/json
+{
+  "resource_logs": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {"stringValue": "myapp"}
+          }
+        ]
+      },
+      "scope_logs": [
+        {
+          "log_records": [
+            {
+              "time_unix_nano": "...",
+              "severity_number": 9,
+              "severity_text": "INFO",
+              "body": {"stringValue": "hello world"},
+              "attributes": [
+                {
+                  "key": "foo",
+                  "value": {"stringValue": "bar"}
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+
+<div
+  style={{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'start',
+    gap: '2rem',
+  }}
+>
+  <div>
+    <img src={NodeRouterDirectUrl} alt="Direct node" />
+  </div>
+  <div style={{ fontSize: '4rem' }}>
+    &rArr;
+  </div>
+  <div>
+    ```json
+    {
+      "timestamp": "...",
+      "fields": {
+        "severity_number": "9",
+        "severity_text": "INFO",
+        "body": "hello world",
+        "dropped_attribute_count": "0",
+        "flags": "0",
+        "trace_id": "...",
+        "span_id": "...",
+        "event_name": "...",
+        "observed_time_unix_nano": "...",
+        "time_unix_nano": "...",
+        "attr.service.name": "myapp",
+        "attr.foo": "bar"
+      }
+    }
+    ```
+  </div>
+</div>
+
+## OpenTelemetry Protobuf format
+
+```
+POST /api/v1/pipelines/default/logs/otlp
+Content-Type: application/x-protobuf
+...
+```
+
+<div
+  style={{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'start',
+    gap: '2rem',
+  }}
+>
+  <div>
+    <img src={NodeRouterDirectUrl} alt="Direct node" />
+  </div>
+  <div style={{ fontSize: '4rem' }}>
+    &rArr;
+  </div>
+  <div>
+    ```json
+    {
+      "timestamp": "...",
+      "fields": {
+        "severity_number": "9",
+        "severity_text": "INFO",
+        "body": "hello world",
+        "dropped_attribute_count": "0",
+        "flags": "0",
+        "trace_id": "...",
+        "span_id": "...",
+        "event_name": "...",
+        "observed_time_unix_nano": "...",
+        "time_unix_nano": "...",
+        "attr.service.name": "myapp",
+        "attr.foo": "bar"
+      }
+    }
+    ```
+  </div>
+</div>

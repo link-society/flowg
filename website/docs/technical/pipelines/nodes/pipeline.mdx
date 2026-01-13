@@ -1,0 +1,58 @@
+---
+sidebar_position: 3
+---
+
+# Pipeline
+
+Pipeline nodes are used to pass log records through another pipeline, allowing
+for modular and reusable pipeline designs.
+
+> **NB:** Pipeline nodes references pipelines by their unique name. If a
+> pipeline is updated, all pipeline nodes referencing it will be
+> invalidated.
+
+## Example
+
+import NodePipelineDefaultUrl from '@site/static/img/guides/pipelines/node-pipeline-default.png'
+
+The following are equivalent:
+
+<div
+  style={{
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'start',
+    gap: '2rem',
+  }}
+>
+  <div>
+    ```json
+    {
+      "timestamp": "...",
+      "fields": {
+        "content": "hello world"
+      }
+    }
+    ```
+  </div>
+  <div style={{ fontSize: '4rem' }}>
+    &rArr;
+  </div>
+  <div>
+    <img src={NodePipelineDefaultUrl} alt="Pipeline node" />
+  </div>
+</div>
+
+**OR**
+
+```json
+POST /api/v1/pipelines/default/logs/struct
+{
+  "records": [
+    {
+      "content": "hello world"
+    }
+  ]
+}
+```

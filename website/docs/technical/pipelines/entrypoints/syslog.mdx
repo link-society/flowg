@@ -1,0 +1,101 @@
+---
+sidebar_position: 2
+---
+
+# Syslog
+
+import NodeRouterSyslogUrl from '@site/static/img/guides/pipelines/node-router-syslog.png'
+
+FlowG is also a [Syslog Server](/docs/user/setup/syslog). But it is a single
+endpoint. As such, the logs received by the Syslog server are routed to every
+pipeline via the `SYSLOG` entrypoint.
+
+Both [RFC 3164](https://datatracker.ietf.org/doc/html/rfc3164) and
+[RFC 5424](https://datatracker.ietf.org/doc/html/rfc5424) formats are supported.
+
+> **NB:** For more inforation about Syslog priorities, facilities and severities,
+> please refer to [this page](https://techdocs.broadcom.com/us/en/symantec-security-software/identity-security/privileged-access-manager/4-1/reference/messages-and-log-formats/syslog-message-formats/syslog-priority-facility-severity-grid.html).
+
+## RFC 3164 format
+
+```bash
+logger -n localhost -P 5514 -d -t myapp --rfc3164 "hello world"
+```
+
+<div
+  style={{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'start',
+    gap: '2rem',
+  }}
+>
+  <div>
+    <img src={NodeRouterSyslogUrl} alt="Syslog node" />
+  </div>
+  <div style={{ fontSize: '4rem' }}>
+    &rArr;
+  </div>
+  <div>
+    ```json
+    {
+      "timestamp": "...",
+      "fields": {
+        "timestamp": "...",
+        "client": "...",
+        "hostname": "...",
+        "tls_peer": "...",
+        "tag": "myapp",
+        "content": "hello world",
+        "priority": "13",
+        "facility": "1",
+        "severity": "6"
+      }
+    }
+    ```
+  </div>
+</div>
+
+## RFC 5424 format
+
+```bash
+logger -n localhost -P 5514 -d -t myapp --rfc5424 "hello world"
+```
+
+<div
+  style={{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'start',
+    gap: '2rem',
+  }}
+>
+  <div>
+    <img src={NodeRouterSyslogUrl} alt="Syslog node" />
+  </div>
+  <div style={{ fontSize: '4rem' }}>
+    &rArr;
+  </div>
+  <div>
+    ```json
+    {
+      "timestamp": "...",
+      "fields": {
+        "timestamp": "...",
+        "client": "...",
+        "hostname": "...",
+        "tls_peer": "...",
+        "app_name": "myapp",
+        "message": "hello world",
+        "priority": "13",
+        "facility": "1",
+        "severity": "6",
+        "version": "1",
+        "msg_id": "",
+        "proc_id": "",
+        "structured_data": "[key key=\"value\"]",
+      }
+    }
+    ```
+  </div>
+</div>

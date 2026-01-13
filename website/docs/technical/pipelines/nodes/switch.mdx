@@ -1,0 +1,99 @@
+---
+sidebar_position: 2
+---
+
+# Switch
+
+A switch node is used to filter log records based on a given condition. Only log
+records matching the condition will be passed to the next nodes, while others
+will be discarded.
+
+> **NB:** The language used to write conditions is [Expr](https://expr-lang.org).
+
+## Example
+
+import NodeSwitchTagMyappUrl from '@site/static/img/guides/pipelines/node-switch-tagmyapp.png'
+
+<div
+  style={{
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'start',
+    justifyContent: 'center',
+    gap: '2rem',
+  }}
+>
+  <div
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}
+  >
+    <div>
+      ```json
+      {
+        "timestamp": "...",
+        "fields": {
+          "tag": "myapp",
+          "content": "hello world"
+        }
+      }
+      ```
+    </div>
+    <div style={{ fontSize: '4rem' }}>
+      &dArr;
+    </div>
+    <div>
+      <img src={NodeSwitchTagMyappUrl} alt="Switch node" />
+    </div>
+    <div style={{ fontSize: '4rem' }}>
+      &dArr;
+    </div>
+    <div>
+      ```json
+      {
+        "timestamp": "...",
+        "fields": {
+          "tag": "myapp",
+          "content": "hello world"
+        }
+      }
+      ```
+    </div>
+  </div>
+
+  <div
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}
+  >
+    <div>
+      ```json
+      {
+        "timestamp": "...",
+        "fields": {
+          "tag": "notmyapp",
+          "content": "hello world"
+        }
+      }
+      ```
+    </div>
+    <div style={{ fontSize: '4rem' }}>
+      &dArr;
+    </div>
+    <div>
+      <img src={NodeSwitchTagMyappUrl} alt="Switch node" />
+    </div>
+    <div style={{ fontSize: '4rem' }}>
+      &dArr;
+    </div>
+    <div style={{ fontSize: '4rem' }}>
+      &#9747;
+    </div>
+  </div>
+</div>
