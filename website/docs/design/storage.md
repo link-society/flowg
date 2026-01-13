@@ -112,5 +112,5 @@ entry:<stream name>:<to timestamp>:
 
 Because of the internal structure of *BadgerDB*, this operation is fast.
 
-Then, if a [filter](/docs/guides/filtering) is given, we match the log record
-to the filter expression to determine if it should be returned.
+Then, if a [filter](/docs/user/guides/filtering) is given, we match the log
+record to the filter expression to determine if it should be returned.
