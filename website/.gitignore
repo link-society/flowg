@@ -7,7 +7,7 @@
 # Generated files
 .docusaurus
 .cache-loader
-docs/cli/**/*.md
+docs/technical/cli/**/*.md
 src/openapi.json
 static/slides
 
