@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { LoaderFunction, useLoaderData } from 'react-router'
+import { LoaderFunction, useLoaderData, useNavigate } from 'react-router'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -59,19 +59,20 @@ const TransformerDetailView = () => {
 
   const { permissions } = useProfile()
   const { transformers, currentTransformer } = useLoaderData() as LoaderData
+  const navigate = useNavigate()
 
   const [code, setCode] = useState(currentTransformer.script)
 
   const onCreate = (name: string) => {
     queueMicrotask(() => {
-      globalThis.location.pathname = `/web/transformers/${name}`
+      navigate(`/web/transformers/${name}`)
     })
   }
 
   const [onDelete, deleteLoading] = useApiOperation(async () => {
     await configApi.deleteTransformer(currentTransformer.name)
     queueMicrotask(() => {
-      globalThis.location.pathname = '/web/transformers'
+      navigate('/web/transformers')
     })
   }, [currentTransformer])
 

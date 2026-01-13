@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { LoaderFunction, useLoaderData } from 'react-router'
+import { LoaderFunction, useLoaderData, useNavigate } from 'react-router'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -53,19 +53,20 @@ const StorageDetailView = () => {
 
   const { permissions } = useProfile()
   const { streams, usage, currentStream } = useLoaderData() as LoaderData
+  const navigate = useNavigate()
 
   const [streamConfig, setStreamConfig] = useState(streams[currentStream])
 
   const onCreate = (name: string) => {
     queueMicrotask(() => {
-      globalThis.location.pathname = `/web/storage/${name}`
+      navigate(`/web/storage/${name}`)
     })
   }
 
   const [onDelete, deleteLoading] = useApiOperation(async () => {
     await configApi.purgeStream(currentStream)
     queueMicrotask(() => {
-      globalThis.location.pathname = '/web/storage'
+      navigate('/web/storage')
     })
   }, [currentStream])
 
