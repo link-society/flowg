@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router'
+
 import FilterAltIcon from '@mui/icons-material/FilterAlt'
 
 import * as configApi from '@/lib/api/operations/config'
@@ -15,6 +17,7 @@ const PipelineEditorNodeListTransformer = ({
   className,
 }: PipelineEditorNodeListTransformerProps) => {
   const { permissions } = useProfile()
+  const navigate = useNavigate()
 
   return (
     <PipelineEditorNodeList
@@ -31,7 +34,7 @@ const PipelineEditorNodeListTransformer = ({
       itemIcon={<FilterAltIcon />}
       itemColor="blue"
       onItemOpen={(transformer) => {
-        globalThis.location.pathname = `/web/transformers/${transformer}`
+        navigate(`/web/transformers/${transformer}`)
       }}
       className={className}
     />
