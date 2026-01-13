@@ -39,7 +39,7 @@ const ForwarderEditorSplunk = ({
         token: token.value,
       })
     }
-  }, [endpoint, token, onValidationChange, onConfigChange])
+  }, [endpoint, token])
 
   return (
     <div

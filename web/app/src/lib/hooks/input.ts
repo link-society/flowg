@@ -25,6 +25,7 @@ export const useInput = <T>(
 
   const [value, setValue] = useState<T>(initialState)
   const valid = useMemo(() => validate(value), [value, validate])
+  const container = useMemo(() => ({ value, valid }), [value, valid])
 
-  return [{ value, valid }, setValue]
+  return [container, setValue]
 }

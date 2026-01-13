@@ -41,7 +41,7 @@ const ForwarderEditorOtlp = ({
         headers: headers.value,
       })
     }
-  }, [endpoint, headers, onValidationChange, onConfigChange])
+  }, [endpoint, headers])
 
   return (
     <div

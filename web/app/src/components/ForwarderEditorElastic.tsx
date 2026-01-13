@@ -68,8 +68,6 @@ const ForwarderEditorElastic = ({
     password,
     addresses,
     ca,
-    onValidationChange,
-    onConfigChange,
   ])
 
   return (

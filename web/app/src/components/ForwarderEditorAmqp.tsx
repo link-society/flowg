@@ -41,7 +41,7 @@ const ForwarderEditorAmqp = ({
         routing_key: routingKey.value,
       })
     }
-  }, [url, exchange, routingKey, onValidationChange, onConfigChange])
+  }, [url, exchange, routingKey])
 
   return (
     <div

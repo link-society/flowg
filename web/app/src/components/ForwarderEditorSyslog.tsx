@@ -77,8 +77,6 @@ const ForwarderEditorSyslog = ({
     tag,
     severity,
     facility,
-    onValidationChange,
-    onConfigChange,
   ])
 
   return (
