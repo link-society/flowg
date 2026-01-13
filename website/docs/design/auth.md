@@ -20,6 +20,8 @@ assigns permissions to one or more of the following **scopes**:
 | `read_acls` | Can list users and roles, but cannot update them nor delete them |
 | `write_acls`| Can create, read, update or delete roles and users |
 | `send_logs` | Can send logs to a pipeline for processing (useful for log sources) |
+| `read_system_configuration` | Can see the global system configuration |
+| `write_system_configuration` | Can edit the global system configuration |
 
 Each user is associated to one or more roles. A user has a required password,
 and can have zero or more personal access tokens.
