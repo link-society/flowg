@@ -51,7 +51,7 @@ const ForwarderEditorClickhouse = ({
         tls: tls.value,
       })
     }
-  }, [address, db, table, user, pass, tls, onValidationChange, onConfigChange])
+  }, [address, db, table, user, pass, tls])
 
   return (
     <div

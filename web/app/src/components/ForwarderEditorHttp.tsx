@@ -42,7 +42,7 @@ const ForwarderEditorHttp = ({
         headers: headers.value,
       })
     }
-  }, [url, headers, onValidationChange, onConfigChange])
+  }, [url, headers])
 
   return (
     <div

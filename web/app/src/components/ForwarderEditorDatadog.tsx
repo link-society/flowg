@@ -37,7 +37,7 @@ const ForwarderEditorDatadog = ({
         apiKey: apiKey.value,
       })
     }
-  }, [url, apiKey, onValidationChange, onConfigChange])
+  }, [url, apiKey])
 
   return (
     <div
