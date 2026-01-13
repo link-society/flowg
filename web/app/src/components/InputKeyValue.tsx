@@ -87,19 +87,7 @@ const InputKeyValue = (props: InputKeyValueProps) => {
         </div>
       ))}
 
-      <form
-        className="flex flex-row items-stretch gap-2"
-        onSubmit={(e) => {
-          e.preventDefault()
-          setPairs((prev) => {
-            const newEntry: [string, string] = [newKey, newValue]
-            const next = [...prev, newEntry]
-            setNewKey('')
-            setNewValue('')
-            return next
-          })
-        }}
-      >
+      <div className="flex flex-row items-stretch gap-2">
         <TextField
           data-ref="input:generic.kv-editor.new.key"
           label={props.keyLabel ?? 'Key'}
@@ -131,11 +119,19 @@ const InputKeyValue = (props: InputKeyValueProps) => {
           color="primary"
           variant="contained"
           size="small"
-          type="submit"
+          onClick={() => {
+            setPairs((prev) => {
+              const newEntry: [string, string] = [newKey, newValue]
+              const next = [...prev, newEntry]
+              setNewKey('')
+              setNewValue('')
+              return next
+            })
+          }}
         >
           <AddIcon />
         </Button>
-      </form>
+      </div>
     </div>
   )
 }
