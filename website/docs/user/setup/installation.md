@@ -34,7 +34,7 @@ flowg-server \
 > **NB:** All the options are optional and default to the values shown above.
 
 For more informations about the command line interface, please consult
-[this document](/docs/cli/flowg-server).
+[this document](/docs/technical/cli/flowg-server).
 
 ### From Sources
 
