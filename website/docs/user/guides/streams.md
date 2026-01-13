@@ -6,7 +6,7 @@ sidebar_position: 2
 
 A stream is the destination of a log record after being processed by a pipeline.
 This is the actual collection that you will query/visualize using
-[filters](/docs/guides/filtering).
+[filters](/docs/user/guides/filtering).
 
 Every field can be indexed, allowing fast retrieval of log records matching some
-[filter](/docs/guides/filtering).
+[filter](/docs/user/guides/filtering).
