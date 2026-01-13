@@ -86,7 +86,7 @@ func (f *ForwarderSyslogV2) init(context.Context) error {
 
 	msg := string(f.Message)
 	if msg == "" {
-		msg = "toJSON(log)"
+		msg = "@expr:toJSON(log)"
 	}
 	f.state.messageProg, err = CompileDynamicField(msg)
 	if err != nil {
