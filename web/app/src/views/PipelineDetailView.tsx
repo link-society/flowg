@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { LoaderFunction, useLoaderData } from 'react-router'
+import { LoaderFunction, useLoaderData, useNavigate } from 'react-router'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -64,8 +64,9 @@ const PipelineDetailView = () => {
 
   const { permissions } = useProfile()
   const { currentPipeline } = useLoaderData() as LoaderData
-  const initialFlow = currentPipeline.flow
+  const navigate = useNavigate()
 
+  const initialFlow = currentPipeline.flow
   const [flow, setFlow] = useState(initialFlow)
 
   const onChange = useCallback(
@@ -84,7 +85,7 @@ const PipelineDetailView = () => {
     await configApi.deletePipeline(currentPipeline.name)
 
     queueMicrotask(() => {
-      globalThis.location.pathname = '/web/pipelines'
+      navigate('/web/pipelines')
     })
   }, [currentPipeline])
 
