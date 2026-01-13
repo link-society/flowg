@@ -71,13 +71,7 @@ const ForwarderEditorSyslog = ({
         message: message.value,
       })
     }
-  }, [
-    network,
-    address,
-    tag,
-    severity,
-    facility,
-  ])
+  }, [network, address, tag, severity, facility])
 
   return (
     <div
