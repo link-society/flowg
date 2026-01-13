@@ -13,7 +13,7 @@ tasks:
     cmds:
       - NODE_ENV=dev npm i
       - rm -rf ../public ./dist
-      - npm run build
+      - NODE_ENV=dev npm run build:dev
       - mkdir -p ../public
       - cp -r ./dist/* ../public/
 
@@ -23,7 +23,7 @@ tasks:
       - task: "backend:vrl"
       - go get ./...
       - go generate ./...
-      - go build -a -tags debug -ldflags="-s -w" -o bin/ ./cmd/...
+      - go build -tags debug -ldflags="-s -w" -o bin/ ./cmd/...
 
   "backend:vrl":
     desc: "Build libvrl Rust crate"
