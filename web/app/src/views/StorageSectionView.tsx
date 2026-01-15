@@ -1,4 +1,5 @@
-import { LoaderFunction, redirect, useNavigate } from 'react-router'
+import { useEffect } from 'react'
+import { LoaderFunction, useLoaderData, useNavigate } from 'react-router'
 
 import * as configApi from '@/lib/api/operations/config'
 
@@ -10,12 +11,21 @@ export const loader: LoaderFunction = loginRequired(async () => {
   const streams = await configApi.listStreams()
   const streamNames = Object.keys(streams)
   if (streamNames.length > 0) {
-    throw redirect(`/web/storage/${streamNames[0]}`)
+    return { redirectTo: `/web/storage/${streamNames[0]}` }
   }
+
+  return { redirectTo: null }
 })
 
 const StorageSectionView = () => {
   const navigate = useNavigate()
+  const { redirectTo } = useLoaderData<{ redirectTo: string | null }>()
+
+  useEffect(() => {
+    if (redirectTo !== null) {
+      navigate(redirectTo, { replace: true })
+    }
+  }, [redirectTo])
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center gap-5">
