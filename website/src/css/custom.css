@@ -7,3 +7,7 @@
 .medium-zoom-overlay, .medium-zoom-image {
   z-index: 999;
 }
+
+.codeblock-nomargin .theme-code-block {
+  margin-bottom: 0 !important;
+}
