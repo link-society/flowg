@@ -112,9 +112,9 @@ jobs:
         if: steps.need-doc-cli.outputs.exists == 'false'
         run: |
           oras push ${ARTIFACT_BASENAME}/doc-cli:${ARTIFACT_ID} \
-            website/docs/cli/flowg-client/*.md \
-            website/docs/cli/flowg-health/*.md \
-            website/docs/cli/flowg-server/*.md
+            website/docs/technical/cli/flowg-client/*.md \
+            website/docs/technical/cli/flowg-health/*.md \
+            website/docs/technical/cli/flowg-server/*.md
 
       - name: upload-doc-openapi
         if: steps.need-doc-openapi.outputs.exists == 'false'
