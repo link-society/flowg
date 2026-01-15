@@ -1,4 +1,5 @@
-import { LoaderFunction, redirect, useNavigate } from 'react-router'
+import { useEffect } from 'react'
+import { LoaderFunction, useLoaderData, useNavigate } from 'react-router'
 
 import * as configApi from '@/lib/api/operations/config'
 
@@ -9,12 +10,21 @@ import ButtonNewPipeline from '@/components/ButtonNewPipeline'
 export const loader: LoaderFunction = loginRequired(async () => {
   const pipelines = await configApi.listPipelines()
   if (pipelines.length > 0) {
-    throw redirect(`/web/pipelines/${pipelines[0]}`)
+    return { redirectTo: `/web/pipelines/${pipelines[0]}` }
   }
+
+  return { redirectTo: null }
 })
 
 const PipelineSectionView = () => {
   const navigate = useNavigate()
+  const { redirectTo } = useLoaderData<{ redirectTo: string | null }>()
+
+  useEffect(() => {
+    if (redirectTo !== null) {
+      navigate(redirectTo, { replace: true })
+    }
+  }, [redirectTo])
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center gap-5">
