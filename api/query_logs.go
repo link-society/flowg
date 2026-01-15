@@ -58,7 +58,8 @@ func (ctrl *controller) QueryStreamUsecase() usecase.Interactor {
 					filter = nil
 				}
 
-				records, err := ctrl.deps.LogStorage.FetchLogs(ctx, req.Stream, req.From, req.To, filter)
+				indexing := make(map[string][]string)
+				records, err := ctrl.deps.LogStorage.FetchLogs(ctx, req.Stream, req.From, req.To, filter, indexing)
 				if err != nil {
 					ctrl.logger.ErrorContext(
 						ctx,
