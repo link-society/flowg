@@ -18,13 +18,28 @@ func FetchLogs(
 	stream string,
 	from, to time.Time,
 	filter filtering.Filter,
+	indexing map[string][]string,
 ) ([]models.LogRecord, error) {
 	results := []models.LogRecord{}
 
 	keys := fetchKeysByTime(txn, stream, from, to)
 	sort.Sort(sort.Reverse(sort.StringSlice(keys)))
 
+	var keysForIndex []string
+	encodedIndexing := encodeIndexingMap(indexing)
+
 	for _, key := range keys {
+		matched, err := matchesIndexingForKey(txn, stream, key, encodedIndexing)
+		if err != nil {
+			return nil, err
+		}
+
+		if matched {
+			keysForIndex = append(keysForIndex, key)
+		}
+	}
+
+	for _, key := range keysForIndex {
 		entry, err := fetchRecord(txn, stream, key)
 		if err != nil {
 			return nil, err
@@ -96,62 +111,4 @@ func fetchRecord(txn *badger.Txn, stream string, key string) (models.LogRecord, 
 	})
 
 	return record, err
-}
-
-func intersectKeysMap(a, b map[string]struct{}) map[string]struct{} {
-	result := map[string]struct{}{}
-
-	for key := range a {
-		if _, exists := b[key]; exists {
-			result[key] = struct{}{}
-		}
-	}
-
-	return result
-}
-
-func unionKeysMap(a, b map[string]struct{}) map[string]struct{} {
-	result := map[string]struct{}{}
-
-	for key := range a {
-		result[key] = struct{}{}
-	}
-
-	for key := range b {
-		result[key] = struct{}{}
-	}
-
-	return result
-}
-
-func differenceKeysMap(a, b map[string]struct{}) map[string]struct{} {
-	result := map[string]struct{}{}
-
-	for key := range a {
-		if _, exists := b[key]; !exists {
-			result[key] = struct{}{}
-		}
-	}
-
-	return result
-}
-
-func sliceToMap(slice []string) map[string]struct{} {
-	result := map[string]struct{}{}
-
-	for _, key := range slice {
-		result[key] = struct{}{}
-	}
-
-	return result
-}
-
-func mapToSlice(m map[string]struct{}) []string {
-	result := []string{}
-
-	for key := range m {
-		result = append(result, key)
-	}
-
-	return result
 }

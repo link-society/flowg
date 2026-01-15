@@ -139,3 +139,58 @@ func purgeEntryFromFieldIndex(txn *badger.Txn, stream string, key []byte) error 
 
 	return nil
 }
+
+func encodeIndexingMap(indexing map[string][]string) map[string][]string {
+	encodedMap := make(map[string][]string, len(indexing))
+
+	for field, values := range indexing {
+		encodedValues := make([]string, len(values))
+
+		for _, value := range values {
+			encodedValues = append(
+				encodedValues,
+				base64.StdEncoding.EncodeToString([]byte(value)),
+			)
+		}
+
+		encodedMap[field] = encodedValues
+	}
+
+	return encodedMap
+}
+
+func matchesIndexingForKey(
+	txn *badger.Txn,
+	stream string,
+	entryKey string,
+	encodedIndexing map[string][]string,
+) (bool, error) {
+	for field, encodedValues := range encodedIndexing {
+		matched := false
+
+		for _, encodedValue := range encodedValues {
+			indexKey := fmt.Sprintf(
+				"index:%s:field:%s:%s:%s",
+				stream, field, encodedValue, entryKey,
+			)
+
+			_, err := txn.Get([]byte(indexKey))
+			if err == nil {
+				matched = true
+				break
+			}
+			if err != badger.ErrKeyNotFound {
+				return false, fmt.Errorf(
+					"could not check existence of index key '%s': %w",
+					indexKey, err,
+				)
+			}
+		}
+
+		if !matched {
+			return false, nil
+		}
+	}
+
+	return true, nil
+}

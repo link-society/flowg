@@ -39,6 +39,7 @@ type Storage interface {
 		stream string,
 		from, to time.Time,
 		filter filtering.Filter,
+		indexing map[string][]string,
 	) ([]models.LogRecord, error)
 }
 
@@ -238,6 +239,7 @@ func (s *storageImpl) FetchLogs(
 	stream string,
 	from, to time.Time,
 	filter filtering.Filter,
+	indexing map[string][]string,
 ) ([]models.LogRecord, error) {
 	var results []models.LogRecord
 
@@ -245,7 +247,7 @@ func (s *storageImpl) FetchLogs(
 		ctx,
 		func(txn *badger.Txn) error {
 			var err error
-			results, err = transactions.FetchLogs(txn, stream, from, to, filter)
+			results, err = transactions.FetchLogs(txn, stream, from, to, filter, indexing)
 			return err
 		},
 	)

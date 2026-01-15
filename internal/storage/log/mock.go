@@ -95,7 +95,7 @@ func (m *MockStorage) Ingest(ctx context.Context, stream string, logRecord *mode
 	return args.Get(0).([]byte), args.Error(1)
 }
 
-func (m *MockStorage) FetchLogs(ctx context.Context, stream string, from time.Time, to time.Time, filter filtering.Filter) ([]models.LogRecord, error) {
-	args := m.Called(ctx, stream, from, to, filter)
+func (m *MockStorage) FetchLogs(ctx context.Context, stream string, from time.Time, to time.Time, filter filtering.Filter, indexing map[string][]string) ([]models.LogRecord, error) {
+	args := m.Called(ctx, stream, from, to, filter, indexing)
 	return args.Get(0).([]models.LogRecord), args.Error(1)
 }
