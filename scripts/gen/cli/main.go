@@ -23,17 +23,17 @@ func main() {
 	}{
 		{
 			cmd:        client.NewRootCommand(),
-			destdir:    "website/docs/cli/technical/flowg-client",
+			destdir:    "website/docs/technical/cli/flowg-client",
 			binaryName: "flowg-client",
 		},
 		{
 			cmd:        health.NewRootCommand(),
-			destdir:    "website/docs/cli/technical/flowg-health",
+			destdir:    "website/docs/technical/cli/flowg-health",
 			binaryName: "flowg-health",
 		},
 		{
 			cmd:        server.NewRootCommand(),
-			destdir:    "website/docs/cli/technical/flowg-server",
+			destdir:    "website/docs/technical/cli/flowg-server",
 			binaryName: "flowg-server",
 		},
 	}
