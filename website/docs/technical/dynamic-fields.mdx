@@ -1,0 +1,110 @@
+---
+sidebar_position: 3
+---
+
+# Dynamic Fields
+
+Dynamic fields are mainly used in [Forwarder](/docs/technical/forwarders)
+configuration. They allow you to define fields whose values are computed at
+runtime based on the log record being processed.
+
+In the web interface, dynamic fields appears with a dropdown menu, allowing the
+user to select between "Static" and "Expression" modes.
+
+In the API, a dynamic field is represented as a string. If the string starts
+with `@expr:`, the rest of the string is treated as an expression to be
+evaluated for each log record. Otherwise, the string is treated as a static
+value.
+
+> **NB:** Not all fields are dynamic, consult the documentation of each
+> forwarder to know which fields support dynamic values.
+
+## Edition mode
+
+### Static
+
+import DynamicFieldExampleStatic from '@site/static/img/technical/dynamic-field-example-static.png'
+
+In static mode, the user can enter a fixed value for the field. This value will
+be used for all log records processed by the forwarder.
+
+Under the hood, the value is sent as-is to the API:
+
+<div
+  style={{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'start',
+    gap: '2rem',
+  }}
+>
+  <div>
+    <img src={DynamicFieldExampleStatic} alt="Dynamic field example - static mode" />
+  </div>
+  <div style={{ fontSize: '4rem' }}>
+    &rArr;
+  </div>
+  <div className="codeblock-nomargin">
+    ```json
+    {
+      "tag": "example"
+    }
+    ```
+  </div>
+</div>
+
+### Expression
+
+import DynamicFieldExampleExpr from '@site/static/img/technical/dynamic-field-example-expr.png'
+
+In expression mode, the user can enter an expression in the
+[Expr](https://expr-lang.org/) language. This expression will be evaluated for
+each log record processed by the forwarder, and the result will be used as the
+value of the field.
+
+> **NB:** The expression must evaluate to a string.
+
+Under the hood, the value is sent to the API as a string prefixed with `@expr:`:
+
+<div
+  style={{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'start',
+    gap: '2rem',
+  }}
+>
+  <div>
+    <img src={DynamicFieldExampleExpr} alt="Dynamic field example - expression mode" />
+  </div>
+  <div style={{ fontSize: '4rem' }}>
+    &rArr;
+  </div>
+  <div className="codeblock-nomargin">
+    ```json
+    {
+      "tag": "@expr:log.tag"
+    }
+    ```
+  </div>
+</div>
+
+## Available variables
+
+A log record, in its JSON format looks like this:
+
+```json
+{
+  "timestamp": "2026-01-15T12:34:56+01:00",
+  "fields": {
+    "foo": "bar"
+  }
+}
+```
+
+The expression used in dynamic fields has access to the following variables:
+
+| Variable Name | Description                   | Example Value                 |
+| --------------|-------------------------------|-------------------------------|
+| `log`         | The log fields as an object   | `{ "foo": "bar" }`            |
+| `timestamp`   | The log timestamp as a string | `"2026-01-15T12:34:56+01:00"` |
