@@ -15,14 +15,17 @@ erDiagram
 
   Configuration {
     str url "URL of AMQP broker"
-    str exchange "Name of the exchange to send the log to"
-    str routing_key "Routing Key to use when sending the log to the exchange"
+    str exchange[2] "Name of the exchange to send the log to"
+    str routing_key[2] "Routing Key to use when sending the log to the exchange"
+    str body[2] "The body of a log message"
   }
 ```
 
 *Notes:*
 
 1. The token is **NOT** encrypted in the database.
+2. These fields are "dynamic", consult
+   [this page](/docs/technical/dynamic-fields) for more information.
 
 ## Behavior
 
