@@ -8,7 +8,7 @@ tasks:
       - task: build:slides
       - task: copy:slides
       - npm i
-      - npm start
+      - npm start -- --no-open -h 0.0.0.0
 
   build:
     desc: "Build website"
