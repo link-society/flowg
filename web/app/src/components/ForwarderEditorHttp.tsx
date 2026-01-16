@@ -5,10 +5,12 @@ import TextField from '@mui/material/TextField'
 
 import { useInput } from '@/lib/hooks/input'
 
+import { DynamicField } from '@/lib/models/DynamicField.ts'
 import ForwarderConfigHttpModel from '@/lib/models/ForwarderConfigHttpModel'
 
 import * as validators from '@/lib/validators'
 
+import DynamicFieldControl from '@/components/DynamicFieldControl.tsx'
 import InputKeyValue from '@/components/InputKeyValue'
 
 type ForwarderEditorHttpProps = {
@@ -31,6 +33,10 @@ const ForwarderEditorHttp = ({
     []
   )
 
+  const [body, setBody] = useInput<DynamicField<string>>(config.body, [
+    validators.dynamicField([]),
+  ])
+
   useEffect(() => {
     const valid = url.valid && headers.valid
     onValidationChange(valid)
@@ -40,6 +46,7 @@ const ForwarderEditorHttp = ({
         type: 'http',
         url: url.value,
         headers: headers.value,
+        body: body.value,
       })
     }
   }, [url, headers])
@@ -71,6 +78,16 @@ const ForwarderEditorHttp = ({
         onChange={(pairs) => {
           setHeaders(Object.fromEntries(pairs))
         }}
+      />
+
+      <DynamicFieldControl
+        id="input:editor.forwarders.http.body"
+        label="Body"
+        multiline
+        variant="outlined"
+        error={!body.valid}
+        value={body.value}
+        onChange={setBody}
       />
     </div>
   )
