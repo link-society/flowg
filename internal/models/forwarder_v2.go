@@ -137,6 +137,15 @@ func (cfg *ForwarderConfigV2) MarshalJSON() ([]byte, error) {
 }
 
 func (cfg *ForwarderConfigV2) UnmarshalJSON(data []byte) error {
+	cfg.Http = nil
+	cfg.Syslog = nil
+	cfg.Datadog = nil
+	cfg.Amqp = nil
+	cfg.Splunk = nil
+	cfg.Otlp = nil
+	cfg.Elastic = nil
+	cfg.Clickhouse = nil
+
 	var typeInfo struct {
 		Type string `json:"type" required:"true"`
 	}
