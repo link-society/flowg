@@ -4,9 +4,9 @@ tasks:
   build:
     desc: "Build the docker image"
     cmds:
-      - docker build -t linksociety/flowg:latest -f docker/flowg.dockerfile .
+      - docker build -t linksociety/flowg:localdev -f docker/flowg.dockerfile .
 
   run:
     desc: "Run the docker image"
     cmds:
-      - docker run --rm -v ./data:/data -p 5080:5080/tcp -p 5514:5514/udp linksociety/flowg:latest serve
+      - docker run --rm -v ./data:/data -p 5080:5080/tcp -p 5514:5514/udp linksociety/flowg:localdev serve

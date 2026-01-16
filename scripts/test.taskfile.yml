@@ -15,6 +15,7 @@ tasks:
       - pdm run pytest
     env:
       FLOWG_TEST_SUITES: api
+      FLOWG_TEST_DOCKER_IMAGE_NAME: linksociety/flowg:localdev
 
   "e2e:web":
     desc: "Run Web end-to-end tests"
@@ -25,6 +26,7 @@ tasks:
       - pdm run pytest
     env:
       FLOWG_TEST_SUITES: web
+      FLOWG_TEST_DOCKER_IMAGE_NAME: linksociety/flowg:localdev
 
   "e2e:consul":
     desc: "Run Consul end-to-end tests"
@@ -34,6 +36,7 @@ tasks:
       - pdm run pytest
     env:
       FLOWG_TEST_SUITES: consul
+      FLOWG_TEST_DOCKER_IMAGE_NAME: linksociety/flowg:localdev
 
   bench:
     desc: "Run benchmark"
@@ -43,6 +46,7 @@ tasks:
       - pdm run pytest
     env:
       FLOWG_TEST_SUITES: bench
+      FLOWG_TEST_DOCKER_IMAGE_NAME: linksociety/flowg:localdev
 
   "test:unit:go":
     internal: true
