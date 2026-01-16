@@ -16,6 +16,7 @@ erDiagram
   Configuration {
     str url "The target URL"
     HttpHeader[] headers "Additional HTTP headers to send"
+    str body[1] "The body of a log message"
   }
 
   HttpHeader {
@@ -25,6 +26,11 @@ erDiagram
 
   Configuration ||--o{ HttpHeader : has
 ```
+
+*Notes: *
+
+1. This field is "dynamic", consult
+   [this page](/docs/technical/dynamic-fields) for more information.
 
 ## Behavior
 
