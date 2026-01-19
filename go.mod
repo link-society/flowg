@@ -1,18 +1,18 @@
 module link-society.com/flowg
 
-go 1.25.3
+go 1.25.5
 
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.42.0
 	github.com/dgraph-io/badger/v4 v4.9.0
 	github.com/elastic/go-elasticsearch/v9 v9.2.1
 	github.com/expr-lang/expr v1.17.7
-	github.com/go-chi/chi/v5 v5.2.3
+	github.com/go-chi/chi/v5 v5.2.4
 	github.com/go-logfmt/logfmt v0.6.1
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/google/uuid v1.6.0
-	github.com/hashicorp/consul/api v1.33.0
+	github.com/hashicorp/consul/api v1.33.2
 	github.com/hashicorp/go-sockaddr v1.0.7
 	github.com/hashicorp/memberlist v0.5.4
 	github.com/jarcoal/httpmock v1.4.1
