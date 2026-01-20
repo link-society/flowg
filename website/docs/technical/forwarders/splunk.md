@@ -15,12 +15,16 @@ erDiagram
   Configuration {
     str endpoint "URL of the Splunk HTTP Event Collector endpoint"
     str token[1] "Token used for authentication"
+    str source[2] "Source of Log (defaults to 'flowg')"
+    str host[2] "The host to be sent to Splunk"
   }
 ```
 
 *Notes:*
 
 1. The token is **NOT** encrypted in the database.
+2. These fields are "dynamic", consult
+   [this page](/docs/technical/dynamic-fields) for more information.
 
 ## Behavior
 
@@ -34,7 +38,7 @@ Content-Type: application/json
     "...": "...",
   },
   "sourcetype": "json",
-  "source": "flowg",
+  "source": "<log.source>",
   "host": "<log.host>",
   "time": "<timestamp>",
 }
