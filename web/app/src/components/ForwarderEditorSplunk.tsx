@@ -5,9 +5,12 @@ import TextField from '@mui/material/TextField'
 
 import { useInput } from '@/lib/hooks/input'
 
+import { DynamicField } from '@/lib/models/DynamicField.ts'
 import ForwarderConfigSplunkModel from '@/lib/models/ForwarderConfigSplunkModel'
 
 import * as validators from '@/lib/validators'
+
+import DynamicFieldControl from '@/components/DynamicFieldControl.tsx'
 
 type ForwarderEditorSplunkProps = {
   config: ForwarderConfigSplunkModel
@@ -27,6 +30,12 @@ const ForwarderEditorSplunk = ({
   const [token, setToken] = useInput<string>(config.token, [
     validators.minLength(1),
   ])
+  const [source, setSource] = useInput<DynamicField<string>>(config.source, [
+    validators.dynamicField([]),
+  ])
+  const [host, setHost] = useInput<DynamicField<string>>(config.host, [
+    validators.dynamicField([]),
+  ])
 
   useEffect(() => {
     const valid = endpoint.valid && token.valid
@@ -37,6 +46,8 @@ const ForwarderEditorSplunk = ({
         type: 'splunk',
         endpoint: endpoint.value,
         token: token.value,
+        source: source.value,
+        host: host.value,
       })
     }
   }, [endpoint, token])
@@ -70,6 +81,26 @@ const ForwarderEditorSplunk = ({
         onChange={(e) => {
           setToken(e.target.value)
         }}
+      />
+
+      <DynamicFieldControl
+        id="input:editor.forwarders.splunk.source"
+        label="Source"
+        variant="outlined"
+        type="text"
+        error={!source.valid}
+        value={source.value}
+        onChange={setSource}
+      />
+
+      <DynamicFieldControl
+        id="input:editor.forwarders.splunk.host"
+        label="Host"
+        variant="outlined"
+        type="text"
+        error={!host.valid}
+        value={host.value}
+        onChange={setHost}
       />
     </div>
   )
