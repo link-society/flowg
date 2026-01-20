@@ -2,6 +2,7 @@ import pytest
 
 from contextlib import contextmanager
 from time import sleep
+import json
 
 import requests
 
@@ -23,17 +24,8 @@ def container(
         name=name,
         network=network.name,
         hostname=name,
-        environment={
-            "MOCKSERVER_INITIALIZATION_JSON_PATH": "/config.json",
-        },
         ports={
             "1080/tcp": 1080,
-        },
-        volumes={
-            (config_dir / "mockserver-config.json").absolute().as_posix(): {
-                "bind": "/config.json",
-                "mode": "ro",
-            }
         },
         detach=True,
     )
@@ -45,6 +37,16 @@ def container(
     except RuntimeError as err:
         docker_utils.teardown_container(container, report_dir)
         pytest.fail(f"{err}", pytrace=False)
+
+    with (config_dir / "mockserver-config.json").open() as f:
+        expectations = json.load(f)
+
+        for expectation in expectations:
+            resp = requests.put(
+                "http://localhost:1080/expectation",
+                json=expectation,
+            )
+            resp.raise_for_status()
 
     yield
 
