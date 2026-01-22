@@ -6,7 +6,6 @@ import Typography from '@mui/material/Typography'
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
-
 type ValueChipProps = {
   value: string
   selected: boolean
@@ -34,8 +33,7 @@ const ValueChip = (props: ValueChipProps) => {
         <Typography variant="caption">{value}</Typography>
       </div>
     )
-  }
-  else {
+  } else {
     return (
       <div
         className="
@@ -55,7 +53,6 @@ const ValueChip = (props: ValueChipProps) => {
   }
 }
 
-
 type StreamIndexSelectorProps = {
   indices: Record<string, Array<string>>
   selection: Record<string, Array<string>>
@@ -65,7 +62,11 @@ type StreamIndexSelectorProps = {
 const StreamIndexSelector = (props: StreamIndexSelectorProps) => {
   const { indices, selection, onSelectionChange } = props
 
-  const toggleIndexValue = (field: string, value: string, selected: boolean) => {
+  const toggleIndexValue = (
+    field: string,
+    value: string,
+    selected: boolean
+  ) => {
     const newSelection: Record<string, Array<string>> = {}
 
     for (const [f, vals] of Object.entries(selection)) {
@@ -77,9 +78,10 @@ const StreamIndexSelector = (props: StreamIndexSelectorProps) => {
       if (!newSelection[field].includes(value)) {
         newSelection[field].push(value)
       }
-    }
-    else {
-      newSelection[field] = (newSelection[field] ?? []).filter((v) => v !== value)
+    } else {
+      newSelection[field] = (newSelection[field] ?? []).filter(
+        (v) => v !== value
+      )
       if (newSelection[field].length === 0) {
         delete newSelection[field]
       }
@@ -92,9 +94,7 @@ const StreamIndexSelector = (props: StreamIndexSelectorProps) => {
     <Paper className="h-full overflow-auto">
       {Object.entries(indices).map(([field, values]) => (
         <Accordion key={field} className="w-full" disableGutters>
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-          >
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="caption">{field}</Typography>
           </AccordionSummary>
           <AccordionDetails>
@@ -104,7 +104,9 @@ const StreamIndexSelector = (props: StreamIndexSelectorProps) => {
                   key={value}
                   value={value}
                   selected={(selection[field] ?? []).includes(value)}
-                  onToggle={(isSelected) => toggleIndexValue(field, value, isSelected)}
+                  onToggle={(isSelected) =>
+                    toggleIndexValue(field, value, isSelected)
+                  }
                 />
               ))}
             </div>

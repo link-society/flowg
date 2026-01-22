@@ -7,7 +7,7 @@ export const queryLogs = async (
   from: Date,
   to: Date,
   filter?: string,
-  indexing?: Record<string, Array<string>>,
+  indexing?: Record<string, Array<string>>
 ): Promise<LogEntryModel[]> => {
   type QueryLogsResponse = {
     success: boolean
@@ -46,10 +46,17 @@ export const queryLogs = async (
   }))
 }
 
-export const watchLogs = (stream: string, filter: string, indexing: Record<string, Array<string>>) => {
+export const watchLogs = (
+  stream: string,
+  filter: string,
+  indexing: Record<string, Array<string>>
+) => {
   return request.SSE({
     path: `/api/v1/streams/${stream}/logs/watch`,
-    searchParams: new URLSearchParams({ filter, indexing: JSON.stringify(indexing) }),
+    searchParams: new URLSearchParams({
+      filter,
+      indexing: JSON.stringify(indexing),
+    }),
   })
 }
 
@@ -77,7 +84,9 @@ export const getStreamUsage = async (stream: string): Promise<number> => {
   return body.usage
 }
 
-export const getStreamIndices = async (stream: string): Promise<Record<string, Array<string>>> => {
+export const getStreamIndices = async (
+  stream: string
+): Promise<Record<string, Array<string>>> => {
   type GetStreamIndicesResponse = {
     success: boolean
     indices: Record<string, Array<string>>
