@@ -6,7 +6,8 @@ export const queryLogs = async (
   stream: string,
   from: Date,
   to: Date,
-  filter?: string
+  filter?: string,
+  indexing?: Record<string, Array<string>>,
 ): Promise<LogEntryModel[]> => {
   type QueryLogsResponse = {
     success: boolean
@@ -16,20 +17,27 @@ export const queryLogs = async (
     }>
   }
 
+  const searchParams: {
+    from: string
+    to: string
+    filter?: string
+    indexing?: string
+  } = {
+    from: from.toISOString(),
+    to: to.toISOString(),
+  }
+
+  if (filter !== undefined) {
+    searchParams.filter = filter
+  }
+
+  if (indexing !== undefined) {
+    searchParams.indexing = JSON.stringify(indexing)
+  }
+
   const { body } = await request.GET<QueryLogsResponse>({
     path: `/api/v1/streams/${stream}/logs`,
-    searchParams: new URLSearchParams(
-      filter === undefined
-        ? {
-            from: from.toISOString(),
-            to: to.toISOString(),
-          }
-        : {
-            from: from.toISOString(),
-            to: to.toISOString(),
-            filter,
-          }
-    ),
+    searchParams: new URLSearchParams(searchParams),
   })
 
   return body.records.map(({ timestamp, fields }) => ({
@@ -38,10 +46,10 @@ export const queryLogs = async (
   }))
 }
 
-export const watchLogs = (stream: string, filter: string) => {
+export const watchLogs = (stream: string, filter: string, indexing: Record<string, Array<string>>) => {
   return request.SSE({
     path: `/api/v1/streams/${stream}/logs/watch`,
-    searchParams: new URLSearchParams({ filter }),
+    searchParams: new URLSearchParams({ filter, indexing: JSON.stringify(indexing) }),
   })
 }
 
@@ -67,4 +75,17 @@ export const getStreamUsage = async (stream: string): Promise<number> => {
   })
 
   return body.usage
+}
+
+export const getStreamIndices = async (stream: string): Promise<Record<string, Array<string>>> => {
+  type GetStreamIndicesResponse = {
+    success: boolean
+    indices: Record<string, Array<string>>
+  }
+
+  const { body } = await request.GET<GetStreamIndicesResponse>({
+    path: `/api/v1/streams/${stream}/indices`,
+  })
+
+  return body.indices
 }

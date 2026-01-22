@@ -31,7 +31,7 @@ const LogQueryPanel = (props: LogQueryPanelProps) => {
       const { from, to, live } = timeWindowFactory.make()
       props.onFetchRequested(filter, from, to, live)
     }
-  }, [timeWindowFactory, filter])
+  }, [timeWindowFactory, filter, props.onFetchRequested])
 
   useEffect(() => {
     requestFetch()
