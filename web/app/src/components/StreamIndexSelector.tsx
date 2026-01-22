@@ -29,6 +29,7 @@ const ValueChip = (props: ValueChipProps) => {
           transition-all duration-150 ease-in-out
         "
         onClick={() => onToggle(false)}
+        role="button"
       >
         <Typography variant="caption">{value}</Typography>
       </div>
@@ -46,6 +47,7 @@ const ValueChip = (props: ValueChipProps) => {
           transition-all duration-150 ease-in-out
         "
         onClick={() => onToggle(true)}
+        role="button"
       >
         <Typography variant="caption">{value}</Typography>
       </div>
