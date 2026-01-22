@@ -77,15 +77,57 @@ func UnindexField(txn *badger.Txn, stream, field string) error {
 	return nil
 }
 
+func Distinct(txn *badger.Txn, stream string) (map[string][]string, error) {
+	indices := make(map[string][]string)
+	seenValuesPerField := make(map[string]map[string]struct{})
+
+	opts := badger.DefaultIteratorOptions
+	opts.PrefetchValues = false
+	opts.Prefix = fmt.Appendf(nil, "index:%s:field:", stream)
+	it := txn.NewIterator(opts)
+	defer it.Close()
+
+	for it.Rewind(); it.Valid(); it.Next() {
+		indexKey := it.Item().Key()
+		parts := strings.SplitN(string(indexKey), ":", 6)
+		if len(parts) != 6 {
+			continue
+		}
+
+		field := parts[3]
+		encodedValue := parts[4]
+
+		if _, exists := seenValuesPerField[field]; !exists {
+			seenValuesPerField[field] = make(map[string]struct{})
+		}
+
+		if _, seen := seenValuesPerField[field][encodedValue]; !seen {
+			decodedValueBytes, err := base64.StdEncoding.DecodeString(encodedValue)
+			if err != nil {
+				return nil, fmt.Errorf(
+					"could not decode base64 value '%s' for field '%s': %w",
+					encodedValue, field, err,
+				)
+			}
+			decodedValue := string(decodedValueBytes)
+
+			indices[field] = append(indices[field], decodedValue)
+			seenValuesPerField[field][encodedValue] = struct{}{}
+		}
+	}
+
+	return indices, nil
+}
+
 func newFieldIndex(txn *badger.Txn, stream, field, value string) *fieldIndex {
 	encodedValue := base64.StdEncoding.EncodeToString([]byte(value))
 
 	return &fieldIndex{
 		txn: txn,
-		keyPrefix: []byte(fmt.Sprintf(
+		keyPrefix: fmt.Appendf(nil,
 			"index:%s:field:%s:%s:",
 			stream, field, encodedValue,
-		)),
+		),
 	}
 }
 

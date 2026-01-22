@@ -90,6 +90,11 @@ func (m *MockStorage) UnindexField(ctx context.Context, stream string, field str
 	return args.Error(0)
 }
 
+func (m *MockStorage) Distinct(ctx context.Context, stream string) (map[string][]string, error) {
+	args := m.Called(ctx, stream)
+	return args.Get(0).(map[string][]string), args.Error(1)
+}
+
 func (m *MockStorage) Ingest(ctx context.Context, stream string, logRecord *models.LogRecord) ([]byte, error) {
 	args := m.Called(ctx, stream, logRecord)
 	return args.Get(0).([]byte), args.Error(1)

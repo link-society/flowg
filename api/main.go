@@ -108,6 +108,7 @@ func NewHandler(deps Dependencies) http.Handler {
 		r.Get("/api/v1/streams/{stream}/usage", ctrl.GetStreamUsageUsecase())
 		r.Get("/api/v1/streams/{stream}/logs", ctrl.QueryStreamUsecase())
 		r.Get("/api/v1/streams/{stream}/fields", ctrl.ListStreamFieldsUsecase())
+		r.Get("/api/v1/streams/{stream}/indices", ctrl.GetStreamIndicesUsecase())
 		r.Delete("/api/v1/streams/{stream}", ctrl.PurgeStreamUsecase())
 
 		service.OpenAPICollector.AnnotateOperation(
