@@ -16,10 +16,11 @@ import (
 )
 
 type QueryStreamRequest struct {
-	Stream string    `path:"stream" minLength:"1"`
-	From   time.Time `query:"from" format:"date-time" required:"true"`
-	To     time.Time `query:"to" format:"date-time" required:"true"`
-	Filter *string   `query:"filter"`
+	Stream   string              `path:"stream" minLength:"1"`
+	From     time.Time           `query:"from" format:"date-time" required:"true"`
+	To       time.Time           `query:"to" format:"date-time" required:"true"`
+	Filter   *string             `query:"filter"`
+	Indexing map[string][]string `query:"indexing" collectionFormat:"json"`
 }
 
 type QueryStreamResponse struct {
@@ -58,8 +59,7 @@ func (ctrl *controller) QueryStreamUsecase() usecase.Interactor {
 					filter = nil
 				}
 
-				indexing := make(map[string][]string)
-				records, err := ctrl.deps.LogStorage.FetchLogs(ctx, req.Stream, req.From, req.To, filter, indexing)
+				records, err := ctrl.deps.LogStorage.FetchLogs(ctx, req.Stream, req.From, req.To, filter, req.Indexing)
 				if err != nil {
 					ctrl.logger.ErrorContext(
 						ctx,
