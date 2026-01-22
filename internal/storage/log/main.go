@@ -31,6 +31,7 @@ type Storage interface {
 
 	IndexField(ctx context.Context, stream, field string) error
 	UnindexField(ctx context.Context, stream, field string) error
+	Distinct(ctx context.Context, stream string) (map[string][]string, error)
 
 	Ingest(ctx context.Context, stream string, logRecord *models.LogRecord) ([]byte, error)
 
@@ -217,6 +218,24 @@ func (s *storageImpl) UnindexField(ctx context.Context, stream, field string) er
 			return transactions.UnindexField(txn, stream, field)
 		},
 	)
+}
+
+func (s *storageImpl) Distinct(ctx context.Context, stream string) (map[string][]string, error) {
+	var indices map[string][]string
+
+	err := s.kvStore.View(
+		ctx,
+		func(txn *badger.Txn) error {
+			var err error
+			indices, err = transactions.Distinct(txn, stream)
+			return err
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return indices, nil
 }
 
 func (s *storageImpl) Ingest(ctx context.Context, stream string, logRecord *models.LogRecord) ([]byte, error) {
