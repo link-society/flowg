@@ -31,11 +31,7 @@ type LoaderData = {
 }
 
 export const loader: LoaderFunction = loginRequired(async ({ params }) => {
-  const [
-    streamConfigs,
-    fields,
-    indices,
-  ] = await Promise.all([
+  const [streamConfigs, fields, indices] = await Promise.all([
     configApi.listStreams(),
     configApi.listStreamFields(params.stream!),
     logApi.getStreamIndices(params.stream!),
@@ -50,9 +46,12 @@ export const loader: LoaderFunction = loginRequired(async ({ params }) => {
 const StreamDetailView = () => {
   const notify = useNotify()
 
-  const { streams, currentStream, fields, indices } = useLoaderData() as LoaderData
+  const { streams, currentStream, fields, indices } =
+    useLoaderData() as LoaderData
 
-  const [selectedIndices, setSelectedIndices] = useState<Record<string, Array<string>>>({})
+  const [selectedIndices, setSelectedIndices] = useState<
+    Record<string, Array<string>>
+  >({})
 
   const timestampColumnDef = (): ColDef<LogEntryModel> => ({
     headerName: 'Ingested At',
@@ -98,7 +97,7 @@ const StreamDetailView = () => {
         from,
         to,
         filter === '' ? undefined : filter,
-        selectedIndices,
+        selectedIndices
       )
       setRowData(logs)
       setTimeWindow({ from, to })
@@ -113,7 +112,11 @@ const StreamDetailView = () => {
 
   useEffect(() => {
     if (watcher.enabled) {
-      const bus = logApi.watchLogs(currentStream, watcher.filter, selectedIndices)
+      const bus = logApi.watchLogs(
+        currentStream,
+        watcher.filter,
+        selectedIndices
+      )
 
       const incomingState = {
         rowData: [] as LogEntryModel[],
