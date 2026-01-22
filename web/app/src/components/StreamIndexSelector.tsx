@@ -17,7 +17,7 @@ const ValueChip = (props: ValueChipProps) => {
 
   if (selected) {
     return (
-      <div
+      <button
         className="
           cursor-pointer
           px-2 py-0
@@ -25,30 +25,30 @@ const ValueChip = (props: ValueChipProps) => {
           border border-blue-300
           font-semibold
           shadow-xs
+          text-left
           transition-all duration-150 ease-in-out
         "
         onClick={() => onToggle(false)}
-        role="button"
       >
         <Typography variant="caption">{value}</Typography>
-      </div>
+      </button>
     )
   } else {
     return (
-      <div
+      <button
         className="
           cursor-pointer
           px-2 py-0
           bg-gray-200
           border border-gray-300
           shadow-xs
+          text-left
           transition-all duration-150 ease-in-out
         "
         onClick={() => onToggle(true)}
-        role="button"
       >
         <Typography variant="caption">{value}</Typography>
-      </div>
+      </button>
     )
   }
 }
