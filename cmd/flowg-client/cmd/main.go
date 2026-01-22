@@ -61,6 +61,7 @@ func NewRootCommand() *cobra.Command {
 		NewForwarderCommand(),
 		NewAclCommand(),
 		NewTokenCommand(),
+		NewSystemConfigCommand(),
 		NewAdminCommand(),
 	)
 
