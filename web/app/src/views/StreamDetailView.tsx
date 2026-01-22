@@ -21,25 +21,38 @@ import LogChart from '@/components/LogChart'
 import LogQueryPanel from '@/components/LogQueryPanel'
 import LogTable from '@/components/LogTable'
 import SideNavList from '@/components/SideNavList'
+import StreamIndexSelector from '@/components/StreamIndexSelector'
 
 type LoaderData = {
   streams: string[]
   currentStream: string
   fields: string[]
+  indices: Record<string, Array<string>>
 }
 
 export const loader: LoaderFunction = loginRequired(async ({ params }) => {
-  const streams = Object.keys(await configApi.listStreams())
+  const [
+    streamConfigs,
+    fields,
+    indices,
+  ] = await Promise.all([
+    configApi.listStreams(),
+    configApi.listStreamFields(params.stream!),
+    logApi.getStreamIndices(params.stream!),
+  ])
+
+  const streams = Object.keys(streamConfigs)
   streams.sort((a, b) => a.localeCompare(b))
 
-  const fields = await configApi.listStreamFields(params.stream!)
-  return { streams, currentStream: params.stream!, fields }
+  return { streams, currentStream: params.stream!, fields, indices }
 })
 
 const StreamDetailView = () => {
   const notify = useNotify()
 
-  const { streams, currentStream, fields } = useLoaderData() as LoaderData
+  const { streams, currentStream, fields, indices } = useLoaderData() as LoaderData
+
+  const [selectedIndices, setSelectedIndices] = useState<Record<string, Array<string>>>({})
 
   const timestampColumnDef = (): ColDef<LogEntryModel> => ({
     headerName: 'Ingested At',
@@ -79,17 +92,19 @@ const StreamDetailView = () => {
 
   const [fetchLogs, loading] = useApiOperation(
     async (filter: string, from: Date, to: Date, live: boolean) => {
+      console.log(selectedIndices)
       const logs = await logApi.queryLogs(
         currentStream,
         from,
         to,
-        filter === '' ? undefined : filter
+        filter === '' ? undefined : filter,
+        selectedIndices,
       )
       setRowData(logs)
       setTimeWindow({ from, to })
       setWatcher({ enabled: live, filter })
     },
-    [currentStream, setRowData]
+    [currentStream, setRowData, selectedIndices]
   )
 
   const [handleLiveError] = useApiOperation(async (err: Error) => {
@@ -98,7 +113,7 @@ const StreamDetailView = () => {
 
   useEffect(() => {
     if (watcher.enabled) {
-      const bus = logApi.watchLogs(currentStream, watcher.filter)
+      const bus = logApi.watchLogs(currentStream, watcher.filter, selectedIndices)
 
       const incomingState = {
         rowData: [] as LogEntryModel[],
@@ -162,7 +177,7 @@ const StreamDetailView = () => {
         clearInterval(token)
       }
     }
-  }, [currentStream, watcher])
+  }, [currentStream, watcher, selectedIndices])
 
   return (
     <Grid container spacing={1} className="p-2 h-full">
@@ -174,7 +189,7 @@ const StreamDetailView = () => {
           currentItem={currentStream}
         />
       </Grid>
-      <Grid size={{ xs: 10 }} className="flex flex-col items-stretch gap-2">
+      <Grid size={{ xs: 8 }} className="flex flex-col items-stretch gap-2">
         <Paper>
           <LogQueryPanel loading={loading} onFetchRequested={fetchLogs} />
           <Divider />
@@ -186,6 +201,13 @@ const StreamDetailView = () => {
         </Paper>
 
         <LogTable rowData={rowData} columnDefs={columnDefs} />
+      </Grid>
+      <Grid size={{ xs: 2 }} className="h-full">
+        <StreamIndexSelector
+          indices={indices}
+          selection={selectedIndices}
+          onSelectionChange={setSelectedIndices}
+        />
       </Grid>
     </Grid>
   )
