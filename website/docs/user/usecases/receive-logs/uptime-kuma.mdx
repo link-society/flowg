@@ -41,14 +41,14 @@ Then, let's create a webhook notification:
 | --- | --- | --- |
 | Notification Type | Webhook | We will send the notification directly on a pipeline |
 | Friendly Name | FlowG | You can use any value you want |
-| Post URL | `http://localhost:5080/api/v1/pipelines/default/logs` | Adjust this URL to send the logs to the desired pipeline, here `default` |
+| Post URL | `http://localhost:5080/api/v1/pipelines/default/logs/struct` | Adjust this URL to send the logs to the desired pipeline, here `default` |
 | Request Body | Custom Body | In order to build the request body the FlowG pipeline endpoint expects |
 
 **Request Body:**
 
 ```json
 {
-  "record": {
+  "records": {
     "message": "{{ msg }}",
     "monitor.name": "{{ monitorJSON['name'] }}",
     "heartbeat.status": "{{ heartbeatJSON['status'] }}",
