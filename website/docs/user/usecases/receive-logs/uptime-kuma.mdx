@@ -48,11 +48,13 @@ Then, let's create a webhook notification:
 
 ```json
 {
-  "records": {
+  "records": [
+    {
     "message": "{{ msg }}",
     "monitor.name": "{{ monitorJSON['name'] }}",
-    "heartbeat.status": "{{ heartbeatJSON['status'] }}",
-  }
+    "heartbeat.status": "{{ heartbeatJSON['status'] }}"
+    }
+  ]
 }
 ```
 
