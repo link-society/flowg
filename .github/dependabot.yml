@@ -79,8 +79,21 @@ updates:
         patterns:
           - "*"
 
+  - package-ecosystem: "npm"
+    directory: "/docs/slides"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: ":arrow_up: "
+    labels:
+      - "deps: javascript"
+    groups:
+      slides:
+        patterns:
+          - "*"
+
   - package-ecosystem: "pip"
-    directory: "/tests/e2e/web"
+    directory: "/tests"
     schedule:
       interval: "weekly"
     commit-message:
@@ -88,6 +101,7 @@ updates:
     labels:
       - "deps: tests"
     groups:
-      pip:
+      tests:
         patterns:
           - "*"
+
