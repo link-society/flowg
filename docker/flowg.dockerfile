@@ -68,6 +68,7 @@ RUN mkdir -p /workspace/web/app
 WORKDIR /workspace/web/app
 
 COPY --from=sources-js /src/web/app/package.json /workspace/web/app
+COPY --from=sources-js /src/web/app/package-lock.json /workspace/web/app
 RUN npm i
 
 COPY --from=sources-js /src /workspace
