@@ -13,17 +13,21 @@ import (
 	"link-society.com/flowg/internal/models"
 
 	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/internal/utils/client/flags"
 	"link-society.com/flowg/internal/utils/client/log"
 	"link-society.com/flowg/internal/utils/client/sse"
 )
 
 func NewStreamWatchCommand() *cobra.Command {
 	type options struct {
-		name   string
-		filter string
+		name     string
+		filter   string
+		indexing flags.IndexMap
 	}
 
-	opts := &options{}
+	opts := &options{
+		indexing: make(flags.IndexMap),
+	}
 
 	cmd := &cobra.Command{
 		Use:   "watch",
@@ -42,6 +46,17 @@ func NewStreamWatchCommand() *cobra.Command {
 
 			if opts.filter != "" {
 				queryset.Set("filter", opts.filter)
+			}
+
+			if len(opts.indexing) > 0 {
+				payload, err := json.Marshal(opts.indexing)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "ERROR: Could not encode indexing parameters: %v\n", err)
+					ExitCode = 1
+					return
+				}
+
+				queryset.Set("indexing", string(payload))
 			}
 
 			req.URL.RawQuery = queryset.Encode()
@@ -111,6 +126,12 @@ func NewStreamWatchCommand() *cobra.Command {
 		"filter",
 		"",
 		"Filter logs",
+	)
+
+	cmd.Flags().Var(
+		&opts.indexing,
+		"index",
+		"Indexing key-value pairs to filter logs (can be specified multiple times)",
 	)
 
 	return cmd
