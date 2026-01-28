@@ -14,18 +14,22 @@ import (
 	"link-society.com/flowg/api"
 
 	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/internal/utils/client/flags"
 	"link-society.com/flowg/internal/utils/client/log"
 	"link-society.com/flowg/internal/utils/timex"
 )
 
 func NewStreamTailCommand() *cobra.Command {
 	type options struct {
-		name   string
-		filter string
-		period string
+		name     string
+		filter   string
+		period   string
+		indexing flags.IndexMap
 	}
 
-	opts := &options{}
+	opts := &options{
+		indexing: make(flags.IndexMap),
+	}
 
 	cmd := &cobra.Command{
 		Use:   "tail",
@@ -54,6 +58,17 @@ func NewStreamTailCommand() *cobra.Command {
 
 			if opts.filter != "" {
 				queryset.Set("filter", opts.filter)
+			}
+
+			if len(opts.indexing) > 0 {
+				payload, err := json.Marshal(opts.indexing)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "ERROR: Could not encode indexing parameters: %v\n", err)
+					ExitCode = 1
+					return
+				}
+
+				queryset.Set("indexing", string(payload))
 			}
 
 			queryset.Set("from", from.Format(time.RFC3339))
@@ -115,6 +130,12 @@ func NewStreamTailCommand() *cobra.Command {
 		"period",
 		"15m",
 		"Timespan to fetch logs for",
+	)
+
+	cmd.Flags().Var(
+		&opts.indexing,
+		"index",
+		"Indexing key-value pairs to filter logs (can be specified multiple times)",
 	)
 
 	return cmd
