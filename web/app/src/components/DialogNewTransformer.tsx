@@ -36,7 +36,7 @@ const DialogNewTransformer = ({
       slotProps={{
         paper: {
           component: 'form',
-          onSubmit: (e: React.FormEvent<HTMLFormElement>) => {
+          onSubmit: (e: React.SubmitEvent<HTMLFormElement>) => {
             e.preventDefault()
             onSubmit()
           },
