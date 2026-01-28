@@ -91,7 +91,6 @@ const StreamDetailView = () => {
 
   const [fetchLogs, loading] = useApiOperation(
     async (filter: string, from: Date, to: Date, live: boolean) => {
-      console.log(selectedIndices)
       const logs = await logApi.queryLogs(
         currentStream,
         from,
@@ -192,7 +191,10 @@ const StreamDetailView = () => {
           currentItem={currentStream}
         />
       </Grid>
-      <Grid size={{ xs: 8 }} className="flex flex-col items-stretch gap-2">
+      <Grid
+        size={{ xs: Object.keys(indices).length > 0 ? 8 : 10 }}
+        className="flex flex-col items-stretch gap-2"
+      >
         <Paper>
           <LogQueryPanel loading={loading} onFetchRequested={fetchLogs} />
           <Divider />
@@ -205,13 +207,15 @@ const StreamDetailView = () => {
 
         <LogTable rowData={rowData} columnDefs={columnDefs} />
       </Grid>
-      <Grid size={{ xs: 2 }} className="h-full">
-        <StreamIndexSelector
-          indices={indices}
-          selection={selectedIndices}
-          onSelectionChange={setSelectedIndices}
-        />
-      </Grid>
+      {Object.keys(indices).length > 0 && (
+        <Grid size={{ xs: 2 }} className="h-full">
+          <StreamIndexSelector
+            indices={indices}
+            selection={selectedIndices}
+            onSelectionChange={setSelectedIndices}
+          />
+        </Grid>
+      )}
     </Grid>
   )
 }
