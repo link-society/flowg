@@ -22,6 +22,7 @@ type logMessage struct {
 	pipelineName string
 	entrypoint   string
 	record       *models.LogRecord
+	tracer       *NodeTracer
 }
 
 type invalidateCacheMessage struct {
@@ -44,6 +45,10 @@ func (msg logMessage) handle(ctx context.Context, w *worker) {
 		}
 
 		ctx := context.WithValue(ctx, workerKey, w)
+		if msg.tracer != nil {
+			ctx = WithTracer(ctx, msg.tracer)
+		}
+
 		err = pipeline.Process(ctx, msg.entrypoint, msg.record)
 		msg.replyTo <- err
 	}()

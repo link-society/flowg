@@ -97,6 +97,7 @@ func (r *runnerImpl) Run(
 		pipelineName: pipelineName,
 		entrypoint:   entrypoint,
 		record:       record,
+		tracer:       GetTracer(ctx),
 	})
 	if err != nil {
 		return err
