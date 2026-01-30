@@ -155,6 +155,7 @@ func NewHandler(deps Dependencies) http.Handler {
 
 		r.Post("/api/v1/test/transformer", ctrl.TestTransformerUsecase())
 		r.Post("/api/v1/test/forwarders/{forwarder}", ctrl.TestForwarderUsecase())
+		r.Post("/api/v1/test/pipeline/{pipeline}", ctrl.TestPipelineUsecase())
 
 		service.OpenAPICollector.AnnotateOperation(
 			"GET", "/api/v1/backup/auth",

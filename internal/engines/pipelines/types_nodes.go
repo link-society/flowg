@@ -6,7 +6,6 @@ import (
 	"sync"
 
 	"link-society.com/flowg/internal/app/metrics"
-
 	"link-society.com/flowg/internal/models"
 
 	"link-society.com/flowg/internal/utils/langs/filtering"
@@ -75,6 +74,15 @@ func (n *SourceNode) Process(ctx context.Context, record *models.LogRecord) erro
 	errC := make(chan error, len(n.Next))
 	wg := sync.WaitGroup{}
 
+	tracer := GetTracer(ctx)
+	if tracer != nil {
+		tracer.Trace = append(tracer.Trace, NodeTrace{
+			NodeID: n.ID,
+			Input:  record.Fields,
+			Output: nil,
+		})
+	}
+
 	for _, next := range n.Next {
 		wg.Add(1)
 		go func(next Node) {
@@ -122,6 +130,15 @@ func (n *TransformNode) Process(ctx context.Context, record *models.LogRecord) e
 	errC := make(chan error, len(n.Next))
 	wg := sync.WaitGroup{}
 
+	tracer := GetTracer(ctx)
+	if tracer != nil {
+		tracer.Trace = append(tracer.Trace, NodeTrace{
+			NodeID: n.ID,
+			Input:  record.Fields,
+			Output: output,
+		})
+	}
+
 	for _, next := range n.Next {
 		wg.Add(1)
 		go func(next Node) {
@@ -131,6 +148,7 @@ func (n *TransformNode) Process(ctx context.Context, record *models.LogRecord) e
 				Timestamp: record.Timestamp,
 				Fields:    output,
 			}
+
 			err := next.Process(ctx, newEntry)
 			if err != nil {
 				errC <- err
@@ -168,6 +186,22 @@ func (n *SwitchNode) Process(ctx context.Context, record *models.LogRecord) erro
 	matches, err := n.runner.Evaluate(record)
 	if err != nil {
 		return err
+	}
+
+	tracer := GetTracer(ctx)
+
+	if tracer != nil {
+		trace := NodeTrace{
+			NodeID: n.ID,
+			Input:  record.Fields,
+			Output: nil,
+		}
+
+		if matches {
+			trace.Output = record.Fields
+		}
+
+		tracer.Trace = append(tracer.Trace, trace)
 	}
 
 	if matches {
@@ -212,6 +246,18 @@ func (n *PipelineNode) Close(ctx context.Context) error {
 
 func (n *PipelineNode) Process(ctx context.Context, record *models.LogRecord) error {
 	w := getWorker(ctx)
+
+	tracer := GetTracer(ctx)
+	if tracer != nil {
+		tracer.Trace = append(tracer.Trace, NodeTrace{
+			NodeID: n.ID,
+			Input:  record.Fields,
+			Output: nil,
+		})
+
+		return nil
+	}
+
 	pipeline, err := w.getOrBuildPipeline(ctx, n.Pipeline)
 	if err != nil {
 		return err
@@ -230,6 +276,16 @@ func (n *ForwardNode) Close(ctx context.Context) error {
 }
 
 func (n *ForwardNode) Process(ctx context.Context, record *models.LogRecord) error {
+	tracer := GetTracer(ctx)
+	if tracer != nil {
+		tracer.Trace = append(tracer.Trace, NodeTrace{
+			NodeID: n.ID,
+			Input:  record.Fields,
+			Output: nil,
+		})
+		return nil
+	}
+
 	return n.Forwarder.Call(ctx, record)
 }
 
@@ -244,6 +300,16 @@ func (n *RouterNode) Close(ctx context.Context) error {
 
 func (n *RouterNode) Process(ctx context.Context, record *models.LogRecord) error {
 	w := getWorker(ctx)
+
+	tracer := GetTracer(ctx)
+	if tracer != nil {
+		tracer.Trace = append(tracer.Trace, NodeTrace{
+			NodeID: n.ID,
+			Input:  record.Fields,
+			Output: nil,
+		})
+		return nil
+	}
 
 	key, err := w.logStorage.Ingest(ctx, n.Stream, record)
 	if err == nil {

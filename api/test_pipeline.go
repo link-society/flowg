@@ -4,9 +4,6 @@ import (
 	"context"
 	"log/slog"
 
-	"strings"
-	"time"
-
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
@@ -18,45 +15,31 @@ import (
 	"link-society.com/flowg/internal/engines/pipelines"
 )
 
-type IngestLogsTextRequest struct {
-	Pipeline string `path:"pipeline" minLength:"1"`
-	TextBody string `contentType:"text/plain"`
+type TestPipelineRequest struct {
+	Pipeline string              `path:"pipeline" minLength:"1"`
+	Records  []map[string]string `json:"records" required:"true"`
 }
-type IngestLogsTextResponse struct {
-	Success        bool `json:"success"`
-	ProcessedCount int  `json:"processed_count"`
+type TestPipelineResponse struct {
+	Success bool                  `json:"success"`
+	Trace   []pipelines.NodeTrace `json:"trace"`
 }
 
-func (ctrl *controller) IngestLogsTextUsecase() usecase.Interactor {
+func (ctrl *controller) TestPipelineUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
 		apiUtils.RequireScopeApiDecorator(
 			ctrl.deps.AuthStorage,
 			models.SCOPE_SEND_LOGS,
 			func(
 				ctx context.Context,
-				req IngestLogsTextRequest,
-				resp *IngestLogsTextResponse,
+				req TestPipelineRequest,
+				resp *TestPipelineResponse,
 			) error {
+				tracer := pipelines.NodeTracer{}
+				ctx = pipelines.WithTracer(ctx, &tracer)
 				logging.MarkSensitive(ctx)
 
-				lines := strings.Split(strings.ReplaceAll(req.TextBody, "\r\n", "\n"), "\n")
-				var messages []string
-
-				for _, line := range lines {
-					line = strings.TrimSpace(line)
-					if line != "" {
-						messages = append(messages, line)
-					}
-				}
-
-				for _, message := range messages {
-					record := &models.LogRecord{
-						Timestamp: time.Now(),
-						Fields: map[string]string{
-							"content": message,
-						},
-					}
-
+				for _, recordData := range req.Records {
+					record := models.NewLogRecord(recordData)
 					err := ctrl.deps.PipelineRunner.Run(
 						ctx,
 						req.Pipeline,
@@ -83,17 +66,17 @@ func (ctrl *controller) IngestLogsTextUsecase() usecase.Interactor {
 				}
 
 				resp.Success = true
-				resp.ProcessedCount = len(messages)
+				resp.Trace = tracer.Trace
 
 				return nil
 			},
 		),
 	)
 
-	u.SetName("ingest_logs_text")
-	u.SetTitle("Ingest Textual Logs")
-	u.SetDescription("Run textual logs through a pipeline")
-	u.SetTags("pipelines")
+	u.SetName("test_pipeline")
+	u.SetTitle("Test the pipeline")
+	u.SetDescription("Test running structured logs through a pipeline")
+	u.SetTags("tests")
 
 	u.SetExpectedErrors(status.PermissionDenied, status.Internal)
 
