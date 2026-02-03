@@ -43,12 +43,12 @@ function HomepageHeader() {
           </Link>
         </div>
         <div className={styles.news}>
-          <a href="https://osmc.de/talks/easy-logging-refinement-with-flowg/">
+          <Link to="/blog/osmc-2025-video">
             🚩
-            FlowG will be presented at the <b>OpenSource Monitoring Conference</b> in
-            Nuremberg, Germany this November.
+            Check out the video of the FlowG talk at the
+            <b>OpenSource Monitoring Conference 2025</b>.
             🚩
-          </a>
+          </Link>
         </div>
       </div>
     </header>
