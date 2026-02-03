@@ -48,6 +48,7 @@ func Build(ctx context.Context, configStorage config.Storage, name string) (*Pip
 			}
 
 			pipelineNode := &TransformNode{
+				ID:          flowNode.ID,
 				Transformer: transformer,
 			}
 			pipelineNodes[flowNode.ID] = pipelineNode
@@ -62,6 +63,7 @@ func Build(ctx context.Context, configStorage config.Storage, name string) (*Pip
 			}
 
 			pipelineNode := &SwitchNode{
+				ID:        flowNode.ID,
 				Condition: condition,
 			}
 			pipelineNodes[flowNode.ID] = pipelineNode
@@ -76,6 +78,7 @@ func Build(ctx context.Context, configStorage config.Storage, name string) (*Pip
 			}
 
 			pipelineNode := &PipelineNode{
+				ID:       flowNode.ID,
 				Pipeline: pipeline,
 			}
 			pipelineNodes[flowNode.ID] = pipelineNode
@@ -95,6 +98,7 @@ func Build(ctx context.Context, configStorage config.Storage, name string) (*Pip
 			}
 
 			pipelineNode := &ForwardNode{
+				ID:        flowNode.ID,
 				Forwarder: forwarder,
 			}
 			pipelineNodes[flowNode.ID] = pipelineNode
@@ -109,6 +113,7 @@ func Build(ctx context.Context, configStorage config.Storage, name string) (*Pip
 			}
 
 			pipelineNode := &RouterNode{
+				ID:     flowNode.ID,
 				Stream: stream,
 			}
 			pipelineNodes[flowNode.ID] = pipelineNode
@@ -119,7 +124,9 @@ func Build(ctx context.Context, configStorage config.Storage, name string) (*Pip
 				sourceType = DIRECT_ENTRYPOINT
 			}
 
-			pipelineNode := &SourceNode{}
+			pipelineNode := &SourceNode{
+				ID: flowNode.ID,
+			}
 			pipelineNodes[flowNode.ID] = pipelineNode
 			sourceNodeTypes[flowNode.ID] = sourceType
 			entrypointNodes[sourceType] = pipelineNode

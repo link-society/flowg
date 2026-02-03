@@ -20,10 +20,12 @@ type Node interface {
 }
 
 type SourceNode struct {
+	ID   string
 	Next []Node
 }
 
 type TransformNode struct {
+	ID          string
 	Transformer string
 	Next        []Node
 
@@ -31,6 +33,7 @@ type TransformNode struct {
 }
 
 type SwitchNode struct {
+	ID        string
 	Condition string
 	Next      []Node
 
@@ -38,14 +41,17 @@ type SwitchNode struct {
 }
 
 type PipelineNode struct {
+	ID       string
 	Pipeline string
 }
 
 type ForwardNode struct {
+	ID        string
 	Forwarder *models.ForwarderV2
 }
 
 type RouterNode struct {
+	ID     string
 	Stream string
 }
 
