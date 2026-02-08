@@ -155,7 +155,7 @@ func NewManager(opts ManagerOptions) fx.Option {
 
 				localNodeID:   opts.NodeID,
 				localEndpoint: localEndpoint,
-				endpoints:     make(map[string]*url.URL),
+				endpoints:     newEndpointCache(),
 
 				notifyC: make(chan notification, 1000),
 			}, nil
@@ -249,7 +249,7 @@ func NewManager(opts ManagerOptions) fx.Option {
 						return actor.WorkerEnd
 					}
 
-					d.Delegate.endpoints[joinNode.JoinNodeID] = joinNode.JoinNodeEndpoint
+					d.Delegate.endpoints.Set(joinNode.JoinNodeID, joinNode.JoinNodeEndpoint)
 					_, err := d.Memberlist.Join([]string{joinNode.Address()})
 					if err != nil {
 						d.Delegate.logger.Error(

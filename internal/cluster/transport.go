@@ -78,7 +78,7 @@ func (t *httpTransport) WriteToAddress(b []byte, addr memberlist.Address) (time.
 		return time.Time{}, fmt.Errorf("empty node name")
 	}
 
-	endpoint, ok := t.delegate.endpoints[addr.Name]
+	endpoint, ok := t.delegate.endpoints.Get(addr.Name)
 	if !ok {
 		return time.Time{}, fmt.Errorf("endpoint not found for %s", addr.Name)
 	}
@@ -121,7 +121,7 @@ func (t *httpTransport) DialAddressTimeout(addr memberlist.Address, timeout time
 		return nil, fmt.Errorf("empty node name")
 	}
 
-	endpoint, ok := t.delegate.endpoints[addr.Name]
+	endpoint, ok := t.delegate.endpoints.Get(addr.Name)
 	if !ok {
 		return nil, fmt.Errorf("endpoint not found for %s", addr.Name)
 	}
@@ -216,7 +216,7 @@ func (t *httpTransport) handleStatus(w http.ResponseWriter, r *http.Request) {
 		Nodes []nodeInfo `json:"nodes"`
 	}
 
-	for nodeID, endpoint := range t.delegate.endpoints {
+	for nodeID, endpoint := range t.delegate.endpoints.All() {
 		payload.Nodes = append(payload.Nodes, nodeInfo{
 			NodeID:   nodeID,
 			Endpoint: endpoint.String(),
