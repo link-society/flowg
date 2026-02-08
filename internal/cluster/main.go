@@ -14,9 +14,6 @@ import (
 
 	"github.com/hashicorp/memberlist"
 
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
-	"link-society.com/flowg/internal/storage/log"
 	"link-society.com/flowg/internal/utils/kvstore"
 )
 
@@ -40,9 +37,6 @@ type deps struct {
 	fx.In
 
 	ClusterStateStorage kvstore.Storage `name:"cluster.state"`
-	AuthStorage         auth.Storage
-	ConfigStorage       config.Storage
-	LogStorage          log.Storage
 }
 
 var _ Manager = (*managerImpl)(nil)
@@ -157,7 +151,6 @@ func NewManager(opts ManagerOptions) fx.Option {
 			delegate *delegate,
 			connM actor.Mailbox[net.Conn],
 			packetM actor.Mailbox[*memberlist.Packet],
-			deps deps,
 		) *httpTransport {
 			return &httpTransport{
 				delegate: delegate,
@@ -165,10 +158,6 @@ func NewManager(opts ManagerOptions) fx.Option {
 
 				connM:   connM,
 				packetM: packetM,
-
-				authStorage:   deps.AuthStorage,
-				configStorage: deps.ConfigStorage,
-				logStorage:    deps.LogStorage,
 			}
 		}),
 		fx.Provide(func(
