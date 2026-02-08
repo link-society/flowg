@@ -14,7 +14,7 @@ import (
 
 	"github.com/hashicorp/memberlist"
 
-	"link-society.com/flowg/internal/utils/kvstore"
+	clusterstate "link-society.com/flowg/internal/storage/cluster-state"
 )
 
 type Manager interface {
@@ -34,22 +34,16 @@ type managerImpl struct {
 	notifyM actor.Mailbox[notification]
 }
 
-type deps struct {
-	fx.In
-
-	ClusterStateStorage kvstore.Storage `name:"cluster.state"`
-}
-
 var _ Manager = (*managerImpl)(nil)
 
 func NewManager(opts ManagerOptions) fx.Option {
-	kvOpts := kvstore.DefaultOptions()
-	kvOpts.LogChannel = "cluster.state"
-	kvOpts.Directory = opts.ClusterStateDir
-
 	return fx.Module(
 		"cluster.manager",
-		kvstore.NewStorage(kvOpts),
+		clusterstate.NewStorage(func() clusterstate.Options {
+			clusterStateOpts := clusterstate.DefaultOptions()
+			clusterStateOpts.Directory = opts.ClusterStateDir
+			return clusterStateOpts
+		}()),
 		fx.Provide(func(lc fx.Lifecycle) actor.Mailbox[notification] {
 			mbox := actor.NewMailbox[notification]()
 
