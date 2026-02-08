@@ -19,7 +19,6 @@ import (
 
 	"github.com/vladopajic/go-actor/actor"
 
-	"link-society.com/flowg/internal/storage"
 	"link-society.com/flowg/internal/storage/auth"
 	"link-society.com/flowg/internal/storage/config"
 	"link-society.com/flowg/internal/storage/log"
@@ -211,9 +210,6 @@ func (t *httpTransport) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	mux.HandleFunc("GET /cluster/nodes", t.handleStatus)
 	mux.HandleFunc("POST /cluster/gossip", t.handleGossip)
-	mux.HandleFunc("POST /cluster/sync/auth", t.handleSync(t.authStorage, "auth"))
-	mux.HandleFunc("POST /cluster/sync/config", t.handleSync(t.configStorage, "config"))
-	mux.HandleFunc("POST /cluster/sync/log", t.handleSync(t.logStorage, "log"))
 
 	mux.ServeHTTP(w, r)
 }
@@ -345,48 +341,4 @@ func (t *httpTransport) handleGossipPacket(w http.ResponseWriter, r *http.Reques
 	}
 
 	w.WriteHeader(http.StatusAccepted)
-}
-
-func (t *httpTransport) handleSync(s storage.Streamable, dbType string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if t.cookie != "" && r.Header.Get(COOKIE_HEADER_NAME) != t.cookie {
-			http.Error(w, "invalid cluster key", http.StatusUnauthorized)
-			return
-		}
-
-		remoteNodeID := r.Header.Get(NODEID_HEADER_NAME)
-		if remoteNodeID == "" {
-			message := fmt.Sprintf("missing %s header", NODEID_HEADER_NAME)
-			http.Error(w, message, http.StatusBadRequest)
-			return
-		}
-
-		if err := s.Load(r.Context(), r.Body); err != nil {
-			message := fmt.Sprintf("failed to load data: %v", err)
-			http.Error(w, message, http.StatusInternalServerError)
-			return
-		}
-
-		since, err := strconv.ParseUint(r.Trailer.Get(SINCE_HEADER_NAME), 10, 64)
-		if err != nil {
-			message := fmt.Sprintf("failed to parse %s header: %v", SINCE_HEADER_NAME, err)
-			http.Error(w, message, http.StatusBadRequest)
-			return
-		}
-
-		err = updateLocalState(
-			r.Context(),
-			t.delegate.clusterStateStorage,
-			remoteNodeID,
-			dbType,
-			since,
-		)
-		if err != nil {
-			message := fmt.Sprintf("failed to update local state: %v", err)
-			http.Error(w, message, http.StatusInternalServerError)
-			return
-		}
-
-		w.WriteHeader(http.StatusOK)
-	}
 }
