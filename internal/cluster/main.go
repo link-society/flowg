@@ -17,11 +17,16 @@ import (
 	"link-society.com/flowg/internal/storage/auth"
 	"link-society.com/flowg/internal/storage/config"
 	"link-society.com/flowg/internal/storage/log"
+
+	"link-society.com/flowg/internal/engines/pipelines"
+
 	"link-society.com/flowg/internal/utils/kvstore"
 )
 
 type Manager interface {
 	HttpHandler() http.Handler
+
+	BroadcastInvalidatePipelineCache(ctx context.Context, pipelineName string) error
 }
 
 type ManagerOptions struct {
@@ -33,8 +38,11 @@ type ManagerOptions struct {
 }
 
 type managerImpl struct {
-	handler http.Handler
+	handler    http.Handler
+	broadcastM actor.MailboxSender[broadcastMessage]
 }
+
+var _ Manager = (*managerImpl)(nil)
 
 type deps struct {
 	fx.In
@@ -43,6 +51,8 @@ type deps struct {
 	AuthStorage         auth.Storage
 	ConfigStorage       config.Storage
 	LogStorage          log.Storage
+
+	PipelineRunner pipelines.Runner
 }
 
 var _ Manager = (*managerImpl)(nil)
@@ -55,6 +65,22 @@ func NewManager(opts ManagerOptions) fx.Option {
 	return fx.Module(
 		"cluster.manager",
 		kvstore.NewStorage(kvOpts),
+		fx.Provide(func(lc fx.Lifecycle) actor.Mailbox[broadcastMessage] {
+			mbox := actor.NewMailbox[broadcastMessage]()
+
+			lc.Append(fx.Hook{
+				OnStart: func(ctx context.Context) error {
+					mbox.Start()
+					return nil
+				},
+				OnStop: func(ctx context.Context) error {
+					mbox.Stop()
+					return nil
+				},
+			})
+
+			return mbox
+		}),
 		fx.Provide(func(lc fx.Lifecycle) actor.Mailbox[net.Conn] {
 			mbox := actor.NewMailbox[net.Conn]()
 
@@ -170,6 +196,9 @@ func NewManager(opts ManagerOptions) fx.Option {
 
 					workers: make(map[string]*syncActor),
 				},
+
+				broadcasts:     &memberlist.TransmitLimitedQueue{},
+				pipelineRunner: deps.PipelineRunner,
 			}, nil
 		}),
 		fx.Provide(func(
@@ -226,6 +255,7 @@ func NewManager(opts ManagerOptions) fx.Option {
 		fx.Provide(func(
 			lc fx.Lifecycle,
 			joinM actor.Mailbox[*ClusterJoinNode],
+			broadcastM actor.Mailbox[broadcastMessage],
 			delegate *delegate,
 			mlist *memberlist.Memberlist,
 			transport *httpTransport,
@@ -234,6 +264,24 @@ func NewManager(opts ManagerOptions) fx.Option {
 				select {
 				case <-ctx.Done():
 					return actor.WorkerEnd
+
+				case msg, ok := <-broadcastM.ReceiveC():
+					if !ok {
+						return actor.WorkerEnd
+					}
+
+					delegate.broadcasts.QueueBroadcast(msg)
+
+					return actor.WorkerContinue
+
+				case msg, ok := <-delegate.broadcastInbox:
+					if !ok {
+						return actor.WorkerEnd
+					}
+
+					msg.Handle(ctx, delegate)
+
+					return actor.WorkerContinue
 
 				case joinNode, ok := <-joinM.ReceiveC():
 					if !ok {
@@ -268,7 +316,10 @@ func NewManager(opts ManagerOptions) fx.Option {
 				},
 			})
 
-			return &managerImpl{handler: transport}
+			return &managerImpl{
+				handler:    transport,
+				broadcastM: broadcastM,
+			}
 		}),
 		fx.Invoke(func(_ struct {
 			fx.In
@@ -281,4 +332,12 @@ func NewManager(opts ManagerOptions) fx.Option {
 
 func (m *managerImpl) HttpHandler() http.Handler {
 	return m.handler
+}
+
+func (m *managerImpl) BroadcastInvalidatePipelineCache(ctx context.Context, pipelineName string) error {
+	msg := &invalidatePipelineBuildCache{
+		pipelineName: pipelineName,
+	}
+
+	return m.broadcastM.Send(ctx, msg)
 }
