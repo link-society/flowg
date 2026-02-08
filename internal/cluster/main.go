@@ -151,25 +151,6 @@ func NewManager(opts ManagerOptions) fx.Option {
 				localNodeID:   opts.NodeID,
 				localEndpoint: localEndpoint,
 				endpoints:     make(map[string]*url.URL),
-
-				clusterStateStorage: deps.ClusterStateStorage,
-
-				syncPool: &syncPool{
-					logger: slog.Default().With(
-						slog.String("channel", "cluster.replication"),
-						slog.String("cluster.local.node", opts.NodeID),
-						slog.String("cluster.local.endpoint", localEndpoint.String()),
-					),
-
-					nodeID: opts.NodeID,
-					cookie: opts.Cookie,
-
-					authStorage:   deps.AuthStorage,
-					configStorage: deps.ConfigStorage,
-					logStorage:    deps.LogStorage,
-
-					workers: make(map[string]*syncActor),
-				},
 			}, nil
 		}),
 		fx.Provide(func(
@@ -211,8 +192,6 @@ func NewManager(opts ManagerOptions) fx.Option {
 
 			lc.Append(fx.Hook{
 				OnStop: func(ctx context.Context) error {
-					delegate.syncPool.RemoveAll()
-
 					if err := mlist.Leave(5 * time.Second); err != nil {
 						return err
 					}
