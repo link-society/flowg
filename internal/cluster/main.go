@@ -31,6 +31,7 @@ type ManagerOptions struct {
 
 type managerImpl struct {
 	handler http.Handler
+	notifyM actor.Mailbox[notification]
 }
 
 type deps struct {
@@ -49,6 +50,22 @@ func NewManager(opts ManagerOptions) fx.Option {
 	return fx.Module(
 		"cluster.manager",
 		kvstore.NewStorage(kvOpts),
+		fx.Provide(func(lc fx.Lifecycle) actor.Mailbox[notification] {
+			mbox := actor.NewMailbox[notification]()
+
+			lc.Append(fx.Hook{
+				OnStart: func(ctx context.Context) error {
+					mbox.Start()
+					return nil
+				},
+				OnStop: func(ctx context.Context) error {
+					mbox.Stop()
+					return nil
+				},
+			})
+
+			return mbox
+		}),
 		fx.Provide(func(lc fx.Lifecycle) actor.Mailbox[net.Conn] {
 			mbox := actor.NewMailbox[net.Conn]()
 
@@ -125,7 +142,7 @@ func NewManager(opts ManagerOptions) fx.Option {
 			},
 			fx.ResultTags(`name:"cluster.manager.formation"`),
 		)),
-		fx.Provide(func(deps deps, listener *Listener) (*delegate, error) {
+		fx.Provide(func(listener *Listener) (*delegate, error) {
 			var err error
 
 			localEndpoint, err := listener.ResolveLocalEndpoint()
@@ -145,6 +162,8 @@ func NewManager(opts ManagerOptions) fx.Option {
 				localNodeID:   opts.NodeID,
 				localEndpoint: localEndpoint,
 				endpoints:     make(map[string]*url.URL),
+
+				notifyC: make(chan notification, 1000),
 			}, nil
 		}),
 		fx.Provide(func(
@@ -191,27 +210,55 @@ func NewManager(opts ManagerOptions) fx.Option {
 
 			return mlist, nil
 		}),
-		fx.Provide(func(
-			lc fx.Lifecycle,
-			joinM actor.Mailbox[*ClusterJoinNode],
-			delegate *delegate,
-			mlist *memberlist.Memberlist,
-			transport *httpTransport,
-		) Manager {
+		fx.Provide(func(d struct {
+			fx.In
+
+			LC fx.Lifecycle
+
+			JoinM   actor.Mailbox[*ClusterJoinNode]
+			NotifyM actor.Mailbox[notification]
+
+			Delegate   *delegate
+			Memberlist *memberlist.Memberlist
+			Transport  *httpTransport
+		}) Manager {
 			worker := actor.NewWorker(func(ctx actor.Context) actor.WorkerStatus {
 				select {
 				case <-ctx.Done():
 					return actor.WorkerEnd
 
-				case joinNode, ok := <-joinM.ReceiveC():
+				case msg, ok := <-d.NotifyM.ReceiveC():
 					if !ok {
 						return actor.WorkerEnd
 					}
 
-					delegate.endpoints[joinNode.JoinNodeID] = joinNode.JoinNodeEndpoint
-					_, err := mlist.Join([]string{joinNode.Address()})
+					payload := msg.Marshal()
+					for _, node := range d.Memberlist.Members() {
+						if node.Name != d.Delegate.localNodeID {
+							go d.Memberlist.SendReliable(node, payload)
+						}
+					}
+
+					return actor.WorkerContinue
+
+				case msg, ok := <-d.Delegate.notifyC:
+					if !ok {
+						return actor.WorkerEnd
+					}
+
+					msg.Handle(ctx, d.Delegate)
+
+					return actor.WorkerContinue
+
+				case joinNode, ok := <-d.JoinM.ReceiveC():
+					if !ok {
+						return actor.WorkerEnd
+					}
+
+					d.Delegate.endpoints[joinNode.JoinNodeID] = joinNode.JoinNodeEndpoint
+					_, err := d.Memberlist.Join([]string{joinNode.Address()})
 					if err != nil {
-						delegate.logger.Error(
+						d.Delegate.logger.Error(
 							"failed to join cluster node",
 							slog.String("cluster.join.node", joinNode.JoinNodeID),
 							slog.String("cluster.join.address", joinNode.Address()),
@@ -225,7 +272,7 @@ func NewManager(opts ManagerOptions) fx.Option {
 			})
 			a := actor.New(worker)
 
-			lc.Append(fx.Hook{
+			d.LC.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {
 					a.Start()
 					return nil
@@ -236,7 +283,7 @@ func NewManager(opts ManagerOptions) fx.Option {
 				},
 			})
 
-			return &managerImpl{handler: transport}
+			return &managerImpl{handler: d.Transport, notifyM: d.NotifyM}
 		}),
 		fx.Invoke(func(_ struct {
 			fx.In

@@ -14,6 +14,8 @@ type delegate struct {
 	localNodeID   string
 	localEndpoint *url.URL
 	endpoints     map[string]*url.URL
+
+	notifyC chan notification
 }
 
 var _ memberlist.Delegate = (*delegate)(nil)
@@ -22,8 +24,15 @@ func (d *delegate) NodeMeta(int) []byte {
 	return []byte(d.localEndpoint.String())
 }
 
-func (d *delegate) NotifyMsg([]byte) {
-	// No-op
+func (d *delegate) NotifyMsg(msg []byte) {
+	if msg, err := parseNotification(msg); err != nil {
+		d.logger.Error(
+			"failed to parse notification message",
+			slog.String("error", err.Error()),
+		)
+	} else {
+		d.notifyC <- msg
+	}
 }
 
 func (d *delegate) GetBroadcasts(overhead, limit int) [][]byte {
