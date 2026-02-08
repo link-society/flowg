@@ -19,10 +19,6 @@ import (
 
 	"github.com/vladopajic/go-actor/actor"
 
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
-	"link-society.com/flowg/internal/storage/log"
-
 	"github.com/hashicorp/memberlist"
 )
 
@@ -38,10 +34,6 @@ type httpTransport struct {
 
 	connM   actor.Mailbox[net.Conn]
 	packetM actor.Mailbox[*memberlist.Packet]
-
-	authStorage   auth.Storage
-	configStorage config.Storage
-	logStorage    log.Storage
 }
 
 var _ memberlist.Transport = (*httpTransport)(nil)
