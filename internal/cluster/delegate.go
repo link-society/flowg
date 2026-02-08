@@ -13,7 +13,7 @@ type delegate struct {
 
 	localNodeID   string
 	localEndpoint *url.URL
-	endpoints     map[string]*url.URL
+	endpoints     *endpointCache
 
 	notifyC chan notification
 }
@@ -66,7 +66,7 @@ func (d *delegate) NotifyJoin(node *memberlist.Node) {
 		return
 	}
 
-	d.endpoints[node.Name] = endpointUrl
+	d.endpoints.Set(node.Name, endpointUrl)
 }
 
 func (d *delegate) NotifyLeave(node *memberlist.Node) {
@@ -76,7 +76,7 @@ func (d *delegate) NotifyLeave(node *memberlist.Node) {
 		slog.String("cluster.remote.endpoint", string(node.Meta)),
 	)
 
-	delete(d.endpoints, node.Name)
+	d.endpoints.Delete(node.Name)
 }
 
 func (d *delegate) NotifyUpdate(node *memberlist.Node) {

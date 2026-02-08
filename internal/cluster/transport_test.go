@@ -28,7 +28,7 @@ func TestFinalAdvertiseAddr_WithValidIPv4(t *testing.T) {
 				Scheme: "http",
 				Host:   "1.2.3.4:5678",
 			},
-			endpoints: make(map[string]*url.URL),
+			endpoints: newEndpointCache(),
 		},
 		cookie: "test",
 
@@ -58,7 +58,7 @@ func TestFinalAdvertiseAddr_WithValidIPv6(t *testing.T) {
 				Scheme: "http",
 				Host:   "[::1]:5678",
 			},
-			endpoints: make(map[string]*url.URL),
+			endpoints: newEndpointCache(),
 		},
 		cookie: "test",
 
@@ -88,7 +88,7 @@ func TestFinalAdvertiseAddr_WithInvalidHost(t *testing.T) {
 				Scheme: "http",
 				Host:   "invalid",
 			},
-			endpoints: make(map[string]*url.URL),
+			endpoints: newEndpointCache(),
 		},
 		cookie: "test",
 
@@ -110,7 +110,7 @@ func TestWriteToAddress_EmptyNodeName(t *testing.T) {
 				Scheme: "http",
 				Host:   "invalid",
 			},
-			endpoints: make(map[string]*url.URL),
+			endpoints: newEndpointCache(),
 		},
 		cookie: "test",
 
@@ -132,7 +132,7 @@ func TestWriteToAddress_EndpointNotFound(t *testing.T) {
 				Scheme: "http",
 				Host:   "invalid",
 			},
-			endpoints: make(map[string]*url.URL),
+			endpoints: newEndpointCache(),
 		},
 		cookie: "test",
 
@@ -162,14 +162,13 @@ func TestWriteToAddress_Valid(t *testing.T) {
 				Scheme: "http",
 				Host:   "invalid",
 			},
-			endpoints: map[string]*url.URL{
-				"node": {
-					Scheme: "http",
-					Host:   "1.2.3.4:5678",
-				},
-			},
+			endpoints: newEndpointCache(),
 		},
 	}
+	transport.delegate.endpoints.Set("node", &url.URL{
+		Scheme: "http",
+		Host:   "1.2.3.4:5678",
+	})
 
 	_, err := transport.WriteToAddress(nil, memberlist.Address{Name: "node"})
 	if err != nil {
@@ -184,13 +183,13 @@ func TestGossipStream(t *testing.T) {
 			Scheme: "http",
 			Host:   "127.0.0.1:9113",
 		},
-		endpoints: map[string]*url.URL{
-			"node": {
-				Scheme: "http",
-				Host:   "127.0.0.1:9113",
-			},
-		},
+		endpoints: newEndpointCache(),
 	}
+
+	delegate.endpoints.Set("node", &url.URL{
+		Scheme: "http",
+		Host:   "127.0.0.1:9113",
+	})
 
 	connM := actor.NewMailbox[net.Conn]()
 	connM.Start()
@@ -268,13 +267,13 @@ func TestGossipPacket(t *testing.T) {
 			Scheme: "http",
 			Host:   "127.0.0.1:9113",
 		},
-		endpoints: map[string]*url.URL{
-			"node": {
-				Scheme: "http",
-				Host:   "127.0.0.1:9113",
-			},
-		},
+		endpoints: newEndpointCache(),
 	}
+
+	delegate.endpoints.Set("node", &url.URL{
+		Scheme: "http",
+		Host:   "127.0.0.1:9113",
+	})
 
 	connM := actor.NewMailbox[net.Conn]()
 	connM.Start()
