@@ -6,8 +6,9 @@ import (
 	"github.com/vladopajic/go-actor/actor"
 	"go.uber.org/fx"
 
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/utils/fxproviders"
 
+	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage/config"
 	"link-society.com/flowg/internal/storage/log"
 
@@ -15,17 +16,23 @@ import (
 )
 
 type Runner interface {
+	actor.Actor
+
 	Run(ctx context.Context, pipelineName string, entrypoint string, record *models.LogRecord) error
 	InvalidateCachedBuild(ctx context.Context, pipelineName string) error
 	InvalidateAllCachedBuilds(ctx context.Context) error
 }
 
 type runnerImpl struct {
+	actor.Actor
+
 	mbox actor.MailboxSender[message]
 }
 
 type deps struct {
 	fx.In
+
+	Mailbox actor.Mailbox[message]
 
 	ConfigStorage config.Storage
 	LogStorage    log.Storage
@@ -37,48 +44,28 @@ var _ Runner = (*runnerImpl)(nil)
 func NewRunner() fx.Option {
 	return fx.Module(
 		"pipelineRunner",
-		fx.Provide(func(lc fx.Lifecycle) actor.Mailbox[message] {
-			mbox := actor.NewMailbox[message]()
-
+		fxproviders.ProvideMailbox[message](),
+		fxproviders.ProvideActor[Runner](
+			func(d deps) Runner {
+				w := &worker{
+					mbox:          d.Mailbox,
+					configStorage: d.ConfigStorage,
+					logStorage:    d.LogStorage,
+					logNotifier:   d.LogNotifier,
+					cache:         make(map[string]*Pipeline),
+				}
+				return &runnerImpl{
+					Actor: actor.New(w),
+					mbox:  d.Mailbox,
+				}
+			},
+		),
+		fx.Invoke(func(lc fx.Lifecycle, runner Runner) {
 			lc.Append(fx.Hook{
-				OnStart: func(ctx context.Context) error {
-					mbox.Start()
-					return nil
-				},
 				OnStop: func(ctx context.Context) error {
-					mbox.Stop()
-					return nil
+					return runner.InvalidateAllCachedBuilds(ctx)
 				},
 			})
-
-			return mbox
-		}),
-		fx.Provide(func(lc fx.Lifecycle, d deps, mbox actor.Mailbox[message]) Runner {
-			a := actor.New(&worker{
-				mbox:          mbox,
-				configStorage: d.ConfigStorage,
-				logStorage:    d.LogStorage,
-				logNotifier:   d.LogNotifier,
-				cache:         make(map[string]*Pipeline),
-			})
-			runner := &runnerImpl{mbox: mbox}
-
-			lc.Append(fx.Hook{
-				OnStart: func(ctx context.Context) error {
-					a.Start()
-					return nil
-				},
-				OnStop: func(ctx context.Context) error {
-					if err := runner.InvalidateAllCachedBuilds(ctx); err != nil {
-						return err
-					}
-
-					a.Stop()
-					return nil
-				},
-			})
-
-			return runner
 		}),
 	)
 }
