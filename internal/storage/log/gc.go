@@ -12,6 +12,10 @@ import (
 	"link-society.com/flowg/internal/storage/log/transactions"
 )
 
+type gcActor struct {
+	actor.Actor
+}
+
 type gcWorker struct {
 	kvStore    kvstore.Storage
 	gcInterval time.Duration

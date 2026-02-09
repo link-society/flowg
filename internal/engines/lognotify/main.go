@@ -6,10 +6,14 @@ import (
 	"github.com/vladopajic/go-actor/actor"
 	"go.uber.org/fx"
 
+	"link-society.com/flowg/internal/utils/fxproviders"
+
 	"link-society.com/flowg/internal/models"
 )
 
 type LogNotifier interface {
+	actor.Actor
+
 	Subscribe(ctx context.Context, stream string) (actor.MailboxReceiver[LogMessage], error)
 	Notify(ctx context.Context, stream string, logKey string, logRecord models.LogRecord) error
 }
@@ -26,44 +30,13 @@ var _ LogNotifier = (*logNotifierImpl)(nil)
 func NewLogNotifier() fx.Option {
 	return fx.Module(
 		"lognotifier",
-		fx.Provide(func(lc fx.Lifecycle) actor.Mailbox[SubscribeMessage] {
-			mbox := actor.NewMailbox[SubscribeMessage]()
-
-			lc.Append(fx.Hook{
-				OnStart: func(ctx context.Context) error {
-					mbox.Start()
-					return nil
-				},
-				OnStop: func(ctx context.Context) error {
-					mbox.Stop()
-					return nil
-				},
-			})
-
-			return mbox
-		}),
-		fx.Provide(func(lc fx.Lifecycle) actor.Mailbox[LogMessage] {
-			mbox := actor.NewMailbox[LogMessage]()
-
-			lc.Append(fx.Hook{
-				OnStart: func(ctx context.Context) error {
-					mbox.Start()
-					return nil
-				},
-				OnStop: func(ctx context.Context) error {
-					mbox.Stop()
-					return nil
-				},
-			})
-
-			return mbox
-		}),
-		fx.Provide(func(
-			lc fx.Lifecycle,
+		fxproviders.ProvideMailbox[SubscribeMessage](),
+		fxproviders.ProvideMailbox[LogMessage](),
+		fxproviders.ProvideActor[LogNotifier](func(
 			subMbox actor.Mailbox[SubscribeMessage],
 			logMbox actor.Mailbox[LogMessage],
 		) LogNotifier {
-			logNotifier := &logNotifierImpl{
+			return &logNotifierImpl{
 				Actor: actor.New(&worker{
 					subscribers: make(map[string]subscriberSet),
 					subMbox:     subMbox,
@@ -73,19 +46,6 @@ func NewLogNotifier() fx.Option {
 				subMbox: subMbox,
 				logMbox: logMbox,
 			}
-
-			lc.Append(fx.Hook{
-				OnStart: func(ctx context.Context) error {
-					logNotifier.Start()
-					return nil
-				},
-				OnStop: func(ctx context.Context) error {
-					logNotifier.Stop()
-					return nil
-				},
-			})
-
-			return logNotifier
 		}),
 	)
 }
