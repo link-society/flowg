@@ -17,15 +17,20 @@ type ClusterFormationStrategy interface {
 }
 
 type clusterFormationController struct {
+	actor.Actor
+}
+
+type clusterFormationControllerWorker struct {
 	logger   *slog.Logger
 	joinM    actor.MailboxSender[*ClusterJoinNode]
 	resolver LocalEndpointResolverCallback
 	strategy ClusterFormationStrategy
 }
 
-var _ actor.Worker = (*clusterFormationController)(nil)
+var _ actor.Actor = (*clusterFormationController)(nil)
+var _ actor.Worker = (*clusterFormationControllerWorker)(nil)
 
-func (c *clusterFormationController) DoWork(ctx actor.Context) actor.WorkerStatus {
+func (c *clusterFormationControllerWorker) DoWork(ctx actor.Context) actor.WorkerStatus {
 	c.joiner(ctx)
 
 	select {
@@ -39,7 +44,7 @@ func (c *clusterFormationController) DoWork(ctx actor.Context) actor.WorkerStatu
 	}
 }
 
-func (c *clusterFormationController) joiner(ctx context.Context) {
+func (c *clusterFormationControllerWorker) joiner(ctx context.Context) {
 	joinNodes, err := c.strategy.Join(ctx, c.resolver)
 	if err != nil {
 		c.logger.WarnContext(
