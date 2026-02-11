@@ -4,10 +4,10 @@ go 1.25.5
 
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.43.0
-	github.com/dgraph-io/badger/v4 v4.9.0
+	github.com/dgraph-io/badger/v4 v4.9.1
 	github.com/elastic/go-elasticsearch/v9 v9.3.0
 	github.com/expr-lang/expr v1.17.7
-	github.com/go-chi/chi/v5 v5.2.4
+	github.com/go-chi/chi/v5 v5.2.5
 	github.com/go-logfmt/logfmt v0.6.1
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
@@ -30,13 +30,13 @@ require (
 	github.com/vladopajic/go-actor v1.1.0
 	go.opentelemetry.io/proto/otlp v1.9.0
 	go.uber.org/fx v1.24.0
-	golang.org/x/crypto v0.47.0
-	golang.org/x/term v0.39.0
+	golang.org/x/crypto v0.48.0
+	golang.org/x/term v0.40.0
 	google.golang.org/protobuf v1.36.11
 	gopkg.in/mcuadros/go-syslog.v2 v2.3.0
-	k8s.io/api v0.35.0
-	k8s.io/apimachinery v0.35.0
-	k8s.io/client-go v0.35.0
+	k8s.io/api v0.35.1
+	k8s.io/apimachinery v0.35.1
+	k8s.io/client-go v0.35.1
 )
 
 require (
@@ -116,14 +116,14 @@ require (
 	go.uber.org/zap v1.27.1 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/mod v0.31.0 // indirect
+	golang.org/x/mod v0.32.0 // indirect
 	golang.org/x/net v0.49.0 // indirect
 	golang.org/x/oauth2 v0.30.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
-	golang.org/x/sys v0.40.0 // indirect
-	golang.org/x/text v0.33.0 // indirect
+	golang.org/x/sys v0.41.0 // indirect
+	golang.org/x/text v0.34.0 // indirect
 	golang.org/x/time v0.9.0 // indirect
-	golang.org/x/tools v0.40.0 // indirect
+	golang.org/x/tools v0.41.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250825161204-c5933d9347a5 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250825161204-c5933d9347a5 // indirect
 	google.golang.org/grpc v1.75.1 // indirect
