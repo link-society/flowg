@@ -79,7 +79,7 @@ RUN NODE_ENV="production" npm run build
 ## BUILD GO CODE
 ##############################
 
-FROM golang:1.25-alpine3.23 AS builder-go
+FROM golang:1.26-alpine3.23 AS builder-go
 ARG UPX_VERSION
 ARG UPX_ARCH
 ARG UPX_OS
