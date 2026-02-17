@@ -69,7 +69,6 @@ const DialogStreamEditor = ({ stream }: DialogStreamEditorProps) => {
   const [onSave, saveLoading] = useApiOperation(async () => {
     await configApi.configureStream(stream, streamConfig)
     notify.success('Stream saved')
-    setStreamConfigPromise(onFetch(stream))
   }, [stream, streamConfig])
 
   return (
