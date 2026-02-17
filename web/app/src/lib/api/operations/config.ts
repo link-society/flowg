@@ -184,6 +184,24 @@ export const deleteForwarder = async (forwarder: string): Promise<void> => {
   })
 }
 
+export const testForwarder = async (
+  forwarder: string,
+  record: Record<string, string>
+): Promise<void> => {
+  type TestForwarderRequest = {
+    record: Record<string, string>
+  }
+
+  type TestForwarderResponse = {
+    success: boolean
+  }
+
+  await request.POST<TestForwarderRequest, TestForwarderResponse>({
+    path: `/api/v1/test/forwarders/${forwarder}`,
+    body: { record },
+  })
+}
+
 export const listPipelines = async (): Promise<string[]> => {
   type ListPipelinesResponse = {
     success: boolean
