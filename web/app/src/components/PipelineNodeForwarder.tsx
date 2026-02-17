@@ -4,11 +4,15 @@ import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox'
 
 import { Handle, Node, NodeProps, NodeToolbar, Position } from '@xyflow/react'
 
+import { NodeTrace } from '@/lib/models/PipelineTrace.ts'
+
 import DialogForwarderEditor from '@/components/DialogForwarderEditor'
 import PipelineDeleteNodeButton from '@/components/PipelineDeleteNodeButton'
+import PipelineTraceNodeButton from '@/components/PipelineTraceNodeButton.tsx'
 
 type PipelineNodeForwarderData = Node<{
   forwarder: string
+  trace: NodeTrace | null
 }>
 
 const PipelineNodeForwarder = ({
@@ -21,6 +25,7 @@ const PipelineNodeForwarder = ({
       <NodeToolbar className="flex flex-row items-center gap-2">
         <DialogForwarderEditor forwarderName={data.forwarder} />
         <PipelineDeleteNodeButton nodeId={id} />
+        {data.trace && <PipelineTraceNodeButton trace={data.trace} />}
       </NodeToolbar>
     )}
 
@@ -62,6 +67,21 @@ const PipelineNodeForwarder = ({
         />
       </div>
     </div>
+
+    {data.trace && (
+      <div
+        style={{
+          width: '18px',
+          height: '18px',
+          position: 'absolute',
+          right: '-9px',
+          top: '-9px',
+          backgroundColor: '#ff4444',
+          borderRadius: '50%',
+          boxShadow: '-2px 2px 2px #00000055',
+        }}
+      />
+    )}
   </>
 )
 

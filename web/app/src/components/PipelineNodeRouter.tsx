@@ -4,11 +4,15 @@ import StorageIcon from '@mui/icons-material/Storage'
 
 import { Handle, Node, NodeProps, NodeToolbar, Position } from '@xyflow/react'
 
+import { NodeTrace } from '@/lib/models/PipelineTrace.ts'
+
 import DialogStreamEditor from '@/components/DialogStreamEditor'
 import PipelineDeleteNodeButton from '@/components/PipelineDeleteNodeButton'
+import PipelineTraceNodeButton from '@/components/PipelineTraceNodeButton.tsx'
 
 type PipelineNodeRouterData = Node<{
   stream: string
+  trace: NodeTrace | null
 }>
 
 const PipelineNodeRouter = ({
@@ -21,6 +25,7 @@ const PipelineNodeRouter = ({
       <NodeToolbar className="flex flex-row items-center gap-2">
         <DialogStreamEditor stream={data.stream} />
         <PipelineDeleteNodeButton nodeId={id} />
+        {data.trace && <PipelineTraceNodeButton trace={data.trace} />}
       </NodeToolbar>
     )}
 
@@ -62,6 +67,21 @@ const PipelineNodeRouter = ({
         />
       </div>
     </div>
+
+    {data.trace && (
+      <div
+        style={{
+          width: '18px',
+          height: '18px',
+          position: 'absolute',
+          right: '-9px',
+          top: '-9px',
+          backgroundColor: '#ff4444',
+          borderRadius: '50%',
+          boxShadow: '-2px 2px 2px #00000055',
+        }}
+      />
+    )}
   </>
 )
 

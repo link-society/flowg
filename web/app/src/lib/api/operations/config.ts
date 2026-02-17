@@ -2,6 +2,7 @@ import * as request from '@/lib/api/request'
 
 import ForwarderModel from '@/lib/models/ForwarderModel'
 import PipelineModel from '@/lib/models/PipelineModel'
+import { PipelineTrace } from '@/lib/models/PipelineTrace.ts'
 import StreamConfigModel from '@/lib/models/StreamConfigModel'
 import SystemConfigurationModel from '@/lib/models/SystemConfigurationModel.ts'
 
@@ -234,6 +235,29 @@ export const deletePipeline = async (pipeline: string): Promise<void> => {
   await request.DELETE<DeletePipelineResponse>({
     path: `/api/v1/pipelines/${pipeline}`,
   })
+}
+
+type TestPipelineResult =
+  | {
+      success: boolean
+      trace: PipelineTrace
+    }
+  | { success: false; error: string }
+
+export const testPipeline = async (
+  pipeline: string,
+  records: Record<string, string>[]
+): Promise<TestPipelineResult> => {
+  type TestPipelineRequest = {
+    records: Record<string, string>[]
+  }
+
+  const { body } = await request.POST<TestPipelineRequest, TestPipelineResult>({
+    path: `/api/v1/test/pipeline/${pipeline}`,
+    body: { records },
+  })
+
+  return body
 }
 
 export const getSystemConfiguration =
