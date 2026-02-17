@@ -78,8 +78,8 @@ func (n *SourceNode) Process(ctx context.Context, record *models.LogRecord) erro
 	if tracer != nil {
 		tracer.Trace = append(tracer.Trace, NodeTrace{
 			NodeID: n.ID,
-			Input:  record.Fields,
-			Output: nil,
+			Input:  nil,
+			Output: record.Fields,
 		})
 	}
 
