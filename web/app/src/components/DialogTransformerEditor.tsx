@@ -60,7 +60,6 @@ const DialogTransformerEditor = ({
   const [onSave, saveLoading] = useApiOperation(async () => {
     await configApi.saveTransformer(transformer, code)
     notify.success('Transformer saved')
-    setTransformerPromise(onFetch(transformer))
   }, [transformer, code])
 
   return (

@@ -63,7 +63,6 @@ const DialogForwarderEditor = ({
   const [onSave, saveLoading] = useApiOperation(async () => {
     await configApi.saveForwarder(forwarderName, forwarder)
     notify.success('Forwarder saved')
-    setForwarderPromise(onFetch(forwarderName))
   }, [forwarderName, forwarder])
 
   return (
