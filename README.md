@@ -15,7 +15,7 @@ logs using a visual pipeline builder. It handles structured logs without
 requiring predefined schemas and relies on
 [BadgerDB](https://dgraph.io/docs/badger/) as its storage backend.
 
-For more informations, consult the
+For more information, consult the
 [documentation](https://link-society.github.io/flowg/docs/).
 
 You wish to contribute? Please read our [guidelines](./CONTRIBUTING.md) first.
@@ -23,7 +23,7 @@ You wish to contribute? Please read our [guidelines](./CONTRIBUTING.md) first.
 ## :sparkles: Key Features
 
  - **Pipelines:** Build and manage log processing pipelines visually, with
-   support for transormations with [VRL](https://vector.dev/docs/reference/vrl/)
+   support for transformations with [VRL](https://vector.dev/docs/reference/vrl/)
    scripts and conditional routing to dedicated streams
  - **Dynamic Logs:** Manage logs with varying structures without needing
    predefined schemas
