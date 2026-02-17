@@ -2,14 +2,28 @@ import TextField from '@mui/material/TextField'
 
 import InputIcon from '@mui/icons-material/Input'
 
-import { Handle, Node, NodeProps, Position } from '@xyflow/react'
+import { Handle, Node, NodeProps, NodeToolbar, Position } from '@xyflow/react'
+
+import { NodeTrace } from '@/lib/models/PipelineTrace.ts'
+
+import PipelineTraceNodeButton from '@/components/PipelineTraceNodeButton.tsx'
 
 type PipelineNodeSourceData = Node<{
   type: string
+  trace: NodeTrace | null
 }>
 
-const PipelineNodeSource = ({ data }: NodeProps<PipelineNodeSourceData>) => (
+const PipelineNodeSource = ({
+  selected,
+  data,
+}: NodeProps<PipelineNodeSourceData>) => (
   <>
+    {selected && data.trace && (
+      <NodeToolbar className="flex flex-row items-center gap-2">
+        <PipelineTraceNodeButton trace={data.trace} />
+      </NodeToolbar>
+    )}
+
     <div
       className="
         flex flex-row items-stretch gap-2
@@ -48,6 +62,21 @@ const PipelineNodeSource = ({ data }: NodeProps<PipelineNodeSourceData>) => (
         height: '12px',
       }}
     />
+
+    {data.trace && (
+      <div
+        style={{
+          width: '18px',
+          height: '18px',
+          position: 'absolute',
+          right: '-9px',
+          top: '-9px',
+          backgroundColor: '#ff4444',
+          borderRadius: '50%',
+          boxShadow: '-2px 2px 2px #00000055',
+        }}
+      />
+    )}
   </>
 )
 

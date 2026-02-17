@@ -6,11 +6,15 @@ import { Handle, Node, NodeProps, NodeToolbar, Position } from '@xyflow/react'
 
 import { useProfile } from '@/lib/hooks/profile'
 
+import { NodeTrace } from '@/lib/models/PipelineTrace.ts'
+
 import DialogTransformerEditor from '@/components/DialogTransformerEditor'
 import PipelineDeleteNodeButton from '@/components/PipelineDeleteNodeButton'
+import PipelineTraceNodeButton from '@/components/PipelineTraceNodeButton.tsx'
 
 type PipelineNodeTransformerData = Node<{
   transformer: string
+  trace: NodeTrace | null
 }>
 
 const PipelineNodeTransformer = ({
@@ -26,6 +30,7 @@ const PipelineNodeTransformer = ({
         <NodeToolbar className="flex flex-row items-center gap-2">
           <DialogTransformerEditor transformer={data.transformer} />
           <PipelineDeleteNodeButton nodeId={id} />
+          {data.trace && <PipelineTraceNodeButton trace={data.trace} />}
         </NodeToolbar>
       )}
 
@@ -75,6 +80,21 @@ const PipelineNodeTransformer = ({
           height: '12px',
         }}
       />
+
+      {data.trace && (
+        <div
+          style={{
+            width: '18px',
+            height: '18px',
+            position: 'absolute',
+            right: '-9px',
+            top: '-9px',
+            backgroundColor: '#ff4444',
+            borderRadius: '50%',
+            boxShadow: '-2px 2px 2px #00000055',
+          }}
+        />
+      )}
     </>
   )
 }

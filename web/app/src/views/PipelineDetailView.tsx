@@ -1,15 +1,23 @@
+import { Science } from '@mui/icons-material'
+
 import { useCallback, useState } from 'react'
 import { LoaderFunction, useLoaderData, useNavigate } from 'react-router'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
 import Grid from '@mui/material/Grid'
 import TextField from '@mui/material/TextField'
 import * as colors from '@mui/material/colors'
 
+import CancelIcon from '@mui/icons-material/Cancel'
 import DeleteIcon from '@mui/icons-material/Delete'
 import HelpIcon from '@mui/icons-material/Help'
+import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import SaveIcon from '@mui/icons-material/Save'
 
 import { ReactFlowProvider } from '@xyflow/react'
@@ -21,9 +29,11 @@ import { useNotify } from '@/lib/hooks/notify'
 import { useProfile } from '@/lib/hooks/profile'
 
 import PipelineModel from '@/lib/models/PipelineModel'
+import { PipelineTrace } from '@/lib/models/PipelineTrace.ts'
 
 import { loginRequired } from '@/lib/decorators/loaders'
 
+import InputKeyValue from '@/components/InputKeyValue.tsx'
 import PipelineEditorFlow from '@/components/PipelineEditorFlow'
 import PipelineEditorNodeListForwarder from '@/components/PipelineEditorNodeListForwarder'
 import PipelineEditorNodeListPipeline from '@/components/PipelineEditorNodeListPipeline'
@@ -68,6 +78,9 @@ const PipelineDetailView = () => {
 
   const initialFlow = currentPipeline.flow
   const [flow, setFlow] = useState(initialFlow)
+  const [testOpen, setTestOpen] = useState(false)
+  const [testRecords, setTestRecords] = useState<[string, string][]>([])
+  const [testResult, setTestResult] = useState<PipelineTrace | null>(null)
 
   const onChange = useCallback(
     (newFlow: PipelineModel) => {
@@ -94,8 +107,54 @@ const PipelineDetailView = () => {
     notify.success('Pipeline saved')
   }, [flow, currentPipeline])
 
+  const [onTest, testLoading] = useApiOperation(async () => {
+    const input = Object.fromEntries(testRecords)
+    const output = await configApi.testPipeline(currentPipeline.name, [input])
+
+    if (output.success) {
+      setTestResult(output.trace)
+    } else {
+      setTestResult(null)
+    }
+    setTestOpen(false)
+  }, [testRecords])
+
   return (
     <ReactFlowProvider>
+      <Dialog open={testOpen} scroll="paper" onClose={() => setTestOpen(false)}>
+        <DialogTitle>Test the pipeline</DialogTitle>
+        <DialogContent>
+          <p className="text-sm text-gray-700 font-semibold mb-2">
+            Input Record:
+          </p>
+          <InputKeyValue
+            id="kv:transformers.test.record"
+            keyLabel="Field"
+            keyValues={testRecords}
+            onChange={setTestRecords}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            startIcon={<CancelIcon />}
+            onClick={() => setTestOpen(false)}
+            disabled={testLoading}
+          >
+            Cancel
+          </Button>
+          <Button
+            id="btn:transformers.test.run"
+            variant="contained"
+            color="secondary"
+            endIcon={<PlayArrowIcon />}
+            disabled={testLoading}
+            onClick={() => onTest()}
+          >
+            {testLoading ? <CircularProgress size={24} /> : <>Run</>}
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Box className="h-full flex flex-col items-stretch">
         <Box
           className="
@@ -154,6 +213,18 @@ const PipelineDetailView = () => {
             </Button>
           </div>
 
+          <div className="flex items-center mx-3">
+            <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              onClick={() => setTestOpen(true)}
+              startIcon={<Science />}
+            >
+              Test
+            </Button>
+          </div>
+
           {permissions.can_edit_pipelines && (
             <div className="flex flex-row items-center gap-3">
               <Button
@@ -185,7 +256,11 @@ const PipelineDetailView = () => {
             <PipelineEditorNodeListPipeline className="w-full h-full" />
           </Grid>
           <Grid size={{ xs: 8 }} className="h-full">
-            <PipelineEditorFlow flow={initialFlow} onFlowChange={onChange} />
+            <PipelineEditorFlow
+              pipelineTrace={testResult}
+              flow={initialFlow}
+              onFlowChange={onChange}
+            />
           </Grid>
           <Grid
             size={{ xs: 2 }}

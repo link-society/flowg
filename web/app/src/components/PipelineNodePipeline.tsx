@@ -4,10 +4,14 @@ import AccountTreeIcon from '@mui/icons-material/AccountTree'
 
 import { Handle, Node, NodeProps, NodeToolbar, Position } from '@xyflow/react'
 
+import { NodeTrace } from '@/lib/models/PipelineTrace.ts'
+
 import PipelineDeleteNodeButton from '@/components/PipelineDeleteNodeButton'
+import PipelineTraceNodeButton from '@/components/PipelineTraceNodeButton.tsx'
 
 type PipelineNodePipelineData = Node<{
   pipeline: string
+  trace: NodeTrace | null
 }>
 
 const PipelineNodePipeline = ({
@@ -19,6 +23,7 @@ const PipelineNodePipeline = ({
     {selected && (
       <NodeToolbar className="flex flex-row items-center gap-2">
         <PipelineDeleteNodeButton nodeId={id} />
+        {data.trace && <PipelineTraceNodeButton trace={data.trace} />}
       </NodeToolbar>
     )}
     <Handle
@@ -59,6 +64,21 @@ const PipelineNodePipeline = ({
         />
       </div>
     </div>
+
+    {data.trace && (
+      <div
+        style={{
+          width: '18px',
+          height: '18px',
+          position: 'absolute',
+          right: '-9px',
+          top: '-9px',
+          backgroundColor: '#ff4444',
+          borderRadius: '50%',
+          boxShadow: '-2px 2px 2px #00000055',
+        }}
+      />
+    )}
   </>
 )
 

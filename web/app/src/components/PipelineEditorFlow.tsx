@@ -32,6 +32,7 @@ import {
 } from '@xyflow/react'
 
 import PipelineModel from '@/lib/models/PipelineModel'
+import { PipelineTrace } from '@/lib/models/PipelineTrace.ts'
 
 import PipelineEditorHooksProvider from '@/components/PipelineEditorHooksProvider'
 import PipelineNodeForwarder from '@/components/PipelineNodeForwarder'
@@ -60,11 +61,13 @@ const shortcuts: ShortcutMap = {
 type PipelineEditorFlowProps = Readonly<{
   flow: PipelineModel
   onFlowChange: (flow: PipelineModel) => void
+  pipelineTrace: PipelineTrace | null
 }>
 
 export const PipelineEditorFlow: React.FC<PipelineEditorFlowProps> = ({
   flow,
   onFlowChange,
+  pipelineTrace,
 }) => {
   const { screenToFlowPosition } = useReactFlow()
 
@@ -111,15 +114,19 @@ export const PipelineEditorFlow: React.FC<PipelineEditorFlowProps> = ({
           node.measured = oldNode.measured
         }
 
+        node.data.trace = pipelineTrace?.find(
+          (trace) => trace.nodeID == node.id
+        )
+
         return node
       })
     })
     setEdges(initialEdges)
-  }, [flow])
+  }, [flow, pipelineTrace])
 
   useEffect(() => {
     onFlowChange({ nodes, edges })
-  }, [nodes, edges])
+  }, [nodes, edges, pipelineTrace])
 
   const onNodesChange: OnNodesChange = (changes) =>
     setNodes((nds) => applyNodeChanges(changes, nds))
