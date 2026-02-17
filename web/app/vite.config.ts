@@ -21,6 +21,18 @@ export default defineConfig({
       filename: '[path][base]',
       deleteOriginalAssets: true
     }),
+    {
+      name: 'rewrite-assets-path',
+      configureServer(serve) {
+        serve.middlewares.use((req, _res, next) => {
+          if (req.url?.startsWith('/web/assets/')) {
+            req.url = req.url?.replace('/web/assets', '/assets')
+          }
+
+          next()
+        })
+      }
+    }
   ],
   build: {
     sourcemap: true,
@@ -38,5 +50,14 @@ export default defineConfig({
   },
   define: {
     'import.meta.env.FLOWG_VERSION': JSON.stringify(fs.readFileSync('../../VERSION.txt', 'utf8').trim()),
+  },
+  server: {
+    open: '/web',
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5080',
+        changeOrigin: true
+      },
+    }
   },
 })
