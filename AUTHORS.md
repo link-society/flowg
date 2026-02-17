@@ -12,4 +12,5 @@
  - [@minnerlas](https://github.com/minnerlas)
  - [@glooopsies](https://github.com/glooopsies)
  - [@sanderdw](https://github.com/sanderdw)
+ - [@clarabennett2626](https://github.com/clarabennett2626)
 
