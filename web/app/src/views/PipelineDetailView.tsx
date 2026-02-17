@@ -103,7 +103,16 @@ const PipelineDetailView = () => {
   }, [currentPipeline])
 
   const [onSave, saveLoading] = useApiOperation(async () => {
-    await configApi.savePipeline(currentPipeline.name, flow)
+    const savedFlow = {
+      ...flow,
+      nodes: flow.nodes.map((node) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { trace, ...data } = node.data
+        return { ...node, data }
+      }),
+    }
+
+    await configApi.savePipeline(currentPipeline.name, savedFlow)
     notify.success('Pipeline saved')
   }, [flow, currentPipeline])
 
