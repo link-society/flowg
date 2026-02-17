@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from 'react'
+import { ReactElement, ReactNode, useEffect, useState } from 'react'
 
 import Chip from '@mui/material/Chip'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -12,7 +12,7 @@ type PipelineEditorNodeListProps = Readonly<{
   newButton: (createdCb: () => void) => ReactNode
   fetchItems: () => Promise<string[]>
   itemType: string
-  itemIcon: ReactNode
+  itemIcon: ReactElement
   itemColor: keyof typeof colors
   onItemOpen: (item: string) => void
   className?: string
@@ -80,7 +80,7 @@ const PipelineEditorNodeList = (props: PipelineEditorNodeListProps) => {
             {items.map((item) => (
               <Chip
                 key={item}
-                icon={<>{props.itemIcon}</>}
+                icon={props.itemIcon}
                 label={item}
                 onDelete={() => props.onItemOpen(item)}
                 deleteIcon={<OpenInNewIcon />}
