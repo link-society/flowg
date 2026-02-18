@@ -5,8 +5,8 @@ go 1.25.5
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.43.0
 	github.com/dgraph-io/badger/v4 v4.9.1
-	github.com/elastic/go-elasticsearch/v9 v9.3.0
-	github.com/expr-lang/expr v1.17.7
+	github.com/elastic/go-elasticsearch/v9 v9.3.1
+	github.com/expr-lang/expr v1.17.8
 	github.com/go-chi/chi/v5 v5.2.5
 	github.com/go-logfmt/logfmt v0.6.1
 	github.com/golang-jwt/jwt/v5 v5.3.1
