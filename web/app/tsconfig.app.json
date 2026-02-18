@@ -6,7 +6,6 @@
     "module": "ESNext",
     "skipLibCheck": true,
     "paths": {
-      "@materializecss/materialize": ["./node_modules/@materializecss/materialize/dist/js/materialize.d.ts"],
       "@/*": ["./src/*"]
     },
 
