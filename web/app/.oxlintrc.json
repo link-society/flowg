@@ -7,15 +7,10 @@
   "env": {
     "builtin": true
   },
-  "ignorePatterns": [
-    "dist",
-    "src/lib/vrl-highlighter.ts"
-  ],
+  "ignorePatterns": ["dist", "src/lib/vrl-highlighter.ts"],
   "overrides": [
     {
-      "files": [
-        "**/*.{ts,tsx}"
-      ],
+      "files": ["**/*.{ts,tsx}"],
       "rules": {
         "constructor-super": "error",
         "for-direction": "error",
@@ -76,9 +71,7 @@
       }
     },
     {
-      "files": [
-        "**/*.{ts,tsx}"
-      ],
+      "files": ["**/*.{ts,tsx}"],
       "rules": {
         "@typescript-eslint/ban-ts-comment": "error",
         "no-array-constructor": "error",
@@ -101,34 +94,21 @@
         "@typescript-eslint/prefer-namespace-keyword": "error",
         "@typescript-eslint/triple-slash-reference": "error"
       },
-      "plugins": [
-        "typescript"
-      ]
+      "plugins": ["typescript"]
     },
     {
-      "files": [
-        "**/*.{ts,tsx}"
-      ],
+      "files": ["**/*.{ts,tsx}"],
       "rules": {
         "react-hooks/rules-of-hooks": "error",
-        "react-hooks/exhaustive-deps": [
-          "off"
-        ],
-        "@typescript-eslint/no-explicit-any": [
-          "off"
-        ],
-        "react/only-export-components": [
-          "off"
-        ]
+        "react-hooks/exhaustive-deps": ["off"],
+        "@typescript-eslint/no-explicit-any": ["off"],
+        "react/only-export-components": ["off"]
       },
       "env": {
         "es2020": true,
         "browser": true
       },
-      "plugins": [
-        "react",
-        "typescript"
-      ]
+      "plugins": ["react", "typescript"]
     }
   ]
 }
