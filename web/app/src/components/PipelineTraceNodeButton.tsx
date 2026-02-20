@@ -33,44 +33,64 @@ const PipelineTraceNodeButton = ({ trace }: PipelineTraceNodeButtonProps) => {
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>Node trace</DialogTitle>
         <DialogContent>
-          <div className="flex gap-5">
-            {trace.input && (
+          <div className="flex flex-col gap-5">
+            {trace.error && (
               <div className="flex flex-col gap-2">
                 <p className="text-sm text-gray-700 font-semibold mb-2">
-                  Input Record:
+                  Error:
                 </p>
                 <Paper
                   id="container:transformers.test.result"
                   variant="outlined"
                   className="
-                    p-2 grow shrink overflow-auto
-                    font-mono bg-gray-100! min-w-50
-                  "
+                      p-2 grow shrink overflow-auto
+                      font-mono bg-gray-100! min-w-50
+                    "
                   component="pre"
                 >
-                  {JSON.stringify(trace.input, null, 2)}
+                  {trace.error}
                 </Paper>
               </div>
             )}
+            <div className="flex gap-5">
+              {trace.input && (
+                <div className="flex flex-col gap-2">
+                  <p className="text-sm text-gray-700 font-semibold mb-2">
+                    Input Record:
+                  </p>
+                  <Paper
+                    id="container:transformers.test.result"
+                    variant="outlined"
+                    className="
+                      p-2 grow shrink overflow-auto
+                      font-mono bg-gray-100! min-w-50
+                    "
+                    component="pre"
+                  >
+                    {JSON.stringify(trace.input, null, 2)}
+                  </Paper>
+                </div>
+              )}
 
-            {trace.output && (
-              <div className="flex flex-col gap-2">
-                <p className="text-sm text-gray-700 font-semibold mb-2">
-                  Output Record:
-                </p>
-                <Paper
-                  id="container:transformers.test.result"
-                  variant="outlined"
-                  className="
-                    p-2 grow shrink overflow-auto
-                    font-mono bg-gray-100! min-w-50
-                  "
-                  component="pre"
-                >
-                  {JSON.stringify(trace.output, null, 2)}
-                </Paper>
-              </div>
-            )}
+              {trace.output && (
+                <div className="flex flex-col gap-2">
+                  <p className="text-sm text-gray-700 font-semibold mb-2">
+                    Output Record:
+                  </p>
+                  <Paper
+                    id="container:transformers.test.result"
+                    variant="outlined"
+                    className="
+                      p-2 grow shrink overflow-auto
+                      font-mono bg-gray-100! min-w-50
+                    "
+                    component="pre"
+                  >
+                    {JSON.stringify(trace.output, null, 2)}
+                  </Paper>
+                </div>
+              )}
+            </div>
           </div>
         </DialogContent>
         <DialogActions>

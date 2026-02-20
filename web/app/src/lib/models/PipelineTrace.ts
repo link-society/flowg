@@ -6,4 +6,5 @@ export type PipelineTrace = NodeTrace &
 export type NodeTrace = {
   input?: Record<string, string>
   output?: Record<string, string>
+  error?: string
 }

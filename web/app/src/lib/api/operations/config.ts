@@ -259,6 +259,7 @@ type TestPipelineResult =
   | {
       success: boolean
       trace: PipelineTrace
+      error: string
     }
   | { success: false; error: string }
 
