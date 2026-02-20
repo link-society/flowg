@@ -122,6 +122,11 @@ const PipelineDetailView = () => {
 
     if (output.success) {
       setTestResult(output.trace)
+      if (output.error) {
+        notify.error(`Test failed: ${output.error}`)
+      } else {
+        notify.success('Test passed')
+      }
     } else {
       setTestResult(null)
     }

@@ -9,6 +9,7 @@ import { NodeTrace } from '@/lib/models/PipelineTrace.ts'
 import DialogForwarderEditor from '@/components/DialogForwarderEditor'
 import PipelineDeleteNodeButton from '@/components/PipelineDeleteNodeButton'
 import PipelineTraceNodeButton from '@/components/PipelineTraceNodeButton.tsx'
+import PipelineTraceNodeIndicator from '@/components/PipelineTraceNodeIndicator.tsx'
 
 type PipelineNodeForwarderData = Node<{
   forwarder: string
@@ -68,20 +69,7 @@ const PipelineNodeForwarder = ({
       </div>
     </div>
 
-    {data.trace && (
-      <div
-        style={{
-          width: '18px',
-          height: '18px',
-          position: 'absolute',
-          right: '-9px',
-          top: '-9px',
-          backgroundColor: '#ff4444',
-          borderRadius: '50%',
-          boxShadow: '-2px 2px 2px #00000055',
-        }}
-      />
-    )}
+    <PipelineTraceNodeIndicator trace={data.trace} />
   </>
 )
 
