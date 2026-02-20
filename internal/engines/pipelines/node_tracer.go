@@ -2,6 +2,7 @@ package pipelines
 
 import (
 	"context"
+	"fmt"
 )
 
 const TRACER_KEY = "tracer_key"
@@ -9,7 +10,8 @@ const TRACER_KEY = "tracer_key"
 type NodeTrace struct {
 	NodeID string            `json:"nodeID"`
 	Input  map[string]string `json:"input"`
-	Output map[string]string `json:"output,omitempty"`
+	Output map[string]string `json:"output"`
+	Error  *string           `json:"error"`
 }
 
 type NodeTracer struct {
@@ -26,4 +28,13 @@ func GetTracer(ctx context.Context) *NodeTracer {
 		return nil
 	}
 	return m.(*NodeTracer)
+}
+
+func TraceError(err error) *string {
+	if err == nil {
+		return nil
+	}
+
+	errMsg := fmt.Sprint(err)
+	return &errMsg
 }

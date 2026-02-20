@@ -74,15 +74,6 @@ func (n *SourceNode) Process(ctx context.Context, record *models.LogRecord) erro
 	errC := make(chan error, len(n.Next))
 	wg := sync.WaitGroup{}
 
-	tracer := GetTracer(ctx)
-	if tracer != nil {
-		tracer.Trace = append(tracer.Trace, NodeTrace{
-			NodeID: n.ID,
-			Input:  nil,
-			Output: record.Fields,
-		})
-	}
-
 	for _, next := range n.Next {
 		wg.Add(1)
 		go func(next Node) {
@@ -102,11 +93,21 @@ func (n *SourceNode) Process(ctx context.Context, record *models.LogRecord) erro
 		errs = append(errs, err)
 	}
 
-	if len(errs) > 0 {
-		return errors.Join(errs...)
+	err := errors.Join(errs...)
+
+	tracer := GetTracer(ctx)
+	if tracer != nil {
+		trace := NodeTrace{
+			NodeID: n.ID,
+			Input:  nil,
+			Output: record.Fields,
+			Error:  TraceError(err),
+		}
+
+		tracer.Trace = append(tracer.Trace, trace)
 	}
 
-	return nil
+	return err
 }
 
 // MARK: transform
@@ -122,22 +123,26 @@ func (n *TransformNode) Close(ctx context.Context) error {
 }
 
 func (n *TransformNode) Process(ctx context.Context, record *models.LogRecord) error {
+	tracer := GetTracer(ctx)
+	trace := NodeTrace{
+		NodeID: n.ID,
+		Input:  record.Fields,
+		Output: nil,
+	}
+
 	output, err := n.runner.Eval(record.Fields)
 	if err != nil {
+		trace.Error = TraceError(err)
+		if tracer != nil {
+			tracer.Trace = append(tracer.Trace, trace)
+		}
+
 		return err
 	}
+	trace.Output = output
 
 	errC := make(chan error, len(n.Next))
 	wg := sync.WaitGroup{}
-
-	tracer := GetTracer(ctx)
-	if tracer != nil {
-		tracer.Trace = append(tracer.Trace, NodeTrace{
-			NodeID: n.ID,
-			Input:  record.Fields,
-			Output: output,
-		})
-	}
 
 	for _, next := range n.Next {
 		wg.Add(1)
@@ -164,11 +169,14 @@ func (n *TransformNode) Process(ctx context.Context, record *models.LogRecord) e
 		errs = append(errs, err)
 	}
 
-	if len(errs) > 0 {
-		return errors.Join(errs...)
+	err = errors.Join(errs...)
+
+	if tracer != nil {
+		trace.Error = TraceError(err)
+		tracer.Trace = append(tracer.Trace, trace)
 	}
 
-	return nil
+	return err
 }
 
 // MARK: switch
@@ -183,25 +191,25 @@ func (n *SwitchNode) Close(ctx context.Context) error {
 }
 
 func (n *SwitchNode) Process(ctx context.Context, record *models.LogRecord) error {
+	tracer := GetTracer(ctx)
+	trace := NodeTrace{
+		NodeID: n.ID,
+		Input:  record.Fields,
+		Output: nil,
+	}
+
 	matches, err := n.runner.Evaluate(record)
 	if err != nil {
+		trace.Error = TraceError(err)
+		if tracer != nil {
+			tracer.Trace = append(tracer.Trace, trace)
+		}
+
 		return err
 	}
 
-	tracer := GetTracer(ctx)
-
-	if tracer != nil {
-		trace := NodeTrace{
-			NodeID: n.ID,
-			Input:  record.Fields,
-			Output: nil,
-		}
-
-		if matches {
-			trace.Output = record.Fields
-		}
-
-		tracer.Trace = append(tracer.Trace, trace)
+	if matches {
+		trace.Output = record.Fields
 	}
 
 	if matches {
@@ -223,16 +231,17 @@ func (n *SwitchNode) Process(ctx context.Context, record *models.LogRecord) erro
 		close(errC)
 
 		var errs []error
-		for err := range errC {
+		for err = range errC {
 			errs = append(errs, err)
-		}
-
-		if len(errs) > 0 {
-			return errors.Join(errs...)
 		}
 	}
 
-	return nil
+	if tracer != nil {
+		trace.Error = TraceError(err)
+		tracer.Trace = append(tracer.Trace, trace)
+	}
+
+	return err
 }
 
 // MARK: pipeline
@@ -245,22 +254,29 @@ func (n *PipelineNode) Close(ctx context.Context) error {
 }
 
 func (n *PipelineNode) Process(ctx context.Context, record *models.LogRecord) error {
-	w := getWorker(ctx)
-
 	tracer := GetTracer(ctx)
-	if tracer != nil {
-		tracer.Trace = append(tracer.Trace, NodeTrace{
-			NodeID: n.ID,
-			Input:  record.Fields,
-			Output: nil,
-		})
-
-		return nil
+	trace := NodeTrace{
+		NodeID: n.ID,
+		Input:  record.Fields,
+		Output: nil,
 	}
+
+	w := getWorker(ctx)
 
 	pipeline, err := w.getOrBuildPipeline(ctx, n.Pipeline)
 	if err != nil {
+		if tracer != nil {
+			trace.Error = TraceError(err)
+			tracer.Trace = append(tracer.Trace, trace)
+		}
+
 		return err
+	}
+
+	if tracer != nil {
+		tracer.Trace = append(tracer.Trace, trace)
+
+		return nil
 	}
 
 	return pipeline.Process(ctx, DIRECT_ENTRYPOINT, record)
