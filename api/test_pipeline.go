@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 
 	"github.com/swaggest/usecase"
@@ -22,6 +23,7 @@ type TestPipelineRequest struct {
 type TestPipelineResponse struct {
 	Success bool                  `json:"success"`
 	Trace   []pipelines.NodeTrace `json:"trace"`
+	Error   *string               `json:"error,omitempty"`
 }
 
 func (ctrl *controller) TestPipelineUsecase() usecase.Interactor {
@@ -46,16 +48,10 @@ func (ctrl *controller) TestPipelineUsecase() usecase.Interactor {
 						pipelines.DIRECT_ENTRYPOINT,
 						record,
 					)
-					if err != nil {
-						ctrl.logger.DebugContext(
-							ctx,
-							"Failed to process log entry",
-							slog.String("pipeline", req.Pipeline),
-							slog.String("error", err.Error()),
-						)
 
-						resp.Success = false
-						return status.Wrap(err, status.Internal)
+					if err != nil {
+						errMsg := fmt.Sprint(err)
+						resp.Error = &errMsg
 					}
 
 					ctrl.logger.DebugContext(
