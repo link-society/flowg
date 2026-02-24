@@ -45,7 +45,7 @@ func (w *worker) getOrBuildPipeline(ctx context.Context, pipelineName string) (*
 	w.cacheMu.Lock()
 	defer w.cacheMu.Unlock()
 
-	if pipeline, exists := w.cache[pipelineName]; exists {
+	if pipeline, exists := w.cache[pipelineName]; exists && GetTracer(ctx) == nil {
 		return pipeline, nil
 	}
 

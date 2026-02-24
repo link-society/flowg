@@ -38,15 +38,15 @@ func (msg logMessage) handle(ctx context.Context, w *worker) {
 	go func() {
 		defer close(msg.replyTo)
 
+		ctx := context.WithValue(ctx, workerKey, w)
+		if msg.tracer != nil {
+			ctx = WithTracer(ctx, msg.tracer)
+		}
+
 		pipeline, err := w.getOrBuildPipeline(ctx, msg.pipelineName)
 		if err != nil {
 			msg.replyTo <- err
 			return
-		}
-
-		ctx := context.WithValue(ctx, workerKey, w)
-		if msg.tracer != nil {
-			ctx = WithTracer(ctx, msg.tracer)
 		}
 
 		err = pipeline.Process(ctx, msg.entrypoint, msg.record)

@@ -3,6 +3,8 @@ package pipelines
 import (
 	"context"
 	"fmt"
+
+	"link-society.com/flowg/internal/models"
 )
 
 const TRACER_KEY = "tracer_key"
@@ -15,7 +17,8 @@ type NodeTrace struct {
 }
 
 type NodeTracer struct {
-	Trace []NodeTrace `json:"trace"`
+	Flow  models.FlowGraphV2 `json:"flow"`
+	Trace []NodeTrace        `json:"trace"`
 }
 
 func WithTracer(ctx context.Context, tracer *NodeTracer) context.Context {
