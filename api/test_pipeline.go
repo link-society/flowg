@@ -7,7 +7,6 @@ import (
 
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
-
 	"link-society.com/flowg/internal/app/logging"
 	apiUtils "link-society.com/flowg/internal/utils/api"
 
@@ -18,6 +17,7 @@ import (
 
 type TestPipelineRequest struct {
 	Pipeline string              `path:"pipeline" minLength:"1"`
+	Flow     models.FlowGraphV2  `json:"flow" required:"true"`
 	Records  []map[string]string `json:"records" required:"true"`
 }
 type TestPipelineResponse struct {
@@ -36,7 +36,9 @@ func (ctrl *controller) TestPipelineUsecase() usecase.Interactor {
 				req TestPipelineRequest,
 				resp *TestPipelineResponse,
 			) error {
-				tracer := pipelines.NodeTracer{}
+				tracer := pipelines.NodeTracer{
+					Flow: req.Flow,
+				}
 				ctx = pipelines.WithTracer(ctx, &tracer)
 				logging.MarkSensitive(ctx)
 
@@ -56,7 +58,7 @@ func (ctrl *controller) TestPipelineUsecase() usecase.Interactor {
 
 					ctrl.logger.DebugContext(
 						ctx,
-						"Log entry processed",
+						"Ran test for",
 						slog.String("pipeline", req.Pipeline),
 					)
 				}

@@ -17,9 +17,17 @@ type Pipeline struct {
 }
 
 func Build(ctx context.Context, configStorage config.Storage, name string) (*Pipeline, error) {
-	flowGraph, err := configStorage.ReadPipeline(ctx, name)
-	if err != nil {
-		return nil, err
+	var err error
+	var flowGraph *models.FlowGraphV2
+
+	tracer := GetTracer(ctx)
+	if tracer != nil {
+		flowGraph = &tracer.Flow
+	} else {
+		flowGraph, err = configStorage.ReadPipeline(ctx, name)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	var (
