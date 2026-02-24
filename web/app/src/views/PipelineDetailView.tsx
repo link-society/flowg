@@ -117,8 +117,21 @@ const PipelineDetailView = () => {
   }, [flow, currentPipeline])
 
   const [onTest, testLoading] = useApiOperation(async () => {
+    const savedFlow = {
+      ...flow,
+      nodes: flow.nodes.map((node) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { trace, ...data } = node.data
+        return { ...node, data }
+      }),
+    }
+
     const input = Object.fromEntries(testRecords)
-    const output = await configApi.testPipeline(currentPipeline.name, [input])
+    const output = await configApi.testPipeline(
+      currentPipeline.name,
+      savedFlow,
+      [input]
+    )
 
     if (output.success) {
       setTestResult(output.trace)
