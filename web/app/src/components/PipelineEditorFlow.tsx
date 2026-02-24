@@ -114,19 +114,27 @@ export const PipelineEditorFlow: React.FC<PipelineEditorFlowProps> = ({
           node.measured = oldNode.measured
         }
 
-        node.data.trace = pipelineTrace?.find(
-          (trace) => trace.nodeID == node.id
-        )
-
         return node
       })
     })
     setEdges(initialEdges)
-  }, [flow, pipelineTrace])
+  }, [flow])
+
+  useEffect(() => {
+    setNodes(
+      nodes.map((node) => ({
+        ...node,
+        data: {
+          ...node.data,
+          trace: pipelineTrace?.find((trace) => trace.nodeID == node.id),
+        },
+      }))
+    )
+  }, [pipelineTrace])
 
   useEffect(() => {
     onFlowChange({ nodes, edges })
-  }, [nodes, edges, pipelineTrace])
+  }, [nodes, edges])
 
   const onNodesChange: OnNodesChange = (changes) =>
     setNodes((nds) => applyNodeChanges(changes, nds))

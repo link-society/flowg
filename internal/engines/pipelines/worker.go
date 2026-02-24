@@ -45,11 +45,11 @@ func (w *worker) getOrBuildPipeline(ctx context.Context, pipelineName string) (*
 	w.cacheMu.Lock()
 	defer w.cacheMu.Unlock()
 
-	if pipeline, exists := w.cache[pipelineName]; exists && GetTracer(ctx) == nil {
+	if pipeline, exists := w.cache[pipelineName]; exists {
 		return pipeline, nil
 	}
 
-	pipeline, err := Build(ctx, w.configStorage, pipelineName)
+	pipeline, err := BuildFromStorage(ctx, w.configStorage, pipelineName)
 	if err != nil {
 		return nil, err
 	}

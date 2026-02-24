@@ -265,15 +265,17 @@ type TestPipelineResult =
 
 export const testPipeline = async (
   pipeline: string,
+  flow: PipelineModel,
   records: Record<string, string>[]
 ): Promise<TestPipelineResult> => {
   type TestPipelineRequest = {
     records: Record<string, string>[]
+    flow: PipelineModel
   }
 
   const { body } = await request.POST<TestPipelineRequest, TestPipelineResult>({
     path: `/api/v1/test/pipeline/${pipeline}`,
-    body: { records },
+    body: { records, flow },
   })
 
   return body

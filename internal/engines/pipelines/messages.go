@@ -36,14 +36,19 @@ type invalidateAllCacheMessage struct {
 
 func (msg logMessage) handle(ctx context.Context, w *worker) {
 	go func() {
+		var pipeline *Pipeline
+		var err error
 		defer close(msg.replyTo)
 
 		ctx := context.WithValue(ctx, workerKey, w)
 		if msg.tracer != nil {
 			ctx = WithTracer(ctx, msg.tracer)
+
+			pipeline, err = BuildFlow(ctx, w.configStorage, msg.pipelineName, &msg.tracer.Flow)
+		} else {
+			pipeline, err = w.getOrBuildPipeline(ctx, msg.pipelineName)
 		}
 
-		pipeline, err := w.getOrBuildPipeline(ctx, msg.pipelineName)
 		if err != nil {
 			msg.replyTo <- err
 			return
