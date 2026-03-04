@@ -98,7 +98,7 @@ jobs:
 
       - name: compress@binary
         if: inputs.goos != 'darwin' && (steps.need-binaries.outputs.exists == 'false' || steps.need-doc-cli.outputs.exists == 'false' || steps.need-doc-openapi.outputs.exists == 'false')
-        uses: crazy-max/ghaction-upx@db8cc9515a4a7ea1b312cb82fbeae6d716daf777
+        uses: crazy-max/ghaction-upx@c83f378efc804f828e988debb88ed6116feb2368
         with:
           files: bin/*
 
