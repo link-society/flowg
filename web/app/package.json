@@ -24,7 +24,7 @@
     "dayjs": "^1.11.19",
     "event-source-plus": "^0.1.15",
     "react": "^19.2.4",
-    "react-apexcharts": "^2.0.1",
+    "react-apexcharts": "^2.1.0",
     "react-dom": "^19.2.4",
     "react-router": "^7.13.1",
     "uuid": "^13.0.0"
@@ -32,18 +32,18 @@
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.1",
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
-    "@types/node": "^25.3.0",
+    "@types/node": "^25.3.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.4",
-    "autoprefixer": "^10.4.24",
-    "globals": "^17.3.0",
-    "oxlint": "^1.50.0",
+    "autoprefixer": "^10.4.27",
+    "globals": "^17.4.0",
+    "oxlint": "^1.51.0",
     "prettier": "^3.8.1",
     "prettier-plugin-organize-imports": "^4.3.0",
     "tailwindcss": "^4.1.15",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
-    "vite-plugin-compression2": "^2.4.0"
+    "vite-plugin-compression2": "^2.5.0"
   }
 }
