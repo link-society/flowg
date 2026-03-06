@@ -37,8 +37,12 @@ var (
 	defaultClusterFormationKubernetesServiceName      = getEnvString("FLOWG_CLUSTER_FORMATION_K8S_SERVICE_NAME", "flowg")
 	defaultClusterFormationKubernetesServicePortName  = getEnvString("FLOWG_CLUSTER_FORMATION_K8S_SERVICE_PORT_NAME", "mgmt")
 
-	defaultSyslogProtocol     = getEnvString("FLOWG_SYSLOG_PROTOCOL", "udp")
-	defaultSyslogBindAddr     = getEnvString("FLOWG_SYSLOG_BIND_ADDRESS", ":5514")
+	defaultClusterFormationDnsServer = getEnvString("FLOWG_CLUSTER_FORMATION_DNS_SERVER", "")
+	defaultClusterFormationDnsDomain = getEnvString("FLOWG_CLUSTER_FORMATION_DNS_DOMAIN", "")
+	defaultClusterFormationDnsScript = getEnvString("FLOWG_CLUSTER_FORMATION_DNS_SCRIPT", "")
+
+	defaultSyslogProtocol = getEnvString("FLOWG_SYSLOG_PROTOCOL", "udp")
+	defaultSyslogBindAddr = getEnvString("FLOWG_SYSLOG_BIND_ADDRESS", ":5514")
 
 	defaultSyslogTlsEnabled     = getEnvBool("FLOWG_SYSLOG_TLS_ENABLED", false)
 	defaultSyslogTlsCert        = getEnvString("FLOWG_SYSLOG_TLS_CERT", "")

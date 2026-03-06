@@ -33,6 +33,10 @@ type options struct {
 	clusterFormationKubernetesServiceName      string
 	clusterFormationKubernetesServicePortName  string
 
+	clusterFormationDnsServer string
+	clusterFormationDnsDomain string
+	clusterFormationDnsScript string
+
 	syslogProtocol       string
 	syslogBindAddr       string
 	syslogTlsEnabled     bool
@@ -193,6 +197,27 @@ func (opts *options) defineCliOptions(cmd *cobra.Command) {
 		"cluster-formation-k8s-service-port-name",
 		defaultClusterFormationKubernetesServicePortName,
 		"Name of the port in the Kubernetes service to use for cluster formation, ignored if not using 'k8s' strategy",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.clusterFormationDnsServer,
+		"cluster-formation-dns-server",
+		defaultClusterFormationDnsServer,
+		"DNS server to use for cluster formation, ignored if not using 'dns' strategy",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.clusterFormationDnsDomain,
+		"cluster-formation-dns-domain",
+		defaultClusterFormationDnsDomain,
+		"DNS domain to use for cluster formation, ignored if not using 'dns' strategy",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.clusterFormationDnsScript,
+		"cluster-formation-dns-script",
+		defaultClusterFormationDnsScript,
+		"DNS management script to use for cluster formation, ignored if not using 'dns' strategy",
 	)
 
 	cmd.Flags().StringVar(
