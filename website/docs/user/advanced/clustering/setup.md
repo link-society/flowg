@@ -289,3 +289,118 @@ spec:
 
 > **NB:** Automatic cluster formation using Kubernetes expects the node ID to be
 > set to the pod's name.
+
+
+## DNS
+
+Using DNS cluster formation can be done in two ways:
+1. Manually setting DNS records
+2. Creating a DNS management script
+
+
+### Manually setting DNS records
+
+First you need to set up at least one TXT DNS record with the format
+```
+flowg-cluster=nodeid;endpoint
+```
+
+then you can start flowg services using the `dns` formation strategy. 
+
+```bash
+flowg-server \
+  --cluster-node-id flowg-node0 \
+  --auth-dir ./data/node0/auth \
+  --log-dir ./data/node0/logs \
+  --config-dir ./data/node0/config \
+  --cluster-state-dir ./data/node0/state \
+  --http-bind 127.0.0.1:5080 \
+  --mgmt-bind 127.0.0.1:9113 \
+  --syslog-bind 127.0.0.1:5514 &
+
+flowg-server \
+  --cluster-node-id flowg-node1 \
+  --cluster-formation-strategy="dns" \
+  --cluster-formation-dns-server 127.0.0.1:53 \
+  --cluster-formation-dns-domain example.org \
+  --auth-dir ./data/node1/auth \
+  --log-dir ./data/node1/logs \
+  --config-dir ./data/node1/config \
+  --cluster-state-dir ./data/node1/state \
+  --http-bind 127.0.0.1:5081 \
+  --mgmt-bind 127.0.0.1:9114 \
+  --syslog-bind 127.0.0.1:5515 &
+
+flowg-server \
+  --cluster-node-id flowg-node2 \
+  --cluster-formation-strategy="dns" \
+  --cluster-formation-dns-server 127.0.0.1:53 \
+  --cluster-formation-dns-domain example.org \
+  --auth-dir ./data/node2/auth \
+  --log-dir ./data/node2/logs \
+  --config-dir ./data/node2/config \
+  --cluster-state-dir ./data/node2/state \
+  --http-bind 127.0.0.1:5082 \
+  --mgmt-bind 127.0.0.1:9115 \
+  --syslog-bind 127.0.0.1:5516 &
+```
+
+> **NB:** DNS records need time to update and propagate, if the setup fails, check if the DNS records have propagated to your dns server.
+
+### Creating a DNS management script
+
+Using a DNS management script automatically updates DNS records at startup and cleans DNS records during graceful shutdown.
+
+You will need to create a script that accepts 3 arguments:
+```shell
+./dns-script {set,del} [address] [dns record type] [dns record]
+```
+
+Ensure that the script is executable with
+```shell
+chmod +x ./dns-script
+```
+
+Then you will need to start the flowg server and pass the script as the argument
+```bash
+flowg-server \
+  --cluster-node-id flowg-node0 \
+  --cluster-formation-dns-server 127.0.0.1:53 \
+  --cluster-formation-dns-domain example.org \
+  --cluster-formation-dns-script "./dns-script" \
+  --auth-dir ./data/node0/auth \
+  --log-dir ./data/node0/logs \
+  --config-dir ./data/node0/config \
+  --cluster-state-dir ./data/node0/state \
+  --http-bind 127.0.0.1:5080 \
+  --mgmt-bind 127.0.0.1:9113 \
+  --syslog-bind 127.0.0.1:5514 &
+
+flowg-server \
+  --cluster-node-id flowg-node1 \
+  --cluster-formation-strategy="dns" \
+  --cluster-formation-dns-server 127.0.0.1:53 \
+  --cluster-formation-dns-domain example.org \
+  --cluster-formation-dns-script "./dns-script" \
+  --auth-dir ./data/node1/auth \
+  --log-dir ./data/node1/logs \
+  --config-dir ./data/node1/config \
+  --cluster-state-dir ./data/node1/state \
+  --http-bind 127.0.0.1:5081 \
+  --mgmt-bind 127.0.0.1:9114 \
+  --syslog-bind 127.0.0.1:5515 &
+
+flowg-server \
+  --cluster-node-id flowg-node2 \
+  --cluster-formation-strategy="dns" \
+  --cluster-formation-dns-server 127.0.0.1:53 \
+  --cluster-formation-dns-domain example.org \
+  --cluster-formation-dns-script "./dns-script" \
+  --auth-dir ./data/node2/auth \
+  --log-dir ./data/node2/logs \
+  --config-dir ./data/node2/config \
+  --cluster-state-dir ./data/node2/state \
+  --http-bind 127.0.0.1:5082 \
+  --mgmt-bind 127.0.0.1:9115 \
+  --syslog-bind 127.0.0.1:5516 &
+```
