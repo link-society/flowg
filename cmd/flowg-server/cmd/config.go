@@ -102,6 +102,23 @@ func newServerConfig(opts *options) (server.Options, error) {
 			ServicePortName:  opts.clusterFormationKubernetesServicePortName,
 		}
 
+	case "dns":
+		if opts.clusterFormationDnsServer == "" {
+			return server.Options{}, fmt.Errorf("dns server is required for 'dns' cluster formation")
+		}
+
+		if opts.clusterFormationDnsDomain == "" {
+			return server.Options{}, fmt.Errorf("dns domain is required for 'dns' cluster formation")
+		}
+
+		clusterFormationStrategy = &cluster.DnsClusterFormationStrategy{
+			DnsServer:   opts.clusterFormationDnsServer,
+			DnsDomain:   opts.clusterFormationDnsDomain,
+			DnsScript:   opts.clusterFormationDnsScript,
+			NodeID:      opts.clusterNodeID,
+			MgmtAddress: opts.mgmtBindAddress,
+		}
+
 	default:
 		return server.Options{}, fmt.Errorf("invalid cluster formation strategy: %s", opts.clusterFormationStrategy)
 	}
