@@ -1,11 +1,19 @@
 package cluster
 
 import (
+	"context"
 	"log/slog"
+
+	"encoding/json"
+	"time"
 
 	"net/url"
 
+	"github.com/vladopajic/go-actor/actor"
+
 	"github.com/hashicorp/memberlist"
+
+	clusterstate "link-society.com/flowg/internal/storage/cluster-state"
 )
 
 type delegate struct {
@@ -16,6 +24,9 @@ type delegate struct {
 	endpoints     *endpointCache
 
 	notifyC chan notification
+
+	clusterStateStorage clusterstate.Storage
+	syncRequestM        actor.MailboxSender[*syncRequest]
 }
 
 var _ memberlist.Delegate = (*delegate)(nil)
@@ -40,10 +51,86 @@ func (d *delegate) GetBroadcasts(overhead, limit int) [][]byte {
 }
 
 func (d *delegate) LocalState(join bool) []byte {
-	return []byte{}
+	endpointNames := []string{}
+
+	for endpointName := range d.endpoints.All() {
+		endpointNames = append(endpointNames, endpointName)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	defer cancel()
+
+	localState, err := d.clusterStateStorage.FetchLocalState(
+		ctx,
+		d.localNodeID,
+		endpointNames,
+	)
+	if err != nil {
+		d.logger.Error(
+			"failed to fetch local state",
+			slog.String("error", err.Error()),
+		)
+		return []byte{}
+	}
+
+	buf, err := json.Marshal(localState)
+	if err != nil {
+		d.logger.Error(
+			"failed to encode local state",
+			slog.String("error", err.Error()),
+		)
+		return []byte{}
+	}
+
+	return buf
 }
 
 func (d *delegate) MergeRemoteState(buf []byte, join bool) {
+	var remoteState clusterstate.NodeState
+	if err := json.Unmarshal(buf, &remoteState); err != nil {
+		d.logger.Error(
+			"failed to decode remote state",
+			slog.String("error", err.Error()),
+		)
+		return
+	}
+
+	if remoteState.NodeID != d.localNodeID {
+		lastSync, ok := remoteState.LastSync[d.localNodeID]
+		if !ok {
+			d.logger.Error(
+				"remote state does not contain sync information for local node",
+				slog.String("cluster.remote.node", remoteState.NodeID),
+			)
+			return
+		}
+
+		remoteEndpoint, ok := d.endpoints.Get(remoteState.NodeID)
+		if !ok {
+			d.logger.Error(
+				"remote endpoint not found",
+				slog.String("cluster.remote.node", remoteState.NodeID),
+			)
+			return
+		}
+
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		defer cancel()
+
+		req := &syncRequest{
+			remoteNodeID:   remoteState.NodeID,
+			remoteEndpoint: remoteEndpoint,
+			lastSync:       lastSync,
+		}
+		if err := d.syncRequestM.Send(ctx, req); err != nil {
+			d.logger.Error(
+				"failed to send sync request",
+				slog.String("cluster.remote.node", remoteState.NodeID),
+				slog.String("error", err.Error()),
+			)
+			return
+		}
+	}
 }
 
 func (d *delegate) NotifyJoin(node *memberlist.Node) {
