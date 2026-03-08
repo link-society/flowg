@@ -14,7 +14,11 @@ import (
 
 	"link-society.com/flowg/internal/utils/fxproviders"
 
+	"link-society.com/flowg/internal/storage"
+	"link-society.com/flowg/internal/storage/auth"
 	clusterstate "link-society.com/flowg/internal/storage/cluster-state"
+	"link-society.com/flowg/internal/storage/config"
+	"link-society.com/flowg/internal/storage/log"
 
 	"github.com/hashicorp/memberlist"
 )
@@ -54,6 +58,35 @@ func NewManager(opts ManagerOptions) fx.Option {
 		fxproviders.ProvideMailbox[net.Conn](),
 		fxproviders.ProvideMailbox[*memberlist.Packet](),
 		fxproviders.ProvideMailbox[*ClusterJoinNode](),
+		fxproviders.ProvideMailbox[*syncRequest](),
+		fxproviders.ProvideActor[*syncActor](
+			func(d struct {
+				fx.In
+
+				SyncRequestM actor.Mailbox[*syncRequest]
+
+				AuthStorage         auth.Storage
+				ConfigStorage       config.Storage
+				LogStorage          log.Storage
+				ClusterStateStorage clusterstate.Storage
+			}) *syncActor {
+				return &syncActor{
+					Actor: actor.New(&syncWorker{
+						logger: slog.Default().With(slog.String("channel", "cluster.sync")),
+
+						requestM: d.SyncRequestM,
+						cookie:   opts.Cookie,
+
+						storages: map[string]storage.Streamable{
+							"auth":   d.AuthStorage,
+							"config": d.ConfigStorage,
+							"log":    d.LogStorage,
+						},
+						clusterStateStorage: d.ClusterStateStorage,
+					}),
+				}
+			},
+		),
 		fxproviders.ProvideActor[*clusterFormationController](
 			func(
 				joinM actor.Mailbox[*ClusterJoinNode],
@@ -73,6 +106,7 @@ func NewManager(opts ManagerOptions) fx.Option {
 			fx.In
 
 			Listener            *Listener
+			SyncRequestM        actor.Mailbox[*syncRequest]
 			ClusterStateStorage clusterstate.Storage
 		}) (*delegate, error) {
 			var err error
@@ -98,6 +132,7 @@ func NewManager(opts ManagerOptions) fx.Option {
 				notifyC: make(chan notification, 1000),
 
 				clusterStateStorage: d.ClusterStateStorage,
+				syncRequestM:        d.SyncRequestM,
 			}, nil
 		}),
 		fx.Provide(func(
@@ -108,6 +143,9 @@ func NewManager(opts ManagerOptions) fx.Option {
 				ConnM    actor.Mailbox[net.Conn]
 				PacketM  actor.Mailbox[*memberlist.Packet]
 
+				AuthStorage         auth.Storage
+				ConfigStorage       config.Storage
+				LogStorage          log.Storage
 				ClusterStateStorage clusterstate.Storage
 			},
 		) *httpTransport {
@@ -118,6 +156,11 @@ func NewManager(opts ManagerOptions) fx.Option {
 				connM:   d.ConnM,
 				packetM: d.PacketM,
 
+				storages: map[string]storage.Streamable{
+					"auth":   d.AuthStorage,
+					"config": d.ConfigStorage,
+					"log":    d.LogStorage,
+				},
 				clusterStateStorage: d.ClusterStateStorage,
 			}
 		}),
@@ -219,7 +262,10 @@ func NewManager(opts ManagerOptions) fx.Option {
 				}
 			},
 		),
-		fx.Invoke(func(_ *clusterFormationController) {
+		fx.Invoke(func(_ struct {
+			S *syncActor
+			C *clusterFormationController
+		}) {
 			// No-op, just to force the creation of all components
 		}),
 	)

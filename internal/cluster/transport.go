@@ -19,6 +19,9 @@ import (
 
 	"github.com/vladopajic/go-actor/actor"
 
+	"link-society.com/flowg/internal/storage"
+	clusterstate "link-society.com/flowg/internal/storage/cluster-state"
+
 	"github.com/hashicorp/memberlist"
 )
 
@@ -34,6 +37,9 @@ type httpTransport struct {
 
 	connM   actor.Mailbox[net.Conn]
 	packetM actor.Mailbox[*memberlist.Packet]
+
+	storages            map[string]storage.Streamable
+	clusterStateStorage clusterstate.Storage
 }
 
 var _ memberlist.Transport = (*httpTransport)(nil)
@@ -202,6 +208,7 @@ func (t *httpTransport) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	mux.HandleFunc("GET /cluster/nodes", t.handleStatus)
 	mux.HandleFunc("POST /cluster/gossip", t.handleGossip)
+	mux.HandleFunc("POST /cluster/sync/:namespace", t.handleSync)
 
 	mux.ServeHTTP(w, r)
 }
@@ -333,4 +340,53 @@ func (t *httpTransport) handleGossipPacket(w http.ResponseWriter, r *http.Reques
 	}
 
 	w.WriteHeader(http.StatusAccepted)
+}
+
+func (t *httpTransport) handleSync(w http.ResponseWriter, r *http.Request) {
+	namespace := r.PathValue("namespace")
+	storage, ok := t.storages[namespace]
+	if !ok {
+		message := fmt.Sprintf("unknown namespace: %s", namespace)
+		http.Error(w, message, http.StatusNotFound)
+		return
+	}
+
+	if t.cookie != "" && r.Header.Get(COOKIE_HEADER_NAME) != t.cookie {
+		http.Error(w, "invalid cluster key", http.StatusUnauthorized)
+		return
+	}
+
+	remoteNodeID := r.Header.Get(NODEID_HEADER_NAME)
+	if remoteNodeID == "" {
+		message := fmt.Sprintf("missing %s header", NODEID_HEADER_NAME)
+		http.Error(w, message, http.StatusBadRequest)
+		return
+	}
+
+	if err := storage.Load(r.Context(), r.Body); err != nil {
+		message := fmt.Sprintf("failed to load data: %v", err)
+		http.Error(w, message, http.StatusInternalServerError)
+		return
+	}
+
+	since, err := strconv.ParseUint(r.Trailer.Get(SINCE_HEADER_NAME), 10, 64)
+	if err != nil {
+		message := fmt.Sprintf("failed to parse %s header: %v", SINCE_HEADER_NAME, err)
+		http.Error(w, message, http.StatusBadRequest)
+		return
+	}
+
+	err = t.clusterStateStorage.UpdateLocalState(
+		r.Context(),
+		remoteNodeID,
+		namespace,
+		since,
+	)
+	if err != nil {
+		message := fmt.Sprintf("failed to update local state: %v", err)
+		http.Error(w, message, http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
