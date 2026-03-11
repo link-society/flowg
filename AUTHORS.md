@@ -13,4 +13,4 @@
  - [@glooopsies](https://github.com/glooopsies)
  - [@sanderdw](https://github.com/sanderdw)
  - [@clarabennett2626](https://github.com/clarabennett2626)
-
+ - [@coyote2190](https://github.com/coyote2190)
