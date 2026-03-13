@@ -4,7 +4,6 @@ import (
 	"os"
 
 	"strconv"
-	"strings"
 )
 
 var (
@@ -40,14 +39,6 @@ var (
 
 	defaultSyslogProtocol     = getEnvString("FLOWG_SYSLOG_PROTOCOL", "udp")
 	defaultSyslogBindAddr     = getEnvString("FLOWG_SYSLOG_BIND_ADDRESS", ":5514")
-	defaultSyslogAllowOrigins = (func() []string {
-		origins := getEnvString("FLOWG_SYSLOG_ALLOW_ORIGINS", "")
-		if origins == "" {
-			return nil
-		} else {
-			return strings.Split(origins, ",")
-		}
-	})()
 
 	defaultSyslogTlsEnabled     = getEnvBool("FLOWG_SYSLOG_TLS_ENABLED", false)
 	defaultSyslogTlsCert        = getEnvString("FLOWG_SYSLOG_TLS_CERT", "")
