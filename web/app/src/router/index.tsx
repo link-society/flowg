@@ -8,7 +8,8 @@ export default createBrowserRouter([
   {
     path: '/web/',
     lazy: async () => {
-      const { default: Component } = await import('@/layouts/base')
+      const { default: Component } =
+        await import('@/layouts/BaseLayout/component')
       return {
         Component,
         HydrateFallback: () => <LinearProgress />,
@@ -34,7 +35,8 @@ export default createBrowserRouter([
       {
         path: '',
         lazy: async () => {
-          const { default: Component, loader } = await import('@/layouts/app')
+          const { default: Component, loader } =
+            await import('@/layouts/AppLayout/component')
           return { Component, loader }
         },
         children: [

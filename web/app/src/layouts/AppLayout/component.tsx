@@ -10,6 +10,8 @@ import NavBar from '@/components/NavBar'
 import PageFooter from '@/components/PageFooter'
 import ProfileProvider from '@/components/ProfileProvider'
 
+import { StyledAppLayout } from './styles'
+
 export const loader = async () => {
   return await loginRequired(authApi.whoami)()
 }
@@ -20,15 +22,15 @@ const AppLayout = () => {
 
   return (
     <ProfileProvider value={profile}>
-      <div className="h-full flex flex-col overflow-hidden">
+      <StyledAppLayout>
         <NavBar />
 
-        <main className="grow shrink h-0">
+        <main>
           <Outlet key={location.key} />
         </main>
 
         <PageFooter />
-      </div>
+      </StyledAppLayout>
     </ProfileProvider>
   )
 }

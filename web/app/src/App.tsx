@@ -1,28 +1,13 @@
-import { RouterProvider } from 'react-router'
+import { ThemeRegistry } from '@/theme'
 
-import * as colors from '@mui/material/colors'
-import { ThemeProvider, createTheme } from '@mui/material/styles'
+import { RouterProvider } from 'react-router'
 
 import router from '@/router'
 
-const theme = createTheme({
-  shape: {
-    borderRadius: 0,
-  },
-  palette: {
-    primary: {
-      main: colors.blue[800],
-    },
-    secondary: {
-      main: colors.teal[400],
-    },
-  },
-})
-
 const App = () => (
-  <ThemeProvider theme={theme}>
+  <ThemeRegistry>
     <RouterProvider router={router} />
-  </ThemeProvider>
+  </ThemeRegistry>
 )
 
 export default App
