@@ -13,7 +13,7 @@ inputs:
     description: GitHub Token
     required: true
   testsuite:
-    description: Test suite to run (api, web, consul, k8s)
+    description: Test suite to run (api, web, consul, dns, k8s)
     required: true
   checkname:
     description: Name of the check
