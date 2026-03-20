@@ -6,9 +6,11 @@ import { Outlet } from 'react-router'
 import DialogsProvider from '@/components/DialogsProvider'
 import NotificationsProvider from '@/components/NotificationsProvider'
 
+import { StyledBaseLayout } from './styles'
+
 const BaseLayout = () => {
   return (
-    <div className="h-full flex flex-col overflow-hidden">
+    <StyledBaseLayout>
       <DialogsProvider>
         <NotificationsProvider>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -16,7 +18,7 @@ const BaseLayout = () => {
           </LocalizationProvider>
         </NotificationsProvider>
       </DialogsProvider>
-    </div>
+    </StyledBaseLayout>
   )
 }
 
