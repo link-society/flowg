@@ -105,6 +105,37 @@ jobs:
           testsuite: consul
           checkname: "Consul End-To-End Test Report"
 
+  dns:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: read
+      contents: write
+      checks: write
+      pull-requests: write
+      statuses: write
+
+    steps:
+      - name: checkout@scm
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: "${{ inputs.ref }}"
+
+      - name: setup@testsuite
+        uses: ./.github/actions/setup-testsuite
+        with:
+          ref: ${{ inputs.ref }}
+          ghactor: ${{ github.actor }}
+          ghtoken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: run@testsuite
+        uses: ./.github/actions/run-hurl-testsuite
+        with:
+          ref: ${{ inputs.ref }}
+          pr: ${{ inputs.pr }}
+          ghtoken: ${{ secrets.GITHUB_TOKEN }}
+          testsuite: dns
+          checkname: "DNS End-To-End Test Report"
+
   k8s:
     runs-on: ubuntu-latest
     permissions:
