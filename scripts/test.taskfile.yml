@@ -38,6 +38,25 @@ tasks:
       FLOWG_TEST_SUITES: consul
       FLOWG_TEST_DOCKER_IMAGE_NAME: linksociety/flowg:localdev
 
+  "e2e:dns:build":
+    desc: "Build the docker images used for testing"
+    cmds:
+      - docker build -t linksociety/flowg-dns:localdev -f tests/config/dns/flowg-dns.dockerfile .
+      - docker build -t linksociety/dns:localdev -f tests/config/dns/dns.dockerfile .
+
+  "e2e:dns":
+    desc: "Run DNS end-to-end tests"
+    dir: ./tests
+    cmds:
+      - task: e2e:dns:build
+      - pdm install
+      - pdm run pytest
+    env:
+      FLOWG_TEST_SUITES: dns
+      FLOWG_TEST_DOCKER_IMAGE_NAME: linksociety/flowg:localdev
+      FLOWG_TEST_DOCKER_FLOWG_DNS_IMAGE_NAME: linksociety/flowg-dns:localdev
+      FLOWG_TEST_DOCKER_DNS_IMAGE_NAME: linksociety/dns:localdev
+
   bench:
     desc: "Run benchmark"
     dir: ./tests

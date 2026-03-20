@@ -1,0 +1,10 @@
+#!/sbin/openrc-run
+
+depend() {
+	need net
+}
+
+command="/dns-management-server.sh"
+command_args="--no-fork"
+command_background="yes"
+pidfile="/run/management-server.pid"
