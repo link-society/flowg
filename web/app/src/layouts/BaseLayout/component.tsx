@@ -8,6 +8,8 @@ import NotificationsProvider from '@/components/NotificationsProvider'
 
 import { StyledBaseLayout } from './styles'
 
+import { StyledBaseLayout } from './styles'
+
 const BaseLayout = () => {
   return (
     <StyledBaseLayout>
