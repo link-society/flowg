@@ -114,6 +114,11 @@ jobs:
       pull-requests: write
       statuses: write
 
+    env:
+      ARTIFACT_ID: ${{ inputs.ref }}-linux-amd64
+      FLOWG_TEST_DOCKER_DNS_IMAGE_NAME: ghcr.io/link-society/dns/ci-artifacts/docker:${ARTIFACT_ID}
+      FLOWG_TEST_DOCKER_FLOWG_DNS_IMAGE_NAME: ghcr.io/link-society/flowg-dns/ci-artifacts/docker:${ARTIFACT_ID}
+
     steps:
       - name: checkout@scm
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -126,6 +131,12 @@ jobs:
           ref: ${{ inputs.ref }}
           ghactor: ${{ github.actor }}
           ghtoken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: download-dns@artifacts
+        shell: bash
+        run: |
+          docker pull $FLOWG_TEST_DOCKER_DNS_IMAGE_NAME
+          docker pull $FLOWG_TEST_DOCKER_FLOWG_DNS_IMAGE_NAME
 
       - name: run@testsuite
         uses: ./.github/actions/run-hurl-testsuite
