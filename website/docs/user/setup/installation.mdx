@@ -107,18 +107,13 @@ flowg-server \
 
 Otherwise, you can restrict which IP address (or range) will be allowed:
 
-```bash
-flowg-server \
-  --syslog-allow-origin="127.0.0.1" \
-  --syslog-allow-origin="192.168.1.0/24"
-```
+Go to `Settings > System Configuration > Allowed Syslog Origins` and add IPs
 
-Or via an environment variable:
+import AllowedSyslogOriginsUrl from '@site/static/img/setup/installation/allowed-syslog-origins.png'
 
-```bash
-export FLOWG_SYSLOG_ALLOW_ORIGINS="127.0.0.1,192.168.1.0/24"
-flowg-server
-```
+<div style={{ textAlign: 'center' }}>
+  <img src={AllowedSyslogOriginsUrl} alt="Allowed Syslog Origins Configuration" />
+</div>
 
 ## Next Steps
 
