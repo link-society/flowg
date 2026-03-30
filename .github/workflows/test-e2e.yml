@@ -116,8 +116,9 @@ jobs:
 
     env:
       ARTIFACT_ID: ${{ inputs.ref }}-linux-amd64
-      FLOWG_TEST_DOCKER_DNS_IMAGE_BASENAME: ghcr.io/link-society/flowg/tests/dns
-      FLOWG_TEST_DOCKER_FLOWG_DNS_IMAGE_BASENAME: ghcr.io/link-society/flowg/tests/flowg-dns
+      ARTIFACT_FLOWG_BASENAME: ghcr.io/link-society/flowg/ci-artifacts/docker
+      ARTIFACT_DNSSERVER_BASENAME: ghcr.io/link-society/flowg/tests-artifacts/dns-server
+      ARTIFACT_DNSCLIENT_BASENAME: ghcr.io/link-society/flowg/tests-artifacts/dns-client
 
     steps:
       - name: checkout@scm
@@ -135,23 +136,25 @@ jobs:
       - name: setup@docker
         uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd
 
-      - name: build-dns@docker
+      - name: build-dns-server@docker
         uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294
         with:
           context: .
-          file: ./tests/config/dns/dns.dockerfile
-          tags: ${{ env.FLOWG_TEST_DOCKER_DNS_IMAGE_BASENAME }}/docker:${{ env.ARTIFACT_ID }}
+          file: ./tests/config/dns/dns-server.dockerfile
+          tags: ${{ env.ARTIFACT_DNSSERVER_BASENAME }}:${{ env.ARTIFACT_ID }}
           push: true
           load: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: build-flowg-dns@docker
+      - name: build-dns-client@docker
         uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294
         with:
           context: .
-          file: ./tests/config/dns/flowg-dns.dockerfile
-          tags: ${{ env.FLOWG_TEST_DOCKER_FLOWG_DNS_IMAGE_BASENAME }}/docker:${{ env.ARTIFACT_ID }}
+          file: ./tests/config/dns/dns-client.dockerfile
+          build-args: |
+            BASEIMAGE=${{ env.ARTIFACT_FLOWG_BASENAME }}:${{ env.ARTIFACT_ID }}
+          tags: ${{ env.ARTIFACT_DNSCLIENT_BASENAME }}:${{ env.ARTIFACT_ID }}
           push: true
           load: true
           cache-from: type=gha
@@ -159,9 +162,15 @@ jobs:
 
       - name: download-dns@artifacts
         shell: bash
+        env:
+          DOCKER_DNSSERVER_IMAGE: ${{ env.ARTIFACT_DNSSERVER_BASENAME }}:${{ env.ARTIFACT_ID }}
+          DOCKER_DNSCLIENT_IMAGE: ${{ env.ARTIFACT_DNSCLIENT_BASENAME }}:${{ env.ARTIFACT_ID }}
         run: |
-          docker pull ${{ env.FLOWG_TEST_DOCKER_DNS_IMAGE_BASENAME }}/docker:${{ env.ARTIFACT_ID }}
-          docker pull ${{ env.FLOWG_TEST_DOCKER_FLOWG_DNS_IMAGE_BASENAME }}/docker:${{ env.ARTIFACT_ID }}
+          docker pull ${DOCKER_DNSSERVER_IMAGE}
+          docker pull ${DOCKER_DNSCLIENT_IMAGE}
+
+          echo "DNSSERVER_TEST_DOCKER_IMAGE_NAME=${DOCKER_DNSSERVER_IMAGE}" >> $GITHUB_ENV
+          echo "DNSCLIENT_TEST_DOCKER_IMAGE_NAME=${DOCKER_DNSCLIENT_IMAGE}" >> $GITHUB_ENV
 
       - name: run@testsuite
         uses: ./.github/actions/run-hurl-testsuite
