@@ -41,8 +41,8 @@ tasks:
   "e2e:dns:build":
     desc: "Build the docker images used for testing"
     cmds:
-      - docker build -t linksociety/flowg-dns:localdev -f tests/config/dns/flowg-dns.dockerfile .
-      - docker build -t linksociety/dns:localdev -f tests/config/dns/dns.dockerfile .
+      - docker build -t linksociety/dns-client:localdev -f tests/config/dns/dns-client.dockerfile .
+      - docker build -t linksociety/dns-server:localdev -f tests/config/dns/dns-server.dockerfile .
 
   "e2e:dns":
     desc: "Run DNS end-to-end tests"
@@ -54,8 +54,8 @@ tasks:
     env:
       FLOWG_TEST_SUITES: dns
       FLOWG_TEST_DOCKER_IMAGE_NAME: linksociety/flowg:localdev
-      FLOWG_TEST_DOCKER_FLOWG_DNS_IMAGE_NAME: linksociety/flowg-dns:localdev
-      FLOWG_TEST_DOCKER_DNS_IMAGE_NAME: linksociety/dns:localdev
+      DNSSERVER_TEST_DOCKER_IMAGE_NAME: linksociety/dns-server:localdev
+      DNSCLIENT_TEST_DOCKER_IMAGE_NAME: linksociety/dns-client:localdev
 
   bench:
     desc: "Run benchmark"

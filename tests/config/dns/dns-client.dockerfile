@@ -1,4 +1,5 @@
-FROM linksociety/flowg:localdev
+ARG BASEIMAGE="linksociety/flowg:localdev"
+FROM ${BASEIMAGE}
 
 RUN apk add --no-cache curl
 
