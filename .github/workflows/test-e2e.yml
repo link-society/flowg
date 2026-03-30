@@ -108,7 +108,7 @@ jobs:
   dns:
     runs-on: ubuntu-latest
     permissions:
-      packages: read
+      packages: write
       contents: write
       checks: write
       pull-requests: write
