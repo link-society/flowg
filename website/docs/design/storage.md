@@ -5,7 +5,7 @@ sidebar_position: 1
 # How Logs Are Stored?
 
 The storage backend of **FlowG** is the key/value store
-[BadgerDB](https://dgraph.io/docs/badger/).
+[BadgerDB](https://github.com/dgraph-io/badger).
 
 ## Streams
 

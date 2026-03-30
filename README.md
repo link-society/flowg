@@ -13,7 +13,7 @@
 FlowG is a log management platform that lets you ingest, transform, and query
 logs using a visual pipeline builder. It handles structured logs without
 requiring predefined schemas and relies on
-[BadgerDB](https://dgraph.io/docs/badger/) as its storage backend.
+[BadgerDB](https://github.com/dgraph-io/badger) as its storage backend.
 
 For more information, consult the
 [documentation](https://link-society.github.io/flowg/docs/).
@@ -47,9 +47,9 @@ which gives a solid base for log refinement.
 It aims to replace tools like [Logstash](https://www.elastic.co/logstash) by
 integrating the feature right in the solution.
 
-It also leverages [BadgerDB](https://dgraph.io/docs/badger/) which is a battle
-tested Key/Value database, with the right feature set to easily support indexing
-dynamically structured logs, as well as log compression.
+It also leverages [BadgerDB](https://github.com/dgraph-io/badger) which is a
+battle tested Key/Value database, with the right feature set to easily support
+indexing dynamically structured logs, as well as log compression.
 
 ## :zap: Benchmark
 

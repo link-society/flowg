@@ -17,6 +17,6 @@ which gives a solid base for log refinement.
 It aims to replace tools like [Logstash](https://www.elastic.co/logstash) by
 integrating the feature right in the solution.
 
-It also leverages [BadgerDB](https://dgraph.io/docs/badger/) which is a battle
-tested Key/Value database, with the right feature set to easily support indexing
-dynamically structured logs, as well as log compression.
+It also leverages [BadgerDB](https://github.com/dgraph-io/badger) which is a
+battle tested Key/Value database, with the right feature set to easily support
+indexing dynamically structured logs, as well as log compression.
