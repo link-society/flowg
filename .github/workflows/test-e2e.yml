@@ -116,8 +116,8 @@ jobs:
 
     env:
       ARTIFACT_ID: ${{ inputs.ref }}-linux-amd64
-      FLOWG_TEST_DOCKER_DNS_IMAGE_NAME: ghcr.io/link-society/flowg/tests/dns/docker:${ARTIFACT_ID}
-      FLOWG_TEST_DOCKER_FLOWG_DNS_IMAGE_NAME: ghcr.io/link-society/flowg/tests/flowg-dns/docker:${ARTIFACT_ID}
+      FLOWG_TEST_DOCKER_DNS_IMAGE_BASENAME: ghcr.io/link-society/flowg/tests/dns
+      FLOWG_TEST_DOCKER_FLOWG_DNS_IMAGE_BASENAME: ghcr.io/link-society/flowg/tests/flowg-dns
 
     steps:
       - name: checkout@scm
@@ -140,7 +140,7 @@ jobs:
         with:
           context: .
           file: ./tests/config/dns/dns.dockerfile
-          tags: ${{ env.FLOWG_TEST_DOCKER_DNS_IMAGE_NAME }}
+          tags: ${{ env.FLOWG_TEST_DOCKER_DNS_IMAGE_BASENAME }}/docker:${{ env.ARTIFACT_ID }}
           push: true
           load: true
           cache-from: type=gha
@@ -151,7 +151,7 @@ jobs:
         with:
           context: .
           file: ./tests/config/dns/flowg-dns.dockerfile
-          tags: ${{ env.FLOWG_TEST_DOCKER_FLOWG_DNS_IMAGE_NAME }}
+          tags: ${{ env.FLOWG_TEST_DOCKER_FLOWG_DNS_IMAGE_BASENAME }}/docker:${{ env.ARTIFACT_ID }}
           push: true
           load: true
           cache-from: type=gha
@@ -160,8 +160,8 @@ jobs:
       - name: download-dns@artifacts
         shell: bash
         run: |
-          docker pull ${{ env.FLOWG_TEST_DOCKER_DNS_IMAGE_NAME }}
-          docker pull ${{ env.FLOWG_TEST_DOCKER_FLOWG_DNS_IMAGE_NAME }}
+          docker pull ${{ env.FLOWG_TEST_DOCKER_DNS_IMAGE_BASENAME }}/docker:${{ env.ARTIFACT_ID }}
+          docker pull ${{ env.FLOWG_TEST_DOCKER_FLOWG_DNS_IMAGE_BASENAME }}/docker:${{ env.ARTIFACT_ID }}
 
       - name: run@testsuite
         uses: ./.github/actions/run-hurl-testsuite
