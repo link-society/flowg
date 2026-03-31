@@ -74,8 +74,8 @@ def flowg_node0_container(
         volume=flowg_node0_volume,
         image=dns_client_image,
         environment={
-            "FLOWG_CLUSTER_FORMATION_DNS_SERVER": "test-flowg-dns:53",
-            "FLOWG_CLUSTER_FORMATION_DNS_MANAGEMENT_SERVER": "test-flowg-dns:8080",
+            "FLOWG_CLUSTER_FORMATION_DNS_SERVER": "test-flowg-dns-server:53",
+            "FLOWG_CLUSTER_FORMATION_DNS_MANAGEMENT_SERVER": "test-flowg-dns-server:8080",
         },
         ports={
             "5080/tcp": 5080,
@@ -105,8 +105,8 @@ def flowg_node1_container(
             "FLOWG_HTTP_BIND_ADDRESS": ":5081",
             "FLOWG_MGMT_BIND_ADDRESS": ":9114",
             "FLOWG_SYSLOG_BIND_ADDRESS": ":5515",
-            "FLOWG_CLUSTER_FORMATION_DNS_SERVER": "test-flowg-dns:53",
-            "FLOWG_CLUSTER_FORMATION_DNS_MANAGEMENT_SERVER": "test-flowg-dns:8080",
+            "FLOWG_CLUSTER_FORMATION_DNS_SERVER": "test-flowg-dns-server:53",
+            "FLOWG_CLUSTER_FORMATION_DNS_MANAGEMENT_SERVER": "test-flowg-dns-server:8080",
         },
         ports={
             "5081/tcp": 5081,
@@ -136,8 +136,8 @@ def flowg_node2_container(
             "FLOWG_HTTP_BIND_ADDRESS": ":5082",
             "FLOWG_MGMT_BIND_ADDRESS": ":9115",
             "FLOWG_SYSLOG_BIND_ADDRESS": ":5516",
-            "FLOWG_CLUSTER_FORMATION_DNS_SERVER": "test-flowg-dns:53",
-            "FLOWG_CLUSTER_FORMATION_DNS_MANAGEMENT_SERVER": "test-flowg-dns:8080",
+            "FLOWG_CLUSTER_FORMATION_DNS_SERVER": "test-flowg-dns-server:53",
+            "FLOWG_CLUSTER_FORMATION_DNS_MANAGEMENT_SERVER": "test-flowg-dns-server:8080",
         },
         ports={
             "5082/tcp": 5082,
