@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "@iconify-json/logos": "^1.2.10",
-    "mermaid": "^11.13.0",
+    "@iconify-json/logos": "^1.2.11",
+    "mermaid": "^11.14.0",
     "reveal.js": "^6.0.0"
   }
 }
