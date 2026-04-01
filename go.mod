@@ -3,8 +3,8 @@ module link-society.com/flowg
 go 1.25.8
 
 require (
-	codeberg.org/miekg/dns v0.6.70
-	github.com/ClickHouse/clickhouse-go/v2 v2.43.0
+	codeberg.org/miekg/dns v0.6.73
+	github.com/ClickHouse/clickhouse-go/v2 v2.44.0
 	github.com/dgraph-io/badger/v4 v4.9.1
 	github.com/elastic/go-elasticsearch/v9 v9.3.1
 	github.com/expr-lang/expr v1.17.8
@@ -13,7 +13,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/google/uuid v1.6.0
-	github.com/hashicorp/consul/api v1.33.5
+	github.com/hashicorp/consul/api v1.33.7
 	github.com/hashicorp/go-sockaddr v1.0.7
 	github.com/hashicorp/memberlist v0.5.4
 	github.com/jarcoal/httpmock v1.4.1
