@@ -209,6 +209,7 @@ func (t *httpTransport) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	mux.HandleFunc("GET /cluster/nodes", t.handleStatus)
 	mux.HandleFunc("POST /cluster/gossip", t.handleGossip)
 	mux.HandleFunc("POST /cluster/sync/:namespace", t.handleSync)
+	mux.HandleFunc("POST /cluster/notifications", t.handleNotifications)
 
 	mux.ServeHTTP(w, r)
 }
@@ -389,4 +390,49 @@ func (t *httpTransport) handleSync(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+}
+
+type Notification = struct {
+	Type string `json:"type"`
+}
+
+func (t *httpTransport) handleNotifications(w http.ResponseWriter, r *http.Request) {
+	defer func() { _ = r.Body.Close() }()
+
+	var notification Notification
+
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&notification)
+	if err != nil {
+		message := fmt.Sprintf("failed to parse body: %v", err)
+		http.Error(w, message, http.StatusInternalServerError)
+		return
+	}
+
+	t.delegate.logger.DebugContext(
+		r.Context(),
+		"I am alive",
+	)
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func (t *httpTransport) Broadcast() error {
+	notification := Notification{
+		Type: "i-am-alive",
+	}
+
+	body, err := json.Marshal(notification)
+	if err != nil {
+		return err
+	}
+
+	for _, nodeUrl := range t.delegate.endpoints.All() {
+		_, err = http.NewRequest("POST", nodeUrl.String(), bytes.NewBuffer(body))
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
