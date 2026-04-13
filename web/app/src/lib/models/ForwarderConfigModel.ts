@@ -23,14 +23,14 @@ import ForwarderConfigSyslogModel, {
   factory as ForwarderConfigSyslogFactory,
 } from '@/lib/models/ForwarderConfigSyslogModel'
 
-import ForwarderIconAmqp from '@/components/ForwarderIconAmqp'
-import ForwarderIconClickhouse from '@/components/ForwarderIconClickhouse'
-import ForwarderIconDatadog from '@/components/ForwarderIconDatadog'
-import ForwarderIconElastic from '@/components/ForwarderIconElastic'
-import ForwarderIconHttp from '@/components/ForwarderIconHttp'
-import ForwarderIconOtlp from '@/components/ForwarderIconOtlp'
-import ForwarderIconSplunk from '@/components/ForwarderIconSplunk'
-import ForwarderIconSyslog from '@/components/ForwarderIconSyslog'
+import ForwarderIconAmqp from '@/components/icons/ForwarderIconAmqp/component'
+import ForwarderIconClickhouse from '@/components/icons/ForwarderIconClickhouse/component'
+import ForwarderIconDatadog from '@/components/icons/ForwarderIconDatadog/component'
+import ForwarderIconElastic from '@/components/icons/ForwarderIconElastic/component'
+import ForwarderIconHttp from '@/components/icons/ForwarderIconHttp/component'
+import ForwarderIconOtlp from '@/components/icons/ForwarderIconOtlp/component'
+import ForwarderIconSplunk from '@/components/icons/ForwarderIconSplunk/component'
+import ForwarderIconSyslog from '@/components/icons/ForwarderIconSyslog/component'
 
 type ForwarderConfigModel =
   | ForwarderConfigHttpModel

@@ -1,20 +1,19 @@
 import breakpoints, { BreakpointsType } from './breakpoints'
 import colors, { ColorsType } from './colors'
+import typography, { TypographyType } from './typography'
 
 export const tokens = {
   breakpoints,
   colors,
+  typography,
 }
 
 export type TokensType = {
   breakpoints: BreakpointsType
   colors: ColorsType
+  typography: TypographyType
 }
 
-export { breakpoints, colors }
-<<<<<<< HEAD
 export type { BreakpointsType } from './breakpoints'
 export type { ColorsType } from './colors'
-=======
-export type { BreakpointsType, ColorsType }
->>>>>>> 975214e4 (🎨 feat(style): setup MUI theme)
+export type { TypographyType } from './typography'

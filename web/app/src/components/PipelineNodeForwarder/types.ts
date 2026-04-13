@@ -1,0 +1,8 @@
+import { Node } from '@xyflow/react'
+
+import { NodeTrace } from '@/lib/models/PipelineTrace.ts'
+
+export type PipelineNodeForwarderData = Node<{
+  forwarder: string
+  traces: NodeTrace[] | null
+}>
