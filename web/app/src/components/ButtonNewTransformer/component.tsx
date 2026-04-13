@@ -1,0 +1,44 @@
+import Button from '@mui/material/Button'
+
+import AddIcon from '@mui/icons-material/Add'
+
+import { useApiOperation } from '@/lib/hooks/api'
+import { useDialogs } from '@/lib/hooks/dialogs'
+import { useNotify } from '@/lib/hooks/notify'
+
+import DialogNewTransformer from '@/components/DialogNewTransformer/component'
+
+import { ButtonNewTransformerProps } from './types'
+
+const ButtonNewTransformer = ({
+  onTransformerCreated,
+}: ButtonNewTransformerProps) => {
+  const dialogs = useDialogs()
+  const notify = useNotify()
+
+  const [handleClick] = useApiOperation(async () => {
+    const transformerName = (await dialogs.open(DialogNewTransformer)) as
+      | string
+      | null
+    if (transformerName !== null) {
+      onTransformerCreated(transformerName)
+
+      notify.success('Transformer created')
+    }
+  }, [onTransformerCreated])
+
+  return (
+    <Button
+      id="btn:transformers.create"
+      variant="contained"
+      color="primary"
+      size="small"
+      onClick={() => handleClick()}
+      startIcon={<AddIcon />}
+    >
+      New
+    </Button>
+  )
+}
+
+export default ButtonNewTransformer

@@ -6,11 +6,11 @@ import ProfileModel from '@/lib/models/ProfileModel'
 
 import { loginRequired } from '@/lib/decorators/loaders'
 
-import NavBar from '@/components/NavBar'
-import PageFooter from '@/components/PageFooter'
-import ProfileProvider from '@/components/ProfileProvider'
+import NavBar from '@/components/NavBar/component'
+import PageFooter from '@/components/PageFooter/component'
+import ProfileProvider from '@/components/ProfileProvider/component'
 
-import { StyledAppLayout } from './styles'
+import { AppLayoutContainer } from './styles'
 
 export const loader = async () => {
   return await loginRequired(authApi.whoami)()
@@ -22,7 +22,7 @@ const AppLayout = () => {
 
   return (
     <ProfileProvider value={profile}>
-      <StyledAppLayout>
+      <AppLayoutContainer>
         <NavBar />
 
         <main>
@@ -30,7 +30,7 @@ const AppLayout = () => {
         </main>
 
         <PageFooter />
-      </StyledAppLayout>
+      </AppLayoutContainer>
     </ProfileProvider>
   )
 }

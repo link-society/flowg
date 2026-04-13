@@ -1,6 +1,6 @@
 import type { GlobalStylesProps } from '@mui/material/GlobalStyles'
 
-import { colors } from './tokens'
+import colors from './tokens/colors'
 
 const globalStyles: GlobalStylesProps['styles'] = {
   'html, body': {
@@ -8,7 +8,7 @@ const globalStyles: GlobalStylesProps['styles'] = {
     padding: 0,
     width: '100vw',
     height: '100vh',
-    backgroundColor: colors.backgroundBody,
+    backgroundColor: colors.bodyBg,
     overflow: 'hidden',
   },
   '#root': {
