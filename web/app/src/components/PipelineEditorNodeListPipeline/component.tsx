@@ -1,0 +1,37 @@
+import { useNavigate } from 'react-router'
+
+import AccountTreeIcon from '@mui/icons-material/AccountTree'
+
+import * as configApi from '@/lib/api/operations/config'
+
+import { useProfile } from '@/lib/hooks/profile'
+
+import ButtonNewPipeline from '@/components/ButtonNewPipeline/component'
+import PipelineEditorNodeList from '@/components/PipelineEditorNodeList/component'
+
+const PipelineEditorNodeListPipeline = () => {
+  const { permissions } = useProfile()
+  const navigate = useNavigate()
+
+  return (
+    <PipelineEditorNodeList
+      title="Pipelines"
+      newButton={(createdCb) => (
+        <>
+          {permissions.can_edit_pipelines && (
+            <ButtonNewPipeline onPipelineCreated={createdCb} />
+          )}
+        </>
+      )}
+      fetchItems={configApi.listPipelines}
+      itemType="pipeline"
+      itemIcon={<AccountTreeIcon />}
+      itemColor="lime"
+      onItemOpen={(pipeline) => {
+        navigate(`/web/pipelines/${pipeline}`)
+      }}
+    />
+  )
+}
+
+export default PipelineEditorNodeListPipeline
