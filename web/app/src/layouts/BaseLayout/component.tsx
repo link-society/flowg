@@ -6,13 +6,11 @@ import { Outlet } from 'react-router'
 import DialogsProvider from '@/components/DialogsProvider'
 import NotificationsProvider from '@/components/NotificationsProvider'
 
-import { StyledBaseLayout } from './styles'
-
-import { StyledBaseLayout } from './styles'
+import { BaseLayoutContainer } from './styles'
 
 const BaseLayout = () => {
   return (
-    <StyledBaseLayout>
+    <BaseLayoutContainer>
       <DialogsProvider>
         <NotificationsProvider>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -20,7 +18,7 @@ const BaseLayout = () => {
           </LocalizationProvider>
         </NotificationsProvider>
       </DialogsProvider>
-    </StyledBaseLayout>
+    </BaseLayoutContainer>
   )
 }
 
