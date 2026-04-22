@@ -6,7 +6,7 @@ require (
 	codeberg.org/miekg/dns v0.6.73
 	github.com/ClickHouse/clickhouse-go/v2 v2.45.0
 	github.com/dgraph-io/badger/v4 v4.9.1
-	github.com/elastic/go-elasticsearch/v9 v9.3.1
+	github.com/elastic/go-elasticsearch/v9 v9.3.2
 	github.com/expr-lang/expr v1.17.8
 	github.com/go-chi/chi/v5 v5.2.5
 	github.com/go-logfmt/logfmt v0.6.1
@@ -19,14 +19,14 @@ require (
 	github.com/jarcoal/httpmock v1.4.1
 	github.com/prometheus/client_golang v1.23.2
 	github.com/prometheus/procfs v0.20.1
-	github.com/rabbitmq/amqp091-go v1.10.0
+	github.com/rabbitmq/amqp091-go v1.11.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
 	github.com/stretchr/testify v1.11.1
 	github.com/swaggest/jsonschema-go v0.3.79
 	github.com/swaggest/openapi-go v0.2.61
 	github.com/swaggest/rest v0.2.75
-	github.com/swaggest/swgui v1.8.6
+	github.com/swaggest/swgui v1.8.7
 	github.com/swaggest/usecase v1.3.1
 	github.com/vladopajic/go-actor v1.1.0
 	go.opentelemetry.io/proto/otlp v1.10.0
@@ -35,9 +35,9 @@ require (
 	golang.org/x/term v0.42.0
 	google.golang.org/protobuf v1.36.11
 	gopkg.in/mcuadros/go-syslog.v2 v2.3.0
-	k8s.io/api v0.35.3
-	k8s.io/apimachinery v0.35.3
-	k8s.io/client-go v0.35.3
+	k8s.io/api v0.35.4
+	k8s.io/apimachinery v0.35.4
+	k8s.io/client-go v0.35.4
 )
 
 require (
