@@ -20,8 +20,8 @@ import * as aclApi from '@/lib/api/operations/acls'
 
 import { useApiOperation } from '@/lib/hooks/api'
 
-import UserModel from '@/lib/models/UserModel'
 import { DialogProps } from '@/lib/models/Dialog'
+import UserModel from '@/lib/models/UserModel'
 
 import InputTransferList from '@/components/InputTransferList'
 

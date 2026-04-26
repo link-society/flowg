@@ -3,9 +3,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 
 import { Outlet } from 'react-router'
 
-import { NotificationsProvider } from '@toolpad/core/useNotifications'
-
 import DialogsProvider from '@/components/DialogsProvider'
+import NotificationsProvider from '@/components/NotificationsProvider'
 
 const BaseLayout = () => {
   return (

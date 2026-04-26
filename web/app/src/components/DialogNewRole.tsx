@@ -18,9 +18,9 @@ import * as aclApi from '@/lib/api/operations/acls'
 
 import { useApiOperation } from '@/lib/hooks/api'
 
+import { DialogProps } from '@/lib/models/Dialog'
 import RoleModel from '@/lib/models/RoleModel'
 import { ScopeLabels, Scopes } from '@/lib/models/Scopes'
-import { DialogProps } from '@/lib/models/Dialog'
 
 import InputTransferList from '@/components/InputTransferList'
 
