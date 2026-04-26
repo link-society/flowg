@@ -159,8 +159,10 @@ const TimeWindowSelector = ({
         anchorEl={menu}
         open={open}
         onClose={handleClose}
-        MenuListProps={{
-          sx: { width: menu?.offsetWidth },
+        slotProps={{
+          list: {
+            sx: { width: menu?.offsetWidth },
+          },
         }}
       >
         <Box>
