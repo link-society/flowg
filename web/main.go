@@ -1,12 +1,15 @@
 package web
 
 import (
-	"compress/gzip"
 	"embed"
+
+	"mime"
+	"path"
 
 	"html/template"
 	"strings"
 
+	"compress/gzip"
 	"encoding/base64"
 
 	"io"
@@ -15,28 +18,32 @@ import (
 	"link-society.com/flowg/internal/app/featureflags"
 )
 
-//go:embed public/**/*.css
-//go:embed public/**/*.js
-//go:embed public/**/*.map
-//go:embed public/**/*.ico
-//go:embed public/**/*.png
-//go:embed public/index.html
+//go:embed public/**/*.gz
+//go:embed public/*.gz
 var staticfiles embed.FS
 
 func NewHandler() http.Handler {
 	return http.StripPrefix(
 		"/web/",
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+				http.Error(w, "gzip required", http.StatusNotAcceptable)
+				return
+			}
+
 			if strings.HasPrefix(r.URL.Path, "assets/") {
-				r.URL.Path = "/public/" + r.URL.Path
+				reqpath := "public/" + r.URL.Path
+				realpath := reqpath + ".gz"
+				r.URL.Path = realpath
 
 				w.Header().Set("Content-Encoding", "gzip")
+				w.Header().Set("Content-Type", mime.TypeByExtension(path.Ext(reqpath)))
 				w.Header().Set("Cache-Control", "public, max-age=86400")
 				w.Header().Set("ETag", base64.StdEncoding.EncodeToString([]byte(r.URL.Path)))
 
 				http.FileServer(http.FS(staticfiles)).ServeHTTP(w, r)
 			} else {
-				htmlTemplateFile, err := staticfiles.Open("public/index.html")
+				htmlTemplateFile, err := staticfiles.Open("public/index.html.gz")
 				if err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 					return

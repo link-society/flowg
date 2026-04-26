@@ -18,8 +18,6 @@ export default defineConfig({
       include: [
         /\.(html|css|js|map|ico|png)$/,
       ],
-      filename: '[path][base]',
-      deleteOriginalAssets: true
     }),
     {
       name: 'rewrite-assets-path',
@@ -36,10 +34,10 @@ export default defineConfig({
   ],
   build: {
     sourcemap: true,
-    chunkSizeWarningLimit: 1024,
+    chunkSizeWarningLimit: 4096,
     rollupOptions: {
       output: {
-        manualChunks: () => 'bundle.js',
+        manualChunks: () => 'bundle',
       },
     },
   },
