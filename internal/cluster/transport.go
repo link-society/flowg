@@ -20,9 +20,7 @@ import (
 	"github.com/vladopajic/go-actor/actor"
 
 	"link-society.com/flowg/internal/storage"
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
-	"link-society.com/flowg/internal/storage/log"
+	clusterstate "link-society.com/flowg/internal/storage/cluster-state"
 
 	"github.com/hashicorp/memberlist"
 )
@@ -40,9 +38,8 @@ type httpTransport struct {
 	connM   actor.Mailbox[net.Conn]
 	packetM actor.Mailbox[*memberlist.Packet]
 
-	authStorage   auth.Storage
-	configStorage config.Storage
-	logStorage    log.Storage
+	storages            map[string]storage.Streamable
+	clusterStateStorage clusterstate.Storage
 }
 
 var _ memberlist.Transport = (*httpTransport)(nil)
@@ -87,7 +84,7 @@ func (t *httpTransport) WriteToAddress(b []byte, addr memberlist.Address) (time.
 		return time.Time{}, fmt.Errorf("empty node name")
 	}
 
-	endpoint, ok := t.delegate.endpoints[addr.Name]
+	endpoint, ok := t.delegate.endpoints.Get(addr.Name)
 	if !ok {
 		return time.Time{}, fmt.Errorf("endpoint not found for %s", addr.Name)
 	}
@@ -130,7 +127,7 @@ func (t *httpTransport) DialAddressTimeout(addr memberlist.Address, timeout time
 		return nil, fmt.Errorf("empty node name")
 	}
 
-	endpoint, ok := t.delegate.endpoints[addr.Name]
+	endpoint, ok := t.delegate.endpoints.Get(addr.Name)
 	if !ok {
 		return nil, fmt.Errorf("endpoint not found for %s", addr.Name)
 	}
@@ -211,9 +208,8 @@ func (t *httpTransport) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	mux.HandleFunc("GET /cluster/nodes", t.handleStatus)
 	mux.HandleFunc("POST /cluster/gossip", t.handleGossip)
-	mux.HandleFunc("POST /cluster/sync/auth", t.handleSync(t.authStorage, "auth"))
-	mux.HandleFunc("POST /cluster/sync/config", t.handleSync(t.configStorage, "config"))
-	mux.HandleFunc("POST /cluster/sync/log", t.handleSync(t.logStorage, "log"))
+	mux.HandleFunc("POST /cluster/sync/:namespace", t.handleSync)
+	mux.HandleFunc("POST /cluster/notifications", t.handleNotifications)
 
 	mux.ServeHTTP(w, r)
 }
@@ -228,7 +224,7 @@ func (t *httpTransport) handleStatus(w http.ResponseWriter, r *http.Request) {
 		Nodes []nodeInfo `json:"nodes"`
 	}
 
-	for nodeID, endpoint := range t.delegate.endpoints {
+	for nodeID, endpoint := range t.delegate.endpoints.All() {
 		payload.Nodes = append(payload.Nodes, nodeInfo{
 			NodeID:   nodeID,
 			Endpoint: endpoint.String(),
@@ -347,46 +343,96 @@ func (t *httpTransport) handleGossipPacket(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusAccepted)
 }
 
-func (t *httpTransport) handleSync(s storage.Streamable, dbType string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if t.cookie != "" && r.Header.Get(COOKIE_HEADER_NAME) != t.cookie {
-			http.Error(w, "invalid cluster key", http.StatusUnauthorized)
-			return
-		}
-
-		remoteNodeID := r.Header.Get(NODEID_HEADER_NAME)
-		if remoteNodeID == "" {
-			message := fmt.Sprintf("missing %s header", NODEID_HEADER_NAME)
-			http.Error(w, message, http.StatusBadRequest)
-			return
-		}
-
-		if err := s.Load(r.Context(), r.Body); err != nil {
-			message := fmt.Sprintf("failed to load data: %v", err)
-			http.Error(w, message, http.StatusInternalServerError)
-			return
-		}
-
-		since, err := strconv.ParseUint(r.Trailer.Get(SINCE_HEADER_NAME), 10, 64)
-		if err != nil {
-			message := fmt.Sprintf("failed to parse %s header: %v", SINCE_HEADER_NAME, err)
-			http.Error(w, message, http.StatusBadRequest)
-			return
-		}
-
-		err = updateLocalState(
-			r.Context(),
-			t.delegate.clusterStateStorage,
-			remoteNodeID,
-			dbType,
-			since,
-		)
-		if err != nil {
-			message := fmt.Sprintf("failed to update local state: %v", err)
-			http.Error(w, message, http.StatusInternalServerError)
-			return
-		}
-
-		w.WriteHeader(http.StatusOK)
+func (t *httpTransport) handleSync(w http.ResponseWriter, r *http.Request) {
+	namespace := r.PathValue("namespace")
+	storage, ok := t.storages[namespace]
+	if !ok {
+		message := fmt.Sprintf("unknown namespace: %s", namespace)
+		http.Error(w, message, http.StatusNotFound)
+		return
 	}
+
+	if t.cookie != "" && r.Header.Get(COOKIE_HEADER_NAME) != t.cookie {
+		http.Error(w, "invalid cluster key", http.StatusUnauthorized)
+		return
+	}
+
+	remoteNodeID := r.Header.Get(NODEID_HEADER_NAME)
+	if remoteNodeID == "" {
+		message := fmt.Sprintf("missing %s header", NODEID_HEADER_NAME)
+		http.Error(w, message, http.StatusBadRequest)
+		return
+	}
+
+	if err := storage.Load(r.Context(), r.Body); err != nil {
+		message := fmt.Sprintf("failed to load data: %v", err)
+		http.Error(w, message, http.StatusInternalServerError)
+		return
+	}
+
+	since, err := strconv.ParseUint(r.Trailer.Get(SINCE_HEADER_NAME), 10, 64)
+	if err != nil {
+		message := fmt.Sprintf("failed to parse %s header: %v", SINCE_HEADER_NAME, err)
+		http.Error(w, message, http.StatusBadRequest)
+		return
+	}
+
+	err = t.clusterStateStorage.UpdateLocalState(
+		r.Context(),
+		remoteNodeID,
+		namespace,
+		since,
+	)
+	if err != nil {
+		message := fmt.Sprintf("failed to update local state: %v", err)
+		http.Error(w, message, http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+type Notification = struct {
+	Type string `json:"type"`
+}
+
+func (t *httpTransport) handleNotifications(w http.ResponseWriter, r *http.Request) {
+	defer func() { _ = r.Body.Close() }()
+
+	var notification Notification
+
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&notification)
+	if err != nil {
+		message := fmt.Sprintf("failed to parse body: %v", err)
+		http.Error(w, message, http.StatusInternalServerError)
+		return
+	}
+
+	t.delegate.logger.DebugContext(
+		r.Context(),
+		"I am alive",
+	)
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func (t *httpTransport) Broadcast() error {
+	notification := Notification{
+		Type: "i-am-alive",
+	}
+
+	body, err := json.Marshal(notification)
+	if err != nil {
+		return err
+	}
+
+	for _, nodeUrl := range t.delegate.endpoints.All() {
+		_, err = http.NewRequest("POST", nodeUrl.String(), bytes.NewBuffer(body))
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

@@ -9,6 +9,8 @@ import (
 	"github.com/vladopajic/go-actor/actor"
 	"go.uber.org/fx"
 
+	"link-society.com/flowg/internal/utils/fxproviders"
+
 	"github.com/dgraph-io/badger/v4"
 
 	"link-society.com/flowg/internal/models"
@@ -82,28 +84,18 @@ func NewStorage(opts Options) fx.Option {
 	return fx.Module(
 		"storage.log",
 		kvstore.NewStorage(kvOpts),
-		fx.Provide(func(lc fx.Lifecycle, d deps) Storage {
-			storage := &storageImpl{
+		fx.Provide(func(d deps) Storage {
+			return &storageImpl{
 				kvStore: d.S,
 			}
-
-			gc := actor.New(&gcWorker{
-				kvStore:    d.S,
-				gcInterval: opts.GCInterval,
-			})
-
-			lc.Append(fx.Hook{
-				OnStart: func(ctx context.Context) error {
-					gc.Start()
-					return nil
-				},
-				OnStop: func(ctx context.Context) error {
-					gc.Stop()
-					return nil
-				},
-			})
-
-			return storage
+		}),
+		fxproviders.ProvideActor[*gcActor](func(d deps) *gcActor {
+			return &gcActor{
+				Actor: actor.New(&gcWorker{
+					kvStore:    d.S,
+					gcInterval: opts.GCInterval,
+				}),
+			}
 		}),
 	)
 }
