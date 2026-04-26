@@ -1,6 +1,6 @@
-import useEventCallback from '@mui/utils/useEventCallback'
-
 import { useId, useMemo, useRef, useState } from 'react'
+
+import useEventCallback from '@mui/utils/useEventCallback'
 
 import DialogsContext from '@/lib/context/dialogs'
 

@@ -1,7 +1,6 @@
-import {
-  ShowNotificationOptions,
-  useNotifications,
-} from '@toolpad/core/useNotifications'
+import { useNotifications } from '@/lib/hooks/notifications'
+
+import { ShowNotificationOptions } from '@/lib/models/Notification'
 
 export const useNotify = () => {
   const notifications = useNotifications()

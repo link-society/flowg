@@ -21,13 +21,13 @@ import * as configApi from '@/lib/api/operations/config'
 import { useApiOperation } from '@/lib/hooks/api'
 import { useInput } from '@/lib/hooks/input'
 
+import { DialogProps } from '@/lib/models/Dialog'
 import {
   factory as ForwarderConfigFactory,
   ForwarderConfigTypeValues,
   ForwarderConfigTypes,
 } from '@/lib/models/ForwarderConfigModel'
 import ForwarderModel from '@/lib/models/ForwarderModel'
-import { DialogProps } from '@/lib/models/Dialog'
 
 import * as validators from '@/lib/validators'
 
