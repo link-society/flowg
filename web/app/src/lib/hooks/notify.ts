@@ -1,9 +1,11 @@
-import { useNotifications } from '@/lib/hooks/notifications'
+import { useContext } from 'react'
+
+import NotificationsContext from '@/lib/context/notifications'
 
 import { ShowNotificationOptions } from '@/lib/models/Notification'
 
 export const useNotify = () => {
-  const notifications = useNotifications()
+  const notifications = useContext(NotificationsContext)
 
   type Severity = ShowNotificationOptions['severity']
   const notify = (severity: Severity, message: string) => {
