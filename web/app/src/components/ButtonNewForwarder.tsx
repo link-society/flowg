@@ -1,9 +1,9 @@
 import Button from '@mui/material/Button'
-import { useDialogs } from '@toolpad/core/useDialogs'
 
 import AddIcon from '@mui/icons-material/Add'
 
 import { useApiOperation } from '@/lib/hooks/api'
+import { useDialogs } from '@/lib/hooks/dialogs'
 import { useNotify } from '@/lib/hooks/notify'
 
 import DialogNewForwarder from '@/components/DialogNewForwarder'

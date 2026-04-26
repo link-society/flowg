@@ -10,7 +10,6 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import TextField from '@mui/material/TextField'
 import Tooltip from '@mui/material/Tooltip'
-import { DialogProps } from '@toolpad/core/useDialogs'
 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import CancelIcon from '@mui/icons-material/Cancel'
@@ -22,6 +21,7 @@ import * as aclApi from '@/lib/api/operations/acls'
 import { useApiOperation } from '@/lib/hooks/api'
 
 import UserModel from '@/lib/models/UserModel'
+import { DialogProps } from '@/lib/models/Dialog'
 
 import InputTransferList from '@/components/InputTransferList'
 

@@ -5,10 +5,11 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import TextField from '@mui/material/TextField'
-import { DialogProps } from '@toolpad/core/useDialogs'
 
 import KeyIcon from '@mui/icons-material/Key'
 import LabelIcon from '@mui/icons-material/Label'
+
+import { DialogProps } from '@/lib/models/Dialog'
 
 const DialogNewToken = ({
   open,

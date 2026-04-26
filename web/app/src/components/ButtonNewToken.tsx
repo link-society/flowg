@@ -1,12 +1,12 @@
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
-import { useDialogs } from '@toolpad/core/useDialogs'
 
 import AddIcon from '@mui/icons-material/Add'
 
 import * as tokenApi from '@/lib/api/operations/token'
 
 import { useApiOperation } from '@/lib/hooks/api'
+import { useDialogs } from '@/lib/hooks/dialogs'
 import { useNotify } from '@/lib/hooks/notify'
 
 import DialogNewToken from '@/components/DialogNewToken'

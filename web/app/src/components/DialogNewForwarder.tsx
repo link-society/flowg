@@ -12,7 +12,6 @@ import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
 import Select from '@mui/material/Select'
 import TextField from '@mui/material/TextField'
-import { DialogProps } from '@toolpad/core/useDialogs'
 
 import CancelIcon from '@mui/icons-material/Cancel'
 import SaveIcon from '@mui/icons-material/Save'
@@ -28,6 +27,7 @@ import {
   ForwarderConfigTypes,
 } from '@/lib/models/ForwarderConfigModel'
 import ForwarderModel from '@/lib/models/ForwarderModel'
+import { DialogProps } from '@/lib/models/Dialog'
 
 import * as validators from '@/lib/validators'
 
