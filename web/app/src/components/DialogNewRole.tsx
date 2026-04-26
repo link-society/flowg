@@ -10,7 +10,6 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import TextField from '@mui/material/TextField'
 import Tooltip from '@mui/material/Tooltip'
-import { DialogProps } from '@toolpad/core/useDialogs'
 
 import CancelIcon from '@mui/icons-material/Cancel'
 import SaveIcon from '@mui/icons-material/Save'
@@ -21,6 +20,7 @@ import { useApiOperation } from '@/lib/hooks/api'
 
 import RoleModel from '@/lib/models/RoleModel'
 import { ScopeLabels, Scopes } from '@/lib/models/Scopes'
+import { DialogProps } from '@/lib/models/Dialog'
 
 import InputTransferList from '@/components/InputTransferList'
 
