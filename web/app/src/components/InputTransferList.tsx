@@ -8,6 +8,7 @@ import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import Paper from '@mui/material/Paper'
+import Stack from '@mui/material/Stack'
 
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft'
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
@@ -127,7 +128,7 @@ const InputTransferList = <T,>(props: InputTransferListProps<T>) => {
         {customList(left)}
       </Grid>
       <Grid>
-        <Grid container direction="column" sx={{ alignItems: 'center' }}>
+        <Stack sx={{ alignItems: 'center' }}>
           <Button
             id="btn:generic.transfer-list.all-right"
             sx={{ my: 0.5 }}
@@ -172,7 +173,7 @@ const InputTransferList = <T,>(props: InputTransferListProps<T>) => {
           >
             <KeyboardDoubleArrowLeftIcon />
           </Button>
-        </Grid>
+        </Stack>
       </Grid>
       <Grid data-ref="container:generic.transfer-list.items-right" size="grow">
         {customList(right)}
