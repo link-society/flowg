@@ -6,13 +6,12 @@ export interface ShowNotificationOptions {
   onAction?: () => void
 }
 
-export interface ShowNotification {
-  (message: React.ReactNode, options?: ShowNotificationOptions): string
-}
+export type ShowNotification = (
+  message: React.ReactNode,
+  options?: ShowNotificationOptions
+) => string
 
-export interface CloseNotification {
-  (key: string): void
-}
+export type CloseNotification = (key: string) => void
 
 export interface NotificationQueueEntry {
   notificationKey: string
