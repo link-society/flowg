@@ -26,9 +26,7 @@ export interface OpenDialog {
   ): Promise<R>
 }
 
-export interface CloseDialog {
-  <R>(dialog: Promise<R>, result: R): Promise<R>
-}
+export type CloseDialog = <R>(dialog: Promise<R>, result: R) => Promise<R>
 
 export interface DialogStackEntry<P, R> {
   key: string
