@@ -21,6 +21,9 @@ runs:
 
     - name: setup@sys-deps
       uses: gacts/install-hurl@8c80c69c281b4b618858de1e1a9ce931e9e61c97
+      with:
+        version: '7.1.0'
+        github-token: ${{ inputs.ghtoken }}
 
     - name: setup@env
       shell: bash
