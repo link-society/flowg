@@ -1,4 +1,4 @@
-import { colors } from '@mui/material'
+import { colors as muiColors } from '@mui/material'
 
 import { createTheme } from '@mui/material/styles'
 
@@ -11,6 +11,27 @@ declare module '@mui/material/styles' {
   interface ThemeOptions {
     tokens?: TokensType
   }
+  interface TypographyVariants {
+    titleLg: React.CSSProperties
+    titleMd: React.CSSProperties
+    titleSm: React.CSSProperties
+    text: React.CSSProperties
+  }
+  interface TypographyVariantsOptions {
+    titleLg?: React.CSSProperties
+    titleMd?: React.CSSProperties
+    titleSm?: React.CSSProperties
+    text?: React.CSSProperties
+  }
+}
+
+declare module '@mui/material/Typography' {
+  interface TypographyPropsVariantOverrides {
+    titleLg: true
+    titleMd: true
+    titleSm: true
+    text: true
+  }
 }
 
 const theme = createTheme({
@@ -20,10 +41,39 @@ const theme = createTheme({
   },
   palette: {
     primary: {
-      main: colors.blue[800],
+      main: muiColors.blue[800],
     },
     secondary: {
-      main: colors.teal[400],
+      main: muiColors.teal[400],
+    },
+  },
+  typography: {
+    titleLg: { fontSize: tokens.typography.titleLg, letterSpacing: 'normal' },
+    titleMd: { fontSize: tokens.typography.titleMd, letterSpacing: 'normal' },
+    titleSm: { fontSize: tokens.typography.titleSm, letterSpacing: 'normal' },
+    text: { fontSize: tokens.typography.text, letterSpacing: 'normal' },
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'uppercase',
+        },
+        contained: {},
+        outlined: {},
+        text: {},
+      },
+    },
+    MuiCardHeader: {
+      styleOverrides: {
+        root: {
+          padding: '12px 16px',
+          minHeight: '56px',
+        },
+        content: {
+          overflow: 'hidden',
+        },
+      },
     },
   },
 })
