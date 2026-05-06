@@ -13,3 +13,5 @@ cc = "1.2"
 vrl = "0.32.0"
 anyhow = "1.0"
 ariadne = "0.6.0"
+serde = { version = "1.0.228", features = ["derive"] }
+rmp-serde = "1.3.1"

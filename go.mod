@@ -29,6 +29,7 @@ require (
 	github.com/swaggest/swgui v1.8.7
 	github.com/swaggest/usecase v1.3.1
 	github.com/vladopajic/go-actor v1.1.1
+	github.com/vmihailenco/msgpack/v5 v5.4.1
 	go.opentelemetry.io/proto/otlp v1.10.0
 	go.uber.org/fx v1.24.0
 	golang.org/x/crypto v0.50.0
@@ -107,6 +108,7 @@ require (
 	github.com/swaggest/form/v5 v5.1.1 // indirect
 	github.com/swaggest/refl v1.4.0 // indirect
 	github.com/vearutop/statigz v1.4.0 // indirect
+	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/otel v1.41.0 // indirect
