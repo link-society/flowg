@@ -8,108 +8,158 @@ import "C"
 
 import (
 	"unsafe"
+
+	"bytes"
+	"fmt"
+
+	"github.com/vmihailenco/msgpack/v5"
 )
 
 type ScriptRunner struct {
 	ffiObject C.script_runner
+	buffer    bytes.Buffer
+	encoder   *msgpack.Encoder
 }
 
 func NewScriptRunner(source string) (*ScriptRunner, error) {
 	cSource := C.CString(source)
 	defer C.free(unsafe.Pointer(cSource))
 
-	var err *C.char
-	obj := C.script_runner_new(cSource, &err)
-	if obj == nil {
-		defer C.free(unsafe.Pointer(err))
-		return nil, &CompileError{Message: C.GoString(err)}
+	res := C.compile_script(cSource)
+	if !bool(res.is_ok) {
+		defer C.free(unsafe.Pointer(res.err.reason))
+		return nil, &CompileError{Message: C.GoString(res.err.reason)}
 	}
+	obj := res.ok.runner
 
-	return &ScriptRunner{ffiObject: obj}, nil
+	self := &ScriptRunner{ffiObject: obj}
+	self.buffer.Grow(1024)
+	self.encoder = msgpack.NewEncoder(&self.buffer)
+	return self, nil
 }
 
 func (sr *ScriptRunner) Close() {
 	if sr.ffiObject != nil {
-		C.script_runner_free(sr.ffiObject)
+		C.drop_script_runner(sr.ffiObject)
 		sr.ffiObject = nil
 	}
 }
 
-func (sr *ScriptRunner) Eval(input map[string]string) (map[string]string, error) {
-	cInput := mapToHmap(input)
-	defer freeHmap(cInput)
+func (sr *ScriptRunner) TransformLog(logEvent map[string]string) ([]map[string]string, error) {
+	sr.buffer.Reset()
 
-	var err *C.char
-	cOutput := C.script_runner_eval(sr.ffiObject, cInput, &err)
-	defer C.hmap_free(cOutput)
+	if err := sr.encoder.Encode(logEvent); err != nil {
+		return nil, err
+	}
+	data := sr.buffer.Bytes()
 
-	if cOutput == nil {
-		defer C.free(unsafe.Pointer(err))
-		return nil, &EvalError{Message: C.GoString(err)}
+	buf := C.msgpack_buffer{
+		data: (*C.uint8_t)(unsafe.Pointer(&data[0])),
+		len:  C.size_t(len(data)),
+	}
+	res := C.transform_log(sr.ffiObject, buf)
+	if !bool(res.is_ok) {
+		defer C.free(unsafe.Pointer(res.err.reason))
+		return nil, &EvalError{Message: C.GoString(res.err.reason)}
 	}
 
-	return hmapToMap(cOutput), nil
+	data = unsafe.Slice((*byte)(unsafe.Pointer(res.ok.data.data)), int(res.ok.data.len))
+	var result any
+	if err := msgpack.Unmarshal(data, &result); err != nil {
+		return nil, err
+	}
+
+	return normalizeTranformedLog(result)
 }
 
-func hmapToMap(cHmap *C.hmap) map[string]string {
-	result := make(map[string]string)
+func normalizeTranformedLog(result any) ([]map[string]string, error) {
+	switch v := result.(type) {
+	case []any:
+		logs := make([]map[string]string, len(v))
+		for i, item := range v {
+			logs[i] = normalizeLogEvent(item)
+		}
+		return logs, nil
 
-	if cHmap != nil && cHmap.count > 0 {
-		count := int(cHmap.count)
-		cEntries := unsafe.Pointer(cHmap.entries)
+	default:
+		return []map[string]string{normalizeLogEvent(result)}, nil
+	}
+}
 
-		if cEntries != nil {
-			cSlice := (*[1 << 30]C.hmap_entry)(cEntries)[:count:count]
-			for _, entry := range cSlice {
-				key := C.GoString(entry.key)
-				value := C.GoString(entry.value)
-				result[key] = value
+func normalizeLogEvent(event any) map[string]string {
+	switch v := event.(type) {
+	case map[string]any:
+		return flattenObjectMap(v)
+
+	case []any:
+		return flattenArray(v)
+
+	default:
+		return map[string]string{"value": toString(v)}
+	}
+}
+
+func flattenObjectMap(obj map[string]any) map[string]string {
+	flat := make(map[string]string)
+
+	for key, value := range obj {
+		switch v := value.(type) {
+		case map[string]any:
+			nested := flattenObjectMap(v)
+			for nestedKey, nestedValue := range nested {
+				flatKey := fmt.Sprintf("%s.%s", key, nestedKey)
+				flat[flatKey] = nestedValue
 			}
-		}
-	}
 
-	return result
-}
-
-func mapToHmap(input map[string]string) *C.hmap {
-	var (
-		cEntries    unsafe.Pointer
-		cEntrySlice []C.hmap_entry
-	)
-
-	if len(input) > 0 {
-		cEntries = C.malloc(C.size_t(len(input)) * C.size_t(unsafe.Sizeof(C.hmap_entry{})))
-
-		cEntrySlice = (*[1 << 30]C.hmap_entry)(cEntries)[:len(input):len(input)]
-		i := 0
-		for key, value := range input {
-			cKey := C.CString(key)
-			cValue := C.CString(value)
-			cEntrySlice[i] = C.hmap_entry{key: cKey, value: cValue}
-			i++
-		}
-	}
-
-	cHmap := (*C.hmap)(C.malloc(C.size_t(unsafe.Sizeof(C.hmap{}))))
-	cHmap.count = C.size_t(len(input))
-	cHmap.entries = (*C.hmap_entry)(cEntries)
-
-	return cHmap
-}
-
-func freeHmap(cHmap *C.hmap) {
-	if cHmap != nil {
-		count := int(cHmap.count)
-		cEntries := unsafe.Pointer(cHmap.entries)
-
-		if cEntries != nil {
-			cSlice := (*[1 << 30]C.hmap_entry)(cEntries)[:count:count]
-			for _, entry := range cSlice {
-				C.free(unsafe.Pointer(entry.key))
-				C.free(unsafe.Pointer(entry.value))
+		case []any:
+			nested := flattenArray(v)
+			for nestedKey, nestedValue := range nested {
+				flatKey := fmt.Sprintf("%s.%s", key, nestedKey)
+				flat[flatKey] = nestedValue
 			}
-			C.free(cEntries)
+
+		default:
+			flat[key] = toString(v)
 		}
-		C.free(unsafe.Pointer(cHmap))
+	}
+
+	return flat
+}
+
+func flattenArray(arr []any) map[string]string {
+	flat := make(map[string]string)
+
+	for i, value := range arr {
+		key := fmt.Sprintf("%d", i)
+
+		switch v := value.(type) {
+		case map[string]any:
+			nested := flattenObjectMap(v)
+			for nestedKey, nestedValue := range nested {
+				flatKey := fmt.Sprintf("%s.%s", key, nestedKey)
+				flat[flatKey] = nestedValue
+			}
+
+		case []any:
+			nested := flattenArray(v)
+			for nestedKey, nestedValue := range nested {
+				flatKey := fmt.Sprintf("%s.%s", key, nestedKey)
+				flat[flatKey] = nestedValue
+			}
+
+		default:
+			flat[key] = toString(v)
+		}
+	}
+
+	return flat
+}
+
+func toString(value any) string {
+	switch v := value.(type) {
+	case string:
+		return v
+	default:
+		return fmt.Sprintf("%v", v)
 	}
 }
