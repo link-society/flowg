@@ -7,16 +7,24 @@ import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
-import Paper from '@mui/material/Paper'
+import Tabs from '@mui/material/Tabs'
+import Tab from '@mui/material/Tab'
 
 import { NodeTrace } from '@/lib/models/PipelineTrace.ts'
 
+import NodeTraceTabPanel from '@/components/NodeTraceTabPanel'
+
 type PipelineTraceNodeButtonProps = {
-  trace: NodeTrace
+  traces: NodeTrace[]
 }
 
-const PipelineTraceNodeButton = ({ trace }: PipelineTraceNodeButtonProps) => {
+const PipelineTraceNodeButton = ({ traces }: PipelineTraceNodeButtonProps) => {
   const [open, setOpen] = useState<boolean>(false)
+  const [tab, setTab] = useState<number>(0)
+
+  const onTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+    setTab(newValue)
+  }
 
   return (
     <>
@@ -30,67 +38,36 @@ const PipelineTraceNodeButton = ({ trace }: PipelineTraceNodeButtonProps) => {
         Inspect
       </Button>
 
-      <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>Node trace</DialogTitle>
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        maxWidth={false}
+        slotProps={{
+          paper: {
+            sx: {
+              width: '80%',
+              height: '90%',
+            },
+          },
+        }}
+      >
+        <DialogTitle>Node traces</DialogTitle>
         <DialogContent>
           <div className="flex flex-col gap-5">
-            {trace.error && (
-              <div className="flex flex-col gap-2">
-                <p className="text-sm text-gray-700 font-semibold mb-2">
-                  Error:
-                </p>
-                <Paper
-                  id="container:transformers.test.result"
-                  variant="outlined"
-                  className="
-                      p-2 grow shrink overflow-auto
-                      font-mono bg-gray-100! min-w-50
-                    "
-                  component="pre"
-                >
-                  {trace.error}
-                </Paper>
-              </div>
-            )}
-            <div className="flex gap-5">
-              {trace.input && (
-                <div className="flex flex-col gap-2">
-                  <p className="text-sm text-gray-700 font-semibold mb-2">
-                    Input Record:
-                  </p>
-                  <Paper
-                    id="container:transformers.test.result"
-                    variant="outlined"
-                    className="
-                      p-2 grow shrink overflow-auto
-                      font-mono bg-gray-100! min-w-50
-                    "
-                    component="pre"
-                  >
-                    {JSON.stringify(trace.input, null, 2)}
-                  </Paper>
-                </div>
-              )}
+            <Tabs
+              variant="scrollable"
+              sx={{ borderBottom: 1, borderColor: 'divider' }}
+              value={tab}
+              onChange={onTabChange}
+            >
+              {traces.map((_trace, index) => (
+                <Tab key={index} label={`Event #${index + 1}`} />
+              ))}
+            </Tabs>
 
-              {trace.output && (
-                <div className="flex flex-col gap-2">
-                  <p className="text-sm text-gray-700 font-semibold mb-2">
-                    Output Record:
-                  </p>
-                  <Paper
-                    id="container:transformers.test.result"
-                    variant="outlined"
-                    className="
-                      p-2 grow shrink overflow-auto
-                      font-mono bg-gray-100! min-w-50
-                    "
-                    component="pre"
-                  >
-                    {JSON.stringify(trace.output, null, 2)}
-                  </Paper>
-                </div>
-              )}
-            </div>
+            {traces.map((trace, index) => (
+              <NodeTraceTabPanel trace={trace} key={index} value={tab} index={index} />
+            ))}
           </div>
         </DialogContent>
         <DialogActions>

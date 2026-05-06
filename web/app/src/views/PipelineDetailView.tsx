@@ -107,7 +107,7 @@ const PipelineDetailView = () => {
       ...flow,
       nodes: flow.nodes.map((node) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { trace, ...data } = node.data
+        const { traces, ...data } = node.data
         return { ...node, data }
       }),
     }
@@ -121,7 +121,7 @@ const PipelineDetailView = () => {
       ...flow,
       nodes: flow.nodes.map((node) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { trace, ...data } = node.data
+        const { traces, ...data } = node.data
         return { ...node, data }
       }),
     }

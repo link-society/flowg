@@ -13,7 +13,7 @@ import PipelineTraceNodeIndicator from '@/components/PipelineTraceNodeIndicator.
 
 type PipelineNodeForwarderData = Node<{
   forwarder: string
-  trace: NodeTrace | null
+  traces: NodeTrace[] | null
 }>
 
 const PipelineNodeForwarder = ({
@@ -26,7 +26,7 @@ const PipelineNodeForwarder = ({
       <NodeToolbar className="flex flex-row items-center gap-2">
         <DialogForwarderEditor forwarderName={data.forwarder} />
         <PipelineDeleteNodeButton nodeId={id} />
-        {data.trace && <PipelineTraceNodeButton trace={data.trace} />}
+        {data.traces && <PipelineTraceNodeButton traces={data.traces} />}
       </NodeToolbar>
     )}
 
@@ -69,7 +69,9 @@ const PipelineNodeForwarder = ({
       </div>
     </div>
 
-    <PipelineTraceNodeIndicator trace={data.trace} />
+    <PipelineTraceNodeIndicator
+      status={data.traces ? (data.traces.some(trace => trace.error) ? 'error' : 'success') : null}
+    />
   </>
 )
 

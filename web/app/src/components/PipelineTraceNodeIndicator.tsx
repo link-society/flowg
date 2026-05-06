@@ -1,14 +1,12 @@
-import { NodeTrace } from '@/lib/models/PipelineTrace.ts'
-
 type PipelineTraceNodeIndicatorProps = {
-  trace: NodeTrace | null
+  status: 'success' | 'error' | null
 }
 
 const PipelineTraceNodeIndicator = ({
-  trace,
+  status,
 }: PipelineTraceNodeIndicatorProps) => (
   <>
-    {trace && (
+    {status !== null && (
       <div
         style={{
           width: '18px',
@@ -16,7 +14,7 @@ const PipelineTraceNodeIndicator = ({
           position: 'absolute',
           right: '-9px',
           top: '-9px',
-          backgroundColor: trace.error === null ? '#20b834' : '#ff4444',
+          backgroundColor: status === 'success' ? '#20b834' : '#ff4444',
           borderRadius: '50%',
           boxShadow: '-2px 2px 2px #00000055',
         }}

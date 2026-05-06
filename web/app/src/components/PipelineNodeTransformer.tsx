@@ -15,7 +15,7 @@ import PipelineTraceNodeIndicator from '@/components/PipelineTraceNodeIndicator.
 
 type PipelineNodeTransformerData = Node<{
   transformer: string
-  trace: NodeTrace | null
+  traces: NodeTrace[] | null
 }>
 
 const PipelineNodeTransformer = ({
@@ -31,7 +31,7 @@ const PipelineNodeTransformer = ({
         <NodeToolbar className="flex flex-row items-center gap-2">
           <DialogTransformerEditor transformer={data.transformer} />
           <PipelineDeleteNodeButton nodeId={id} />
-          {data.trace && <PipelineTraceNodeButton trace={data.trace} />}
+          {data.traces && <PipelineTraceNodeButton traces={data.traces} />}
         </NodeToolbar>
       )}
 
@@ -82,7 +82,9 @@ const PipelineNodeTransformer = ({
         }}
       />
 
-      <PipelineTraceNodeIndicator trace={data.trace} />
+      <PipelineTraceNodeIndicator
+        status={data.traces ? (data.traces.some(trace => trace.error) ? 'error' : 'success') : null}
+      />
     </>
   )
 }
