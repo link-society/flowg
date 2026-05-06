@@ -2,7 +2,7 @@ import { InvalidArgumentError } from '@/lib/api/errors'
 import * as request from '@/lib/api/request'
 
 type TestTransformerResult =
-  | { success: true; record: Record<string, string> }
+  | { success: true; records: Array<Record<string, string>> }
   | { success: false; error: string }
 
 export const testTransformer = async (
@@ -16,7 +16,7 @@ export const testTransformer = async (
 
   type TestTransformerResponse = {
     success: boolean
-    record: Record<string, string>
+    records: Array<Record<string, string>>
   }
 
   try {
@@ -30,7 +30,7 @@ export const testTransformer = async (
         record,
       },
     })
-    return { success: true, record: body.record }
+    return { success: true, records: body.records }
   } catch (err) {
     if (err instanceof InvalidArgumentError && err.appcode === 422) {
       return { success: false, error: err.message }
