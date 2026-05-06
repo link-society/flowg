@@ -4,9 +4,9 @@ go 1.26.0
 
 require (
 	codeberg.org/miekg/dns v0.6.73
-	github.com/ClickHouse/clickhouse-go/v2 v2.45.0
+	github.com/ClickHouse/clickhouse-go/v2 v2.46.0
 	github.com/dgraph-io/badger/v4 v4.9.1
-	github.com/elastic/go-elasticsearch/v9 v9.3.3
+	github.com/elastic/go-elasticsearch/v9 v9.4.0
 	github.com/expr-lang/expr v1.17.8
 	github.com/go-chi/chi/v5 v5.2.5
 	github.com/go-logfmt/logfmt v0.6.1
