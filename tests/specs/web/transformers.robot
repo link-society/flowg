@@ -33,8 +33,8 @@ Configure transformer
     Click Button                   id=btn:transformers.test.run
     ${result}=  Get Text           id=container:transformers.test.result
     ${payload}=  Evaluate          json.loads('''${result}''')
-    Should Be Equal As Strings     ${payload['foo']}  bar
-    Should Be Equal As Strings     ${payload['message']}  test
+    Should Be Equal As Strings     ${payload[0]['foo']}  bar
+    Should Be Equal As Strings     ${payload[0]['message']}  test
     Click Button                   id=btn:transformers.save
     Wait Until Page Contains       Transformer saved  timeout=5s
     Close Browser
