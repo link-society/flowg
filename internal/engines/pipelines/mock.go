@@ -17,6 +17,14 @@ func NewMockRunner() Runner {
 	return &MockRunner{}
 }
 
+func (m *MockRunner) Start() {
+	// No-op for mock
+}
+
+func (m *MockRunner) Stop() {
+	// No-op for mock
+}
+
 func (m *MockRunner) Run(ctx context.Context, pipelineName string, entrypoint string, record *models.LogRecord) error {
 	args := m.Called(ctx, pipelineName, entrypoint, record)
 	return args.Error(0)

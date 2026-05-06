@@ -20,6 +20,14 @@ func NewMockNotifier() LogNotifier {
 	return &MockNotifier{}
 }
 
+func (m *MockNotifier) Start() {
+	// No-op for mock
+}
+
+func (m *MockNotifier) Stop() {
+	// No-op for mock
+}
+
 func (m *MockNotifier) Subscribe(ctx context.Context, stream string) (actor.MailboxReceiver[LogMessage], error) {
 	args := m.Called(ctx, stream)
 	return args.Get(0).(actor.MailboxReceiver[LogMessage]), args.Error(1)
