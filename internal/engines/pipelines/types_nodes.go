@@ -60,28 +60,19 @@ var _ Node = (*PipelineNode)(nil)
 var _ Node = (*ForwardNode)(nil)
 var _ Node = (*RouterNode)(nil)
 
-// MARK: source
-func (n *SourceNode) Init(context.Context) error {
-	return nil
-}
-
-func (n *SourceNode) Close(context.Context) error {
-	return nil
-}
-
-func (n *SourceNode) Process(ctx context.Context, record *models.LogRecord) error {
-	errC := make(chan error, len(n.Next))
+func sendRecordToNextNodes(ctx context.Context, next []Node, record *models.LogRecord) error {
+	errC := make(chan error, len(next))
 	wg := sync.WaitGroup{}
 
-	for _, next := range n.Next {
+	for _, nextNode := range next {
 		wg.Add(1)
-		go func(next Node) {
+		go func(nextNode Node) {
 			defer wg.Done()
-			err := next.Process(ctx, record)
+			err := nextNode.Process(ctx, record)
 			if err != nil {
 				errC <- err
 			}
-		}(next)
+		}(nextNode)
 	}
 
 	wg.Wait()
@@ -92,20 +83,43 @@ func (n *SourceNode) Process(ctx context.Context, record *models.LogRecord) erro
 		errs = append(errs, err)
 	}
 
-	err := errors.Join(errs...)
+	return errors.Join(errs...)
+}
 
+func traceNode(
+	ctx context.Context,
+	nodeID string,
+	err error,
+	input map[string]string,
+	output []map[string]string,
+) {
 	tracer := GetTracer(ctx)
 	if tracer != nil {
-		trace := NodeTrace{
-			NodeID: n.ID,
-			Input:  nil,
-			Output: record.Fields,
+		tracer.Trace = append(tracer.Trace, NodeTrace{
+			NodeID: nodeID,
+			Input:  input,
+			Output: output,
 			Error:  TraceError(err),
-		}
-
-		tracer.Trace = append(tracer.Trace, trace)
+		})
 	}
+}
 
+func isDryRun(ctx context.Context) bool {
+	return GetTracer(ctx) != nil
+}
+
+// MARK: source
+func (n *SourceNode) Init(context.Context) error {
+	return nil
+}
+
+func (n *SourceNode) Close(context.Context) error {
+	return nil
+}
+
+func (n *SourceNode) Process(ctx context.Context, record *models.LogRecord) error {
+	err := sendRecordToNextNodes(ctx, n.Next, record)
+	traceNode(ctx, n.ID, err, record.Fields, []map[string]string{record.Fields})
 	return err
 }
 
@@ -122,60 +136,25 @@ func (n *TransformNode) Close(ctx context.Context) error {
 }
 
 func (n *TransformNode) Process(ctx context.Context, record *models.LogRecord) error {
-	tracer := GetTracer(ctx)
-	trace := NodeTrace{
-		NodeID: n.ID,
-		Input:  record.Fields,
-		Output: nil,
-	}
-
-	output, err := n.runner.Eval(record.Fields)
+	output, err := n.runner.TransformLog(record.Fields)
 	if err != nil {
-		trace.Error = TraceError(err)
-		if tracer != nil {
-			tracer.Trace = append(tracer.Trace, trace)
-		}
-
+		traceNode(ctx, n.ID, err, record.Fields, nil)
 		return err
 	}
-	trace.Output = output
 
-	errC := make(chan error, len(n.Next))
-	wg := sync.WaitGroup{}
-
-	for _, next := range n.Next {
-		wg.Add(1)
-		go func(next Node) {
-			defer wg.Done()
-
-			newEntry := &models.LogRecord{
-				Timestamp: record.Timestamp,
-				Fields:    output,
-			}
-
-			err := next.Process(ctx, newEntry)
-			if err != nil {
-				errC <- err
-			}
-		}(next)
+	for _, event := range output {
+		err := sendRecordToNextNodes(ctx, n.Next, &models.LogRecord{
+			Timestamp: record.Timestamp,
+			Fields:    event,
+		})
+		if err != nil {
+			traceNode(ctx, n.ID, err, record.Fields, output)
+			return err
+		}
 	}
 
-	wg.Wait()
-	close(errC)
-
-	var errs []error
-	for err := range errC {
-		errs = append(errs, err)
-	}
-
-	err = errors.Join(errs...)
-
-	if tracer != nil {
-		trace.Error = TraceError(err)
-		tracer.Trace = append(tracer.Trace, trace)
-	}
-
-	return err
+	traceNode(ctx, n.ID, nil, record.Fields, output)
+	return nil
 }
 
 // MARK: switch
@@ -190,56 +169,19 @@ func (n *SwitchNode) Close(ctx context.Context) error {
 }
 
 func (n *SwitchNode) Process(ctx context.Context, record *models.LogRecord) error {
-	tracer := GetTracer(ctx)
-	trace := NodeTrace{
-		NodeID: n.ID,
-		Input:  record.Fields,
-		Output: nil,
-	}
-
 	matches, err := n.runner.Evaluate(record)
 	if err != nil {
-		trace.Error = TraceError(err)
-		if tracer != nil {
-			tracer.Trace = append(tracer.Trace, trace)
-		}
-
+		traceNode(ctx, n.ID, err, record.Fields, nil)
 		return err
 	}
 
 	if matches {
-		trace.Output = record.Fields
+		err = sendRecordToNextNodes(ctx, n.Next, record)
+		traceNode(ctx, n.ID, err, record.Fields, []map[string]string{record.Fields})
+		return err
 	}
 
-	if matches {
-		errC := make(chan error, len(n.Next))
-		wg := sync.WaitGroup{}
-
-		for _, next := range n.Next {
-			wg.Add(1)
-			go func(next Node) {
-				defer wg.Done()
-				err := next.Process(ctx, record)
-				if err != nil {
-					errC <- err
-				}
-			}(next)
-		}
-
-		wg.Wait()
-		close(errC)
-
-		var errs []error
-		for err = range errC {
-			errs = append(errs, err)
-		}
-	}
-
-	if tracer != nil {
-		trace.Error = TraceError(err)
-		tracer.Trace = append(tracer.Trace, trace)
-	}
-
+	traceNode(ctx, n.ID, nil, record.Fields, nil)
 	return err
 }
 
@@ -253,28 +195,15 @@ func (n *PipelineNode) Close(ctx context.Context) error {
 }
 
 func (n *PipelineNode) Process(ctx context.Context, record *models.LogRecord) error {
-	tracer := GetTracer(ctx)
-	trace := NodeTrace{
-		NodeID: n.ID,
-		Input:  record.Fields,
-		Output: nil,
-	}
-
 	w := getWorker(ctx)
 
 	pipeline, err := w.getOrBuildPipeline(ctx, n.Pipeline)
+	traceNode(ctx, n.ID, err, record.Fields, nil)
 	if err != nil {
-		if tracer != nil {
-			trace.Error = TraceError(err)
-			tracer.Trace = append(tracer.Trace, trace)
-		}
-
 		return err
 	}
 
-	if tracer != nil {
-		tracer.Trace = append(tracer.Trace, trace)
-
+	if isDryRun(ctx) {
 		return nil
 	}
 
@@ -291,13 +220,8 @@ func (n *ForwardNode) Close(ctx context.Context) error {
 }
 
 func (n *ForwardNode) Process(ctx context.Context, record *models.LogRecord) error {
-	tracer := GetTracer(ctx)
-	if tracer != nil {
-		tracer.Trace = append(tracer.Trace, NodeTrace{
-			NodeID: n.ID,
-			Input:  record.Fields,
-			Output: nil,
-		})
+	traceNode(ctx, n.ID, nil, record.Fields, nil)
+	if isDryRun(ctx) {
 		return nil
 	}
 
@@ -314,17 +238,12 @@ func (n *RouterNode) Close(ctx context.Context) error {
 }
 
 func (n *RouterNode) Process(ctx context.Context, record *models.LogRecord) error {
-	w := getWorker(ctx)
-
-	tracer := GetTracer(ctx)
-	if tracer != nil {
-		tracer.Trace = append(tracer.Trace, NodeTrace{
-			NodeID: n.ID,
-			Input:  record.Fields,
-			Output: nil,
-		})
+	traceNode(ctx, n.ID, nil, record.Fields, nil)
+	if isDryRun(ctx) {
 		return nil
 	}
+
+	w := getWorker(ctx)
 
 	key, err := w.logStorage.Ingest(ctx, n.Stream, record)
 	if err == nil {

@@ -19,8 +19,8 @@ type TestTransformerRequest struct {
 }
 
 type TestTransformerResponse struct {
-	Success bool              `json:"success"`
-	Record  map[string]string `json:"record"`
+	Success bool                `json:"success"`
+	Records []map[string]string `json:"records"`
 }
 
 func (ctrl *controller) TestTransformerUsecase() usecase.Interactor {
@@ -52,7 +52,7 @@ func (ctrl *controller) TestTransformerUsecase() usecase.Interactor {
 				}
 				defer runner.Close()
 
-				output, err := runner.Eval(req.Record)
+				output, err := runner.TransformLog(req.Record)
 				if err != nil {
 					ctrl.logger.ErrorContext(
 						ctx,
@@ -70,7 +70,7 @@ func (ctrl *controller) TestTransformerUsecase() usecase.Interactor {
 				}
 
 				resp.Success = true
-				resp.Record = output
+				resp.Records = output
 
 				return nil
 			},
