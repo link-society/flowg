@@ -1,6 +1,6 @@
 import type { GlobalStylesProps } from '@mui/material/GlobalStyles'
 
-import { colors } from './tokens'
+import colors from './tokens/colors'
 
 const globalStyles: GlobalStylesProps['styles'] = {
   'html, body': {

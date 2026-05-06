@@ -135,9 +135,56 @@ export const ComponentName: FC<ComponentNameProps> = () => (
 
 **Guidelines:**
 
-- Use `theme.palette` for colors, `theme.spacing` for spacing, `theme.typography` for text styles.
+- **Colors** — always access colors via `theme.tokens.colors` inside `styled`. Never use hard-coded hex values, direct imports of `colors.ts`, or `theme.palette` inline in `styles.tsx`. If a color is missing from `theme/tokens/colors.ts`, add it there first.
+- Use `theme.spacing` for spacing and `theme.typography` for text styles.
+- Use `theme.shadows` for elevation/shadow values.
 - Import `styled` from `@mui/material/styles` to get automatic theme access.
-- Avoid inline `style={{}} or sx={{}}`
+- Avoid inline `style={{}}` or `sx={{}}`
+
+```tsx
+// ✅ correct — color via theme.tokens.colors
+export const Header = styled('div')`
+  background-color: ${({ theme }) => theme.tokens.colors.primary};
+  color: ${({ theme }) => theme.tokens.colors.primaryContrast};
+`
+
+// ❌ wrong — direct import of colors
+import { colors } from '@/theme/tokens'
+export const Header = styled('div')`
+  background-color: ${colors.primary};
+`
+
+// ❌ wrong — hard-coded hex
+export const Header = styled('div')`
+  background-color: #1565c0;
+`
+```
+
+---
+
+## Typography
+
+All visible text — headings, labels, descriptions, captions, button labels when not handled by a dedicated MUI component — must be wrapped in MUI's `<Typography>` component. Never use bare `<span>`, `<p>`, `<h1>`–`<h6>`, or string literals directly in JSX.
+
+Use the custom variants defined in `theme/theme.ts`:
+
+| Variant   | Use case                         |
+| --------- | -------------------------------- |
+| `titleLg` | Page titles                      |
+| `titleMd` | Section headings                 |
+| `titleSm` | Card headers, sub-section titles |
+| `text`    | Body text, labels                |
+
+```tsx
+// ✅ correct
+<Typography variant="titleSm">Account Information</Typography>
+
+// ❌ wrong — bare span
+<span>Account Information</span>
+
+// ❌ wrong — bare text node
+Account Information
+```
 
 ---
 

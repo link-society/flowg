@@ -3,14 +3,14 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 
 import { Outlet } from 'react-router'
 
-import DialogsProvider from '@/components/DialogsProvider'
-import NotificationsProvider from '@/components/NotificationsProvider'
+import DialogsProvider from '@/components/DialogsProvider/component'
+import NotificationsProvider from '@/components/NotificationsProvider/component'
 
-import { StyledBaseLayout } from './styles'
+import { BaseLayoutContainer } from './styles'
 
 const BaseLayout = () => {
   return (
-    <StyledBaseLayout>
+    <BaseLayoutContainer>
       <DialogsProvider>
         <NotificationsProvider>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -18,7 +18,7 @@ const BaseLayout = () => {
           </LocalizationProvider>
         </NotificationsProvider>
       </DialogsProvider>
-    </StyledBaseLayout>
+    </BaseLayoutContainer>
   )
 }
 
