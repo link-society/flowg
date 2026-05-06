@@ -33,7 +33,7 @@ const TransformerEditor = (props: TransformerEditorProps) => {
     const output = await testApi.testTransformer(code, input)
 
     if (output.success) {
-      setTestResult(JSON.stringify(output.record, null, 2))
+      setTestResult(JSON.stringify(output.records, null, 2))
     } else {
       setTestResult(output.error)
     }
