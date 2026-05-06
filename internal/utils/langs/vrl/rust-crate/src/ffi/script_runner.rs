@@ -1,15 +1,34 @@
 use std::ffi::*;
 
 use crate::{
-  ffi::hmap::*,
   runner::ScriptRunner,
 };
 
+#[allow(non_camel_case_types)]
+pub type script_runner = *mut c_void;
+
+#[repr(C)]
+pub struct compilation_result {
+  pub is_ok: bool,
+  pub ok: compilation_result_ok_variant,
+  pub err: compilation_result_err_variant,
+}
+
+#[repr(C)]
+pub struct compilation_result_ok_variant {
+  pub runner: script_runner,
+}
+
+#[repr(C)]
+pub struct compilation_result_err_variant {
+  pub reason: *mut c_char,
+}
+
+
 #[no_mangle]
-pub extern "C" fn script_runner_new(
+pub extern "C" fn compile_script(
   c_source: *const c_char,
-  c_err: *mut *mut c_char,
-) -> *mut c_void {
+) -> compilation_result {
   let source = unsafe {
     assert!(!c_source.is_null());
     CStr::from_ptr(c_source).to_string_lossy().into_owned()
@@ -18,55 +37,38 @@ pub extern "C" fn script_runner_new(
   match ScriptRunner::new(&source) {
     Ok(runner) => {
       let boxed = Box::new(runner);
-      Box::into_raw(boxed) as *mut c_void
+      let handle = Box::into_raw(boxed) as *mut c_void;
+
+      compilation_result {
+        is_ok: true,
+        ok: compilation_result_ok_variant {
+          runner: handle,
+        },
+        err: compilation_result_err_variant {
+          reason: std::ptr::null_mut(),
+        },
+      }
     }
     Err(e) => {
-      if !c_err.is_null() {
-        let err_msg = CString::new(format!("{:#}", e)).unwrap();
-        unsafe {
-          *c_err = err_msg.into_raw();
-        }
+      compilation_result {
+        is_ok: false,
+        ok: compilation_result_ok_variant {
+          runner: std::ptr::null_mut(),
+        },
+        err: compilation_result_err_variant {
+          reason: CString::new(format!("{:#}", e)).unwrap().into_raw(),
+        },
       }
-      std::ptr::null_mut()
     }
   }
 }
 
 #[no_mangle]
-pub extern "C" fn script_runner_free(this: *mut c_void) {
+pub extern "C" fn drop_script_runner(this: script_runner) {
   if !this.is_null() {
     unsafe {
       let _ = Box::from_raw(this as *mut ScriptRunner);
       // dropped automatically
-    }
-  }
-}
-
-#[no_mangle]
-pub extern "C" fn script_runner_eval(
-  this: *mut c_void,
-  c_input: *mut hmap,
-  c_err: *mut *mut c_char,
-) -> *mut hmap {
-  let runner = unsafe {
-    assert!(!this.is_null());
-    &*(this as *mut ScriptRunner)
-  };
-  let input = hmap_to_hashmap(c_input);
-
-  match runner.process_record(input) {
-    Ok(output) => {
-      let boxed = Box::new(hmap_new_from_hashmap(&output));
-      Box::into_raw(boxed)
-    },
-    Err(e) => {
-      if !c_err.is_null() {
-        let err_msg = CString::new(format!("{:#}", e)).unwrap();
-        unsafe {
-          *c_err = err_msg.into_raw();
-        }
-      }
-      std::ptr::null_mut()
     }
   }
 }

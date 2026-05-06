@@ -2,6 +2,7 @@ mod runner;
 mod ffi;
 
 pub use ffi::{
-  hmap::*,
+  msgpack_buffer::*,
   script_runner::*,
+  log_event::*,
 };

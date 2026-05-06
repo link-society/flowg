@@ -1,12 +1,13 @@
-mod utils;
 mod report;
 
-use std::{collections::HashMap, sync::Mutex};
+use std::sync::Mutex;
 use vrl::prelude::*;
 use anyhow::{Context, Result};
 
 pub struct ScriptRunner {
   inner: Mutex<ScriptRunnerInner>,
+
+  pub outbuf: Vec<u8>,
 }
 
 struct ScriptRunnerInner {
@@ -30,22 +31,15 @@ impl ScriptRunner {
         program,
         source: source.to_string(),
       }),
+      outbuf: Vec::with_capacity(1024),
     })
   }
 
-  pub fn process_record(
-    &self,
-    record: HashMap<String, String>,
-  ) -> Result<HashMap<String, String>> {
+  pub fn eval(&self, input: Value) -> Result<Value> {
     let guard = self.inner.lock().unwrap();
 
-    let mut obj = ObjectMap::new();
-    for (key, value) in record.iter() {
-      obj.insert(key.clone().into(), Value::from(value.clone()));
-    }
-
     let mut target = vrl::compiler::TargetValue {
-      value: Value::Object(obj),
+      value: input,
       metadata: Value::Object(ObjectMap::new()),
       secrets: vrl::value::Secrets::default(),
     };
@@ -59,13 +53,7 @@ impl ScriptRunner {
       .context(report::render_error(expression_error, &guard.source));
     }
 
-    let result = if let Value::Object(obj) = target.value {
-      utils::flatten_obj(&obj)
-    } else {
-      HashMap::new()
-    };
-
-    Ok(result)
+    Ok(target.value)
   }
 }
 
@@ -74,8 +62,8 @@ mod tests {
   use super::*;
 
   #[test]
-  fn test_process_record() {
-    let input = HashMap::new();
+  fn test_input() {
+    let input = Value::Object(ObjectMap::new());
     let script = r#"
       .foo = "x"
       .bar.baz = [1, 2, 3, "a"]
@@ -83,12 +71,25 @@ mod tests {
     "#;
 
     let runner = ScriptRunner::new(script).unwrap();
-    let output = runner.process_record(input).unwrap();
+    let output = runner.eval(input).unwrap();
 
-    assert_eq!(output.get("foo"), Some(&"x".to_string()));
-    assert_eq!(output.get("bar.baz.0"), Some(&"1".to_string()));
-    assert_eq!(output.get("bar.baz.1"), Some(&"2".to_string()));
-    assert_eq!(output.get("bar.baz.2"), Some(&"3".to_string()));
-    assert_eq!(output.get("bar.baz.3"), Some(&"a".to_string()));
+    assert!(output.is_object());
+
+    let obj = output.as_object().unwrap();
+    assert_eq!(obj.get("foo"), Some(&Value::Bytes(Bytes::from("x"))));
+
+    assert!(obj.get("bar").is_some());
+    assert!(obj.get("bar").unwrap().is_object());
+
+    let bar = obj.get("bar").unwrap().as_object().unwrap();
+    assert!(bar.get("baz").is_some());
+    assert!(bar.get("baz").unwrap().is_array());
+
+    let baz = bar.get("baz").unwrap().as_array().unwrap();
+    assert_eq!(baz.len(), 4);
+    assert_eq!(baz[0], Value::Integer(1));
+    assert_eq!(baz[1], Value::Integer(2));
+    assert_eq!(baz[2], Value::Integer(3));
+    assert_eq!(baz[3], Value::Bytes(Bytes::from("a")));
   }
 }
