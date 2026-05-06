@@ -45,6 +45,16 @@ func (msg logMessage) handle(ctx context.Context, w *worker) {
 			ctx = WithTracer(ctx, msg.tracer)
 
 			pipeline, err = BuildFlow(ctx, w.configStorage, msg.pipelineName, &msg.tracer.Flow)
+			if err != nil {
+				msg.replyTo <- err
+				return
+			}
+
+			if err := pipeline.Init(ctx); err != nil {
+				_ = pipeline.Close(ctx)
+				msg.replyTo <- err
+				return
+			}
 		} else {
 			pipeline, err = w.getOrBuildPipeline(ctx, msg.pipelineName)
 		}
@@ -55,6 +65,11 @@ func (msg logMessage) handle(ctx context.Context, w *worker) {
 		}
 
 		err = pipeline.Process(ctx, msg.entrypoint, msg.record)
+
+		if msg.tracer != nil {
+			_ = pipeline.Close(ctx)
+		}
+
 		msg.replyTo <- err
 	}()
 }
