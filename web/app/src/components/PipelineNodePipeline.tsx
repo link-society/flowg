@@ -67,7 +67,13 @@ const PipelineNodePipeline = ({
     </div>
 
     <PipelineTraceNodeIndicator
-      status={data.traces ? (data.traces.some(trace => trace.error) ? 'error' : 'success') : null}
+      status={
+        data.traces
+          ? data.traces.some((trace) => trace.error)
+            ? 'error'
+            : 'success'
+          : null
+      }
     />
   </>
 )

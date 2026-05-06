@@ -12,9 +12,7 @@ const NodeTraceTabPanel = ({ trace, index, value }: NodeTraceTabPanelProps) => (
   <div role="tabpanel" hidden={value !== index} key={index}>
     {trace.error && (
       <div className="grow flex flex-col gap-2">
-        <p className="text-sm text-gray-700 font-semibold mb-2">
-          Error:
-        </p>
+        <p className="text-sm text-gray-700 font-semibold mb-2">Error:</p>
         <Paper
           id="container:transformers.test.result"
           variant="outlined"
