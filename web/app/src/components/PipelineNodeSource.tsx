@@ -11,7 +11,7 @@ import PipelineTraceNodeIndicator from '@/components/PipelineTraceNodeIndicator.
 
 type PipelineNodeSourceData = Node<{
   type: string
-  trace: NodeTrace | null
+  traces: NodeTrace[] | null
 }>
 
 const PipelineNodeSource = ({
@@ -19,9 +19,9 @@ const PipelineNodeSource = ({
   data,
 }: NodeProps<PipelineNodeSourceData>) => (
   <>
-    {selected && data.trace && (
+    {selected && data.traces && (
       <NodeToolbar className="flex flex-row items-center gap-2">
-        <PipelineTraceNodeButton trace={data.trace} />
+        <PipelineTraceNodeButton traces={data.traces} />
       </NodeToolbar>
     )}
 
@@ -64,7 +64,9 @@ const PipelineNodeSource = ({
       }}
     />
 
-    <PipelineTraceNodeIndicator trace={data.trace} />
+    <PipelineTraceNodeIndicator
+      status={data.traces ? (data.traces.some(trace => trace.error) ? 'error' : 'success') : null}
+    />
   </>
 )
 

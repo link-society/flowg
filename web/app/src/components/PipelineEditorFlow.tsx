@@ -126,7 +126,7 @@ export const PipelineEditorFlow: React.FC<PipelineEditorFlowProps> = ({
         ...node,
         data: {
           ...node.data,
-          trace: pipelineTrace?.find((trace) => trace.nodeID == node.id),
+          traces: pipelineTrace?.filter((trace) => trace.nodeID == node.id) ?? null,
         },
       }))
     )
