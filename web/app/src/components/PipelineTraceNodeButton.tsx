@@ -7,8 +7,8 @@ import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
-import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
 
 import { NodeTrace } from '@/lib/models/PipelineTrace.ts'
 
@@ -66,7 +66,12 @@ const PipelineTraceNodeButton = ({ traces }: PipelineTraceNodeButtonProps) => {
             </Tabs>
 
             {traces.map((trace, index) => (
-              <NodeTraceTabPanel trace={trace} key={index} value={tab} index={index} />
+              <NodeTraceTabPanel
+                trace={trace}
+                key={index}
+                value={tab}
+                index={index}
+              />
             ))}
           </div>
         </DialogContent>
