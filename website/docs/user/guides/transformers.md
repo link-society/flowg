@@ -18,3 +18,34 @@ A common use case is to parse log records comming from **syslog**:
 The above script expects a record with a single field `message`, containing text
 in the **syslog** format. After processing, the resulting record will have
 fields such as `program`, `timestamp`, or `hostname`.
+
+A transformer can emit multiple logs from a single input by returning an array:
+
+```vrl
+. = [
+  {"message": "first"},
+  {"message": "second"}
+]
+```
+
+The above script would emit 2 log records with the field `message`.
+
+All datatypes support by VRL are also normalized after the script execution:
+
+```vrl
+. = [
+  1,
+  2,
+  "hello",
+  {"foo": {"bar": "baz}}
+]
+```
+
+The above script would emit the following logs:
+
+```json
+{"value": "1"}
+{"value": "2"}
+{"value": "hello"}
+{"foo.bar": "baz"}
+```
