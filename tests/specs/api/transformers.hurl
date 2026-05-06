@@ -18,8 +18,29 @@ Content-Type: application/json
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true
-jsonpath "$.record.level" == "info"
-jsonpath "$.record.message" == "foo bar"
+jsonpath "$.records[0].level" == "info"
+jsonpath "$.records[0].message" == "foo bar"
+
+# -----------------------------------------------------------------------------
+# TEST:
+#  - Verify that a transformer can return multiple log records
+
+POST http://localhost:5080/api/v1/test/transformer
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+{
+  "code": ". = [parse_logfmt!(.message), parse_logfmt!(.message)]",
+  "record": {
+    "message": "level=info message=\"foo bar\""
+  }
+}
+HTTP 200
+[Asserts]
+jsonpath "$.success" == true
+jsonpath "$.records[0].level" == "info"
+jsonpath "$.records[0].message" == "foo bar"
+jsonpath "$.records[1].level" == "info"
+jsonpath "$.records[1].message" == "foo bar"
 
 # -----------------------------------------------------------------------------
 # TEST:
