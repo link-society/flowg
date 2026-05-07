@@ -16,7 +16,7 @@ requiring predefined schemas and relies on
 [BadgerDB](https://github.com/dgraph-io/badger) as its storage backend.
 
 For more information, consult the
-[documentation](https://link-society.github.io/flowg/docs/).
+[documentation](https://docs.flowg.cloud).
 
 You wish to contribute? Please read our [guidelines](./CONTRIBUTING.md) first.
 
