@@ -19,7 +19,7 @@ For the MVP, we wanted to have at least the following features:
 
  - ability to ingest and store logs
  - interoperability with many third party services, done via
-   [Forwarders](https://link-society.github.io/flowg/docs/technical/forwarders)
+   [Forwarders](https://flowg.cloud/docs/technical/forwarders)
  - basis of clustering with the most common cluster formation strategies
 
 After months of work, this is now done. Special thanks to our main contributors,

@@ -5,7 +5,7 @@ const presentations = [
   {
     title: "OSMC",
     date: "November 20th, 2025",
-    href: "/flowg/slides/2025-11-20_OSMC/index.html",
+    href: "/slides/2025-11-20_OSMC/index.html",
   },
 ]
 

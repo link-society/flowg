@@ -10,8 +10,8 @@ const config: Config = {
   tagline: 'Free and Open-Source Low-Code log processing solution',
   favicon: 'img/favicon.ico',
 
-  url: 'https://link-society.github.io/',
-  baseUrl: '/flowg/',
+  url: 'https://flowg.cloud/',
+  baseUrl: '/',
   trailingSlash: false,
 
   organizationName: 'link-society',
