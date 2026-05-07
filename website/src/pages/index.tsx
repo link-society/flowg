@@ -41,6 +41,13 @@ function HomepageHeader() {
           >
             Bug Tracker
           </Link>
+          <Link
+            className="button button--success button--lg"
+            to="https://demo.flowg.cloud"
+            target="_blank"
+          >
+            Try the Demo
+          </Link>
         </div>
         <div className={styles.news}>
           <Link to="/blog/osmc-2025-video">
