@@ -90,7 +90,7 @@ const StorageDetailView = () => {
             variant="contained"
             color="primary"
             size="small"
-            href="https://link-society.github.io/flowg/docs/"
+            href="https://flowg.cloud/docs/"
             target="_blank"
             startIcon={<HelpIcon />}
           >
