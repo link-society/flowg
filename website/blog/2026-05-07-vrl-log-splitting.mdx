@@ -1,0 +1,141 @@
+---
+title: VRL Log Splitting
+description: FlowG pipelines become more powerful with the new v0.55.0 release
+slug: vrl-log-splitting
+authors: linkdd
+tags: [release, vrl]
+---
+
+:tada:
+**[FlowG v0.55.0](https://github.com/link-society/flowg/releases/tag/v0.55.0)**
+has been released, and with it a new shiny feature: **VRL Log Splitting**.
+
+<!-- truncate -->
+
+## Before: One input, one output
+
+Until now, a transformer would take one log record as input and return one log
+record as output. That works well for parsing, enriching, or reshaping logs.
+
+But real logs are not always that simple.
+
+Sometimes one incoming log line actually contains several events (like in
+OpenTelemetry when batching multiple logs). Sometimes, we want to send different
+information from a single log to different services (metrics to a timeserie
+database, user information to an audit tool, ...).
+
+## After: One input, many outputs
+
+With this release, a [transformer](https://flowg.cloud/docs/user/guides/transformers)
+can return an array. Each item in that array becomes its own log record.
+
+For example:
+
+```vrl
+. = [
+  1,
+  2,
+  "hello",
+  { "foo": { "bar": "baz" } }
+]
+```
+
+The above script would produce the following logs:
+
+```json
+{"value": "1"}
+{"value": "2"}
+{"value": "hello"}
+{"foo.bar": "baz"}
+```
+
+> **NB:** All data types are normalized and flattened to fit the datamodel of
+> FlowG.
+
+Each generated log is passed to the next nodes in the pipeline.
+
+## Simplicity as a consequence
+
+This feature makes pipelines easier to design. Instead of forcing every
+downstream node to understand a large nested payload, you can split the payload
+early and let the rest of the pipeline work on simpler records.
+
+As a result:
+
+ - filters can operate on one event at a time
+ - routing rules become easier to write
+ - storage output is more predictable
+ - forwarding to third-party systems becomes more natural
+
+The pipeline no longer has to carry a batch-shaped record when what you really
+want is a stream of individual events.
+
+## A foundational change for the future
+
+On the technical side of things, this feature introduce some foundational
+changes to how VRL programs are called by FlowG.
+
+As a reminder, FlrowG is implemented in **Go**, but the VRL library is
+implemented in **Rust**. To make both talk to each other, it requires the
+**C FFI**.
+
+Before the *v0.55.0* release, the communication went like this:
+
+ - convert a Go `map[string]string` into a C `hmap` (homemade data structure),
+   lots of allocations done to copy the data
+ - convert the C `hmap` to a Rust `HashMap<String, String>`, lots of allocations
+   done to copy the data (again)
+ - convert the `HashMap<String, String>` to a `vrl::value::ObjectMap` (why the
+   `HashMap` intermediate step? because I did not think it through) wrapped in a
+   `vrl::value::Value` (the input for a VRL program)
+ - convert and flatten the resulting `vrl::value::Value` of the VRL program to
+   a `HashMap<String, String>` (more allocations, more copies)
+ - convert the `HashMap<String, String>` to a C `hmap` (here, we actually
+   **move** the data! to be then freed by Golang's allocator, which in
+   retrospective might not be a good idea)
+ - convert the C `hmap` to a Go `map[string]string` (more allocations, more
+   copies)
+
+Not only there are way more allocations and copies than needed, but there is a
+dubious memory ownership model, and a not very flexible API.
+
+In the future, [we might want to support more than just logs](https://github.com/link-society/flowg/discussions/595),
+which means the actual inputs to the VRL program might evolve.
+
+That's when I noticed, the `vrl::value::Value` is actually (de)serializable
+using Rust's great library [serde](https://serde.rs/).
+
+If we use [MessagePack](https://msgpack.org/) to (de)serialize our events and
+send through the C FFI boundaries only a byte array, this might simplify
+everything:
+
+ - avoiding unnecessary allocations and copies
+ - make the VRL program runner completly agnostic of the data shape
+ - cleaner memory ownership model
+
+The flow becomes:
+
+ - serialize the Go `map[string]string` to a `[]byte` buffer (the buffer is
+   cached to avoid allocating it for every log)
+ - convert the Go `[]byte` buffer to a C `uint8_t*` pointer and a `size_t`
+   length (no copy needed, memory is owned by Go)
+ - convert the pointer and length to a Rust `&[u8]` (no copy needed, memory
+   is still owned by Go)
+ - deserialize the `&[u8]` directly to a `vrl::value::Value` (allocations and
+   copies unavoidable here)
+ - call the VRL program
+ - serialize the resulting `vrl::value::Value` to a `Vec<u8>` buffer (the buffer
+   is cached to avoid allocating it for every log)
+ - convert the `Vec<u8>` buffer to a C `uint8_t*` pointer and a `size_t` length
+   (again, no copy needed, memory is owned by Rust)
+ - convert the C pointer and length to a non owning Go `[]byte`
+ - deserialize the `[]byte` to `any`, convert and flatten to `map[string]string`
+   (allocations and copies unavoidable here)
+
+## Conclusion
+
+That's all folks! Conclusions are hard to write, so stay tuned for more content.
+
+<p style={{textAlign: "right"}}>
+  `\_o< {quack}`
+</p>

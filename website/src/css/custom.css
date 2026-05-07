@@ -11,3 +11,7 @@
 .codeblock-nomargin .theme-code-block {
   margin-bottom: 0 !important;
 }
+
+code {
+  white-space: nowrap;
+}
