@@ -17,16 +17,27 @@ runs:
       with:
         go-version: '1.26'
         check-latest: true
+        cache: true
+        cache-dependency-paths: |
+          go.sum
 
     - name: setup@node
       uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903
       with:
         node-version: '24'
+        cache: npm
+        cache-dependency-paths: |
+          web/app/package-lock.json
+          website/package-lock.json
+          docs/slides/package-lock.json
 
     - name: setup@rust
       uses: actions-rust-lang/setup-rust-toolchain@1780873c7b576612439a134613cc4cc74ce5538c
       with:
         target: ${{ inputs.rstarget }}
+        cache: true
+        cache-workspaces: |
+          internal/util/langs/vrl/rust-crate/
 
     - name: setup@task
       uses: arduino/setup-task@b91d5d2c96a56797b48ac1e0e89220bf64044611
