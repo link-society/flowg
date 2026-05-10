@@ -15,6 +15,7 @@ Create new forwarder
     Log as                         username=root  password=root
     Click Navbar Menu Item         id=menu:navbar.settings  id=link:navbar.settings.forwarders
     Wait Until Page Contains       No forwarder found  timeout=5s
+    Sleep                          1s
     Click Element                  id=btn:forwarders.create
     Wait Until Element Is Visible  id=input:forwarder.modal.name
     Input Text                     id=input:forwarder.modal.name  test
@@ -30,6 +31,7 @@ Configure forwarder
     Log as                                username=root  password=root
     Click Navbar Menu Item                id=menu:navbar.settings  id=link:navbar.settings.forwarders
     Wait Until Element Is Visible         id=label:forwarders.list-item.test
+    Sleep                                 1s
     Element Should Be Visible             id=container:editor.forwarders.http
     Input Text                            id=input:editor.forwarders.http.webhook_url  http://test.com
     Input Key/Value Pair                  editor=field:editor.forwarders.http.headers  key=Test-Header  value=Test-Value
@@ -47,6 +49,7 @@ Delete forwarder
     Log as                         username=root  password=root
     Click Navbar Menu Item         id=menu:navbar.settings  id=link:navbar.settings.forwarders
     Wait Until Element Is Visible  id=label:forwarders.list-item.test
+    Sleep                          1s
     Click Element                  id=btn:forwarders.delete
     Wait Until Page Contains       No forwarder found  timeout=5s
     Close Browser
