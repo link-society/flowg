@@ -15,6 +15,7 @@ Create test role
     Log as                         username=root  password=root
     Click Navbar Menu Item         id=menu:navbar.profile  id=link:navbar.profile.admin
     Wait Until Page Contains       Roles
+    Sleep                          1s
     Click Element                  id=btn:admin.roles.create
     Wait Until Element Is Visible  id=input:admin.roles.modal.name
     Input Text                     id=input:admin.roles.modal.name  test
@@ -30,6 +31,7 @@ Create test user
     Log as                         username=root  password=root
     Click Navbar Menu Item         id=menu:navbar.profile  id=link:navbar.profile.admin
     Wait Until Page Contains       Users
+    Sleep                          1s
     Click Element                  id=btn:admin.users.create
     Wait Until Element Is Visible  id=input:admin.users.modal.username
     Input Text                     id=input:admin.users.modal.username  test

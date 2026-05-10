@@ -15,6 +15,7 @@ Create new transformer
     Log as                         username=root  password=root
     Click Navbar Menu Item         id=menu:navbar.settings  id=link:navbar.settings.transformers
     Wait Until Page Contains       No transformer found  timeout=5s
+    Sleep                          1s
     Click Element                  id=btn:transformers.create
     Wait Until Element Is Visible  id=input:transformers.modal.name
     Input Text                     id=input:transformers.modal.name  test
@@ -28,6 +29,7 @@ Configure transformer
     Log as                         username=root  password=root
     Click Navbar Menu Item         id=menu:navbar.settings  id=link:navbar.settings.transformers
     Wait Until Element Is Visible  id=label:transformers.list-item.test
+    Sleep                          1s
     Input Code                     editor=monaco:transformers.editor  code=.foo = "bar"
     Input Key/Value Pair           editor=kv:transformers.test.record  key=message  value=test
     Click Button                   id=btn:transformers.test.run
@@ -45,6 +47,7 @@ Delete transformer
     Log as                         username=root  password=root
     Click Navbar Menu Item         id=menu:navbar.settings  id=link:navbar.settings.transformers
     Wait Until Element Is Visible  id=label:transformers.list-item.test
+    Sleep                          1s
     Click Element                  id=btn:transformers.delete
     Wait Until Page Contains       No transformer found  timeout=5s
     Close Browser

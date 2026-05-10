@@ -15,6 +15,7 @@ Create and Delete Personal Access Token
     Log as                         username=root  password=root
     Click Navbar Menu Item         id=menu:navbar.profile  id=link:navbar.profile.account
     Wait Until Page Contains       API Tokens  timeout=5s
+    Sleep                          1s
     Click Element                  id=btn:account.tokens.create
     Wait Until Element Is Visible  id=input:account.tokens.modal.token  timeout=5s
     Element Should Be Visible      id=input:account.tokens.modal.token_uuid
@@ -37,6 +38,7 @@ Change Password
     Log as                    username=root  password=root
     Click Navbar Menu Item    id=menu:navbar.profile  id=link:navbar.profile.account
     Wait Until Page Contains  Account Information  timeout=5s
+    Sleep                     1s
     Input Text                id=input:account.settings.change-password.old  root
     Input Text                id=input:account.settings.change-password.new  rootroot
     Click Button              id=btn:account.settings.change-password.submit
@@ -52,6 +54,7 @@ Restore Password
     Log as                    username=root  password=rootroot
     Click Navbar Menu Item    id=menu:navbar.profile  id=link:navbar.profile.account
     Wait Until Page Contains  Account Information  timeout=5s
+    Sleep                     1s
     Input Text                id=input:account.settings.change-password.old  rootroot
     Input Text                id=input:account.settings.change-password.new  root
     Click Button              id=btn:account.settings.change-password.submit

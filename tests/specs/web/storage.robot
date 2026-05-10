@@ -13,6 +13,7 @@ Create new stream
     Log as                         username=root  password=root
     Click Navbar Menu Item         id=menu:navbar.settings  id=link:navbar.settings.storage
     Wait Until Page Contains       No stream found  timeout=5s
+    Sleep                          1s
     Click Element                  id=btn:streams.create
     Wait Until Element Is Visible  id=input:streams.modal.name
     Input Text                     id=input:streams.modal.name  test
@@ -26,6 +27,7 @@ Configure stream
     Log as                             username=root  password=root
     Click Navbar Menu Item             id=menu:navbar.settings  id=link:navbar.settings.storage
     Wait Until Element Is Visible      id=label:streams.list-item.test
+    Sleep                              1s
     Input Text                         id=input:editor.streams.retention-size  100
     Input Text                         id=input:editor.streams.retention-ttl  84600
     Input Text                         id=input:editor.streams.indexed-field.new.name  appname
@@ -46,6 +48,7 @@ Delete stream
     Log as                         username=root  password=root
     Click Navbar Menu Item         id=menu:navbar.settings  id=link:navbar.settings.storage
     Wait Until Element Is Visible  id=label:streams.list-item.test
+    Sleep                          1s
     Click Element                  id=btn:streams.delete
     Wait Until Page Contains       No stream found  timeout=5s
     Close Browser
