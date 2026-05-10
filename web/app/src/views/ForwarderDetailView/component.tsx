@@ -37,6 +37,7 @@ import {
   ForwarderDetailViewHeader,
   ForwarderDetailViewHeaderActions,
   ForwarderDetailViewHeaderLeft,
+  ForwarderDetailViewHeaderRight,
   ForwarderDetailViewHeaderTest,
   ForwarderDetailViewRoot,
   ForwarderDetailViewSidebar,
@@ -122,47 +123,49 @@ const ForwarderDetailView = () => {
             </Button>
           </ForwarderDetailViewHeaderLeft>
 
-          <ForwarderDetailViewHeaderTest>
-            <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              onClick={() => setTestOpen(true)}
-              startIcon={<Science />}
-            >
-              Test
-            </Button>
-          </ForwarderDetailViewHeaderTest>
-
-          {permissions.can_edit_forwarders && (
-            <ForwarderDetailViewHeaderActions>
-              <ButtonNewForwarder onForwarderCreated={onCreate} />
-
+          <ForwarderDetailViewHeaderRight>
+            <ForwarderDetailViewHeaderTest>
               <Button
-                id="btn:forwarders.delete"
                 variant="contained"
-                color="error"
+                color="primary"
                 size="small"
-                onClick={onDelete}
-                disabled={deleteLoading}
-                startIcon={!deleteLoading && <DeleteIcon />}
+                onClick={() => setTestOpen(true)}
+                startIcon={<Science />}
               >
-                {deleteLoading ? <CircularProgress size={24} /> : <>Delete</>}
+                Test
               </Button>
+            </ForwarderDetailViewHeaderTest>
 
-              <Button
-                id="btn:forwarders.save"
-                variant="contained"
-                color="secondary"
-                size="small"
-                onClick={onSave}
-                disabled={saveLoading || !valid}
-                startIcon={!saveLoading && <SaveIcon />}
-              >
-                {saveLoading ? <CircularProgress size={24} /> : <>Save</>}
-              </Button>
-            </ForwarderDetailViewHeaderActions>
-          )}
+            {permissions.can_edit_forwarders && (
+              <ForwarderDetailViewHeaderActions>
+                <ButtonNewForwarder onForwarderCreated={onCreate} />
+
+                <Button
+                  id="btn:forwarders.delete"
+                  variant="contained"
+                  color="error"
+                  size="small"
+                  onClick={onDelete}
+                  disabled={deleteLoading}
+                  startIcon={!deleteLoading && <DeleteIcon />}
+                >
+                  {deleteLoading ? <CircularProgress size={24} /> : <>Delete</>}
+                </Button>
+
+                <Button
+                  id="btn:forwarders.save"
+                  variant="contained"
+                  color="secondary"
+                  size="small"
+                  onClick={onSave}
+                  disabled={saveLoading || !valid}
+                  startIcon={!saveLoading && <SaveIcon />}
+                >
+                  {saveLoading ? <CircularProgress size={24} /> : <>Save</>}
+                </Button>
+              </ForwarderDetailViewHeaderActions>
+            )}
+          </ForwarderDetailViewHeaderRight>
         </ForwarderDetailViewHeader>
 
         <ForwarderDetailViewBody variant="page">

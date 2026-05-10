@@ -28,10 +28,16 @@ export const ForwarderDetailViewHeaderLeft = styled('div')({
   gap: '0.75rem',
 })
 
+export const ForwarderDetailViewHeaderRight = styled('div')({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: '0.75rem',
+})
+
 export const ForwarderDetailViewHeaderTest = styled('div')({
   display: 'flex',
   alignItems: 'center',
-  margin: '0 0.75rem',
 })
 
 export const ForwarderDetailViewHeaderActions = styled('div')({

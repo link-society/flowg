@@ -44,6 +44,7 @@ import {
   PipelineDetailViewHeader,
   PipelineDetailViewHeaderActions,
   PipelineDetailViewHeaderLeft,
+  PipelineDetailViewHeaderRight,
   PipelineDetailViewHeaderTest,
   PipelineDetailViewLeft,
   PipelineDetailViewRight,
@@ -204,43 +205,45 @@ const PipelineDetailView = () => {
             </Button>
           </PipelineDetailViewHeaderLeft>
 
-          <PipelineDetailViewHeaderTest>
-            <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              onClick={() => setTestOpen(true)}
-              startIcon={<Science />}
-            >
-              Test
-            </Button>
-          </PipelineDetailViewHeaderTest>
-
-          {permissions.can_edit_pipelines && (
-            <PipelineDetailViewHeaderActions>
+          <PipelineDetailViewHeaderRight>
+            <PipelineDetailViewHeaderTest>
               <Button
                 variant="contained"
-                color="error"
+                color="primary"
                 size="small"
-                onClick={onDelete}
-                disabled={deleteLoading}
-                startIcon={!deleteLoading && <DeleteIcon />}
+                onClick={() => setTestOpen(true)}
+                startIcon={<Science />}
               >
-                {deleteLoading ? <CircularProgress size={24} /> : <>Delete</>}
+                Test
               </Button>
+            </PipelineDetailViewHeaderTest>
 
-              <Button
-                variant="contained"
-                color="secondary"
-                size="small"
-                onClick={onSave}
-                disabled={saveLoading}
-                startIcon={!saveLoading && <SaveIcon />}
-              >
-                {saveLoading ? <CircularProgress size={24} /> : <>Save</>}
-              </Button>
-            </PipelineDetailViewHeaderActions>
-          )}
+            {permissions.can_edit_pipelines && (
+              <PipelineDetailViewHeaderActions>
+                <Button
+                  variant="contained"
+                  color="error"
+                  size="small"
+                  onClick={onDelete}
+                  disabled={deleteLoading}
+                  startIcon={!deleteLoading && <DeleteIcon />}
+                >
+                  {deleteLoading ? <CircularProgress size={24} /> : <>Delete</>}
+                </Button>
+
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  size="small"
+                  onClick={onSave}
+                  disabled={saveLoading}
+                  startIcon={!saveLoading && <SaveIcon />}
+                >
+                  {saveLoading ? <CircularProgress size={24} /> : <>Save</>}
+                </Button>
+              </PipelineDetailViewHeaderActions>
+            )}
+          </PipelineDetailViewHeaderRight>
         </PipelineDetailViewHeader>
 
         <PipelineDetailViewBody variant="page">

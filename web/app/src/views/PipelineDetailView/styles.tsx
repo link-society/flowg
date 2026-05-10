@@ -28,10 +28,16 @@ export const PipelineDetailViewHeaderLeft = styled('div')({
   gap: '0.75rem',
 })
 
+export const PipelineDetailViewHeaderRight = styled('div')({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: '0.75rem',
+})
+
 export const PipelineDetailViewHeaderTest = styled('div')({
   display: 'flex',
   alignItems: 'center',
-  margin: '0 0.75rem',
 })
 
 export const PipelineDetailViewHeaderActions = styled('div')({
