@@ -46,6 +46,7 @@ const NavBar = () => {
             href="https://github.com/link-society/flowg"
             color="inherit"
             target="_blank"
+            underline="none"
           >
             <GitHubIcon fontSize="small" />
             <Typography variant="titleSm" className="nav-text">
@@ -53,7 +54,12 @@ const NavBar = () => {
             </Typography>
           </NavBarLink>
 
-          <NavBarLink href="/api/docs" target="_blank" color="inherit">
+          <NavBarLink
+            href="/api/docs"
+            target="_blank"
+            color="inherit"
+            underline="none"
+          >
             <ApiIcon fontSize="small" />
             <Typography variant="titleSm" className="nav-text">
               API Docs

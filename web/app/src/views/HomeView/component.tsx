@@ -10,20 +10,12 @@ import StorageIcon from '@mui/icons-material/Storage'
 import * as authApi from '@/lib/api/operations/auth'
 import * as configApi from '@/lib/api/operations/config'
 
-import StreamConfigModel from '@/lib/models/StreamConfigModel'
-
 import { loginRequired } from '@/lib/decorators/loaders'
 
 import StatCard from '@/components/StatCard/component'
 
 import { HomeViewContainer, HomeViewPermissionsWrapper } from './styles'
-
-type HomeViewData = {
-  streams: { [stream: string]: StreamConfigModel } | null
-  transformers: string[] | null
-  forwarders: string[] | null
-  pipelines: string[] | null
-}
+import { HomeViewData } from './types'
 
 export const loader: LoaderFunction = loginRequired(async () => {
   const profile = await authApi.whoami()
