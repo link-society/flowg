@@ -1,64 +1,47 @@
-import Paper from '@mui/material/Paper'
-
+import { TraceCode, TraceLabel, TraceRow, TraceSection } from './styles'
 import { NodeTraceTabPanelProps } from './types'
 
 const NodeTraceTabPanel = ({ trace, index, value }: NodeTraceTabPanelProps) => (
   <div role="tabpanel" hidden={value !== index} key={index}>
     {trace.error && (
-      <div className="grow flex flex-col gap-2">
-        <p className="text-sm text-gray-700 font-semibold mb-2">Error:</p>
-        <Paper
+      <TraceSection>
+        <TraceLabel>Error:</TraceLabel>
+        <TraceCode
           id="container:transformers.test.result"
           variant="outlined"
-          className="
-              p-2 grow shrink overflow-auto
-              font-mono bg-gray-100! min-w-50
-            "
           component="pre"
         >
           {trace.error}
-        </Paper>
-      </div>
+        </TraceCode>
+      </TraceSection>
     )}
-    <div className="flex gap-5">
+    <TraceRow>
       {trace.input && (
-        <div className="grow flex flex-col gap-2">
-          <p className="text-sm text-gray-700 font-semibold mb-2">
-            Input Record:
-          </p>
-          <Paper
+        <TraceSection>
+          <TraceLabel>Input Record:</TraceLabel>
+          <TraceCode
             id="container:transformers.test.result"
             variant="outlined"
-            className="
-              p-2 grow shrink overflow-auto
-              font-mono bg-gray-100! min-w-50
-            "
             component="pre"
           >
             {JSON.stringify(trace.input, null, 2)}
-          </Paper>
-        </div>
+          </TraceCode>
+        </TraceSection>
       )}
 
       {trace.output && (
-        <div className="grow flex flex-col gap-2">
-          <p className="text-sm text-gray-700 font-semibold mb-2">
-            Output Record(s):
-          </p>
-          <Paper
+        <TraceSection>
+          <TraceLabel>Output Record(s):</TraceLabel>
+          <TraceCode
             id="container:transformers.test.result"
             variant="outlined"
-            className="
-              p-2 grow shrink overflow-auto
-              font-mono bg-gray-100! min-w-50
-            "
             component="pre"
           >
             {JSON.stringify(trace.output, null, 2)}
-          </Paper>
-        </div>
+          </TraceCode>
+        </TraceSection>
       )}
-    </div>
+    </TraceRow>
   </div>
 )
 

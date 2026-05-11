@@ -29,7 +29,6 @@
     "uuid": "^14.0.0"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.2.4",
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@types/node": "^25.6.0",
     "@types/react": "^19.2.14",
@@ -40,7 +39,6 @@
     "oxlint": "^1.63.0",
     "prettier": "^3.8.3",
     "prettier-plugin-organize-imports": "^4.3.0",
-    "tailwindcss": "^4.2.4",
     "typescript": "^6.0.3",
     "vite": "^8.0.10",
     "vite-plugin-compression2": "^2.5.3"

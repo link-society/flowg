@@ -38,8 +38,8 @@ const HomeView = () => {
   return (
     <HomeViewContainer variant="page">
       <Typography variant="titleLg" component="h1">
-        <span className="text-3xl">Welcome to FlowG</span>
-        <img src="/web/assets/logo.png" alt="Logo" className="h-8" />
+        <span style={{ fontSize: '1.875rem' }}>Welcome to FlowG</span>
+        <img src="/web/assets/logo.png" alt="Logo" style={{ height: '2rem' }} />
       </Typography>
 
       <HomeViewPermissionsWrapper>
