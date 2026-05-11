@@ -1,13 +1,13 @@
-@import 'tailwindcss';
-
 .flowg-table .ag-header {
-  @apply bg-gray-200 z-10 shadow-xs;
+  background-color: #e5e7eb;
+  z-index: 10;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .flowg-table .ag-cell-wrapper {
-  @apply h-full;
+  height: 100%;
 }
 
 .flowg-table .flowg-actions-header .ag-header-cell-label {
-  @apply justify-center;
+  justify-content: center;
 }
