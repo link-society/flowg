@@ -91,6 +91,7 @@ const LoginView = () => {
                 variant="standard"
                 className="grow"
                 required
+                fullWidth
               />
             </div>
 
@@ -106,6 +107,7 @@ const LoginView = () => {
                 className="grow"
                 disabled={loading}
                 required
+                fullWidth
               />
             </div>
           </LoginViewCardFields>

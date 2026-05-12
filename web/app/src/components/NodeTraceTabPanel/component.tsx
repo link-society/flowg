@@ -6,11 +6,7 @@ const NodeTraceTabPanel = ({ trace, index, value }: NodeTraceTabPanelProps) => (
     {trace.error && (
       <TraceSection>
         <TraceLabel>Error:</TraceLabel>
-        <TraceCode
-          id="container:transformers.test.result"
-          variant="outlined"
-          component="pre"
-        >
+        <TraceCode id="container:transformers.test.result" variant="outlined">
           {trace.error}
         </TraceCode>
       </TraceSection>
@@ -18,12 +14,8 @@ const NodeTraceTabPanel = ({ trace, index, value }: NodeTraceTabPanelProps) => (
     <TraceRow>
       {trace.input && (
         <TraceSection>
-          <TraceLabel>Input Record:</TraceLabel>
-          <TraceCode
-            id="container:transformers.test.result"
-            variant="outlined"
-            component="pre"
-          >
+          <TraceLabel variant="text">Input Record:</TraceLabel>
+          <TraceCode id="container:transformers.test.result" variant="outlined">
             {JSON.stringify(trace.input, null, 2)}
           </TraceCode>
         </TraceSection>
@@ -31,12 +23,8 @@ const NodeTraceTabPanel = ({ trace, index, value }: NodeTraceTabPanelProps) => (
 
       {trace.output && (
         <TraceSection>
-          <TraceLabel>Output Record(s):</TraceLabel>
-          <TraceCode
-            id="container:transformers.test.result"
-            variant="outlined"
-            component="pre"
-          >
+          <TraceLabel variant="text">Output Record(s):</TraceLabel>
+          <TraceCode id="container:transformers.test.result" variant="outlined">
             {JSON.stringify(trace.output, null, 2)}
           </TraceCode>
         </TraceSection>

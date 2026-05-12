@@ -14,19 +14,17 @@ export const TraceRow = styled('div')({
   gap: 20,
 })
 
-export const TraceLabel = styled(Typography)({
-  fontSize: '0.875rem',
-  color: '#374151',
+export const TraceLabel = styled(Typography)(({ theme }) => ({
+  color: theme.tokens.colors.labelText,
   fontWeight: 600,
-  marginBottom: 8,
-})
+}))
 
-export const TraceCode = styled(Paper)({
+export const TraceCode = styled(Paper)(({ theme }) => ({
   padding: 8,
   flex: 1,
   flexShrink: 1,
   overflow: 'auto',
   fontFamily: 'monospace',
-  backgroundColor: '#f3f4f6',
+  backgroundColor: theme.tokens.colors.codeBg,
   minWidth: 200,
-})
+}))

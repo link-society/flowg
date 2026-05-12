@@ -19,6 +19,7 @@ export type ColorsType = {
   disabledBg: string
   selectedBg: string
   selectedBorder: string
+  labelText: string
 
   // Status
   statusError: string
@@ -61,6 +62,7 @@ export const colors: ColorsType = {
   disabledBg: '#e5e7eb',
   selectedBg: '#bfdbfe',
   selectedBorder: '#93c5fd',
+  labelText: '#374151',
 
   // Status
   statusError: '#ff4444',
