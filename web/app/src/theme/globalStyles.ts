@@ -1,14 +1,12 @@
 import type { GlobalStylesProps } from '@mui/material/GlobalStyles'
 
-import colors from './tokens/colors'
-
-const globalStyles: GlobalStylesProps['styles'] = {
+const globalStyles: GlobalStylesProps['styles'] = (theme) => ({
   'html, body': {
     margin: 0,
     padding: 0,
     width: '100vw',
     height: '100vh',
-    backgroundColor: colors.bodyBg,
+    backgroundColor: theme.tokens.colors.bodyBg,
     overflow: 'hidden',
   },
   '#root': {
@@ -21,6 +19,17 @@ const globalStyles: GlobalStylesProps['styles'] = {
     textDecoration: 'none',
     color: 'inherit',
   },
-}
+  '.flowg-table .ag-header': {
+    backgroundColor: theme.tokens.colors.disabledBg,
+    zIndex: 10,
+    boxShadow: theme.shadows[1],
+  },
+  '.flowg-table .ag-cell-wrapper': {
+    height: '100%',
+  },
+  '.flowg-table .flowg-actions-header .ag-header-cell-label': {
+    justifyContent: 'center',
+  },
+})
 
 export default globalStyles
