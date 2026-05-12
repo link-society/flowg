@@ -89,7 +89,6 @@ const LoginView = () => {
                 type="text"
                 onChange={(e) => setUsername(e.target.value)}
                 variant="standard"
-                className="grow"
                 required
                 fullWidth
               />
@@ -104,7 +103,6 @@ const LoginView = () => {
                 type="password"
                 onChange={(e) => setPassword(e.target.value)}
                 variant="standard"
-                className="grow"
                 disabled={loading}
                 required
                 fullWidth
