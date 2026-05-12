@@ -8,6 +8,10 @@ export const HomeViewContainer = styled(AppContainer)({
   '& h1': {
     display: 'flex',
     gap: 8,
+    placeItems: 'center',
+    img: {
+      height: '2rem',
+    },
   },
 })
 
