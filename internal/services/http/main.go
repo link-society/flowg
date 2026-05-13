@@ -20,6 +20,7 @@ import (
 
 type ServerOptions struct {
 	BindAddress string
+	MountPath   string
 	TlsConfig   *tls.Config
 }
 
@@ -38,17 +39,25 @@ type handlers struct {
 func NewServer(opts ServerOptions) fx.Option {
 	return fx.Module(
 		"services.http",
-		fx.Provide(fx.Annotate(api.NewHandler, fx.ResultTags(`name:"service-http-api"`))),
-		fx.Provide(fx.Annotate(web.NewHandler, fx.ResultTags(`name:"service-http-web"`))),
+		fx.Provide(fx.Annotate(
+			api.NewHandler,
+			fx.ResultTags(`name:"service-http-api"`),
+		)),
+		fx.Provide(fx.Annotate(
+			func() gohttp.Handler {
+				return web.NewHandler(opts.MountPath)
+			},
+			fx.ResultTags(`name:"service-http-web"`),
+		)),
 		fx.Provide(func(lc fx.Lifecycle, h handlers) *Server {
 			rootHandler := gohttp.NewServeMux()
-			rootHandler.Handle("/api/", h.ApiHandler)
-			rootHandler.Handle("/web/", h.WebHandler)
+			rootHandler.Handle(opts.MountPath+"/api/", gohttp.StripPrefix(opts.MountPath, h.ApiHandler))
+			rootHandler.Handle(opts.MountPath+"/web/", gohttp.StripPrefix(opts.MountPath, h.WebHandler))
 
 			rootHandler.HandleFunc(
-				"GET /{$}",
+				"GET "+opts.MountPath+"/{$}",
 				func(w gohttp.ResponseWriter, r *gohttp.Request) {
-					gohttp.Redirect(w, r, "/web/", gohttp.StatusPermanentRedirect)
+					gohttp.Redirect(w, r, opts.MountPath+"/web/", gohttp.StatusPermanentRedirect)
 				},
 			)
 

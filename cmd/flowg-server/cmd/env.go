@@ -13,6 +13,7 @@ var (
 	defaultLogLevel = getEnvString("FLOWG_LOGLEVEL", "info")
 
 	defaultHttpBindAddress = getEnvString("FLOWG_HTTP_BIND_ADDRESS", ":5080")
+	defaultHttpMountPath   = getEnvString("FLOWG_HTTP_MOUNT_PATH", "/")
 	defaultHttpTlsEnabled  = getEnvBool("FLOWG_HTTP_TLS_ENABLED", false)
 	defaultHttpTlsCert     = getEnvString("FLOWG_HTTP_TLS_CERT", "")
 	defaultHttpTlsCertKey  = getEnvString("FLOWG_HTTP_TLS_KEY", "")
