@@ -8,6 +8,7 @@ type options struct {
 	demoMode bool
 
 	httpBindAddress string
+	httpMountPath   string
 	httpTlsEnabled  bool
 	httpTlsCert     string
 	httpTlsCertKey  string
@@ -71,6 +72,13 @@ func (opts *options) defineCliOptions(cmd *cobra.Command) {
 		"http-bind",
 		defaultHttpBindAddress,
 		"Address to bind the HTTP server to",
+	)
+
+	cmd.Flags().StringVar(
+		&opts.httpMountPath,
+		"http-mount-path",
+		defaultHttpMountPath,
+		"Path to mount the HTTP server",
 	)
 
 	cmd.Flags().BoolVar(

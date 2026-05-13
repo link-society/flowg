@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
 	"crypto/tls"
 	"net/url"
@@ -150,6 +151,7 @@ func newServerConfig(opts *options) (server.Options, error) {
 
 	config := server.Options{
 		HttpBindAddress: opts.httpBindAddress,
+		HttpMountPath:   strings.TrimSuffix(opts.httpMountPath, "/"),
 		HttpTlsConfig:   httpTlsConfig,
 
 		MgmtBindAddress: opts.mgmtBindAddress,

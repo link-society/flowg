@@ -22,7 +22,7 @@ import (
 //go:embed public/*.gz
 var staticfiles embed.FS
 
-func NewHandler() http.Handler {
+func NewHandler(mountPath string) http.Handler {
 	return http.StripPrefix(
 		"/web/",
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -73,6 +73,7 @@ func NewHandler() http.Handler {
 					"FeatureFlags": map[string]bool{
 						"DemoMode": featureflags.GetDemoMode(),
 					},
+					"MountPath": mountPath,
 				}
 
 				w.WriteHeader(http.StatusOK)

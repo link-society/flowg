@@ -23,6 +23,7 @@ import (
 
 type Options struct {
 	HttpBindAddress string
+	HttpMountPath   string
 	HttpTlsConfig   *tls.Config
 
 	MgmtBindAddress string
@@ -76,6 +77,7 @@ func NewServer(opts Options) fx.Option {
 		// Service Layer
 		http.NewServer(http.ServerOptions{
 			BindAddress: opts.HttpBindAddress,
+			MountPath:   opts.HttpMountPath,
 			TlsConfig:   opts.HttpTlsConfig,
 		}),
 		mgmt.NewServer(mgmt.ServerOptions{
