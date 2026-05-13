@@ -62,7 +62,7 @@ RUN cargo test
 ## BUILD JS DEPENDENCIES
 ##############################
 
-FROM node:25-alpine3.23 AS builder-js
+FROM node:26-alpine3.23 AS builder-js
 
 RUN mkdir -p /workspace/web/app
 WORKDIR /workspace/web/app
