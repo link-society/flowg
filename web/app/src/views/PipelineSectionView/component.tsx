@@ -8,12 +8,14 @@ import { loginRequired } from '@/lib/decorators/loaders'
 
 import ButtonNewPipeline from '@/components/ButtonNewPipeline/component'
 
+import { buildUrl } from '@/router'
+
 import { PipelineSectionViewRoot } from './styles'
 
 export const loader: LoaderFunction = loginRequired(async () => {
   const pipelines = await configApi.listPipelines()
   if (pipelines.length > 0) {
-    return redirect(`/web/pipelines/${pipelines[0]}`)
+    return redirect(buildUrl(`/pipelines/${pipelines[0]}`))
   }
 
   return null
@@ -30,7 +32,7 @@ const PipelineSectionView = () => {
 
       <ButtonNewPipeline
         onPipelineCreated={(name) => {
-          navigate(`/web/pipelines/${name}`)
+          navigate(buildUrl(`/pipelines/${name}`))
         }}
       />
     </PipelineSectionViewRoot>

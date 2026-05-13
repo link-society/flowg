@@ -9,6 +9,8 @@ import { useProfile } from '@/lib/hooks/profile'
 import ButtonNewForwarder from '@/components/ButtonNewForwarder/component'
 import PipelineEditorNodeList from '@/components/PipelineEditorNodeList/component'
 
+import { buildUrl } from '@/router'
+
 const PipelineEditorNodeListForwarder = () => {
   const { permissions } = useProfile()
   const navigate = useNavigate()
@@ -28,7 +30,7 @@ const PipelineEditorNodeListForwarder = () => {
       itemIcon={<ForwardToInboxIcon />}
       itemColor="green"
       onItemOpen={(forwarder) => {
-        navigate(`/web/forwarders/${forwarder}`)
+        navigate(buildUrl(`/forwarders/${forwarder}`))
       }}
     />
   )

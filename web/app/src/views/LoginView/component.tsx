@@ -19,6 +19,8 @@ import { useApiOperation } from '@/lib/hooks/api'
 import { useFeatureFlags } from '@/lib/hooks/featureflags'
 import { useNotify } from '@/lib/hooks/notify'
 
+import { buildUrl } from '@/router'
+
 import {
   LoginViewCard,
   LoginViewCardFields,
@@ -45,13 +47,13 @@ const LoginView = () => {
       }
     }
 
-    navigate('/web/')
+    navigate(buildUrl('/'))
   }, [username, password])
 
   return (
     <LoginViewContainer variant="page">
       <header>
-        <img src="/web/assets/logo.png" alt="Logo flowG" />
+        <img src={buildUrl('/assets/logo.png')} alt="Logo flowG" />
         <Typography variant="h1">FlowG</Typography>
       </header>
 

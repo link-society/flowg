@@ -9,13 +9,15 @@ import { loginRequired } from '@/lib/decorators/loaders'
 
 import ButtonNewStreamConfig from '@/components/ButtonNewStreamConfig/component'
 
+import { buildUrl } from '@/router'
+
 import { StorageSectionViewRoot } from './styles'
 
 export const loader: LoaderFunction = loginRequired(async () => {
   const streams = await configApi.listStreams()
   const streamNames = Object.keys(streams)
   if (streamNames.length > 0) {
-    return { redirectTo: `/web/storage/${streamNames[0]}` }
+    return { redirectTo: buildUrl(`/storage/${streamNames[0]}`) }
   }
 
   return { redirectTo: null }
@@ -39,7 +41,7 @@ const StorageSectionView = () => {
 
       <ButtonNewStreamConfig
         onStreamConfigCreated={(name) => {
-          navigate(`/web/storage/${name}`)
+          navigate(buildUrl(`/storage/${name}`))
         }}
       />
     </StorageSectionViewRoot>

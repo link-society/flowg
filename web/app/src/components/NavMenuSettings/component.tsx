@@ -15,6 +15,8 @@ import SettingsIcon from '@mui/icons-material/Settings'
 
 import { useProfile } from '@/lib/hooks/profile'
 
+import { buildUrl } from '@/router'
+
 import { NavMenuSettingsButton } from './styles'
 
 const NavMenuSettings = () => {
@@ -74,7 +76,7 @@ const NavMenuSettings = () => {
           <MenuItem
             variant="navLink"
             id="link:navbar.settings.transformers"
-            onClick={() => handleNavigate('/web/transformers')}
+            onClick={() => handleNavigate(buildUrl('/transformers'))}
           >
             <FilterAltIcon fontSize="small" />
             Transformers
@@ -85,7 +87,7 @@ const NavMenuSettings = () => {
           <MenuItem
             variant="navLink"
             id="link:navbar.settings.forwarders"
-            onClick={() => handleNavigate('/web/forwarders')}
+            onClick={() => handleNavigate(buildUrl('/forwarders'))}
           >
             <ForwardToInboxIcon fontSize="small" />
             Forwarders
@@ -96,7 +98,7 @@ const NavMenuSettings = () => {
           <MenuItem
             variant="navLink"
             id="link:navbar.settings.storage"
-            onClick={() => handleNavigate('/web/storage')}
+            onClick={() => handleNavigate(buildUrl('/storage'))}
           >
             <SdStorageIcon fontSize="small" />
             Storage
@@ -107,7 +109,7 @@ const NavMenuSettings = () => {
           <MenuItem
             variant="navLink"
             id="link:navbar.settings.pipelines"
-            onClick={() => handleNavigate('/web/pipelines')}
+            onClick={() => handleNavigate(buildUrl('/pipelines'))}
           >
             <AccountTreeIcon fontSize="small" />
             Pipelines
@@ -118,7 +120,7 @@ const NavMenuSettings = () => {
           <MenuItem
             variant="navLink"
             id="link:navbar.settings.configuration"
-            onClick={() => handleNavigate('/web/system-configuration')}
+            onClick={() => handleNavigate(buildUrl('/system-configuration'))}
           >
             <SettingsIcon fontSize="small" />
             System configuration

@@ -8,12 +8,14 @@ import { loginRequired } from '@/lib/decorators/loaders'
 
 import ButtonNewForwarder from '@/components/ButtonNewForwarder/component'
 
+import { buildUrl } from '@/router'
+
 import { ForwarderSectionViewRoot } from './styles'
 
 export const loader: LoaderFunction = loginRequired(async () => {
   const forwarders = await configApi.listForwarders()
   if (forwarders.length > 0) {
-    return redirect(`/web/forwarders/${forwarders[0]}`)
+    return redirect(buildUrl(`/forwarders/${forwarders[0]}`))
   }
 
   return null
@@ -30,7 +32,7 @@ const ForwarderSectionView = () => {
 
       <ButtonNewForwarder
         onForwarderCreated={(name) => {
-          navigate(`/web/forwarders/${name}`)
+          navigate(buildUrl(`/forwarders/${name}`))
         }}
       />
     </ForwarderSectionViewRoot>

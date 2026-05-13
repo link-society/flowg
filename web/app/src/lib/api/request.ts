@@ -3,6 +3,17 @@ import { EventSourcePlus } from 'event-source-plus'
 import * as errors from '@/lib/api/errors'
 import { ApiErrorResponse } from '@/lib/api/response'
 
+const getBasePath = (): string => {
+  const basePath = document
+    .getElementsByTagName('base')[0]
+    ?.getAttribute('href')
+  if (basePath === null) {
+    throw new Error('ASSERTION FAILED: <base href> is required in index.html')
+  }
+  const suffix = '/web/'
+  return basePath.slice(0, -suffix.length)
+}
+
 type ApiMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'
 
 type ApiRequestResult<R> = {
@@ -30,14 +41,19 @@ const request = async <B, R extends { success: boolean }>(
 
   const ct = contentType ?? 'application/json'
 
-  const response = await fetch(`${path}?${searchParams?.toString() ?? ''}`, {
-    method,
-    headers: {
-      'Content-Type': ct,
-      Authorization: authHeader,
-    },
-    body: ct === 'application/json' ? JSON.stringify(body) : (body as BodyInit),
-  })
+  const basePath = getBasePath()
+  const response = await fetch(
+    `${basePath}${path}?${searchParams?.toString() ?? ''}`,
+    {
+      method,
+      headers: {
+        'Content-Type': ct,
+        Authorization: authHeader,
+      },
+      body:
+        ct === 'application/json' ? JSON.stringify(body) : (body as BodyInit),
+    }
+  )
 
   let responseBody: unknown
 

@@ -9,6 +9,8 @@ import { useProfile } from '@/lib/hooks/profile'
 import ButtonNewStreamConfig from '@/components/ButtonNewStreamConfig/component'
 import PipelineEditorNodeList from '@/components/PipelineEditorNodeList/component'
 
+import { buildUrl } from '@/router'
+
 const PipelineEditorNodeListStream = () => {
   const { permissions } = useProfile()
   const navigate = useNavigate()
@@ -31,7 +33,7 @@ const PipelineEditorNodeListStream = () => {
       itemIcon={<StorageIcon />}
       itemColor="purple"
       onItemOpen={(stream) => {
-        navigate(`/web/storage/${stream}`)
+        navigate(buildUrl(`/storage/${stream}`))
       }}
     />
   )

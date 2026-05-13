@@ -9,6 +9,8 @@ import { useProfile } from '@/lib/hooks/profile'
 import ButtonNewTransformer from '@/components/ButtonNewTransformer/component'
 import PipelineEditorNodeList from '@/components/PipelineEditorNodeList/component'
 
+import { buildUrl } from '@/router'
+
 const PipelineEditorNodeListTransformer = () => {
   const { permissions } = useProfile()
   const navigate = useNavigate()
@@ -28,7 +30,7 @@ const PipelineEditorNodeListTransformer = () => {
       itemIcon={<FilterAltIcon />}
       itemColor="blue"
       onItemOpen={(transformer) => {
-        navigate(`/web/transformers/${transformer}`)
+        navigate(buildUrl(`/transformers/${transformer}`))
       }}
     />
   )

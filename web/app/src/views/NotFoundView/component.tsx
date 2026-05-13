@@ -6,6 +6,8 @@ import Button from '@mui/material/Button'
 
 import SearchOffIcon from '@mui/icons-material/SearchOff'
 
+import { buildUrl } from '@/router'
+
 import { NotFoundViewContainer } from './styles'
 
 const NotFoundView = () => {
@@ -30,7 +32,7 @@ const NotFoundView = () => {
       <Button
         variant="contained"
         color="secondary"
-        onClick={() => navigate('/web/')}
+        onClick={() => navigate(buildUrl('/'))}
       >
         Back to home
       </Button>

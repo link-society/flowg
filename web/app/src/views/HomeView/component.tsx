@@ -14,6 +14,8 @@ import { loginRequired } from '@/lib/decorators/loaders'
 
 import StatCard from '@/components/StatCard/component'
 
+import { buildUrl } from '@/router'
+
 import { HomeViewContainer, HomeViewPermissionsWrapper } from './styles'
 import { HomeViewData } from './types'
 
@@ -39,7 +41,7 @@ const HomeView = () => {
     <HomeViewContainer variant="page">
       <Typography variant="titleLg" component="h1">
         <span>Welcome to FlowG</span>
-        <img src="/web/assets/logo.png" alt="Logo FlowG" />
+        <img src={buildUrl('/assets/logo.png')} alt="Logo FlowG" />
       </Typography>
 
       <HomeViewPermissionsWrapper>
@@ -48,7 +50,7 @@ const HomeView = () => {
             icon={<StorageIcon />}
             title="Streams"
             value={Object.keys(streams).length}
-            to="/web/streams"
+            to={buildUrl('/streams')}
           />
         )}
         {transformers !== null && (
@@ -56,7 +58,7 @@ const HomeView = () => {
             icon={<FilterAltIcon />}
             title="Transformers"
             value={transformers.length}
-            to="/web/transformers"
+            to={buildUrl('/transformers')}
           />
         )}
         {forwarders !== null && (
@@ -64,7 +66,7 @@ const HomeView = () => {
             icon={<ForwardToInboxIcon />}
             title="Forwarders"
             value={forwarders.length}
-            to="/web/forwarders"
+            to={buildUrl('/forwarders')}
           />
         )}
         {pipelines !== null && (
@@ -72,7 +74,7 @@ const HomeView = () => {
             icon={<AccountTreeIcon />}
             title="Pipelines"
             value={pipelines.length}
-            to="/web/pipelines"
+            to={buildUrl('/pipelines')}
           />
         )}
       </HomeViewPermissionsWrapper>

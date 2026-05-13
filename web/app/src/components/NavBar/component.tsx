@@ -14,6 +14,8 @@ import { useProfile } from '@/lib/hooks/profile'
 import NavMenuProfile from '@/components/NavMenuProfile/component'
 import NavMenuSettings from '@/components/NavMenuSettings/component'
 
+import { buildUrl } from '@/router'
+
 import {
   NavBarButton,
   NavBarButtonLogo,
@@ -34,8 +36,11 @@ const NavBar = () => {
     <AppBar position="static">
       <Toolbar>
         <NavBarLeftSection>
-          <NavBarButtonLogo onClick={handleNavigate('/web/')} color="inherit">
-            <img src="/web/assets/logo.png" alt="Logo FlowG" />
+          <NavBarButtonLogo
+            onClick={handleNavigate(buildUrl('/'))}
+            color="inherit"
+          >
+            <img src="./assets/logo.png" alt="Logo FlowG" />
 
             <Typography variant="titleSm" className="nav-text">
               FlowG
@@ -74,7 +79,7 @@ const NavBar = () => {
           {permissions.can_view_streams && (
             <NavBarButton
               id="link:navbar.streams"
-              onClick={handleNavigate('/web/streams')}
+              onClick={handleNavigate(buildUrl('/streams'))}
               color="inherit"
             >
               <StorageIcon fontSize="small" />
@@ -88,7 +93,7 @@ const NavBar = () => {
           {permissions.can_send_logs && (
             <NavBarButton
               id="link:navbar.upload"
-              onClick={handleNavigate('/web/upload')}
+              onClick={handleNavigate(buildUrl('/upload'))}
               color="inherit"
             >
               <UploadFileIcon fontSize="small" />

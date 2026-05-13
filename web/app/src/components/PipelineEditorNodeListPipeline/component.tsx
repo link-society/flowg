@@ -9,6 +9,8 @@ import { useProfile } from '@/lib/hooks/profile'
 import ButtonNewPipeline from '@/components/ButtonNewPipeline/component'
 import PipelineEditorNodeList from '@/components/PipelineEditorNodeList/component'
 
+import { buildUrl } from '@/router'
+
 const PipelineEditorNodeListPipeline = () => {
   const { permissions } = useProfile()
   const navigate = useNavigate()
@@ -28,7 +30,7 @@ const PipelineEditorNodeListPipeline = () => {
       itemIcon={<AccountTreeIcon />}
       itemColor="lime"
       onItemOpen={(pipeline) => {
-        navigate(`/web/pipelines/${pipeline}`)
+        navigate(buildUrl(`/pipelines/${pipeline}`))
       }}
     />
   )
