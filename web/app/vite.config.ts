@@ -14,8 +14,9 @@ export default defineConfig({
     compression({
       algorithms: ['gzip'],
       include: [
-        /\.(html|css|js|map|ico|png)$/,
+        /\.(html|css|js|map|ico|png|woff2?)$/,
       ],
+      skipIfLargerOrEqual: false,
     }),
     {
       name: 'rewrite-assets-path',
