@@ -5,6 +5,8 @@ import { PermissionDeniedError, UnauthenticatedError } from '@/lib/api/errors'
 
 import { useNotify } from '@/lib/hooks/notify'
 
+import { buildUrl } from '@/router'
+
 export function useApiOperation<Args extends unknown[]>(
   fn: (...args: Args) => Promise<void>,
   deps: unknown[]
@@ -25,7 +27,7 @@ export function useApiOperation<Args extends unknown[]>(
 
         if (error instanceof UnauthenticatedError) {
           notify.error('Session expired')
-          navigate('/web/login')
+          navigate(buildUrl('/login'))
         } else if (error instanceof PermissionDeniedError) {
           notify.error('Permission denied')
         } else {

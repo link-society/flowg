@@ -23,6 +23,8 @@ import ButtonNewStreamConfig from '@/components/ButtonNewStreamConfig/component'
 import SideNavList from '@/components/SideNavList/component'
 import StreamEditor from '@/components/StreamEditor/component'
 
+import { buildUrl } from '@/router'
+
 import {
   StorageDetailViewBody,
   StorageDetailViewContent,
@@ -61,14 +63,14 @@ const StorageDetailView = () => {
 
   const onCreate = (name: string) => {
     queueMicrotask(() => {
-      navigate(`/web/storage/${name}`)
+      navigate(buildUrl(`/storage/${name}`))
     })
   }
 
   const [onDelete, deleteLoading] = useApiOperation(async () => {
     await configApi.purgeStream(currentStream)
     queueMicrotask(() => {
-      navigate('/web/storage')
+      navigate(buildUrl('/storage'))
     })
   }, [currentStream])
 
@@ -134,7 +136,7 @@ const StorageDetailView = () => {
         <StorageDetailViewSidebar>
           <SideNavList
             namespace="streams"
-            urlPrefix="/web/storage"
+            urlPrefix={buildUrl('/storage')}
             items={Object.keys(streams)}
             currentItem={currentStream}
           />

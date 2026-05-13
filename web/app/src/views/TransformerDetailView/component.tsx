@@ -20,6 +20,8 @@ import ButtonNewTransformer from '@/components/ButtonNewTransformer/component'
 import SideNavList from '@/components/SideNavList/component'
 import TransformerEditor from '@/components/TransformerEditor/component'
 
+import { buildUrl } from '@/router'
+
 import {
   TransformerDetailViewBody,
   TransformerDetailViewContainer,
@@ -63,14 +65,14 @@ const TransformerDetailView = () => {
 
   const onCreate = (name: string) => {
     queueMicrotask(() => {
-      navigate(`/web/transformers/${name}`)
+      navigate(buildUrl(`/transformers/${name}`))
     })
   }
 
   const [onDelete, deleteLoading] = useApiOperation(async () => {
     await configApi.deleteTransformer(currentTransformer.name)
     queueMicrotask(() => {
-      navigate('/web/transformers')
+      navigate(buildUrl('/transformers'))
     })
   }, [currentTransformer])
 
@@ -130,7 +132,7 @@ const TransformerDetailView = () => {
         <TransformerDetailViewSidebar>
           <SideNavList
             namespace="transformers"
-            urlPrefix="/web/transformers"
+            urlPrefix={buildUrl('/transformers')}
             items={transformers}
             currentItem={currentTransformer.name}
           />

@@ -8,12 +8,14 @@ import { loginRequired } from '@/lib/decorators/loaders'
 
 import ButtonNewTransformer from '@/components/ButtonNewTransformer/component'
 
+import { buildUrl } from '@/router'
+
 import { TransformerSectionViewContainer } from './styles'
 
 export const loader: LoaderFunction = loginRequired(async () => {
   const transformers = await configApi.listTransformers()
   if (transformers.length > 0) {
-    return redirect(`/web/transformers/${transformers[0]}`)
+    return redirect(buildUrl(`/transformers/${transformers[0]}`))
   }
 
   return null
@@ -30,7 +32,7 @@ const TransformerSectionView = () => {
 
       <ButtonNewTransformer
         onTransformerCreated={(name) => {
-          navigate(`/web/transformers/${name}`)
+          navigate(buildUrl(`/transformers/${name}`))
         }}
       />
     </TransformerSectionViewContainer>

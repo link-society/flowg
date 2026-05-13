@@ -38,6 +38,8 @@ import PipelineEditorNodeListPipeline from '@/components/PipelineEditorNodeListP
 import PipelineEditorNodeListStream from '@/components/PipelineEditorNodeListStream/component'
 import PipelineEditorNodeListTransformer from '@/components/PipelineEditorNodeListTransformer/component'
 
+import { buildUrl } from '@/router'
+
 import {
   PipelineDetailViewBody,
   PipelineDetailViewCenter,
@@ -104,7 +106,7 @@ const PipelineDetailView = () => {
     await configApi.deletePipeline(currentPipeline.name)
 
     queueMicrotask(() => {
-      navigate('/web/pipelines')
+      navigate(buildUrl('/pipelines'))
     })
   }, [currentPipeline])
 

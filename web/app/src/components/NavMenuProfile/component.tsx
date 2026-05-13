@@ -14,6 +14,8 @@ import LogoutIcon from '@mui/icons-material/Logout'
 
 import { useProfile } from '@/lib/hooks/profile'
 
+import { buildUrl } from '@/router'
+
 import { NavMenuProfileButton } from './styles'
 
 const NavMenuProfile = () => {
@@ -72,7 +74,7 @@ const NavMenuProfile = () => {
         <MenuItem
           variant="navLink"
           id="link:navbar.profile.account"
-          onClick={() => handleNavigate('/web/account')}
+          onClick={() => handleNavigate(buildUrl('/account'))}
         >
           <AccountCircleIcon fontSize="small" />
           Account
@@ -82,7 +84,7 @@ const NavMenuProfile = () => {
           <MenuItem
             variant="navLink"
             id="link:navbar.profile.admin"
-            onClick={() => handleNavigate('/web/admin')}
+            onClick={() => handleNavigate(buildUrl('/admin'))}
           >
             <DashboardIcon fontSize="small" />
             Admin
@@ -94,7 +96,7 @@ const NavMenuProfile = () => {
         <MenuItem
           variant="navLink"
           id="link:navbar.profile.logout"
-          onClick={() => handleNavigate('/web/logout')}
+          onClick={() => handleNavigate(buildUrl('/logout'))}
         >
           <LogoutIcon fontSize="small" />
           Logout

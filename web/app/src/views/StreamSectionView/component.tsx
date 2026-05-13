@@ -6,13 +6,15 @@ import * as configApi from '@/lib/api/operations/config'
 
 import { loginRequired } from '@/lib/decorators/loaders'
 
+import { buildUrl } from '@/router'
+
 import { StreamSectionViewContainer } from './styles'
 
 export const loader: LoaderFunction = loginRequired(async () => {
   const streams = Object.keys(await configApi.listStreams())
   streams.sort((a, b) => a.localeCompare(b))
   if (streams.length > 0) {
-    return redirect(`/web/streams/${streams[0]}`)
+    return redirect(buildUrl(`/streams/${streams[0]}`))
   }
 
   return null

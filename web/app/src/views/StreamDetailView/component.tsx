@@ -22,6 +22,8 @@ import LogTable from '@/components/LogTable/component'
 import SideNavList from '@/components/SideNavList/component'
 import StreamIndexSelector from '@/components/StreamIndexSelector/component'
 
+import { buildUrl } from '@/router'
+
 import {
   StreamDetailViewContainer,
   StreamDetailViewContent,
@@ -189,7 +191,7 @@ const StreamDetailView = () => {
       <StreamDetailViewSidebar>
         <SideNavList
           namespace="streams"
-          urlPrefix="/web/streams"
+          urlPrefix={buildUrl('/streams')}
           items={streams}
           currentItem={currentStream}
         />

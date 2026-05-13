@@ -4,9 +4,17 @@ import LinearProgress from '@mui/material/LinearProgress'
 
 import ErrorBoundary from '@/components/ErrorBoundary/component'
 
+const basePath = document.getElementsByTagName('base')[0]?.getAttribute('href')
+if (basePath === null) {
+  throw new Error('ASSERTION FAILED: <base href> is required in index.html')
+}
+
+export const buildUrl = (path: string): string =>
+  `${basePath.slice(0, -1)}${path}`
+
 export default createBrowserRouter([
   {
-    path: '/web/',
+    path: basePath,
     lazy: async () => {
       const { default: Component } =
         await import('@/layouts/BaseLayout/component')

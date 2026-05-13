@@ -30,6 +30,8 @@ import ForwarderEditor from '@/components/ForwarderEditor/component'
 import InputKeyValue from '@/components/InputKeyValue/component'
 import SideNavList from '@/components/SideNavList/component'
 
+import { buildUrl } from '@/router'
+
 import {
   ForwarderDetailViewBody,
   ForwarderDetailViewContent,
@@ -90,14 +92,14 @@ const ForwarderDetailView = () => {
 
   const onCreate = (name: string) => {
     queueMicrotask(() => {
-      navigate(`/web/forwarders/${name}`)
+      navigate(buildUrl(`/forwarders/${name}`))
     })
   }
 
   const [onDelete, deleteLoading] = useApiOperation(async () => {
     await configApi.deleteForwarder(currentForwarder.name)
     queueMicrotask(() => {
-      navigate('/web/forwarders')
+      navigate(buildUrl('/forwarders'))
     })
   }, [currentForwarder])
 
@@ -172,7 +174,7 @@ const ForwarderDetailView = () => {
           <ForwarderDetailViewSidebar>
             <SideNavList
               namespace="forwarders"
-              urlPrefix="/web/forwarders"
+              urlPrefix={buildUrl('/forwarders')}
               items={forwarders}
               currentItem={currentForwarder.name}
             />
