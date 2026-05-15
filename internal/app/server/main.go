@@ -102,13 +102,14 @@ func NewServer(opts Options) fx.Option {
 			logStorage log.Storage,
 		) *bootstrapHandler {
 			h := &bootstrapHandler{
-				logger:          slog.Default().With(slog.String("channel", "bootstrap")),
-				authStorage:     authStorage,
-				configStorage:   configStorage,
-				initialUser:     opts.AuthInitialUser,
-				initialPassword: opts.AuthInitialPassword,
-				resetUser:       opts.AuthResetUser,
-				resetPassword:   opts.AuthResetPassword,
+				logger:                      slog.Default().With(slog.String("channel", "bootstrap")),
+				authStorage:                 authStorage,
+				configStorage:               configStorage,
+				initialSyslogAllowedOrigins: opts.SyslogInitialAllowedOrigins,
+				initialUser:                 opts.AuthInitialUser,
+				initialPassword:             opts.AuthInitialPassword,
+				resetUser:                   opts.AuthResetUser,
+				resetPassword:               opts.AuthResetPassword,
 			}
 
 			lc.Append(fx.Hook{
