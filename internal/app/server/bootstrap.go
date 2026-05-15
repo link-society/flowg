@@ -17,6 +17,8 @@ type bootstrapHandler struct {
 	authStorage   auth.Storage
 	configStorage config.Storage
 
+	initialSyslogAllowedOrigins []string
+
 	initialUser     string
 	initialPassword string
 
@@ -25,7 +27,14 @@ type bootstrapHandler struct {
 }
 
 func (h *bootstrapHandler) Run(ctx context.Context) error {
-	err := bootstrap.DefaultRolesAndUsers(ctx, h.authStorage, bootstrap.BootstrapOptions{
+	err := bootstrap.DefaultSystemConfig(ctx, h.configStorage, bootstrap.BootstrapSystemOptions{
+		InitialSyslogAllowedOrigins: h.initialSyslogAllowedOrigins,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to bootstrap default system config: %w", err)
+	}
+
+	err = bootstrap.DefaultRolesAndUsers(ctx, h.authStorage, bootstrap.BootstrapAuthOptions{
 		InitialUser:     h.initialUser,
 		InitialPassword: h.initialPassword,
 	})

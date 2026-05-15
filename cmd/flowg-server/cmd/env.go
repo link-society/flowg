@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"strconv"
+	"strings"
 )
 
 var (
@@ -45,10 +46,11 @@ var (
 	defaultSyslogProtocol = getEnvString("FLOWG_SYSLOG_PROTOCOL", "udp")
 	defaultSyslogBindAddr = getEnvString("FLOWG_SYSLOG_BIND_ADDRESS", ":5514")
 
-	defaultSyslogTlsEnabled     = getEnvBool("FLOWG_SYSLOG_TLS_ENABLED", false)
-	defaultSyslogTlsCert        = getEnvString("FLOWG_SYSLOG_TLS_CERT", "")
-	defaultSyslogTlsCertKey     = getEnvString("FLOWG_SYSLOG_TLS_KEY", "")
-	defaultSyslogTlsAuthEnabled = getEnvBool("FLOWG_SYSLOG_TLS_AUTH", false)
+	defaultSyslogTlsEnabled            = getEnvBool("FLOWG_SYSLOG_TLS_ENABLED", false)
+	defaultSyslogTlsCert               = getEnvString("FLOWG_SYSLOG_TLS_CERT", "")
+	defaultSyslogTlsCertKey            = getEnvString("FLOWG_SYSLOG_TLS_KEY", "")
+	defaultSyslogTlsAuthEnabled        = getEnvBool("FLOWG_SYSLOG_TLS_AUTH", false)
+	defaultSyslogInitialAllowedOrigins = getEnvListString("FLOWG_SYSLOG_INITIAL_ALLOWED_ORIGINS", []string{})
 
 	defaultAuthDir         = getEnvString("FLOWG_AUTH_DIR", "./data/auth")
 	defaultConfigDir       = getEnvString("FLOWG_CONFIG_DIR", "./data/config")
@@ -61,6 +63,20 @@ var (
 	defaultAuthResetUser     = getEnvString("FLOWG_AUTH_RESET_USER", "")
 	defaultAuthResetPassword = getEnvString("FLOWG_AUTH_RESET_PASSWORD", "")
 )
+
+func getEnvListString(key string, defaultValue []string) []string {
+	value := os.Getenv(key)
+	if value == "" {
+		return defaultValue
+	}
+
+	items := strings.Split(value, ",")
+	for i := range items {
+		items[i] = strings.TrimSpace(items[i])
+	}
+
+	return items
+}
 
 func getEnvString(key string, defaultValue string) string {
 	value := os.Getenv(key)

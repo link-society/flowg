@@ -38,12 +38,13 @@ type options struct {
 	clusterFormationDnsDomain string
 	clusterFormationDnsScript string
 
-	syslogProtocol       string
-	syslogBindAddr       string
-	syslogTlsEnabled     bool
-	syslogTlsCert        string
-	syslogTlsCertKey     string
-	syslogTlsAuthEnabled bool
+	syslogProtocol              string
+	syslogBindAddr              string
+	syslogTlsEnabled            bool
+	syslogTlsCert               string
+	syslogTlsCertKey            string
+	syslogTlsAuthEnabled        bool
+	syslogInitialAllowedOrigins []string
 
 	authDir   string
 	logDir    string
@@ -268,6 +269,13 @@ func (opts *options) defineCliOptions(cmd *cobra.Command) {
 		"syslog-tls-auth",
 		defaultSyslogTlsAuthEnabled,
 		"Require clients to authenticate against the Syslog server with a client certificate",
+	)
+
+	cmd.Flags().StringArrayVar(
+		&opts.syslogInitialAllowedOrigins,
+		"syslog-initial-allowed-origin",
+		defaultSyslogInitialAllowedOrigins,
+		"Initial allowed origins for the Syslog server (can be set multiple times)",
 	)
 
 	cmd.Flags().StringVar(

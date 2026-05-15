@@ -11,7 +11,7 @@ import (
 	"link-society.com/flowg/internal/storage/auth"
 )
 
-type BootstrapOptions struct {
+type BootstrapAuthOptions struct {
 	InitialUser     string
 	InitialPassword string
 }
@@ -21,7 +21,7 @@ type ResetUserOptions struct {
 	Password string
 }
 
-func DefaultRolesAndUsers(ctx context.Context, authStorage auth.Storage, opts BootstrapOptions) error {
+func DefaultRolesAndUsers(ctx context.Context, authStorage auth.Storage, opts BootstrapAuthOptions) error {
 	roles, err := authStorage.ListRoles(ctx)
 	if err != nil {
 		return err

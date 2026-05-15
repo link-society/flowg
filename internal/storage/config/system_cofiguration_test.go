@@ -24,6 +24,15 @@ func TestReadSystemConfig(t *testing.T) {
 	app.RequireStart()
 	defer app.RequireStop()
 
+	hasConfig, err := confStorage.HasSystemConfig(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if hasConfig {
+		t.Fatal("expected no system config, but found one")
+	}
+
 	systemConfig, err := confStorage.ReadSystemConfig(ctx)
 
 	if err != nil {
@@ -42,6 +51,15 @@ func TestReadSystemConfig(t *testing.T) {
 
 	if err := confStorage.WriteSystemConfig(ctx, systemConfig); err != nil {
 		t.Fatal(err)
+	}
+
+	hasConfig, err = confStorage.HasSystemConfig(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !hasConfig {
+		t.Fatal("expected system config to exist, but it does not")
 	}
 
 	systemConfig, err = confStorage.ReadSystemConfig(ctx)
