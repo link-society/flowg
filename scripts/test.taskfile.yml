@@ -4,8 +4,10 @@ tasks:
   unit:
     desc: "Run unit tests"
     cmds:
-      - task: "test:unit:go"
       - task: "test:unit:rust:vrl"
+      - task: "test:unit:go"
+    env:
+      MACOSX_DEPLOYMENT_TARGET: "26.0"
 
   "e2e:api":
     desc: "Run API end-to-end tests"

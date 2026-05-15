@@ -19,7 +19,7 @@ jobs:
             rust-target: aarch64-unknown-linux-gnu
             goos: linux
             goarch: arm64
-          - gh-runner: macos-latest
+          - gh-runner: macos-26
             rust-target: aarch64-apple-darwin
             goos: darwin
             goarch: arm64

@@ -95,6 +95,7 @@ jobs:
           GOOS: ${{ inputs.goos }}
           GOARCH: ${{ inputs.goarch }}
           NODE_ENV: "production"
+          MACOSX_DEPLOYMENT_TARGET: "26.0"
 
       - name: compress@binary
         if: inputs.goos != 'darwin' && (steps.need-binaries.outputs.exists == 'false' || steps.need-doc-cli.outputs.exists == 'false' || steps.need-doc-openapi.outputs.exists == 'false')
