@@ -41,6 +41,7 @@ type Storage interface {
 	WriteForwarder(ctx context.Context, name string, forwarder *models.ForwarderV2) error
 	DeleteForwarder(ctx context.Context, name string) error
 
+	HasSystemConfig(ctx context.Context) (bool, error)
 	ReadSystemConfig(ctx context.Context) (*models.SystemConfiguration, error)
 	WriteSystemConfig(ctx context.Context, config *models.SystemConfiguration) error
 }
@@ -221,6 +222,19 @@ func (s *storageImpl) WriteForwarder(ctx context.Context, name string, forwarder
 
 func (s *storageImpl) DeleteForwarder(ctx context.Context, name string) error {
 	return s.deleteItem(ctx, forwarderItemType, name)
+}
+
+func (s *storageImpl) HasSystemConfig(ctx context.Context) (bool, error) {
+	_, err := s.readItem(ctx, systemItemType, "config")
+	if errors.Is(err, badger.ErrKeyNotFound) {
+		return false, nil
+	}
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 func (s *storageImpl) ReadSystemConfig(ctx context.Context) (*models.SystemConfiguration, error) {

@@ -34,9 +34,10 @@ type Options struct {
 	ClusterStateDir          string
 	ClusterFormationStrategy cluster.ClusterFormationStrategy
 
-	SyslogTcpMode     bool
-	SyslogBindAddress string
-	SyslogTlsConfig   *tls.Config
+	SyslogTcpMode               bool
+	SyslogBindAddress           string
+	SyslogTlsConfig             *tls.Config
+	SyslogInitialAllowedOrigins []string
 
 	AuthStorageDir   string
 	ConfigStorageDir string

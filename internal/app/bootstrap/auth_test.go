@@ -33,7 +33,7 @@ func TestDefaultRolesAndUsers(t *testing.T) {
 	app.RequireStart()
 	defer app.RequireStop()
 
-	err := bootstrap.DefaultRolesAndUsers(ctx, authStorage, bootstrap.BootstrapOptions{
+	err := bootstrap.DefaultRolesAndUsers(ctx, authStorage, bootstrap.BootstrapAuthOptions{
 		InitialUser:     "root",
 		InitialPassword: "root",
 	})

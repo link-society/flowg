@@ -162,9 +162,10 @@ func newServerConfig(opts *options) (server.Options, error) {
 		ClusterStateDir:          opts.clusterStateDir,
 		ClusterFormationStrategy: clusterFormationStrategy,
 
-		SyslogTcpMode:     opts.syslogProtocol == "tcp",
-		SyslogBindAddress: opts.syslogBindAddr,
-		SyslogTlsConfig:   syslogTlsConfig,
+		SyslogTcpMode:               opts.syslogProtocol == "tcp",
+		SyslogBindAddress:           opts.syslogBindAddr,
+		SyslogTlsConfig:             syslogTlsConfig,
+		SyslogInitialAllowedOrigins: opts.syslogInitialAllowedOrigins,
 
 		ConfigStorageDir: opts.configDir,
 		AuthStorageDir:   opts.authDir,
