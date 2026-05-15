@@ -44,7 +44,7 @@ func (w *worker) DoWork(ctx actor.Context) actor.WorkerStatus {
 			return actor.WorkerContinue
 		}
 
-		if systemConfig.SyslogAllowedOrigins != nil {
+		if len(systemConfig.SyslogAllowedOrigins) > 0 {
 			// no logging here to avoid potential performance issues
 
 			client := logParts["client"].(string)
