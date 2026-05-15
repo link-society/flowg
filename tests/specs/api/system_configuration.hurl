@@ -11,7 +11,7 @@ Authorization: Bearer {{admin_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true
-jsonpath "$.configuration.syslog_allowed_origins" == null
+jsonpath "$.configuration.syslog_allowed_origins" count == 0
 
 # -----------------------------------------------------------------------------
 # TEST:
