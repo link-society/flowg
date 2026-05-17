@@ -9,7 +9,6 @@ import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
-import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
 import CancelIcon from '@mui/icons-material/Cancel'
@@ -41,6 +40,7 @@ import PipelineEditorNodeListTransformer from '@/components/PipelineEditorNodeLi
 import { buildUrl } from '@/router'
 
 import {
+  HeaderNameInput,
   PipelineDetailViewBody,
   PipelineDetailViewCenter,
   PipelineDetailViewHeader,
@@ -159,7 +159,7 @@ const PipelineDetailView = () => {
       <PipelineDetailViewRoot>
         <PipelineDetailViewHeader variant="toolbar">
           <PipelineDetailViewHeaderLeft>
-            <TextField
+            <HeaderNameInput
               label="Pipeline name"
               value={currentPipeline.name}
               type="text"
@@ -168,18 +168,6 @@ const PipelineDetailView = () => {
               slotProps={{
                 input: {
                   readOnly: true,
-                  sx: {
-                    color: 'white',
-                    backgroundColor: 'rgba(0,0,0,0.15)',
-                  },
-                },
-                inputLabel: {
-                  sx: {
-                    color: 'white',
-                    '&.Mui-focused': {
-                      color: 'white',
-                    },
-                  },
                 },
               }}
             />
