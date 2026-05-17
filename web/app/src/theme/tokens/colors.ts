@@ -7,6 +7,7 @@ export type ColorsType = {
   bodyBg: string
   primary: string
   primaryContrast: string
+  toolbarInputBorder: string
   cardHeaderBkg: string
   toolbarBkg: string
   editorToolbarBkg: string
@@ -50,6 +51,7 @@ export const colors: ColorsType = {
   bodyBg: '#e2e8f0',
   primary: '#1565c0',
   primaryContrast: '#ffffff',
+  toolbarInputBorder: 'rgba(255, 255, 255, 0.23)',
   cardHeaderBkg: '#51a2ff',
   toolbarBkg: '#2d7eff',
   editorToolbarBkg: '#3b82f6',

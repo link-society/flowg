@@ -20,6 +20,6 @@ export const LogTableDetailPre = styled('pre')(({ theme }) => ({
   overflow: 'auto',
   fontFamily: 'monospace',
   backgroundColor: theme.tokens.colors.codeBg,
-  border: '1px solid rgba(0, 0, 0, 0.12)',
+  border: `1px solid rgba(0, 0, 0, ${theme.tokens.opacity.medium})`,
   borderRadius: 4,
 }))

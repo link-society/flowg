@@ -14,12 +14,11 @@ export const TransformerDetailViewToolbar = styled(AppContainer)(
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'stretch',
-    color: 'white',
+    color: theme.tokens.colors.primaryContrast,
     backgroundColor: theme.tokens.colors.editorToolbarBkg,
     zIndex: 10,
     flex: 0,
-    boxShadow:
-      '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+    boxShadow: theme.tokens.shadows.md,
   })
 )
 

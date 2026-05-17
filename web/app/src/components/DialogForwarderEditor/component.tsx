@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react'
 
-import AppBar from '@mui/material/AppBar'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 import Dialog from '@mui/material/Dialog'
 import IconButton from '@mui/material/IconButton'
 import Slide from '@mui/material/Slide'
-import TextField from '@mui/material/TextField'
 import { TransitionProps } from '@mui/material/transitions'
 
 import CloseIcon from '@mui/icons-material/Close'
@@ -24,10 +22,12 @@ import AuthenticatedAwait from '@/components/AuthenticatedAwait/component'
 import ForwarderEditor from '@/components/ForwarderEditor/component'
 
 import {
+  DialogAppBar,
   DialogBody,
   DialogLoading,
   DialogToolbar,
   DialogToolbarName,
+  ToolbarNameInput,
 } from './styles'
 
 const Transition = React.forwardRef(function Transition(
@@ -89,7 +89,7 @@ const DialogForwarderEditor = ({
           transition: Transition,
         }}
       >
-        <AppBar sx={{ position: 'relative' }}>
+        <DialogAppBar>
           <DialogToolbar>
             <IconButton
               edge="start"
@@ -100,7 +100,7 @@ const DialogForwarderEditor = ({
             </IconButton>
 
             <DialogToolbarName>
-              <TextField
+              <ToolbarNameInput
                 label="Forwarder name"
                 value={forwarderName}
                 type="text"
@@ -109,18 +109,6 @@ const DialogForwarderEditor = ({
                 slotProps={{
                   input: {
                     readOnly: true,
-                    sx: {
-                      color: 'white',
-                      backgroundColor: 'rgba(0,0,0,0.15)',
-                    },
-                  },
-                  inputLabel: {
-                    sx: {
-                      color: 'white',
-                      '&.Mui-focused': {
-                        color: 'white',
-                      },
-                    },
                   },
                 }}
               />
@@ -137,7 +125,7 @@ const DialogForwarderEditor = ({
               {saveLoading ? <CircularProgress size={24} /> : <>Save</>}
             </Button>
           </DialogToolbar>
-        </AppBar>
+        </DialogAppBar>
 
         <DialogBody>
           <React.Suspense

@@ -1,4 +1,4 @@
-import { Box, styled } from '@mui/material'
+import { Box, TextField as MuiTextField, styled } from '@mui/material'
 
 import AppContainer from '@/components/AppContainer/component'
 
@@ -98,3 +98,19 @@ export const PipelineDetailViewRightItem = styled('div')({
 export const TestDialogHint = styled('div')({
   marginBottom: '0.5rem',
 })
+
+export const HeaderNameInput = styled(MuiTextField)(({ theme }) => ({
+  '& .MuiOutlinedInput-root': {
+    color: theme.tokens.colors.primaryContrast,
+    backgroundColor: `rgba(0, 0, 0, ${theme.tokens.opacity.disabled})`,
+    '& fieldset': {
+      borderColor: theme.tokens.colors.toolbarInputBorder,
+    },
+  },
+  '& .MuiFormLabel-root': {
+    color: theme.tokens.colors.primaryContrast,
+    '&.Mui-focused': {
+      color: theme.tokens.colors.primaryContrast,
+    },
+  },
+}))

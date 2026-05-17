@@ -25,7 +25,12 @@ const NotFoundView = () => {
         Page not found
       </Typography>
 
-      <Typography variant="text" sx={{ color: 'rgba(0, 0, 0, 0.6)' }}>
+      <Typography
+        variant="text"
+        sx={{
+          color: (theme) => `rgba(0, 0, 0, ${theme.tokens.opacity.overlay})`,
+        }}
+      >
         The page you are looking for does not exist or has been moved.
       </Typography>
 

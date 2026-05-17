@@ -25,7 +25,7 @@ export const CodeBlock = styled(Box)<BoxProps<'pre'>>(({ theme }) => ({
   padding: '0.5rem',
   backgroundColor: theme.tokens.colors.black,
   color: theme.tokens.colors.mutedText,
-  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+  boxShadow: theme.tokens.shadows.sm,
   fontFamily: 'monospace',
   whiteSpace: 'pre',
   overflow: 'auto',

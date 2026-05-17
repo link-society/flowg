@@ -19,11 +19,10 @@ export const NodeRoot = styled(Box)(({ theme }) => ({
   gap: 8,
   backgroundColor: theme.tokens.colors.white,
   border: `4px solid ${theme.tokens.colors.nodeRouterBorder}`,
-  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-  transition: 'box-shadow 150ms ease-in-out',
+  boxShadow: theme.tokens.shadows.nodeElevated,
+  transition: theme.tokens.transitions.shadow,
   '&:hover': {
-    boxShadow:
-      '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+    boxShadow: theme.tokens.shadows.nodeElevatedHover,
   },
 }))
 
