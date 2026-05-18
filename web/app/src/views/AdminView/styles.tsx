@@ -7,19 +7,19 @@ export const AdminViewContainer = styled(AppContainer)(({ theme }) => ({
   height: '100%',
   padding: theme.spacing(1),
   gap: theme.spacing(1),
-  '@media (max-width: 1200px)': {
+  [theme.breakpoints.down('lg')]: {
     flexDirection: 'column',
     overflow: 'auto',
   },
 }))
 
-export const AdminViewPanel = styled('div')({
+export const AdminViewPanel = styled('div')(({ theme }) => ({
   flex: 1,
   height: '100%',
-  '@media (max-width: 1200px)': {
+  [theme.breakpoints.down('lg')]: {
     height: 'auto',
   },
-  '@media (max-width: 990px)': {
+  [theme.breakpoints.down('md')]: {
     width: '100%',
   },
-})
+}))

@@ -7,16 +7,16 @@ export const AccountViewContainer = styled(AppContainer)(({ theme }) => ({
   height: '100%',
   padding: theme.spacing(1),
   gap: theme.spacing(1),
-  '@media (max-width: 1200px)': {
+  [theme.breakpoints.down('lg')]: {
     flexDirection: 'column',
     overflow: 'auto',
   },
 }))
 
-export const AccountViewPanel = styled('div')({
+export const AccountViewPanel = styled('div')(({ theme }) => ({
   flex: 1,
   height: '100%',
-  '@media (max-width: 1200px)': {
+  [theme.breakpoints.down('lg')]: {
     height: 'auto',
   },
-})
+}))

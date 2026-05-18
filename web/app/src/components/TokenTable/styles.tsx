@@ -1,14 +1,14 @@
 import { Card, CardContent, CardHeader, styled } from '@mui/material'
 
-export const TokenTableCard = styled(Card)({
+export const TokenTableCard = styled(Card)(({ theme }) => ({
   height: '100%',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',
-  '@media (max-width: 1200px)': {
+  [theme.breakpoints.down('lg')]: {
     minHeight: '24rem',
   },
-})
+}))
 
 export const TokenTableCardHeader = styled(CardHeader)(({ theme }) => ({
   backgroundColor: theme.tokens.colors.cardHeaderBkg,

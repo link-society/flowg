@@ -10,7 +10,7 @@ export const StreamEditorRoot = styled(Box)(({ theme }) => ({
   alignItems: 'stretch',
   gap: theme.spacing(1.5),
 
-  '@media (min-width: 990px)': {
+  [theme.breakpoints.up('md')]: {
     flexDirection: 'row',
   },
 }))

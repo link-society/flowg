@@ -20,7 +20,7 @@ export const HomeViewPermissionsWrapper = styled('div')(({ theme }) => ({
   gridTemplateColumns: '1fr',
   gap: theme.spacing(2),
   width: '100%',
-  '@media (min-width: 990px)': {
+  [theme.breakpoints.up('md')]: {
     gridAutoColumns: '1fr',
     gridAutoFlow: 'column',
     gridTemplateColumns: 'unset',
