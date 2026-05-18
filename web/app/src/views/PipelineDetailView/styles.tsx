@@ -53,20 +53,20 @@ export const PipelineDetailViewBody = styled(AppContainer)(({ theme }) => ({
   overflow: 'auto',
   flex: 1,
   flexDirection: 'column',
-  '@media (min-width: 990px)': {
+  [theme.breakpoints.up('md')]: {
     flexDirection: 'row',
     overflow: 'hidden',
   },
 }))
 
-export const PipelineDetailViewLeft = styled('div')({
+export const PipelineDetailViewLeft = styled('div')(({ theme }) => ({
   flex: '0 0 16.67%',
   height: '100%',
   width: '100%',
-  '@media (min-width: 990px)': {
+  [theme.breakpoints.up('md')]: {
     flexDirection: 'row',
   },
-})
+}))
 
 export const PipelineDetailViewCenter = styled('div')({
   flex: 1,
@@ -82,7 +82,7 @@ export const PipelineDetailViewRight = styled('div')(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'stretch',
   gap: theme.spacing(1),
-  '@media (min-width: 990px)': {
+  [theme.breakpoints.up('md')]: {
     width: 'calc(100% / 6)',
   },
 }))

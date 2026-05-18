@@ -44,32 +44,32 @@ export const TransformerDetailViewBody = styled(AppContainer)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing(1),
-  '@media (min-width: 990px)': {
+  [theme.breakpoints.up('md')]: {
     flexDirection: 'row',
   },
 }))
 
-export const TransformerDetailViewSidebar = styled('div')({
+export const TransformerDetailViewSidebar = styled('div')(({ theme }) => ({
   flex: '0 0 16.67%',
   height: '100%',
   width: '100%',
-  '@media (min-width: 990px)': {
+  [theme.breakpoints.up('md')]: {
     flexDirection: 'row',
   },
-})
+}))
 
-export const TransformerDetailViewEditor = styled('div')({
+export const TransformerDetailViewEditor = styled('div')(({ theme }) => ({
   flex: 1,
   height: '100%',
   flexDirection: 'column',
-  '@media (min-width: 990px)': {
+  [theme.breakpoints.up('md')]: {
     flexDirection: 'row',
   },
   '& > div': {
     display: 'flex',
     flexDirection: 'column',
-    '@media (min-width: 990px)': {
+    [theme.breakpoints.up('md')]: {
       flexDirection: 'row',
     },
   },
-})
+}))

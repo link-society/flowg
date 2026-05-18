@@ -42,19 +42,19 @@ export const StorageDetailViewBody = styled(AppContainer)(({ theme }) => ({
   gap: theme.spacing(1),
   flex: '1 1 0',
   overflow: 'hidden',
-  '@media (min-width: 990px)': {
+  [theme.breakpoints.up('md')]: {
     flexDirection: 'row',
   },
 }))
 
-export const StorageDetailViewSidebar = styled('div')({
+export const StorageDetailViewSidebar = styled('div')(({ theme }) => ({
   flex: '0 0 16.67%',
   height: '100%',
   width: '100%',
-  '@media (min-width: 990px)': {
+  [theme.breakpoints.up('md')]: {
     flexDirection: 'row',
   },
-})
+}))
 
 export const StorageDetailViewContent = styled('div')({
   flex: 1,

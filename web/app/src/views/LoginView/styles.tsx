@@ -42,7 +42,7 @@ export const LoginViewCard = styled(Card)(({ theme }) => ({
       fontWeight: 400,
     },
   },
-  '@media (max-width: 990px)': {
+  [theme.breakpoints.down('md')]: {
     minWidth: '100%',
   },
 }))
@@ -62,4 +62,4 @@ export const LoginViewCardFields = styled('section')(({ theme }) => ({
       marginBottom: theme.spacing(0.5),
     },
   },
-})
+}))

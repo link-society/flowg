@@ -1,14 +1,14 @@
 import { Card, CardContent, CardHeader, styled } from '@mui/material'
 
-export const RoleTableCard = styled(Card)({
+export const RoleTableCard = styled(Card)(({ theme }) => ({
   height: '100%',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',
-  '@media (max-width: 1200px)': {
+  [theme.breakpoints.down('lg')]: {
     minHeight: '24rem',
   },
-})
+}))
 
 export const RoleTableCardHeader = styled(CardHeader)(({ theme }) => ({
   backgroundColor: theme.tokens.colors.cardHeaderBkg,
@@ -27,11 +27,11 @@ export const RoleTableCardHeaderTitleText = styled('span')({
   flex: 1,
 })
 
-export const RoleTableCardContent = styled(CardContent)({
+export const RoleTableCardContent = styled(CardContent)(({ theme }) => ({
   padding: '0 !important',
   flex: '1 1 0',
   overflow: 'hidden',
-  '@media (max-width: 990px)': {
+  [theme.breakpoints.down('md')]: {
     overflowX: 'auto',
   },
   '& .ag-cell-wrapper': {
@@ -44,7 +44,7 @@ export const RoleTableCardContent = styled(CardContent)({
   '& .flowg-actions-cell': {
     justifyContent: 'center',
   },
-})
+}))
 
 export const ScopesCellRoot = styled('div')(({ theme }) => ({
   display: 'flex',
