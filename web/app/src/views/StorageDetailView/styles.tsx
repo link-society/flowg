@@ -20,32 +20,32 @@ export const StorageDetailViewHeader = styled(AppContainer)(({ theme }) => ({
   flex: 0,
 }))
 
-export const StorageDetailViewHeaderLeft = styled('div')({
+export const StorageDetailViewHeaderLeft = styled('div')(({ theme }) => ({
   display: 'flex',
   flex: 1,
   flexDirection: 'row',
   alignItems: 'center',
-  gap: '0.75rem',
-})
+  gap: theme.spacing(1.5),
+}))
 
-export const StorageDetailViewHeaderActions = styled('div')({
+export const StorageDetailViewHeaderActions = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  gap: '0.75rem',
-})
+  gap: theme.spacing(1.5),
+}))
 
-export const StorageDetailViewBody = styled(AppContainer)({
+export const StorageDetailViewBody = styled(AppContainer)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',
-  gap: '0.5rem',
+  gap: theme.spacing(1),
   flex: '1 1 0',
   overflow: 'hidden',
   '@media (min-width: 990px)': {
     flexDirection: 'row',
   },
-})
+}))
 
 export const StorageDetailViewSidebar = styled('div')({
   flex: '0 0 16.67%',

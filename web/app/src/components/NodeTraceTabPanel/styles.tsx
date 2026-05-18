@@ -2,17 +2,17 @@ import Paper from '@mui/material/Paper'
 import Typography from '@mui/material/Typography'
 import { styled } from '@mui/material/styles'
 
-export const TraceSection = styled('div')({
+export const TraceSection = styled('div')(({ theme }) => ({
   flex: 1,
   display: 'flex',
   flexDirection: 'column',
-  gap: 8,
-})
+  gap: theme.spacing(1),
+}))
 
-export const TraceRow = styled('div')({
+export const TraceRow = styled('div')(({ theme }) => ({
   display: 'flex',
-  gap: 20,
-})
+  gap: theme.spacing(2.5),
+}))
 
 export const TraceLabel = styled(Typography)(({ theme }) => ({
   color: theme.tokens.colors.labelText,
@@ -20,7 +20,7 @@ export const TraceLabel = styled(Typography)(({ theme }) => ({
 }))
 
 export const TraceCode = styled(Paper)(({ theme }) => ({
-  padding: 8,
+  padding: theme.spacing(1),
   flex: 1,
   flexShrink: 1,
   overflow: 'auto',

@@ -1,15 +1,15 @@
 import Box from '@mui/material/Box'
 import { styled } from '@mui/material/styles'
 
-export const Root = styled(Box)({
+export const Root = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
-  gap: 12,
-})
+  gap: theme.spacing(1.5),
+}))
 
-export const Row = styled(Box)({
+export const Row = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'stretch',
-  gap: 12,
-})
+  gap: theme.spacing(1.5),
+}))

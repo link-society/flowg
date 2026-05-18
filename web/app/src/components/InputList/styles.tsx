@@ -1,16 +1,16 @@
 import Box from '@mui/material/Box'
 import { styled } from '@mui/material/styles'
 
-export const InputListRoot = styled(Box)({
+export const InputListRoot = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',
-  gap: '0.5rem',
-})
+  gap: theme.spacing(1),
+}))
 
-export const InputListRow = styled(Box)({
+export const InputListRow = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'stretch',
-  gap: '0.5rem',
-})
+  gap: theme.spacing(1),
+}))

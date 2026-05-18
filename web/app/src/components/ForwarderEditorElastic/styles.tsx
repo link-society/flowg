@@ -1,8 +1,8 @@
 import { styled } from '@mui/material'
 
-export const ForwarderEditorElasticRoot = styled('div')({
+export const ForwarderEditorElasticRoot = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',
-  gap: '0.75rem',
-})
+  gap: theme.spacing(1.5),
+}))

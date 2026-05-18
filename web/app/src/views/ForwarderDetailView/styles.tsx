@@ -20,44 +20,44 @@ export const ForwarderDetailViewHeader = styled(AppContainer)(({ theme }) => ({
   flex: 0,
 }))
 
-export const ForwarderDetailViewHeaderLeft = styled('div')({
+export const ForwarderDetailViewHeaderLeft = styled('div')(({ theme }) => ({
   display: 'flex',
   flex: 1,
   flexDirection: 'row',
   alignItems: 'center',
-  gap: '0.75rem',
-})
+  gap: theme.spacing(1.5),
+}))
 
-export const ForwarderDetailViewHeaderRight = styled('div')({
+export const ForwarderDetailViewHeaderRight = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  gap: '0.75rem',
-})
+  gap: theme.spacing(1.5),
+}))
 
 export const ForwarderDetailViewHeaderTest = styled('div')({
   display: 'flex',
   alignItems: 'center',
 })
 
-export const ForwarderDetailViewHeaderActions = styled('div')({
+export const ForwarderDetailViewHeaderActions = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  gap: '0.75rem',
-})
+  gap: theme.spacing(1.5),
+}))
 
-export const ForwarderDetailViewBody = styled(AppContainer)({
+export const ForwarderDetailViewBody = styled(AppContainer)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',
-  gap: '0.5rem',
+  gap: theme.spacing(1),
   flex: 1,
   overflow: 'hidden',
   '@media (min-width: 990px)': {
     flexDirection: 'row',
   },
-})
+}))
 
 export const ForwarderDetailViewSidebar = styled('div')({
   flex: '0 0 16.67%',
@@ -74,11 +74,11 @@ export const ForwarderDetailViewContent = styled('div')({
   minWidth: 0,
 })
 
-export const ForwarderDetailViewEditorPaper = styled(Paper)({
+export const ForwarderDetailViewEditorPaper = styled(Paper)(({ theme }) => ({
   height: '100%',
   overflow: 'auto',
-  padding: '0.75rem',
-})
+  padding: theme.spacing(1.5),
+}))
 
 export const TestDialogHint = styled('div')({
   marginBottom: '0.5rem',

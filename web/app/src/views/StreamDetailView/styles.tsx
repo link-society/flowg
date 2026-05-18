@@ -16,11 +16,11 @@ export const StreamDetailViewSidebar = styled('div')({
   },
 })
 
-export const StreamDetailViewContent = styled('div')({
+export const StreamDetailViewContent = styled('div')(({ theme }) => ({
   flex: 1,
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',
-  gap: 8,
+  gap: theme.spacing(1),
   height: '100%',
-})
+}))

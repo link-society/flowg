@@ -17,11 +17,11 @@ export const UserTableCardHeader = styled(CardHeader)(({ theme }) => ({
   zIndex: 20,
 }))
 
-export const UserTableCardHeaderTitle = styled('div')({
+export const UserTableCardHeaderTitle = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: '0.75rem',
-})
+  gap: theme.spacing(1.5),
+}))
 
 export const UserTableCardHeaderTitleText = styled('span')({
   flex: 1,
@@ -43,11 +43,11 @@ export const UserTableCardContent = styled(CardContent)({
   },
 })
 
-export const RolesCellRoot = styled('div')({
+export const RolesCellRoot = styled('div')(({ theme }) => ({
   display: 'flex',
   flexWrap: 'wrap',
-  gap: 4,
-  padding: '8px 0',
+  gap: theme.spacing(0.5),
+  padding: theme.spacing(1, 0),
   alignContent: 'center',
   width: '100%',
-})
+}))

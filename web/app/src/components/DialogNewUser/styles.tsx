@@ -2,12 +2,12 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import { styled } from '@mui/material/styles'
 
-export const FormStack = styled(Box)({
+export const FormStack = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',
-  gap: '0.75rem',
-})
+  gap: theme.spacing(1.5),
+}))
 
 export const FieldRow = styled(Box)({
   display: 'flex',
@@ -15,12 +15,12 @@ export const FieldRow = styled(Box)({
   alignItems: 'flex-end',
 })
 
-export const FieldStack = styled(Box)({
+export const FieldStack = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',
-  gap: '0.5rem',
-})
+  gap: theme.spacing(1),
+}))
 
 export const FieldLabel = styled(Typography)({
   fontWeight: 600,

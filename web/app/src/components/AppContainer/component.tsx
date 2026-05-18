@@ -45,14 +45,14 @@ export const AppContainer = forwardRef<HTMLDivElement, AppContainerProps>(
         ref={ref}
         maxWidth={fluid ? false : 'xl'}
         {...props}
-        sx={{
+        sx={(theme) => ({
           ...getPadding(),
           ...sx,
           display: 'flex',
           placeItems: 'center',
-          gap: '2rem',
+          gap: theme.spacing(4),
           flex: 1,
-        }}
+        })}
       >
         {children}
       </Container>

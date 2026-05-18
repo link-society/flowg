@@ -1,8 +1,8 @@
 import { styled } from '@mui/material'
 
-export const ForwarderEditorAmqpRoot = styled('div')({
+export const ForwarderEditorAmqpRoot = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',
-  gap: '0.75rem',
-})
+  gap: theme.spacing(1.5),
+}))

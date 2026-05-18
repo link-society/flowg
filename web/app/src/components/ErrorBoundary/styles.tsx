@@ -2,12 +2,12 @@ import Box, { BoxProps } from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import { styled } from '@mui/material/styles'
 
-export const ErrorRoot = styled(Box)({
-  padding: '0.75rem',
+export const ErrorRoot = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(1.5),
   display: 'flex',
   flexDirection: 'column',
-  gap: '0.75rem',
-})
+  gap: theme.spacing(1.5),
+}))
 
 export const ErrorHeading = styled(Typography)(({ theme }) => ({
   fontSize: '1.5rem',
@@ -22,7 +22,7 @@ export const ErrorHeadingLabel = styled(Typography)({
 })
 
 export const CodeBlock = styled(Box)<BoxProps<'pre'>>(({ theme }) => ({
-  padding: '0.5rem',
+  padding: theme.spacing(1),
   backgroundColor: theme.tokens.colors.black,
   color: theme.tokens.colors.mutedText,
   boxShadow: theme.tokens.shadows.sm,

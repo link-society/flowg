@@ -8,26 +8,26 @@ export const UploadViewRoot = styled(AppContainer)({
   flexDirection: 'column',
 })
 
-export const UploadViewHeader = styled(Box)({
+export const UploadViewHeader = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'center',
-  gap: '0.5rem',
-})
+  gap: theme.spacing(1),
+}))
 
-export const UploadViewCard = styled(Card)({
-  padding: '0.75rem',
+export const UploadViewCard = styled(Card)(({ theme }) => ({
+  padding: theme.spacing(1.5),
   maxWidth: 400,
   width: '100%',
-})
+}))
 
-export const UploadViewForm = styled('form')({
+export const UploadViewForm = styled('form')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',
-  gap: '0.75rem',
-})
+  gap: theme.spacing(1.5),
+}))
 
 export const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',

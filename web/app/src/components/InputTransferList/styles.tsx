@@ -2,13 +2,13 @@ import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
 import { styled } from '@mui/material/styles'
 
-export const TransferRoot = styled(Box)({
+export const TransferRoot = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'center',
-  gap: '1rem',
-})
+  gap: theme.spacing(2),
+}))
 
 export const TransferColumn = styled(Box)({
   flex: 1,

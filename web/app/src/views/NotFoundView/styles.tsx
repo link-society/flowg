@@ -1,12 +1,12 @@
 import { styled } from '@mui/material'
 
-export const NotFoundViewContainer = styled('div')({
+export const NotFoundViewContainer = styled('div')(({ theme }) => ({
   flex: 1,
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  gap: '1rem',
-  padding: '2rem',
+  gap: theme.spacing(2),
+  padding: theme.spacing(4),
   textAlign: 'center',
-})
+}))

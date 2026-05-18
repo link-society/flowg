@@ -10,9 +10,9 @@ export const DialogAppBar = styled(MuiAppBar)({
   position: 'relative',
 })
 
-export const DialogToolbar = styled(Toolbar)({
-  gap: '0.75rem',
-})
+export const DialogToolbar = styled(Toolbar)(({ theme }) => ({
+  gap: theme.spacing(1.5),
+}))
 
 export const DialogToolbarName = styled('div')({
   flexGrow: 1,
@@ -34,11 +34,11 @@ export const ToolbarNameInput = styled(MuiTextField)(({ theme }) => ({
   },
 }))
 
-export const DialogBody = styled(Box)({
+export const DialogBody = styled(Box)(({ theme }) => ({
   flex: 1,
-  padding: '1.5rem',
+  padding: theme.spacing(3),
   overflow: 'auto',
-})
+}))
 
 export const DialogLoading = styled(Box)({
   width: '100%',

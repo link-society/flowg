@@ -1,5 +1,5 @@
 import { styled } from '@mui/material'
 
-export const LogoutViewRoot = styled('div')({
-  padding: '1.5rem 0',
-})
+export const LogoutViewRoot = styled('div')(({ theme }) => ({
+  padding: theme.spacing(3, 0),
+}))

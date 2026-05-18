@@ -8,7 +8,7 @@ export const NodeListRoot = styled(Paper)({
 })
 
 export const NodeListHeader = styled('div')(({ theme }) => ({
-  padding: '0.5rem',
+  padding: theme.spacing(1),
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
@@ -30,13 +30,13 @@ export const NodeListLoading = styled('div')({
   justifyContent: 'center',
 })
 
-export const NodeListItems = styled('div')({
+export const NodeListItems = styled('div')(({ theme }) => ({
   flex: '1 1 0',
   minHeight: 0,
   overflow: 'auto',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'flex-start',
-  gap: '0.5rem',
-  padding: '0.5rem',
-})
+  gap: theme.spacing(1),
+  padding: theme.spacing(1),
+}))
