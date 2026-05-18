@@ -22,32 +22,32 @@ export const TransformerDetailViewToolbar = styled(AppContainer)(
   })
 )
 
-export const TransformerDetailViewToolbarLeft = styled('div')({
+export const TransformerDetailViewToolbarLeft = styled('div')(({ theme }) => ({
   flexGrow: 1,
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  gap: 12,
-})
+  gap: theme.spacing(1.5),
+}))
 
-export const TransformerDetailViewToolbarRight = styled('div')({
+export const TransformerDetailViewToolbarRight = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  gap: 12,
-})
+  gap: theme.spacing(1.5),
+}))
 
-export const TransformerDetailViewBody = styled(AppContainer)({
+export const TransformerDetailViewBody = styled(AppContainer)(({ theme }) => ({
   flexGrow: 1,
   flexShrink: 1,
   height: 0,
   display: 'flex',
   flexDirection: 'column',
-  gap: 8,
+  gap: theme.spacing(1),
   '@media (min-width: 990px)': {
     flexDirection: 'row',
   },
-})
+}))
 
 export const TransformerDetailViewSidebar = styled('div')({
   flex: '0 0 16.67%',

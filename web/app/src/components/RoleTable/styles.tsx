@@ -17,11 +17,11 @@ export const RoleTableCardHeader = styled(CardHeader)(({ theme }) => ({
   zIndex: 20,
 }))
 
-export const RoleTableCardHeaderTitle = styled('div')({
+export const RoleTableCardHeaderTitle = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: '0.75rem',
-})
+  gap: theme.spacing(1.5),
+}))
 
 export const RoleTableCardHeaderTitleText = styled('span')({
   flex: 1,
@@ -46,11 +46,11 @@ export const RoleTableCardContent = styled(CardContent)({
   },
 })
 
-export const ScopesCellRoot = styled('div')({
+export const ScopesCellRoot = styled('div')(({ theme }) => ({
   display: 'flex',
   flexWrap: 'wrap',
-  gap: 4,
-  padding: '8px 0',
+  gap: theme.spacing(0.5),
+  padding: theme.spacing(1, 0),
   alignContent: 'center',
   width: '100%',
-})
+}))

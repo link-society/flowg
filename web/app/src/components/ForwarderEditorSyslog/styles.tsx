@@ -1,24 +1,24 @@
 import { FormControl, TextField, styled } from '@mui/material'
 
-export const ForwarderEditorSyslogRoot = styled('div')({
+export const ForwarderEditorSyslogRoot = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',
-  gap: '0.75rem',
-})
+  gap: theme.spacing(1.5),
+}))
 
-export const ForwarderEditorSyslogRow = styled('div')({
+export const ForwarderEditorSyslogRow = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  gap: '0.75rem',
-})
+  gap: theme.spacing(1.5),
+}))
 
-export const ForwarderEditorSyslogColumn = styled('div')({
+export const ForwarderEditorSyslogColumn = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
-  gap: '0.75rem',
-})
+  gap: theme.spacing(1.5),
+}))
 
 export const ForwarderEditorSyslogAddressField = styled(TextField)({
   flexGrow: 1,

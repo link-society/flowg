@@ -3,17 +3,17 @@ import Paper from '@mui/material/Paper'
 import Typography from '@mui/material/Typography'
 import { styled } from '@mui/material/styles'
 
-export const StreamEditorRoot = styled(Box)({
+export const StreamEditorRoot = styled(Box)(({ theme }) => ({
   height: '100%',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',
-  gap: '0.75rem',
+  gap: theme.spacing(1.5),
 
   '@media (min-width: 990px)': {
     flexDirection: 'row',
   },
-})
+}))
 
 export const StreamEditorPanel = styled(Paper)({
   flex: 1,
@@ -24,30 +24,30 @@ export const StreamEditorPanel = styled(Paper)({
 })
 
 export const StreamEditorPanelHeader = styled(Box)(({ theme }) => ({
-  padding: '0.75rem',
+  padding: theme.spacing(1.5),
   backgroundColor: theme.palette.grey[100],
   boxShadow: theme.shadows[1],
   textAlign: 'center',
 }))
 
-export const StreamEditorPanelBody = styled(Box)({
+export const StreamEditorPanelBody = styled(Box)(({ theme }) => ({
   flex: '1 1 0',
   height: 0,
   overflow: 'auto',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',
-  gap: '0.75rem',
-  padding: '0.75rem',
-})
+  gap: theme.spacing(1.5),
+  padding: theme.spacing(1.5),
+}))
 
-export const StreamEditorUsageRow = styled(Box)({
+export const StreamEditorUsageRow = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  gap: '2.5rem',
+  gap: theme.spacing(5),
   marginBottom: '0.5rem',
-})
+}))
 
 export const StreamEditorHint = styled(Typography)({
   fontStyle: 'italic',

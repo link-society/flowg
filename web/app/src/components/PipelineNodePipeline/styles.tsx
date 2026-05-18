@@ -3,12 +3,12 @@ import { styled } from '@mui/material/styles'
 
 import { NodeToolbar } from '@xyflow/react'
 
-export const ToolbarRow = styled(NodeToolbar)({
+export const ToolbarRow = styled(NodeToolbar)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  gap: 8,
-})
+  gap: theme.spacing(1),
+}))
 
 export const NodeRoot = styled(Box)(({ theme }) => ({
   width: 270,
@@ -16,31 +16,30 @@ export const NodeRoot = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'stretch',
-  gap: 8,
+  gap: theme.spacing(1),
   backgroundColor: theme.tokens.colors.white,
   border: `4px solid ${theme.tokens.colors.nodePipelineBorder}`,
-  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-  transition: 'box-shadow 150ms ease-in-out',
+  boxShadow: theme.tokens.shadows.nodeElevated,
+  transition: theme.tokens.transitions.shadow,
   '&:hover': {
-    boxShadow:
-      '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+    boxShadow: theme.tokens.shadows.nodeElevatedHover,
   },
 }))
 
 export const NodeIcon = styled(Box)(({ theme }) => ({
   backgroundColor: theme.tokens.colors.nodePipelineBg,
-  color: theme.tokens.colors.white,
-  padding: 12,
+  color: theme.tokens.colors.primaryContrast,
+  padding: theme.spacing(1.5),
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
 }))
 
-export const NodeBody = styled(Box)({
-  padding: 12,
+export const NodeBody = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(1.5),
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-})
+}))
 
 export const handleStyle = { width: 12, height: 12 }

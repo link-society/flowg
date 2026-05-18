@@ -13,17 +13,17 @@ export const ProfileInfoCardHeader = styled(CardHeader)(({ theme }) => ({
   boxShadow: theme.shadows[4],
 }))
 
-export const ProfileInfoCardHeaderTitle = styled('div')({
+export const ProfileInfoCardHeaderTitle = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: '0.75rem',
-})
+  gap: theme.spacing(1.5),
+}))
 
-export const ProfileInfoCardContent = styled(CardContent)({
+export const ProfileInfoCardContent = styled(CardContent)(({ theme }) => ({
   flex: '1 1 0',
   overflow: 'auto',
   display: 'flex',
   flexDirection: 'column',
-  gap: '0.75rem',
+  gap: theme.spacing(1.5),
   alignItems: 'stretch',
-})
+}))

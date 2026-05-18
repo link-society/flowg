@@ -2,23 +2,23 @@ import { styled } from '@mui/material'
 
 import AppContainer from '@/components/AppContainer/component'
 
-export const HomeViewContainer = styled(AppContainer)({
+export const HomeViewContainer = styled(AppContainer)(({ theme }) => ({
   placeContent: 'space-evenly',
   flexDirection: 'column',
   '& h1': {
     display: 'flex',
-    gap: 8,
+    gap: theme.spacing(1),
     placeItems: 'center',
     img: {
       height: '2rem',
     },
   },
-})
+}))
 
-export const HomeViewPermissionsWrapper = styled('div')({
+export const HomeViewPermissionsWrapper = styled('div')(({ theme }) => ({
   display: 'grid',
   gridTemplateColumns: '1fr',
-  gap: 16,
+  gap: theme.spacing(2),
   width: '100%',
   '@media (min-width: 990px)': {
     gridAutoColumns: '1fr',
@@ -26,4 +26,4 @@ export const HomeViewPermissionsWrapper = styled('div')({
     gridTemplateColumns: 'unset',
     width: 'auto',
   },
-})
+}))

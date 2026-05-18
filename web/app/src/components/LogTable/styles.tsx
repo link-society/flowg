@@ -7,15 +7,15 @@ export const LogTableContainer = styled(Paper)({
   flexGrow: 1,
 })
 
-export const LogTableDrawer = styled(Drawer)({
+export const LogTableDrawer = styled(Drawer)(({ theme }) => ({
   '& .MuiDrawer-paper': {
     width: '33vw',
-    padding: '0.75rem',
+    padding: theme.spacing(1.5),
   },
-})
+}))
 
 export const LogTableDetailPre = styled('pre')(({ theme }) => ({
-  padding: '0.5rem',
+  padding: theme.spacing(1),
   width: '100%',
   overflow: 'auto',
   fontFamily: 'monospace',

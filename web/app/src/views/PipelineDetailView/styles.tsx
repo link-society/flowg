@@ -20,36 +20,36 @@ export const PipelineDetailViewHeader = styled(AppContainer)(({ theme }) => ({
   flex: 0,
 }))
 
-export const PipelineDetailViewHeaderLeft = styled('div')({
+export const PipelineDetailViewHeaderLeft = styled('div')(({ theme }) => ({
   display: 'flex',
   flex: 1,
   flexDirection: 'row',
   alignItems: 'center',
-  gap: '0.75rem',
-})
+  gap: theme.spacing(1.5),
+}))
 
-export const PipelineDetailViewHeaderRight = styled('div')({
+export const PipelineDetailViewHeaderRight = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  gap: '0.75rem',
-})
+  gap: theme.spacing(1.5),
+}))
 
 export const PipelineDetailViewHeaderTest = styled('div')({
   display: 'flex',
   alignItems: 'center',
 })
 
-export const PipelineDetailViewHeaderActions = styled('div')({
+export const PipelineDetailViewHeaderActions = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  gap: '0.75rem',
-})
+  gap: theme.spacing(1.5),
+}))
 
-export const PipelineDetailViewBody = styled(AppContainer)({
+export const PipelineDetailViewBody = styled(AppContainer)(({ theme }) => ({
   alignItems: 'stretch',
-  gap: '0.5rem',
+  gap: theme.spacing(1),
   overflow: 'auto',
   flex: 1,
   flexDirection: 'column',
@@ -57,7 +57,7 @@ export const PipelineDetailViewBody = styled(AppContainer)({
     flexDirection: 'row',
     overflow: 'hidden',
   },
-})
+}))
 
 export const PipelineDetailViewLeft = styled('div')({
   flex: '0 0 16.67%',
@@ -74,18 +74,18 @@ export const PipelineDetailViewCenter = styled('div')({
   minHeight: 600,
 })
 
-export const PipelineDetailViewRight = styled('div')({
+export const PipelineDetailViewRight = styled('div')(({ theme }) => ({
   width: '100%',
   height: '100%',
   flexShrink: 0,
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',
-  gap: '0.5rem',
+  gap: theme.spacing(1),
   '@media (min-width: 990px)': {
     width: 'calc(100% / 6)',
   },
-})
+}))
 
 export const PipelineDetailViewRightItem = styled('div')({
   flex: '1 1 0',

@@ -17,11 +17,11 @@ export const TokenTableCardHeader = styled(CardHeader)(({ theme }) => ({
   zIndex: 20,
 }))
 
-export const TokenTableCardHeaderTitle = styled('div')({
+export const TokenTableCardHeaderTitle = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: '0.75rem',
-})
+  gap: theme.spacing(1.5),
+}))
 
 export const TokenTableCardHeaderTitleText = styled('span')({
   flex: 1,

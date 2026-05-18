@@ -20,21 +20,21 @@ export const SystemConfigurationCard = styled(Card)({
   flexDirection: 'column',
 })
 
-export const SystemConfigurationWrapper = styled('div')({
+export const SystemConfigurationWrapper = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   maxWidth: 400,
   width: '100%',
-  gap: '1rem',
-})
+  gap: theme.spacing(2),
+}))
 
 export const SystemConfigurationCardHeader = styled(Box)(({ theme }) => ({
-  padding: '0.75rem 1rem',
+  padding: theme.spacing(1.5, 2),
   backgroundColor: theme.tokens.colors.cardHeaderBkg,
   color: theme.tokens.colors.primaryContrast,
   boxShadow: theme.shadows[4],
   zIndex: 20,
   display: 'flex',
   alignItems: 'center',
-  gap: '0.75rem',
+  gap: theme.spacing(1.5),
 }))

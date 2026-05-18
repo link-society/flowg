@@ -9,7 +9,7 @@ export const FlowPanelPaper = styled(Paper)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  gap: '0.75rem',
+  gap: theme.spacing(1.5),
   boxShadow: theme.shadows[1],
 }))
 
@@ -22,13 +22,13 @@ export const FlowPanelLabel = styled('div')(({ theme }) => ({
   fontWeight: 600,
   backgroundColor: theme.palette.grey[100],
   borderRight: `1px solid ${theme.palette.grey[200]}`,
-  padding: '0.5rem',
+  padding: theme.spacing(1),
 }))
 
-export const FlowPanelChips = styled('div')({
+export const FlowPanelChips = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  gap: '0.5rem',
-  padding: '0.5rem',
-})
+  gap: theme.spacing(1),
+  padding: theme.spacing(1),
+}))

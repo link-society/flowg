@@ -7,20 +7,20 @@ export const StreamIndexSelectorContainer = styled(Paper)({
   overflow: 'auto',
 })
 
-export const StreamIndexSelectorValueList = styled('div')({
+export const StreamIndexSelectorValueList = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
-  gap: 4,
-})
+  gap: theme.spacing(0.5),
+}))
 
 export const StreamIndexSelectorChip = styled('button')<{
   $selected?: boolean
 }>(({ $selected, theme }) => ({
   cursor: 'pointer',
-  padding: '0 8px',
+  padding: theme.spacing(0, 1),
   textAlign: 'left',
-  transition: 'all 150ms ease-in-out',
-  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+  transition: `all ${theme.tokens.transitions.normal}`,
+  boxShadow: `0 1px 2px rgba(0, 0, 0, ${theme.tokens.opacity.light})`,
   backgroundColor: $selected
     ? theme.tokens.colors.selectedBg
     : theme.tokens.colors.disabledBg,

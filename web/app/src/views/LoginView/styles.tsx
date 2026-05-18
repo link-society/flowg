@@ -2,7 +2,7 @@ import { Card, styled } from '@mui/material'
 
 import AppContainer from '@/components/AppContainer/component'
 
-export const LoginViewContainer = styled(AppContainer)({
+export const LoginViewContainer = styled(AppContainer)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
@@ -12,7 +12,7 @@ export const LoginViewContainer = styled(AppContainer)({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: '0.5rem',
+    gap: theme.spacing(1),
     '& img': {
       height: '4rem',
     },
@@ -23,18 +23,18 @@ export const LoginViewContainer = styled(AppContainer)({
       textAlign: 'center',
     },
   },
-})
+}))
 
-export const LoginViewCard = styled(Card)({
+export const LoginViewCard = styled(Card)(({ theme }) => ({
   width: '100%',
   maxWidth: '28rem',
-  padding: '0.75rem',
+  padding: theme.spacing(1.5),
   minWidth: 550,
   '& > form': {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'stretch',
-    gap: '0.75rem',
+    gap: theme.spacing(1.5),
     '& header h2': {
       fontSize: '1.5rem',
       lineHeight: '2rem',
@@ -45,21 +45,21 @@ export const LoginViewCard = styled(Card)({
   '@media (max-width: 990px)': {
     minWidth: '100%',
   },
-})
+}))
 
-export const LoginViewCardFields = styled('section')({
+export const LoginViewCardFields = styled('section')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',
-  gap: '0.75rem',
+  gap: theme.spacing(1.5),
   '& > div': {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'flex-end',
     '& .icon': {
-      marginRight: 8,
-      marginTop: 4,
-      marginBottom: 4,
+      marginRight: theme.spacing(1),
+      marginTop: theme.spacing(0.5),
+      marginBottom: theme.spacing(0.5),
     },
   },
 })

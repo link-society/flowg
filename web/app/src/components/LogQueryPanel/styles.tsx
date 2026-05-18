@@ -1,11 +1,11 @@
 import { styled } from '@mui/material'
 
-export const LogQueryPanelContainer = styled('div')({
+export const LogQueryPanelContainer = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: 16,
-  padding: 12,
-})
+  gap: theme.spacing(2),
+  padding: theme.spacing(1.5),
+}))
 
 export const LogQueryPanelFilterForm = styled('form')({
   flex: 3,

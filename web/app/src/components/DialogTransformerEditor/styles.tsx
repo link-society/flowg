@@ -2,9 +2,9 @@ import Box from '@mui/material/Box'
 import Toolbar from '@mui/material/Toolbar'
 import { styled } from '@mui/material/styles'
 
-export const EditorToolbar = styled(Toolbar)({
-  gap: '0.75rem',
-})
+export const EditorToolbar = styled(Toolbar)(({ theme }) => ({
+  gap: theme.spacing(1.5),
+}))
 
 export const TitleField = styled(Box)({
   flexGrow: 1,
@@ -13,7 +13,7 @@ export const TitleField = styled(Box)({
 export const FullScreenBody = styled(Box)(({ theme }) => ({
   flexGrow: 1,
   backgroundColor: theme.tokens.colors.bodyBg,
-  padding: '0.5rem',
+  padding: theme.spacing(1),
 }))
 
 export const FallbackContainer = styled(Box)({
