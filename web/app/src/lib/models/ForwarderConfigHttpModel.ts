@@ -5,6 +5,7 @@ type ForwarderConfigHttpModel = {
   url: string
   headers?: Record<string, string>
   body: DynamicField<string>
+  proxy?: string
 }
 
 export default ForwarderConfigHttpModel
@@ -14,4 +15,5 @@ export const factory = (): ForwarderConfigHttpModel => ({
   url: '',
   headers: undefined,
   body: '@expr:toJSON(log)',
+  proxy: '',
 })

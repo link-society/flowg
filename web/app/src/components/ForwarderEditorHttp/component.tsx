@@ -24,6 +24,7 @@ const ForwarderEditorHttp = ({
     validators.minLength(1),
     validators.formatUri,
   ])
+
   const [headers, setHeaders] = useInput<Record<string, string>>(
     config.headers ?? {},
     []
@@ -31,6 +32,10 @@ const ForwarderEditorHttp = ({
 
   const [body, setBody] = useInput<DynamicField<string>>(config.body, [
     validators.dynamicField([]),
+  ])
+
+  const [proxy, setProxy] = useInput<string>(config.proxy ?? '', [
+    validators.formatUri,
   ])
 
   useEffect(() => {
@@ -43,9 +48,10 @@ const ForwarderEditorHttp = ({
         url: url.value,
         headers: headers.value,
         body: body.value,
+        proxy: proxy.value,
       })
     }
-  }, [url, headers])
+  }, [url, headers, proxy])
 
   return (
     <ForwarderEditorHttpRoot id="container:editor.forwarders.http">
@@ -81,6 +87,18 @@ const ForwarderEditorHttp = ({
         error={!body.valid}
         value={body.value}
         onChange={setBody}
+      />
+
+      <TextField
+        id="input:editor.forwarders.http.proxy_url"
+        label="Proxy URL"
+        variant="outlined"
+        type="text"
+        error={proxy.value.length > 0 && !proxy.valid}
+        value={proxy.value}
+        onChange={(e) => {
+          setProxy(e.target.value)
+        }}
       />
     </ForwarderEditorHttpRoot>
   )
