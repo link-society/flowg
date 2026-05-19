@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 
 	"net/http"
+	"net/url"
 
 	"github.com/expr-lang/expr"
 	"github.com/expr-lang/expr/vm"
@@ -23,6 +24,7 @@ type ForwarderHttpV2 struct {
 	Type    string                   `json:"type" enum:"http" required:"true"`
 	Url     string                   `json:"url" required:"true" format:"uri"`
 	Headers map[string]string        `json:"headers,omitempty"`
+	Proxy   string                   `json:"proxy,omitempty"`
 	Body    ForwarderHttpV2BodyField `json:"body,omitempty"`
 
 	state *forwarderStateHttpV2
@@ -91,6 +93,14 @@ func (f *ForwarderHttpV2) call(ctx context.Context, record *LogRecord) error {
 
 	for key, value := range f.Headers {
 		req.Header.Add(key, value)
+	}
+
+	if len(f.Proxy) > 0 {
+		proxy, err := url.Parse(f.Proxy)
+		if err != nil {
+			return fmt.Errorf("failed to parse proxy: %w", err)
+		}
+		f.state.client.Transport = &http.Transport{Proxy: http.ProxyURL(proxy)}
 	}
 
 	resp, err := f.state.client.Do(req)
