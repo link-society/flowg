@@ -53,7 +53,7 @@ export const AppContainer = forwardRef<HTMLDivElement, AppContainerProps>(
             gap: theme.spacing(4),
             flex: 1,
           }),
-          ...(Array.isArray(sx) ? sx : sx != null ? [sx] : []),
+          ...(sx == null ? [] : Array.isArray(sx) ? sx : [sx]),
         ]}
       >
         {children}
