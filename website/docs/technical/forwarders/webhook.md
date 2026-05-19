@@ -15,6 +15,7 @@ erDiagram
 
   Configuration {
     str url "The target URL"
+    str proxy "Use a proxy server to send the request (if specified)"
     HttpHeader[] headers "Additional HTTP headers to send"
     str body[1] "The body of a log message"
   }
