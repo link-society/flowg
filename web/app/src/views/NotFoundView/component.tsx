@@ -19,9 +19,7 @@ const NotFoundView = () => {
     <NotFoundViewContainer>
       <NotFoundIcon />
 
-      <NotFoundTitle variant="titleLg" component="h1">
-        404
-      </NotFoundTitle>
+      <NotFoundTitle variant="titleLg">404</NotFoundTitle>
 
       <Typography variant="titleMd" component="h2">
         Page not found
