@@ -38,20 +38,6 @@ export default defineConfig({
           .replace(/\{\{\s*\.FeatureFlags\.DemoMode\s*\}\}/g, 'false')
       },
     },
-    {
-      name: 'trailing-slash-redirect',
-      configureServer(serve) {
-        serve.middlewares.use((req, res, next) => {
-          if (req.url === '/web') {
-            res.writeHead(302, { Location: '/web/' })
-            res.end()
-            return
-          }
-
-          next()
-        })
-      },
-    },
   ],
   build: {
     sourcemap: true,
