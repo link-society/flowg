@@ -67,7 +67,6 @@ const InputList = (props: InputListProps) => {
             }}
             variant="outlined"
             size="small"
-            sx={{ flexGrow: 1 }}
           />
 
           <Button
@@ -98,7 +97,6 @@ const InputList = (props: InputListProps) => {
           }}
           variant="outlined"
           size="small"
-          sx={{ flexGrow: 1 }}
           required
         />
 

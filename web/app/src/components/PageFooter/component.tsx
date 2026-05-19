@@ -1,8 +1,6 @@
-import { Typography } from '@mui/material'
-
 import { useFeatureFlags } from '@/lib/hooks/featureflags'
 
-import { PageFooterContainer } from './styles'
+import { PageFooterContainer, PageFooterText } from './styles'
 
 const PageFooter = () => {
   const { demoMode } = useFeatureFlags()
@@ -10,15 +8,13 @@ const PageFooter = () => {
   return (
     <PageFooterContainer>
       {demoMode && (
-        <Typography variant="text" sx={{ fontWeight: 600 }}>
-          Demo Mode Enabled
-        </Typography>
+        <PageFooterText variant="text">Demo Mode Enabled</PageFooterText>
       )}
 
       <div>
-        <Typography variant="text" sx={{ fontWeight: 600 }}>
+        <PageFooterText variant="text">
           {import.meta.env.FLOWG_VERSION}
-        </Typography>
+        </PageFooterText>
       </div>
     </PageFooterContainer>
   )

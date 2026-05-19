@@ -29,7 +29,29 @@ export default defineConfig({
           next()
         })
       }
-    }
+    },
+    {
+      name: 'go-template-substitution',
+      transformIndexHtml(html) {
+        return html
+          .replace(/\{\{\s*\.MountPath\s*\}\}/g, '')
+          .replace(/\{\{\s*\.FeatureFlags\.DemoMode\s*\}\}/g, 'false')
+      },
+    },
+    {
+      name: 'trailing-slash-redirect',
+      configureServer(serve) {
+        serve.middlewares.use((req, res, next) => {
+          if (req.url === '/web') {
+            res.writeHead(302, { Location: '/web/' })
+            res.end()
+            return
+          }
+
+          next()
+        })
+      },
+    },
   ],
   build: {
     sourcemap: true,
@@ -49,7 +71,7 @@ export default defineConfig({
     'import.meta.env.FLOWG_VERSION': JSON.stringify(fs.readFileSync('../../VERSION.txt', 'utf8').trim()),
   },
   server: {
-    open: '/web',
+    open: '/web/',
     proxy: {
       '/api': {
         target: 'http://localhost:5080',

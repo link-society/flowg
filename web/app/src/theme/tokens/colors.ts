@@ -27,6 +27,10 @@ export type ColorsType = {
   statusSuccess: string
   shadowOverlay: string
 
+  // Switch node chip
+  switchChipBg: string
+  switchChipBorder: string
+
   // Pipeline nodes (bg = header band, border = node outline)
   nodeRouterBg: string
   nodeRouterBorder: string
@@ -70,6 +74,10 @@ export const colors: ColorsType = {
   statusError: '#ff4444',
   statusSuccess: '#20b834',
   shadowOverlay: '#00000055',
+
+  // Switch node chip
+  switchChipBg: '#ffebee',
+  switchChipBorder: '#f44336',
 
   // Pipeline nodes
   nodeRouterBg: '#7e22ce',

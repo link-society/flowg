@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { LoaderFunction, useLoaderData } from 'react-router'
 
 import Button from '@mui/material/Button'
-import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 
 import {
@@ -19,7 +18,9 @@ import ListEdit from '@/components/ListEdit/component'
 
 import {
   SystemConfigurationCard,
+  SystemConfigurationCardContent,
   SystemConfigurationCardHeader,
+  SystemConfigurationCardTitle,
   SystemConfigurationHeader,
   SystemConfigurationRoot,
   SystemConfigurationWrapper,
@@ -48,11 +49,11 @@ const SystemConfiguration = () => {
       <SystemConfigurationWrapper>
         <SystemConfigurationCard>
           <SystemConfigurationCardHeader>
-            <Typography variant="titleSm" sx={{ flexGrow: 1 }}>
+            <SystemConfigurationCardTitle variant="titleSm">
               Allowed Syslog Origins
-            </Typography>
+            </SystemConfigurationCardTitle>
           </SystemConfigurationCardHeader>
-          <CardContent sx={{ p: 1.5 }}>
+          <SystemConfigurationCardContent>
             <ListEdit
               id="editor.config.syslog_allowed_origins"
               list={config.syslog_allowed_origins ?? []}
@@ -60,7 +61,7 @@ const SystemConfiguration = () => {
                 setConfig({ ...config, syslog_allowed_origins: list })
               }
             />
-          </CardContent>
+          </SystemConfigurationCardContent>
         </SystemConfigurationCard>
 
         <Button

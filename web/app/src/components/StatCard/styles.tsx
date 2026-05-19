@@ -1,4 +1,4 @@
-import { CardContent, styled } from '@mui/material'
+import { CardContent, Typography, styled } from '@mui/material'
 
 export const StatCardHeaderWrapper = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -17,3 +17,7 @@ export const StatCardContent = styled(CardContent)(({ theme }) => ({
   flexDirection: 'column',
   gap: theme.spacing(1.25),
 }))
+
+export const StatCardValue = styled(Typography)({
+  fontWeight: 700,
+})

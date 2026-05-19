@@ -7,13 +7,21 @@ import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
 import Menu from '@mui/material/Menu'
 import ToggleButton from '@mui/material/ToggleButton'
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Typography from '@mui/material/Typography'
 
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import CheckIcon from '@mui/icons-material/Check'
 
-import { LabelRow, LabelStrong, MenuPad, MenuSection } from './styles'
+import {
+  LabelRow,
+  LabelStrong,
+  MenuBody,
+  MenuPad,
+  MenuSection,
+  TimeWindowButton,
+  TimeWindowToggleButton,
+  TimeWindowToggleGroup,
+} from './styles'
 import {
   LabelRendererProps,
   RelTimeWindowOption,
@@ -117,20 +125,13 @@ const TimeWindowSelector = ({
 
   return (
     <>
-      <Button
+      <TimeWindowButton
         id="btn:streams.timewindow-selector.open"
         variant="outlined"
         onClick={(evt) => {
           setMenu(evt.currentTarget)
         }}
         endIcon={<ArrowDropDownIcon />}
-        sx={{
-          width: '100%',
-          height: '100%',
-          '& .MuiButton-icon': {
-            marginLeft: 'auto',
-          },
-        }}
       >
         <LabelRenderer
           timewindowType={timeWindowType}
@@ -139,7 +140,7 @@ const TimeWindowSelector = ({
           to={to}
           live={live}
         />
-      </Button>
+      </TimeWindowButton>
       <Menu
         id="menu:streams.timewindow-selector"
         anchorEl={menu}
@@ -147,12 +148,12 @@ const TimeWindowSelector = ({
         onClose={handleClose}
         slotProps={{
           list: {
-            sx: { width: menu?.offsetWidth },
+            style: { width: menu?.offsetWidth },
           },
         }}
       >
-        <MenuSection sx={{ p: 0, gap: 0 }}>
-          <ToggleButtonGroup
+        <MenuBody>
+          <TimeWindowToggleGroup
             color="primary"
             value={timeWindowType}
             exclusive
@@ -161,27 +162,24 @@ const TimeWindowSelector = ({
                 setTimeWindowType(value)
               }
             }}
-            sx={{ p: 1.5, width: '100%' }}
           >
-            <ToggleButton
+            <TimeWindowToggleButton
               id="btn:streams.timewindow-selector.type.relative"
               value="relative"
-              sx={{ flexGrow: 1 }}
             >
               Relative
-            </ToggleButton>
-            <ToggleButton
+            </TimeWindowToggleButton>
+            <TimeWindowToggleButton
               id="btn:streams.timewindow-selector.type.absolute"
               value="absolute"
-              sx={{ flexGrow: 1 }}
             >
               Absolute
-            </ToggleButton>
-          </ToggleButtonGroup>
+            </TimeWindowToggleButton>
+          </TimeWindowToggleGroup>
           <Divider />
 
           {timeWindowType === 'relative' && (
-            <ToggleButtonGroup
+            <TimeWindowToggleGroup
               color="secondary"
               orientation="vertical"
               exclusive
@@ -191,7 +189,6 @@ const TimeWindowSelector = ({
                   setRelativeTimeWindow(value)
                 }
               }}
-              sx={{ p: 1.5, width: '100%' }}
             >
               {RELATIVE_TIMEWINDOW_OPTIONS.map((option) => (
                 <ToggleButton
@@ -202,7 +199,7 @@ const TimeWindowSelector = ({
                   {option.label}
                 </ToggleButton>
               ))}
-            </ToggleButtonGroup>
+            </TimeWindowToggleGroup>
           )}
           {timeWindowType === 'absolute' && (
             <MenuSection>
@@ -230,7 +227,7 @@ const TimeWindowSelector = ({
 
           <Divider />
 
-          <ToggleButtonGroup
+          <TimeWindowToggleGroup
             color="info"
             orientation="vertical"
             exclusive
@@ -238,7 +235,6 @@ const TimeWindowSelector = ({
             onChange={(_, value) => {
               setLive(value !== null)
             }}
-            sx={{ p: 1.5, width: '100%' }}
           >
             <ToggleButton
               id="btn:streams.timewindow-selector.live"
@@ -246,9 +242,7 @@ const TimeWindowSelector = ({
             >
               Watch Logs
             </ToggleButton>
-          </ToggleButtonGroup>
-
-          <Divider />
+          </TimeWindowToggleGroup>
 
           <MenuPad>
             <Button
@@ -262,7 +256,7 @@ const TimeWindowSelector = ({
               Apply
             </Button>
           </MenuPad>
-        </MenuSection>
+        </MenuBody>
       </Menu>
     </>
   )

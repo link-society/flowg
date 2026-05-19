@@ -3,7 +3,6 @@ import { LoaderFunction, useLoaderData, useNavigate } from 'react-router'
 
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
-import Typography from '@mui/material/Typography'
 
 import DeleteIcon from '@mui/icons-material/Delete'
 import HelpIcon from '@mui/icons-material/Help'
@@ -26,6 +25,7 @@ import StreamEditor from '@/components/StreamEditor/component'
 import { buildUrl } from '@/router'
 
 import {
+  DemoModeBanner,
   StorageDetailViewBody,
   StorageDetailViewContent,
   StorageDetailViewHeader,
@@ -95,9 +95,9 @@ const StorageDetailView = () => {
           </Button>
 
           {featureFlags.demoMode && (
-            <Typography variant="text" sx={{ fontStyle: 'italic' }}>
+            <DemoModeBanner variant="text">
               Demo Mode Active, changes will be ignored.
-            </Typography>
+            </DemoModeBanner>
           )}
         </StorageDetailViewHeaderLeft>
 

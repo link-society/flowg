@@ -7,7 +7,6 @@ import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
-import TextField from '@mui/material/TextField'
 import Tooltip from '@mui/material/Tooltip'
 
 import CancelIcon from '@mui/icons-material/Cancel'
@@ -23,7 +22,7 @@ import { ScopeLabels, Scopes } from '@/lib/models/Scopes'
 
 import InputTransferList from '@/components/InputTransferList/component'
 
-import { FieldLabel, FieldStack, FormStack } from './styles'
+import { FieldLabel, FieldStack, FormStack, FormTextField } from './styles'
 
 const DialogNewRole = ({
   open,
@@ -61,14 +60,13 @@ const DialogNewRole = ({
       <DialogTitle>Create a new role</DialogTitle>
       <DialogContent>
         <FormStack>
-          <TextField
+          <FormTextField
             id="input:admin.roles.modal.name"
             label="Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             type="text"
             variant="outlined"
-            sx={{ mt: 2 }}
             required
           />
 

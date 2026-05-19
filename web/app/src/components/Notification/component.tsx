@@ -2,8 +2,6 @@ import { Fragment, useCallback, useContext } from 'react'
 
 import useSlotProps from '@mui/utils/useSlotProps'
 
-import Alert from '@mui/material/Alert'
-import Badge from '@mui/material/Badge'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar'
@@ -16,6 +14,7 @@ import NotificationsContext from '@/lib/context/notifications'
 
 import { RootPropsContext } from '@/components/NotificationsProvider/context'
 
+import { NotificationAlert, NotificationBadge } from './styles'
 import { NotificationProps } from './types'
 
 const Notification = ({
@@ -74,15 +73,15 @@ const Notification = ({
 
   return (
     <SnackbarComponent key={notificationKey} {...snackbarSlotProps}>
-      <Badge badgeContent={badge} color="primary" sx={{ width: '100%' }}>
+      <NotificationBadge badgeContent={badge} color="primary">
         {severity ? (
-          <Alert severity={severity} sx={{ width: '100%' }} action={action}>
+          <NotificationAlert severity={severity} action={action}>
             {message}
-          </Alert>
+          </NotificationAlert>
         ) : (
           <SnackbarContent message={message} action={action} />
         )}
-      </Badge>
+      </NotificationBadge>
     </SnackbarComponent>
   )
 }

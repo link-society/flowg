@@ -4,7 +4,7 @@ export const NavToolbar = styled('div')`
   background-color: ${({ theme }) => theme.tokens.colors.black};
   display: flex;
   align-items: center;
-  padding: 0 16px;
+  padding: 0 ${({ theme }) => theme.spacing(2)};
   min-height: 64px;
   width: 100%;
 `
@@ -14,7 +14,7 @@ export const NavBarLeftSection = styled('section')`
   display: flex;
   flex-direction: row;
   align-items: stretch;
-  gap: 0.75rem;
+  gap: ${({ theme }) => theme.spacing(1.5)};
   flex-grow: 1;
 
   img {
@@ -27,7 +27,7 @@ export const NavBarRightSection = styled('section')`
   display: flex;
   flex-direction: row-reverse;
   align-items: stretch;
-  gap: 0.75rem;
+  gap: ${({ theme }) => theme.spacing(1.5)};
 `
 
 export const NavBarDesktopMenus = styled('div')`
@@ -36,7 +36,7 @@ export const NavBarDesktopMenus = styled('div')`
 
 export const NavBarDrawerClose = styled(IconButton)`
   align-self: flex-end;
-  margin: 8px;
+  margin: ${({ theme }) => theme.spacing(1)};
 `
 
 export const NavBarDrawerList = styled('div')`
@@ -45,18 +45,18 @@ export const NavBarDrawerList = styled('div')`
 
 export const NavBarButtonLogo = styled(Button)`
   display: flex;
-  gap: 8px;
+  gap: ${({ theme }) => theme.spacing(1)};
   width: auto;
   text-transform: none;
 
-  @media (max-width: 990px) {
-    padding: 8px;
+  ${({ theme }) => theme.breakpoints.down('md')} {
+    padding: ${({ theme }) => theme.spacing(1)};
     min-width: fit-content;
   }
 
   .nav-text {
     display: none;
-    @media (min-width: 990px) {
+    ${({ theme }) => theme.breakpoints.up('md')} {
       display: block;
     }
   }
@@ -64,19 +64,19 @@ export const NavBarButtonLogo = styled(Button)`
 
 export const NavBarButton = styled(Button)`
   display: flex;
-  gap: 8px;
+  gap: ${({ theme }) => theme.spacing(1)};
   width: auto;
   text-transform: none;
 
-  @media (max-width: 990px) {
-    padding: 8px;
+  ${({ theme }) => theme.breakpoints.down('md')} {
+    padding: ${({ theme }) => theme.spacing(1)};
     min-width: fit-content;
   }
 
   .nav-text {
     display: none;
     font-size: 14px;
-    @media (min-width: 990px) {
+    ${({ theme }) => theme.breakpoints.up('md')} {
       display: block;
     }
   }
@@ -84,20 +84,20 @@ export const NavBarButton = styled(Button)`
 
 export const NavBarLink = styled(Link)`
   display: flex;
-  gap: 8px;
+  gap: ${({ theme }) => theme.spacing(1)};
   width: auto;
   text-transform: none;
   place-items: center;
 
-  @media (max-width: 990px) {
-    padding: 8px;
+  ${({ theme }) => theme.breakpoints.down('md')} {
+    padding: ${({ theme }) => theme.spacing(1)};
     min-width: fit-content;
   }
 
   .nav-text {
     font-size: 14px;
     display: none;
-    @media (min-width: 990px) {
+    ${({ theme }) => theme.breakpoints.up('md')} {
       display: block;
     }
   }

@@ -1,4 +1,4 @@
-import { Paper, styled } from '@mui/material'
+import { Chip, Paper, styled } from '@mui/material'
 
 export const NodeListRoot = styled(Paper)({
   height: '100%',
@@ -40,3 +40,17 @@ export const NodeListItems = styled('div')(({ theme }) => ({
   gap: theme.spacing(1),
   padding: theme.spacing(1),
 }))
+
+export const NodeChip = styled(Chip, {
+  shouldForwardProp: (prop) =>
+    prop !== 'chipBgColor' && prop !== 'chipBorderColor',
+})<{ chipBgColor: string; chipBorderColor: string }>(
+  ({ theme, chipBgColor, chipBorderColor }) => ({
+    backgroundColor: chipBgColor,
+    borderColor: chipBorderColor,
+    borderRadius: 0,
+    boxShadow: theme.shadows[1],
+    fontFamily: 'monospace',
+    '&:hover': { boxShadow: theme.shadows[4] },
+  })
+)

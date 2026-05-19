@@ -49,7 +49,6 @@ const PasswordChange = () => {
           type="password"
           onChange={(e) => setOldPassword(e.target.value)}
           variant="outlined"
-          sx={{ flexGrow: 1 }}
           required
         />
 
@@ -60,7 +59,6 @@ const PasswordChange = () => {
           type="password"
           onChange={(e) => setNewPassword(e.target.value)}
           variant="outlined"
-          sx={{ flexGrow: 1 }}
           required
         />
 
@@ -68,7 +66,6 @@ const PasswordChange = () => {
           id="btn:account.settings.change-password.submit"
           variant="contained"
           color="secondary"
-          sx={{ flexGrow: 0, alignSelf: 'stretch' }}
           type="submit"
           disabled={loading}
         >

@@ -12,4 +12,5 @@ export const Row = styled(Box)(({ theme }) => ({
   flexDirection: 'row',
   alignItems: 'stretch',
   gap: theme.spacing(1.5),
+  '& .MuiTextField-root': { flexGrow: 1 },
 }))

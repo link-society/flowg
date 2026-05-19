@@ -1,15 +1,8 @@
-import {
-  Button,
-  Card,
-  CardActions,
-  CardHeader,
-  Divider,
-  Typography,
-} from '@mui/material'
+import { Button, Card, CardActions, CardHeader, Divider } from '@mui/material'
 
 import { useNavigate } from 'react-router'
 
-import { StatCardContent, StatCardHeaderWrapper } from './styles'
+import { StatCardContent, StatCardHeaderWrapper, StatCardValue } from './styles'
 import { StatCardProps } from './types'
 
 const StatCard = ({ icon, title, value, to }: StatCardProps) => {
@@ -27,9 +20,7 @@ const StatCard = ({ icon, title, value, to }: StatCardProps) => {
       />
 
       <StatCardContent>
-        <Typography variant="titleLg" sx={{ fontWeight: 700 }}>
-          {value}
-        </Typography>
+        <StatCardValue variant="titleLg">{value}</StatCardValue>
         <Divider />
       </StatCardContent>
 

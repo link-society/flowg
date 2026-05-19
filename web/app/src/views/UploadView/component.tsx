@@ -41,7 +41,7 @@ const UploadView = () => {
   const notify = useNotify()
 
   const { pipelines } = useLoaderData() as LoaderData
-  const [pipeline, setPipeline] = useState<string | null>(null)
+  const [pipeline, setPipeline] = useState<string>('')
   const [file, setFile] = useState<File | null>(null)
 
   const onSelectPipeline = (event: any) => {
@@ -49,14 +49,14 @@ const UploadView = () => {
   }
 
   const [uploadLogs, loading] = useApiOperation(async () => {
-    if (pipeline === null || file === null) {
+    if (pipeline === '' || file === null) {
       return
     }
 
     await logsApi.uploadTextLogs(pipeline, file)
     notify.success('Logs uploaded successfully')
 
-    setPipeline(null)
+    setPipeline('')
     setFile(null)
   }, [pipeline, file])
 

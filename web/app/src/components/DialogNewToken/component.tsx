@@ -28,7 +28,7 @@ const DialogNewToken = ({
     <DialogTitle>Your Personal Access Token</DialogTitle>
     <DialogContent>
       <FieldRow>
-        <LabelIcon sx={{ mr: 1, my: 0.5 }} />
+        <LabelIcon />
         <TextField
           id="input:account.tokens.modal.token_uuid"
           label="Token UUID"
@@ -45,7 +45,7 @@ const DialogNewToken = ({
       </FieldRow>
 
       <FieldRow>
-        <KeyIcon sx={{ mr: 1, my: 0.5 }} />
+        <KeyIcon />
         <TextField
           id="input:account.tokens.modal.token"
           label="Token"

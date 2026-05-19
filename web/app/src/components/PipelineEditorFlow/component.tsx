@@ -8,9 +8,7 @@ import React, {
   useState,
 } from 'react'
 
-import Chip from '@mui/material/Chip'
 import Typography from '@mui/material/Typography'
-import * as colors from '@mui/material/colors'
 
 import DeviceHubIcon from '@mui/icons-material/DeviceHub'
 
@@ -47,6 +45,7 @@ import {
   FlowPanelLabel,
   FlowPanelPaper,
   FlowRoot,
+  SwitchNodeChip,
 } from './styles'
 
 type ShortcutMap = {
@@ -242,18 +241,10 @@ export const PipelineEditorFlow: React.FC<PipelineEditorFlowProps> = ({
               </FlowPanelLabel>
 
               <FlowPanelChips>
-                <Chip
+                <SwitchNodeChip
                   icon={<DeviceHubIcon />}
                   label="switch"
                   variant="outlined"
-                  sx={{
-                    backgroundColor: colors.red[50],
-                    borderColor: colors.red[500],
-                    borderRadius: 0,
-                    boxShadow: 1,
-                    fontFamily: 'monospace',
-                    '&:hover': { boxShadow: 4 },
-                  }}
                   draggable
                   onDragStart={(evt) => {
                     evt.dataTransfer.setData('item-type', 'switch')

@@ -15,12 +15,16 @@ export const TransferColumn = styled(Box)({
   minWidth: 0,
 })
 
-export const TransferControls = styled(Box)({
+export const TransferControls = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   flexShrink: 0,
-})
+  '& .MuiButtonBase-root': {
+    marginTop: theme.spacing(0.5),
+    marginBottom: theme.spacing(0.5),
+  },
+}))
 
 export const TransferListPaper = styled(Paper)({
   minHeight: '15rem',

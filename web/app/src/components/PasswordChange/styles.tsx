@@ -12,6 +12,8 @@ export const FormRow = styled('form')(({ theme }) => ({
   flexDirection: 'row',
   alignItems: 'center',
   gap: theme.spacing(1),
+  '& .MuiTextField-root': { flexGrow: 1 },
+  '& > .MuiButtonBase-root': { flexGrow: 0, alignSelf: 'stretch' },
 }))
 
 export const IconBox = styled(Box)({

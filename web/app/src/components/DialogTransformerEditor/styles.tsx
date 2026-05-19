@@ -1,3 +1,4 @@
+import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
 import Toolbar from '@mui/material/Toolbar'
 import { styled } from '@mui/material/styles'
@@ -24,3 +25,5 @@ export const FallbackContainer = styled(Box)({
   alignItems: 'center',
   justifyContent: 'center',
 })
+
+export const DialogAppBar = styled(AppBar)({ position: 'relative' })

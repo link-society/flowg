@@ -1,5 +1,7 @@
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import Typography from '@mui/material/Typography'
 import { styled } from '@mui/material/styles'
 
 import AppContainer from '@/components/AppContainer/component'
@@ -38,3 +40,13 @@ export const SystemConfigurationCardHeader = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   gap: theme.spacing(1.5),
 }))
+
+export const SystemConfigurationCardTitle = styled(Typography)({
+  flexGrow: 1,
+})
+
+export const SystemConfigurationCardContent = styled(CardContent)(
+  ({ theme }) => ({
+    padding: theme.spacing(1.5),
+  })
+)

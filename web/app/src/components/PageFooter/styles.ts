@@ -1,11 +1,15 @@
-import { styled } from '@mui/material'
+import { Typography, styled } from '@mui/material'
 
 export const PageFooterContainer = styled('footer')`
   display: flex;
-  padding: 0.75rem;
+  padding: ${({ theme }) => theme.spacing(1.5)};
   background-color: ${({ theme }) => theme.tokens.colors.borderLight};
 
   > div {
     margin-left: auto;
   }
 `
+
+export const PageFooterText = styled(Typography)({
+  fontWeight: 600,
+})
