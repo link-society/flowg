@@ -1,12 +1,12 @@
 import { ReactElement, ReactNode, useEffect, useState } from 'react'
 
-import Chip from '@mui/material/Chip'
 import CircularProgress from '@mui/material/CircularProgress'
 import * as colors from '@mui/material/colors'
 
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 
 import {
+  NodeChip,
   NodeListHeader,
   NodeListItems,
   NodeListLoading,
@@ -74,21 +74,15 @@ const PipelineEditorNodeList = (props: PipelineEditorNodeListProps) => {
       ) : (
         <NodeListItems>
           {items.map((item) => (
-            <Chip
+            <NodeChip
               key={item}
               icon={props.itemIcon}
               label={item}
               onDelete={() => props.onItemOpen(item)}
               deleteIcon={<OpenInNewIcon />}
               variant="outlined"
-              sx={{
-                backgroundColor,
-                borderColor,
-                borderRadius: 0,
-                boxShadow: 1,
-                fontFamily: 'monospace',
-                '&:hover': { boxShadow: 4 },
-              }}
+              chipBgColor={backgroundColor}
+              chipBorderColor={borderColor}
               draggable
               onDragStart={(evt) => {
                 evt.dataTransfer.setData('item-type', props.itemType)

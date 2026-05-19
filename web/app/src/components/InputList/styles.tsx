@@ -13,4 +13,5 @@ export const InputListRow = styled(Box)(({ theme }) => ({
   flexDirection: 'row',
   alignItems: 'stretch',
   gap: theme.spacing(1),
+  '& .MuiTextField-root': { flexGrow: 1 },
 }))

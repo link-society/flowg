@@ -1,4 +1,4 @@
-import { Paper, styled } from '@mui/material'
+import { Chip, Paper, styled } from '@mui/material'
 
 export const FlowRoot = styled(Paper)({
   width: '100%',
@@ -31,4 +31,13 @@ export const FlowPanelChips = styled('div')(({ theme }) => ({
   alignItems: 'center',
   gap: theme.spacing(1),
   padding: theme.spacing(1),
+}))
+
+export const SwitchNodeChip = styled(Chip)(({ theme }) => ({
+  backgroundColor: theme.tokens.colors.switchChipBg,
+  borderColor: theme.tokens.colors.switchChipBorder,
+  borderRadius: 0,
+  boxShadow: theme.shadows[1],
+  fontFamily: 'monospace',
+  '&:hover': { boxShadow: theme.shadows[4] },
 }))

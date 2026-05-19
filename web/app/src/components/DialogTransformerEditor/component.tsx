@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 
-import AppBar from '@mui/material/AppBar'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 import Dialog from '@mui/material/Dialog'
@@ -22,6 +21,7 @@ import AuthenticatedAwait from '@/components/AuthenticatedAwait/component'
 import TransformerEditor from '@/components/TransformerEditor/component'
 
 import {
+  DialogAppBar,
   EditorToolbar,
   FallbackContainer,
   FullScreenBody,
@@ -83,7 +83,7 @@ const DialogTransformerEditor = ({
           transition: Transition,
         }}
       >
-        <AppBar sx={{ position: 'relative' }}>
+        <DialogAppBar>
           <EditorToolbar>
             <IconButton
               edge="start"
@@ -131,7 +131,7 @@ const DialogTransformerEditor = ({
               {saveLoading ? <CircularProgress size={24} /> : <>Save</>}
             </Button>
           </EditorToolbar>
-        </AppBar>
+        </DialogAppBar>
         <FullScreenBody>
           <React.Suspense
             fallback={

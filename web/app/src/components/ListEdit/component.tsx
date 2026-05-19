@@ -28,7 +28,6 @@ const ListEdit = ({
             variant="outlined"
             type="text"
             value={field}
-            sx={{ flexGrow: 1 }}
             onChange={({ target }) => {
               setList(list.map((e, i) => (index == i ? target.value : e)))
             }}
@@ -53,7 +52,6 @@ const ListEdit = ({
           id={`input:${id}.new.name`}
           variant="outlined"
           type="text"
-          sx={{ flexGrow: 1 }}
           value={newItem}
           onChange={({ target }) => setNewItem(target.value)}
         />

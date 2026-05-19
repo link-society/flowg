@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 
-import AppBar from '@mui/material/AppBar'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 import Dialog from '@mui/material/Dialog'
@@ -25,6 +24,7 @@ import AuthenticatedAwait from '@/components/AuthenticatedAwait/component'
 import StreamEditor from '@/components/StreamEditor/component'
 
 import {
+  DialogAppBar,
   EditorToolbar,
   FallbackContainer,
   FullScreenBody,
@@ -92,7 +92,7 @@ const DialogStreamEditor = ({ stream }: DialogStreamEditorProps) => {
           transition: Transition,
         }}
       >
-        <AppBar sx={{ position: 'relative' }}>
+        <DialogAppBar>
           <EditorToolbar>
             <IconButton
               edge="start"
@@ -140,7 +140,7 @@ const DialogStreamEditor = ({ stream }: DialogStreamEditorProps) => {
               {saveLoading ? <CircularProgress size={24} /> : <>Save</>}
             </Button>
           </EditorToolbar>
-        </AppBar>
+        </DialogAppBar>
         <FullScreenBody>
           <React.Suspense
             fallback={

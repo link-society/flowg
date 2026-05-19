@@ -65,7 +65,7 @@ const DialogNewUser = ({
       <DialogContent>
         <FormStack>
           <FieldRow>
-            <AccountCircleIcon sx={{ mr: 1, my: 0.5 }} />
+            <AccountCircleIcon />
             <TextField
               id="input:admin.users.modal.username"
               label="Username"
@@ -79,7 +79,7 @@ const DialogNewUser = ({
           </FieldRow>
 
           <FieldRow>
-            <LockIcon sx={{ mr: 1, my: 0.5 }} />
+            <LockIcon />
             <TextField
               id="input:admin.users.modal.password"
               label="Password"

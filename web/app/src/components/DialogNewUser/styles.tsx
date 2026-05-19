@@ -9,11 +9,16 @@ export const FormStack = styled(Box)(({ theme }) => ({
   gap: theme.spacing(1.5),
 }))
 
-export const FieldRow = styled(Box)({
+export const FieldRow = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'flex-end',
-})
+  '& > .MuiSvgIcon-root': {
+    marginRight: theme.spacing(1),
+    marginTop: theme.spacing(0.5),
+    marginBottom: theme.spacing(0.5),
+  },
+}))
 
 export const FieldStack = styled(Box)(({ theme }) => ({
   display: 'flex',

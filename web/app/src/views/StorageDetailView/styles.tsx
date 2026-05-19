@@ -1,4 +1,4 @@
-import { Box, styled } from '@mui/material'
+import { Box, Typography, styled } from '@mui/material'
 
 import AppContainer from '@/components/AppContainer/component'
 
@@ -60,4 +60,8 @@ export const StorageDetailViewContent = styled('div')({
   flex: 1,
   height: '100%',
   minWidth: 0,
+})
+
+export const DemoModeBanner = styled(Typography)({
+  fontStyle: 'italic',
 })

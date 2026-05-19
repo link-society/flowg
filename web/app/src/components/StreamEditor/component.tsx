@@ -1,5 +1,4 @@
 import Divider from '@mui/material/Divider'
-import LinearProgress from '@mui/material/LinearProgress'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
@@ -10,6 +9,7 @@ import {
   StreamEditorPanel,
   StreamEditorPanelBody,
   StreamEditorPanelHeader,
+  StreamEditorProgress,
   StreamEditorRoot,
   StreamEditorUsageRow,
 } from './styles'
@@ -27,9 +27,7 @@ const StreamEditor = ({
     <StreamEditorRoot>
       <StreamEditorPanel>
         <StreamEditorPanelHeader>
-          <Typography variant="titleSm" sx={{ fontWeight: 700 }}>
-            Retention
-          </Typography>
+          <Typography variant="titleSm">Retention</Typography>
         </StreamEditorPanelHeader>
         <Divider />
         <StreamEditorPanelBody>
@@ -38,8 +36,7 @@ const StreamEditor = ({
               Estimated storage usage: {usageMB.toFixed(2)}MB
             </Typography>
             {streamConfig.size > 0 && (
-              <LinearProgress
-                sx={{ flexGrow: 1, height: '20px' }}
+              <StreamEditorProgress
                 variant="determinate"
                 color={usagePercent < 100 ? 'primary' : 'error'}
                 value={Math.round(Math.min(usagePercent, 100) * 100) / 100}
@@ -83,9 +80,7 @@ const StreamEditor = ({
 
       <StreamEditorPanel>
         <StreamEditorPanelHeader>
-          <Typography variant="titleSm" sx={{ fontWeight: 700 }}>
-            Indexes
-          </Typography>
+          <Typography variant="titleSm">Indexes</Typography>
         </StreamEditorPanelHeader>
         <Divider />
         <StreamEditorPanelBody>

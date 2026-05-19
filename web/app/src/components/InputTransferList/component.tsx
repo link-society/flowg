@@ -128,7 +128,6 @@ const InputTransferList = <T,>(props: InputTransferListProps<T>) => {
       <TransferControls>
         <Button
           id="btn:generic.transfer-list.all-right"
-          sx={{ my: 0.5 }}
           variant="outlined"
           size="small"
           onClick={handleAllRight}
@@ -139,7 +138,6 @@ const InputTransferList = <T,>(props: InputTransferListProps<T>) => {
         </Button>
         <Button
           id="btn:generic.transfer-list.selected-right"
-          sx={{ my: 0.5 }}
           variant="outlined"
           size="small"
           onClick={handleCheckedRight}
@@ -150,7 +148,6 @@ const InputTransferList = <T,>(props: InputTransferListProps<T>) => {
         </Button>
         <Button
           id="btn:generic.transfer-list.selected-left"
-          sx={{ my: 0.5 }}
           variant="outlined"
           size="small"
           onClick={handleCheckedLeft}
@@ -161,7 +158,6 @@ const InputTransferList = <T,>(props: InputTransferListProps<T>) => {
         </Button>
         <Button
           id="btn:generic.transfer-list.all-left"
-          sx={{ my: 0.5 }}
           variant="outlined"
           size="small"
           onClick={handleAllLeft}

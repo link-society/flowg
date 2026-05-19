@@ -48,7 +48,6 @@ const InputKeyValue = (props: InputKeyValueProps) => {
             }}
             variant="outlined"
             size="small"
-            sx={{ flexGrow: 1 }}
           />
 
           <TextField
@@ -64,7 +63,6 @@ const InputKeyValue = (props: InputKeyValueProps) => {
             }}
             variant="outlined"
             size="small"
-            sx={{ flexGrow: 1 }}
           />
 
           <Button
@@ -95,7 +93,6 @@ const InputKeyValue = (props: InputKeyValueProps) => {
           }}
           variant="outlined"
           size="small"
-          sx={{ flexGrow: 1 }}
         />
 
         <TextField
@@ -107,7 +104,6 @@ const InputKeyValue = (props: InputKeyValueProps) => {
           }}
           variant="outlined"
           size="small"
-          sx={{ flexGrow: 1 }}
         />
 
         <Button

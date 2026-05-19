@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box'
+import LinearProgress from '@mui/material/LinearProgress'
 import Paper from '@mui/material/Paper'
 import Typography from '@mui/material/Typography'
 import { styled } from '@mui/material/styles'
@@ -28,6 +29,7 @@ export const StreamEditorPanelHeader = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.grey[100],
   boxShadow: theme.shadows[1],
   textAlign: 'center',
+  '& .MuiTypography-root': { fontWeight: 700 },
 }))
 
 export const StreamEditorPanelBody = styled(Box)(({ theme }) => ({
@@ -51,4 +53,9 @@ export const StreamEditorUsageRow = styled(Box)(({ theme }) => ({
 
 export const StreamEditorHint = styled(Typography)({
   fontStyle: 'italic',
+})
+
+export const StreamEditorProgress = styled(LinearProgress)({
+  flexGrow: 1,
+  height: '20px',
 })

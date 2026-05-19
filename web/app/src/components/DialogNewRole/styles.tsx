@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box'
+import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { styled } from '@mui/material/styles'
 
@@ -19,3 +20,7 @@ export const FieldStack = styled(Box)(({ theme }) => ({
 export const FieldLabel = styled(Typography)({
   fontWeight: 600,
 })
+
+export const FormTextField = styled(TextField)(({ theme }) => ({
+  marginTop: theme.spacing(2),
+}))
