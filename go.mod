@@ -3,7 +3,7 @@ module link-society.com/flowg
 go 1.26.0
 
 require (
-	codeberg.org/miekg/dns v0.6.76
+	codeberg.org/miekg/dns v0.6.79
 	github.com/ClickHouse/clickhouse-go/v2 v2.46.0
 	github.com/dgraph-io/badger/v4 v4.9.1
 	github.com/elastic/go-elasticsearch/v9 v9.4.1
