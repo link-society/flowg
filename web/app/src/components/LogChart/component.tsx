@@ -1,3 +1,4 @@
+import { useColorMode } from '@/theme'
 import type { ApexOptions } from 'apexcharts'
 
 import { useMemo } from 'react'
@@ -8,21 +9,21 @@ import { aggregateLogs } from '@/lib/timeserie'
 import { LogChartContainer } from './styles'
 import { LogChartProps } from './types'
 
-const CHART_OPTIONS: ApexOptions = {
-  chart: {
-    animations: {
-      enabled: false,
-    },
-  },
-  dataLabels: {
-    enabled: false,
-  },
-  xaxis: {
-    type: 'datetime',
-  },
-}
-
 const LogChart = ({ rowData, from, to }: LogChartProps) => {
+  const { mode } = useColorMode()
+
+  const options: ApexOptions = useMemo(
+    () => ({
+      chart: {
+        animations: { enabled: false },
+        foreColor: mode === 'dark' ? '#ffffff' : undefined,
+      },
+      dataLabels: { enabled: false },
+      xaxis: { type: 'datetime' },
+    }),
+    [mode]
+  )
+
   const series = useMemo(
     () => [
       {
@@ -36,7 +37,7 @@ const LogChart = ({ rowData, from, to }: LogChartProps) => {
   return (
     <LogChartContainer>
       <ApexChart
-        options={CHART_OPTIONS}
+        options={options}
         series={series}
         type="bar"
         width="100%"

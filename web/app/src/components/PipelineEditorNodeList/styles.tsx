@@ -12,7 +12,8 @@ export const NodeListHeader = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  backgroundColor: theme.palette.grey[100],
+  backgroundColor: theme.tokens.colors.cardHeaderBkg,
+  color: theme.tokens.colors.primaryContrast,
   boxShadow: theme.shadows[4],
 }))
 

@@ -20,8 +20,9 @@ export const FlowPanelLabel = styled('div')(({ theme }) => ({
   alignItems: 'center',
   fontSize: '0.75rem',
   fontWeight: 600,
-  backgroundColor: theme.palette.grey[100],
-  borderRight: `1px solid ${theme.palette.grey[200]}`,
+  backgroundColor: theme.tokens.colors.cardHeaderBkg,
+  color: theme.tokens.colors.primaryContrast,
+  borderRight: `1px solid ${theme.tokens.colors.borderLight}`,
   padding: theme.spacing(1),
 }))
 

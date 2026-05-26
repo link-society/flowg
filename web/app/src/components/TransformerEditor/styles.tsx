@@ -8,6 +8,8 @@ export const EditorRoot = styled(Box)(({ theme }) => ({
   flexDirection: 'row',
   width: '100%',
   height: '100%',
+  minHeight: 0,
+  overflow: 'hidden',
   gap: theme.spacing(1),
 }))
 
@@ -20,10 +22,12 @@ export const EditorSide = styled(Box)(({ theme }) => ({
   flex: '0 0 calc(33.333% - 0.25rem)',
   minWidth: 0,
   height: '100%',
+  minHeight: 0,
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',
   gap: theme.spacing(1),
+  overflow: 'hidden',
 }))
 
 export const EditorPaper = styled(Paper)({

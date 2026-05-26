@@ -61,6 +61,8 @@ export const TransformerDetailViewSidebar = styled('div')(({ theme }) => ({
 export const TransformerDetailViewEditor = styled('div')(({ theme }) => ({
   flex: 1,
   height: '100%',
+  minHeight: 0,
+  overflow: 'hidden',
   flexDirection: 'column',
   [theme.breakpoints.up('md')]: {
     flexDirection: 'row',

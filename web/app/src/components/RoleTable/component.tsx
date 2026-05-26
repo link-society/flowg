@@ -117,8 +117,8 @@ const RoleTable = ({ roles }: RoleTableProps) => {
         },
         suppressMovable: true,
         sortable: false,
-        minWidth: 80,
-        width: 80,
+        minWidth: 100,
+        width: 100,
       },
     ],
     [permissions.can_edit_acls, onDelete]

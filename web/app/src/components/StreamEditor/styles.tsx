@@ -26,7 +26,8 @@ export const StreamEditorPanel = styled(Paper)({
 
 export const StreamEditorPanelHeader = styled(Box)(({ theme }) => ({
   padding: theme.spacing(1.5),
-  backgroundColor: theme.palette.grey[100],
+  backgroundColor: theme.tokens.colors.cardHeaderBkg,
+  color: theme.tokens.colors.primaryContrast,
   boxShadow: theme.shadows[1],
   textAlign: 'center',
   '& .MuiTypography-root': { fontWeight: 700 },
