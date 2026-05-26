@@ -660,3 +660,13 @@ export let vrlThemeDefinition = {
     'editor.selectionHighlightBorder': '#fafbfc',
   },
 }
+
+export let vrlThemeDarkDefinition = {
+  base: 'vs-dark',
+  inherit: true,
+  rules: [],
+  colors: {
+    'editor.background': '#252535',
+    'editor.lineHighlightBackground': '#2d2d3e',
+  },
+}

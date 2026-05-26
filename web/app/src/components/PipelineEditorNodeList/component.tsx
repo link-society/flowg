@@ -1,3 +1,5 @@
+import { useColorMode } from '@/theme'
+
 import { ReactElement, ReactNode, useEffect, useState } from 'react'
 
 import CircularProgress from '@mui/material/CircularProgress'
@@ -54,9 +56,13 @@ const PipelineEditorNodeList = (props: PipelineEditorNodeListProps) => {
     }
   }, [error])
 
+  const { mode } = useColorMode()
+
   const baseColorMap = colors[props.itemColor]
-  const bgColorIndex = 50 as keyof typeof baseColorMap
-  const bdColorIndex = 500 as keyof typeof baseColorMap
+  const bgColorIndex = (mode === 'dark' ? 900 : 50) as keyof typeof baseColorMap
+  const bdColorIndex = (
+    mode === 'dark' ? 300 : 500
+  ) as keyof typeof baseColorMap
   const backgroundColor = baseColorMap[bgColorIndex]
   const borderColor = baseColorMap[bdColorIndex]
 

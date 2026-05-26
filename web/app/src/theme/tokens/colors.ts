@@ -46,7 +46,7 @@ export type ColorsType = {
   nodeSourceBorder: string
 }
 
-export const colors: ColorsType = {
+export const lightColors: ColorsType = {
   // Base
   white: '#ffffff',
   black: '#000000',
@@ -93,5 +93,55 @@ export const colors: ColorsType = {
   nodeSourceBg: '#f97316',
   nodeSourceBorder: '#c2410c',
 }
+
+export const darkColors: ColorsType = {
+  // Base
+  white: '#ffffff',
+  black: '#000000',
+
+  // App layout
+  bodyBg: '#1e1e2e',
+  primary: '#3b82f6',
+  primaryContrast: '#ffffff',
+  toolbarInputBorder: 'rgba(255, 255, 255, 0.23)',
+  cardHeaderBkg: '#1565c0',
+  toolbarBkg: '#1565c0',
+  editorToolbarBkg: '#1565c0',
+  navbarBg: '#073162',
+
+  // Surfaces / neutrals
+  codeBg: '#252535',
+  mutedText: '#94a3b8',
+  borderLight: '#2d3a52',
+  disabledBg: '#252535',
+  selectedBg: '#1e3a8a',
+  selectedBorder: '#3b82f6',
+  labelText: '#cbd5e1',
+
+  // Status
+  statusError: '#f87171',
+  statusSuccess: '#4ade80',
+  shadowOverlay: '#00000088',
+
+  // Switch node chip
+  switchChipBg: '#450a0a',
+  switchChipBorder: '#dc2626',
+
+  // Pipeline nodes
+  nodeRouterBg: '#7e22ce',
+  nodeRouterBorder: '#a855f7',
+  nodeSwitchBg: '#dc2626',
+  nodeSwitchBorder: '#f87171',
+  nodePipelineBg: '#ca8a04',
+  nodePipelineBorder: '#fde047',
+  nodeTransformerBg: '#1d4ed8',
+  nodeTransformerBorder: '#60a5fa',
+  nodeForwarderBg: '#15803d',
+  nodeForwarderBorder: '#4ade80',
+  nodeSourceBg: '#ea580c',
+  nodeSourceBorder: '#fb923c',
+}
+
+export const colors = lightColors
 
 export default colors

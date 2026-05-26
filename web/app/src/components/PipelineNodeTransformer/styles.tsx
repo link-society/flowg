@@ -17,7 +17,7 @@ export const NodeRoot = styled(Box)(({ theme }) => ({
   flexDirection: 'row',
   alignItems: 'stretch',
   gap: theme.spacing(1),
-  backgroundColor: theme.tokens.colors.white,
+  backgroundColor: theme.palette.background.paper,
   border: `4px solid ${theme.tokens.colors.nodeTransformerBorder}`,
   boxShadow: theme.tokens.shadows.nodeElevated,
   transition: theme.tokens.transitions.shadow,
