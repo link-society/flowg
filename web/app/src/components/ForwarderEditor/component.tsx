@@ -9,6 +9,7 @@ import ForwarderConfigModel, {
 
 import ForwarderEditorAmqp from '@/components/ForwarderEditorAmqp/component'
 import ForwarderEditorClickhouse from '@/components/ForwarderEditorClickhouse/component'
+import ForwarderEditorCloudWatch from '@/components/ForwarderEditorCloudWatch/component.tsx'
 import ForwarderEditorDatadog from '@/components/ForwarderEditorDatadog/component'
 import ForwarderEditorElastic from '@/components/ForwarderEditorElastic/component'
 import ForwarderEditorHttp from '@/components/ForwarderEditorHttp/component'
@@ -28,6 +29,7 @@ const editors = {
   otlp: ForwarderEditorOtlp,
   splunk: ForwarderEditorSplunk,
   syslog: ForwarderEditorSyslog,
+  cloudwatch: ForwarderEditorCloudWatch,
 }
 
 const ForwarderEditor = ({
