@@ -1,9 +1,14 @@
+import React from 'react'
+
 import ForwarderConfigAmqpModel, {
   factory as ForwarderConfigAmqpFactory,
 } from '@/lib/models/ForwarderConfigAmqpModel'
 import ForwarderConfigClickhouseModel, {
   factory as ForwarderConfigClickhouseFactory,
 } from '@/lib/models/ForwarderConfigClickhouseModel'
+import ForwarderConfigCloudWatchModel, {
+  factory as ForwarderConfigCloudWatchFactory,
+} from '@/lib/models/ForwarderConfigCloudWatchModel'
 import ForwarderConfigDatadogModel, {
   factory as ForwarderConfigDatadogFactory,
 } from '@/lib/models/ForwarderConfigDatadogModel'
@@ -25,6 +30,7 @@ import ForwarderConfigSyslogModel, {
 
 import ForwarderIconAmqp from '@/components/icons/ForwarderIconAmqp/component'
 import ForwarderIconClickhouse from '@/components/icons/ForwarderIconClickhouse/component'
+import ForwarderIconCloudWatch from '@/components/icons/ForwarderIconCloudWatch/component'
 import ForwarderIconDatadog from '@/components/icons/ForwarderIconDatadog/component'
 import ForwarderIconElastic from '@/components/icons/ForwarderIconElastic/component'
 import ForwarderIconHttp from '@/components/icons/ForwarderIconHttp/component'
@@ -41,6 +47,7 @@ type ForwarderConfigModel =
   | ForwarderConfigOtlpModel
   | ForwarderConfigElasticModel
   | ForwarderConfigClickhouseModel
+  | ForwarderConfigCloudWatchModel
 
 export type ForwarderConfigTypes = ForwarderConfigModel['type']
 
@@ -53,6 +60,7 @@ export const ForwarderConfigTypeValues = [
   { key: 'otlp', label: 'OpenTelemetry', icon: ForwarderIconOtlp },
   { key: 'elastic', label: 'Elastic Search', icon: ForwarderIconElastic },
   { key: 'clickhouse', label: 'Clickhouse', icon: ForwarderIconClickhouse },
+  { key: 'cloudwatch', label: 'Cloudwatch', icon: ForwarderIconCloudWatch },
 ] as const
 
 export const ForwarderConfigTypeLabelMap = ForwarderConfigTypeValues.reduce(
@@ -82,6 +90,7 @@ const factories: Record<ForwarderConfigTypes, () => ForwarderConfigModel> = {
   otlp: ForwarderConfigOtlpFactory,
   elastic: ForwarderConfigElasticFactory,
   clickhouse: ForwarderConfigClickhouseFactory,
+  cloudwatch: ForwarderConfigCloudWatchFactory,
 }
 
 export const factory = (type: ForwarderConfigTypes): ForwarderConfigModel => {
