@@ -1,12 +1,63 @@
-import pytest
-
+import os
+import time
 from pathlib import Path
 from shutil import rmtree
-import time
 
+import pytest
 from opentelemetry.proto.collector.logs.v1.logs_service_pb2 import ExportLogsServiceRequest
-from opentelemetry.proto.resource.v1.resource_pb2 import Resource
 from opentelemetry.proto.common.v1.common_pb2 import AnyValue, KeyValue
+from opentelemetry.proto.resource.v1.resource_pb2 import Resource
+
+import boto3
+from .._lib import docker_utils
+
+
+@pytest.fixture(scope='module')
+def floci_image():
+    img = os.getenv("FLOCI_TEST_DOCKER_IMAGE_NAME", "floci/floci:latest")
+    print(f"Using floci Docker image: {img}")
+    return img
+
+
+@pytest.fixture(scope='module')
+def floci_container(
+        docker_client,
+        flowg_network,
+        report_dir,
+        floci_image
+):
+    name = "floci-test-server"
+
+    print(f"Creating Container: {name}")
+    container = docker_client.containers.run(
+        image=floci_image,
+        name=name,
+        network=flowg_network.name,
+        hostname=name,
+        ports={
+            "4566/tcp": 4566
+        },
+        detach=True,
+    )
+
+    yield
+
+    docker_utils.teardown_container(container, report_dir)
+
+
+@pytest.fixture(scope="module")
+def cloudwatch_log_stream(floci_container):
+    print("Creating CloudWatch log stream")
+    client = boto3.client(
+        "logs",
+        endpoint_url='http://localhost:4566',
+        region_name='us-east-1',
+        aws_access_key_id='test',
+        aws_secret_access_key='test'
+    )
+
+    client.create_log_group(logGroupName="flowg")
+    client.create_log_stream(logGroupName="flowg", logStreamName="logs")
 
 
 @pytest.fixture(scope="module")
