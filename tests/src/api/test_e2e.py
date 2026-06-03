@@ -14,6 +14,8 @@ def test_hurl(
     mockserver_container,
     flowg_admin_token,
     flowg_guest_token,
+    floci_container,
+    cloudwatch_log_stream,
     otlp_pb,
 ):
     print("Running Hurl test suite:\n")

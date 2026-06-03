@@ -6,6 +6,7 @@ require (
 	codeberg.org/miekg/dns v0.6.79
 	github.com/ClickHouse/clickhouse-go/v2 v2.46.0
 	github.com/aws/aws-sdk-go-v2/config v1.32.18
+	github.com/aws/aws-sdk-go-v2/credentials v1.19.17
 	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.74.0
 	github.com/dgraph-io/badger/v4 v4.9.1
 	github.com/elastic/go-elasticsearch/v9 v9.4.1
@@ -61,7 +62,6 @@ require (
 	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.41.7 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.10 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.19.17 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.23 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.23 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.23 // indirect

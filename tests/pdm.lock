@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:8052bee269b211aac0a5e891fdc39d633ac36690dae7e48784a52c0f1e6ff04c"
+content_hash = "sha256:5de6ae114ea75ea747a544fd732418cbf6485c8f8e2bb86bcee06d397ceb825e"
 
 [[metadata.targets]]
 requires_python = "==3.13.*"
@@ -19,6 +19,38 @@ groups = ["default", "dev"]
 files = [
     {file = "attrs-25.1.0-py3-none-any.whl", hash = "sha256:c75a69e28a550a7e93789579c22aa26b0f5b83b75dc4e08fe092980051e1090a"},
     {file = "attrs-25.1.0.tar.gz", hash = "sha256:1c97078a80c814273a76b2a298a932eb681c87415c11dee0a6921de7f1b02c3e"},
+]
+
+[[package]]
+name = "boto3"
+version = "1.43.26"
+requires_python = ">=3.10"
+summary = "The AWS SDK for Python"
+groups = ["default", "dev"]
+dependencies = [
+    "botocore<1.44.0,>=1.43.26",
+    "jmespath<2.0.0,>=0.7.1",
+    "s3transfer<0.19.0,>=0.18.0",
+]
+files = [
+    {file = "boto3-1.43.26-py3-none-any.whl", hash = "sha256:7c88bfbde6abcf062d04ac410a1cf4eaf8675f025f35f3ad9accc9b0224ce6b9"},
+    {file = "boto3-1.43.26.tar.gz", hash = "sha256:33f027b7911dffe84f4896b66024c228eb856f4cf8c1ff3465be0eae1f413731"},
+]
+
+[[package]]
+name = "botocore"
+version = "1.43.26"
+requires_python = ">=3.10"
+summary = "Low-level, data-driven core of boto 3."
+groups = ["default", "dev"]
+dependencies = [
+    "jmespath<2.0.0,>=0.7.1",
+    "python-dateutil<3.0.0,>=2.1",
+    "urllib3!=2.2.0,<3,>=1.25.4",
+]
+files = [
+    {file = "botocore-1.43.26-py3-none-any.whl", hash = "sha256:eeb92265bae289555182a46341c998a656ab49c0dbdb762c65b30fe354fcc9e8"},
+    {file = "botocore-1.43.26.tar.gz", hash = "sha256:fd9280ac868194afcee59c7def62e0031fb4b599f7ef85360d30c7e42357c1dc"},
 ]
 
 [[package]]
@@ -133,6 +165,7 @@ path = "."
 summary = ""
 groups = ["dev"]
 dependencies = [
+    "boto3>=1.43.26",
     "docker>=7.1.0",
     "opentelemetry-proto>=1.32.1",
     "pytest>=8.3.5",
@@ -177,6 +210,17 @@ groups = ["default", "dev"]
 files = [
     {file = "iniconfig-2.0.0-py3-none-any.whl", hash = "sha256:b6a85871a79d2e3b22d2d1b94ac2824226a63c6b741c88f7ae975f18b6778374"},
     {file = "iniconfig-2.0.0.tar.gz", hash = "sha256:2d91e135bf72d31a410b17c16da610a82cb55f6b0477d1a902134b24a455b8b3"},
+]
+
+[[package]]
+name = "jmespath"
+version = "1.1.0"
+requires_python = ">=3.9"
+summary = "JSON Matching Expressions"
+groups = ["default", "dev"]
+files = [
+    {file = "jmespath-1.1.0-py3-none-any.whl", hash = "sha256:a5663118de4908c91729bea0acadca56526eb2698e83de10cd116ae0f4e97c64"},
+    {file = "jmespath-1.1.0.tar.gz", hash = "sha256:472c87d80f36026ae83c6ddd0f1d05d4e510134ed462851fd5f754c8c3cbb88d"},
 ]
 
 [[package]]
@@ -288,6 +332,20 @@ files = [
 ]
 
 [[package]]
+name = "python-dateutil"
+version = "2.9.0.post0"
+requires_python = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
+summary = "Extensions to the standard Python datetime module"
+groups = ["default", "dev"]
+dependencies = [
+    "six>=1.5",
+]
+files = [
+    {file = "python-dateutil-2.9.0.post0.tar.gz", hash = "sha256:37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3"},
+    {file = "python_dateutil-2.9.0.post0-py2.py3-none-any.whl", hash = "sha256:a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427"},
+]
+
+[[package]]
 name = "pywin32"
 version = "308"
 summary = "Python for Window Extensions"
@@ -383,6 +441,20 @@ files = [
 ]
 
 [[package]]
+name = "s3transfer"
+version = "0.18.0"
+requires_python = ">=3.10"
+summary = "An Amazon S3 Transfer Manager"
+groups = ["default", "dev"]
+dependencies = [
+    "botocore<2.0a.0,>=1.37.4",
+]
+files = [
+    {file = "s3transfer-0.18.0-py3-none-any.whl", hash = "sha256:239c13b09e65ad0346e1be7348b8a202dcad44ac7ea7c6eb858fc881dce739b6"},
+    {file = "s3transfer-0.18.0.tar.gz", hash = "sha256:3760b8b7ec1315da54048b2d626276732bee4300d054d492d4e1d43e20d4ecbd"},
+]
+
+[[package]]
 name = "selenium"
 version = "4.29.0"
 requires_python = ">=3.9"
@@ -399,6 +471,17 @@ dependencies = [
 files = [
     {file = "selenium-4.29.0-py3-none-any.whl", hash = "sha256:ce5d26f1ddc1111641113653af33694c13947dd36c2df09cdd33f554351d372e"},
     {file = "selenium-4.29.0.tar.gz", hash = "sha256:3a62f7ec33e669364a6c0562a701deb69745b569c50d55f1a912bf8eb33358ba"},
+]
+
+[[package]]
+name = "six"
+version = "1.17.0"
+requires_python = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
+summary = "Python 2 and 3 compatibility utilities"
+groups = ["default", "dev"]
+files = [
+    {file = "six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274"},
+    {file = "six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81"},
 ]
 
 [[package]]

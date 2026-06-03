@@ -10,6 +10,7 @@ dependencies = [
     "robotframework-seleniumlibrary>=6.3.0",
     "pytest>=8.3.5",
     "opentelemetry-proto>=1.32.1",
+    "boto3>=1.43.26"
 ]
 requires-python = "==3.13.*"
 
