@@ -10,7 +10,7 @@ crate-type = ["staticlib"]
 cc = "1.2"
 
 [dependencies]
-vrl = "0.32.0"
+vrl = "0.33.1"
 anyhow = "1.0"
 ariadne = "0.6.0"
 serde = { version = "1.0.228", features = ["derive"] }
