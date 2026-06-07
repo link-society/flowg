@@ -3,6 +3,7 @@ import { CacheProvider } from '@emotion/react'
 import {
   type ReactNode,
   createContext,
+  useCallback,
   useContext,
   useMemo,
   useState,
@@ -47,18 +48,19 @@ export default function ThemeRegistry({ children }: ThemeRegistryProps) {
       : 'light'
   })
 
-  const toggle = () => {
+  const toggle = useCallback(() => {
     setMode((prev) => {
       const next: ColorMode = prev === 'light' ? 'dark' : 'light'
       localStorage.setItem('colorMode', next)
       return next
     })
-  }
+  }, [])
 
   const theme = useMemo(() => createAppTheme(mode), [mode])
+  const colorModeValue = useMemo(() => ({ mode, toggle }), [mode, toggle])
 
   return (
-    <ColorModeContext.Provider value={{ mode, toggle }}>
+    <ColorModeContext.Provider value={colorModeValue}>
       <CacheProvider value={cache}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
