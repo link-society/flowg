@@ -56,7 +56,7 @@ export function createAppTheme(mode: 'light' | 'dark') {
         main: mode === 'dark' ? muiColors.blue[400] : muiColors.blue[800],
       },
       secondary: {
-        main: '#42a5f5',
+        main: mode === 'dark' ? '#4db6ac' : '#26a69a',
       },
       ...(mode === 'dark' && {
         background: {
@@ -83,6 +83,12 @@ export function createAppTheme(mode: 'light' | 'dark') {
           outlined: {},
           text: {},
         },
+        variants: [
+          {
+            props: { variant: 'contained', color: 'secondary' },
+            style: { color: '#ffffff' },
+          },
+        ],
       },
       MuiInputLabel: {
         styleOverrides: {

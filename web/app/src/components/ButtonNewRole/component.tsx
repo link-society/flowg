@@ -29,6 +29,7 @@ const ButtonNewRole = ({ onRoleCreated }: ButtonNewRoleProps) => {
       id="btn:admin.roles.create"
       variant="contained"
       size="small"
+      color="secondary"
       onClick={() => handleClick()}
     >
       <AddIcon />

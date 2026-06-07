@@ -29,6 +29,7 @@ const ButtonNewToken = ({ onTokenCreated }: ButtonNewTokenProps) => {
       id="btn:account.tokens.create"
       variant="contained"
       size="small"
+      color="secondary"
       disabled={loading}
       onClick={() => handleClick()}
     >
