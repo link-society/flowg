@@ -28,7 +28,6 @@ const ButtonNewRole = ({ onRoleCreated }: ButtonNewRoleProps) => {
     <Button
       id="btn:admin.roles.create"
       variant="contained"
-      color="secondary"
       size="small"
       onClick={() => handleClick()}
     >
