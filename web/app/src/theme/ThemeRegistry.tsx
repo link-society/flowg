@@ -43,7 +43,7 @@ export default function ThemeRegistry({ children }: ThemeRegistryProps) {
   const [mode, setMode] = useState<ColorMode>(() => {
     const saved = localStorage.getItem('colorMode')
     if (saved === 'dark' || saved === 'light') return saved
-    return window.matchMedia('(prefers-color-scheme: dark)').matches
+    return globalThis.matchMedia('(prefers-color-scheme: dark)').matches
       ? 'dark'
       : 'light'
   })

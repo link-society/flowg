@@ -28,7 +28,6 @@ const ButtonNewUser = ({ roles, onUserCreated }: ButtonNewUserProps) => {
     <Button
       id="btn:admin.users.create"
       variant="contained"
-      color="secondary"
       size="small"
       onClick={() => handleClick()}
     >
