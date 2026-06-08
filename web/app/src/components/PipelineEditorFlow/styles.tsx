@@ -3,6 +3,9 @@ import { Chip, Paper, styled } from '@mui/material'
 export const FlowRoot = styled(Paper)({
   width: '100%',
   height: '100%',
+  '.react-flow__panel': {
+    backgroundColor: 'transparent',
+  },
 })
 
 export const FlowPanelPaper = styled(Paper)(({ theme }) => ({
