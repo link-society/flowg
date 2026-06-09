@@ -71,7 +71,6 @@ export const PipelineDetailViewLeft = styled('div')(({ theme }) => ({
 export const PipelineDetailViewCenter = styled('div')({
   flex: 1,
   height: '100%',
-  minHeight: 600,
 })
 
 export const PipelineDetailViewRight = styled('div')(({ theme }) => ({
