@@ -41,7 +41,7 @@ ADD internal/utils/langs/vrl/rust-crate /src/internal/utils/langs/vrl/rust-crate
 ##############################
 
 ## VRL
-FROM rust:1.96-alpine3.23 AS builder-rust-vrl
+FROM rust:1.96-alpine3.24 AS builder-rust-vrl
 
 RUN apk add --no-cache musl-dev
 
@@ -50,41 +50,26 @@ WORKDIR /workspace/internal/utils/langs/vrl/rust-crate
 
 COPY --from=sources-rust-vrl /src/internal/utils/langs/vrl/rust-crate/Cargo.toml .
 COPY --from=sources-rust-vrl /src/internal/utils/langs/vrl/rust-crate/Cargo.lock .
-
-RUN --mount=type=cache,target=/usr/local/cargo/registry \
-    --mount=type=cache,target=/usr/local/cargo/git \
-    --mount=type=cache,target=/workspace/internal/utils/langs/vrl/rust-crate/target \
-    mkdir src \
+RUN mkdir src \
     && echo "// dummy file" > src/lib.rs \
     && cargo build
 
 COPY --from=sources-rust-vrl /src /workspace
-RUN --mount=type=cache,target=/usr/local/cargo/registry \
-    --mount=type=cache,target=/usr/local/cargo/git \
-    --mount=type=cache,target=/workspace/internal/utils/langs/vrl/rust-crate/target \
-    cargo build --release && \
-    mkdir -p /out && \
-    cp target/release/libflowg_vrl.a /out/libflowg_vrl.a
-
-RUN --mount=type=cache,target=/usr/local/cargo/registry \
-    --mount=type=cache,target=/usr/local/cargo/git \
-    --mount=type=cache,target=/workspace/internal/utils/langs/vrl/rust-crate/target \
-    cargo test
+RUN cargo build --release
+RUN cargo test
 
 ##############################
 ## BUILD JS DEPENDENCIES
 ##############################
 
-FROM node:26-alpine3.23 AS builder-js
+FROM node:26-alpine3.24 AS builder-js
 
 RUN mkdir -p /workspace/web/app
 WORKDIR /workspace/web/app
 
 COPY --from=sources-js /src/web/app/package.json /workspace/web/app
 COPY --from=sources-js /src/web/app/package-lock.json /workspace/web/app
-
-RUN --mount=type=cache,target=/root/.npm \
-    npm ci
+RUN npm i
 
 COPY --from=sources-js /src /workspace
 RUN npm run lint
@@ -94,7 +79,7 @@ RUN NODE_ENV="production" npm run build
 ## BUILD GO CODE
 ##############################
 
-FROM golang:1.26-alpine3.23 AS builder-go
+FROM golang:1.26-alpine3.24 AS builder-go
 ARG UPX_VERSION
 ARG UPX_ARCH
 ARG UPX_OS
@@ -112,24 +97,15 @@ WORKDIR /workspace
 
 COPY --from=sources-go /src/go.mod .
 COPY --from=sources-go /src/go.sum .
-
-RUN --mount=type=cache,target=/go/pkg/mod \
-    go mod download
+RUN go mod download
 
 COPY --from=sources-go /src /workspace
-COPY --from=builder-rust-vrl /out/libflowg_vrl.a /workspace/internal/utils/langs/vrl/rust-crate/target/release/libflowg_vrl.a
+COPY --from=builder-rust-vrl /workspace/internal/utils/langs/vrl/rust-crate/target/release/libflowg_vrl.a /workspace/internal/utils/langs/vrl/rust-crate/target/release/libflowg_vrl.a
 COPY --from=builder-js /workspace/web/app/dist /workspace/web/public
 
-RUN --mount=type=cache,target=/go/pkg/mod \
-    --mount=type=cache,target=/root/.cache/go-build \
-    go generate ./...
-RUN --mount=type=cache,target=/go/pkg/mod \
-    --mount=type=cache,target=/root/.cache/go-build \
-    go test -timeout 500ms -v ./...
-RUN --mount=type=cache,target=/go/pkg/mod \
-    --mount=type=cache,target=/root/.cache/go-build \
-    go build -ldflags="-s -w" -o bin/ ./cmd/...
-
+RUN go generate ./...
+RUN go test -timeout 500ms -v ./...
+RUN go build -ldflags="-s -w" -o bin/ ./cmd/...
 RUN upx bin/*
 
 ##############################
