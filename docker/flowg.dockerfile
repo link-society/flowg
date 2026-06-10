@@ -50,13 +50,26 @@ WORKDIR /workspace/internal/utils/langs/vrl/rust-crate
 
 COPY --from=sources-rust-vrl /src/internal/utils/langs/vrl/rust-crate/Cargo.toml .
 COPY --from=sources-rust-vrl /src/internal/utils/langs/vrl/rust-crate/Cargo.lock .
-RUN mkdir src \
+
+RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=/usr/local/cargo/git \
+    --mount=type=cache,target=/workspace/internal/utils/langs/vrl/rust-crate/target \
+    mkdir src \
     && echo "// dummy file" > src/lib.rs \
     && cargo build
 
 COPY --from=sources-rust-vrl /src /workspace
-RUN cargo build --release
-RUN cargo test
+RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=/usr/local/cargo/git \
+    --mount=type=cache,target=/workspace/internal/utils/langs/vrl/rust-crate/target \
+    cargo build --release && \
+    mkdir -p /out && \
+    cp target/release/libflowg_vrl.a /out/libflowg_vrl.a
+
+RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=/usr/local/cargo/git \
+    --mount=type=cache,target=/workspace/internal/utils/langs/vrl/rust-crate/target \
+    cargo test
 
 ##############################
 ## BUILD JS DEPENDENCIES
@@ -69,7 +82,9 @@ WORKDIR /workspace/web/app
 
 COPY --from=sources-js /src/web/app/package.json /workspace/web/app
 COPY --from=sources-js /src/web/app/package-lock.json /workspace/web/app
-RUN npm i
+
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci
 
 COPY --from=sources-js /src /workspace
 RUN npm run lint
@@ -97,15 +112,24 @@ WORKDIR /workspace
 
 COPY --from=sources-go /src/go.mod .
 COPY --from=sources-go /src/go.sum .
-RUN go mod download
+
+RUN --mount=type=cache,target=/go/pkg/mod \
+    go mod download
 
 COPY --from=sources-go /src /workspace
-COPY --from=builder-rust-vrl /workspace/internal/utils/langs/vrl/rust-crate/target/release/libflowg_vrl.a /workspace/internal/utils/langs/vrl/rust-crate/target/release/libflowg_vrl.a
+COPY --from=builder-rust-vrl /out/libflowg_vrl.a /workspace/internal/utils/langs/vrl/rust-crate/target/release/libflowg_vrl.a
 COPY --from=builder-js /workspace/web/app/dist /workspace/web/public
 
-RUN go generate ./...
-RUN go test -timeout 500ms -v ./...
-RUN go build -ldflags="-s -w" -o bin/ ./cmd/...
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    go generate ./...
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    go test -timeout 500ms -v ./...
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    go build -ldflags="-s -w" -o bin/ ./cmd/...
+
 RUN upx bin/*
 
 ##############################
