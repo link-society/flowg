@@ -80,6 +80,5 @@ jobs:
             UPX_OS=${{ inputs.os }}
           tags: ${{ env.ARTIFACT_BASENAME }}/docker:${{ env.ARTIFACT_ID }}
           push: true
-          load: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=flowg-${{ inputs.os }}-${{ inputs.arch }}
+          cache-to: type=gha,mode=max,scope=flowg-${{ inputs.os }}-${{ inputs.arch }}
