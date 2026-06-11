@@ -9,7 +9,8 @@ Please open a `Security Bug Report` on the
 
 | Version | Supported |
 | --- | --- |
-| [0.58.0](https://github.com/link-society/flowg/releases/tag/v0.58.0) | :white_check_mark: |
+| [0.59.0](https://github.com/link-society/flowg/releases/tag/v0.59.0) | :white_check_mark: |
+| [0.58.0](https://github.com/link-society/flowg/releases/tag/v0.58.0) | :x: |
 | [0.57.1](https://github.com/link-society/flowg/releases/tag/v0.57.1) | :x: |
 | [0.57.0](https://github.com/link-society/flowg/releases/tag/v0.57.0) | :x: |
 | [0.56.0](https://github.com/link-society/flowg/releases/tag/v0.56.0) | :x: |
