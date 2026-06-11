@@ -3,15 +3,17 @@ package cluster
 import (
 	"context"
 	"log/slog"
-	"time"
 
 	"encoding/json"
+	"time"
 
 	"net/url"
 
+	"github.com/vladopajic/go-actor/actor"
+
 	"github.com/hashicorp/memberlist"
 
-	"link-society.com/flowg/internal/utils/kvstore"
+	clusterstate "link-society.com/flowg/internal/storage/cluster-state"
 )
 
 type delegate struct {
@@ -19,10 +21,12 @@ type delegate struct {
 
 	localNodeID   string
 	localEndpoint *url.URL
-	endpoints     map[string]*url.URL
+	endpoints     *endpointCache
 
-	clusterStateStorage kvstore.Storage
-	syncPool            *syncPool
+	notifyC chan notification
+
+	clusterStateStorage clusterstate.Storage
+	syncRequestM        actor.MailboxSender[*syncRequest]
 }
 
 var _ memberlist.Delegate = (*delegate)(nil)
@@ -31,8 +35,15 @@ func (d *delegate) NodeMeta(int) []byte {
 	return []byte(d.localEndpoint.String())
 }
 
-func (d *delegate) NotifyMsg([]byte) {
-	// No-op
+func (d *delegate) NotifyMsg(msg []byte) {
+	if msg, err := parseNotification(msg); err != nil {
+		d.logger.Error(
+			"failed to parse notification message",
+			slog.String("error", err.Error()),
+		)
+	} else {
+		d.notifyC <- msg
+	}
 }
 
 func (d *delegate) GetBroadcasts(overhead, limit int) [][]byte {
@@ -40,21 +51,25 @@ func (d *delegate) GetBroadcasts(overhead, limit int) [][]byte {
 }
 
 func (d *delegate) LocalState(join bool) []byte {
-	endpointNames := make([]string, 0, len(d.endpoints))
-	for endpointName := range d.endpoints {
+	endpointNames := []string{}
+
+	for endpointName := range d.endpoints.All() {
 		endpointNames = append(endpointNames, endpointName)
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 	defer cancel()
 
-	localState, err := fetchLocalState(ctx, d.clusterStateStorage, d.localNodeID, endpointNames)
+	localState, err := d.clusterStateStorage.FetchLocalState(
+		ctx,
+		d.localNodeID,
+		endpointNames,
+	)
 	if err != nil {
 		d.logger.Error(
-			"failed to get local state",
+			"failed to fetch local state",
 			slog.String("error", err.Error()),
 		)
-
 		return []byte{}
 	}
 
@@ -64,7 +79,6 @@ func (d *delegate) LocalState(join bool) []byte {
 			"failed to encode local state",
 			slog.String("error", err.Error()),
 		)
-
 		return []byte{}
 	}
 
@@ -72,13 +86,12 @@ func (d *delegate) LocalState(join bool) []byte {
 }
 
 func (d *delegate) MergeRemoteState(buf []byte, join bool) {
-	var remoteState nodeState
+	var remoteState clusterstate.NodeState
 	if err := json.Unmarshal(buf, &remoteState); err != nil {
 		d.logger.Error(
 			"failed to decode remote state",
 			slog.String("error", err.Error()),
 		)
-
 		return
 	}
 
@@ -86,31 +99,35 @@ func (d *delegate) MergeRemoteState(buf []byte, join bool) {
 		lastSync, ok := remoteState.LastSync[d.localNodeID]
 		if !ok {
 			d.logger.Error(
-				"failed to get last sync",
+				"remote state does not contain sync information for local node",
 				slog.String("cluster.remote.node", remoteState.NodeID),
 			)
-
 			return
 		}
 
-		worker, ok := d.syncPool.workers[remoteState.NodeID]
+		remoteEndpoint, ok := d.endpoints.Get(remoteState.NodeID)
 		if !ok {
 			d.logger.Error(
-				"no sync worker for node",
+				"remote endpoint not found",
 				slog.String("cluster.remote.node", remoteState.NodeID),
 			)
-
 			return
 		}
 
-		err := worker.mbox.Send(context.Background(), lastSync)
-		if err != nil {
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		defer cancel()
+
+		req := &syncRequest{
+			remoteNodeID:   remoteState.NodeID,
+			remoteEndpoint: remoteEndpoint,
+			lastSync:       lastSync,
+		}
+		if err := d.syncRequestM.Send(ctx, req); err != nil {
 			d.logger.Error(
-				"failed to notify sync worker",
+				"failed to send sync request",
 				slog.String("cluster.remote.node", remoteState.NodeID),
 				slog.String("error", err.Error()),
 			)
-
 			return
 		}
 	}
@@ -136,8 +153,7 @@ func (d *delegate) NotifyJoin(node *memberlist.Node) {
 		return
 	}
 
-	d.endpoints[node.Name] = endpointUrl
-	d.syncPool.AddWorker(node.Name, endpointUrl)
+	d.endpoints.Set(node.Name, endpointUrl)
 }
 
 func (d *delegate) NotifyLeave(node *memberlist.Node) {
@@ -147,8 +163,7 @@ func (d *delegate) NotifyLeave(node *memberlist.Node) {
 		slog.String("cluster.remote.endpoint", string(node.Meta)),
 	)
 
-	d.syncPool.RemoveWorker(node.Name)
-	delete(d.endpoints, node.Name)
+	d.endpoints.Delete(node.Name)
 }
 
 func (d *delegate) NotifyUpdate(node *memberlist.Node) {
