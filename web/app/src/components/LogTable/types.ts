@@ -6,3 +6,7 @@ export type LogTableProps = Readonly<{
   rowData: LogEntryModel[]
   columnDefs: ColDef<LogEntryModel>[]
 }>
+
+export type LogTableHandle = {
+  appendRows: (rows: LogEntryModel[]) => void
+}
