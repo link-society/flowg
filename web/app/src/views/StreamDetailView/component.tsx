@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { LoaderFunction, useLoaderData } from 'react-router'
 
 import Divider from '@mui/material/Divider'
@@ -19,6 +19,7 @@ import { loginRequired } from '@/lib/decorators/loaders'
 import LogChart from '@/components/LogChart/component'
 import LogQueryPanel from '@/components/LogQueryPanel/component'
 import LogTable from '@/components/LogTable/component'
+import { LogTableHandle } from '@/components/LogTable/types'
 import SideNavList from '@/components/SideNavList/component'
 import StreamIndexSelector from '@/components/StreamIndexSelector/component'
 
@@ -88,6 +89,8 @@ const StreamDetailView = () => {
     to: new Date(),
   })
 
+  const logTableRef = useRef<LogTableHandle>(null)
+
   const [rowData, setRowData] = useState<LogEntryModel[]>([])
   const [columnDefs, setColumnDefs] = useState<ColDef<LogEntryModel>[]>([
     timestampColumnDef(),
@@ -127,6 +130,8 @@ const StreamDetailView = () => {
         columnDefs,
       }
 
+      const knownFields = new Set(fields)
+
       bus.control.addEventListener('error', (event) => {
         const evt = event as CustomEvent
         handleLiveError(evt.detail)
@@ -145,20 +150,21 @@ const StreamDetailView = () => {
         }
         incomingState.rowData.push(logEntry)
 
-        const allFields = [...fields]
-
+        let fieldsChanged = false
         for (const field of Object.keys(logEntry.fields)) {
-          if (!allFields.includes(field)) {
-            allFields.push(field)
+          if (!knownFields.has(field)) {
+            knownFields.add(field)
+            fieldsChanged = true
           }
         }
 
-        allFields.sort((a, b) => a.localeCompare(b))
-
-        incomingState.columnDefs = [
-          timestampColumnDef(),
-          ...allFields.map(fieldToColumnDef),
-        ]
+        if (fieldsChanged) {
+          const allFields = [...knownFields].sort((a, b) => a.localeCompare(b))
+          incomingState.columnDefs = [
+            timestampColumnDef(),
+            ...allFields.map(fieldToColumnDef),
+          ]
+        }
       })
 
       bus.messages.addEventListener('exception', (event) => {
@@ -168,15 +174,18 @@ const StreamDetailView = () => {
       })
 
       const token = setInterval(() => {
-        setRowData((prev) => {
-          return [...prev, ...incomingState.rowData]
-        })
+        const newRows = incomingState.rowData
+        incomingState.rowData = []
+
+        if (newRows.length > 0) {
+          logTableRef.current?.appendRows(newRows)
+        }
+
         setColumnDefs(incomingState.columnDefs)
         setTimeWindow((prev) => ({
           from: prev.from,
           to: new Date(),
         }))
-        incomingState.rowData = []
       }, 1000)
 
       return () => {
@@ -208,7 +217,7 @@ const StreamDetailView = () => {
           />
         </Paper>
 
-        <LogTable rowData={rowData} columnDefs={columnDefs} />
+        <LogTable ref={logTableRef} rowData={rowData} columnDefs={columnDefs} />
       </StreamDetailViewContent>
 
       {Object.keys(indices).length > 0 && (
