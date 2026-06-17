@@ -11,3 +11,10 @@ export type DynamicFieldControlProps<T extends string> = Omit<
 }
 
 export type EditMode = 'static' | 'dynamic'
+
+export type BorderState = {
+  focused: boolean
+  error: boolean
+  disabled: boolean
+  shrunk: boolean
+}
