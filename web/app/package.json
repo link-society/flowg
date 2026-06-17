@@ -44,6 +44,6 @@
     "vite-plugin-compression2": "^2.5.3"
   },
   "overrides": {
-    "dompurify": "3.4.0"
+    "dompurify": "3.4.10"
   }
 }
