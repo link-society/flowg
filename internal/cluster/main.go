@@ -186,7 +186,7 @@ func NewManager(opts ManagerOptions) fx.Option {
 			mlistConfig.Transport = transport
 			mlistConfig.Delegate = delegate
 			mlistConfig.Events = delegate
-			mlistConfig.PushPullInterval = time.Second
+			mlistConfig.PushPullInterval = 10 * time.Second
 			mlistConfig.Logger = newMemberlistLogger(delegate.logger)
 
 			mlist, err := memberlist.Create(mlistConfig)
