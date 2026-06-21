@@ -36,119 +36,146 @@ sidebar_position: 1
 
 ## Introduction
 
-Every data in **FlowG** is persisted in a [BadgerDB](https://github.com/dgraph-io/badger)
-store, which internally uses a [Log-structured merge tree](https://en.wikipedia.org/wiki/Log-structured_merge-tree)
-data-structure.
+**FlowG** favors **availability** and **partition tolerance** over strong
+consistency (it is an "AP" system, see [Consensus](./consensus)). Every node
+accepts writes locally and the cluster converges towards a shared state over
+time — a model known as **eventual consistency**.
 
-Every read‐write transaction in BadgerDB is assigned a unique, strictly
-increasing `uint64` "commit timestamp" when it commits. All key‐value mutations
-in that transaction—whether a set or a delete—are stamped with that timestamp as
-their version.
+The foundation that makes this safe is described in
+[How Data Is Replicated?](/docs/design/data-replication): every record is stored
+in a **Last-Writer-Wins envelope** stamped with a **Hybrid Logical Clock**
+timestamp. Because conflict resolution is deterministic and order-independent,
+nodes can exchange records in any order, at any time, and still converge.
 
-When doing an incremental backup since some "version", BadgerDB scans the LSM
-tree and value logs for every entry whose version is superior to the given
-"version". After successfully writing the data, it returns the highest version
-observed which can then be used for the next incremental backup.
+**FlowG** has 3 replicated datasets:
 
-As explained in [the consensus documentation](./consensus), **FlowG** relies on
-the [SWIM Protocol](https://en.wikipedia.org/wiki/SWIM_Protocol) for node
-discovery. And most importantly, on the [hashicorp/memberlist](https://github.com/hashicorp/memberlist)
-implementation.
+ - one for authentication and permissions
+ - one for configuration (pipelines, transformers, ...)
+ - one for the actual logs
 
-Replication between nodes is achieved during *memberlist*'s "TCP Push/Pull".
+Replication is achieved through **two complementary mechanisms**:
 
-## Node's local state
-
-**FlowG** has 3 replicated storages:
-
- - one for authentication/permissions related data
- - one for configuration (pipelines, transormers, ...)
- - one for actual logs
-
-In a 4th, non replicated, storage, **FlowG** stores for each other node in the
-cluster the last known "version":
-
-```
-lastsync:auth:node1   = 1
-lastsync:config:node1 = 1
-lastsync:log:node1    = 2
-
-lastsync:auth:node2   = 2
-lastsync:config:node2 = 3
-lastsync:log:node2    = 7
-
-...
+```mermaid
+flowchart TD
+  W[Local write committed] --> B
+  subgraph FP["Fast path — low latency"]
+    B[Broadcast records to peers]
+  end
+  subgraph SN["Safety net — guaranteed convergence"]
+    A[Periodic anti-entropy reconciliation]
+  end
+  W -.-> A
+  B --> P1[(Peer stores)]
+  A --> P1
 ```
 
-During a "TCP Push/Pull", the local state will be serialized as JSON and sent
-to all other nodes in the cluster:
+ - **Broadcast** propagates fresh writes immediately, for low latency.
+ - **Anti-entropy** periodically reconciles nodes, catching anything a broadcast
+   may have missed.
 
-```json
-{
-  "node_id": "node0",
-  "last_sync": {
-    "node1": {
-      "auth": 1,
-      "config": 1,
-      "log": 2
-    },
-    "node2": {
-      "auth": 2,
-      "config": 3,
-      "log": 7
-    }
-  }
-}
+Neither mechanism needs the other to be correct: broadcast makes replication
+*fast*, anti-entropy makes it *guaranteed*.
+
+## Broadcast (fast path)
+
+When a node commits a write, it immediately gossips the freshly written records
+to the rest of the cluster. Peers merge them into their local store using the
+Last-Writer-Wins rule. This keeps replication latency low under normal
+conditions.
+
+```mermaid
+sequenceDiagram
+  participant C as Client
+  participant N1 as Node 1
+  participant N2 as Node 2
+  participant N3 as Node 3
+
+  C->>N1: Write
+  N1->>N1: Store locally (envelope + HLC)
+  N1-->>C: Acknowledge
+  par Broadcast to peers
+    N1-->>N2: New records
+    N2->>N2: LWW merge
+  and
+    N1-->>N3: New records
+    N3->>N3: LWW merge
+  end
 ```
 
-## Merging node states
+Broadcast is **best-effort**: a message may be lost, or a node may be temporarily
+unreachable (for example during a network partition). On its own it is therefore
+not enough to guarantee that every node eventually holds every record — which is
+why it is paired with anti-entropy.
 
-When a node receive from a remote node its state (aka: a "remote state"), it
-looks up itself to determine the "version" from which the incremental backup
-will be done:
+## Anti-entropy (safety net)
 
-```javascript
-last_sync = remote_state.last_sync[local_node_id]
+Periodically, each node reconciles its datasets with the other members of the
+cluster. To avoid re-sending data that a peer already has, every node keeps track
+— for each peer and each dataset — of **how much of that peer's data it has
+already received**. We call this position a **watermark**.
+
+During reconciliation, a node shares its watermarks; each peer then sends back
+only the records written **after** that position. This makes synchronization
+**incremental**: steady-state reconciliation is cheap, and a node that has fallen
+behind (or just joined) receives exactly the tail of history it is missing —
+starting from the very beginning on first contact.
+
+```mermaid
+sequenceDiagram
+  participant N1 as Node 1
+  participant N2 as Node 2
+
+  Note over N1,N2: Periodic reconciliation
+  N1->>N2: My watermarks for your datasets
+  N2->>N2: Select records newer than each watermark
+  N2-->>N1: Incremental batch of records
+  N1->>N1: LWW merge
+  N1->>N1: Advance watermarks
 ```
 
-Then, 3 HTTP requests are made to `remote_state.node_id` on its management
-interface:
+Because merges are conflict-free, a watermark only needs to be an *optimization*:
+even if a record is delivered more than once, applying it again is harmless.
 
-```
-POST http://<remote host>/cluster/sync/auth
-X-FlowG-ClusterKey: ...
-X-FlowG-NodeID: ...
-Transfer-Encoding: chunked
-Trailer: X-FlowG-Since
+### Recovering from a partition
 
-... incremental backup of auth storage ...
+Anti-entropy is what allows the cluster to heal after nodes have been isolated
+from each other. While partitioned, each side keeps accepting writes locally.
+When connectivity is restored, the next reconciliation exchanges everything that
+diverged, and Last-Writer-Wins deterministically settles any conflicting updates.
 
-X-FlowG-Since: ...
-```
+```mermaid
+sequenceDiagram
+  participant N1 as Node 1
+  participant N2 as Node 2
 
-```
-POST http://<remote host>/cluster/sync/config
-X-FlowG-ClusterKey: ...
-X-FlowG-NodeID: ...
-Transfer-Encoding: chunked
-Trailer: X-FlowG-Since
+  rect rgb(255, 243, 212)
+    Note over N1,N2: Network partition
+    N1->>N1: Accept writes locally
+    N2->>N2: Accept writes locally
+  end
 
-... incremental backup of config storage ...
-
-X-FlowG-Since: ...
-```
-
-```
-POST http://<remote host>/cluster/sync/log
-X-FlowG-ClusterKey: ...
-X-FlowG-NodeID: ...
-Transfer-Encoding: chunked
-Trailer: X-FlowG-Since
-
-... incremental backup of log storage ...
-
-X-FlowG-Since: ...
+  Note over N1,N2: Connectivity restored
+  N1->>N2: Watermarks
+  N2-->>N1: Records written during the partition
+  N1->>N2: Records written during the partition
+  Note over N1,N2: Both sides converge (LWW)
 ```
 
-Once the data has been saved, we register in the local state the new "version",
-read from the trailer HTTP header `X-FlowG-Since`.
+## Putting it together
+
+The diagram below summarizes how a single write reaches the rest of the cluster
+through both paths:
+
+```mermaid
+flowchart LR
+  W[Write on a node] --> S[(Local store)]
+  S -->|immediately| BC[Broadcast]
+  S -->|periodically| AE[Anti-entropy]
+  BC --> M[Peers merge via LWW]
+  AE --> M
+  M --> CV([Cluster converges])
+```
+
+The concrete HTTP endpoints used to carry broadcasts and synchronization batches
+between nodes are documented in the [Architecture](./architecture) page.
+

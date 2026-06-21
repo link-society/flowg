@@ -4,6 +4,42 @@ sidebar_position: 3
 
 # Architecture
 
+## Component Overview
+
+A node is built from a few cooperating components layered on top of FlowG's HTTP
+management interface:
+
+```mermaid
+flowchart TB
+  subgraph Node["A FlowG node"]
+    direction TB
+    MEM["Membership layer<br/>(SWIM gossip)"]
+    REP["Replication engine<br/>(broadcast + anti-entropy)"]
+    ST[("Replicated stores<br/>auth · config · logs")]
+
+    MEM -->|peer list & state| REP
+    REP -->|reads / merges| ST
+    ST -->|new records| REP
+  end
+
+  HTTP["HTTP management interface"]
+  MEM <-->|gossip| HTTP
+  REP <-->|sync batches| HTTP
+  HTTP <-->|cluster traffic| PEERS["Other nodes"]
+```
+
+ - The **membership layer** discovers nodes and tracks who is alive using the
+   [SWIM protocol](./consensus). It also carries the lightweight state nodes
+   piggyback on each other during gossip.
+ - The **replication engine** uses that membership information to
+   [propagate and reconcile data](./replication) — broadcasting fresh writes and
+   periodically running anti-entropy.
+ - The **replicated stores** hold the actual data as Last-Writer-Wins envelopes
+   (see [How Data Is Replicated?](/docs/design/data-replication)).
+
+All cluster traffic — discovery, gossip and synchronization — flows over the same
+HTTP management interface, whose endpoints are described below.
+
 ## Bootstrap
 
 When starting FlowG, it sets up a single-node cluster automatically. Every node

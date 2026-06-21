@@ -56,6 +56,13 @@ entry:test:00000001724140167373:057804d1-832f-45bf-8e70-7acbf22ec480
 When added to the database, if no stream configuration exists, a default one is
 added.
 
+:::info
+Before being persisted, every value (log entries, stream configuration, indexes,
+...) is wrapped in a replication envelope so that it can be safely reconciled
+across a cluster. See [How Data Is Replicated?](/docs/design/data-replication)
+for details on the Last-Writer-Wins model and the Hybrid Logical Clock.
+:::
+
 For each field of the log record, the following key is added to the database:
 
 ```
