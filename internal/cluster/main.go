@@ -242,7 +242,8 @@ func NewManager(opts ManagerOptions) fx.Option {
 						d.Delegate.endpoints.Set(joinNode.JoinNodeID, joinNode.JoinNodeEndpoint)
 						_, err := d.Memberlist.Join([]string{joinNode.Address()})
 						if err != nil {
-							d.Delegate.logger.Error(
+							d.Delegate.logger.ErrorContext(
+								ctx,
 								"failed to join cluster node",
 								slog.String("cluster.join.node", joinNode.JoinNodeID),
 								slog.String("cluster.join.address", joinNode.Address()),
