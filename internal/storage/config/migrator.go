@@ -53,14 +53,14 @@ func migrateToBadger(ctx context.Context, baseDir string, storage *storageImpl) 
 			dir:       "transformers",
 			extension: ".vrl",
 			converter: func(name string, content []byte) error {
-				return storage.writeItem(ctx, transformerItemType, name, content)
+				return storage.writeItem(ctx, TransformerItemType, name, content)
 			},
 		},
 		{
 			dir:       "pipelines",
 			extension: ".json",
 			converter: func(name string, content []byte) error {
-				return storage.writeItem(ctx, pipelineItemType, name, content)
+				return storage.writeItem(ctx, PipelineItemType, name, content)
 			},
 		},
 		{
@@ -73,7 +73,7 @@ func migrateToBadger(ctx context.Context, baseDir string, storage *storageImpl) 
 					return err
 				}
 
-				return storage.writeItem(ctx, forwarderItemType, name, content[:n])
+				return storage.writeItem(ctx, ForwarderItemType, name, content[:n])
 			},
 		},
 	}

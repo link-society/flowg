@@ -43,18 +43,6 @@ func (ctrl *controller) SavePipelineUsecase() usecase.Interactor {
 					return status.Wrap(err, status.Internal)
 				}
 
-				if err := ctrl.deps.PipelineRunner.InvalidateCachedBuild(ctx, req.Pipeline); err != nil {
-					ctrl.logger.ErrorContext(
-						ctx,
-						"Failed to refresh pipeline cache after save",
-						slog.String("pipeline", req.Pipeline),
-						slog.String("error", err.Error()),
-					)
-
-					resp.Success = false
-					return status.Wrap(err, status.Internal)
-				}
-
 				resp.Success = true
 
 				return nil

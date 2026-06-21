@@ -55,10 +55,10 @@ type Storage interface {
 }
 
 const (
-	transformerItemType = "transformer"
-	pipelineItemType    = "pipeline"
-	forwarderItemType   = "forwarder"
-	systemItemType      = "system"
+	TransformerItemType = "transformer"
+	PipelineItemType    = "pipeline"
+	ForwarderItemType   = "forwarder"
+	SystemItemType      = "system"
 )
 
 type Options struct {
@@ -168,11 +168,11 @@ func (s *storageImpl) Merge(ctx context.Context, r io.Reader) error {
 }
 
 func (s *storageImpl) ListTransformers(ctx context.Context) ([]string, error) {
-	return s.listItems(ctx, transformerItemType)
+	return s.listItems(ctx, TransformerItemType)
 }
 
 func (s *storageImpl) ReadTransformer(ctx context.Context, name string) (string, error) {
-	content, err := s.readItem(ctx, transformerItemType, name)
+	content, err := s.readItem(ctx, TransformerItemType, name)
 	if err != nil {
 		return "", err
 	}
@@ -181,19 +181,19 @@ func (s *storageImpl) ReadTransformer(ctx context.Context, name string) (string,
 }
 
 func (s *storageImpl) WriteTransformer(ctx context.Context, name string, content string) error {
-	return s.writeItem(ctx, transformerItemType, name, []byte(content))
+	return s.writeItem(ctx, TransformerItemType, name, []byte(content))
 }
 
 func (s *storageImpl) DeleteTransformer(ctx context.Context, name string) error {
-	return s.deleteItem(ctx, transformerItemType, name)
+	return s.deleteItem(ctx, TransformerItemType, name)
 }
 
 func (s *storageImpl) ListPipelines(ctx context.Context) ([]string, error) {
-	return s.listItems(ctx, pipelineItemType)
+	return s.listItems(ctx, PipelineItemType)
 }
 
 func (s *storageImpl) ReadPipeline(ctx context.Context, name string) (*models.FlowGraphV2, error) {
-	content, err := s.readItem(ctx, pipelineItemType, name)
+	content, err := s.readItem(ctx, PipelineItemType, name)
 	if err != nil {
 		return nil, err
 	}
@@ -218,23 +218,23 @@ func (s *storageImpl) WritePipeline(ctx context.Context, name string, flow *mode
 		return fmt.Errorf("failed to marshal flow: %w", err)
 	}
 
-	return s.writeItem(ctx, pipelineItemType, name, content)
+	return s.writeItem(ctx, PipelineItemType, name, content)
 }
 
 func (s *storageImpl) WriteRawPipeline(ctx context.Context, name string, content string) error {
-	return s.writeItem(ctx, pipelineItemType, name, []byte(content))
+	return s.writeItem(ctx, PipelineItemType, name, []byte(content))
 }
 
 func (s *storageImpl) DeletePipeline(ctx context.Context, name string) error {
-	return s.deleteItem(ctx, pipelineItemType, name)
+	return s.deleteItem(ctx, PipelineItemType, name)
 }
 
 func (s *storageImpl) ListForwarders(ctx context.Context) ([]string, error) {
-	return s.listItems(ctx, forwarderItemType)
+	return s.listItems(ctx, ForwarderItemType)
 }
 
 func (s *storageImpl) ReadForwarder(ctx context.Context, name string) (*models.ForwarderV2, error) {
-	content, err := s.readItem(ctx, forwarderItemType, name)
+	content, err := s.readItem(ctx, ForwarderItemType, name)
 	if err != nil {
 		return nil, err
 	}
@@ -259,15 +259,15 @@ func (s *storageImpl) WriteForwarder(ctx context.Context, name string, forwarder
 		return fmt.Errorf("failed to marshal forwarder: %w", err)
 	}
 
-	return s.writeItem(ctx, forwarderItemType, name, content)
+	return s.writeItem(ctx, ForwarderItemType, name, content)
 }
 
 func (s *storageImpl) DeleteForwarder(ctx context.Context, name string) error {
-	return s.deleteItem(ctx, forwarderItemType, name)
+	return s.deleteItem(ctx, ForwarderItemType, name)
 }
 
 func (s *storageImpl) HasSystemConfig(ctx context.Context) (bool, error) {
-	_, err := s.readItem(ctx, systemItemType, "config")
+	_, err := s.readItem(ctx, SystemItemType, "config")
 	if errors.Is(err, badger.ErrKeyNotFound) {
 		return false, nil
 	}
@@ -288,7 +288,7 @@ func (s *storageImpl) ReadSystemConfig(ctx context.Context) (*models.SystemConfi
 	defer s.lock.Unlock()
 
 	if s.configurationInstance == nil {
-		content, err := s.readItem(ctx, systemItemType, "config")
+		content, err := s.readItem(ctx, SystemItemType, "config")
 		if errors.Is(err, badger.ErrKeyNotFound) {
 			s.configurationInstance = &models.SystemConfiguration{}
 			return s.configurationInstance, nil
@@ -335,7 +335,7 @@ func (s *storageImpl) WriteSystemConfig(ctx context.Context, config *models.Syst
 		return fmt.Errorf("failed to marshal config: %w", err)
 	}
 
-	return s.writeItem(ctx, systemItemType, "config", content)
+	return s.writeItem(ctx, SystemItemType, "config", content)
 }
 
 func (s *storageImpl) listItems(ctx context.Context, itemType string) ([]string, error) {

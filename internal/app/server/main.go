@@ -89,6 +89,7 @@ func NewServer(opts Options) fx.Option {
 		// Engine Layer
 		lognotify.NewLogNotifier(),
 		pipelines.NewRunner(),
+		pipelines.NewReactor(),
 		// Service Layer
 		http.NewServer(http.ServerOptions{
 			BindAddress: opts.HttpBindAddress,
