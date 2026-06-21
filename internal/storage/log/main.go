@@ -2,6 +2,7 @@ package log
 
 import (
 	"context"
+	"fmt"
 	"io"
 
 	"time"
@@ -16,6 +17,7 @@ import (
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage"
 	"link-society.com/flowg/internal/storage/log/transactions"
+	"link-society.com/flowg/internal/storage/schema"
 	"link-society.com/flowg/internal/utils/hlc"
 	"link-society.com/flowg/internal/utils/kvstore"
 
@@ -87,11 +89,24 @@ func NewStorage(opts Options) fx.Option {
 	return fx.Module(
 		"storage.log",
 		kvstore.NewStorage(kvOpts),
-		fx.Provide(func(d deps) Storage {
-			return &storageImpl{
+		fx.Provide(func(lc fx.Lifecycle, d deps) Storage {
+			storage := &storageImpl{
 				kvStore: d.S,
 				clock:   d.Clock,
 			}
+
+			lc.Append(fx.Hook{
+				OnStart: func(ctx context.Context) error {
+					prefixes := [][]byte{[]byte("stream:config:")}
+					if err := schema.Migrate(ctx, storage.kvStore, storage.clock, prefixes); err != nil {
+						return fmt.Errorf("failed to migrate schema: %w", err)
+					}
+
+					return nil
+				},
+			})
+
+			return storage
 		}),
 		fxproviders.ProvideActor[*gcActor](func(d deps) *gcActor {
 			return &gcActor{

@@ -19,6 +19,7 @@ import (
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage"
 	"link-society.com/flowg/internal/storage/config/transactions"
+	"link-society.com/flowg/internal/storage/schema"
 	"link-society.com/flowg/internal/utils/hlc"
 	"link-society.com/flowg/internal/utils/kvstore"
 )
@@ -104,6 +105,10 @@ func NewStorage(opts Options) fx.Option {
 
 			lc.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {
+					if err := schema.Migrate(ctx, storage.kvStore, storage.clock, nil); err != nil {
+						return fmt.Errorf("failed to migrate schema: %w", err)
+					}
+
 					if err := migrateAlerts(opts.Directory); err != nil {
 						return fmt.Errorf("failed to migrate alerts: %w", err)
 					}
