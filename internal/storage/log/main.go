@@ -52,10 +52,11 @@ type Storage interface {
 }
 
 type Options struct {
-	Directory  string
-	InMemory   bool
-	ReadOnly   bool
-	GCInterval time.Duration
+	Directory            string
+	InMemory             bool
+	ReadOnly             bool
+	GCInterval           time.Duration
+	TombstoneGracePeriod time.Duration
 }
 
 type storageImpl struct {
@@ -74,10 +75,11 @@ var _ Storage = (*storageImpl)(nil)
 
 func DefaultOptions() Options {
 	return Options{
-		Directory:  "",
-		InMemory:   false,
-		ReadOnly:   false,
-		GCInterval: 5 * time.Minute,
+		Directory:            "",
+		InMemory:             false,
+		ReadOnly:             false,
+		GCInterval:           5 * time.Minute,
+		TombstoneGracePeriod: 24 * time.Hour,
 	}
 }
 
@@ -114,6 +116,7 @@ func NewStorage(opts Options) fx.Option {
 			return &gcActor{
 				Actor: actor.New(&gcWorker{
 					kvStore:    d.S,
+					grace:      opts.TombstoneGracePeriod,
 					gcInterval: opts.GCInterval,
 				}),
 			}

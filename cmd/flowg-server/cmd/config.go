@@ -171,6 +171,8 @@ func newServerConfig(opts *options) (server.Options, error) {
 		AuthStorageDir:   opts.authDir,
 		LogStorageDir:    opts.logDir,
 
+		TombstoneGracePeriod: opts.tombstoneGracePeriod,
+
 		AuthInitialUser:     opts.authInitialUser,
 		AuthInitialPassword: opts.authInitialPassword,
 

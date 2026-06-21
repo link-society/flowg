@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	"crypto/tls"
+	"time"
 
 	"go.uber.org/fx"
 
@@ -45,6 +46,8 @@ type Options struct {
 	ConfigStorageDir string
 	LogStorageDir    string
 
+	TombstoneGracePeriod time.Duration
+
 	ServiceName string
 	ConsulUrl   string
 
@@ -66,16 +69,19 @@ func NewServer(opts Options) fx.Option {
 		auth.NewStorage(func() auth.Options {
 			authOpts := auth.DefaultOptions()
 			authOpts.Directory = opts.AuthStorageDir
+			authOpts.TombstoneGracePeriod = opts.TombstoneGracePeriod
 			return authOpts
 		}()),
 		config.NewStorage(func() config.Options {
 			configOpts := config.DefaultOptions()
 			configOpts.Directory = opts.ConfigStorageDir
+			configOpts.TombstoneGracePeriod = opts.TombstoneGracePeriod
 			return configOpts
 		}()),
 		log.NewStorage(func() log.Options {
 			logOpts := log.DefaultOptions()
 			logOpts.Directory = opts.LogStorageDir
+			logOpts.TombstoneGracePeriod = opts.TombstoneGracePeriod
 			return logOpts
 		}()),
 		// Engine Layer

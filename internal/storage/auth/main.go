@@ -6,14 +6,18 @@ import (
 
 	"io"
 
+	"time"
+
 	"go.uber.org/fx"
 
 	"github.com/dgraph-io/badger/v4"
+	"github.com/vladopajic/go-actor/actor"
 
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage"
 	"link-society.com/flowg/internal/storage/auth/transactions"
 	"link-society.com/flowg/internal/storage/schema"
+	"link-society.com/flowg/internal/utils/fxproviders"
 	"link-society.com/flowg/internal/utils/hlc"
 	"link-society.com/flowg/internal/utils/kvstore"
 )
@@ -46,6 +50,9 @@ type Options struct {
 	Directory string
 	InMemory  bool
 	ReadOnly  bool
+
+	GCInterval           time.Duration
+	TombstoneGracePeriod time.Duration
 }
 
 type storageImpl struct {
@@ -67,6 +74,9 @@ func DefaultOptions() Options {
 		Directory: "",
 		InMemory:  false,
 		ReadOnly:  false,
+
+		GCInterval:           time.Hour,
+		TombstoneGracePeriod: 24 * time.Hour,
 	}
 }
 
@@ -98,6 +108,15 @@ func NewStorage(opts Options) fx.Option {
 			})
 
 			return storage
+		}),
+		fxproviders.ProvideActor[*gcActor](func(d deps) *gcActor {
+			return &gcActor{
+				Actor: actor.New(&gcWorker{
+					kvStore:    d.S,
+					grace:      opts.TombstoneGracePeriod,
+					gcInterval: opts.GCInterval,
+				}),
+			}
 		}),
 	)
 }

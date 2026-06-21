@@ -5,6 +5,7 @@ import (
 
 	"strconv"
 	"strings"
+	"time"
 )
 
 var (
@@ -57,6 +58,8 @@ var (
 	defaultLogDir          = getEnvString("FLOWG_LOG_DIR", "./data/logs")
 	defaultClusterStateDir = getEnvString("FLOWG_CLUSTER_STATE_DIR", "./data/state")
 
+	defaultTombstoneGracePeriod = getEnvDuration("FLOWG_TOMBSTONE_GRACE_PERIOD", 24*time.Hour)
+
 	defaultAuthInitialUser     = getEnvString("FLOWG_AUTH_INITIAL_USER", "root")
 	defaultAuthInitialPassword = getEnvString("FLOWG_AUTH_INITIAL_PASSWORD", "root")
 
@@ -96,4 +99,16 @@ func getEnvBool(key string, defaultValue bool) bool {
 		return value
 	}
 	return false
+}
+
+func getEnvDuration(key string, defaultValue time.Duration) time.Duration {
+	stringVal := os.Getenv(key)
+	if stringVal == "" {
+		return defaultValue
+	}
+	value, err := time.ParseDuration(stringVal)
+	if err == nil {
+		return value
+	}
+	return defaultValue
 }

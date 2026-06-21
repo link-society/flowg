@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"time"
+
 	"github.com/spf13/cobra"
 )
 
@@ -49,6 +51,8 @@ type options struct {
 	authDir   string
 	logDir    string
 	configDir string
+
+	tombstoneGracePeriod time.Duration
 
 	verbose  bool
 	loglevel string
@@ -300,6 +304,13 @@ func (opts *options) defineCliOptions(cmd *cobra.Command) {
 		"Path to the config directory",
 	)
 	cmd.MarkFlagDirname("config-dir")
+
+	cmd.Flags().DurationVar(
+		&opts.tombstoneGracePeriod,
+		"tombstone-grace-period",
+		defaultTombstoneGracePeriod,
+		"Duration to retain replicated delete tombstones before garbage collection",
+	)
 
 	cmd.Flags().BoolVar(
 		&opts.verbose,

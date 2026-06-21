@@ -119,3 +119,44 @@ func readEnvelope(item *badger.Item) (Envelope, error) {
 	})
 	return e, err
 }
+
+func CollectGarbage(txn *badger.Txn, prefixes [][]byte, before hlc.Timestamp) (int, error) {
+	if len(prefixes) == 0 {
+		prefixes = [][]byte{nil}
+	}
+
+	expired := [][]byte{}
+
+	for _, prefix := range prefixes {
+		opts := badger.DefaultIteratorOptions
+		opts.PrefetchValues = true
+		if prefix != nil {
+			opts.Prefix = prefix
+		}
+		it := txn.NewIterator(opts)
+
+		for it.Rewind(); it.Valid(); it.Next() {
+			item := it.Item()
+
+			env, err := readEnvelope(item)
+			if err != nil {
+				continue
+			}
+			if !env.Deleted || !env.Timestamp.Before(before) {
+				continue
+			}
+
+			expired = append(expired, item.KeyCopy(nil))
+		}
+
+		it.Close()
+	}
+
+	for _, key := range expired {
+		if err := txn.Delete(key); err != nil {
+			return 0, err
+		}
+	}
+
+	return len(expired), nil
+}

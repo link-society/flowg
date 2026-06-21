@@ -6,6 +6,7 @@ import (
 
 	"bytes"
 	"encoding/binary"
+	"time"
 
 	"github.com/dgraph-io/badger/v4"
 	"github.com/dgraph-io/badger/v4/pb"
@@ -39,6 +40,23 @@ func MergeEnveloped(txn *badger.Txn, kv *pb.KV) error {
 	}
 
 	return ApplyEnvelope(txn, kv.Key, kv.Value)
+}
+
+func CollectGarbage(
+	ctx context.Context,
+	kvStore kvstore.Storage,
+	grace time.Duration,
+	prefixes [][]byte,
+) (int, error) {
+	before := hlc.Timestamp{WallTime: time.Now().Add(-grace).UnixNano()}
+
+	purged := 0
+	err := kvStore.Update(ctx, func(txn *badger.Txn) error {
+		var err error
+		purged, err = lww.CollectGarbage(txn, prefixes, before)
+		return err
+	})
+	return purged, err
 }
 
 func Migrate(

@@ -1,4 +1,4 @@
-package log
+package auth
 
 import (
 	"log/slog"
@@ -9,8 +9,6 @@ import (
 
 	"link-society.com/flowg/internal/storage/schema"
 	"link-society.com/flowg/internal/utils/kvstore"
-
-	"link-society.com/flowg/internal/storage/log/transactions"
 )
 
 type gcActor struct {
@@ -32,21 +30,11 @@ func (w *gcWorker) DoWork(ctx actor.Context) actor.WorkerStatus {
 
 	case <-time.After(w.gcInterval):
 		go func() {
-			if err := w.kvStore.Update(ctx, transactions.CollectGarbage); err != nil {
-				slog.ErrorContext(
-					ctx,
-					"failed to collect garbage",
-					slog.String("channel", "logstorage"),
-					slog.String("error", err.Error()),
-				)
-			}
-
-			prefixes := [][]byte{streamConfigPrefix}
-			if _, err := schema.CollectGarbage(ctx, w.kvStore, w.grace, prefixes); err != nil {
+			if _, err := schema.CollectGarbage(ctx, w.kvStore, w.grace, nil); err != nil {
 				slog.ErrorContext(
 					ctx,
 					"failed to collect tombstones",
-					slog.String("channel", "logstorage"),
+					slog.String("channel", "authstorage"),
 					slog.String("error", err.Error()),
 				)
 			}

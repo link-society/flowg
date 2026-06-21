@@ -194,3 +194,57 @@ func TestWriteNewerThanTombstoneResurrects(t *testing.T) {
 		t.Fatalf("got (%q, %v); want (back, true)", env.Payload, found)
 	}
 }
+
+func TestCollectGarbage(t *testing.T) {
+	db := newDB(t)
+
+	apply(t, db, "old-tomb", lww.Envelope{Timestamp: ts(100, 0, "a"), Deleted: true})
+	apply(t, db, "recent-tomb", lww.Envelope{Timestamp: ts(900, 0, "a"), Deleted: true})
+	apply(t, db, "live", lww.Envelope{Timestamp: ts(100, 0, "a"), Payload: []byte("v")})
+
+	if err := db.Update(func(txn *badger.Txn) error {
+		return txn.Set([]byte("version"), []byte("plain"))
+	}); err != nil {
+		t.Fatalf("seed plain key: %v", err)
+	}
+
+	var purged int
+	if err := db.Update(func(txn *badger.Txn) error {
+		var cerr error
+		purged, cerr = lww.CollectGarbage(txn, nil, ts(500, 0, ""))
+		return cerr
+	}); err != nil {
+		t.Fatalf("CollectGarbage error = %v", err)
+	}
+
+	if purged != 1 {
+		t.Fatalf("purged = %d; want 1", purged)
+	}
+
+	assertAbsent := func(key string) {
+		t.Helper()
+		err := db.View(func(txn *badger.Txn) error {
+			_, gerr := txn.Get([]byte(key))
+			return gerr
+		})
+		if err != badger.ErrKeyNotFound {
+			t.Fatalf("key %q: got err %v; want ErrKeyNotFound", key, err)
+		}
+	}
+
+	assertPresent := func(key string) {
+		t.Helper()
+		err := db.View(func(txn *badger.Txn) error {
+			_, gerr := txn.Get([]byte(key))
+			return gerr
+		})
+		if err != nil {
+			t.Fatalf("key %q: got err %v; want present", key, err)
+		}
+	}
+
+	assertAbsent("old-tomb")
+	assertPresent("recent-tomb")
+	assertPresent("live")
+	assertPresent("version")
+}
