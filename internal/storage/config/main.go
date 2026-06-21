@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net"
 	"strings"
 	"sync"
@@ -21,6 +22,7 @@ import (
 
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage"
+	"link-society.com/flowg/internal/storage/changefeed"
 	"link-society.com/flowg/internal/storage/config/transactions"
 	"link-society.com/flowg/internal/storage/schema"
 	"link-society.com/flowg/internal/utils/fxproviders"
@@ -71,6 +73,7 @@ type Options struct {
 type storageImpl struct {
 	kvStore               kvstore.Storage
 	clock                 *hlc.Clock
+	notifier              changefeed.Notifier
 	lock                  *sync.Mutex
 	configurationInstance *models.SystemConfiguration
 }
@@ -78,8 +81,9 @@ type storageImpl struct {
 type deps struct {
 	fx.In
 
-	S     kvstore.Storage `name:"storage.config"`
-	Clock *hlc.Clock
+	S        kvstore.Storage `name:"storage.config"`
+	Clock    *hlc.Clock
+	Notifier changefeed.Notifier
 }
 
 var _ Storage = (*storageImpl)(nil)
@@ -109,6 +113,7 @@ func NewStorage(opts Options) fx.Option {
 			storage := &storageImpl{
 				kvStore:               d.S,
 				clock:                 d.Clock,
+				notifier:              d.Notifier,
 				lock:                  &sync.Mutex{},
 				configurationInstance: nil,
 			}
@@ -375,20 +380,56 @@ func (s *storageImpl) writeItem(
 	content []byte,
 ) error {
 	ts := s.clock.Now()
-	return s.kvStore.Update(
+	err := s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
 			return transactions.WriteItem(txn, itemType, name, content, ts)
 		},
 	)
+	if err != nil {
+		return err
+	}
+
+	s.emitChange(ctx, itemType, name, changefeed.OpWrite)
+	return nil
 }
 
 func (s *storageImpl) deleteItem(ctx context.Context, itemType string, name string) error {
 	ts := s.clock.Now()
-	return s.kvStore.Update(
+	err := s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
 			return transactions.DeleteItem(txn, itemType, name, ts)
 		},
 	)
+	if err != nil {
+		return err
+	}
+
+	s.emitChange(ctx, itemType, name, changefeed.OpDelete)
+	return nil
+}
+
+func (s *storageImpl) emitChange(
+	ctx context.Context,
+	itemType string,
+	name string,
+	op changefeed.Operation,
+) {
+	event := changefeed.ChangeEvent{
+		Namespace: changefeed.NamespaceConfig,
+		Kind:      itemType,
+		Name:      name,
+		Op:        op,
+	}
+	if err := s.notifier.Notify(ctx, event); err != nil {
+		slog.ErrorContext(
+			ctx,
+			"failed to emit change event",
+			"channel", "storage.config",
+			"kind", itemType,
+			"name", name,
+			"error", err.Error(),
+		)
+	}
 }

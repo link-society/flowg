@@ -11,6 +11,7 @@ import (
 
 	"link-society.com/flowg/internal/cluster"
 	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage/changefeed"
 	"link-society.com/flowg/internal/storage/config"
 	"link-society.com/flowg/internal/storage/log"
 
@@ -66,6 +67,7 @@ func NewServer(opts Options) fx.Option {
 			return hlc.NewClock(opts.ClusterNodeID)
 		}),
 		// Storage Layer
+		changefeed.NewNotifier(),
 		auth.NewStorage(func() auth.Options {
 			authOpts := auth.DefaultOptions()
 			authOpts.Directory = opts.AuthStorageDir

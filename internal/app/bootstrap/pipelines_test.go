@@ -6,6 +6,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 
+	"link-society.com/flowg/internal/storage/changefeed"
 	"link-society.com/flowg/internal/storage/config"
 	"link-society.com/flowg/internal/utils/hlc"
 
@@ -23,6 +24,7 @@ func TestDefaultPipeline(t *testing.T) {
 	app := fxtest.New(
 		t,
 		fx.Provide(func() *hlc.Clock { return hlc.NewClock("test") }),
+		changefeed.NewNotifier(),
 		config.NewStorage(configOpts),
 		fx.Populate(&configStorage),
 		fx.NopLogger,
