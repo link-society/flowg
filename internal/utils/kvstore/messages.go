@@ -42,11 +42,16 @@ type updateOperation struct {
 	txnFn func(txn *badger.Txn) error
 }
 
+type latestVersionOperation struct {
+	version uint64
+}
+
 var _ operation = (*backupOperation)(nil)
 var _ operation = (*restoreOperation)(nil)
 var _ operation = (*mergeOperation)(nil)
 var _ operation = (*viewOperation)(nil)
 var _ operation = (*updateOperation)(nil)
+var _ operation = (*latestVersionOperation)(nil)
 
 func (m *backupOperation) Handle(db *badger.DB) error {
 	var err error
@@ -153,4 +158,9 @@ func (m *updateOperation) Handle(db *badger.DB) error {
 			return err
 		}
 	}
+}
+
+func (m *latestVersionOperation) Handle(db *badger.DB) error {
+	m.version = db.MaxVersion()
+	return nil
 }

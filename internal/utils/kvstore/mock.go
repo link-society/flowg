@@ -52,3 +52,8 @@ func (m *MockStorage) Update(ctx context.Context, txnFn func(txn *badger.Txn) er
 	args := m.Called(ctx, txnFn)
 	return args.Error(0)
 }
+
+func (m *MockStorage) LatestVersion(ctx context.Context) (uint64, error) {
+	args := m.Called(ctx)
+	return args.Get(0).(uint64), args.Error(1)
+}

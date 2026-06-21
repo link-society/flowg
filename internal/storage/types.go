@@ -12,4 +12,5 @@ type Streamable interface {
 	Load(context.Context, io.Reader) error
 	Merge(context.Context, io.Reader) error
 	ApplyReplicated(context.Context, []changefeed.Record) error
+	LatestVersion(context.Context) (uint64, error)
 }

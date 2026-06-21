@@ -23,6 +23,7 @@ type Storage interface {
 	Merge(ctx context.Context, r io.Reader, mergeFn func(txn *badger.Txn, kv *pb.KV) error) error
 	View(ctx context.Context, txnFn func(txn *badger.Txn) error) error
 	Update(ctx context.Context, txnFn func(txn *badger.Txn) error) error
+	LatestVersion(ctx context.Context) (uint64, error)
 }
 type Options struct {
 	LogChannel string
@@ -259,4 +260,26 @@ func (kv *storageImpl) Update(
 	}
 
 	return <-replyTo
+}
+
+func (kv *storageImpl) LatestVersion(ctx context.Context) (uint64, error) {
+	replyTo := make(chan error, 1)
+	op := &latestVersionOperation{}
+
+	err := kv.mbox.Send(
+		ctx,
+		message{
+			replyTo:   replyTo,
+			operation: op,
+		},
+	)
+	if err != nil {
+		return 0, err
+	}
+
+	if err := <-replyTo; err != nil {
+		return 0, err
+	}
+
+	return op.version, nil
 }

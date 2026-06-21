@@ -46,6 +46,11 @@ func (m *MockStorage) Dump(ctx context.Context, w io.Writer, since uint64) (uint
 	return args.Get(0).(uint64), args.Error(1)
 }
 
+func (m *MockStorage) LatestVersion(ctx context.Context) (uint64, error) {
+	args := m.Called(ctx)
+	return args.Get(0).(uint64), args.Error(1)
+}
+
 func (m *MockStorage) Load(ctx context.Context, r io.Reader) error {
 	args := m.Called(ctx, r)
 	return args.Error(0)

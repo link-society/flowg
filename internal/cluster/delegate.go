@@ -115,16 +115,34 @@ func (d *delegate) MergeRemoteState(buf []byte, join bool) {
 		knownSince[syncState.Namespace] = syncState.Since
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	defer cancel()
+
 	lastSync := make([]clusterstate.NamespaceSyncState, 0, len(d.storages))
-	for namespace := range d.storages {
+	for namespace, store := range d.storages {
+		latest, err := store.LatestVersion(ctx)
+		if err != nil {
+			d.logger.Error(
+				"failed to fetch latest version",
+				slog.String("cluster.replication.namespace", namespace),
+				slog.String("error", err.Error()),
+			)
+			continue
+		}
+
+		if knownSince[namespace] >= latest {
+			continue
+		}
+
 		lastSync = append(lastSync, clusterstate.NamespaceSyncState{
 			Namespace: namespace,
 			Since:     knownSince[namespace],
 		})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
-	defer cancel()
+	if len(lastSync) == 0 {
+		return
+	}
 
 	req := &syncRequest{
 		remoteNodeID:   remoteState.NodeID,

@@ -14,6 +14,7 @@ import (
 type fakeStreamable struct {
 	applied [][]changefeed.Record
 	err     error
+	latest  uint64
 }
 
 var _ storage.Streamable = (*fakeStreamable)(nil)
@@ -21,6 +22,8 @@ var _ storage.Streamable = (*fakeStreamable)(nil)
 func (f *fakeStreamable) Dump(context.Context, io.Writer, uint64) (uint64, error) { return 0, nil }
 func (f *fakeStreamable) Load(context.Context, io.Reader) error                   { return nil }
 func (f *fakeStreamable) Merge(context.Context, io.Reader) error                  { return nil }
+
+func (f *fakeStreamable) LatestVersion(context.Context) (uint64, error) { return f.latest, nil }
 
 func (f *fakeStreamable) ApplyReplicated(_ context.Context, records []changefeed.Record) error {
 	f.applied = append(f.applied, records)

@@ -36,13 +36,24 @@ func newMergeDelegate(t *testing.T, syncM actor.MailboxSender[*syncRequest]) *de
 		endpoints:     newEndpointCache(),
 		syncRequestM:  syncM,
 		storages: map[string]storage.Streamable{
-			"auth":   &fakeStreamable{},
-			"config": &fakeStreamable{},
-			"log":    &fakeStreamable{},
+			// A non-zero latest version means there is data to replicate, so the
+			// caught-up short-circuit does not kick in unless a test asks for it.
+			"auth":   &fakeStreamable{latest: 1000},
+			"config": &fakeStreamable{latest: 1000},
+			"log":    &fakeStreamable{latest: 1000},
 		},
 	}
 	d.endpoints.Set("node-remote", &url.URL{Scheme: "http", Host: "127.0.0.1:9114"})
 	return d
+}
+
+func setLatest(t *testing.T, d *delegate, namespace string, latest uint64) {
+	t.Helper()
+	store, ok := d.storages[namespace].(*fakeStreamable)
+	if !ok {
+		t.Fatalf("namespace %q is not a *fakeStreamable", namespace)
+	}
+	store.latest = latest
 }
 
 func expectSyncRequest(t *testing.T, m actor.Mailbox[*syncRequest]) *syncRequest {
@@ -171,6 +182,96 @@ func TestMergeRemoteStateUnknownEndpoint(t *testing.T) {
 	m := newSyncMailbox(t)
 	d := newMergeDelegate(t, m)
 	d.endpoints.Delete("node-remote")
+
+	remote := clusterstate.NodeState{
+		NodeID:   "node-remote",
+		LastSync: map[string][]clusterstate.NamespaceSyncState{},
+	}
+	buf, err := json.Marshal(remote)
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+
+	d.MergeRemoteState(buf, false)
+	expectNoSyncRequest(t, m)
+}
+
+// TestMergeRemoteStateSkipsCaughtUpNamespaces verifies that namespaces for which
+// the peer's watermark already covers our latest version are not included in the
+// sync request, while lagging namespaces still are.
+func TestMergeRemoteStateSkipsCaughtUpNamespaces(t *testing.T) {
+	m := newSyncMailbox(t)
+	d := newMergeDelegate(t, m)
+
+	setLatest(t, d, "auth", 50)
+	setLatest(t, d, "config", 50)
+	setLatest(t, d, "log", 50)
+
+	remote := clusterstate.NodeState{
+		NodeID: "node-remote",
+		LastSync: map[string][]clusterstate.NamespaceSyncState{
+			"node-local": {
+				{Namespace: "auth", Since: 50},   // caught up exactly -> skip
+				{Namespace: "config", Since: 80}, // ahead of us -> skip
+				{Namespace: "log", Since: 10},    // behind -> sync
+			},
+		},
+	}
+	buf, err := json.Marshal(remote)
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+
+	d.MergeRemoteState(buf, false)
+
+	req := expectSyncRequest(t, m)
+	since := sinceByNamespace(req.lastSync)
+	if len(since) != 1 {
+		t.Fatalf("expected only the lagging namespace, got %v", since)
+	}
+	if v, ok := since["log"]; !ok || v != 10 {
+		t.Fatalf("log since: got %d (present=%v) want 10", v, ok)
+	}
+}
+
+// TestMergeRemoteStateNoRequestWhenAllCaughtUp verifies that no sync request is
+// emitted at all when the peer already holds everything we have.
+func TestMergeRemoteStateNoRequestWhenAllCaughtUp(t *testing.T) {
+	m := newSyncMailbox(t)
+	d := newMergeDelegate(t, m)
+
+	setLatest(t, d, "auth", 50)
+	setLatest(t, d, "config", 50)
+	setLatest(t, d, "log", 50)
+
+	remote := clusterstate.NodeState{
+		NodeID: "node-remote",
+		LastSync: map[string][]clusterstate.NamespaceSyncState{
+			"node-local": {
+				{Namespace: "auth", Since: 50},
+				{Namespace: "config", Since: 50},
+				{Namespace: "log", Since: 50},
+			},
+		},
+	}
+	buf, err := json.Marshal(remote)
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+
+	d.MergeRemoteState(buf, false)
+	expectNoSyncRequest(t, m)
+}
+
+// TestMergeRemoteStateEmptyStoreNoRequest verifies that a node with no data yet
+// (latest version 0) does not generate any traffic on first contact.
+func TestMergeRemoteStateEmptyStoreNoRequest(t *testing.T) {
+	m := newSyncMailbox(t)
+	d := newMergeDelegate(t, m)
+
+	setLatest(t, d, "auth", 0)
+	setLatest(t, d, "config", 0)
+	setLatest(t, d, "log", 0)
 
 	remote := clusterstate.NodeState{
 		NodeID:   "node-remote",
