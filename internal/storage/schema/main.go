@@ -24,22 +24,44 @@ func IsVersionKey(key []byte) bool {
 	return bytes.Equal(key, versionKey)
 }
 
-func ApplyEnvelope(txn *badger.Txn, key []byte, value []byte) error {
+func ApplyEnvelope(txn *badger.Txn, key []byte, value []byte) (bool, error) {
 	env, err := lww.Unmarshal(value)
 	if err != nil {
-		return err
+		return false, err
 	}
 
-	_, err = lww.Apply(txn, key, env)
-	return err
+	return lww.Apply(txn, key, env)
 }
 
-func MergeEnveloped(txn *badger.Txn, kv *pb.KV) error {
-	if IsVersionKey(kv.Key) {
+type AppliedRecord struct {
+	Key     []byte
+	Deleted bool
+}
+
+func MergeEnveloped(applied *[]AppliedRecord) func(txn *badger.Txn, kv *pb.KV) error {
+	return func(txn *badger.Txn, kv *pb.KV) error {
+		if IsVersionKey(kv.Key) {
+			return nil
+		}
+
+		env, err := lww.Unmarshal(kv.Value)
+		if err != nil {
+			return err
+		}
+
+		ok, err := lww.Apply(txn, kv.Key, env)
+		if err != nil {
+			return err
+		}
+		if ok {
+			*applied = append(*applied, AppliedRecord{
+				Key:     append([]byte(nil), kv.Key...),
+				Deleted: env.Deleted,
+			})
+		}
+
 		return nil
 	}
-
-	return ApplyEnvelope(txn, kv.Key, kv.Value)
 }
 
 func CollectGarbage(

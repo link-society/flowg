@@ -7,6 +7,7 @@ import (
 	"log/slog"
 
 	"bytes"
+	"sync/atomic"
 	"time"
 
 	"github.com/vladopajic/go-actor/actor"
@@ -140,34 +141,50 @@ func (s *storageImpl) Load(ctx context.Context, r io.Reader) error {
 }
 
 func (s *storageImpl) Merge(ctx context.Context, r io.Reader) error {
-	if err := s.kvStore.Merge(ctx, r, mergeRecord); err != nil {
+	var changed atomic.Bool
+	if err := s.kvStore.Merge(ctx, r, mergeRecord(&changed)); err != nil {
 		return err
 	}
 
-	s.emitResync(ctx)
+	if changed.Load() {
+		s.emitResync(ctx)
+	}
 	return nil
 }
 
 var streamConfigPrefix = []byte("stream:config:")
 
-func mergeRecord(txn *badger.Txn, kv *pb.KV) error {
-	switch {
-	case schema.IsVersionKey(kv.Key):
-		return nil
+func mergeRecord(changed *atomic.Bool) func(txn *badger.Txn, kv *pb.KV) error {
+	return func(txn *badger.Txn, kv *pb.KV) error {
+		switch {
+		case schema.IsVersionKey(kv.Key):
+			return nil
 
-	case bytes.HasPrefix(kv.Key, streamConfigPrefix):
-		return schema.ApplyEnvelope(txn, kv.Key, kv.Value)
+		case bytes.HasPrefix(kv.Key, streamConfigPrefix):
+			applied, err := schema.ApplyEnvelope(txn, kv.Key, kv.Value)
+			if err != nil {
+				return err
+			}
+			if applied {
+				changed.Store(true)
+			}
+			return nil
 
-	default:
-		entry := &badger.Entry{
-			Key:       kv.Key,
-			Value:     kv.Value,
-			ExpiresAt: kv.ExpiresAt,
+		default:
+			entry := &badger.Entry{
+				Key:       kv.Key,
+				Value:     kv.Value,
+				ExpiresAt: kv.ExpiresAt,
+			}
+			if len(kv.UserMeta) > 0 {
+				entry.UserMeta = kv.UserMeta[0]
+			}
+			if err := txn.SetEntry(entry); err != nil {
+				return err
+			}
+			changed.Store(true)
+			return nil
 		}
-		if len(kv.UserMeta) > 0 {
-			entry.UserMeta = kv.UserMeta[0]
-		}
-		return txn.SetEntry(entry)
 	}
 }
 

@@ -23,6 +23,10 @@ type ChangeEvent struct {
 	Name      string
 	Op        Operation
 	Resync    bool
+
+	Origin string
+	Key    []byte
+	Record []byte
 }
 
 type subscribeMessage struct {

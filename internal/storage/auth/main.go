@@ -140,11 +140,14 @@ func (s *storageImpl) Load(ctx context.Context, r io.Reader) error {
 }
 
 func (s *storageImpl) Merge(ctx context.Context, r io.Reader) error {
-	if err := s.kvStore.Merge(ctx, r, schema.MergeEnveloped); err != nil {
+	var applied []schema.AppliedRecord
+	if err := s.kvStore.Merge(ctx, r, schema.MergeEnveloped(&applied)); err != nil {
 		return err
 	}
 
-	s.emitResync(ctx)
+	if len(applied) > 0 {
+		s.emitResync(ctx)
+	}
 	return nil
 }
 
