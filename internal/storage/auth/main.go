@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"io"
 
@@ -16,6 +17,7 @@ import (
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage"
 	"link-society.com/flowg/internal/storage/auth/transactions"
+	"link-society.com/flowg/internal/storage/changefeed"
 	"link-society.com/flowg/internal/storage/schema"
 	"link-society.com/flowg/internal/utils/fxproviders"
 	"link-society.com/flowg/internal/utils/hlc"
@@ -55,16 +57,24 @@ type Options struct {
 	TombstoneGracePeriod time.Duration
 }
 
+const (
+	roleKind  = "role"
+	userKind  = "user"
+	tokenKind = "token"
+)
+
 type storageImpl struct {
-	kvStore kvstore.Storage
-	clock   *hlc.Clock
+	kvStore  kvstore.Storage
+	clock    *hlc.Clock
+	notifier changefeed.Notifier
 }
 
 type deps struct {
 	fx.In
 
-	S     kvstore.Storage `name:"storage.auth"`
-	Clock *hlc.Clock
+	S        kvstore.Storage `name:"storage.auth"`
+	Clock    *hlc.Clock
+	Notifier changefeed.Notifier
 }
 
 var _ Storage = (*storageImpl)(nil)
@@ -91,7 +101,7 @@ func NewStorage(opts Options) fx.Option {
 		"storage.auth",
 		kvstore.NewStorage(kvOpts),
 		fx.Provide(func(lc fx.Lifecycle, d deps) Storage {
-			storage := &storageImpl{kvStore: d.S, clock: d.Clock}
+			storage := &storageImpl{kvStore: d.S, clock: d.Clock, notifier: d.Notifier}
 
 			lc.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {
@@ -130,7 +140,12 @@ func (s *storageImpl) Load(ctx context.Context, r io.Reader) error {
 }
 
 func (s *storageImpl) Merge(ctx context.Context, r io.Reader) error {
-	return s.kvStore.Merge(ctx, r, schema.MergeEnveloped)
+	if err := s.kvStore.Merge(ctx, r, schema.MergeEnveloped); err != nil {
+		return err
+	}
+
+	s.emitResync(ctx)
+	return nil
 }
 
 func (s *storageImpl) ListRoles(ctx context.Context) ([]models.Role, error) {
@@ -171,22 +186,34 @@ func (s *storageImpl) FetchRole(ctx context.Context, name string) (*models.Role,
 
 func (s *storageImpl) SaveRole(ctx context.Context, role models.Role) error {
 	ts := s.clock.Now()
-	return s.kvStore.Update(
+	err := s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
 			return transactions.SaveRole(txn, role, ts)
 		},
 	)
+	if err != nil {
+		return err
+	}
+
+	s.emitChange(ctx, roleKind, role.Name, changefeed.OpWrite)
+	return nil
 }
 
 func (s *storageImpl) DeleteRole(ctx context.Context, name string) error {
 	ts := s.clock.Now()
-	return s.kvStore.Update(
+	err := s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
 			return transactions.DeleteRole(txn, name, ts)
 		},
 	)
+	if err != nil {
+		return err
+	}
+
+	s.emitChange(ctx, roleKind, name, changefeed.OpDelete)
+	return nil
 }
 
 func (s *storageImpl) ListUsers(ctx context.Context) ([]models.User, error) {
@@ -245,32 +272,50 @@ func (s *storageImpl) ListUserScopes(ctx context.Context, name string) ([]models
 
 func (s *storageImpl) SaveUser(ctx context.Context, user models.User, password string) error {
 	ts := s.clock.Now()
-	return s.kvStore.Update(
+	err := s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
 			return transactions.SaveUser(txn, user, password, ts)
 		},
 	)
+	if err != nil {
+		return err
+	}
+
+	s.emitChange(ctx, userKind, user.Name, changefeed.OpWrite)
+	return nil
 }
 
 func (s *storageImpl) PatchUserRoles(ctx context.Context, user models.User) error {
 	ts := s.clock.Now()
-	return s.kvStore.Update(
+	err := s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
 			return transactions.PatchUserRoles(txn, user, ts)
 		},
 	)
+	if err != nil {
+		return err
+	}
+
+	s.emitChange(ctx, userKind, user.Name, changefeed.OpWrite)
+	return nil
 }
 
 func (s *storageImpl) DeleteUser(ctx context.Context, name string) error {
 	ts := s.clock.Now()
-	return s.kvStore.Update(
+	err := s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
 			return transactions.DeleteUser(txn, name, ts)
 		},
 	)
+	if err != nil {
+		return err
+	}
+
+	s.emitChange(ctx, userKind, name, changefeed.OpDelete)
+	return nil
 }
 
 func (s *storageImpl) VerifyUserPassword(ctx context.Context, name, password string) (bool, error) {
@@ -325,6 +370,7 @@ func (s *storageImpl) CreateToken(ctx context.Context, username string) (string,
 		return "", "", err
 	}
 
+	s.emitChange(ctx, tokenKind, username, changefeed.OpWrite)
 	return token, tokenUuid, nil
 }
 
@@ -366,10 +412,55 @@ func (s *storageImpl) ListTokens(ctx context.Context, username string) ([]string
 
 func (s *storageImpl) DeleteToken(ctx context.Context, username string, tokenUUID string) error {
 	ts := s.clock.Now()
-	return s.kvStore.Update(
+	err := s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
 			return transactions.DeleteToken(txn, username, tokenUUID, ts)
 		},
 	)
+	if err != nil {
+		return err
+	}
+
+	s.emitChange(ctx, tokenKind, username, changefeed.OpDelete)
+	return nil
+}
+
+func (s *storageImpl) emitChange(
+	ctx context.Context,
+	kind string,
+	name string,
+	op changefeed.Operation,
+) {
+	event := changefeed.ChangeEvent{
+		Namespace: changefeed.NamespaceAuth,
+		Kind:      kind,
+		Name:      name,
+		Op:        op,
+	}
+	if err := s.notifier.Notify(ctx, event); err != nil {
+		slog.ErrorContext(
+			ctx,
+			"failed to emit change event",
+			"channel", "storage.auth",
+			"kind", kind,
+			"name", name,
+			"error", err.Error(),
+		)
+	}
+}
+
+func (s *storageImpl) emitResync(ctx context.Context) {
+	event := changefeed.ChangeEvent{
+		Namespace: changefeed.NamespaceAuth,
+		Resync:    true,
+	}
+	if err := s.notifier.Notify(ctx, event); err != nil {
+		slog.ErrorContext(
+			ctx,
+			"failed to emit resync event",
+			"channel", "storage.auth",
+			"error", err.Error(),
+		)
+	}
 }

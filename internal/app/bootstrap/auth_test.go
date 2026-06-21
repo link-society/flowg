@@ -9,6 +9,7 @@ import (
 	"link-society.com/flowg/internal/models"
 
 	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage/changefeed"
 
 	"link-society.com/flowg/internal/app/bootstrap"
 	"link-society.com/flowg/internal/app/logging"
@@ -28,6 +29,7 @@ func TestDefaultRolesAndUsers(t *testing.T) {
 	app := fxtest.New(
 		t,
 		fx.Provide(func() *hlc.Clock { return hlc.NewClock("test") }),
+		changefeed.NewNotifier(),
 		auth.NewStorage(authOpts),
 		fx.Populate(&authStorage),
 		fx.NopLogger,

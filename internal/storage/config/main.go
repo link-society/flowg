@@ -159,7 +159,12 @@ func (s *storageImpl) Load(ctx context.Context, r io.Reader) error {
 }
 
 func (s *storageImpl) Merge(ctx context.Context, r io.Reader) error {
-	return s.kvStore.Merge(ctx, r, schema.MergeEnveloped)
+	if err := s.kvStore.Merge(ctx, r, schema.MergeEnveloped); err != nil {
+		return err
+	}
+
+	s.emitResync(ctx)
+	return nil
 }
 
 func (s *storageImpl) ListTransformers(ctx context.Context) ([]string, error) {
@@ -429,6 +434,21 @@ func (s *storageImpl) emitChange(
 			"channel", "storage.config",
 			"kind", itemType,
 			"name", name,
+			"error", err.Error(),
+		)
+	}
+}
+
+func (s *storageImpl) emitResync(ctx context.Context) {
+	event := changefeed.ChangeEvent{
+		Namespace: changefeed.NamespaceConfig,
+		Resync:    true,
+	}
+	if err := s.notifier.Notify(ctx, event); err != nil {
+		slog.ErrorContext(
+			ctx,
+			"failed to emit resync event",
+			"channel", "storage.config",
 			"error", err.Error(),
 		)
 	}

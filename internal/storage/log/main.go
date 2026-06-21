@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log/slog"
 
 	"bytes"
 	"time"
@@ -18,6 +19,7 @@ import (
 
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage"
+	"link-society.com/flowg/internal/storage/changefeed"
 	"link-society.com/flowg/internal/storage/log/transactions"
 	"link-society.com/flowg/internal/storage/schema"
 	"link-society.com/flowg/internal/utils/hlc"
@@ -59,16 +61,20 @@ type Options struct {
 	TombstoneGracePeriod time.Duration
 }
 
+const streamKind = "stream"
+
 type storageImpl struct {
-	kvStore kvstore.Storage
-	clock   *hlc.Clock
+	kvStore  kvstore.Storage
+	clock    *hlc.Clock
+	notifier changefeed.Notifier
 }
 
 type deps struct {
 	fx.In
 
-	S     kvstore.Storage `name:"storage.log"`
-	Clock *hlc.Clock
+	S        kvstore.Storage `name:"storage.log"`
+	Clock    *hlc.Clock
+	Notifier changefeed.Notifier
 }
 
 var _ Storage = (*storageImpl)(nil)
@@ -95,8 +101,9 @@ func NewStorage(opts Options) fx.Option {
 		kvstore.NewStorage(kvOpts),
 		fx.Provide(func(lc fx.Lifecycle, d deps) Storage {
 			storage := &storageImpl{
-				kvStore: d.S,
-				clock:   d.Clock,
+				kvStore:  d.S,
+				clock:    d.Clock,
+				notifier: d.Notifier,
 			}
 
 			lc.Append(fx.Hook{
@@ -133,7 +140,12 @@ func (s *storageImpl) Load(ctx context.Context, r io.Reader) error {
 }
 
 func (s *storageImpl) Merge(ctx context.Context, r io.Reader) error {
-	return s.kvStore.Merge(ctx, r, mergeRecord)
+	if err := s.kvStore.Merge(ctx, r, mergeRecord); err != nil {
+		return err
+	}
+
+	s.emitResync(ctx)
+	return nil
 }
 
 var streamConfigPrefix = []byte("stream:config:")
@@ -215,22 +227,67 @@ func (s *storageImpl) GetOrCreateStreamConfig(ctx context.Context, stream string
 
 func (s *storageImpl) ConfigureStream(ctx context.Context, stream string, config models.StreamConfig) error {
 	ts := s.clock.Now()
-	return s.kvStore.Update(
+	err := s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
 			return transactions.ConfigureStream(txn, stream, config, ts)
 		},
 	)
+	if err != nil {
+		return err
+	}
+
+	s.emitChange(ctx, stream, changefeed.OpWrite)
+	return nil
 }
 
 func (s *storageImpl) DeleteStream(ctx context.Context, stream string) error {
 	ts := s.clock.Now()
-	return s.kvStore.Update(
+	err := s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
 			return transactions.DeleteStream(txn, stream, ts)
 		},
 	)
+	if err != nil {
+		return err
+	}
+
+	s.emitChange(ctx, stream, changefeed.OpDelete)
+	return nil
+}
+
+func (s *storageImpl) emitChange(ctx context.Context, stream string, op changefeed.Operation) {
+	event := changefeed.ChangeEvent{
+		Namespace: changefeed.NamespaceLog,
+		Kind:      streamKind,
+		Name:      stream,
+		Op:        op,
+	}
+	if err := s.notifier.Notify(ctx, event); err != nil {
+		slog.ErrorContext(
+			ctx,
+			"failed to emit change event",
+			"channel", "storage.log",
+			"stream", stream,
+			"error", err.Error(),
+		)
+	}
+}
+
+func (s *storageImpl) emitResync(ctx context.Context) {
+	event := changefeed.ChangeEvent{
+		Namespace: changefeed.NamespaceLog,
+		Resync:    true,
+	}
+	if err := s.notifier.Notify(ctx, event); err != nil {
+		slog.ErrorContext(
+			ctx,
+			"failed to emit resync event",
+			"channel", "storage.log",
+			"error", err.Error(),
+		)
+	}
 }
 
 func (s *storageImpl) StreamUsage(ctx context.Context, stream string) (int64, error) {

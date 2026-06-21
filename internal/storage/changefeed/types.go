@@ -22,6 +22,7 @@ type ChangeEvent struct {
 	Kind      string
 	Name      string
 	Op        Operation
+	Resync    bool
 }
 
 type subscribeMessage struct {
