@@ -8,13 +8,14 @@ import (
 
 	"github.com/dgraph-io/badger/v4"
 
+	"link-society.com/flowg/internal/utils/hlc"
 	"link-society.com/flowg/internal/utils/kvstore"
+	"link-society.com/flowg/internal/utils/lww"
 )
 
-func migrateAlertScopes(ctx context.Context, kvStore kvstore.Storage) error {
+func migrateAlertScopes(ctx context.Context, kvStore kvstore.Storage, clock *hlc.Clock) error {
 	return kvStore.Update(ctx, func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
-		opts.PrefetchValues = false
 		opts.Prefix = []byte("role:")
 		it := txn.NewIterator(opts)
 
@@ -24,8 +25,26 @@ func migrateAlertScopes(ctx context.Context, kvStore kvstore.Storage) error {
 		}{}
 
 		for it.Rewind(); it.Valid(); it.Next() {
-			key := it.Item().Key()
-			parts := strings.Split(string(key[5:]), ":")
+			item := it.Item()
+
+			live := false
+			err := item.Value(func(val []byte) error {
+				env, err := lww.Unmarshal(val)
+				if err != nil {
+					return err
+				}
+				live = !env.Deleted
+				return nil
+			})
+			if err != nil {
+				it.Close()
+				return err
+			}
+			if !live {
+				continue
+			}
+
+			parts := strings.Split(string(item.Key()[5:]), ":")
 			roleName := parts[0]
 			scopeName := parts[1]
 
@@ -52,11 +71,13 @@ func migrateAlertScopes(ctx context.Context, kvStore kvstore.Storage) error {
 				oldKey := fmt.Sprintf("role:%s:%s_alerts", roleName, update.scopeType)
 				newKey := fmt.Sprintf("role:%s:%s_forwarders", roleName, update.scopeType)
 
-				if err := txn.Set([]byte(newKey), []byte{}); err != nil {
+				ts := clock.Now()
+
+				if _, err := lww.Apply(txn, []byte(newKey), lww.Envelope{Timestamp: ts}); err != nil {
 					return fmt.Errorf("could not migrate old scope '%s' to new scope '%s': %w", oldKey, newKey, err)
 				}
 
-				if err := txn.Delete([]byte(oldKey)); err != nil {
+				if _, err := lww.Apply(txn, []byte(oldKey), lww.Envelope{Timestamp: ts, Deleted: true}); err != nil {
 					return fmt.Errorf("could not delete old scope '%s': %w", oldKey, err)
 				}
 			}

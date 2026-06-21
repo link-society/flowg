@@ -16,6 +16,7 @@ import (
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage"
 	"link-society.com/flowg/internal/storage/log/transactions"
+	"link-society.com/flowg/internal/utils/hlc"
 	"link-society.com/flowg/internal/utils/kvstore"
 
 	"link-society.com/flowg/internal/utils/langs/filtering"
@@ -55,12 +56,14 @@ type Options struct {
 
 type storageImpl struct {
 	kvStore kvstore.Storage
+	clock   *hlc.Clock
 }
 
 type deps struct {
 	fx.In
 
-	S kvstore.Storage `name:"storage.log"`
+	S     kvstore.Storage `name:"storage.log"`
+	Clock *hlc.Clock
 }
 
 var _ Storage = (*storageImpl)(nil)
@@ -87,6 +90,7 @@ func NewStorage(opts Options) fx.Option {
 		fx.Provide(func(d deps) Storage {
 			return &storageImpl{
 				kvStore: d.S,
+				clock:   d.Clock,
 			}
 		}),
 		fxproviders.ProvideActor[*gcActor](func(d deps) *gcActor {
@@ -146,10 +150,11 @@ func (s *storageImpl) ListStreamFields(ctx context.Context, stream string) ([]st
 func (s *storageImpl) GetOrCreateStreamConfig(ctx context.Context, stream string) (models.StreamConfig, error) {
 	var streamConfig models.StreamConfig
 
+	ts := s.clock.Now()
 	err := s.kvStore.Update(ctx,
 		func(txn *badger.Txn) error {
 			var err error
-			streamConfig, err = transactions.GetOrCreateStreamConfig(txn, stream)
+			streamConfig, err = transactions.GetOrCreateStreamConfig(txn, stream, ts)
 			return err
 		},
 	)
@@ -162,19 +167,21 @@ func (s *storageImpl) GetOrCreateStreamConfig(ctx context.Context, stream string
 }
 
 func (s *storageImpl) ConfigureStream(ctx context.Context, stream string, config models.StreamConfig) error {
+	ts := s.clock.Now()
 	return s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
-			return transactions.ConfigureStream(txn, stream, config)
+			return transactions.ConfigureStream(txn, stream, config, ts)
 		},
 	)
 }
 
 func (s *storageImpl) DeleteStream(ctx context.Context, stream string) error {
+	ts := s.clock.Now()
 	return s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
-			return transactions.DeleteStream(txn, stream)
+			return transactions.DeleteStream(txn, stream, ts)
 		},
 	)
 }
@@ -232,10 +239,11 @@ func (s *storageImpl) Distinct(ctx context.Context, stream string) (map[string][
 
 func (s *storageImpl) Ingest(ctx context.Context, stream string, logRecord *models.LogRecord) ([]byte, error) {
 	key := logRecord.NewDbKey(stream)
+	ts := s.clock.Now()
 	err := s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
-			return transactions.Ingest(txn, stream, logRecord, key)
+			return transactions.Ingest(txn, stream, logRecord, key, ts)
 		},
 	)
 	if err != nil {

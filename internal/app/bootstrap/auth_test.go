@@ -12,6 +12,7 @@ import (
 
 	"link-society.com/flowg/internal/app/bootstrap"
 	"link-society.com/flowg/internal/app/logging"
+	"link-society.com/flowg/internal/utils/hlc"
 )
 
 func TestDefaultRolesAndUsers(t *testing.T) {
@@ -26,6 +27,7 @@ func TestDefaultRolesAndUsers(t *testing.T) {
 
 	app := fxtest.New(
 		t,
+		fx.Provide(func() *hlc.Clock { return hlc.NewClock("test") }),
 		auth.NewStorage(authOpts),
 		fx.Populate(&authStorage),
 		fx.NopLogger,

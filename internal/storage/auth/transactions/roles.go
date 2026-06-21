@@ -6,11 +6,15 @@ import (
 	"github.com/dgraph-io/badger/v4"
 
 	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/utils/hlc"
 )
 
 func ListRoles(txn *badger.Txn) ([]models.Role, error) {
 	roles := []models.Role{}
-	roleNames := fetchRoleNames(txn)
+	roleNames, err := fetchRoleNames(txn)
+	if err != nil {
+		return nil, err
+	}
 
 	for _, roleName := range roleNames {
 		role, err := FetchRole(txn, roleName)
@@ -30,14 +34,21 @@ func FetchRole(txn *badger.Txn, name string) (*models.Role, error) {
 	role := &models.Role{Name: name}
 
 	opts := badger.DefaultIteratorOptions
-	opts.PrefetchValues = false
 	opts.Prefix = []byte(fmt.Sprintf("role:%s:", name))
 	it := txn.NewIterator(opts)
 	defer it.Close()
 
 	for it.Rewind(); it.Valid(); it.Next() {
-		key := it.Item().Key()
-		scopeName := string(key[len(name)+6:])
+		item := it.Item()
+		_, live, err := liveValue(item)
+		if err != nil {
+			return nil, err
+		}
+		if !live {
+			continue
+		}
+
+		scopeName := string(item.Key()[len(name)+6:])
 		scope, err := models.ParseScope(scopeName)
 		if err != nil {
 			return nil, err
@@ -49,10 +60,9 @@ func FetchRole(txn *badger.Txn, name string) (*models.Role, error) {
 	return role, nil
 }
 
-func SaveRole(txn *badger.Txn, role models.Role) error {
-	key := []byte(fmt.Sprintf("index:role:%s", role.Name))
-	err := txn.Set(key, []byte{})
-	if err != nil {
+func SaveRole(txn *badger.Txn, role models.Role, ts hlc.Timestamp) error {
+	indexKey := []byte(fmt.Sprintf("index:role:%s", role.Name))
+	if err := setItem(txn, indexKey, []byte{}, ts); err != nil {
 		return fmt.Errorf(
 			"failed to save index of role '%s': %w",
 			role.Name, err,
@@ -60,18 +70,27 @@ func SaveRole(txn *badger.Txn, role models.Role) error {
 	}
 
 	opts := badger.DefaultIteratorOptions
-	opts.PrefetchValues = false
 	opts.Prefix = []byte(fmt.Sprintf("role:%s:", role.Name))
 	it := txn.NewIterator(opts)
-	defer it.Close()
 
 	obsoleteScopes := map[models.Scope][]byte{}
 
 	for it.Rewind(); it.Valid(); it.Next() {
-		key := it.Item().KeyCopy(nil)
+		item := it.Item()
+		_, live, err := liveValue(item)
+		if err != nil {
+			it.Close()
+			return err
+		}
+		if !live {
+			continue
+		}
+
+		key := item.KeyCopy(nil)
 		scopeName := string(key[len(role.Name)+6:])
 		scope, err := models.ParseScope(scopeName)
 		if err != nil {
+			it.Close()
 			return err
 		}
 
@@ -79,12 +98,12 @@ func SaveRole(txn *badger.Txn, role models.Role) error {
 			obsoleteScopes[scope] = key
 		}
 	}
+	it.Close()
 
 	for _, scope := range role.Scopes {
 		if _, exists := obsoleteScopes[scope]; !exists {
 			key := []byte(fmt.Sprintf("role:%s:%s", role.Name, scope))
-			err := txn.Set(key, []byte{})
-			if err != nil {
+			if err := setItem(txn, key, []byte{}, ts); err != nil {
 				return fmt.Errorf(
 					"failed to add scope '%s' to role '%s': %w",
 					scope, role.Name, err,
@@ -96,8 +115,7 @@ func SaveRole(txn *badger.Txn, role models.Role) error {
 	}
 
 	for scope, key := range obsoleteScopes {
-		err := txn.Delete(key)
-		if err != nil {
+		if err := deleteItem(txn, key, ts); err != nil {
 			return fmt.Errorf(
 				"failed to remove obsolete scope '%s' from role '%s': %w",
 				scope, role.Name, err,
@@ -108,22 +126,28 @@ func SaveRole(txn *badger.Txn, role models.Role) error {
 	return nil
 }
 
-func DeleteRole(txn *badger.Txn, name string) error {
+func DeleteRole(txn *badger.Txn, name string, ts hlc.Timestamp) error {
 	opts := badger.DefaultIteratorOptions
-	opts.PrefetchValues = false
 	opts.Prefix = []byte(fmt.Sprintf("role:%s:", name))
 	it := txn.NewIterator(opts)
-	defer it.Close()
 
 	keys := make([][]byte, 0)
 
 	for it.Rewind(); it.Valid(); it.Next() {
-		keys = append(keys, it.Item().KeyCopy(nil))
+		item := it.Item()
+		_, live, err := liveValue(item)
+		if err != nil {
+			it.Close()
+			return err
+		}
+		if live {
+			keys = append(keys, item.KeyCopy(nil))
+		}
 	}
+	it.Close()
 
 	for _, key := range keys {
-		err := txn.Delete(key)
-		if err != nil && err != badger.ErrKeyNotFound {
+		if err := deleteItem(txn, key, ts); err != nil {
 			return fmt.Errorf(
 				"failed to delete key '%s' from role '%s': %w",
 				string(key), name, err,
@@ -131,8 +155,8 @@ func DeleteRole(txn *badger.Txn, name string) error {
 		}
 	}
 
-	err := txn.Delete([]byte(fmt.Sprintf("index:role:%s", name)))
-	if err != nil && err != badger.ErrKeyNotFound {
+	indexKey := []byte(fmt.Sprintf("index:role:%s", name))
+	if err := deleteItem(txn, indexKey, ts); err != nil {
 		return fmt.Errorf(
 			"failed to delete index of role '%s': %w",
 			name, err,
@@ -142,19 +166,25 @@ func DeleteRole(txn *badger.Txn, name string) error {
 	return nil
 }
 
-func fetchRoleNames(txn *badger.Txn) []string {
+func fetchRoleNames(txn *badger.Txn) ([]string, error) {
 	roleNames := []string{}
 
 	opts := badger.DefaultIteratorOptions
-	opts.PrefetchValues = false
 	opts.Prefix = []byte("index:role:")
 	it := txn.NewIterator(opts)
 	defer it.Close()
 
 	for it.Rewind(); it.Valid(); it.Next() {
-		key := it.Item().Key()
-		roleNames = append(roleNames, string(key[11:]))
+		item := it.Item()
+		_, live, err := liveValue(item)
+		if err != nil {
+			return nil, err
+		}
+		if !live {
+			continue
+		}
+		roleNames = append(roleNames, string(item.Key()[11:]))
 	}
 
-	return roleNames
+	return roleNames, nil
 }

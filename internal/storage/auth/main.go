@@ -13,6 +13,7 @@ import (
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage"
 	"link-society.com/flowg/internal/storage/auth/transactions"
+	"link-society.com/flowg/internal/utils/hlc"
 	"link-society.com/flowg/internal/utils/kvstore"
 )
 
@@ -48,12 +49,14 @@ type Options struct {
 
 type storageImpl struct {
 	kvStore kvstore.Storage
+	clock   *hlc.Clock
 }
 
 type deps struct {
 	fx.In
 
-	S kvstore.Storage `name:"storage.auth"`
+	S     kvstore.Storage `name:"storage.auth"`
+	Clock *hlc.Clock
 }
 
 var _ Storage = (*storageImpl)(nil)
@@ -77,11 +80,11 @@ func NewStorage(opts Options) fx.Option {
 		"storage.auth",
 		kvstore.NewStorage(kvOpts),
 		fx.Provide(func(lc fx.Lifecycle, d deps) Storage {
-			storage := &storageImpl{kvStore: d.S}
+			storage := &storageImpl{kvStore: d.S, clock: d.Clock}
 
 			lc.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {
-					if err := migrateAlertScopes(ctx, storage.kvStore); err != nil {
+					if err := migrateAlertScopes(ctx, storage.kvStore, storage.clock); err != nil {
 						return fmt.Errorf("failed to migrate alerts: %w", err)
 					}
 
@@ -139,19 +142,21 @@ func (s *storageImpl) FetchRole(ctx context.Context, name string) (*models.Role,
 }
 
 func (s *storageImpl) SaveRole(ctx context.Context, role models.Role) error {
+	ts := s.clock.Now()
 	return s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
-			return transactions.SaveRole(txn, role)
+			return transactions.SaveRole(txn, role, ts)
 		},
 	)
 }
 
 func (s *storageImpl) DeleteRole(ctx context.Context, name string) error {
+	ts := s.clock.Now()
 	return s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
-			return transactions.DeleteRole(txn, name)
+			return transactions.DeleteRole(txn, name, ts)
 		},
 	)
 }
@@ -211,28 +216,31 @@ func (s *storageImpl) ListUserScopes(ctx context.Context, name string) ([]models
 }
 
 func (s *storageImpl) SaveUser(ctx context.Context, user models.User, password string) error {
+	ts := s.clock.Now()
 	return s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
-			return transactions.SaveUser(txn, user, password)
+			return transactions.SaveUser(txn, user, password, ts)
 		},
 	)
 }
 
 func (s *storageImpl) PatchUserRoles(ctx context.Context, user models.User) error {
+	ts := s.clock.Now()
 	return s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
-			return transactions.PatchUserRoles(txn, user)
+			return transactions.PatchUserRoles(txn, user, ts)
 		},
 	)
 }
 
 func (s *storageImpl) DeleteUser(ctx context.Context, name string) error {
+	ts := s.clock.Now()
 	return s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
-			return transactions.DeleteUser(txn, name)
+			return transactions.DeleteUser(txn, name, ts)
 		},
 	)
 }
@@ -276,11 +284,12 @@ func (s *storageImpl) VerifyUserPermission(ctx context.Context, username string,
 func (s *storageImpl) CreateToken(ctx context.Context, username string) (string, string, error) {
 	var token, tokenUuid string
 
+	ts := s.clock.Now()
 	err := s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
 			var err error
-			token, tokenUuid, err = transactions.CreateToken(txn, username)
+			token, tokenUuid, err = transactions.CreateToken(txn, username, ts)
 			return err
 		},
 	)
@@ -315,8 +324,9 @@ func (s *storageImpl) ListTokens(ctx context.Context, username string) ([]string
 	err := s.kvStore.View(
 		ctx,
 		func(txn *badger.Txn) error {
-			tokens = transactions.ListTokens(txn, username)
-			return nil
+			var err error
+			tokens, err = transactions.ListTokens(txn, username)
+			return err
 		},
 	)
 	if err != nil {
@@ -327,10 +337,11 @@ func (s *storageImpl) ListTokens(ctx context.Context, username string) ([]string
 }
 
 func (s *storageImpl) DeleteToken(ctx context.Context, username string, tokenUUID string) error {
+	ts := s.clock.Now()
 	return s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
-			return transactions.DeleteToken(txn, username, tokenUUID)
+			return transactions.DeleteToken(txn, username, tokenUUID, ts)
 		},
 	)
 }

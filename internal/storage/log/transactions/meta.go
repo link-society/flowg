@@ -10,6 +10,8 @@ import (
 	"link-society.com/flowg/internal/app/featureflags"
 
 	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/utils/hlc"
+	"link-society.com/flowg/internal/utils/lww"
 )
 
 var demoStreamConfig = models.StreamConfig{
@@ -34,9 +36,18 @@ func FetchStreamConfigs(txn *badger.Txn) (map[string]models.StreamConfig, error)
 		if featureflags.GetDemoMode() {
 			streamConfig = demoStreamConfig
 		} else {
+			live := false
 			err := it.Item().Value(func(val []byte) error {
-				if len(val) > 0 {
-					if err := json.Unmarshal(val, &streamConfig); err != nil {
+				env, err := lww.Unmarshal(val)
+				if err != nil {
+					return fmt.Errorf("could not unmarshal stream config '%s': %w", stream, err)
+				}
+				if env.Deleted {
+					return nil
+				}
+				live = true
+				if len(env.Payload) > 0 {
+					if err := json.Unmarshal(env.Payload, &streamConfig); err != nil {
 						return fmt.Errorf("could not unmarshal stream config '%s': %w", stream, err)
 					}
 				}
@@ -44,6 +55,9 @@ func FetchStreamConfigs(txn *badger.Txn) (map[string]models.StreamConfig, error)
 			})
 			if err != nil {
 				return nil, err
+			}
+			if !live {
+				continue
 			}
 		}
 
@@ -78,7 +92,7 @@ func FetchStreamFields(txn *badger.Txn, stream string) []string {
 	return fields
 }
 
-func GetOrCreateStreamConfig(txn *badger.Txn, stream string) (models.StreamConfig, error) {
+func GetOrCreateStreamConfig(txn *badger.Txn, stream string, ts hlc.Timestamp) (models.StreamConfig, error) {
 	if featureflags.GetDemoMode() {
 		return demoStreamConfig, nil
 	}
@@ -86,36 +100,27 @@ func GetOrCreateStreamConfig(txn *badger.Txn, stream string) (models.StreamConfi
 	var streamConfig models.StreamConfig
 
 	streamKey := []byte(fmt.Sprintf("stream:config:%s", stream))
-	switch streamConfigItem, err := txn.Get(streamKey); {
-	case err != nil && err != badger.ErrKeyNotFound:
+	env, found, err := lww.Read(txn, streamKey)
+	if err != nil {
 		return models.StreamConfig{}, fmt.Errorf(
 			"could not fetch stream config '%s': %w",
 			stream, err,
 		)
+	}
 
-	case err == badger.ErrKeyNotFound:
-		err := txn.Set(streamKey, []byte(""))
-		if err != nil {
+	if !found {
+		if _, err := lww.Apply(txn, streamKey, lww.Envelope{Timestamp: ts}); err != nil {
 			return models.StreamConfig{}, fmt.Errorf(
 				"could not create default stream config '%s': %w",
 				stream, err,
 			)
 		}
-
-	case err == nil:
-		err := streamConfigItem.Value(func(val []byte) error {
-			if len(val) > 0 {
-				if err := json.Unmarshal(val, &streamConfig); err != nil {
-					return fmt.Errorf(
-						"could not unmarshal stream config '%s': %w",
-						stream, err,
-					)
-				}
-			}
-			return nil
-		})
-		if err != nil {
-			return models.StreamConfig{}, err
+	} else if len(env.Payload) > 0 {
+		if err := json.Unmarshal(env.Payload, &streamConfig); err != nil {
+			return models.StreamConfig{}, fmt.Errorf(
+				"could not unmarshal stream config '%s': %w",
+				stream, err,
+			)
 		}
 	}
 
@@ -126,12 +131,12 @@ func GetOrCreateStreamConfig(txn *badger.Txn, stream string) (models.StreamConfi
 	return streamConfig, nil
 }
 
-func ConfigureStream(txn *badger.Txn, stream string, config models.StreamConfig) error {
+func ConfigureStream(txn *badger.Txn, stream string, config models.StreamConfig, ts hlc.Timestamp) error {
 	if config.IndexedFields == nil {
 		config.IndexedFields = []string{}
 	}
 
-	oldConfig, err := GetOrCreateStreamConfig(txn, stream)
+	oldConfig, err := GetOrCreateStreamConfig(txn, stream, ts)
 	if err != nil {
 		return fmt.Errorf("could not fetch old stream config '%s': %w", stream, err)
 	}
@@ -142,7 +147,7 @@ func ConfigureStream(txn *badger.Txn, stream string, config models.StreamConfig)
 		return fmt.Errorf("could not marshal stream config '%s': %w", stream, err)
 	}
 
-	if err := txn.Set(streamKey, configVal); err != nil {
+	if _, err := lww.Apply(txn, streamKey, lww.Envelope{Timestamp: ts, Payload: configVal}); err != nil {
 		return fmt.Errorf("could not save stream config '%s': %w", stream, err)
 	}
 
@@ -161,7 +166,7 @@ func ConfigureStream(txn *badger.Txn, stream string, config models.StreamConfig)
 	return nil
 }
 
-func DeleteStream(txn *badger.Txn, stream string) error {
+func DeleteStream(txn *badger.Txn, stream string, ts hlc.Timestamp) error {
 	prefixes := []string{
 		fmt.Sprintf("entry:%s:", stream),
 		fmt.Sprintf("index:%s:", stream),
@@ -188,7 +193,7 @@ func DeleteStream(txn *badger.Txn, stream string) error {
 	}
 
 	streamKey := []byte(fmt.Sprintf("stream:config:%s", stream))
-	if err := txn.Delete(streamKey); err != nil {
+	if _, err := lww.Apply(txn, streamKey, lww.Envelope{Timestamp: ts, Deleted: true}); err != nil {
 		return fmt.Errorf("could not delete stream config '%s': %w", stream, err)
 	}
 

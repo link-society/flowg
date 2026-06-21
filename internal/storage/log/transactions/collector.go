@@ -9,15 +9,16 @@ import (
 	"github.com/dgraph-io/badger/v4"
 
 	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/utils/hlc"
 )
 
-func Ingest(txn *badger.Txn, stream string, logRecord *models.LogRecord, key []byte) error {
+func Ingest(txn *badger.Txn, stream string, logRecord *models.LogRecord, key []byte, ts hlc.Timestamp) error {
 	val, err := json.Marshal(logRecord)
 	if err != nil {
 		return fmt.Errorf("could not marshal log entry: %w", err)
 	}
 
-	streamConfig, err := GetOrCreateStreamConfig(txn, stream)
+	streamConfig, err := GetOrCreateStreamConfig(txn, stream, ts)
 	if err != nil {
 		return err
 	}

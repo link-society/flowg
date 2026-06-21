@@ -10,9 +10,10 @@ import (
 
 	authUtils "link-society.com/flowg/internal/utils/auth"
 	"link-society.com/flowg/internal/utils/auth/hash"
+	"link-society.com/flowg/internal/utils/hlc"
 )
 
-func CreateToken(txn *badger.Txn, username string) (string, string, error) {
+func CreateToken(txn *badger.Txn, username string, ts hlc.Timestamp) (string, string, error) {
 	token, err := authUtils.NewSecret("pat", 32)
 	if err != nil {
 		return "", "", err
@@ -26,18 +27,16 @@ func CreateToken(txn *badger.Txn, username string) (string, string, error) {
 	tokenUuid := uuid.New().String()
 
 	userKey := []byte(fmt.Sprintf("index:user:%s", username))
-	_, err = txn.Get(userKey)
+	_, found, err := getItem(txn, userKey)
 	if err != nil {
-		if err == badger.ErrKeyNotFound {
-			return "", "", fmt.Errorf("user '%s' does not exist", username)
-		}
-
 		return "", "", fmt.Errorf("failed to check if user '%s' exists: %w", username, err)
+	}
+	if !found {
+		return "", "", fmt.Errorf("user '%s' does not exist", username)
 	}
 
 	tokenKey := []byte(fmt.Sprintf("pat:%s:%s", username, tokenUuid))
-	err = txn.Set(tokenKey, []byte(tokenHash))
-	if err != nil {
+	if err := setItem(txn, tokenKey, []byte(tokenHash), ts); err != nil {
 		return "", "", fmt.Errorf("failed to add token to user '%s': %w", username, err)
 	}
 
@@ -54,30 +53,26 @@ func VerifyToken(txn *badger.Txn, token string) (*models.User, error) {
 	defer it.Close()
 
 	for it.Rewind(); it.Valid(); it.Next() {
-		key := it.Item().Key()
-		keySuffix := string(key[4:])
-		associatedUser := keySuffix[:len(keySuffix)-37] // remove UUID
-
-		err := it.Item().Value(func(val []byte) error {
-			tokenHash := string(val)
-			isValid, err := hash.VerifyPassword(token, tokenHash)
-			if err != nil {
-				return fmt.Errorf("failed to verify token: %w", err)
-			}
-
-			if isValid {
-				username = associatedUser
-				found = true
-			}
-
-			return nil
-		})
-
+		item := it.Item()
+		payload, live, err := liveValue(item)
 		if err != nil {
 			return nil, err
 		}
+		if !live {
+			continue
+		}
 
-		if found {
+		keySuffix := string(item.Key()[4:])
+		associatedUser := keySuffix[:len(keySuffix)-37] // remove UUID
+
+		isValid, err := hash.VerifyPassword(token, string(payload))
+		if err != nil {
+			return nil, fmt.Errorf("failed to verify token: %w", err)
+		}
+
+		if isValid {
+			username = associatedUser
+			found = true
 			break
 		}
 	}
@@ -89,27 +84,32 @@ func VerifyToken(txn *badger.Txn, token string) (*models.User, error) {
 	return FetchUser(txn, username)
 }
 
-func ListTokens(txn *badger.Txn, username string) []string {
+func ListTokens(txn *badger.Txn, username string) ([]string, error) {
 	tokenUUIDs := []string{}
 
 	opts := badger.DefaultIteratorOptions
-	opts.PrefetchValues = false
 	opts.Prefix = []byte(fmt.Sprintf("pat:%s:", username))
 	it := txn.NewIterator(opts)
 	defer it.Close()
 
 	for it.Rewind(); it.Valid(); it.Next() {
-		key := it.Item().Key()
-		tokenUUIDs = append(tokenUUIDs, string(key[len(username)+5:]))
+		item := it.Item()
+		_, live, err := liveValue(item)
+		if err != nil {
+			return nil, err
+		}
+		if !live {
+			continue
+		}
+		tokenUUIDs = append(tokenUUIDs, string(item.Key()[len(username)+5:]))
 	}
 
-	return tokenUUIDs
+	return tokenUUIDs, nil
 }
 
-func DeleteToken(txn *badger.Txn, username string, tokenUUID string) error {
+func DeleteToken(txn *badger.Txn, username string, tokenUUID string, ts hlc.Timestamp) error {
 	key := []byte(fmt.Sprintf("pat:%s:%s", username, tokenUUID))
-	err := txn.Delete(key)
-	if err != nil && err != badger.ErrKeyNotFound {
+	if err := deleteItem(txn, key, ts); err != nil {
 		return fmt.Errorf(
 			"failed to delete token '%s' for user '%s': %w",
 			tokenUUID, username, err,

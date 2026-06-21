@@ -8,6 +8,7 @@ import (
 	"link-society.com/flowg/internal/models"
 
 	"link-society.com/flowg/internal/utils/auth/hash"
+	"link-society.com/flowg/internal/utils/hlc"
 )
 
 func ListUsers(txn *badger.Txn) ([]models.User, error) {
@@ -33,75 +34,85 @@ func ListUsers(txn *badger.Txn) ([]models.User, error) {
 }
 
 func FetchUser(txn *badger.Txn, name string) (*models.User, error) {
-	_, err := txn.Get([]byte(fmt.Sprintf("index:user:%s", name)))
+	_, found, err := getItem(txn, []byte(fmt.Sprintf("index:user:%s", name)))
 	if err != nil {
-		if err == badger.ErrKeyNotFound {
-			return nil, nil
-		}
-
 		return nil, fmt.Errorf("failed to get index of user '%s': %w", name, err)
+	}
+	if !found {
+		return nil, nil
 	}
 
 	user := &models.User{Name: name}
 
 	opts := badger.DefaultIteratorOptions
-	opts.PrefetchValues = false
 	opts.Prefix = []byte(fmt.Sprintf("user:%s:role:", name))
 	it := txn.NewIterator(opts)
 	defer it.Close()
 
 	for it.Rewind(); it.Valid(); it.Next() {
-		key := it.Item().Key()
-		roleName := string(key[len(name)+11:])
+		item := it.Item()
+		_, live, err := liveValue(item)
+		if err != nil {
+			return nil, err
+		}
+		if !live {
+			continue
+		}
+		roleName := string(item.Key()[len(name)+11:])
 		user.Roles = append(user.Roles, roleName)
 	}
 
 	return user, nil
 }
 
-func SaveUser(txn *badger.Txn, user models.User, password string) error {
+func SaveUser(txn *badger.Txn, user models.User, password string, ts hlc.Timestamp) error {
 	passwordHash, err := hash.HashPassword(password)
 	if err != nil {
 		return fmt.Errorf("failed to hash password: %w", err)
 	}
 
 	key := []byte(fmt.Sprintf("user:%s:password", user.Name))
-	err = txn.Set(key, []byte(passwordHash))
-	if err != nil {
+	if err := setItem(txn, key, []byte(passwordHash), ts); err != nil {
 		return fmt.Errorf("failed to save password of user '%s': %w", user.Name, err)
 	}
 
-	return PatchUserRoles(txn, user)
+	return PatchUserRoles(txn, user, ts)
 }
 
-func PatchUserRoles(txn *badger.Txn, user models.User) error {
-	key := []byte(fmt.Sprintf("index:user:%s", user.Name))
-	err := txn.Set(key, []byte{})
-	if err != nil {
+func PatchUserRoles(txn *badger.Txn, user models.User, ts hlc.Timestamp) error {
+	indexKey := []byte(fmt.Sprintf("index:user:%s", user.Name))
+	if err := setItem(txn, indexKey, []byte{}, ts); err != nil {
 		return fmt.Errorf("failed to save index of user '%s': %w", user.Name, err)
 	}
 
 	opts := badger.DefaultIteratorOptions
-	opts.PrefetchValues = false
 	opts.Prefix = []byte(fmt.Sprintf("user:%s:role:", user.Name))
 	it := txn.NewIterator(opts)
-	defer it.Close()
 
 	obsoleteRoles := map[string][]byte{}
 
 	for it.Rewind(); it.Valid(); it.Next() {
-		key := it.Item().KeyCopy(nil)
+		item := it.Item()
+		_, live, err := liveValue(item)
+		if err != nil {
+			it.Close()
+			return err
+		}
+		if !live {
+			continue
+		}
+		key := item.KeyCopy(nil)
 		roleName := string(key[len(user.Name)+11:])
 		if !user.HasRole(roleName) {
 			obsoleteRoles[roleName] = key
 		}
 	}
+	it.Close()
 
 	for _, role := range user.Roles {
 		if _, exists := obsoleteRoles[role]; !exists {
 			key := []byte(fmt.Sprintf("user:%s:role:%s", user.Name, role))
-			err := txn.Set(key, []byte{})
-			if err != nil {
+			if err := setItem(txn, key, []byte{}, ts); err != nil {
 				return fmt.Errorf(
 					"failed to add role '%s' to user '%s': %w",
 					role, user.Name, err,
@@ -113,8 +124,7 @@ func PatchUserRoles(txn *badger.Txn, user models.User) error {
 	}
 
 	for role, key := range obsoleteRoles {
-		err := txn.Delete(key)
-		if err != nil && err != badger.ErrKeyNotFound {
+		if err := deleteItem(txn, key, ts); err != nil {
 			return fmt.Errorf(
 				"failed to delete role '%s' from user '%s': %w",
 				role, user.Name, err,
@@ -125,36 +135,37 @@ func PatchUserRoles(txn *badger.Txn, user models.User) error {
 	return nil
 }
 
-func DeleteUser(txn *badger.Txn, name string) error {
+func DeleteUser(txn *badger.Txn, name string, ts hlc.Timestamp) error {
 	keys := make([][]byte, 0)
 
-	(func() {
+	collect := func(prefix string) error {
 		opts := badger.DefaultIteratorOptions
-		opts.PrefetchValues = false
-		opts.Prefix = []byte(fmt.Sprintf("user:%s:", name))
+		opts.Prefix = []byte(prefix)
 		it := txn.NewIterator(opts)
 		defer it.Close()
 
 		for it.Rewind(); it.Valid(); it.Next() {
-			keys = append(keys, it.Item().KeyCopy(nil))
+			item := it.Item()
+			_, live, err := liveValue(item)
+			if err != nil {
+				return err
+			}
+			if live {
+				keys = append(keys, item.KeyCopy(nil))
+			}
 		}
-	})()
+		return nil
+	}
 
-	(func() {
-		opts := badger.DefaultIteratorOptions
-		opts.PrefetchValues = false
-		opts.Prefix = []byte(fmt.Sprintf("pat:%s:", name))
-		it := txn.NewIterator(opts)
-		defer it.Close()
-
-		for it.Rewind(); it.Valid(); it.Next() {
-			keys = append(keys, it.Item().KeyCopy(nil))
-		}
-	})()
+	if err := collect(fmt.Sprintf("user:%s:", name)); err != nil {
+		return err
+	}
+	if err := collect(fmt.Sprintf("pat:%s:", name)); err != nil {
+		return err
+	}
 
 	for _, key := range keys {
-		err := txn.Delete(key)
-		if err != nil && err != badger.ErrKeyNotFound {
+		if err := deleteItem(txn, key, ts); err != nil {
 			return fmt.Errorf(
 				"failed to delete key '%s' of user '%s': %w",
 				name, key, err,
@@ -162,8 +173,8 @@ func DeleteUser(txn *badger.Txn, name string) error {
 		}
 	}
 
-	err := txn.Delete([]byte(fmt.Sprintf("index:user:%s", name)))
-	if err != nil && err != badger.ErrKeyNotFound {
+	indexKey := []byte(fmt.Sprintf("index:user:%s", name))
+	if err := deleteItem(txn, indexKey, ts); err != nil {
 		return fmt.Errorf(
 			"failed to delete index of user '%s': %w",
 			name, err,
@@ -177,21 +188,17 @@ func VerifyUserPassword(txn *badger.Txn, name, password string) (bool, error) {
 	isValid := false
 
 	key := []byte(fmt.Sprintf("user:%s:password", name))
-	item, err := txn.Get(key)
+	payload, found, err := getItem(txn, key)
 	if err != nil {
 		return false, fmt.Errorf("failed to get password of user '%s': %w", name, err)
 	}
+	if !found {
+		return false, fmt.Errorf("failed to get password of user '%s': %w", name, badger.ErrKeyNotFound)
+	}
 
-	err = item.Value(func(val []byte) error {
-		passwordHash := string(val)
-		isValid, err = hash.VerifyPassword(password, passwordHash)
-		if err != nil {
-			return fmt.Errorf("failed to verify password of user '%s': %w", name, err)
-		}
-		return nil
-	})
+	isValid, err = hash.VerifyPassword(password, string(payload))
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("failed to verify password of user '%s': %w", name, err)
 	}
 
 	return isValid, nil
@@ -199,7 +206,6 @@ func VerifyUserPassword(txn *badger.Txn, name, password string) (bool, error) {
 
 func VerifyUserPermission(txn *badger.Txn, name string, scope models.Scope) (bool, error) {
 	opts := badger.DefaultIteratorOptions
-	opts.PrefetchValues = false
 	opts.Prefix = []byte(fmt.Sprintf("user:%s:role:", name))
 	it := txn.NewIterator(opts)
 	defer it.Close()
@@ -207,21 +213,34 @@ func VerifyUserPermission(txn *badger.Txn, name string, scope models.Scope) (boo
 	roles := make([]string, 0)
 
 	for it.Rewind(); it.Valid(); it.Next() {
-		key := it.Item().Key()
-		roleName := string(key[len(name)+11:])
+		item := it.Item()
+		_, live, err := liveValue(item)
+		if err != nil {
+			return false, err
+		}
+		if !live {
+			continue
+		}
+		roleName := string(item.Key()[len(name)+11:])
 		roles = append(roles, roleName)
 	}
 
 	for _, roleName := range roles {
 		opts := badger.DefaultIteratorOptions
-		opts.PrefetchValues = false
 		opts.Prefix = []byte(fmt.Sprintf("role:%s:", roleName))
 		it := txn.NewIterator(opts)
 		defer it.Close()
 
 		for it.Rewind(); it.Valid(); it.Next() {
-			key := it.Item().Key()
-			scopeName := string(key[len(roleName)+6:])
+			item := it.Item()
+			_, live, err := liveValue(item)
+			if err != nil {
+				return false, err
+			}
+			if !live {
+				continue
+			}
+			scopeName := string(item.Key()[len(roleName)+6:])
 			roleScope, err := models.ParseScope(scopeName)
 			if err != nil {
 				return false, err
@@ -256,7 +275,6 @@ func ListUserScopes(txn *badger.Txn, username string) ([]models.Scope, error) {
 	scopeMap := map[models.Scope]struct{}{}
 
 	opts := badger.DefaultIteratorOptions
-	opts.PrefetchValues = false
 	opts.Prefix = []byte(fmt.Sprintf("user:%s:role:", username))
 	it := txn.NewIterator(opts)
 	defer it.Close()
@@ -264,21 +282,34 @@ func ListUserScopes(txn *badger.Txn, username string) ([]models.Scope, error) {
 	roles := make([]string, 0)
 
 	for it.Rewind(); it.Valid(); it.Next() {
-		key := it.Item().Key()
-		roleName := string(key[len(username)+11:])
+		item := it.Item()
+		_, live, err := liveValue(item)
+		if err != nil {
+			return nil, err
+		}
+		if !live {
+			continue
+		}
+		roleName := string(item.Key()[len(username)+11:])
 		roles = append(roles, roleName)
 	}
 
 	for _, roleName := range roles {
 		opts := badger.DefaultIteratorOptions
-		opts.PrefetchValues = false
 		opts.Prefix = []byte(fmt.Sprintf("role:%s:", roleName))
 		it := txn.NewIterator(opts)
 		defer it.Close()
 
 		for it.Rewind(); it.Valid(); it.Next() {
-			key := it.Item().Key()
-			scopeName := string(key[len(roleName)+6:])
+			item := it.Item()
+			_, live, err := liveValue(item)
+			if err != nil {
+				return nil, err
+			}
+			if !live {
+				continue
+			}
+			scopeName := string(item.Key()[len(roleName)+6:])
 			roleScope, err := models.ParseScope(scopeName)
 			if err != nil {
 				return nil, err
@@ -323,14 +354,20 @@ func fetchUsernames(txn *badger.Txn) ([]string, error) {
 	usernames := []string{}
 
 	opts := badger.DefaultIteratorOptions
-	opts.PrefetchValues = false
 	opts.Prefix = []byte("index:user:")
 	it := txn.NewIterator(opts)
 	defer it.Close()
 
 	for it.Rewind(); it.Valid(); it.Next() {
-		key := it.Item().Key()
-		usernames = append(usernames, string(key[11:]))
+		item := it.Item()
+		_, live, err := liveValue(item)
+		if err != nil {
+			return nil, err
+		}
+		if !live {
+			continue
+		}
+		usernames = append(usernames, string(item.Key()[11:]))
 	}
 
 	return usernames, nil
