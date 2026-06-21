@@ -208,7 +208,7 @@ func (t *httpTransport) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	mux.HandleFunc("GET /cluster/nodes", t.handleStatus)
 	mux.HandleFunc("POST /cluster/gossip", t.handleGossip)
-	mux.HandleFunc("POST /cluster/sync/:namespace", t.handleSync)
+	mux.HandleFunc("POST /cluster/sync/{namespace}", t.handleSync)
 
 	mux.ServeHTTP(w, r)
 }

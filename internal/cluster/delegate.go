@@ -97,41 +97,47 @@ func (d *delegate) MergeRemoteState(buf []byte, join bool) {
 		return
 	}
 
-	if remoteState.NodeID != d.localNodeID {
-		lastSync, ok := remoteState.LastSync[d.localNodeID]
-		if !ok {
-			d.logger.Error(
-				"remote state does not contain sync information for local node",
-				slog.String("cluster.remote.node", remoteState.NodeID),
-			)
-			return
-		}
+	if remoteState.NodeID == d.localNodeID {
+		return
+	}
 
-		remoteEndpoint, ok := d.endpoints.Get(remoteState.NodeID)
-		if !ok {
-			d.logger.Error(
-				"remote endpoint not found",
-				slog.String("cluster.remote.node", remoteState.NodeID),
-			)
-			return
-		}
+	remoteEndpoint, ok := d.endpoints.Get(remoteState.NodeID)
+	if !ok {
+		d.logger.Error(
+			"remote endpoint not found",
+			slog.String("cluster.remote.node", remoteState.NodeID),
+		)
+		return
+	}
 
-		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
-		defer cancel()
+	knownSince := make(map[string]uint64)
+	for _, syncState := range remoteState.LastSync[d.localNodeID] {
+		knownSince[syncState.Namespace] = syncState.Since
+	}
 
-		req := &syncRequest{
-			remoteNodeID:   remoteState.NodeID,
-			remoteEndpoint: remoteEndpoint,
-			lastSync:       lastSync,
-		}
-		if err := d.syncRequestM.Send(ctx, req); err != nil {
-			d.logger.Error(
-				"failed to send sync request",
-				slog.String("cluster.remote.node", remoteState.NodeID),
-				slog.String("error", err.Error()),
-			)
-			return
-		}
+	lastSync := make([]clusterstate.NamespaceSyncState, 0, len(d.storages))
+	for namespace := range d.storages {
+		lastSync = append(lastSync, clusterstate.NamespaceSyncState{
+			Namespace: namespace,
+			Since:     knownSince[namespace],
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	defer cancel()
+
+	req := &syncRequest{
+		remoteNodeID:   remoteState.NodeID,
+		remoteEndpoint: remoteEndpoint,
+		lastSync:       lastSync,
+	}
+	if err := d.syncRequestM.Send(ctx, req); err != nil {
+		d.logger.Error(
+			"failed to send sync request",
+			slog.String("cluster.remote.node", remoteState.NodeID),
+			slog.String("error", err.Error()),
+		)
+		return
 	}
 }
 

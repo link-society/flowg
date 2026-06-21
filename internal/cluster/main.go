@@ -75,8 +75,9 @@ func NewManager(opts ManagerOptions) fx.Option {
 					Actor: actor.New(&syncWorker{
 						logger: slog.Default().With(slog.String("channel", "cluster.sync")),
 
-						requestM: d.SyncRequestM,
-						cookie:   opts.Cookie,
+						localNodeID: opts.NodeID,
+						requestM:    d.SyncRequestM,
+						cookie:      opts.Cookie,
 
 						storages: map[string]storage.Streamable{
 							"auth":   d.AuthStorage,

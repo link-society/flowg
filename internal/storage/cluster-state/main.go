@@ -5,6 +5,7 @@ import (
 
 	"encoding/binary"
 	"fmt"
+	"strings"
 
 	"github.com/dgraph-io/badger/v4"
 	"go.uber.org/fx"
@@ -60,14 +61,21 @@ func (s *storageImpl) FetchLocalState(ctx context.Context, nodeID string, endpoi
 	}
 
 	err := s.kvStore.View(ctx, func(txn *badger.Txn) error {
-		prefix := fmt.Appendf(nil, "lastsync:%s:", nodeID)
+		prefix := []byte("lastsync:")
 		it := txn.NewIterator(badger.DefaultIteratorOptions)
 		defer it.Close()
 
 		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
 			item := it.Item()
-			key := item.Key()
-			namespace := string(key[len(prefix):])
+			key := string(item.Key())
+
+			rest := key[len(prefix):]
+			sep := strings.LastIndex(rest, ":")
+			if sep < 0 {
+				continue
+			}
+			sourceNodeID := rest[:sep]
+			namespace := rest[sep+1:]
 
 			var since uint64
 			err := item.Value(func(val []byte) error {
@@ -78,7 +86,7 @@ func (s *storageImpl) FetchLocalState(ctx context.Context, nodeID string, endpoi
 				return err
 			}
 
-			state.LastSync[namespace] = append(state.LastSync[namespace], NamespaceSyncState{
+			state.LastSync[sourceNodeID] = append(state.LastSync[sourceNodeID], NamespaceSyncState{
 				Namespace: namespace,
 				Since:     since,
 			})

@@ -32,8 +32,9 @@ type syncActor struct {
 type syncWorker struct {
 	logger *slog.Logger
 
-	requestM actor.MailboxReceiver[*syncRequest]
-	cookie   string
+	localNodeID string
+	requestM    actor.MailboxReceiver[*syncRequest]
+	cookie      string
 
 	storages            map[string]storage.Streamable
 	clusterStateStorage clusterstate.Storage
@@ -81,7 +82,7 @@ func (w *syncWorker) syncStorage(ctx context.Context, remoteNodeID string, remot
 		return
 	}
 
-	url, err := url.JoinPath(remoteEndpoint.String(), syncState.Namespace)
+	url, err := url.JoinPath(remoteEndpoint.String(), "cluster", "sync", syncState.Namespace)
 	if err != nil {
 		logger.ErrorContext(ctx, "failed to build sync URL", slog.String("error", err.Error()))
 		return
@@ -96,7 +97,7 @@ func (w *syncWorker) syncStorage(ctx context.Context, remoteNodeID string, remot
 	}
 
 	req.Header.Set(COOKIE_HEADER_NAME, w.cookie)
-	req.Header.Set(NODEID_HEADER_NAME, remoteNodeID)
+	req.Header.Set(NODEID_HEADER_NAME, w.localNodeID)
 	req.Header.Set("Transfer-Encoding", "chunked")
 	req.Header.Set("Trailer", SINCE_HEADER_NAME)
 	req.Trailer = http.Header{SINCE_HEADER_NAME: nil}
