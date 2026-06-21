@@ -6,6 +6,7 @@ import (
 	"github.com/dgraph-io/badger/v4"
 
 	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/storage/changefeed"
 	"link-society.com/flowg/internal/utils/hlc"
 )
 
@@ -60,9 +61,9 @@ func FetchRole(txn *badger.Txn, name string) (*models.Role, error) {
 	return role, nil
 }
 
-func SaveRole(txn *badger.Txn, role models.Role, ts hlc.Timestamp) error {
+func SaveRole(txn *badger.Txn, role models.Role, ts hlc.Timestamp, sink *[]changefeed.Record) error {
 	indexKey := []byte(fmt.Sprintf("index:role:%s", role.Name))
-	if err := setItem(txn, indexKey, []byte{}, ts); err != nil {
+	if err := setItem(txn, indexKey, []byte{}, ts, sink); err != nil {
 		return fmt.Errorf(
 			"failed to save index of role '%s': %w",
 			role.Name, err,
@@ -103,7 +104,7 @@ func SaveRole(txn *badger.Txn, role models.Role, ts hlc.Timestamp) error {
 	for _, scope := range role.Scopes {
 		if _, exists := obsoleteScopes[scope]; !exists {
 			key := []byte(fmt.Sprintf("role:%s:%s", role.Name, scope))
-			if err := setItem(txn, key, []byte{}, ts); err != nil {
+			if err := setItem(txn, key, []byte{}, ts, sink); err != nil {
 				return fmt.Errorf(
 					"failed to add scope '%s' to role '%s': %w",
 					scope, role.Name, err,
@@ -115,7 +116,7 @@ func SaveRole(txn *badger.Txn, role models.Role, ts hlc.Timestamp) error {
 	}
 
 	for scope, key := range obsoleteScopes {
-		if err := deleteItem(txn, key, ts); err != nil {
+		if err := deleteItem(txn, key, ts, sink); err != nil {
 			return fmt.Errorf(
 				"failed to remove obsolete scope '%s' from role '%s': %w",
 				scope, role.Name, err,
@@ -126,7 +127,7 @@ func SaveRole(txn *badger.Txn, role models.Role, ts hlc.Timestamp) error {
 	return nil
 }
 
-func DeleteRole(txn *badger.Txn, name string, ts hlc.Timestamp) error {
+func DeleteRole(txn *badger.Txn, name string, ts hlc.Timestamp, sink *[]changefeed.Record) error {
 	opts := badger.DefaultIteratorOptions
 	opts.Prefix = []byte(fmt.Sprintf("role:%s:", name))
 	it := txn.NewIterator(opts)
@@ -147,7 +148,7 @@ func DeleteRole(txn *badger.Txn, name string, ts hlc.Timestamp) error {
 	it.Close()
 
 	for _, key := range keys {
-		if err := deleteItem(txn, key, ts); err != nil {
+		if err := deleteItem(txn, key, ts, sink); err != nil {
 			return fmt.Errorf(
 				"failed to delete key '%s' from role '%s': %w",
 				string(key), name, err,
@@ -156,7 +157,7 @@ func DeleteRole(txn *badger.Txn, name string, ts hlc.Timestamp) error {
 	}
 
 	indexKey := []byte(fmt.Sprintf("index:role:%s", name))
-	if err := deleteItem(txn, indexKey, ts); err != nil {
+	if err := deleteItem(txn, indexKey, ts, sink); err != nil {
 		return fmt.Errorf(
 			"failed to delete index of role '%s': %w",
 			name, err,

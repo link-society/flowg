@@ -13,6 +13,7 @@ import (
 
 	"github.com/hashicorp/memberlist"
 
+	"link-society.com/flowg/internal/storage"
 	clusterstate "link-society.com/flowg/internal/storage/cluster-state"
 )
 
@@ -27,6 +28,7 @@ type delegate struct {
 
 	clusterStateStorage clusterstate.Storage
 	syncRequestM        actor.MailboxSender[*syncRequest]
+	storages            map[string]storage.Streamable
 }
 
 var _ memberlist.Delegate = (*delegate)(nil)

@@ -7,6 +7,7 @@ import (
 	"io"
 
 	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/storage/changefeed"
 )
 
 type MockStorage struct {
@@ -31,6 +32,11 @@ func (m *MockStorage) Load(ctx context.Context, r io.Reader) error {
 
 func (m *MockStorage) Merge(ctx context.Context, r io.Reader) error {
 	args := m.Called(ctx, r)
+	return args.Error(0)
+}
+
+func (m *MockStorage) ApplyReplicated(ctx context.Context, records []changefeed.Record) error {
+	args := m.Called(ctx, records)
 	return args.Error(0)
 }
 

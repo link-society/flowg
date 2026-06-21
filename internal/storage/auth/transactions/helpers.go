@@ -3,18 +3,39 @@ package transactions
 import (
 	"github.com/dgraph-io/badger/v4"
 
+	"link-society.com/flowg/internal/storage/changefeed"
 	"link-society.com/flowg/internal/utils/hlc"
 	"link-society.com/flowg/internal/utils/lww"
 )
 
-func setItem(txn *badger.Txn, key []byte, payload []byte, ts hlc.Timestamp) error {
-	_, err := lww.Apply(txn, key, lww.Envelope{Timestamp: ts, Payload: payload})
-	return err
+func setItem(txn *badger.Txn, key []byte, payload []byte, ts hlc.Timestamp, sink *[]changefeed.Record) error {
+	env := lww.Envelope{Timestamp: ts, Payload: payload}
+	applied, err := lww.Apply(txn, key, env)
+	if err != nil {
+		return err
+	}
+	if applied && sink != nil {
+		*sink = append(*sink, changefeed.Record{
+			Key:   append([]byte(nil), key...),
+			Value: env.Marshal(),
+		})
+	}
+	return nil
 }
 
-func deleteItem(txn *badger.Txn, key []byte, ts hlc.Timestamp) error {
-	_, err := lww.Apply(txn, key, lww.Envelope{Timestamp: ts, Deleted: true})
-	return err
+func deleteItem(txn *badger.Txn, key []byte, ts hlc.Timestamp, sink *[]changefeed.Record) error {
+	env := lww.Envelope{Timestamp: ts, Deleted: true}
+	applied, err := lww.Apply(txn, key, env)
+	if err != nil {
+		return err
+	}
+	if applied && sink != nil {
+		*sink = append(*sink, changefeed.Record{
+			Key:   append([]byte(nil), key...),
+			Value: env.Marshal(),
+		})
+	}
+	return nil
 }
 
 func getItem(txn *badger.Txn, key []byte) ([]byte, bool, error) {

@@ -36,6 +36,28 @@ func ApplyEnvelope(txn *badger.Txn, key []byte, value []byte) (bool, error) {
 type AppliedRecord struct {
 	Key     []byte
 	Deleted bool
+	Origin  string
+}
+
+func ApplyRecord(txn *badger.Txn, key []byte, value []byte) (AppliedRecord, bool, error) {
+	env, err := lww.Unmarshal(value)
+	if err != nil {
+		return AppliedRecord{}, false, err
+	}
+
+	applied, err := lww.Apply(txn, key, env)
+	if err != nil {
+		return AppliedRecord{}, false, err
+	}
+	if !applied {
+		return AppliedRecord{}, false, nil
+	}
+
+	return AppliedRecord{
+		Key:     append([]byte(nil), key...),
+		Deleted: env.Deleted,
+		Origin:  env.Timestamp.NodeID,
+	}, true, nil
 }
 
 func MergeEnveloped(applied *[]AppliedRecord) func(txn *badger.Txn, kv *pb.KV) error {
@@ -44,20 +66,12 @@ func MergeEnveloped(applied *[]AppliedRecord) func(txn *badger.Txn, kv *pb.KV) e
 			return nil
 		}
 
-		env, err := lww.Unmarshal(kv.Value)
-		if err != nil {
-			return err
-		}
-
-		ok, err := lww.Apply(txn, kv.Key, env)
+		rec, ok, err := ApplyRecord(txn, kv.Key, kv.Value)
 		if err != nil {
 			return err
 		}
 		if ok {
-			*applied = append(*applied, AppliedRecord{
-				Key:     append([]byte(nil), kv.Key...),
-				Deleted: env.Deleted,
-			})
+			*applied = append(*applied, rec)
 		}
 
 		return nil

@@ -8,12 +8,13 @@ import (
 
 	"link-society.com/flowg/internal/models"
 
+	"link-society.com/flowg/internal/storage/changefeed"
 	authUtils "link-society.com/flowg/internal/utils/auth"
 	"link-society.com/flowg/internal/utils/auth/hash"
 	"link-society.com/flowg/internal/utils/hlc"
 )
 
-func CreateToken(txn *badger.Txn, username string, ts hlc.Timestamp) (string, string, error) {
+func CreateToken(txn *badger.Txn, username string, ts hlc.Timestamp, sink *[]changefeed.Record) (string, string, error) {
 	token, err := authUtils.NewSecret("pat", 32)
 	if err != nil {
 		return "", "", err
@@ -36,7 +37,7 @@ func CreateToken(txn *badger.Txn, username string, ts hlc.Timestamp) (string, st
 	}
 
 	tokenKey := []byte(fmt.Sprintf("pat:%s:%s", username, tokenUuid))
-	if err := setItem(txn, tokenKey, []byte(tokenHash), ts); err != nil {
+	if err := setItem(txn, tokenKey, []byte(tokenHash), ts, sink); err != nil {
 		return "", "", fmt.Errorf("failed to add token to user '%s': %w", username, err)
 	}
 
@@ -107,9 +108,9 @@ func ListTokens(txn *badger.Txn, username string) ([]string, error) {
 	return tokenUUIDs, nil
 }
 
-func DeleteToken(txn *badger.Txn, username string, tokenUUID string, ts hlc.Timestamp) error {
+func DeleteToken(txn *badger.Txn, username string, tokenUUID string, ts hlc.Timestamp, sink *[]changefeed.Record) error {
 	key := []byte(fmt.Sprintf("pat:%s:%s", username, tokenUUID))
-	if err := deleteItem(txn, key, ts); err != nil {
+	if err := deleteItem(txn, key, ts, sink); err != nil {
 		return fmt.Errorf(
 			"failed to delete token '%s' for user '%s': %w",
 			tokenUUID, username, err,

@@ -16,6 +16,7 @@ import (
 
 	"link-society.com/flowg/internal/storage"
 	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage/changefeed"
 	clusterstate "link-society.com/flowg/internal/storage/cluster-state"
 	"link-society.com/flowg/internal/storage/config"
 	"link-society.com/flowg/internal/storage/log"
@@ -108,6 +109,10 @@ func NewManager(opts ManagerOptions) fx.Option {
 			Listener            *Listener
 			SyncRequestM        actor.Mailbox[*syncRequest]
 			ClusterStateStorage clusterstate.Storage
+
+			AuthStorage   auth.Storage
+			ConfigStorage config.Storage
+			LogStorage    log.Storage
 		}) (*delegate, error) {
 			var err error
 
@@ -133,6 +138,11 @@ func NewManager(opts ManagerOptions) fx.Option {
 
 				clusterStateStorage: d.ClusterStateStorage,
 				syncRequestM:        d.SyncRequestM,
+				storages: map[string]storage.Streamable{
+					"auth":   d.AuthStorage,
+					"config": d.ConfigStorage,
+					"log":    d.LogStorage,
+				},
 			}, nil
 		}),
 		fx.Provide(func(
@@ -230,7 +240,13 @@ func NewManager(opts ManagerOptions) fx.Option {
 							return actor.WorkerEnd
 						}
 
-						msg.Handle(ctx, d.Delegate)
+						if err := msg.Handle(ctx, d.Delegate); err != nil {
+							d.Delegate.logger.ErrorContext(
+								ctx,
+								"failed to handle notification",
+								slog.String("error", err.Error()),
+							)
+						}
 
 						return actor.WorkerContinue
 
@@ -263,11 +279,28 @@ func NewManager(opts ManagerOptions) fx.Option {
 				}
 			},
 		),
+		fxproviders.ProvideActor[*broadcaster](
+			func(d struct {
+				fx.In
+
+				NotifyM  actor.Mailbox[notification]
+				Notifier changefeed.Notifier
+			}) *broadcaster {
+				return &broadcaster{
+					Actor: actor.New(&broadcasterWorker{
+						localNodeID: opts.NodeID,
+						notifier:    d.Notifier,
+						notifyM:     d.NotifyM,
+					}),
+				}
+			},
+		),
 		fx.Invoke(func(_ struct {
 			fx.In
 
 			S *syncActor
 			C *clusterFormationController
+			B *broadcaster
 		}) {
 			// No-op, just to force the creation of all components
 		}),

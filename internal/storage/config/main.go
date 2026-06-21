@@ -21,13 +21,16 @@ import (
 	"github.com/vladopajic/go-actor/actor"
 
 	"link-society.com/flowg/internal/models"
+
 	"link-society.com/flowg/internal/storage"
 	"link-society.com/flowg/internal/storage/changefeed"
 	"link-society.com/flowg/internal/storage/config/transactions"
 	"link-society.com/flowg/internal/storage/schema"
+
 	"link-society.com/flowg/internal/utils/fxproviders"
 	"link-society.com/flowg/internal/utils/hlc"
 	"link-society.com/flowg/internal/utils/kvstore"
+	"link-society.com/flowg/internal/utils/lww"
 )
 
 type Storage interface {
@@ -164,6 +167,36 @@ func (s *storageImpl) Merge(ctx context.Context, r io.Reader) error {
 		return err
 	}
 
+	s.emitApplied(ctx, applied)
+	return nil
+}
+
+func (s *storageImpl) ApplyReplicated(ctx context.Context, records []changefeed.Record) error {
+	var applied []schema.AppliedRecord
+	err := s.kvStore.Update(
+		ctx,
+		func(txn *badger.Txn) error {
+			for _, record := range records {
+				ar, ok, err := schema.ApplyRecord(txn, record.Key, record.Value)
+				if err != nil {
+					return err
+				}
+				if ok {
+					applied = append(applied, ar)
+				}
+			}
+			return nil
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	s.emitApplied(ctx, applied)
+	return nil
+}
+
+func (s *storageImpl) emitApplied(ctx context.Context, applied []schema.AppliedRecord) {
 	for _, rec := range applied {
 		itemType, name, ok := strings.Cut(string(rec.Key), ":")
 		if !ok {
@@ -175,10 +208,8 @@ func (s *storageImpl) Merge(ctx context.Context, r io.Reader) error {
 			op = changefeed.OpDelete
 		}
 
-		s.emitChange(ctx, itemType, name, op)
+		s.emitChange(ctx, itemType, name, op, rec.Origin, nil)
 	}
-
-	return nil
 }
 
 func (s *storageImpl) ListTransformers(ctx context.Context) ([]string, error) {
@@ -409,7 +440,11 @@ func (s *storageImpl) writeItem(
 		return err
 	}
 
-	s.emitChange(ctx, itemType, name, changefeed.OpWrite)
+	record := changefeed.Record{
+		Key:   fmt.Appendf(nil, "%s:%s", itemType, name),
+		Value: lww.Envelope{Timestamp: ts, Payload: content}.Marshal(),
+	}
+	s.emitChange(ctx, itemType, name, changefeed.OpWrite, ts.NodeID, []changefeed.Record{record})
 	return nil
 }
 
@@ -425,7 +460,11 @@ func (s *storageImpl) deleteItem(ctx context.Context, itemType string, name stri
 		return err
 	}
 
-	s.emitChange(ctx, itemType, name, changefeed.OpDelete)
+	record := changefeed.Record{
+		Key:   fmt.Appendf(nil, "%s:%s", itemType, name),
+		Value: lww.Envelope{Timestamp: ts, Deleted: true}.Marshal(),
+	}
+	s.emitChange(ctx, itemType, name, changefeed.OpDelete, ts.NodeID, []changefeed.Record{record})
 	return nil
 }
 
@@ -434,12 +473,16 @@ func (s *storageImpl) emitChange(
 	itemType string,
 	name string,
 	op changefeed.Operation,
+	origin string,
+	records []changefeed.Record,
 ) {
 	event := changefeed.ChangeEvent{
 		Namespace: changefeed.NamespaceConfig,
 		Kind:      itemType,
 		Name:      name,
 		Op:        op,
+		Origin:    origin,
+		Records:   records,
 	}
 	if err := s.notifier.Notify(ctx, event); err != nil {
 		slog.ErrorContext(

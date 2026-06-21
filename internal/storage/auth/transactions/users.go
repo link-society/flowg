@@ -7,6 +7,7 @@ import (
 
 	"link-society.com/flowg/internal/models"
 
+	"link-society.com/flowg/internal/storage/changefeed"
 	"link-society.com/flowg/internal/utils/auth/hash"
 	"link-society.com/flowg/internal/utils/hlc"
 )
@@ -65,23 +66,23 @@ func FetchUser(txn *badger.Txn, name string) (*models.User, error) {
 	return user, nil
 }
 
-func SaveUser(txn *badger.Txn, user models.User, password string, ts hlc.Timestamp) error {
+func SaveUser(txn *badger.Txn, user models.User, password string, ts hlc.Timestamp, sink *[]changefeed.Record) error {
 	passwordHash, err := hash.HashPassword(password)
 	if err != nil {
 		return fmt.Errorf("failed to hash password: %w", err)
 	}
 
 	key := []byte(fmt.Sprintf("user:%s:password", user.Name))
-	if err := setItem(txn, key, []byte(passwordHash), ts); err != nil {
+	if err := setItem(txn, key, []byte(passwordHash), ts, sink); err != nil {
 		return fmt.Errorf("failed to save password of user '%s': %w", user.Name, err)
 	}
 
-	return PatchUserRoles(txn, user, ts)
+	return PatchUserRoles(txn, user, ts, sink)
 }
 
-func PatchUserRoles(txn *badger.Txn, user models.User, ts hlc.Timestamp) error {
+func PatchUserRoles(txn *badger.Txn, user models.User, ts hlc.Timestamp, sink *[]changefeed.Record) error {
 	indexKey := []byte(fmt.Sprintf("index:user:%s", user.Name))
-	if err := setItem(txn, indexKey, []byte{}, ts); err != nil {
+	if err := setItem(txn, indexKey, []byte{}, ts, sink); err != nil {
 		return fmt.Errorf("failed to save index of user '%s': %w", user.Name, err)
 	}
 
@@ -112,7 +113,7 @@ func PatchUserRoles(txn *badger.Txn, user models.User, ts hlc.Timestamp) error {
 	for _, role := range user.Roles {
 		if _, exists := obsoleteRoles[role]; !exists {
 			key := []byte(fmt.Sprintf("user:%s:role:%s", user.Name, role))
-			if err := setItem(txn, key, []byte{}, ts); err != nil {
+			if err := setItem(txn, key, []byte{}, ts, sink); err != nil {
 				return fmt.Errorf(
 					"failed to add role '%s' to user '%s': %w",
 					role, user.Name, err,
@@ -124,7 +125,7 @@ func PatchUserRoles(txn *badger.Txn, user models.User, ts hlc.Timestamp) error {
 	}
 
 	for role, key := range obsoleteRoles {
-		if err := deleteItem(txn, key, ts); err != nil {
+		if err := deleteItem(txn, key, ts, sink); err != nil {
 			return fmt.Errorf(
 				"failed to delete role '%s' from user '%s': %w",
 				role, user.Name, err,
@@ -135,7 +136,7 @@ func PatchUserRoles(txn *badger.Txn, user models.User, ts hlc.Timestamp) error {
 	return nil
 }
 
-func DeleteUser(txn *badger.Txn, name string, ts hlc.Timestamp) error {
+func DeleteUser(txn *badger.Txn, name string, ts hlc.Timestamp, sink *[]changefeed.Record) error {
 	keys := make([][]byte, 0)
 
 	collect := func(prefix string) error {
@@ -165,7 +166,7 @@ func DeleteUser(txn *badger.Txn, name string, ts hlc.Timestamp) error {
 	}
 
 	for _, key := range keys {
-		if err := deleteItem(txn, key, ts); err != nil {
+		if err := deleteItem(txn, key, ts, sink); err != nil {
 			return fmt.Errorf(
 				"failed to delete key '%s' of user '%s': %w",
 				name, key, err,
@@ -174,7 +175,7 @@ func DeleteUser(txn *badger.Txn, name string, ts hlc.Timestamp) error {
 	}
 
 	indexKey := []byte(fmt.Sprintf("index:user:%s", name))
-	if err := deleteItem(txn, indexKey, ts); err != nil {
+	if err := deleteItem(txn, indexKey, ts, sink); err != nil {
 		return fmt.Errorf(
 			"failed to delete index of user '%s': %w",
 			name, err,

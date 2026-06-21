@@ -3,10 +3,12 @@ package log
 import (
 	"context"
 	"fmt"
-	"io"
 	"log/slog"
 
 	"bytes"
+	"encoding/json"
+	"io"
+
 	"sync/atomic"
 	"time"
 
@@ -25,6 +27,7 @@ import (
 	"link-society.com/flowg/internal/storage/schema"
 	"link-society.com/flowg/internal/utils/hlc"
 	"link-society.com/flowg/internal/utils/kvstore"
+	"link-society.com/flowg/internal/utils/lww"
 
 	"link-society.com/flowg/internal/utils/langs/filtering"
 )
@@ -152,6 +155,33 @@ func (s *storageImpl) Merge(ctx context.Context, r io.Reader) error {
 	return nil
 }
 
+func (s *storageImpl) ApplyReplicated(ctx context.Context, records []changefeed.Record) error {
+	var applied bool
+	err := s.kvStore.Update(
+		ctx,
+		func(txn *badger.Txn) error {
+			for _, record := range records {
+				_, ok, err := schema.ApplyRecord(txn, record.Key, record.Value)
+				if err != nil {
+					return err
+				}
+				if ok {
+					applied = true
+				}
+			}
+			return nil
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	if applied {
+		s.emitResync(ctx)
+	}
+	return nil
+}
+
 var streamConfigPrefix = []byte("stream:config:")
 
 func mergeRecord(changed *atomic.Bool) func(txn *badger.Txn, kv *pb.KV) error {
@@ -254,7 +284,19 @@ func (s *storageImpl) ConfigureStream(ctx context.Context, stream string, config
 		return err
 	}
 
-	s.emitChange(ctx, stream, changefeed.OpWrite)
+	if config.IndexedFields == nil {
+		config.IndexedFields = []string{}
+	}
+	configVal, err := json.Marshal(config)
+	if err != nil {
+		return fmt.Errorf("could not marshal stream config '%s': %w", stream, err)
+	}
+	record := changefeed.Record{
+		Key:   fmt.Appendf(nil, "stream:config:%s", stream),
+		Value: lww.Envelope{Timestamp: ts, Payload: configVal}.Marshal(),
+	}
+
+	s.emitChange(ctx, stream, changefeed.OpWrite, ts.NodeID, []changefeed.Record{record})
 	return nil
 }
 
@@ -270,16 +312,29 @@ func (s *storageImpl) DeleteStream(ctx context.Context, stream string) error {
 		return err
 	}
 
-	s.emitChange(ctx, stream, changefeed.OpDelete)
+	record := changefeed.Record{
+		Key:   fmt.Appendf(nil, "stream:config:%s", stream),
+		Value: lww.Envelope{Timestamp: ts, Deleted: true}.Marshal(),
+	}
+
+	s.emitChange(ctx, stream, changefeed.OpDelete, ts.NodeID, []changefeed.Record{record})
 	return nil
 }
 
-func (s *storageImpl) emitChange(ctx context.Context, stream string, op changefeed.Operation) {
+func (s *storageImpl) emitChange(
+	ctx context.Context,
+	stream string,
+	op changefeed.Operation,
+	origin string,
+	records []changefeed.Record,
+) {
 	event := changefeed.ChangeEvent{
 		Namespace: changefeed.NamespaceLog,
 		Kind:      streamKind,
 		Name:      stream,
 		Op:        op,
+		Origin:    origin,
+		Records:   records,
 	}
 	if err := s.notifier.Notify(ctx, event); err != nil {
 		slog.ErrorContext(
