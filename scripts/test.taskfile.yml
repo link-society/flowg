@@ -73,7 +73,7 @@ tasks:
   "test:unit:go":
     internal: true
     cmds:
-      - go test -timeout 500ms -v -bench=. ./...
+      - go test -timeout 500ms -count=20 -v -bench=. ./...
 
   "test:unit:rust:vrl":
     internal: true
