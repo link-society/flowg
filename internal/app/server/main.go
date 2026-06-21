@@ -19,6 +19,8 @@ import (
 	"link-society.com/flowg/internal/services/http"
 	"link-society.com/flowg/internal/services/mgmt"
 	"link-society.com/flowg/internal/services/syslog"
+
+	"link-society.com/flowg/internal/utils/hlc"
 )
 
 type Options struct {
@@ -56,6 +58,10 @@ type Options struct {
 func NewServer(opts Options) fx.Option {
 	return fx.Module(
 		"app.server",
+		// Replication clock (must be available before the storage layer)
+		fx.Provide(func() *hlc.Clock {
+			return hlc.NewClock(opts.ClusterNodeID)
+		}),
 		// Storage Layer
 		auth.NewStorage(func() auth.Options {
 			authOpts := auth.DefaultOptions()

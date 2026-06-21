@@ -10,6 +10,7 @@ import (
 	"link-society.com/flowg/internal/app/logging"
 
 	"link-society.com/flowg/internal/storage/config"
+	"link-society.com/flowg/internal/utils/hlc"
 )
 
 func TestDefaultSystemConfig(t *testing.T) {
@@ -24,6 +25,7 @@ func TestDefaultSystemConfig(t *testing.T) {
 
 	app := fxtest.New(
 		t,
+		fx.Provide(func() *hlc.Clock { return hlc.NewClock("test") }),
 		config.NewStorage(confOpts),
 		fx.Populate(&confStorage),
 		fx.NopLogger,

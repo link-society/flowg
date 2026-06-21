@@ -19,6 +19,7 @@ import (
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage"
 	"link-society.com/flowg/internal/storage/config/transactions"
+	"link-society.com/flowg/internal/utils/hlc"
 	"link-society.com/flowg/internal/utils/kvstore"
 )
 
@@ -61,6 +62,7 @@ type Options struct {
 
 type storageImpl struct {
 	kvStore               kvstore.Storage
+	clock                 *hlc.Clock
 	lock                  *sync.Mutex
 	configurationInstance *models.SystemConfiguration
 }
@@ -68,7 +70,8 @@ type storageImpl struct {
 type deps struct {
 	fx.In
 
-	S kvstore.Storage `name:"storage.config"`
+	S     kvstore.Storage `name:"storage.config"`
+	Clock *hlc.Clock
 }
 
 var _ Storage = (*storageImpl)(nil)
@@ -94,6 +97,7 @@ func NewStorage(opts Options) fx.Option {
 		fx.Provide(func(lc fx.Lifecycle, d deps) Storage {
 			storage := &storageImpl{
 				kvStore:               d.S,
+				clock:                 d.Clock,
 				lock:                  &sync.Mutex{},
 				configurationInstance: nil,
 			}
@@ -342,19 +346,21 @@ func (s *storageImpl) writeItem(
 	name string,
 	content []byte,
 ) error {
+	ts := s.clock.Now()
 	return s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
-			return transactions.WriteItem(txn, itemType, name, content)
+			return transactions.WriteItem(txn, itemType, name, content, ts)
 		},
 	)
 }
 
 func (s *storageImpl) deleteItem(ctx context.Context, itemType string, name string) error {
+	ts := s.clock.Now()
 	return s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
-			return transactions.DeleteItem(txn, itemType, name)
+			return transactions.DeleteItem(txn, itemType, name, ts)
 		},
 	)
 }

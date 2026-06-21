@@ -5,6 +5,8 @@ import (
 
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
+
+	"link-society.com/flowg/internal/utils/hlc"
 )
 
 func TestReadSystemConfig(t *testing.T) {
@@ -17,6 +19,7 @@ func TestReadSystemConfig(t *testing.T) {
 
 	app := fxtest.New(
 		t,
+		fx.Provide(func() *hlc.Clock { return hlc.NewClock("test") }),
 		NewStorage(confOpts),
 		fx.Populate(&confStorage),
 		fx.NopLogger,
