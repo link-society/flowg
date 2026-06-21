@@ -7,6 +7,7 @@ import (
 	"io"
 
 	"github.com/dgraph-io/badger/v4"
+	"github.com/dgraph-io/badger/v4/pb"
 )
 
 type MockStorage struct {
@@ -34,6 +35,11 @@ func (m *MockStorage) Backup(ctx context.Context, w io.Writer, since uint64) (ui
 
 func (m *MockStorage) Restore(ctx context.Context, r io.Reader) error {
 	args := m.Called(ctx, r)
+	return args.Error(0)
+}
+
+func (m *MockStorage) Merge(ctx context.Context, r io.Reader, mergeFn func(txn *badger.Txn, kv *pb.KV) error) error {
+	args := m.Called(ctx, r, mergeFn)
 	return args.Error(0)
 }
 

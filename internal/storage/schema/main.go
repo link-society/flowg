@@ -8,6 +8,7 @@ import (
 	"encoding/binary"
 
 	"github.com/dgraph-io/badger/v4"
+	"github.com/dgraph-io/badger/v4/pb"
 
 	"link-society.com/flowg/internal/utils/hlc"
 	"link-society.com/flowg/internal/utils/kvstore"
@@ -17,6 +18,28 @@ import (
 const CurrentVersion uint64 = 1
 
 var versionKey = []byte("version")
+
+func IsVersionKey(key []byte) bool {
+	return bytes.Equal(key, versionKey)
+}
+
+func ApplyEnvelope(txn *badger.Txn, key []byte, value []byte) error {
+	env, err := lww.Unmarshal(value)
+	if err != nil {
+		return err
+	}
+
+	_, err = lww.Apply(txn, key, env)
+	return err
+}
+
+func MergeEnveloped(txn *badger.Txn, kv *pb.KV) error {
+	if IsVersionKey(kv.Key) {
+		return nil
+	}
+
+	return ApplyEnvelope(txn, kv.Key, kv.Value)
+}
 
 func Migrate(
 	ctx context.Context,

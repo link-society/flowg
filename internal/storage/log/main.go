@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 
+	"bytes"
 	"time"
 
 	"github.com/vladopajic/go-actor/actor"
@@ -13,6 +14,7 @@ import (
 	"link-society.com/flowg/internal/utils/fxproviders"
 
 	"github.com/dgraph-io/badger/v4"
+	"github.com/dgraph-io/badger/v4/pb"
 
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage"
@@ -125,6 +127,33 @@ func (s *storageImpl) Dump(ctx context.Context, w io.Writer, since uint64) (uint
 
 func (s *storageImpl) Load(ctx context.Context, r io.Reader) error {
 	return s.kvStore.Restore(ctx, r)
+}
+
+func (s *storageImpl) Merge(ctx context.Context, r io.Reader) error {
+	return s.kvStore.Merge(ctx, r, mergeRecord)
+}
+
+var streamConfigPrefix = []byte("stream:config:")
+
+func mergeRecord(txn *badger.Txn, kv *pb.KV) error {
+	switch {
+	case schema.IsVersionKey(kv.Key):
+		return nil
+
+	case bytes.HasPrefix(kv.Key, streamConfigPrefix):
+		return schema.ApplyEnvelope(txn, kv.Key, kv.Value)
+
+	default:
+		entry := &badger.Entry{
+			Key:       kv.Key,
+			Value:     kv.Value,
+			ExpiresAt: kv.ExpiresAt,
+		}
+		if len(kv.UserMeta) > 0 {
+			entry.UserMeta = kv.UserMeta[0]
+		}
+		return txn.SetEntry(entry)
+	}
 }
 
 func (s *storageImpl) ListStreamConfigs(ctx context.Context) (map[string]models.StreamConfig, error) {

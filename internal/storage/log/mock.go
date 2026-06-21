@@ -50,6 +50,11 @@ func (m *MockStorage) Load(ctx context.Context, r io.Reader) error {
 	return args.Error(0)
 }
 
+func (m *MockStorage) Merge(ctx context.Context, r io.Reader) error {
+	args := m.Called(ctx, r)
+	return args.Error(0)
+}
+
 func (m *MockStorage) ListStreamConfigs(ctx context.Context) (map[string]models.StreamConfig, error) {
 	args := m.Called(ctx)
 	return args.Get(0).(map[string]models.StreamConfig), args.Error(1)

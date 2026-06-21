@@ -110,6 +110,10 @@ func (s *storageImpl) Load(ctx context.Context, r io.Reader) error {
 	return s.kvStore.Restore(ctx, r)
 }
 
+func (s *storageImpl) Merge(ctx context.Context, r io.Reader) error {
+	return s.kvStore.Merge(ctx, r, schema.MergeEnveloped)
+}
+
 func (s *storageImpl) ListRoles(ctx context.Context) ([]models.Role, error) {
 	var roles []models.Role
 

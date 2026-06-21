@@ -363,8 +363,8 @@ func (t *httpTransport) handleSync(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := storage.Load(r.Context(), r.Body); err != nil {
-		message := fmt.Sprintf("failed to load data: %v", err)
+	if err := storage.Merge(r.Context(), r.Body); err != nil {
+		message := fmt.Sprintf("failed to merge data: %v", err)
 		http.Error(w, message, http.StatusInternalServerError)
 		return
 	}

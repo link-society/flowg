@@ -29,6 +29,11 @@ func (m *MockStorage) Load(ctx context.Context, r io.Reader) error {
 	return args.Error(0)
 }
 
+func (m *MockStorage) Merge(ctx context.Context, r io.Reader) error {
+	args := m.Called(ctx, r)
+	return args.Error(0)
+}
+
 func (m *MockStorage) ListTransformers(ctx context.Context) ([]string, error) {
 	args := m.Called(ctx)
 	return args.Get(0).([]string), args.Error(1)

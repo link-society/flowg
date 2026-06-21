@@ -8,4 +8,5 @@ import (
 type Streamable interface {
 	Dump(context.Context, io.Writer, uint64) (uint64, error)
 	Load(context.Context, io.Reader) error
+	Merge(context.Context, io.Reader) error
 }

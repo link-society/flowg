@@ -134,6 +134,10 @@ func (s *storageImpl) Load(ctx context.Context, r io.Reader) error {
 	return s.kvStore.Restore(ctx, r)
 }
 
+func (s *storageImpl) Merge(ctx context.Context, r io.Reader) error {
+	return s.kvStore.Merge(ctx, r, schema.MergeEnveloped)
+}
+
 func (s *storageImpl) ListTransformers(ctx context.Context) ([]string, error) {
 	return s.listItems(ctx, transformerItemType)
 }

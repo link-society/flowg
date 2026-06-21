@@ -10,6 +10,7 @@ import (
 
 	"github.com/dgraph-io/badger/v4"
 	badgerOptions "github.com/dgraph-io/badger/v4/options"
+	"github.com/dgraph-io/badger/v4/pb"
 
 	"link-society.com/flowg/internal/app/logging"
 )
@@ -19,6 +20,7 @@ type Storage interface {
 
 	Backup(ctx context.Context, w io.Writer, since uint64) (uint64, error)
 	Restore(ctx context.Context, r io.Reader) error
+	Merge(ctx context.Context, r io.Reader, mergeFn func(txn *badger.Txn, kv *pb.KV) error) error
 	View(ctx context.Context, txnFn func(txn *badger.Txn) error) error
 	Update(ctx context.Context, txnFn func(txn *badger.Txn) error) error
 }
@@ -189,6 +191,27 @@ func (kv *storageImpl) Restore(
 		message{
 			replyTo:   replyTo,
 			operation: &restoreOperation{r: r},
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	return <-replyTo
+}
+
+func (kv *storageImpl) Merge(
+	ctx context.Context,
+	r io.Reader,
+	mergeFn func(txn *badger.Txn, kv *pb.KV) error,
+) error {
+	replyTo := make(chan error, 1)
+
+	err := kv.mbox.Send(
+		ctx,
+		message{
+			replyTo:   replyTo,
+			operation: &mergeOperation{r: r, mergeFn: mergeFn},
 		},
 	)
 	if err != nil {

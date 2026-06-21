@@ -1,9 +1,14 @@
 package kvstore
 
 import (
+	"bufio"
+	"encoding/binary"
 	"io"
 
+	"google.golang.org/protobuf/proto"
+
 	"github.com/dgraph-io/badger/v4"
+	"github.com/dgraph-io/badger/v4/pb"
 )
 
 type message struct {
@@ -24,6 +29,11 @@ type restoreOperation struct {
 	r io.Reader
 }
 
+type mergeOperation struct {
+	r       io.Reader
+	mergeFn func(txn *badger.Txn, kv *pb.KV) error
+}
+
 type viewOperation struct {
 	txnFn func(txn *badger.Txn) error
 }
@@ -34,6 +44,7 @@ type updateOperation struct {
 
 var _ operation = (*backupOperation)(nil)
 var _ operation = (*restoreOperation)(nil)
+var _ operation = (*mergeOperation)(nil)
 var _ operation = (*viewOperation)(nil)
 var _ operation = (*updateOperation)(nil)
 
@@ -49,6 +60,77 @@ func (m *backupOperation) Handle(db *badger.DB) error {
 
 func (m *restoreOperation) Handle(db *badger.DB) error {
 	return db.Load(m.r, 1)
+}
+
+func (m *mergeOperation) Handle(db *badger.DB) error {
+	const maxBatchCount = 1000
+
+	br := bufio.NewReaderSize(m.r, 16<<10)
+	unmarshalBuf := make([]byte, 1<<10)
+	batch := make([]*pb.KV, 0, maxBatchCount)
+
+	flush := func() error {
+		if len(batch) == 0 {
+			return nil
+		}
+
+		for {
+			err := db.Update(func(txn *badger.Txn) error {
+				for _, kv := range batch {
+					if err := m.mergeFn(txn, kv); err != nil {
+						return err
+					}
+				}
+				return nil
+			})
+
+			switch err {
+			case nil:
+				batch = batch[:0]
+				return nil
+
+			case badger.ErrConflict:
+				db.Opts().Logger.Debugf("Conflict detected, retrying merge batch")
+				continue
+
+			default:
+				return err
+			}
+		}
+	}
+
+	for {
+		var sz uint64
+		err := binary.Read(br, binary.LittleEndian, &sz)
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return err
+		}
+
+		if cap(unmarshalBuf) < int(sz) {
+			unmarshalBuf = make([]byte, sz)
+		}
+		if _, err := io.ReadFull(br, unmarshalBuf[:sz]); err != nil {
+			return err
+		}
+
+		list := &pb.KVList{}
+		if err := proto.Unmarshal(unmarshalBuf[:sz], list); err != nil {
+			return err
+		}
+
+		for _, kv := range list.Kv {
+			batch = append(batch, kv)
+			if len(batch) >= maxBatchCount {
+				if err := flush(); err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	return flush()
 }
 
 func (m *viewOperation) Handle(db *badger.DB) error {
