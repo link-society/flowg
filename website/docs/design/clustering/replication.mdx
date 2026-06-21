@@ -136,6 +136,33 @@ sequenceDiagram
 Because merges are conflict-free, a watermark only needs to be an *optimization*:
 even if a record is delivered more than once, applying it again is harmless.
 
+### Skipping caught-up datasets
+
+The watermarks also let a node avoid talking to a peer that has nothing to learn.
+Before requesting a reconciliation, a node compares — for each dataset — the
+watermark the peer reports against its own latest local version:
+
+ - if the peer's watermark already covers the latest version, the dataset is
+   **up to date** and is skipped entirely;
+ - if *every* dataset is up to date, no exchange happens at all.
+
+This means that, once a cluster has converged, periodic reconciliation becomes
+essentially free: nodes confirm they are in sync from the lightweight state they
+already piggyback on each other, and only generate real traffic when a dataset
+has actually moved forward.
+
+```mermaid
+flowchart TD
+  R[Reconciliation due] --> L{For each dataset}
+  L --> C{Peer's watermark<br/>covers our latest?}
+  C -- Yes --> SK[Skip — nothing to send]
+  C -- No --> RQ[Request records<br/>after the watermark]
+  SK --> D{Any dataset left to send?}
+  RQ --> D
+  D -- No --> Q[Stay silent]
+  D -- Yes --> X[Exchange & merge]
+```
+
 ### Recovering from a partition
 
 Anti-entropy is what allows the cluster to heal after nodes have been isolated
