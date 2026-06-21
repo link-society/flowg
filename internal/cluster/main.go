@@ -263,6 +263,8 @@ func NewManager(opts ManagerOptions) fx.Option {
 			},
 		),
 		fx.Invoke(func(_ struct {
+			fx.In
+
 			S *syncActor
 			C *clusterFormationController
 		}) {
