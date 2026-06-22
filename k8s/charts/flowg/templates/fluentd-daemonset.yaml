@@ -43,7 +43,7 @@ spec:
             - name: FLUENTD_SYSTEMD_CONF
               value: "disable"
           resources:
-            {{- toYaml .Values.flowg.resources | nindent 12 }}
+            {{- toYaml .Values.fluentd.resources | nindent 12 }}
           volumeMounts:
             - name: varlog
               mountPath: /var/log
