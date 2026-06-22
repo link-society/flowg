@@ -43,11 +43,29 @@ type ManagerOptions struct {
 type managerImpl struct {
 	actor.Actor
 
-	handler http.Handler
-	notifyM actor.Mailbox[notification]
+	handler                http.Handler
+	notificationPublisherM actor.Mailbox[notification]
 }
 
 var _ Manager = (*managerImpl)(nil)
+
+type notificationMailboxes struct {
+	actor.Actor
+
+	publisher actor.Mailbox[notification]
+	consumer  actor.Mailbox[notification]
+}
+
+func newNotificationMailboxes() *notificationMailboxes {
+	publisher := actor.NewMailbox[notification]()
+	consumer := actor.NewMailbox[notification]()
+
+	return &notificationMailboxes{
+		Actor:     actor.Combine(publisher, consumer).Build(),
+		publisher: publisher,
+		consumer:  consumer,
+	}
+}
 
 func NewManager(opts ManagerOptions) fx.Option {
 	bootstrapThreshold := opts.TombstoneGracePeriod / 2
@@ -59,11 +77,11 @@ func NewManager(opts ManagerOptions) fx.Option {
 			clusterStateOpts.Directory = opts.ClusterStateDir
 			return clusterStateOpts
 		}()),
-		fxproviders.ProvideMailbox[notification](),
 		fxproviders.ProvideMailbox[net.Conn](),
 		fxproviders.ProvideMailbox[*memberlist.Packet](),
 		fxproviders.ProvideMailbox[*ClusterJoinNode](),
 		fxproviders.ProvideMailbox[*syncRequest](),
+		fxproviders.ProvideActor[*notificationMailboxes](newNotificationMailboxes),
 		fxproviders.ProvideActor[*syncActor](
 			func(d struct {
 				fx.In
@@ -112,9 +130,10 @@ func NewManager(opts ManagerOptions) fx.Option {
 		fx.Provide(func(d struct {
 			fx.In
 
-			Listener            *Listener
-			SyncRequestM        actor.Mailbox[*syncRequest]
-			ClusterStateStorage clusterstate.Storage
+			Listener              *Listener
+			SyncRequestM          actor.Mailbox[*syncRequest]
+			ClusterStateStorage   clusterstate.Storage
+			NotificationMailboxes *notificationMailboxes
 
 			AuthStorage   auth.Storage
 			ConfigStorage config.Storage
@@ -140,7 +159,7 @@ func NewManager(opts ManagerOptions) fx.Option {
 				localEndpoint: localEndpoint,
 				endpoints:     newEndpointCache(),
 
-				notifyC: make(chan notification, 1000),
+				notificationConsumerM: d.NotificationMailboxes.consumer,
 
 				bootstrapThreshold: bootstrapThreshold,
 
@@ -219,8 +238,8 @@ func NewManager(opts ManagerOptions) fx.Option {
 			func(d struct {
 				fx.In
 
-				JoinM   actor.Mailbox[*ClusterJoinNode]
-				NotifyM actor.Mailbox[notification]
+				JoinM                 actor.Mailbox[*ClusterJoinNode]
+				NotificationMailboxes *notificationMailboxes
 
 				Delegate   *delegate
 				Memberlist *memberlist.Memberlist
@@ -231,7 +250,7 @@ func NewManager(opts ManagerOptions) fx.Option {
 					case <-ctx.Done():
 						return actor.WorkerEnd
 
-					case msg, ok := <-d.NotifyM.ReceiveC():
+					case msg, ok := <-d.NotificationMailboxes.publisher.ReceiveC():
 						if !ok {
 							return actor.WorkerEnd
 						}
@@ -245,7 +264,7 @@ func NewManager(opts ManagerOptions) fx.Option {
 
 						return actor.WorkerContinue
 
-					case msg, ok := <-d.Delegate.notifyC:
+					case msg, ok := <-d.NotificationMailboxes.consumer.ReceiveC():
 						if !ok {
 							return actor.WorkerEnd
 						}
@@ -283,9 +302,9 @@ func NewManager(opts ManagerOptions) fx.Option {
 				})
 
 				return &managerImpl{
-					Actor:   actor.New(worker),
-					handler: d.Transport,
-					notifyM: d.NotifyM,
+					Actor:                  actor.New(worker),
+					handler:                d.Transport,
+					notificationPublisherM: d.NotificationMailboxes.publisher,
 				}
 			},
 		),
@@ -293,14 +312,14 @@ func NewManager(opts ManagerOptions) fx.Option {
 			func(d struct {
 				fx.In
 
-				NotifyM  actor.Mailbox[notification]
-				Notifier changefeed.Notifier
+				NotificationMailboxes *notificationMailboxes
+				Notifier              changefeed.Notifier
 			}) *broadcaster {
 				return &broadcaster{
 					Actor: actor.New(&broadcasterWorker{
-						localNodeID: opts.NodeID,
-						notifier:    d.Notifier,
-						notifyM:     d.NotifyM,
+						localNodeID:            opts.NodeID,
+						notifier:               d.Notifier,
+						notificationPublisherM: d.NotificationMailboxes.publisher,
 					}),
 				}
 			},

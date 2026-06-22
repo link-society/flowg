@@ -15,8 +15,8 @@ type broadcaster struct {
 type broadcasterWorker struct {
 	localNodeID string
 
-	notifier changefeed.Notifier
-	notifyM  actor.MailboxSender[notification]
+	notifier               changefeed.Notifier
+	notificationPublisherM actor.MailboxSender[notification]
 
 	eventR actor.MailboxReceiver[changefeed.ChangeEvent]
 }
@@ -59,7 +59,7 @@ func (w *broadcasterWorker) DoWork(ctx actor.Context) actor.WorkerStatus {
 			Namespace: event.Namespace,
 			Records:   event.Records,
 		}
-		if err := w.notifyM.Send(ctx, msg); err != nil {
+		if err := w.notificationPublisherM.Send(ctx, msg); err != nil {
 			if ctx.Err() == nil {
 				slog.ErrorContext(
 					ctx,

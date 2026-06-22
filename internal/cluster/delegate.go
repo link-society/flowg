@@ -24,7 +24,7 @@ type delegate struct {
 	localEndpoint *url.URL
 	endpoints     *endpointCache
 
-	notifyC chan notification
+	notificationConsumerM actor.MailboxSender[notification]
 
 	bootstrapThreshold time.Duration
 
@@ -45,8 +45,11 @@ func (d *delegate) NotifyMsg(msg []byte) {
 			"failed to parse notification message",
 			slog.String("error", err.Error()),
 		)
-	} else {
-		d.notifyC <- msg
+	} else if err := d.notificationConsumerM.Send(context.Background(), msg); err != nil {
+		d.logger.Error(
+			"failed to enqueue notification message",
+			slog.String("error", err.Error()),
+		)
 	}
 }
 
