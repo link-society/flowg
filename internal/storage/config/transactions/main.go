@@ -55,22 +55,24 @@ func ReadItem(txn *badger.Txn, itemType string, name string) ([]byte, error) {
 	return env.Payload, nil
 }
 
-func WriteItem(txn *badger.Txn, itemType string, name string, content []byte, ts hlc.Timestamp) error {
+func WriteItem(txn *badger.Txn, itemType string, name string, content []byte, ts hlc.Timestamp) (bool, error) {
 	key := fmt.Appendf(nil, "%s:%s", itemType, name)
 
-	if _, err := lww.Apply(txn, key, lww.Envelope{Timestamp: ts, Payload: content}); err != nil {
-		return fmt.Errorf("failed to write %s '%s': %w", itemType, name, err)
+	applied, err := lww.Apply(txn, key, lww.Envelope{Timestamp: ts, Payload: content})
+	if err != nil {
+		return false, fmt.Errorf("failed to write %s '%s': %w", itemType, name, err)
 	}
 
-	return nil
+	return applied, nil
 }
 
-func DeleteItem(txn *badger.Txn, itemType string, name string, ts hlc.Timestamp) error {
+func DeleteItem(txn *badger.Txn, itemType string, name string, ts hlc.Timestamp) (bool, error) {
 	key := fmt.Appendf(nil, "%s:%s", itemType, name)
 
-	if _, err := lww.Apply(txn, key, lww.Envelope{Timestamp: ts, Deleted: true}); err != nil {
-		return fmt.Errorf("failed to delete %s '%s': %w", itemType, name, err)
+	applied, err := lww.Apply(txn, key, lww.Envelope{Timestamp: ts, Deleted: true})
+	if err != nil {
+		return false, fmt.Errorf("failed to delete %s '%s': %w", itemType, name, err)
 	}
 
-	return nil
+	return applied, nil
 }

@@ -434,14 +434,20 @@ func (s *storageImpl) writeItem(
 	content []byte,
 ) error {
 	ts := s.clock.Now()
+	var applied bool
 	err := s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
-			return transactions.WriteItem(txn, itemType, name, content, ts)
+			var err error
+			applied, err = transactions.WriteItem(txn, itemType, name, content, ts)
+			return err
 		},
 	)
 	if err != nil {
 		return err
+	}
+	if !applied {
+		return nil
 	}
 
 	record := changefeed.Record{
@@ -454,14 +460,20 @@ func (s *storageImpl) writeItem(
 
 func (s *storageImpl) deleteItem(ctx context.Context, itemType string, name string) error {
 	ts := s.clock.Now()
+	var applied bool
 	err := s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
-			return transactions.DeleteItem(txn, itemType, name, ts)
+			var err error
+			applied, err = transactions.DeleteItem(txn, itemType, name, ts)
+			return err
 		},
 	)
 	if err != nil {
 		return err
+	}
+	if !applied {
+		return nil
 	}
 
 	record := changefeed.Record{
