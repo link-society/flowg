@@ -5,11 +5,8 @@ import (
 	"strings"
 
 	"crypto/tls"
-	"net/url"
 
 	"link-society.com/flowg/internal/app/server"
-	"link-society.com/flowg/internal/cluster"
-	"link-society.com/flowg/internal/utils/rnd"
 )
 
 func newServerConfig(opts *options) (server.Options, error) {
@@ -41,86 +38,6 @@ func newServerConfig(opts *options) (server.Options, error) {
 			Certificates: []tls.Certificate{cert},
 			MinVersion:   tls.VersionTLS13,
 		}
-	}
-
-	if opts.clusterNodeID == "" {
-		opts.clusterNodeID = rnd.RandomName()
-	}
-
-	var clusterFormationStrategy cluster.ClusterFormationStrategy
-
-	switch opts.clusterFormationStrategy {
-	case "manual":
-		manualStrategy := &cluster.ManualClusterFormationStrategy{}
-
-		if opts.clusterFormationManualJoinNodeID != "" {
-			if opts.clusterFormationManualJoinEndpoint == "" {
-				return server.Options{}, fmt.Errorf("cluster join endpoint is required when joining a cluster")
-			}
-
-			endpoint, err := url.Parse(opts.clusterFormationManualJoinEndpoint)
-			if err != nil {
-				return server.Options{}, fmt.Errorf("invalid cluster join endpoint: %w", err)
-			}
-
-			manualStrategy.JoinNodeID = opts.clusterFormationManualJoinNodeID
-			manualStrategy.JoinNodeEndpoint = endpoint
-		}
-
-		clusterFormationStrategy = manualStrategy
-
-	case "consul":
-		if opts.clusterFormationConsulServiceName == "" {
-			return server.Options{}, fmt.Errorf("service name is required for 'consul' cluster formation")
-		}
-		if opts.clusterFormationConsulUrl == "" {
-			return server.Options{}, fmt.Errorf("consul URL is required for 'consul' cluster formation")
-		}
-
-		clusterFormationStrategy = &cluster.ConsulClusterFormationStrategy{
-			NodeID:         opts.clusterNodeID,
-			ServiceName:    opts.clusterFormationConsulServiceName,
-			ServiceAddress: opts.mgmtBindAddress,
-			ServiceTls:     opts.mgmtTlsEnabled,
-			ConsulUrl:      opts.clusterFormationConsulUrl,
-		}
-
-	case "k8s":
-		if opts.clusterFormationKubernetesServiceNamespace == "" {
-			return server.Options{}, fmt.Errorf("kubernetes service namespace is required for 'k8s' cluster formation")
-		}
-		if opts.clusterFormationKubernetesServiceName == "" {
-			return server.Options{}, fmt.Errorf("kubernetes service name is required for 'k8s' cluster formation")
-		}
-		if opts.clusterFormationKubernetesServicePortName == "" {
-			return server.Options{}, fmt.Errorf("kubernetes service port name is required for 'k8s' cluster formation")
-		}
-
-		clusterFormationStrategy = &cluster.KubernetesClusterFormationStrategy{
-			NodeID:           opts.clusterNodeID,
-			ServiceNamespace: opts.clusterFormationKubernetesServiceNamespace,
-			ServiceName:      opts.clusterFormationKubernetesServiceName,
-			ServicePortName:  opts.clusterFormationKubernetesServicePortName,
-		}
-
-	case "dns":
-		if opts.clusterFormationDnsServer == "" {
-			return server.Options{}, fmt.Errorf("dns server is required for 'dns' cluster formation")
-		}
-
-		if opts.clusterFormationDnsDomain == "" {
-			return server.Options{}, fmt.Errorf("dns domain is required for 'dns' cluster formation")
-		}
-
-		clusterFormationStrategy = &cluster.DnsClusterFormationStrategy{
-			DnsServer: opts.clusterFormationDnsServer,
-			DnsDomain: opts.clusterFormationDnsDomain,
-			DnsScript: opts.clusterFormationDnsScript,
-			NodeID:    opts.clusterNodeID,
-		}
-
-	default:
-		return server.Options{}, fmt.Errorf("invalid cluster formation strategy: %s", opts.clusterFormationStrategy)
 	}
 
 	if opts.syslogProtocol != "tcp" && opts.syslogProtocol != "udp" {
@@ -156,11 +73,6 @@ func newServerConfig(opts *options) (server.Options, error) {
 
 		MgmtBindAddress: opts.mgmtBindAddress,
 		MgmtTlsConfig:   mgmtTlsConfig,
-
-		ClusterNodeID:            opts.clusterNodeID,
-		ClusterCookie:            opts.clusterCookie,
-		ClusterStateDir:          opts.clusterStateDir,
-		ClusterFormationStrategy: clusterFormationStrategy,
 
 		SyslogTcpMode:               opts.syslogProtocol == "tcp",
 		SyslogBindAddress:           opts.syslogBindAddr,
