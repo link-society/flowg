@@ -7,6 +7,8 @@ import (
 	"crypto/tls"
 	"net/http"
 
+	"time"
+
 	"go.uber.org/fx"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -22,6 +24,8 @@ type ServerOptions struct {
 	ClusterCookie            string
 	ClusterStateDir          string
 	ClusterFormationStrategy cluster.ClusterFormationStrategy
+
+	TombstoneGracePeriod time.Duration
 }
 
 type Server struct {
@@ -51,6 +55,8 @@ func NewServer(opts ServerOptions) fx.Option {
 
 			ClusterFormationStrategy: opts.ClusterFormationStrategy,
 			ClusterStateDir:          opts.ClusterStateDir,
+
+			TombstoneGracePeriod: opts.TombstoneGracePeriod,
 		}),
 		fx.Provide(func(
 			lc fx.Lifecycle,

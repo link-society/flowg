@@ -36,6 +36,8 @@ type ManagerOptions struct {
 
 	ClusterFormationStrategy ClusterFormationStrategy
 	ClusterStateDir          string
+
+	TombstoneGracePeriod time.Duration
 }
 
 type managerImpl struct {
@@ -48,6 +50,8 @@ type managerImpl struct {
 var _ Manager = (*managerImpl)(nil)
 
 func NewManager(opts ManagerOptions) fx.Option {
+	bootstrapThreshold := opts.TombstoneGracePeriod / 2
+
 	return fx.Module(
 		"cluster.manager",
 		clusterstate.NewStorage(func() clusterstate.Options {
@@ -75,9 +79,10 @@ func NewManager(opts ManagerOptions) fx.Option {
 					Actor: actor.New(&syncWorker{
 						logger: slog.Default().With(slog.String("channel", "cluster.sync")),
 
-						localNodeID: opts.NodeID,
-						requestM:    d.SyncRequestM,
-						cookie:      opts.Cookie,
+						localNodeID:        opts.NodeID,
+						requestM:           d.SyncRequestM,
+						cookie:             opts.Cookie,
+						bootstrapThreshold: bootstrapThreshold,
 
 						storages: map[string]storage.Streamable{
 							"auth":   d.AuthStorage,
@@ -137,6 +142,8 @@ func NewManager(opts ManagerOptions) fx.Option {
 
 				notifyC: make(chan notification, 1000),
 
+				bootstrapThreshold: bootstrapThreshold,
+
 				clusterStateStorage: d.ClusterStateStorage,
 				syncRequestM:        d.SyncRequestM,
 				storages: map[string]storage.Streamable{
@@ -166,6 +173,8 @@ func NewManager(opts ManagerOptions) fx.Option {
 
 				connM:   d.ConnM,
 				packetM: d.PacketM,
+
+				bootstrapThreshold: bootstrapThreshold,
 
 				storages: map[string]storage.Streamable{
 					"auth":   d.AuthStorage,

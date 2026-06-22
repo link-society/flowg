@@ -104,6 +104,8 @@ func NewServer(opts Options) fx.Option {
 			ClusterCookie:            opts.ClusterCookie,
 			ClusterStateDir:          opts.ClusterStateDir,
 			ClusterFormationStrategy: opts.ClusterFormationStrategy,
+
+			TombstoneGracePeriod: opts.TombstoneGracePeriod,
 		}),
 		syslog.NewServer(syslog.ServerOptions{
 			TcpMode:     opts.SyslogTcpMode,
