@@ -3,6 +3,7 @@ package log
 import (
 	"log/slog"
 
+	"sync/atomic"
 	"time"
 
 	"github.com/vladopajic/go-actor/actor"
@@ -21,6 +22,8 @@ type gcWorker struct {
 	kvStore    kvstore.Storage
 	grace      time.Duration
 	gcInterval time.Duration
+
+	running atomic.Bool
 }
 
 var _ actor.Worker = (*gcWorker)(nil)
@@ -31,7 +34,13 @@ func (w *gcWorker) DoWork(ctx actor.Context) actor.WorkerStatus {
 		return actor.WorkerEnd
 
 	case <-time.After(w.gcInterval):
+		if !w.running.CompareAndSwap(false, true) {
+			return actor.WorkerContinue
+		}
+
 		go func() {
+			defer w.running.Store(false)
+
 			if err := w.kvStore.Update(ctx, transactions.CollectGarbage); err != nil {
 				slog.ErrorContext(
 					ctx,
