@@ -4,12 +4,15 @@ import (
 	"errors"
 	"log/slog"
 
+	"sync"
+
 	"github.com/vladopajic/go-actor/actor"
 )
 
 type subscriberSet map[actor.MailboxSender[ChangeEvent]]struct{}
 
 type worker struct {
+	mu          sync.Mutex
 	subscribers subscriberSet
 	subMbox     actor.MailboxReceiver[subscribeMessage]
 	eventMbox   actor.MailboxReceiver[ChangeEvent]
@@ -31,11 +34,15 @@ func (w *worker) DoWork(ctx actor.Context) actor.WorkerStatus {
 			return actor.WorkerEnd
 		}
 
+		w.mu.Lock()
 		w.subscribers[msg.senderM] = struct{}{}
+		w.mu.Unlock()
 
 		go func() {
 			<-msg.doneC
+			w.mu.Lock()
 			delete(w.subscribers, msg.senderM)
+			w.mu.Unlock()
 			msg.senderM.Stop()
 		}()
 
@@ -51,7 +58,14 @@ func (w *worker) DoWork(ctx actor.Context) actor.WorkerStatus {
 			return actor.WorkerEnd
 		}
 
+		w.mu.Lock()
+		subs := make([]actor.MailboxSender[ChangeEvent], 0, len(w.subscribers))
 		for sub := range w.subscribers {
+			subs = append(subs, sub)
+		}
+		w.mu.Unlock()
+
+		for _, sub := range subs {
 			if err := sub.Send(ctx, msg); err != nil {
 				slog.ErrorContext(
 					ctx,
