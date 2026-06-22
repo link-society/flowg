@@ -45,6 +45,8 @@ type syncWorker struct {
 
 var _ actor.Worker = (*syncWorker)(nil)
 
+const syncRequestTimeout = 5 * time.Minute
+
 func (w *syncWorker) DoWork(ctx actor.Context) actor.WorkerStatus {
 	select {
 	case <-ctx.Done():
@@ -94,6 +96,9 @@ func (w *syncWorker) syncStorage(ctx context.Context, remoteNodeID string, remot
 		return
 	}
 
+	ctx, cancel := context.WithTimeout(ctx, syncRequestTimeout)
+	defer cancel()
+
 	url, err := url.JoinPath(remoteEndpoint.String(), "cluster", "sync", syncState.Namespace)
 	if err != nil {
 		logger.ErrorContext(ctx, "failed to build sync URL", slog.String("error", err.Error()))
@@ -115,15 +120,15 @@ func (w *syncWorker) syncStorage(ctx context.Context, remoteNodeID string, remot
 	req.Trailer = http.Header{SINCE_HEADER_NAME: nil}
 
 	go func() {
-		defer writer.Close()
-
 		newSyncTs, err := storage.Dump(ctx, writer, syncState.Since)
 		if err != nil {
 			logger.ErrorContext(ctx, "failed to dump storage", slog.String("error", err.Error()))
+			writer.CloseWithError(err)
 			return
 		}
 
 		req.Trailer.Set(SINCE_HEADER_NAME, strconv.FormatUint(newSyncTs, 10))
+		writer.Close()
 	}()
 
 	resp, err := http.DefaultClient.Do(req)
@@ -160,6 +165,9 @@ func (w *syncWorker) bootstrapStorage(ctx context.Context, remoteNodeID string, 
 		logger.ErrorContext(ctx, "unknown namespace")
 		return
 	}
+
+	ctx, cancel := context.WithTimeout(ctx, syncRequestTimeout)
+	defer cancel()
 
 	endpoint, err := url.JoinPath(remoteEndpoint.String(), "cluster", "sync", namespace)
 	if err != nil {
