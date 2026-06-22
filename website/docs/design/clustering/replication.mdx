@@ -114,11 +114,12 @@ cluster. To avoid re-sending data that a peer already has, every node keeps trac
 — for each peer and each dataset — of **how much of that peer's data it has
 already received**. We call this position a **watermark**.
 
-During reconciliation, a node shares its watermarks; each peer then sends back
-only the records written **after** that position. This makes synchronization
-**incremental**: steady-state reconciliation is cheap, and a node that has fallen
-behind (or just joined) receives exactly the tail of history it is missing —
-starting from the very beginning on first contact.
+During reconciliation, nodes gossip their watermarks to one another. When a node
+sees — from a peer's watermark — that the peer is missing some of the records
+**it** holds, it **pushes** that missing tail to the peer. This makes
+synchronization **incremental**: steady-state reconciliation is cheap, and a node
+that has fallen behind (or just joined) receives exactly the tail of history it is
+missing — starting from the very beginning on first contact.
 
 ```mermaid
 sequenceDiagram
@@ -126,11 +127,11 @@ sequenceDiagram
   participant N2 as Node 2
 
   Note over N1,N2: Periodic reconciliation
-  N1->>N2: My watermarks for your datasets
-  N2->>N2: Select records newer than each watermark
-  N2-->>N1: Incremental batch of records
-  N1->>N1: LWW merge
-  N1->>N1: Advance watermarks
+  N2->>N1: Watermark — how much of N1's data N2 already holds
+  N1->>N1: Select its records newer than that watermark
+  N1-->>N2: Push the missing tail of records
+  N2->>N2: LWW merge
+  N2->>N2: Advance its watermark for N1
 ```
 
 Because merges are conflict-free, a watermark only needs to be an *optimization*:
@@ -139,8 +140,8 @@ even if a record is delivered more than once, applying it again is harmless.
 ### Skipping caught-up datasets
 
 The watermarks also let a node avoid talking to a peer that has nothing to learn.
-Before requesting a reconciliation, a node compares — for each dataset — the
-watermark the peer reports against its own latest local version:
+Before pushing to a peer, a node compares — for each dataset — the watermark the
+peer reports against its own latest local version:
 
  - if the peer's watermark already covers the latest version, the dataset is
    **up to date** and is skipped entirely;
@@ -155,12 +156,12 @@ has actually moved forward.
 flowchart TD
   R[Reconciliation due] --> L{For each dataset}
   L --> C{Peer's watermark<br/>covers our latest?}
-  C -- Yes --> SK[Skip — nothing to send]
-  C -- No --> RQ[Request records<br/>after the watermark]
-  SK --> D{Any dataset left to send?}
+  C -- Yes --> SK[Skip — nothing to push]
+  C -- No --> RQ[Push records<br/>after the watermark]
+  SK --> D{Any dataset left to push?}
   RQ --> D
   D -- No --> Q[Stay silent]
-  D -- Yes --> X[Exchange & merge]
+  D -- Yes --> X[Push & merge]
 ```
 
 ### Recovering from a partition
