@@ -76,12 +76,26 @@ flowchart TD
 Neither mechanism needs the other to be correct: broadcast makes replication
 *fast*, anti-entropy makes it *guaranteed*.
 
+Not every dataset uses both paths the same way. **Control-plane** data — users,
+roles, pipelines, transformers and stream configurations — is small and changes
+rarely, so each write is **broadcast**. **Log entries**, however, arrive in huge
+volumes; broadcasting every one of them would flood the cluster's gossip
+transport. Logs therefore skip the broadcast path entirely and rely on
+anti-entropy — but to keep their latency low, a local write **triggers** an
+immediate reconciliation instead of waiting for the next periodic cycle (see
+[Triggered reconciliation](#triggered-reconciliation)).
+
 ## Broadcast (fast path)
 
-When a node commits a write, it immediately gossips the freshly written records
-to the rest of the cluster. Peers merge them into their local store using the
-Last-Writer-Wins rule. This keeps replication latency low under normal
-conditions.
+When a node commits a **control-plane** write — a change to users, roles,
+pipelines, transformers or a stream's configuration — it immediately gossips the
+freshly written records to the rest of the cluster. Peers merge them into their
+local store using the Last-Writer-Wins rule. This keeps replication latency low
+under normal conditions.
+
+High-volume **log entries** are deliberately **not** broadcast: doing so would
+overwhelm the gossip transport. They achieve low latency through
+[triggered reconciliation](#triggered-reconciliation) instead.
 
 ```mermaid
 sequenceDiagram
@@ -164,6 +178,31 @@ flowchart TD
   D -- Yes --> X[Push & merge]
 ```
 
+### Triggered reconciliation
+
+Periodic anti-entropy alone would make a freshly ingested log wait up to a full
+reconciliation interval before appearing on other nodes. For high-volume data
+that has opted out of broadcast, that delay would be the dominant source of
+replication latency.
+
+To avoid it, a node watches its **own** local writes. Whenever a dataset
+changes, it schedules an **immediate** reconciliation for that dataset — reusing
+the very same incremental, watermark-based push described above. The data still
+travels over the efficient anti-entropy path; only its *timing* changes.
+
+These triggers are **coalesced**: a burst of writes collapses into a single push
+after a short, bounded delay, so a sustained ingestion rate produces a steady
+trickle of incremental syncs rather than one exchange per record. The outcome is
+broadcast-like latency for logs, without broadcast's per-record cost.
+
+```mermaid
+flowchart LR
+  W[Local write] --> M{Coalescing window}
+  M -->|more writes| M
+  M -->|window elapsed| P[Incremental push to peers]
+  P --> MG[Peers merge]
+```
+
 ### Recovering from a partition
 
 Anti-entropy is what allows the cluster to heal after nodes have been isolated
@@ -187,6 +226,31 @@ sequenceDiagram
   N2-->>N1: Records written during the partition
   N1->>N2: Records written during the partition
   Note over N1,N2: Both sides converge (LWW)
+```
+
+### Purging a stream
+
+Log entries are stored raw and append-only, so — unlike control-plane records —
+they carry no individual tombstone (see
+[Removing log entries](/docs/design/data-replication#removing-log-entries)).
+Deleting them in bulk, by **purging a stream**, is therefore recorded as a
+tombstone on that stream's *configuration* rather than on each entry.
+
+That single tombstone travels like any other control-plane record, over both
+broadcast and anti-entropy. When a node applies it, it **cascades** the deletion
+locally, dropping every log entry of the purged stream. And because anti-entropy
+could otherwise re-deliver those entries from a peer that has not yet seen the
+tombstone, a **guard** refuses to re-introduce entries whose stream has been
+purged — so a purge can never be silently undone.
+
+```mermaid
+flowchart TD
+  P[Stream purged on a node] --> T[Tombstone on stream config]
+  T -->|broadcast + anti-entropy| PE[Peer receives tombstone]
+  PE --> C[Cascade: drop the stream's entries]
+  AE[Anti-entropy delivers an old entry] --> G{Stream tombstoned?}
+  G -- Yes --> D[Reject — do not resurrect]
+  G -- No --> K[Keep]
 ```
 
 ### The safe-recovery window

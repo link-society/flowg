@@ -32,9 +32,11 @@ flowchart TB
    [SWIM protocol](./consensus). It also carries the lightweight state nodes
    piggyback on each other during gossip.
  - The **replication engine** uses that membership information to
-   [propagate and reconcile data](./replication) — broadcasting fresh writes and
-   periodically running anti-entropy.
- - The **replicated stores** hold the actual data as Last-Writer-Wins envelopes
+   [propagate and reconcile data](./replication) — broadcasting fresh
+   control-plane writes, periodically running anti-entropy, and triggering an
+   immediate incremental sync for high-volume log writes.
+ - The **replicated stores** hold control-plane data as Last-Writer-Wins
+   envelopes, and log entries as raw append-only records
    (see [How Data Is Replicated?](/docs/design/data-replication)).
 
 All cluster traffic — discovery, gossip and synchronization — flows over the same

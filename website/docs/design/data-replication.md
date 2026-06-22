@@ -45,9 +45,16 @@ flowchart LR
   E --> S[(Local store)]
 ```
 
-The value is opaque to the replication layer: it does not matter whether it is a
-log entry, a pipeline definition or a user account. They are all treated as
-envelopes.
+For most records, the value is opaque to the replication layer: it does not
+matter whether it is a pipeline definition, a user account or a stream's
+configuration — they are all treated as envelopes.
+
+The **log entries** themselves are the one deliberate exception. They are
+written append-only, in very large volumes, and are never updated in place, so
+wrapping each one in an envelope would add overhead for no benefit. Log entries
+are therefore stored as **raw, immutable records**: there is no conflict to
+resolve, and the rare case of *removing* them is handled at a coarser
+granularity (see [Deletions and tombstones](#deletions-and-tombstones)).
 
 ## Last-Writer-Wins resolution
 
@@ -94,6 +101,20 @@ node to converge, after which they can be safely garbage-collected. How long the
 are kept — the **grace period** — bounds how long a disconnected node can safely
 rejoin and keep its offline writes, as explained in
 [The safe-recovery window](/docs/design/clustering/replication#the-safe-recovery-window).
+
+### Removing log entries
+
+Because log entries are stored raw rather than as envelopes, they carry no
+individual tombstone. They only ever disappear in two ways:
+
+ - **Retention expiry** — each entry is written with a lifetime, and every node
+   expires it independently. This needs no coordination: the removal is not a
+   conflicting write, it is the same rule applied identically everywhere.
+ - **Purging a whole stream** — recorded as a tombstone on the stream's
+   *configuration*, which **is** an envelope. Applying that single tombstone
+   then cascades to every one of the stream's log entries. The mechanics of that
+   cascade are described in
+   [Purging a stream](/docs/design/clustering/replication#purging-a-stream).
 
 ## Why a Hybrid Logical Clock?
 
