@@ -23,6 +23,7 @@ type Storage interface {
 
 type Options struct {
 	Directory string
+	InMemory  bool
 }
 
 type storageImpl struct {
@@ -47,6 +48,7 @@ func NewStorage(opts Options) fx.Option {
 	kvOpts := kvstore.DefaultOptions()
 	kvOpts.LogChannel = "cluster.state"
 	kvOpts.Directory = opts.Directory
+	kvOpts.InMemory = opts.InMemory
 
 	return fx.Module(
 		"cluster.state",
