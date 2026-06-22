@@ -79,19 +79,28 @@ func snapshotTransformers(t *testing.T, ctx context.Context, s Storage) map[stri
 	return out
 }
 
-// antiEntropy models a healed network partition: every node exchanges a full
-// state snapshot with every other node. Snapshots are captured up-front (the
-// state at the moment the partition heals), then merged pairwise. Because the
-// LWW merge is commutative, associative and idempotent, a single round over
-// full snapshots is sufficient for every node to converge on the global winner
-// set.
-func antiEntropy(t *testing.T, ctx context.Context, nodes []Storage) {
+// captureDumps snapshots every node's full state at a single instant — the
+// moment a healed network partition begins anti-entropy. Dumps are captured
+// up-front so a later round can replay the exact same payloads (badger's
+// streaming backup is expensive, so callers reuse these snapshots rather than
+// re-dumping).
+func captureDumps(t *testing.T, ctx context.Context, nodes []Storage) [][]byte {
 	t.Helper()
 
 	dumps := make([][]byte, len(nodes))
 	for i, n := range nodes {
 		dumps[i] = dumpNode(t, ctx, n)
 	}
+	return dumps
+}
+
+// mergeRound models a healed network partition: every node merges every other
+// node's snapshot. Because the LWW merge is commutative, associative and
+// idempotent, a single round over full snapshots is sufficient for every node
+// to converge on the global winner set, and replaying the same snapshots is a
+// no-op.
+func mergeRound(t *testing.T, ctx context.Context, nodes []Storage, dumps [][]byte) {
+	t.Helper()
 
 	for i, n := range nodes {
 		for j := range nodes {
@@ -138,7 +147,10 @@ func TestMultiNodePartitionRejoinConvergence(t *testing.T) {
 	mustDeleteTransformer(t, ctx, node2, "victim")
 
 	// --- Rejoin phase: anti-entropy across all nodes ---
-	antiEntropy(t, ctx, nodes)
+	// Snapshot the partition-era state once, then merge those snapshots into
+	// every node. The same snapshots are replayed below to assert idempotency.
+	dumps := captureDumps(t, ctx, nodes)
+	mergeRound(t, ctx, nodes, dumps)
 
 	// --- Convergence: every node must hold identical state ---
 	want := snapshotTransformers(t, ctx, node0)
@@ -163,8 +175,10 @@ func TestMultiNodePartitionRejoinConvergence(t *testing.T) {
 		t.Fatalf("expected victim to be deleted everywhere, but it is present: %q", content)
 	}
 
-	// --- Stability: a second anti-entropy round must be a no-op (idempotent) ---
-	antiEntropy(t, ctx, nodes)
+	// --- Stability: replaying the same anti-entropy payloads must be a no-op ---
+	// Re-merging the original (now stale) partition snapshots must not regress
+	// any node: LWW keeps the winners already converged on above.
+	mergeRound(t, ctx, nodes, dumps)
 	for i := range nodes {
 		got := snapshotTransformers(t, ctx, nodes[i])
 		if !reflect.DeepEqual(want, got) {

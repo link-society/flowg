@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/dgraph-io/badger/v4"
+	badgerOptions "github.com/dgraph-io/badger/v4/options"
 	"github.com/dgraph-io/badger/v4/pb"
 
 	"link-society.com/flowg/internal/utils/hlc"
@@ -16,7 +17,18 @@ func newBadger(t *testing.T) *badger.DB {
 	t.Helper()
 
 	db, err := badger.Open(
-		badger.DefaultOptions("").WithInMemory(true).WithLogger(nil),
+		badger.DefaultOptions("").
+			WithInMemory(true).
+			WithLogger(nil).
+			// An 8 MiB memtable with no compression or caches keeps
+			// badger.Open cheap: the default 64 MiB memtable forces an
+			// ~87 MiB arena allocation per open, which dominates test
+			// runtime under CPU contention. 8 MiB is the floor because
+			// in-memory mode pins the value threshold at 1 MiB.
+			WithMemTableSize(8 << 20).
+			WithCompression(badgerOptions.None).
+			WithBlockCacheSize(0).
+			WithIndexCacheSize(0),
 	)
 	if err != nil {
 		t.Fatalf("failed to open badger: %v", err)
