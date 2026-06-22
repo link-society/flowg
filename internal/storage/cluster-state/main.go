@@ -107,6 +107,26 @@ func (s *storageImpl) FetchLocalState(ctx context.Context, nodeID string, endpoi
 func (s *storageImpl) UpdateLocalState(ctx context.Context, nodeID string, namespace string, since uint64) error {
 	return s.kvStore.Update(ctx, func(txn *badger.Txn) error {
 		key := fmt.Appendf(nil, "lastsync:%s:%s", nodeID, namespace)
+
+		item, err := txn.Get(key)
+		switch err {
+		case nil:
+			var current uint64
+			if err := item.Value(func(val []byte) error {
+				current = binary.BigEndian.Uint64(val)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if current >= since {
+				return nil
+			}
+		case badger.ErrKeyNotFound:
+			// No watermark yet: fall through and record the first one.
+		default:
+			return err
+		}
+
 		return txn.Set(key, binary.BigEndian.AppendUint64(nil, since))
 	})
 }
