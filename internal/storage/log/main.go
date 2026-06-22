@@ -173,8 +173,13 @@ func (s *storageImpl) ApplyReplicated(ctx context.Context, records []changefeed.
 				if err != nil {
 					return err
 				}
-				if ok {
-					applied = true
+				if !ok {
+					continue
+				}
+				applied = true
+
+				if err := cascadePurge(txn, record.Key, record.Value); err != nil {
+					return err
 				}
 			}
 			return nil
@@ -190,7 +195,27 @@ func (s *storageImpl) ApplyReplicated(ctx context.Context, records []changefeed.
 	return nil
 }
 
-var streamConfigPrefix = []byte("stream:config:")
+func cascadePurge(txn *badger.Txn, key []byte, value []byte) error {
+	stream, ok := transactions.StreamFromConfigKey(key)
+	if !ok {
+		return nil
+	}
+
+	env, err := lww.Unmarshal(value)
+	if err != nil {
+		return err
+	}
+	if !env.Deleted {
+		return nil
+	}
+
+	return transactions.PurgeStreamData(txn, stream)
+}
+
+var (
+	streamConfigPrefix = []byte("stream:config:")
+	entryPrefix        = []byte("entry:")
+)
 
 func mergeRecord(changed *atomic.Bool) func(txn *badger.Txn, kv *pb.KV) error {
 	return func(txn *badger.Txn, kv *pb.KV) error {
@@ -205,7 +230,37 @@ func mergeRecord(changed *atomic.Bool) func(txn *badger.Txn, kv *pb.KV) error {
 			}
 			if applied {
 				changed.Store(true)
+				if err := cascadePurge(txn, kv.Key, kv.Value); err != nil {
+					return err
+				}
 			}
+			return nil
+
+		case bytes.HasPrefix(kv.Key, entryPrefix):
+			stream, ok := transactions.StreamFromEntryKey(kv.Key)
+			if ok {
+				configKey := append([]byte("stream:config:"), stream...)
+				env, _, err := lww.Read(txn, configKey)
+				if err != nil {
+					return err
+				}
+				if env.Deleted {
+					return nil
+				}
+			}
+
+			entry := &badger.Entry{
+				Key:       kv.Key,
+				Value:     kv.Value,
+				ExpiresAt: kv.ExpiresAt,
+			}
+			if len(kv.UserMeta) > 0 {
+				entry.UserMeta = kv.UserMeta[0]
+			}
+			if err := txn.SetEntry(entry); err != nil {
+				return err
+			}
+			changed.Store(true)
 			return nil
 
 		default:
@@ -446,13 +501,14 @@ func (s *storageImpl) Ingest(ctx context.Context, stream string, logRecord *mode
 		return nil, err
 	}
 
+	var records []changefeed.Record
 	if created {
-		record := changefeed.Record{
+		records = []changefeed.Record{{
 			Key:   fmt.Appendf(nil, "stream:config:%s", stream),
 			Value: lww.Envelope{Timestamp: ts}.Marshal(),
-		}
-		s.emitChange(ctx, stream, changefeed.OpWrite, ts.NodeID, []changefeed.Record{record})
+		}}
 	}
+	s.emitChange(ctx, stream, changefeed.OpWrite, ts.NodeID, records)
 
 	return key, nil
 }

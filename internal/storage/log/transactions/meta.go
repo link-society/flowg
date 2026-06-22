@@ -170,6 +170,19 @@ func ConfigureStream(txn *badger.Txn, stream string, config models.StreamConfig,
 }
 
 func DeleteStream(txn *badger.Txn, stream string, ts hlc.Timestamp) error {
+	if err := PurgeStreamData(txn, stream); err != nil {
+		return err
+	}
+
+	streamKey := []byte(fmt.Sprintf("stream:config:%s", stream))
+	if _, err := lww.Apply(txn, streamKey, lww.Envelope{Timestamp: ts, Deleted: true}); err != nil {
+		return fmt.Errorf("could not delete stream config '%s': %w", stream, err)
+	}
+
+	return nil
+}
+
+func PurgeStreamData(txn *badger.Txn, stream string) error {
 	prefixes := []string{
 		fmt.Sprintf("entry:%s:", stream),
 		fmt.Sprintf("index:%s:", stream),
@@ -193,11 +206,6 @@ func DeleteStream(txn *badger.Txn, stream string, ts hlc.Timestamp) error {
 				)
 			}
 		}
-	}
-
-	streamKey := []byte(fmt.Sprintf("stream:config:%s", stream))
-	if _, err := lww.Apply(txn, streamKey, lww.Envelope{Timestamp: ts, Deleted: true}); err != nil {
-		return fmt.Errorf("could not delete stream config '%s': %w", stream, err)
 	}
 
 	return nil
