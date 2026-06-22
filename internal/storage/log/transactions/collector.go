@@ -35,10 +35,25 @@ func Ingest(txn *badger.Txn, stream string, logRecord *models.LogRecord, key []b
 		)
 	}
 
+	if err := WriteDerivedKeys(txn, stream, key, logRecord, streamConfig, streamConfig.RetentionTime); err != nil {
+		return false, err
+	}
+
+	return created, nil
+}
+
+func WriteDerivedKeys(
+	txn *badger.Txn,
+	stream string,
+	key []byte,
+	logRecord *models.LogRecord,
+	streamConfig models.StreamConfig,
+	indexRetentionTime int64,
+) error {
 	for field, value := range logRecord.Fields {
 		fieldKey := []byte(fmt.Sprintf("stream:field:%s:%s", stream, field))
 		if err := txn.Set(fieldKey, []byte{}); err != nil {
-			return false, fmt.Errorf(
+			return fmt.Errorf(
 				"could not save field '%s' of log entry '%s' to stream '%s': %w",
 				field, key, stream, err,
 			)
@@ -46,8 +61,8 @@ func Ingest(txn *badger.Txn, stream string, logRecord *models.LogRecord, key []b
 
 		if streamConfig.IsFieldIndexed(field) {
 			fieldIndex := newFieldIndex(txn, stream, field, value)
-			if err := fieldIndex.AddKey(key, streamConfig.RetentionTime); err != nil {
-				return false, fmt.Errorf(
+			if err := fieldIndex.AddKey(key, indexRetentionTime); err != nil {
+				return fmt.Errorf(
 					"could not add field index '%s' of log entry '%s' to stream '%s': %w",
 					field, key, stream, err,
 				)
@@ -55,5 +70,5 @@ func Ingest(txn *badger.Txn, stream string, logRecord *models.LogRecord, key []b
 		}
 	}
 
-	return created, nil
+	return nil
 }

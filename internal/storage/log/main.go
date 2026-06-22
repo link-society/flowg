@@ -215,6 +215,8 @@ func cascadePurge(txn *badger.Txn, key []byte, value []byte) error {
 var (
 	streamConfigPrefix = []byte("stream:config:")
 	entryPrefix        = []byte("entry:")
+	streamFieldPrefix  = []byte("stream:field:")
+	indexPrefix        = []byte("index:")
 )
 
 func mergeRecord(changed *atomic.Bool) func(txn *badger.Txn, kv *pb.KV) error {
@@ -224,6 +226,17 @@ func mergeRecord(changed *atomic.Bool) func(txn *badger.Txn, kv *pb.KV) error {
 			return nil
 
 		case bytes.HasPrefix(kv.Key, streamConfigPrefix):
+			var oldConfig models.StreamConfig
+			oldEnv, oldFound, err := lww.Read(txn, kv.Key)
+			if err != nil {
+				return err
+			}
+			if oldFound && len(oldEnv.Payload) > 0 {
+				if err := json.Unmarshal(oldEnv.Payload, &oldConfig); err != nil {
+					return err
+				}
+			}
+
 			applied, err := schema.ApplyEnvelope(txn, kv.Key, kv.Value)
 			if err != nil {
 				return err
@@ -233,7 +246,28 @@ func mergeRecord(changed *atomic.Bool) func(txn *badger.Txn, kv *pb.KV) error {
 				if err := cascadePurge(txn, kv.Key, kv.Value); err != nil {
 					return err
 				}
+
+				newEnv, err := lww.Unmarshal(kv.Value)
+				if err != nil {
+					return err
+				}
+				if !newEnv.Deleted {
+					if stream, ok := transactions.StreamFromConfigKey(kv.Key); ok {
+						var newConfig models.StreamConfig
+						if len(newEnv.Payload) > 0 {
+							if err := json.Unmarshal(newEnv.Payload, &newConfig); err != nil {
+								return err
+							}
+						}
+						if err := transactions.ReindexStream(txn, stream, oldConfig, newConfig); err != nil {
+							return err
+						}
+					}
+				}
 			}
+			return nil
+
+		case bytes.HasPrefix(kv.Key, streamFieldPrefix), bytes.HasPrefix(kv.Key, indexPrefix):
 			return nil
 
 		case bytes.HasPrefix(kv.Key, entryPrefix):
@@ -246,14 +280,20 @@ func mergeRecord(changed *atomic.Bool) func(txn *badger.Txn, kv *pb.KV) error {
 			}
 
 			stream, ok := transactions.StreamFromEntryKey(kv.Key)
+			var streamConfig models.StreamConfig
 			if ok {
 				configKey := append([]byte("stream:config:"), stream...)
-				env, _, err := lww.Read(txn, configKey)
+				env, found, err := lww.Read(txn, configKey)
 				if err != nil {
 					return err
 				}
 				if env.Deleted {
 					return nil
+				}
+				if found && len(env.Payload) > 0 {
+					if err := json.Unmarshal(env.Payload, &streamConfig); err != nil {
+						return err
+					}
 				}
 			}
 
@@ -269,6 +309,24 @@ func mergeRecord(changed *atomic.Bool) func(txn *badger.Txn, kv *pb.KV) error {
 				return err
 			}
 			changed.Store(true)
+
+			if ok {
+				var logRecord models.LogRecord
+				if err := json.Unmarshal(kv.Value, &logRecord); err != nil {
+					return err
+				}
+
+				indexRetentionTime := int64(0)
+				if kv.ExpiresAt != 0 {
+					indexRetentionTime = int64(kv.ExpiresAt) - time.Now().Unix()
+				}
+
+				if err := transactions.WriteDerivedKeys(
+					txn, stream, kv.Key, &logRecord, streamConfig, indexRetentionTime,
+				); err != nil {
+					return err
+				}
+			}
 			return nil
 
 		default:

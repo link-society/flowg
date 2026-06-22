@@ -164,15 +164,27 @@ func ConfigureStream(txn *badger.Txn, stream string, config models.StreamConfig,
 		return fmt.Errorf("could not save stream config '%s': %w", stream, err)
 	}
 
-	for _, field := range config.IndexedFields {
+	if err := ReindexStream(txn, stream, oldConfig, config); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ReindexStream(txn *badger.Txn, stream string, oldConfig, newConfig models.StreamConfig) error {
+	for _, field := range newConfig.IndexedFields {
 		if !oldConfig.IsFieldIndexed(field) {
-			IndexField(txn, stream, field)
+			if err := IndexField(txn, stream, field); err != nil {
+				return err
+			}
 		}
 	}
 
 	for _, field := range oldConfig.IndexedFields {
-		if !config.IsFieldIndexed(field) {
-			UnindexField(txn, stream, field)
+		if !newConfig.IsFieldIndexed(field) {
+			if err := UnindexField(txn, stream, field); err != nil {
+				return err
+			}
 		}
 	}
 
