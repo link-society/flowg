@@ -5,9 +5,11 @@ metadata:
   labels:
     {{- include "flowg.labels" . | nindent 4 }}
 spec:
-  storageClassName: {{ include "flowg.fullname" . }}-storage
   accessModes:
     - ReadWriteOnce
+  {{- with .Values.flowg.storage.storageClassName }}
+  storageClassName: {{ . | quote }}
+  {{- end }}
   resources:
     requests:
       storage: {{ .Values.flowg.storage.size }}

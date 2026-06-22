@@ -12,7 +12,7 @@ flowg:
 
   storage:
     size: 10Gi
-    hostPath: /var/lib/flowg/data
+    storageClassName: ""
 
   https:
     enabled: false
