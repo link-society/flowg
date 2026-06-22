@@ -21,6 +21,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "flowg.serviceAccountName" . }}
+      automountServiceAccountToken: false
       containers:
         - name: flowg
           image: "{{ .Values.flowg.image.repository }}:{{ .Values.flowg.image.tag | default .Chart.AppVersion }}"
