@@ -29,12 +29,23 @@ func newSyncMailbox(t *testing.T) actor.Mailbox[*syncRequest] {
 
 func newMergeDelegate(t *testing.T, syncM actor.MailboxSender[*syncRequest]) *delegate {
 	t.Helper()
+	stateStorage := newClusterStateStorage(t)
+	// Mark every namespace as freshly synced so the staleness gate treats this
+	// node as a healthy replication source and exercises the normal push path.
+	now := time.Now().UnixNano()
+	for _, ns := range []string{"auth", "config", "log"} {
+		if err := stateStorage.SetLiveness(t.Context(), ns, now); err != nil {
+			t.Fatalf("SetLiveness(%q): %v", ns, err)
+		}
+	}
 	d := &delegate{
-		logger:        slog.New(slog.NewTextHandler(io.Discard, nil)),
-		localNodeID:   "node-local",
-		localEndpoint: &url.URL{Scheme: "http", Host: "127.0.0.1:9113"},
-		endpoints:     newEndpointCache(),
-		syncRequestM:  syncM,
+		logger:              slog.New(slog.NewTextHandler(io.Discard, nil)),
+		localNodeID:         "node-local",
+		localEndpoint:       &url.URL{Scheme: "http", Host: "127.0.0.1:9113"},
+		endpoints:           newEndpointCache(),
+		bootstrapThreshold:  time.Hour,
+		clusterStateStorage: stateStorage,
+		syncRequestM:        syncM,
 		storages: map[string]storage.Streamable{
 			// A non-zero latest version means there is data to replicate, so the
 			// caught-up short-circuit does not kick in unless a test asks for it.
@@ -284,6 +295,144 @@ func TestMergeRemoteStateEmptyStoreNoRequest(t *testing.T) {
 
 	d.MergeRemoteState(buf, false)
 	expectNoSyncRequest(t, m)
+}
+
+// setLiveness rewrites the persisted liveness marker for a namespace so a test
+// can place the local node anywhere on the staleness timeline.
+func setLiveness(t *testing.T, d *delegate, namespace string, at time.Time) {
+	t.Helper()
+	if err := d.clusterStateStorage.SetLiveness(t.Context(), namespace, at.UnixNano()); err != nil {
+		t.Fatalf("SetLiveness(%q): %v", namespace, err)
+	}
+}
+
+func bootstrapSet(req *syncRequest) map[string]struct{} {
+	out := make(map[string]struct{}, len(req.bootstrap))
+	for _, ns := range req.bootstrap {
+		out[ns] = struct{}{}
+	}
+	return out
+}
+
+// TestMergeRemoteStateStaleBootstrapsFromHealthyPeer verifies the push gate: a
+// namespace we have not synced within the threshold is never pushed (which could
+// resurrect GC'd tombstones) and is instead scheduled for a destructive
+// bootstrap, but only because the remote advertises it as a healthy source.
+func TestMergeRemoteStateStaleBootstrapsFromHealthyPeer(t *testing.T) {
+	m := newSyncMailbox(t)
+	d := newMergeDelegate(t, m)
+
+	// auth is stale (out of contact > threshold) but config/log stay fresh.
+	setLiveness(t, d, "auth", time.Now().Add(-2*time.Hour))
+
+	remote := clusterstate.NodeState{
+		NodeID:   "node-remote",
+		LastSync: map[string][]clusterstate.NamespaceSyncState{},
+		Healthy:  map[string]bool{"auth": true, "config": true, "log": true},
+	}
+	buf, err := json.Marshal(remote)
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+
+	d.MergeRemoteState(buf, false)
+
+	req := expectSyncRequest(t, m)
+
+	boot := bootstrapSet(req)
+	if _, ok := boot["auth"]; !ok {
+		t.Fatalf("expected auth to be bootstrapped, got %v", req.bootstrap)
+	}
+
+	since := sinceByNamespace(req.lastSync)
+	if _, ok := since["auth"]; ok {
+		t.Fatalf("stale auth must not be pushed, got lastSync %v", since)
+	}
+	for _, ns := range []string{"config", "log"} {
+		if _, ok := since[ns]; !ok {
+			t.Fatalf("fresh namespace %q should still push, got %v", ns, since)
+		}
+	}
+}
+
+// TestMergeRemoteStateStaleNoHealthySourceWaits verifies that a stale namespace
+// is neither pushed nor bootstrapped when no reachable peer advertises it as
+// healthy and the node has not yet crossed the self-heal horizon.
+func TestMergeRemoteStateStaleNoHealthySourceWaits(t *testing.T) {
+	m := newSyncMailbox(t)
+	d := newMergeDelegate(t, m)
+
+	// Stale (> threshold) but not past the 2*threshold self-heal horizon.
+	setLiveness(t, d, "auth", time.Now().Add(-90*time.Minute))
+
+	remote := clusterstate.NodeState{
+		NodeID:   "node-remote",
+		LastSync: map[string][]clusterstate.NamespaceSyncState{},
+		Healthy:  map[string]bool{"auth": false, "config": true, "log": true},
+	}
+	buf, err := json.Marshal(remote)
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+
+	d.MergeRemoteState(buf, false)
+
+	// config/log still push, so a request is emitted, but auth appears nowhere.
+	req := expectSyncRequest(t, m)
+	if len(req.bootstrap) != 0 {
+		t.Fatalf("expected no bootstrap, got %v", req.bootstrap)
+	}
+	if _, ok := sinceByNamespace(req.lastSync)["auth"]; ok {
+		t.Fatalf("stale auth without healthy source must not push")
+	}
+
+	// Liveness stays old: the node has not been declared healthy again.
+	got, err := d.clusterStateStorage.GetLiveness(t.Context(), "auth")
+	if err != nil {
+		t.Fatalf("GetLiveness: %v", err)
+	}
+	if time.Since(time.Unix(0, got)) < time.Hour {
+		t.Fatalf("liveness should not have been refreshed, got %v ago", time.Since(time.Unix(0, got)))
+	}
+}
+
+// TestMergeRemoteStateStaleSelfHeals verifies that a node out of contact beyond
+// the self-heal horizon (2*threshold) resumes on its own when it can reach peers
+// but none advertise a healthy source — the cold-restart escape hatch.
+func TestMergeRemoteStateStaleSelfHeals(t *testing.T) {
+	m := newSyncMailbox(t)
+	d := newMergeDelegate(t, m)
+
+	setLiveness(t, d, "auth", time.Now().Add(-3*time.Hour)) // > 2*threshold (2h)
+
+	remote := clusterstate.NodeState{
+		NodeID:   "node-remote",
+		LastSync: map[string][]clusterstate.NamespaceSyncState{},
+		Healthy:  map[string]bool{"auth": false, "config": true, "log": true},
+	}
+	buf, err := json.Marshal(remote)
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+
+	d.MergeRemoteState(buf, false)
+	// Drain whatever request config/log produce; auth must not appear in it.
+	req := expectSyncRequest(t, m)
+	if _, ok := sinceByNamespace(req.lastSync)["auth"]; ok {
+		t.Fatalf("auth must not push during the self-heal round")
+	}
+	if len(req.bootstrap) != 0 {
+		t.Fatalf("auth must not bootstrap without a healthy source, got %v", req.bootstrap)
+	}
+
+	// Liveness has been refreshed: the node considers itself healthy again.
+	got, err := d.clusterStateStorage.GetLiveness(t.Context(), "auth")
+	if err != nil {
+		t.Fatalf("GetLiveness: %v", err)
+	}
+	if time.Since(time.Unix(0, got)) > time.Minute {
+		t.Fatalf("expected liveness refreshed to ~now, got %v ago", time.Since(time.Unix(0, got)))
+	}
 }
 
 func newClusterStateStorage(t *testing.T) clusterstate.Storage {
