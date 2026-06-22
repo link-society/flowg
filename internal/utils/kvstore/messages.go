@@ -1,6 +1,8 @@
 package kvstore
 
 import (
+	"fmt"
+
 	"bufio"
 	"encoding/binary"
 	"io"
@@ -72,6 +74,7 @@ func (m *restoreOperation) Handle(db *badger.DB) error {
 
 func (m *mergeOperation) Handle(db *badger.DB) error {
 	const maxBatchCount = 1000
+	const maxFrameSize = 256 << 20 // 256 MiB
 
 	br := bufio.NewReaderSize(m.r, 16<<10)
 	unmarshalBuf := make([]byte, 1<<10)
@@ -114,6 +117,10 @@ func (m *mergeOperation) Handle(db *badger.DB) error {
 			break
 		} else if err != nil {
 			return err
+		}
+
+		if sz > maxFrameSize {
+			return fmt.Errorf("merge frame size %d exceeds limit %d", sz, maxFrameSize)
 		}
 
 		if cap(unmarshalBuf) < int(sz) {
