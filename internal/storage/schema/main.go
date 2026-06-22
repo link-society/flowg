@@ -24,6 +24,12 @@ func IsVersionKey(key []byte) bool {
 	return bytes.Equal(key, versionKey)
 }
 
+const bitDelete = byte(1 << 0)
+
+func IsTombstone(kv *pb.KV) bool {
+	return len(kv.Meta) > 0 && kv.Meta[0]&bitDelete != 0
+}
+
 func ApplyEnvelope(txn *badger.Txn, key []byte, value []byte) (bool, error) {
 	env, err := lww.Unmarshal(value)
 	if err != nil {
@@ -63,6 +69,10 @@ func ApplyRecord(txn *badger.Txn, key []byte, value []byte) (AppliedRecord, bool
 func MergeEnveloped(applied *[]AppliedRecord) func(txn *badger.Txn, kv *pb.KV) error {
 	return func(txn *badger.Txn, kv *pb.KV) error {
 		if IsVersionKey(kv.Key) {
+			return nil
+		}
+
+		if IsTombstone(kv) {
 			return nil
 		}
 

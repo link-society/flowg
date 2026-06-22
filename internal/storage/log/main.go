@@ -237,6 +237,14 @@ func mergeRecord(changed *atomic.Bool) func(txn *badger.Txn, kv *pb.KV) error {
 			return nil
 
 		case bytes.HasPrefix(kv.Key, entryPrefix):
+			if schema.IsTombstone(kv) {
+				if err := txn.Delete(kv.Key); err != nil {
+					return err
+				}
+				changed.Store(true)
+				return nil
+			}
+
 			stream, ok := transactions.StreamFromEntryKey(kv.Key)
 			if ok {
 				configKey := append([]byte("stream:config:"), stream...)
@@ -264,6 +272,14 @@ func mergeRecord(changed *atomic.Bool) func(txn *badger.Txn, kv *pb.KV) error {
 			return nil
 
 		default:
+			if schema.IsTombstone(kv) {
+				if err := txn.Delete(kv.Key); err != nil {
+					return err
+				}
+				changed.Store(true)
+				return nil
+			}
+
 			entry := &badger.Entry{
 				Key:       kv.Key,
 				Value:     kv.Value,
