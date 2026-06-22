@@ -25,3 +25,18 @@ func (m *MockStorage) UpdateLocalState(ctx context.Context, nodeID string, names
 	args := m.Called(ctx, nodeID, namespace, since)
 	return args.Error(0)
 }
+
+func (m *MockStorage) GetLiveness(ctx context.Context, namespace string) (int64, error) {
+	args := m.Called(ctx, namespace)
+	return args.Get(0).(int64), args.Error(1)
+}
+
+func (m *MockStorage) SetLiveness(ctx context.Context, namespace string, unixNano int64) error {
+	args := m.Called(ctx, namespace, unixNano)
+	return args.Error(0)
+}
+
+func (m *MockStorage) ResetLocalState(ctx context.Context, namespace string) error {
+	args := m.Called(ctx, namespace)
+	return args.Error(0)
+}

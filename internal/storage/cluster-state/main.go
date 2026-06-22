@@ -16,6 +16,9 @@ import (
 type Storage interface {
 	FetchLocalState(ctx context.Context, nodeID string, endpoints []string) (*NodeState, error)
 	UpdateLocalState(ctx context.Context, nodeID string, namespace string, since uint64) error
+	GetLiveness(ctx context.Context, namespace string) (int64, error)
+	SetLiveness(ctx context.Context, namespace string, unixNano int64) error
+	ResetLocalState(ctx context.Context, namespace string) error
 }
 
 type Options struct {
@@ -105,5 +108,58 @@ func (s *storageImpl) UpdateLocalState(ctx context.Context, nodeID string, names
 	return s.kvStore.Update(ctx, func(txn *badger.Txn) error {
 		key := fmt.Appendf(nil, "lastsync:%s:%s", nodeID, namespace)
 		return txn.Set(key, binary.BigEndian.AppendUint64(nil, since))
+	})
+}
+
+func (s *storageImpl) GetLiveness(ctx context.Context, namespace string) (int64, error) {
+	var ts int64
+	err := s.kvStore.View(ctx, func(txn *badger.Txn) error {
+		key := fmt.Appendf(nil, "liveness:%s", namespace)
+		item, err := txn.Get(key)
+		if err == badger.ErrKeyNotFound {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		return item.Value(func(val []byte) error {
+			ts = int64(binary.BigEndian.Uint64(val))
+			return nil
+		})
+	})
+	if err != nil {
+		return 0, err
+	}
+	return ts, nil
+}
+
+func (s *storageImpl) SetLiveness(ctx context.Context, namespace string, unixNano int64) error {
+	return s.kvStore.Update(ctx, func(txn *badger.Txn) error {
+		key := fmt.Appendf(nil, "liveness:%s", namespace)
+		return txn.Set(key, binary.BigEndian.AppendUint64(nil, uint64(unixNano)))
+	})
+}
+
+func (s *storageImpl) ResetLocalState(ctx context.Context, namespace string) error {
+	return s.kvStore.Update(ctx, func(txn *badger.Txn) error {
+		prefix := []byte("lastsync:")
+		suffix := ":" + namespace
+
+		it := txn.NewIterator(badger.DefaultIteratorOptions)
+		var keys [][]byte
+		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
+			key := it.Item().KeyCopy(nil)
+			if strings.HasSuffix(string(key), suffix) {
+				keys = append(keys, key)
+			}
+		}
+		it.Close()
+
+		for _, key := range keys {
+			if err := txn.Delete(key); err != nil {
+				return err
+			}
+		}
+		return nil
 	})
 }

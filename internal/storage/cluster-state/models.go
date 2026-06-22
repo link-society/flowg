@@ -3,6 +3,7 @@ package clusterstate
 type NodeState struct {
 	NodeID   string                          `json:"node_id"`
 	LastSync map[string][]NamespaceSyncState `json:"last_sync"`
+	Healthy  map[string]bool                 `json:"healthy,omitempty"`
 }
 
 type NamespaceSyncState struct {
