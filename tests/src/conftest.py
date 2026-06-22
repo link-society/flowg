@@ -57,18 +57,6 @@ def flowg_node0_volume(docker_client):
 
 
 @pytest.fixture(scope='module')
-def flowg_node1_volume(docker_client):
-    with flowg_utils.volume(docker_client, name="test-flowg-node1") as volume:
-        yield volume
-
-
-@pytest.fixture(scope='module')
-def flowg_node2_volume(docker_client):
-    with flowg_utils.volume(docker_client, name="test-flowg-node2") as volume:
-        yield volume
-
-
-@pytest.fixture(scope='module')
 def flowg_image():
     img = os.getenv("FLOWG_TEST_DOCKER_IMAGE_NAME", "linksociety/flowg:latest")
     print(f"Using Flowg Docker image: {img}")
@@ -101,80 +89,14 @@ def flowg_node0_container(
 
 
 @pytest.fixture(scope='module')
-def flowg_node1_container(
-    report_dir,
-    docker_client,
-    flowg_network,
-    flowg_node1_volume,
-    flowg_image,
-):
-    with flowg_utils.container(
-        docker_client,
-        name="test-flowg-node1",
-        network=flowg_network,
-        volume=flowg_node1_volume,
-        image=flowg_image,
-        environment={
-            "FLOWG_CLUSTER_FORMATION_STRATEGY": "manual",
-            "FLOWG_CLUSTER_FORMATION_MANUAL_JOIN_NODE_ID": "test-flowg-node0",
-            "FLOWG_CLUSTER_FORMATION_MANUAL_JOIN_ENDPOINT": "http://test-flowg-node0:9113",
-            "FLOWG_HTTP_BIND_ADDRESS": ":5081",
-            "FLOWG_MGMT_BIND_ADDRESS": ":9114",
-            "FLOWG_SYSLOG_BIND_ADDRESS": ":5515",
-        },
-        ports={
-            "5081/tcp": 5081,
-            "9114/tcp": 9114,
-            "5515/udp": 5515,
-        },
-        report_dir=report_dir,
-    ):
-        yield
-
-
-@pytest.fixture(scope='module')
-def flowg_node2_container(
-    report_dir,
-    docker_client,
-    flowg_network,
-    flowg_node2_volume,
-    flowg_image,
-):
-    with flowg_utils.container(
-        docker_client,
-        name="test-flowg-node2",
-        network=flowg_network,
-        volume=flowg_node2_volume,
-        image=flowg_image,
-        environment={
-            "FLOWG_CLUSTER_FORMATION_STRATEGY": "manual",
-            "FLOWG_CLUSTER_FORMATION_MANUAL_JOIN_NODE_ID": "test-flowg-node1",
-            "FLOWG_CLUSTER_FORMATION_MANUAL_JOIN_ENDPOINT": "http://test-flowg-node1:9114",
-            "FLOWG_HTTP_BIND_ADDRESS": ":5082",
-            "FLOWG_MGMT_BIND_ADDRESS": ":9115",
-            "FLOWG_SYSLOG_BIND_ADDRESS": ":5516",
-        },
-        ports={
-            "5082/tcp": 5082,
-            "9115/tcp": 9115,
-            "5516/udp": 5516,
-        },
-        report_dir=report_dir,
-    ):
-        yield
-
-
-@pytest.fixture(scope='module')
-def flowg_cluster(
+def flowg_server(
     flowg_node0_container,
-    flowg_node1_container,
-    flowg_node2_container,
 ):
     yield
 
 
 @pytest.fixture(scope='module')
-def flowg_admin_token(flowg_cluster):
+def flowg_admin_token(flowg_server):
     return flowg_utils.create_token(username="root", password="root")
 
 
