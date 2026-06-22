@@ -122,7 +122,7 @@ func (m *MockStorage) HasSystemConfig(ctx context.Context) (bool, error) {
 
 func (m *MockStorage) ReadSystemConfig(ctx context.Context) (*models.SystemConfiguration, error) {
 	args := m.Called(ctx)
-	return args.Get(0).(*models.SystemConfiguration), args.Error(0)
+	return args.Get(0).(*models.SystemConfiguration), args.Error(1)
 }
 
 func (m *MockStorage) WriteSystemConfig(ctx context.Context, config *models.SystemConfiguration) error {
