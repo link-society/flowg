@@ -139,12 +139,22 @@ func ConfigureStream(txn *badger.Txn, stream string, config models.StreamConfig,
 		config.IndexedFields = []string{}
 	}
 
-	oldConfig, _, err := GetOrCreateStreamConfig(txn, stream, ts)
+	streamKey := []byte(fmt.Sprintf("stream:config:%s", stream))
+
+	var oldConfig models.StreamConfig
+	env, found, err := lww.Read(txn, streamKey)
 	if err != nil {
 		return fmt.Errorf("could not fetch old stream config '%s': %w", stream, err)
 	}
+	if found && len(env.Payload) > 0 {
+		if err := json.Unmarshal(env.Payload, &oldConfig); err != nil {
+			return fmt.Errorf("could not unmarshal old stream config '%s': %w", stream, err)
+		}
+	}
+	if oldConfig.IndexedFields == nil {
+		oldConfig.IndexedFields = []string{}
+	}
 
-	streamKey := []byte(fmt.Sprintf("stream:config:%s", stream))
 	configVal, err := json.Marshal(config)
 	if err != nil {
 		return fmt.Errorf("could not marshal stream config '%s': %w", stream, err)
