@@ -41,6 +41,7 @@ type syncWorker struct {
 
 	storages            map[string]storage.Streamable
 	clusterStateStorage clusterstate.Storage
+	watermarks          *watermarkCache
 }
 
 var _ actor.Worker = (*syncWorker)(nil)
@@ -119,6 +120,7 @@ func (w *syncWorker) syncStorage(ctx context.Context, remoteNodeID string, remot
 	req.Header.Set("Trailer", SINCE_HEADER_NAME)
 	req.Trailer = http.Header{SINCE_HEADER_NAME: nil}
 
+	resultC := make(chan uint64, 1)
 	go func() {
 		newSyncTs, err := storage.Dump(ctx, writer, syncState.Since)
 		if err != nil {
@@ -129,6 +131,7 @@ func (w *syncWorker) syncStorage(ctx context.Context, remoteNodeID string, remot
 
 		req.Trailer.Set(SINCE_HEADER_NAME, strconv.FormatUint(newSyncTs, 10))
 		writer.Close()
+		resultC <- newSyncTs
 	}()
 
 	resp, err := http.DefaultClient.Do(req)
@@ -150,6 +153,14 @@ func (w *syncWorker) syncStorage(ctx context.Context, remoteNodeID string, remot
 
 	if err := w.clusterStateStorage.SetLiveness(ctx, syncState.Namespace, time.Now().UnixNano()); err != nil {
 		logger.ErrorContext(ctx, "failed to update liveness", slog.String("error", err.Error()))
+	}
+
+	if w.watermarks != nil {
+		select {
+		case newSyncTs := <-resultC:
+			w.watermarks.observe(remoteNodeID, syncState.Namespace, newSyncTs)
+		case <-ctx.Done():
+		}
 	}
 }
 

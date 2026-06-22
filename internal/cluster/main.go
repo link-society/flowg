@@ -39,9 +39,13 @@ type ManagerOptions struct {
 
 	TombstoneGracePeriod time.Duration
 	PushPullInterval     time.Duration
+	SyncTriggerInterval  time.Duration
 }
 
-const defaultPushPullInterval = 10 * time.Second
+const (
+	defaultPushPullInterval    = 10 * time.Second
+	defaultSyncTriggerInterval = 250 * time.Millisecond
+)
 
 type managerImpl struct {
 	actor.Actor
@@ -332,12 +336,36 @@ func NewManager(opts ManagerOptions) fx.Option {
 				}
 			},
 		),
+		fxproviders.ProvideActor[*syncTrigger](
+			func(d struct {
+				fx.In
+
+				Notifier     changefeed.Notifier
+				Delegate     *delegate
+				Watermarks   *watermarkCache
+				SyncRequestM actor.Mailbox[*syncRequest]
+			}) *syncTrigger {
+				return &syncTrigger{
+					Actor: actor.New(&syncTriggerWorker{
+						logger:      slog.Default().With(slog.String("channel", "cluster.trigger")),
+						localNodeID: opts.NodeID,
+						namespaces:  map[string]struct{}{"log": {}},
+						coalesce:    opts.SyncTriggerInterval,
+						notifier:    d.Notifier,
+						endpoints:   d.Delegate.endpoints,
+						watermarks:  d.Watermarks,
+						requestM:    d.SyncRequestM,
+					}),
+				}
+			},
+		),
 		fx.Invoke(func(_ struct {
 			fx.In
 
 			S *syncActor
 			C *clusterFormationController
 			B *broadcaster
+			T *syncTrigger
 		}) {
 			// No-op, just to force the creation of all components
 		}),
