@@ -193,7 +193,7 @@ func envelopeV0toV1(txn *badger.Txn, ts hlc.Timestamp, prefixes [][]byte) error 
 	}
 
 	for _, e := range pending {
-		env := lww.Envelope{Timestamp: ts, Payload: e.payload}
+		env := lww.Envelope{Payload: e.payload}
 		if err := txn.Set(e.key, env.Marshal()); err != nil {
 			return fmt.Errorf("could not envelope key '%s': %w", e.key, err)
 		}

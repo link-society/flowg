@@ -109,8 +109,8 @@ func TestEnvelopeV0toV1WrapsAllKeys(t *testing.T) {
 			if string(env.Payload) != want {
 				t.Fatalf("key %q: expected payload %q, got %q", k, want, env.Payload)
 			}
-			if env.Timestamp != migrationTimestamp() {
-				t.Fatalf("key %q: unexpected timestamp %v", k, env.Timestamp)
+			if env.Timestamp != (hlc.Timestamp{}) {
+				t.Fatalf("key %q: expected zero sentinel timestamp, got %v", k, env.Timestamp)
 			}
 		}
 		return nil
