@@ -30,6 +30,7 @@ type delegate struct {
 
 	clusterStateStorage clusterstate.Storage
 	syncRequestM        actor.MailboxSender[*syncRequest]
+	watermarks          *watermarkCache
 	storages            map[string]storage.Streamable
 }
 
@@ -131,6 +132,9 @@ func (d *delegate) MergeRemoteState(buf []byte, join bool) {
 	knownSince := make(map[string]uint64)
 	for _, syncState := range remoteState.LastSync[d.localNodeID] {
 		knownSince[syncState.Namespace] = syncState.Since
+		if d.watermarks != nil {
+			d.watermarks.observe(remoteState.NodeID, syncState.Namespace, syncState.Since)
+		}
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)

@@ -75,6 +75,7 @@ func NewManager(opts ManagerOptions) fx.Option {
 
 	return fx.Module(
 		"cluster.manager",
+		fx.Provide(newWatermarkCache),
 		clusterstate.NewStorage(func() clusterstate.Options {
 			clusterStateOpts := clusterstate.DefaultOptions()
 			clusterStateOpts.Directory = opts.ClusterStateDir
@@ -95,6 +96,7 @@ func NewManager(opts ManagerOptions) fx.Option {
 				ConfigStorage       config.Storage
 				LogStorage          log.Storage
 				ClusterStateStorage clusterstate.Storage
+				Watermarks          *watermarkCache
 			}) *syncActor {
 				return &syncActor{
 					Actor: actor.New(&syncWorker{
@@ -111,6 +113,7 @@ func NewManager(opts ManagerOptions) fx.Option {
 							"log":    d.LogStorage,
 						},
 						clusterStateStorage: d.ClusterStateStorage,
+						watermarks:          d.Watermarks,
 					}),
 				}
 			},
@@ -137,6 +140,7 @@ func NewManager(opts ManagerOptions) fx.Option {
 			SyncRequestM          actor.Mailbox[*syncRequest]
 			ClusterStateStorage   clusterstate.Storage
 			NotificationMailboxes *notificationMailboxes
+			Watermarks            *watermarkCache
 
 			AuthStorage   auth.Storage
 			ConfigStorage config.Storage
@@ -173,6 +177,7 @@ func NewManager(opts ManagerOptions) fx.Option {
 					"config": d.ConfigStorage,
 					"log":    d.LogStorage,
 				},
+				watermarks: d.Watermarks,
 			}, nil
 		}),
 		fx.Provide(func(
