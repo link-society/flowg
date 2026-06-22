@@ -99,6 +99,7 @@ func sinceByNamespace(states []clusterstate.NamespaceSyncState) map[string]uint6
 // from us (no LastSync entry for the local node) we still trigger a sync, pushing
 // every namespace from scratch instead of logging an error.
 func TestMergeRemoteStateFirstContact(t *testing.T) {
+	t.Parallel()
 	m := newSyncMailbox(t)
 	d := newMergeDelegate(t, m)
 
@@ -134,6 +135,7 @@ func TestMergeRemoteStateFirstContact(t *testing.T) {
 // reports for OUR data drive incremental sync, that watermarks for other source
 // nodes are ignored, and that namespaces the peer has never seen default to 0.
 func TestMergeRemoteStateUsesKnownWatermarks(t *testing.T) {
+	t.Parallel()
 	m := newSyncMailbox(t)
 	d := newMergeDelegate(t, m)
 
@@ -174,6 +176,7 @@ func TestMergeRemoteStateUsesKnownWatermarks(t *testing.T) {
 // TestMergeRemoteStateIgnoresOwnState verifies we never sync against our own
 // gossiped state.
 func TestMergeRemoteStateIgnoresOwnState(t *testing.T) {
+	t.Parallel()
 	m := newSyncMailbox(t)
 	d := newMergeDelegate(t, m)
 
@@ -190,6 +193,7 @@ func TestMergeRemoteStateIgnoresOwnState(t *testing.T) {
 // TestMergeRemoteStateUnknownEndpoint verifies that a peer whose endpoint we have
 // not learned yet does not trigger a sync.
 func TestMergeRemoteStateUnknownEndpoint(t *testing.T) {
+	t.Parallel()
 	m := newSyncMailbox(t)
 	d := newMergeDelegate(t, m)
 	d.endpoints.Delete("node-remote")
@@ -211,6 +215,7 @@ func TestMergeRemoteStateUnknownEndpoint(t *testing.T) {
 // the peer's watermark already covers our latest version are not included in the
 // sync request, while lagging namespaces still are.
 func TestMergeRemoteStateSkipsCaughtUpNamespaces(t *testing.T) {
+	t.Parallel()
 	m := newSyncMailbox(t)
 	d := newMergeDelegate(t, m)
 
@@ -248,6 +253,7 @@ func TestMergeRemoteStateSkipsCaughtUpNamespaces(t *testing.T) {
 // TestMergeRemoteStateNoRequestWhenAllCaughtUp verifies that no sync request is
 // emitted at all when the peer already holds everything we have.
 func TestMergeRemoteStateNoRequestWhenAllCaughtUp(t *testing.T) {
+	t.Parallel()
 	m := newSyncMailbox(t)
 	d := newMergeDelegate(t, m)
 
@@ -277,6 +283,7 @@ func TestMergeRemoteStateNoRequestWhenAllCaughtUp(t *testing.T) {
 // TestMergeRemoteStateEmptyStoreNoRequest verifies that a node with no data yet
 // (latest version 0) does not generate any traffic on first contact.
 func TestMergeRemoteStateEmptyStoreNoRequest(t *testing.T) {
+	t.Parallel()
 	m := newSyncMailbox(t)
 	d := newMergeDelegate(t, m)
 
@@ -319,6 +326,7 @@ func bootstrapSet(req *syncRequest) map[string]struct{} {
 // resurrect GC'd tombstones) and is instead scheduled for a destructive
 // bootstrap, but only because the remote advertises it as a healthy source.
 func TestMergeRemoteStateStaleBootstrapsFromHealthyPeer(t *testing.T) {
+	t.Parallel()
 	m := newSyncMailbox(t)
 	d := newMergeDelegate(t, m)
 
@@ -359,6 +367,7 @@ func TestMergeRemoteStateStaleBootstrapsFromHealthyPeer(t *testing.T) {
 // is neither pushed nor bootstrapped when no reachable peer advertises it as
 // healthy and the node has not yet crossed the self-heal horizon.
 func TestMergeRemoteStateStaleNoHealthySourceWaits(t *testing.T) {
+	t.Parallel()
 	m := newSyncMailbox(t)
 	d := newMergeDelegate(t, m)
 
@@ -400,6 +409,7 @@ func TestMergeRemoteStateStaleNoHealthySourceWaits(t *testing.T) {
 // the self-heal horizon (2*threshold) resumes on its own when it can reach peers
 // but none advertise a healthy source — the cold-restart escape hatch.
 func TestMergeRemoteStateStaleSelfHeals(t *testing.T) {
+	t.Parallel()
 	m := newSyncMailbox(t)
 	d := newMergeDelegate(t, m)
 
@@ -439,7 +449,7 @@ func newClusterStateStorage(t *testing.T) clusterstate.Storage {
 	t.Helper()
 
 	opts := clusterstate.DefaultOptions()
-	opts.Directory = t.TempDir()
+	opts.InMemory = true
 
 	var s clusterstate.Storage
 	app := fxtest.New(t, clusterstate.NewStorage(opts), fx.Populate(&s), fx.NopLogger)
@@ -455,6 +465,7 @@ func newClusterStateStorage(t *testing.T) clusterstate.Storage {
 // NODEID header) is reported by node-b's gossiped state under "node-a", and
 // node-a resumes pushing that namespace from the recorded version.
 func TestWatermarkRoundTripDrivesSync(t *testing.T) {
+	t.Parallel()
 	ctx := t.Context()
 
 	stateStorage := newClusterStateStorage(t)
