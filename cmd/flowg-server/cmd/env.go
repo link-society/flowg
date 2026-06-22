@@ -24,25 +24,6 @@ var (
 	defaultMgmtTlsCert     = getEnvString("FLOWG_MGMT_TLS_CERT", "")
 	defaultMgmtTlsCertKey  = getEnvString("FLOWG_MGMT_TLS_KEY", "")
 
-	defaultClusterNodeID = getEnvString("FLOWG_CLUSTER_NODE_ID", "")
-	defaultClusterCookie = getEnvString("FLOWG_CLUSTER_COOKIE", "")
-
-	defaultClusterFormationStrategy = getEnvString("FLOWG_CLUSTER_FORMATION_STRATEGY", "manual")
-
-	defaultClusterFormationManualJoinNodeID   = getEnvString("FLOWG_CLUSTER_FORMATION_MANUAL_JOIN_NODE_ID", "")
-	defaultClusterFormationManualJoinEndpoint = getEnvString("FLOWG_CLUSTER_FORMATION_MANUAL_JOIN_ENDPOINT", "")
-
-	defaultClusterFormationConsulServiceName = getEnvString("FLOWG_CLUSTER_FORMATION_CONSUL_SERVICE_NAME", "FlowG")
-	defaultClusterFormationConsulUrl         = getEnvString("FLOWG_CLUSTER_FORMATION_CONSUL_URL", "")
-
-	defaultClusterFormationKubernetesServiceNamespace = getEnvString("FLOWG_CLUSTER_FORMATION_K8S_SERVICE_NAMESPACE", "default")
-	defaultClusterFormationKubernetesServiceName      = getEnvString("FLOWG_CLUSTER_FORMATION_K8S_SERVICE_NAME", "flowg")
-	defaultClusterFormationKubernetesServicePortName  = getEnvString("FLOWG_CLUSTER_FORMATION_K8S_SERVICE_PORT_NAME", "mgmt")
-
-	defaultClusterFormationDnsServer = getEnvString("FLOWG_CLUSTER_FORMATION_DNS_SERVER", "")
-	defaultClusterFormationDnsDomain = getEnvString("FLOWG_CLUSTER_FORMATION_DNS_DOMAIN", "")
-	defaultClusterFormationDnsScript = getEnvString("FLOWG_CLUSTER_FORMATION_DNS_SCRIPT", "")
-
 	defaultSyslogProtocol = getEnvString("FLOWG_SYSLOG_PROTOCOL", "udp")
 	defaultSyslogBindAddr = getEnvString("FLOWG_SYSLOG_BIND_ADDRESS", ":5514")
 
@@ -52,10 +33,9 @@ var (
 	defaultSyslogTlsAuthEnabled        = getEnvBool("FLOWG_SYSLOG_TLS_AUTH", false)
 	defaultSyslogInitialAllowedOrigins = getEnvListString("FLOWG_SYSLOG_INITIAL_ALLOWED_ORIGINS", []string{})
 
-	defaultAuthDir         = getEnvString("FLOWG_AUTH_DIR", "./data/auth")
-	defaultConfigDir       = getEnvString("FLOWG_CONFIG_DIR", "./data/config")
-	defaultLogDir          = getEnvString("FLOWG_LOG_DIR", "./data/logs")
-	defaultClusterStateDir = getEnvString("FLOWG_CLUSTER_STATE_DIR", "./data/state")
+	defaultAuthDir   = getEnvString("FLOWG_AUTH_DIR", "./data/auth")
+	defaultConfigDir = getEnvString("FLOWG_CONFIG_DIR", "./data/config")
+	defaultLogDir    = getEnvString("FLOWG_LOG_DIR", "./data/logs")
 
 	defaultAuthInitialUser     = getEnvString("FLOWG_AUTH_INITIAL_USER", "root")
 	defaultAuthInitialPassword = getEnvString("FLOWG_AUTH_INITIAL_PASSWORD", "root")

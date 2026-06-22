@@ -18,26 +18,6 @@ type options struct {
 	mgmtTlsCert     string
 	mgmtTlsCertKey  string
 
-	clusterNodeID   string
-	clusterCookie   string
-	clusterStateDir string
-
-	clusterFormationStrategy string
-
-	clusterFormationManualJoinNodeID   string
-	clusterFormationManualJoinEndpoint string
-
-	clusterFormationConsulServiceName string
-	clusterFormationConsulUrl         string
-
-	clusterFormationKubernetesServiceNamespace string
-	clusterFormationKubernetesServiceName      string
-	clusterFormationKubernetesServicePortName  string
-
-	clusterFormationDnsServer string
-	clusterFormationDnsDomain string
-	clusterFormationDnsScript string
-
 	syslogProtocol              string
 	syslogBindAddr              string
 	syslogTlsEnabled            bool
@@ -129,104 +109,6 @@ func (opts *options) defineCliOptions(cmd *cobra.Command) {
 		"mgmt-tls-key",
 		defaultMgmtTlsCertKey,
 		"Path to the certificate key file for the Management HTTPS server",
-	)
-
-	cmd.Flags().StringVar(
-		&opts.clusterNodeID,
-		"cluster-node-id",
-		defaultClusterNodeID,
-		"Unique identifier for this node in the cluster (leave empty to generate one)",
-	)
-
-	cmd.Flags().StringVar(
-		&opts.clusterCookie,
-		"cluster-cookie",
-		defaultClusterCookie,
-		"Cookie to use for cluster communication (leave empty to disable)",
-	)
-
-	cmd.Flags().StringVar(
-		&opts.clusterStateDir,
-		"cluster-state-dir",
-		defaultClusterStateDir,
-		"Path to the cluster state directory (for replication)",
-	)
-
-	cmd.Flags().StringVar(
-		&opts.clusterFormationStrategy,
-		"cluster-formation-strategy",
-		defaultClusterFormationStrategy,
-		"Strategy to use for cluster formation",
-	)
-
-	cmd.Flags().StringVar(
-		&opts.clusterFormationManualJoinNodeID,
-		"cluster-formation-manual-join-node-id",
-		defaultClusterFormationManualJoinNodeID,
-		"Unique identifier of the node to join in the cluster, ignored if not using 'manual' strategy",
-	)
-
-	cmd.Flags().StringVar(
-		&opts.clusterFormationManualJoinEndpoint,
-		"cluster-formation-manual-join-endpoint",
-		defaultClusterFormationManualJoinEndpoint,
-		"Management endpoint of the node to join the cluster, ignored if not using 'manual' strategy",
-	)
-
-	cmd.Flags().StringVar(
-		&opts.clusterFormationConsulServiceName,
-		"cluster-formation-consul-service-name",
-		defaultClusterFormationConsulServiceName,
-		"Name of the Consul service, ignored if not using 'consul' strategy",
-	)
-
-	cmd.Flags().StringVar(
-		&opts.clusterFormationConsulUrl,
-		"cluster-formation-consul-url",
-		defaultClusterFormationConsulUrl,
-		"URL to local consul instance, ignored if not using 'consul' strategy",
-	)
-
-	cmd.Flags().StringVar(
-		&opts.clusterFormationKubernetesServiceNamespace,
-		"cluster-formation-k8s-service-namespace",
-		defaultClusterFormationKubernetesServiceNamespace,
-		"Namespace of the Kubernetes service, ignored if not using 'k8s' strategy",
-	)
-
-	cmd.Flags().StringVar(
-		&opts.clusterFormationKubernetesServiceName,
-		"cluster-formation-k8s-service-name",
-		defaultClusterFormationKubernetesServiceName,
-		"Name of the Kubernetes service, ignored if not using 'k8s' strategy",
-	)
-
-	cmd.Flags().StringVar(
-		&opts.clusterFormationKubernetesServicePortName,
-		"cluster-formation-k8s-service-port-name",
-		defaultClusterFormationKubernetesServicePortName,
-		"Name of the port in the Kubernetes service to use for cluster formation, ignored if not using 'k8s' strategy",
-	)
-
-	cmd.Flags().StringVar(
-		&opts.clusterFormationDnsServer,
-		"cluster-formation-dns-server",
-		defaultClusterFormationDnsServer,
-		"DNS server to use for cluster formation, ignored if not using 'dns' strategy",
-	)
-
-	cmd.Flags().StringVar(
-		&opts.clusterFormationDnsDomain,
-		"cluster-formation-dns-domain",
-		defaultClusterFormationDnsDomain,
-		"DNS domain to use for cluster formation, ignored if not using 'dns' strategy",
-	)
-
-	cmd.Flags().StringVar(
-		&opts.clusterFormationDnsScript,
-		"cluster-formation-dns-script",
-		defaultClusterFormationDnsScript,
-		"DNS management script to use for cluster formation, ignored if not using 'dns' strategy",
 	)
 
 	cmd.Flags().StringVar(

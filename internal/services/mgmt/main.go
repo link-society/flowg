@@ -2,26 +2,21 @@ package mgmt
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 
 	"crypto/tls"
+	"net"
 	"net/http"
 
 	"go.uber.org/fx"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-
-	"link-society.com/flowg/internal/cluster"
 )
 
 type ServerOptions struct {
 	BindAddress string
 	TlsConfig   *tls.Config
-
-	ClusterNodeID            string
-	ClusterCookie            string
-	ClusterStateDir          string
-	ClusterFormationStrategy cluster.ClusterFormationStrategy
 }
 
 type Server struct {
@@ -38,25 +33,7 @@ func NewServer(opts ServerOptions) fx.Option {
 
 	return fx.Module(
 		"services.mgmt",
-		fx.Provide(func() (*cluster.Listener, error) {
-			return cluster.NewListener(
-				slog.Default().With(slog.String("channel", "cluster.listener")),
-				opts.BindAddress,
-				opts.TlsConfig,
-			)
-		}),
-		cluster.NewManager(cluster.ManagerOptions{
-			NodeID: opts.ClusterNodeID,
-			Cookie: opts.ClusterCookie,
-
-			ClusterFormationStrategy: opts.ClusterFormationStrategy,
-			ClusterStateDir:          opts.ClusterStateDir,
-		}),
-		fx.Provide(func(
-			lc fx.Lifecycle,
-			listener *cluster.Listener,
-			manager cluster.Manager,
-		) *Server {
+		fx.Provide(func(lc fx.Lifecycle) *Server {
 			srv := &Server{}
 
 			lc.Append(fx.Hook{
@@ -64,7 +41,6 @@ func NewServer(opts ServerOptions) fx.Option {
 					logger.InfoContext(ctx, "Start Management HTTP server")
 
 					metricsHandler := promhttp.Handler()
-					clusterHandler := manager.HttpHandler()
 
 					rootHandler := http.NewServeMux()
 					registerProfiler(rootHandler)
@@ -77,7 +53,11 @@ func NewServer(opts ServerOptions) fx.Option {
 						},
 					)
 					rootHandler.Handle("/metrics", metricsHandler)
-					rootHandler.Handle("/cluster/", clusterHandler)
+
+					l, err := net.Listen("tcp", opts.BindAddress)
+					if err != nil {
+						return fmt.Errorf("failed to start Management HTTP server: %w", err)
+					}
 
 					srv.httpServer = &http.Server{
 						Addr:      opts.BindAddress,
@@ -86,9 +66,9 @@ func NewServer(opts ServerOptions) fx.Option {
 					}
 
 					if opts.TlsConfig != nil {
-						go srv.httpServer.ServeTLS(listener.Socket(), "", "")
+						go srv.httpServer.ServeTLS(l, "", "")
 					} else {
-						go srv.httpServer.Serve(listener.Socket())
+						go srv.httpServer.Serve(l)
 					}
 
 					return nil

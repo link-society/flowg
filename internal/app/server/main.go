@@ -8,7 +8,6 @@ import (
 
 	"go.uber.org/fx"
 
-	"link-society.com/flowg/internal/cluster"
 	"link-society.com/flowg/internal/storage/auth"
 	"link-society.com/flowg/internal/storage/config"
 	"link-society.com/flowg/internal/storage/log"
@@ -29,11 +28,6 @@ type Options struct {
 	MgmtBindAddress string
 	MgmtTlsConfig   *tls.Config
 
-	ClusterNodeID            string
-	ClusterCookie            string
-	ClusterStateDir          string
-	ClusterFormationStrategy cluster.ClusterFormationStrategy
-
 	SyslogTcpMode               bool
 	SyslogBindAddress           string
 	SyslogTlsConfig             *tls.Config
@@ -42,9 +36,6 @@ type Options struct {
 	AuthStorageDir   string
 	ConfigStorageDir string
 	LogStorageDir    string
-
-	ServiceName string
-	ConsulUrl   string
 
 	AuthInitialUser     string
 	AuthInitialPassword string
@@ -84,11 +75,6 @@ func NewServer(opts Options) fx.Option {
 		mgmt.NewServer(mgmt.ServerOptions{
 			BindAddress: opts.MgmtBindAddress,
 			TlsConfig:   opts.MgmtTlsConfig,
-
-			ClusterNodeID:            opts.ClusterNodeID,
-			ClusterCookie:            opts.ClusterCookie,
-			ClusterStateDir:          opts.ClusterStateDir,
-			ClusterFormationStrategy: opts.ClusterFormationStrategy,
 		}),
 		syslog.NewServer(syslog.ServerOptions{
 			TcpMode:     opts.SyslogTcpMode,
