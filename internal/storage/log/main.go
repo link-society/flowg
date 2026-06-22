@@ -259,18 +259,27 @@ func (s *storageImpl) ListStreamFields(ctx context.Context, stream string) ([]st
 
 func (s *storageImpl) GetOrCreateStreamConfig(ctx context.Context, stream string) (models.StreamConfig, error) {
 	var streamConfig models.StreamConfig
+	var created bool
 
 	ts := s.clock.Now()
 	err := s.kvStore.Update(ctx,
 		func(txn *badger.Txn) error {
 			var err error
-			streamConfig, err = transactions.GetOrCreateStreamConfig(txn, stream, ts)
+			streamConfig, created, err = transactions.GetOrCreateStreamConfig(txn, stream, ts)
 			return err
 		},
 	)
 
 	if err != nil {
 		return models.StreamConfig{}, err
+	}
+
+	if created {
+		record := changefeed.Record{
+			Key:   fmt.Appendf(nil, "stream:config:%s", stream),
+			Value: lww.Envelope{Timestamp: ts}.Marshal(),
+		}
+		s.emitChange(ctx, stream, changefeed.OpWrite, ts.NodeID, []changefeed.Record{record})
 	}
 
 	return streamConfig, nil
@@ -420,14 +429,25 @@ func (s *storageImpl) Distinct(ctx context.Context, stream string) (map[string][
 func (s *storageImpl) Ingest(ctx context.Context, stream string, logRecord *models.LogRecord) ([]byte, error) {
 	key := logRecord.NewDbKey(stream)
 	ts := s.clock.Now()
+	var created bool
 	err := s.kvStore.Update(
 		ctx,
 		func(txn *badger.Txn) error {
-			return transactions.Ingest(txn, stream, logRecord, key, ts)
+			var err error
+			created, err = transactions.Ingest(txn, stream, logRecord, key, ts)
+			return err
 		},
 	)
 	if err != nil {
 		return nil, err
+	}
+
+	if created {
+		record := changefeed.Record{
+			Key:   fmt.Appendf(nil, "stream:config:%s", stream),
+			Value: lww.Envelope{Timestamp: ts}.Marshal(),
+		}
+		s.emitChange(ctx, stream, changefeed.OpWrite, ts.NodeID, []changefeed.Record{record})
 	}
 
 	return key, nil

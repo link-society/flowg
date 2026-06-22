@@ -92,9 +92,9 @@ func FetchStreamFields(txn *badger.Txn, stream string) []string {
 	return fields
 }
 
-func GetOrCreateStreamConfig(txn *badger.Txn, stream string, ts hlc.Timestamp) (models.StreamConfig, error) {
+func GetOrCreateStreamConfig(txn *badger.Txn, stream string, ts hlc.Timestamp) (models.StreamConfig, bool, error) {
 	if featureflags.GetDemoMode() {
-		return demoStreamConfig, nil
+		return demoStreamConfig, false, nil
 	}
 
 	var streamConfig models.StreamConfig
@@ -102,22 +102,25 @@ func GetOrCreateStreamConfig(txn *badger.Txn, stream string, ts hlc.Timestamp) (
 	streamKey := []byte(fmt.Sprintf("stream:config:%s", stream))
 	env, found, err := lww.Read(txn, streamKey)
 	if err != nil {
-		return models.StreamConfig{}, fmt.Errorf(
+		return models.StreamConfig{}, false, fmt.Errorf(
 			"could not fetch stream config '%s': %w",
 			stream, err,
 		)
 	}
 
+	created := false
 	if !found {
-		if _, err := lww.Apply(txn, streamKey, lww.Envelope{Timestamp: ts}); err != nil {
-			return models.StreamConfig{}, fmt.Errorf(
+		applied, err := lww.Apply(txn, streamKey, lww.Envelope{Timestamp: ts})
+		if err != nil {
+			return models.StreamConfig{}, false, fmt.Errorf(
 				"could not create default stream config '%s': %w",
 				stream, err,
 			)
 		}
+		created = applied
 	} else if len(env.Payload) > 0 {
 		if err := json.Unmarshal(env.Payload, &streamConfig); err != nil {
-			return models.StreamConfig{}, fmt.Errorf(
+			return models.StreamConfig{}, false, fmt.Errorf(
 				"could not unmarshal stream config '%s': %w",
 				stream, err,
 			)
@@ -128,7 +131,7 @@ func GetOrCreateStreamConfig(txn *badger.Txn, stream string, ts hlc.Timestamp) (
 		streamConfig.IndexedFields = []string{}
 	}
 
-	return streamConfig, nil
+	return streamConfig, created, nil
 }
 
 func ConfigureStream(txn *badger.Txn, stream string, config models.StreamConfig, ts hlc.Timestamp) error {
@@ -136,7 +139,7 @@ func ConfigureStream(txn *badger.Txn, stream string, config models.StreamConfig,
 		config.IndexedFields = []string{}
 	}
 
-	oldConfig, err := GetOrCreateStreamConfig(txn, stream, ts)
+	oldConfig, _, err := GetOrCreateStreamConfig(txn, stream, ts)
 	if err != nil {
 		return fmt.Errorf("could not fetch old stream config '%s': %w", stream, err)
 	}
