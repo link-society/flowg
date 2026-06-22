@@ -39,6 +39,7 @@ def container(
     env = {
         "FLOWG_SECRET_KEY": "s3cr3!",
         "FLOWG_CLUSTER_NODE_ID": name,
+        "FLOWG_CLUSTER_PUSH_PULL_INTERVAL": "500ms",
         "FLOWG_AUTH_DIR": "/data/auth",
         "FLOWG_CONFIG_DIR": "/data/config",
         "FLOWG_LOG_DIR": "/data/logs",
