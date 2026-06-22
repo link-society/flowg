@@ -45,6 +45,9 @@ func migrateAlertScopes(ctx context.Context, kvStore kvstore.Storage, clock *hlc
 			}
 
 			parts := strings.Split(string(item.Key()[5:]), ":")
+			if len(parts) < 2 {
+				continue
+			}
 			roleName := parts[0]
 			scopeName := parts[1]
 
