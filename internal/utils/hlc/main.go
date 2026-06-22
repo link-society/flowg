@@ -2,6 +2,9 @@ package hlc
 
 import (
 	"fmt"
+
+	"math"
+
 	"sync"
 	"time"
 )
@@ -55,6 +58,13 @@ func NewClock(nodeID string) *Clock {
 	}
 }
 
+func bumpLogical(wall int64, logical uint32) (int64, uint32) {
+	if logical == math.MaxUint32 {
+		return wall + 1, 0
+	}
+	return wall, logical + 1
+}
+
 func (c *Clock) Now() Timestamp {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -64,7 +74,8 @@ func (c *Clock) Now() Timestamp {
 	if physical > c.last.WallTime {
 		c.last = Timestamp{WallTime: physical, Logical: 0, NodeID: c.nodeID}
 	} else {
-		c.last = Timestamp{WallTime: c.last.WallTime, Logical: c.last.Logical + 1, NodeID: c.nodeID}
+		wall, logical := bumpLogical(c.last.WallTime, c.last.Logical)
+		c.last = Timestamp{WallTime: wall, Logical: logical, NodeID: c.nodeID}
 	}
 
 	return c.last
@@ -80,11 +91,11 @@ func (c *Clock) Update(remote Timestamp) Timestamp {
 	var logical uint32
 	switch {
 	case wall == c.last.WallTime && wall == remote.WallTime:
-		logical = max(c.last.Logical, remote.Logical) + 1
+		wall, logical = bumpLogical(wall, max(c.last.Logical, remote.Logical))
 	case wall == c.last.WallTime:
-		logical = c.last.Logical + 1
+		wall, logical = bumpLogical(wall, c.last.Logical)
 	case wall == remote.WallTime:
-		logical = remote.Logical + 1
+		wall, logical = bumpLogical(wall, remote.Logical)
 	default:
 		logical = 0
 	}
