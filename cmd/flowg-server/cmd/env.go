@@ -60,6 +60,8 @@ var (
 
 	defaultTombstoneGracePeriod = getEnvDuration("FLOWG_TOMBSTONE_GRACE_PERIOD", 24*time.Hour)
 
+	defaultClusterPushPullInterval = getEnvDuration("FLOWG_CLUSTER_PUSH_PULL_INTERVAL", 10*time.Second)
+
 	defaultAuthInitialUser     = getEnvString("FLOWG_AUTH_INITIAL_USER", "root")
 	defaultAuthInitialPassword = getEnvString("FLOWG_AUTH_INITIAL_PASSWORD", "root")
 

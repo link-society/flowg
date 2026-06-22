@@ -38,7 +38,10 @@ type ManagerOptions struct {
 	ClusterStateDir          string
 
 	TombstoneGracePeriod time.Duration
+	PushPullInterval     time.Duration
 }
+
+const defaultPushPullInterval = 10 * time.Second
 
 type managerImpl struct {
 	actor.Actor
@@ -214,7 +217,7 @@ func NewManager(opts ManagerOptions) fx.Option {
 			mlistConfig.Transport = transport
 			mlistConfig.Delegate = delegate
 			mlistConfig.Events = delegate
-			mlistConfig.PushPullInterval = 10 * time.Second
+			mlistConfig.PushPullInterval = opts.PushPullInterval
 			mlistConfig.Logger = newMemberlistLogger(delegate.logger)
 
 			mlist, err := memberlist.Create(mlistConfig)

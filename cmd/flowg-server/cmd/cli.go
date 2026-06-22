@@ -24,6 +24,8 @@ type options struct {
 	clusterCookie   string
 	clusterStateDir string
 
+	clusterPushPullInterval time.Duration
+
 	clusterFormationStrategy string
 
 	clusterFormationManualJoinNodeID   string
@@ -154,6 +156,13 @@ func (opts *options) defineCliOptions(cmd *cobra.Command) {
 		"cluster-state-dir",
 		defaultClusterStateDir,
 		"Path to the cluster state directory (for replication)",
+	)
+
+	cmd.Flags().DurationVar(
+		&opts.clusterPushPullInterval,
+		"cluster-push-pull-interval",
+		defaultClusterPushPullInterval,
+		"Interval between anti-entropy state exchanges with other cluster nodes",
 	)
 
 	cmd.Flags().StringVar(

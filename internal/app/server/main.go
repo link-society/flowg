@@ -48,6 +48,7 @@ type Options struct {
 	LogStorageDir    string
 
 	TombstoneGracePeriod time.Duration
+	PushPullInterval     time.Duration
 
 	ServiceName string
 	ConsulUrl   string
@@ -106,6 +107,7 @@ func NewServer(opts Options) fx.Option {
 			ClusterFormationStrategy: opts.ClusterFormationStrategy,
 
 			TombstoneGracePeriod: opts.TombstoneGracePeriod,
+			PushPullInterval:     opts.PushPullInterval,
 		}),
 		syslog.NewServer(syslog.ServerOptions{
 			TcpMode:     opts.SyslogTcpMode,

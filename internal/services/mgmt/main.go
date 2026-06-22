@@ -26,6 +26,7 @@ type ServerOptions struct {
 	ClusterFormationStrategy cluster.ClusterFormationStrategy
 
 	TombstoneGracePeriod time.Duration
+	PushPullInterval     time.Duration
 }
 
 type Server struct {
@@ -57,6 +58,7 @@ func NewServer(opts ServerOptions) fx.Option {
 			ClusterStateDir:          opts.ClusterStateDir,
 
 			TombstoneGracePeriod: opts.TombstoneGracePeriod,
+			PushPullInterval:     opts.PushPullInterval,
 		}),
 		fx.Provide(func(
 			lc fx.Lifecycle,
