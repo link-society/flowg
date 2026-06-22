@@ -116,6 +116,7 @@ func (t *httpTransport) WriteToAddress(b []byte, addr memberlist.Address) (time.
 	if err != nil {
 		return time.Time{}, err
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusAccepted {
 		return time.Time{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
