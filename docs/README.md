@@ -6,3 +6,6 @@ requiring predefined schemas and relies on
 [BadgerDB](https://github.com/dgraph-io/badger) as its storage backend.
 
 ## Reference
+
+ - [Project Architecture](./ARCHITECTURE.md)
+ - [Frontend Architecture](../web/app/docs/ARCHITECTURE.md)
