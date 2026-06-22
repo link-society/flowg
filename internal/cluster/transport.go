@@ -38,6 +38,8 @@ type httpTransport struct {
 	connM   actor.Mailbox[net.Conn]
 	packetM actor.Mailbox[*memberlist.Packet]
 
+	bootstrapThreshold time.Duration
+
 	storages            map[string]storage.Streamable
 	clusterStateStorage clusterstate.Storage
 }
@@ -209,6 +211,7 @@ func (t *httpTransport) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	mux.HandleFunc("GET /cluster/nodes", t.handleStatus)
 	mux.HandleFunc("POST /cluster/gossip", t.handleGossip)
 	mux.HandleFunc("POST /cluster/sync/{namespace}", t.handleSync)
+	mux.HandleFunc("GET /cluster/sync/{namespace}", t.handleSyncPull)
 
 	mux.ServeHTTP(w, r)
 }
@@ -388,5 +391,48 @@ func (t *httpTransport) handleSync(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	stale, err := namespaceStaleness(r.Context(), t.clusterStateStorage, namespace, t.bootstrapThreshold)
+	if err == nil && !stale {
+		if err := t.clusterStateStorage.SetLiveness(r.Context(), namespace, time.Now().UnixNano()); err != nil {
+			http.Error(w, fmt.Sprintf("failed to update liveness: %v", err), http.StatusInternalServerError)
+			return
+		}
+	}
+
 	w.WriteHeader(http.StatusOK)
+}
+
+func (t *httpTransport) handleSyncPull(w http.ResponseWriter, r *http.Request) {
+	namespace := r.PathValue("namespace")
+	store, ok := t.storages[namespace]
+	if !ok {
+		message := fmt.Sprintf("unknown namespace: %s", namespace)
+		http.Error(w, message, http.StatusNotFound)
+		return
+	}
+
+	if t.cookie != "" && r.Header.Get(COOKIE_HEADER_NAME) != t.cookie {
+		http.Error(w, "invalid cluster key", http.StatusUnauthorized)
+		return
+	}
+
+	stale, err := namespaceStaleness(r.Context(), t.clusterStateStorage, namespace, t.bootstrapThreshold)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("failed to evaluate staleness: %v", err), http.StatusInternalServerError)
+		return
+	}
+	if stale {
+		http.Error(w, "node is not a healthy replication source", http.StatusServiceUnavailable)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	if _, err := store.Dump(r.Context(), w, 0); err != nil {
+		t.delegate.logger.ErrorContext(
+			r.Context(),
+			"failed to stream bootstrap snapshot",
+			slog.String("cluster.replication.namespace", namespace),
+			slog.String("error", err.Error()),
+		)
+	}
 }
