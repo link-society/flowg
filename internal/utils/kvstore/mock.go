@@ -57,3 +57,8 @@ func (m *MockStorage) LatestVersion(ctx context.Context) (uint64, error) {
 	args := m.Called(ctx)
 	return args.Get(0).(uint64), args.Error(1)
 }
+
+func (m *MockStorage) DropAll(ctx context.Context) error {
+	args := m.Called(ctx)
+	return args.Error(0)
+}

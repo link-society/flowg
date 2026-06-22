@@ -139,6 +139,10 @@ func (s *storageImpl) Dump(ctx context.Context, w io.Writer, since uint64) (uint
 	return s.kvStore.Backup(ctx, w, since)
 }
 
+func (s *storageImpl) DropAll(ctx context.Context) error {
+	return s.kvStore.DropAll(ctx)
+}
+
 func (s *storageImpl) LatestVersion(ctx context.Context) (uint64, error) {
 	return s.kvStore.LatestVersion(ctx)
 }
