@@ -188,6 +188,50 @@ sequenceDiagram
   Note over N1,N2: Both sides converge (LWW)
 ```
 
+### The safe-recovery window
+
+Healing after a partition relies on **tombstones** still being present on the
+nodes that stayed up (see
+[Deletions and tombstones](/docs/design/data-replication#deletions-and-tombstones)).
+A tombstone is what lets a deletion win against an older value when the two sides
+reconcile. But tombstones cannot be kept forever — once every node has converged
+they are garbage-collected to reclaim space. This retention period is the
+**grace period**, and it defines a hard limit on how long recovery stays safe.
+
+Consider a node that is isolated for *longer* than the grace period. Meanwhile,
+on the healthy side of the cluster, some keys are deleted **and** their
+tombstones are eventually garbage-collected. When the straggler finally
+reconnects, it still holds the old values, but there is no longer any tombstone
+to out-rank them. Naively pushing its data back would **resurrect** those deleted
+keys across the whole cluster.
+
+To prevent this, a node that has been out of contact longer than the grace period
+is considered **too stale to be trusted as a source**. Instead of pushing its
+diverged state, it **rebuilds its datasets from scratch** from a peer that stayed
+healthy, **discarding any writes it made while isolated beyond the window**. This
+trades a straggler's offline changes for the guarantee that a deletion is never
+undone.
+
+```mermaid
+flowchart TD
+  R[Node reconnects] --> Q{Out of contact<br/>longer than the<br/>grace period?}
+  Q -- No --> N[Normal reconciliation<br/>keeps local writes]
+  Q -- Yes --> H{A healthy peer<br/>is reachable?}
+  H -- Yes --> B[Rebuild from that peer<br/>discard offline writes]
+  H -- No --> W[Wait for a healthy peer]
+```
+
+:::warning Operational sizing
+The grace period is the **maximum downtime or partition a node can survive
+without losing the writes it made while isolated**. Operators should set it
+**longer than the longest outage they want to tolerate** for a single node.
+:::
+
+A whole-cluster restart is a special case: if *every* node comes back stale at the
+same time, there is no healthy peer to rebuild from — but their on-disk tombstones
+are still intact, so they simply resume normal reconciliation among themselves
+instead of waiting indefinitely.
+
 ## Putting it together
 
 The diagram below summarizes how a single write reaches the rest of the cluster

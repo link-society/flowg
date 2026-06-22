@@ -90,7 +90,10 @@ value, "resurrecting" it.
 To avoid this, deletions are stored as **tombstones**: envelopes that mark the
 key as deleted while still carrying a timestamp. A tombstone can win or lose a
 conflict just like a normal value. Tombstones are retained long enough for every
-node to converge, after which they can be safely garbage-collected.
+node to converge, after which they can be safely garbage-collected. How long they
+are kept — the **grace period** — bounds how long a disconnected node can safely
+rejoin and keep its offline writes, as explained in
+[The safe-recovery window](/docs/design/clustering/replication#the-safe-recovery-window).
 
 ## Why a Hybrid Logical Clock?
 
