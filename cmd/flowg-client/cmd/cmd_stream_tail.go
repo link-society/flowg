@@ -13,9 +13,7 @@ import (
 
 	"link-society.com/flowg/api/operations"
 
-	"link-society.com/flowg/internal/utils/client"
-	"link-society.com/flowg/internal/utils/client/flags"
-	"link-society.com/flowg/internal/utils/client/log"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 	"link-society.com/flowg/internal/utils/timex"
 )
 
@@ -24,11 +22,11 @@ func NewStreamTailCommand() *cobra.Command {
 		name     string
 		filter   string
 		period   string
-		indexing flags.IndexMap
+		indexing utils.IndexMap
 	}
 
 	opts := &options{
-		indexing: make(flags.IndexMap),
+		indexing: make(utils.IndexMap),
 	}
 
 	cmd := &cobra.Command{
@@ -46,7 +44,7 @@ func NewStreamTailCommand() *cobra.Command {
 			from := to.Add(-period)
 
 			url := fmt.Sprintf("/api/v1/streams/%s/logs", opts.name)
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			req, err := http.NewRequest(http.MethodGet, url, nil)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not prepare request: %v\n", err)
@@ -91,7 +89,7 @@ func NewStreamTailCommand() *cobra.Command {
 				return
 			}
 
-			printer := log.NewPrinter()
+			printer := utils.NewPrinter()
 
 			var data operations.QueryStreamResponse
 

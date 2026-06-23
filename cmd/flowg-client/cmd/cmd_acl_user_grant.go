@@ -12,7 +12,7 @@ import (
 
 	"link-society.com/flowg/api/operations"
 
-	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
 func NewAclUserGrantCommand() *cobra.Command {
@@ -27,7 +27,7 @@ func NewAclUserGrantCommand() *cobra.Command {
 		Use:   "grant",
 		Short: "Grant a role to a user",
 		Run: func(cmd *cobra.Command, args []string) {
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 
 			url := fmt.Sprintf("/api/v1/users/%s", opts.username)
 			req, err := http.NewRequest(http.MethodGet, url, nil)

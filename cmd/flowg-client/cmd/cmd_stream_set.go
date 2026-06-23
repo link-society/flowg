@@ -12,8 +12,8 @@ import (
 
 	"link-society.com/flowg/api/operations"
 
+	"link-society.com/flowg/cmd/flowg-client/utils"
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/utils/client"
 )
 
 func NewStreamSetCommand() *cobra.Command {
@@ -30,7 +30,7 @@ func NewStreamSetCommand() *cobra.Command {
 		Short: "Set stream properties",
 		Run: func(cmd *cobra.Command, args []string) {
 			url := fmt.Sprintf("/api/v1/streams/%s", opts.name)
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			req, err := http.NewRequest(http.MethodGet, url, nil)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not prepare request: %v\n", err)

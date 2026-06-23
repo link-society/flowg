@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"os"
 
 	"go.uber.org/fx"
@@ -13,11 +13,12 @@ import (
 
 	"link-society.com/flowg/api"
 
+	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage/config"
+	"link-society.com/flowg/internal/storage/log"
+
 	"link-society.com/flowg/internal/engines/lognotify"
 	"link-society.com/flowg/internal/engines/pipelines"
-	authStorage "link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
-	logStorage "link-society.com/flowg/internal/storage/log"
 )
 
 func main() {
@@ -28,9 +29,9 @@ func main() {
 
 		// The schema generation only inspects the route table, so nil backends
 		// are enough to build the handler.
-		fx.Provide(func() authStorage.Storage { return nil }),
+		fx.Provide(func() auth.Storage { return nil }),
 		fx.Provide(func() config.Storage { return nil }),
-		fx.Provide(func() logStorage.Storage { return nil }),
+		fx.Provide(func() log.Storage { return nil }),
 		fx.Provide(func() lognotify.LogNotifier { return nil }),
 		fx.Provide(func() pipelines.Runner { return nil }),
 
@@ -39,17 +40,20 @@ func main() {
 		fx.Populate(fx.Annotate(&handler, fx.ParamTags(`name:"openapi-handler"`))),
 	)
 	if err := app.Err(); err != nil {
-		log.Fatalf("ERROR: Could not build OpenAPI handler: %v", err)
+		fmt.Fprintf(os.Stderr, "ERROR: Could not build OpenAPI handler: %v\n", err)
+		os.Exit(1)
 	}
 
 	apiService := handler.(*web.Service)
 	reflector := apiService.OpenAPIReflector().(*openapi31.Reflector)
 	schema, err := reflector.Spec.MarshalJSON()
 	if err != nil {
-		log.Fatalf("ERROR: Could not marshal OpenAPI schema to JSON: %v", err)
+		fmt.Fprintf(os.Stderr, "ERROR: Could not marshal OpenAPI schema to JSON: %v\n", err)
+		os.Exit(1)
 	}
 
 	if err := os.WriteFile("./website/src/openapi.json", schema, 0644); err != nil {
-		log.Fatalf("ERROR: Could not write OpenAPI schema to file: %v", err)
+		fmt.Fprintf(os.Stderr, "ERROR: Could not write OpenAPI schema to file: %v\n", err)
+		os.Exit(1)
 	}
 }

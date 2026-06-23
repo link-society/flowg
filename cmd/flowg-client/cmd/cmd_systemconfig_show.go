@@ -11,7 +11,7 @@ import (
 
 	"link-society.com/flowg/api/operations"
 
-	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
 func NewSystemConfigShowCommand() *cobra.Command {
@@ -19,7 +19,7 @@ func NewSystemConfigShowCommand() *cobra.Command {
 		Use:   "show",
 		Short: "Show system configuration",
 		Run: func(cmd *cobra.Command, args []string) {
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			url := "/api/v1/system-configuration"
 			req, err := http.NewRequest(http.MethodGet, url, nil)
 			if err != nil {

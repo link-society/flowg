@@ -11,7 +11,7 @@ import (
 
 	"link-society.com/flowg/api/operations"
 
-	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
 func NewTransformerListCommand() *cobra.Command {
@@ -19,7 +19,7 @@ func NewTransformerListCommand() *cobra.Command {
 		Use:   "ls",
 		Short: "List transformers",
 		Run: func(cmd *cobra.Command, args []string) {
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			url := "/api/v1/transformers"
 			req, err := http.NewRequest(http.MethodGet, url, nil)
 			if err != nil {

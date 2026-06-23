@@ -10,10 +10,13 @@ import (
 	"strings"
 )
 
+// EventStreamReader reads Server-Sent Events from a byte stream, one event at a
+// time.
 type EventStreamReader struct {
 	scanner *bufio.Scanner
 }
 
+// NewEventStreamReader builds a reader that decodes events from r.
 func NewEventStreamReader(r io.Reader) *EventStreamReader {
 	scanner := bufio.NewScanner(r)
 	scanner.Buffer(make([]byte, 4096), 64*1024)
@@ -38,6 +41,7 @@ func NewEventStreamReader(r io.Reader) *EventStreamReader {
 	}
 }
 
+// Next returns the next event from the stream, or io.EOF once the stream ends.
 func (r *EventStreamReader) Next() (Event, error) {
 	var e Event
 
