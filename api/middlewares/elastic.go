@@ -5,20 +5,45 @@ import (
 
 	"encoding/base64"
 	"encoding/json"
-	"strconv"
 
 	"fmt"
 	"slices"
+	"strconv"
 	"strings"
 
 	"net/http"
 
-	"link-society.com/flowg/api/auth"
+	"go.uber.org/fx"
 
+	"link-society.com/flowg/api/auth"
+	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/internal/engines/pipelines"
 	"link-society.com/flowg/internal/models"
+
+	authStorage "link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage/config"
 )
 
+// ElasticDeps lists the dependencies of [newElasticHandler]: the backends it
+// uses to authenticate callers and turn the documents they index into pipeline
+// runs.
+type ElasticDeps struct {
+	fx.In
+
+	AuthStorage    authStorage.Storage
+	ConfigStorage  config.Storage
+	PipelineRunner pipelines.Runner
+}
+
+func init() {
+	routing.RegisterMiddleware(
+		newElasticHandler,
+		"/api/v1/middlewares/elastic/",
+	)
+}
+
+// elasticProduct advertises the handler as Elasticsearch, which the official
+// clients probe for before they agree to talk to a server.
 func elasticProduct(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("X-Elastic-Product", "Elasticsearch")
@@ -26,7 +51,9 @@ func elasticProduct(next http.Handler) http.Handler {
 	})
 }
 
-func elasticAuth(deps *Dependencies, next http.Handler) http.Handler {
+// elasticAuth resolves the HTTP Basic credentials Elasticsearch clients send
+// into a FlowG user, so downstream handlers can enforce the user's permissions.
+func elasticAuth(deps ElasticDeps, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
@@ -70,7 +97,10 @@ func elasticAuth(deps *Dependencies, next http.Handler) http.Handler {
 	})
 }
 
-func newElasticHandler(deps *Dependencies) http.Handler {
+// newElasticHandler serves the subset of the Elasticsearch API that log
+// shippers exercise: checking that an index (a FlowG pipeline) exists, and
+// indexing a document (running a log record through that pipeline).
+func newElasticHandler(deps ElasticDeps) http.Handler {
 	logger := slog.Default().With(slog.String("channel", "input.middleware.elastic"))
 	mux := http.NewServeMux()
 

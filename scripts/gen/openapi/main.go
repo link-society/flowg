@@ -12,8 +12,6 @@ import (
 	"github.com/swaggest/rest/web"
 
 	"link-society.com/flowg/api"
-	_ "link-society.com/flowg/api/operations"
-	"link-society.com/flowg/api/routing"
 
 	"link-society.com/flowg/internal/engines/lognotify"
 	"link-society.com/flowg/internal/engines/pipelines"
@@ -36,10 +34,9 @@ func main() {
 		fx.Provide(func() lognotify.LogNotifier { return nil }),
 		fx.Provide(func() pipelines.Runner { return nil }),
 
-		routing.Module("api.operations"),
-		fx.Provide(api.NewHandler),
+		api.Module("openapi-handler"),
 
-		fx.Populate(&handler),
+		fx.Populate(fx.Annotate(&handler, fx.ParamTags(`name:"openapi-handler"`))),
 	)
 	if err := app.Err(); err != nil {
 		log.Fatalf("ERROR: Could not build OpenAPI handler: %v", err)
