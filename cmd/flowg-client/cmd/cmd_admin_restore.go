@@ -11,7 +11,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
 func NewAdminRestoreCommand() *cobra.Command {
@@ -31,7 +31,7 @@ func NewAdminRestoreCommand() *cobra.Command {
 				return
 			}
 
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			if err := restore(client, "auth", opts.src); err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Failed to restore auth database: %v\n", err)
 				ExitCode = 1
@@ -62,7 +62,7 @@ func NewAdminRestoreCommand() *cobra.Command {
 	return cmd
 }
 
-func restore(client *client.Client, dbType string, srcDir string) error {
+func restore(client *utils.Client, dbType string, srcDir string) error {
 	srcPath := path.Join(srcDir, fmt.Sprintf("%s.db", dbType))
 
 	body, writer := io.Pipe()

@@ -5,11 +5,14 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// ExitCode is the process exit code; command handlers set it to signal failure.
 var ExitCode int = 0
 
+// NewRootCommand builds the root flowg-client command with its global flags and
+// subcommands, constructing the API clients once before any subcommand runs.
 func NewRootCommand() *cobra.Command {
 	cobra.EnableTraverseRunHooks = true
 
@@ -26,8 +29,8 @@ func NewRootCommand() *cobra.Command {
 		Short: "API Client for FlowG",
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			ctx := cmd.Context()
-			ctx = context.WithValue(ctx, ApiClient, client.NewClient(opts.apiUrl, opts.apiToken))
-			ctx = context.WithValue(ctx, MgmtApiClient, client.NewClient(opts.mgmtApiUrl, ""))
+			ctx = context.WithValue(ctx, ApiClient, utils.NewClient(opts.apiUrl, opts.apiToken))
+			ctx = context.WithValue(ctx, MgmtApiClient, utils.NewClient(opts.mgmtApiUrl, ""))
 			cmd.SetContext(ctx)
 		},
 	}

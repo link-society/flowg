@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
+
 	"path/filepath"
 	"strings"
 
@@ -40,7 +40,8 @@ func main() {
 
 	for _, item := range items {
 		if err := genDoc(item.cmd, item.destdir, item.binaryName); err != nil {
-			log.Fatal(err)
+			fmt.Fprintf(os.Stderr, "%v\n", err)
+			os.Exit(1)
 		}
 	}
 }

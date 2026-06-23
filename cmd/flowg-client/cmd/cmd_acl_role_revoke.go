@@ -12,8 +12,8 @@ import (
 
 	"link-society.com/flowg/api/operations"
 
+	"link-society.com/flowg/cmd/flowg-client/utils"
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/utils/client"
 )
 
 func NewAclRoleRevokeCommand() *cobra.Command {
@@ -35,7 +35,7 @@ func NewAclRoleRevokeCommand() *cobra.Command {
 				return
 			}
 
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 
 			url := fmt.Sprintf("/api/v1/roles/%s", opts.name)
 			req, err := http.NewRequest(http.MethodGet, url, nil)

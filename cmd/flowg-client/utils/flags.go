@@ -1,4 +1,4 @@
-package flags
+package utils
 
 import (
 	"fmt"
@@ -7,6 +7,8 @@ import (
 	"github.com/spf13/pflag"
 )
 
+// IndexMap is a pflag.Value that collects repeated key=value arguments into a
+// multimap, letting the same flag be supplied several times for one key.
 type IndexMap map[string][]string
 
 var _ pflag.Value = (*IndexMap)(nil)

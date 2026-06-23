@@ -10,7 +10,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
 func NewAclUserAddCommand() *cobra.Command {
@@ -40,7 +40,7 @@ func NewAclUserAddCommand() *cobra.Command {
 				return
 			}
 
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			url := fmt.Sprintf("/api/v1/users/%s", opts.username)
 			req, err := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(payload))
 			if err != nil {

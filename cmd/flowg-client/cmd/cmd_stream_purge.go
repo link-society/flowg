@@ -8,7 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
 func NewStreamPurgeCommand() *cobra.Command {
@@ -22,7 +22,7 @@ func NewStreamPurgeCommand() *cobra.Command {
 		Use:   "purge",
 		Short: "Delete a stream",
 		Run: func(cmd *cobra.Command, args []string) {
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			url := fmt.Sprintf("/api/v1/streams/%s", opts.name)
 			req, err := http.NewRequest(http.MethodDelete, url, nil)
 			if err != nil {

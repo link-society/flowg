@@ -16,7 +16,7 @@ import (
 	"golang.org/x/term"
 
 	"link-society.com/flowg/api/operations"
-	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
 func NewLoginCommand() *cobra.Command {
@@ -69,7 +69,7 @@ func NewLoginCommand() *cobra.Command {
 				return
 			}
 
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			url := "/api/v1/auth/login"
 			req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(payload))
 			if err != nil {

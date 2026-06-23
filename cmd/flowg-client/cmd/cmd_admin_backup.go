@@ -11,7 +11,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
 func NewAdminBackupCommand() *cobra.Command {
@@ -31,7 +31,7 @@ func NewAdminBackupCommand() *cobra.Command {
 				return
 			}
 
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			if err := backup(client, "auth", opts.dest); err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Failed to backup auth database: %v\n", err)
 				ExitCode = 1
@@ -62,7 +62,7 @@ func NewAdminBackupCommand() *cobra.Command {
 	return cmd
 }
 
-func backup(client *client.Client, dbType string, destDir string) error {
+func backup(client *utils.Client, dbType string, destDir string) error {
 	url := fmt.Sprintf("/api/v1/backup/%s", dbType)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {

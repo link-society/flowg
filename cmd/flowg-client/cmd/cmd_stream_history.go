@@ -13,9 +13,7 @@ import (
 
 	"link-society.com/flowg/api/operations"
 
-	"link-society.com/flowg/internal/utils/client"
-	"link-society.com/flowg/internal/utils/client/flags"
-	"link-society.com/flowg/internal/utils/client/log"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
 func NewStreamHistoryCommand() *cobra.Command {
@@ -24,11 +22,11 @@ func NewStreamHistoryCommand() *cobra.Command {
 		filter   string
 		from     string
 		to       string
-		indexing flags.IndexMap
+		indexing utils.IndexMap
 	}
 
 	opts := &options{
-		indexing: make(flags.IndexMap),
+		indexing: make(utils.IndexMap),
 	}
 
 	cmd := &cobra.Command{
@@ -36,7 +34,7 @@ func NewStreamHistoryCommand() *cobra.Command {
 		Short: "Fetch logs using a time window",
 		Run: func(cmd *cobra.Command, args []string) {
 			url := fmt.Sprintf("/api/v1/streams/%s/logs", opts.name)
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			req, err := http.NewRequest(http.MethodGet, url, nil)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not prepare request: %v\n", err)
@@ -81,7 +79,7 @@ func NewStreamHistoryCommand() *cobra.Command {
 				return
 			}
 
-			printer := log.NewPrinter()
+			printer := utils.NewPrinter()
 
 			var data operations.QueryStreamResponse
 

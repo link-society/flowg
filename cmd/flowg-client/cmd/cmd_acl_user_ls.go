@@ -13,7 +13,7 @@ import (
 
 	"link-society.com/flowg/api/operations"
 
-	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
 func NewAclUserListCommand() *cobra.Command {
@@ -21,7 +21,7 @@ func NewAclUserListCommand() *cobra.Command {
 		Use:   "ls",
 		Short: "List all users",
 		Run: func(cmd *cobra.Command, args []string) {
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			url := "/api/v1/users"
 			req, err := http.NewRequest(http.MethodGet, url, nil)
 			if err != nil {

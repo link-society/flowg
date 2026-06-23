@@ -11,7 +11,7 @@ import (
 
 	"link-society.com/flowg/api/operations"
 
-	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
 func NewTokenCreateCommand() *cobra.Command {
@@ -19,7 +19,7 @@ func NewTokenCreateCommand() *cobra.Command {
 		Use:   "create",
 		Short: "Create Personal Access Tokens",
 		Run: func(cmd *cobra.Command, args []string) {
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			url := "/api/v1/token"
 			req, err := http.NewRequest(http.MethodPost, url, nil)
 			if err != nil {
