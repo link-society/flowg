@@ -50,10 +50,6 @@ func Annotated(annotate func(oc openapi.OperationContext) error) OperationOption
 	return func(op *Operation) { op.Annotate = annotate }
 }
 
-// providers accumulates one fx provider per registered endpoint, so [Module]
-// can expose the whole set without a hand-maintained list.
-var providers []fx.Option
-
 // RegisterOperation records an endpoint so [Module] provides it to the
 // dependency-injection container's operations group.
 //
@@ -77,13 +73,4 @@ func RegisterOperation[Deps any](
 		},
 		fx.ResultTags(`group:"operations"`),
 	)))
-}
-
-// Module provides every registered operation to the dependency-injection
-// container.
-//
-// It must be called after the operation files have registered themselves, which
-// the Go runtime guarantees by running their init functions before any caller.
-func Module() fx.Option {
-	return fx.Module("api.routing", providers...)
 }

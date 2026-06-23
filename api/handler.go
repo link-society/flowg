@@ -5,41 +5,32 @@ import (
 	"slices"
 	"strings"
 
+	"go.uber.org/fx"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/swaggest/openapi-go/openapi31"
 	"github.com/swaggest/rest/nethttp"
 	"github.com/swaggest/rest/web"
 	"github.com/swaggest/swgui/v5emb"
 
-	"go.uber.org/fx"
-
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/middlewares"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/internal/app"
 
-	"link-society.com/flowg/internal/engines/lognotify"
-	"link-society.com/flowg/internal/engines/pipelines"
-
 	authStorage "link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
-	"link-society.com/flowg/internal/storage/log"
 )
 
 // handlerParams gathers everything [NewHandler] needs from the
-// dependency-injection container: the cross-cutting backends the handler wires
-// directly, and the full set of operations contributed to the routing group.
+// dependency-injection container: the authentication backend it guards the
+// routes with, the protocol-compatibility middlewares it mounts, and the full
+// set of operations contributed to the routing group.
 type handlerParams struct {
 	fx.In
 
-	AuthStorage   authStorage.Storage
-	LogStorage    log.Storage
-	ConfigStorage config.Storage
+	AuthStorage authStorage.Storage
 
-	LogNotifier    lognotify.LogNotifier
-	PipelineRunner pipelines.Runner
-
-	Operations []routing.Operation `group:"operations"`
+	Operations  []routing.Operation  `group:"operations"`
+	Middlewares []routing.Middleware `group:"middlewares"`
 }
 
 // NewHandler builds the HTTP handler that serves FlowG's REST API.
@@ -107,14 +98,9 @@ func NewHandler(params handlerParams) http.Handler {
 		}
 	})
 
-	service.Mount("/api/v1/middlewares/", middlewares.NewHandler(&middlewares.Dependencies{
-		AuthStorage:   params.AuthStorage,
-		LogStorage:    params.LogStorage,
-		ConfigStorage: params.ConfigStorage,
-
-		LogNotifier:    params.LogNotifier,
-		PipelineRunner: params.PipelineRunner,
-	}))
+	for _, mw := range params.Middlewares {
+		service.Mount(mw.Pattern, mw.Handler)
+	}
 
 	return service
 }
