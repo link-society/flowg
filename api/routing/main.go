@@ -1,11 +1,3 @@
-// Package routing wires API operations to their HTTP routes.
-//
-// It defines the vocabulary every endpoint shares: the [Operation] value that
-// pairs an interactor with its route, and [RegisterOperation], by which each
-// endpoint contributes itself to the routing table. Operations register
-// themselves from their own files, so an API package can assemble its complete
-// routing table out of independently declared endpoints without a central list
-// to keep in sync.
 package routing
 
 import (
@@ -88,10 +80,10 @@ func RegisterOperation[Deps any](
 }
 
 // Module provides every registered operation to the dependency-injection
-// container under the given module name.
+// container.
 //
 // It must be called after the operation files have registered themselves, which
 // the Go runtime guarantees by running their init functions before any caller.
-func Module(name string) fx.Option {
-	return fx.Module(name, providers...)
+func Module() fx.Option {
+	return fx.Module("api.routing", providers...)
 }
