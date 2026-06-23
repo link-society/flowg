@@ -1,4 +1,3 @@
-// Package logging provides the logger shared by every API operation.
 package logging
 
 import "log/slog"
