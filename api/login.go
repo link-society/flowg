@@ -8,7 +8,7 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	authUtils "link-society.com/flowg/internal/utils/auth"
+	"link-society.com/flowg/api/auth"
 )
 
 type LoginRequest struct {
@@ -45,7 +45,7 @@ func (ctrl *controller) LoginUsecase() usecase.Interactor {
 				return status.Wrap(errors.New("invalid credentials"), status.Unauthenticated)
 
 			case valid:
-				token, err := authUtils.NewJWT(req.Username)
+				token, err := auth.NewJWT(req.Username)
 				if err != nil {
 					ctrl.logger.ErrorContext(
 						ctx,

@@ -14,11 +14,20 @@ import (
 
 	"link-society.com/flowg/internal/models"
 
-	authUtils "link-society.com/flowg/internal/utils/auth"
-
 	"link-society.com/flowg/internal/storage/auth"
 )
 
+// ApiMiddleware authenticates incoming HTTP requests and establishes the
+// caller's identity for the rest of the request pipeline.
+//
+// It is the boundary that turns an anonymous request into an authenticated one:
+// it accepts a bearer credential in the Authorization header, supporting both
+// personal access tokens ("pat_" prefix) and JWTs ("jwt_" prefix). On success
+// the resolved user is bound to the request context (see [ContextWithUser]) and
+// the next handler is invoked. Any failure — missing, malformed, or invalid
+// credential — stops the chain and produces a [status.Unauthenticated] error
+// response, so downstream handlers can assume a valid identity is always
+// present.
 func ApiMiddleware(authStorage auth.Storage) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		serveError := func(w http.ResponseWriter, r *http.Request, err error) {
@@ -69,7 +78,7 @@ func ApiMiddleware(authStorage auth.Storage) func(http.Handler) http.Handler {
 			case strings.HasPrefix(strings.ToLower(authHeader), "bearer jwt_"):
 				token := authHeader[len("bearer "):]
 
-				username, err := authUtils.VerifyJWT(token)
+				username, err := VerifyJWT(token)
 				if err != nil {
 					serveError(w, r, err)
 					return

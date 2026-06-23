@@ -17,9 +17,9 @@ import (
 	"link-society.com/flowg/api/middlewares"
 	"link-society.com/flowg/internal/app"
 
-	apiUtils "link-society.com/flowg/internal/utils/api"
+	"link-society.com/flowg/api/auth"
 
-	"link-society.com/flowg/internal/storage/auth"
+	authStorage "link-society.com/flowg/internal/storage/auth"
 	"link-society.com/flowg/internal/storage/config"
 	"link-society.com/flowg/internal/storage/log"
 
@@ -30,7 +30,7 @@ import (
 type Dependencies struct {
 	fx.In
 
-	AuthStorage   auth.Storage
+	AuthStorage   authStorage.Storage
 	LogStorage    log.Storage
 	ConfigStorage config.Storage
 
@@ -71,7 +71,7 @@ func NewHandler(deps Dependencies) http.Handler {
 			"Authentication using JSON Web Token",
 			"JWT",
 		),
-		apiUtils.ApiMiddleware(deps.AuthStorage),
+		auth.ApiMiddleware(deps.AuthStorage),
 	).Group(func(router chi.Router) {
 		r := &routerWrapper{Router: router}
 

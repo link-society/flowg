@@ -8,12 +8,12 @@ import (
 
 	"link-society.com/flowg/internal/models"
 
-	authUtils "link-society.com/flowg/internal/utils/auth"
-	"link-society.com/flowg/internal/utils/auth/hash"
+	"link-society.com/flowg/internal/storage/auth/hash"
+	"link-society.com/flowg/internal/storage/auth/secret"
 )
 
 func CreateToken(txn *badger.Txn, username string) (string, string, error) {
-	token, err := authUtils.NewSecret("pat", 32)
+	token, err := secret.NewSecret("pat", 32)
 	if err != nil {
 		return "", "", err
 	}

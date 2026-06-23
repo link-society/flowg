@@ -3,7 +3,7 @@ package hash_test
 import (
 	"testing"
 
-	"link-society.com/flowg/internal/utils/auth/hash"
+	"link-society.com/flowg/internal/storage/auth/hash"
 )
 
 func TestHashPassword(t *testing.T) {

@@ -12,7 +12,7 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	apiUtils "link-society.com/flowg/internal/utils/api"
+	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/internal/utils/langs/filtering"
 
 	"link-society.com/flowg/internal/models"
@@ -29,7 +29,7 @@ type WatchLogsResponse struct {
 
 func (ctrl *controller) WatchLogsUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
-		apiUtils.RequireScopeApiDecorator(
+		auth.RequireScopeApiDecorator(
 			ctrl.deps.AuthStorage,
 			models.SCOPE_READ_STREAMS,
 			func(
