@@ -11,7 +11,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/api"
+	"link-society.com/flowg/api/operations"
 
 	"link-society.com/flowg/internal/utils/client"
 )
@@ -44,7 +44,7 @@ func NewAclRoleListCommand() *cobra.Command {
 				return
 			}
 
-			var data api.ListRolesResponse
+			var data operations.ListRolesResponse
 			if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Failed to decode response: %v\n", err)
 				ExitCode = 1

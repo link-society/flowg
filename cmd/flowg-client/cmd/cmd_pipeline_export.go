@@ -12,7 +12,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/api"
+	"link-society.com/flowg/api/operations"
 
 	"link-society.com/flowg/internal/utils/client"
 )
@@ -61,7 +61,7 @@ func NewPipelineExportCommand() *cobra.Command {
 				return
 			}
 
-			var data api.GetPipelineResponse
+			var data operations.GetPipelineResponse
 			if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not decode response: %v\n", err)
 				ExitCode = 1

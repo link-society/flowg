@@ -10,7 +10,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/api"
+	"link-society.com/flowg/api/operations"
 
 	"link-society.com/flowg/internal/utils/client"
 )
@@ -50,7 +50,7 @@ func NewSystemConfigUpdateCommand() *cobra.Command {
 				return
 			}
 
-			var data api.GetSystemConfigurationResponse
+			var data operations.GetSystemConfigurationResponse
 			if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not decode response: %v\n", err)
 				ExitCode = 1

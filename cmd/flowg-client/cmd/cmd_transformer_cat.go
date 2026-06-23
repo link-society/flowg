@@ -9,7 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/api"
+	"link-society.com/flowg/api/operations"
 
 	"link-society.com/flowg/internal/utils/client"
 )
@@ -48,7 +48,7 @@ func NewTransformerCatCommand() *cobra.Command {
 				return
 			}
 
-			var data api.GetTransformerResponse
+			var data operations.GetTransformerResponse
 			if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not decode response: %v\n", err)
 				ExitCode = 1
