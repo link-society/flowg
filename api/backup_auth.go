@@ -10,7 +10,7 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/internal/models"
-	apiUtils "link-society.com/flowg/internal/utils/api"
+	"link-society.com/flowg/api/auth"
 )
 
 type BackupAuthRequest struct{}
@@ -21,7 +21,7 @@ type BackupAuthResponse struct {
 
 func (ctrl *controller) BackupAuthUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
-		apiUtils.RequireScopeApiDecorator(
+		auth.RequireScopeApiDecorator(
 			ctrl.deps.AuthStorage,
 			models.SCOPE_READ_ACLS,
 			func(

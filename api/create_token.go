@@ -7,7 +7,7 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	apiUtils "link-society.com/flowg/internal/utils/api"
+	"link-society.com/flowg/api/auth"
 )
 
 type CreateTokenRequest struct{}
@@ -25,7 +25,7 @@ func (ctrl *controller) CreateTokenUsecase() usecase.Interactor {
 			req CreateTokenRequest,
 			resp *CreateTokenResponse,
 		) error {
-			user := apiUtils.GetContextUser(ctx)
+			user := auth.GetContextUser(ctx)
 
 			token, tokenUuid, err := ctrl.deps.AuthStorage.CreateToken(ctx, user.Name)
 			if err != nil {

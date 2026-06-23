@@ -7,7 +7,7 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 	"link-society.com/flowg/internal/models"
-	apiUtils "link-society.com/flowg/internal/utils/api"
+	"link-society.com/flowg/api/auth"
 )
 
 type GetStreamUsageRequest struct {
@@ -21,7 +21,7 @@ type GetStreamUsageResponse struct {
 
 func (ctrl *controller) GetStreamUsageUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
-		apiUtils.RequireScopeApiDecorator(
+		auth.RequireScopeApiDecorator(
 			ctrl.deps.AuthStorage,
 			models.SCOPE_READ_STREAMS,
 			func(

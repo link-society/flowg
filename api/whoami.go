@@ -7,7 +7,7 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	apiUtils "link-society.com/flowg/internal/utils/api"
+	"link-society.com/flowg/api/auth"
 
 	"link-society.com/flowg/internal/models"
 )
@@ -26,7 +26,7 @@ func (ctrl *controller) WhoamiUsecase() usecase.Interactor {
 			req WhoamiRequest,
 			resp *WhoamiResponse,
 		) error {
-			resp.User = apiUtils.GetContextUser(ctx)
+			resp.User = auth.GetContextUser(ctx)
 
 			scopes, err := ctrl.deps.AuthStorage.ListUserScopes(ctx, resp.User.Name)
 			if err != nil {

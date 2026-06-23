@@ -13,7 +13,7 @@ import (
 
 	"net/http"
 
-	apiUtils "link-society.com/flowg/internal/utils/api"
+	"link-society.com/flowg/api/auth"
 
 	"link-society.com/flowg/internal/engines/pipelines"
 	"link-society.com/flowg/internal/models"
@@ -65,7 +65,7 @@ func elasticAuth(deps *Dependencies, next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := apiUtils.ContextWithUser(r.Context(), user)
+		ctx := auth.ContextWithUser(r.Context(), user)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -79,7 +79,7 @@ func newElasticHandler(deps *Dependencies) http.Handler {
 		func(w http.ResponseWriter, r *http.Request) {
 			index := r.PathValue("index")
 
-			user := apiUtils.GetContextUser(r.Context())
+			user := auth.GetContextUser(r.Context())
 			authorized, err := deps.AuthStorage.VerifyUserPermission(
 				r.Context(),
 				user.Name,
@@ -125,7 +125,7 @@ func newElasticHandler(deps *Dependencies) http.Handler {
 		func(w http.ResponseWriter, r *http.Request) {
 			index := r.PathValue("index")
 
-			user := apiUtils.GetContextUser(r.Context())
+			user := auth.GetContextUser(r.Context())
 			authorized, err := deps.AuthStorage.VerifyUserPermission(
 				r.Context(),
 				user.Name,

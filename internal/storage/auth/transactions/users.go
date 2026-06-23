@@ -7,7 +7,7 @@ import (
 
 	"link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/internal/utils/auth/hash"
+	"link-society.com/flowg/internal/storage/auth/hash"
 )
 
 func ListUsers(txn *badger.Txn) ([]models.User, error) {

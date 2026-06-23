@@ -7,7 +7,7 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	apiUtils "link-society.com/flowg/internal/utils/api"
+	"link-society.com/flowg/api/auth"
 )
 
 type DeleteTokenRequest struct {
@@ -25,7 +25,7 @@ func (ctrl *controller) DeleteTokenUsecase() usecase.Interactor {
 			req DeleteTokenRequest,
 			resp *DeleteTokenResponse,
 		) error {
-			user := apiUtils.GetContextUser(ctx)
+			user := auth.GetContextUser(ctx)
 
 			err := ctrl.deps.AuthStorage.DeleteToken(ctx, user.Name, req.TokenUUID)
 			if err != nil {

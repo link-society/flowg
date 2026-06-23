@@ -8,7 +8,7 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/internal/app/logging"
-	apiUtils "link-society.com/flowg/internal/utils/api"
+	"link-society.com/flowg/api/auth"
 
 	"link-society.com/flowg/internal/models"
 
@@ -26,7 +26,7 @@ type IngestLogsStructResponse struct {
 
 func (ctrl *controller) IngestLogsStructUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
-		apiUtils.RequireScopeApiDecorator(
+		auth.RequireScopeApiDecorator(
 			ctrl.deps.AuthStorage,
 			models.SCOPE_SEND_LOGS,
 			func(

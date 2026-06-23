@@ -9,7 +9,7 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/internal/app/logging"
-	apiUtils "link-society.com/flowg/internal/utils/api"
+	"link-society.com/flowg/api/auth"
 )
 
 type ChangePasswordRequest struct {
@@ -30,7 +30,7 @@ func (ctrl *controller) ChangePasswordUsecase() usecase.Interactor {
 		) error {
 			logging.MarkSensitive(ctx)
 
-			user := apiUtils.GetContextUser(ctx)
+			user := auth.GetContextUser(ctx)
 
 			switch valid, err := ctrl.deps.AuthStorage.VerifyUserPassword(ctx, user.Name, req.OldPassword); {
 			case err != nil:

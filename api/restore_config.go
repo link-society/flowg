@@ -10,7 +10,7 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/internal/models"
-	apiUtils "link-society.com/flowg/internal/utils/api"
+	"link-society.com/flowg/api/auth"
 )
 
 type RestoreConfigRequest struct {
@@ -23,7 +23,7 @@ type RestoreConfigResponse struct {
 
 func (ctrl *controller) RestoreConfigUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
-		apiUtils.RequireScopesApiDecorator(
+		auth.RequireScopesApiDecorator(
 			ctrl.deps.AuthStorage,
 			[]models.Scope{
 				models.SCOPE_WRITE_PIPELINES,

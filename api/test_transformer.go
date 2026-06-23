@@ -7,7 +7,7 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	apiUtils "link-society.com/flowg/internal/utils/api"
+	"link-society.com/flowg/api/auth"
 
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/utils/langs/vrl"
@@ -27,7 +27,7 @@ func (ctrl *controller) TestTransformerUsecase() usecase.Interactor {
 	const UnprocessableEntityCode = 422
 
 	u := usecase.NewInteractor(
-		apiUtils.RequireScopeApiDecorator(
+		auth.RequireScopeApiDecorator(
 			ctrl.deps.AuthStorage,
 			models.SCOPE_READ_TRANSFORMERS,
 			func(

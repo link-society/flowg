@@ -7,7 +7,7 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	apiUtils "link-society.com/flowg/internal/utils/api"
+	"link-society.com/flowg/api/auth"
 
 	"link-society.com/flowg/internal/models"
 )
@@ -23,7 +23,7 @@ type TestForwarderResponse struct {
 
 func (ctrl *controller) TestForwarderUsecase() usecase.Interactor {
 	u := usecase.NewInteractor(
-		apiUtils.RequireScopeApiDecorator(
+		auth.RequireScopeApiDecorator(
 			ctrl.deps.AuthStorage,
 			models.SCOPE_WRITE_FORWARDERS,
 			func(

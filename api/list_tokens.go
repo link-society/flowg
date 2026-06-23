@@ -7,7 +7,7 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	apiUtils "link-society.com/flowg/internal/utils/api"
+	"link-society.com/flowg/api/auth"
 )
 
 type ListTokensRequest struct{}
@@ -24,7 +24,7 @@ func (ctrl *controller) ListTokensUsecase() usecase.Interactor {
 			req ListTokensRequest,
 			resp *ListTokensResponse,
 		) error {
-			user := apiUtils.GetContextUser(ctx)
+			user := auth.GetContextUser(ctx)
 
 			tokenUUIDs, err := ctrl.deps.AuthStorage.ListTokens(ctx, user.Name)
 			if err != nil {
