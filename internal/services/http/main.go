@@ -13,6 +13,8 @@ import (
 	"go.uber.org/fx"
 
 	"link-society.com/flowg/api"
+	_ "link-society.com/flowg/api/operations"
+	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/web"
 
 	"link-society.com/flowg/internal/app/logging"
@@ -39,6 +41,7 @@ type handlers struct {
 func NewServer(opts ServerOptions) fx.Option {
 	return fx.Module(
 		"services.http",
+		routing.Module("api.operations"),
 		fx.Provide(fx.Annotate(
 			api.NewHandler,
 			fx.ResultTags(`name:"service-http-api"`),

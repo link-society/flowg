@@ -11,7 +11,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/api"
+	"link-society.com/flowg/api/operations"
 
 	"link-society.com/flowg/internal/utils/client"
 	"link-society.com/flowg/internal/utils/client/flags"
@@ -83,7 +83,7 @@ func NewStreamHistoryCommand() *cobra.Command {
 
 			printer := log.NewPrinter()
 
-			var data api.QueryStreamResponse
+			var data operations.QueryStreamResponse
 
 			if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not decode response: %v\n", err)
