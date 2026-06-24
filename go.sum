@@ -20,8 +20,8 @@ github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.29 h1:RdwIf/CuUsvJX3RgJa
 github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.29/go.mod h1:71wt8W2EgswdZy9Mf9KNnzxZ3TiZlv4caKghPktDOkA=
 github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.30 h1:VTGy885W5DKBxWRUJbym9hytNaYzsyaPkCHGRRMAOhU=
 github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.30/go.mod h1:AS0HycUvJRFvTt613AYDOgO2jzw+00cVSMny8XB3yMY=
-github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.76.0 h1:wdP7t2nMLk/EzDTqVgBuBBvY7I461+kPn2+wUyQSelY=
-github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.76.0/go.mod h1:N336OxQ6TvRbb6V1esVE8PtQFU86YvYaS+lVjsJTmP0=
+github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.78.0 h1:6r+3E3bDRGiPm2x5t0eKy5jkAtWtgpwdCHi2dMaZy1c=
+github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.78.0/go.mod h1:N336OxQ6TvRbb6V1esVE8PtQFU86YvYaS+lVjsJTmP0=
 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.12 h1:ZD2+BSw9vFsNlKYIasSNt3uDbjqqXIBcM13UJv/Lx2k=
 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.12/go.mod h1:Ms4zlcVBbXbiP7EVLhl+lgjvA/a7YphqQ3Ih3174EmI=
 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.29 h1:DRebniUGZ2MqiiIVmQJ04vIXr918hubdHMnarSLEWyU=
@@ -61,8 +61,8 @@ github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkp
 github.com/dustin/go-humanize v1.0.1/go.mod h1:Mu1zIs6XwVuF/gI1OepvI0qD18qycQx+mFykh5fBlto=
 github.com/elastic/elastic-transport-go/v8 v8.9.0 h1:KeT/2P54F0xS0S8Y3Pf+tFDg4HmBgReQMB+BMz8dDAs=
 github.com/elastic/elastic-transport-go/v8 v8.9.0/go.mod h1:ssMTvNS2hwf7CaiGsRRsx4gQHFZ/jS/DkLcISxekWzc=
-github.com/elastic/go-elasticsearch/v9 v9.4.1 h1:pEF8xlnL8D2WdVp4HRHhGNUwC5QHdgk0DZKrJY0WCNs=
-github.com/elastic/go-elasticsearch/v9 v9.4.1/go.mod h1:IKW8WkW++PW8If95XqfMffGjoFrzHCpsKmWgYk5j3fQ=
+github.com/elastic/go-elasticsearch/v9 v9.4.2 h1:94oIfcF5R+OBlhdJFMeF2mcLwDSDKPZOwX3YZebr3X4=
+github.com/elastic/go-elasticsearch/v9 v9.4.2/go.mod h1:IKW8WkW++PW8If95XqfMffGjoFrzHCpsKmWgYk5j3fQ=
 github.com/expr-lang/expr v1.17.8 h1:W1loDTT+0PQf5YteHSTpju2qfUfNoBt4yw9+wOEU9VM=
 github.com/expr-lang/expr v1.17.8/go.mod h1:8/vRC7+7HBzESEqt5kKpYXxrxkr31SaO8r40VO/1IT4=
 github.com/gammazero/deque v1.0.0 h1:LTmimT8H7bXkkCy6gZX7zNLtkbz4NdS2z8LZuor3j34=
