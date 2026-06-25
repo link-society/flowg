@@ -21,6 +21,9 @@ import (
 	"link-society.com/flowg/internal/services/syslog"
 )
 
+// Options configures the FlowG server: the bind addresses and TLS settings of
+// each network service, the on-disk locations of the three storage backends,
+// and the initial/reset credentials applied during bootstrap.
 type Options struct {
 	HttpBindAddress string
 	HttpMountPath   string
@@ -45,6 +48,10 @@ type Options struct {
 	AuthResetPassword string
 }
 
+// NewServer assembles the complete FlowG server as a single fx module. It wires
+// the three storage backends, the engine layer (log notifier and pipeline
+// runner) and the network services (HTTP, management, syslog) together, and
+// registers a bootstrap handler that seeds the default configuration on start.
 func NewServer(opts Options) fx.Option {
 	return fx.Module(
 		"app.server",
