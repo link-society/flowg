@@ -11,7 +11,7 @@ import (
 	"github.com/dgraph-io/badger/v4"
 	badgerOptions "github.com/dgraph-io/badger/v4/options"
 
-	"link-society.com/flowg/internal/app/logging"
+	badgerlog "link-society.com/flowg/internal/storage/backends/badger"
 )
 
 // Storage is a concurrency-safe wrapper around a BadgerDB database.
@@ -80,7 +80,7 @@ func NewStorage(opts Options) fx.Option {
 
 		dbOpts := badger.
 			DefaultOptions(dbDir).
-			WithLogger(&logging.BadgerLogger{Channel: opts.LogChannel}).
+			WithLogger(&badgerlog.BadgerLogger{Channel: opts.LogChannel}).
 			WithCompression(badgerOptions.ZSTD).
 			WithInMemory(opts.InMemory).
 			WithReadOnly(opts.ReadOnly)

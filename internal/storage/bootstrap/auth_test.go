@@ -9,10 +9,10 @@ import (
 	"link-society.com/flowg/internal/models"
 
 	"link-society.com/flowg/internal/storage"
-	"link-society.com/flowg/internal/storage/backends/badger/auth"
+	"link-society.com/flowg/internal/storage/backends/badger/concrete/auth"
 
-	"link-society.com/flowg/internal/app/bootstrap"
-	"link-society.com/flowg/internal/app/logging"
+	"link-society.com/flowg/cmd/flowg-server/logging"
+	"link-society.com/flowg/internal/storage/bootstrap"
 )
 
 func TestDefaultRolesAndUsers(t *testing.T) {

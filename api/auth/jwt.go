@@ -9,7 +9,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 
-	"link-society.com/flowg/internal/storage/backends/badger/auth/secret"
+	"link-society.com/flowg/internal/storage/backends/badger/concrete/auth/secret"
 )
 
 // JWT_SIGNING_KEY is the secret used to sign and verify the JWTs minted by this

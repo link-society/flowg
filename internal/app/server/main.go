@@ -9,9 +9,9 @@ import (
 	"go.uber.org/fx"
 
 	"link-society.com/flowg/internal/storage"
-	"link-society.com/flowg/internal/storage/backends/badger/auth"
-	"link-society.com/flowg/internal/storage/backends/badger/config"
-	"link-society.com/flowg/internal/storage/backends/badger/log"
+	"link-society.com/flowg/internal/storage/backends/badger/concrete/auth"
+	"link-society.com/flowg/internal/storage/backends/badger/concrete/config"
+	"link-society.com/flowg/internal/storage/backends/badger/concrete/log"
 
 	"link-society.com/flowg/internal/engines/lognotify"
 	"link-society.com/flowg/internal/engines/pipelines"

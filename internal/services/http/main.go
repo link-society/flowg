@@ -14,8 +14,6 @@ import (
 
 	"link-society.com/flowg/api"
 	"link-society.com/flowg/web"
-
-	"link-society.com/flowg/internal/app/logging"
 )
 
 type ServerOptions struct {
@@ -62,7 +60,7 @@ func NewServer(opts ServerOptions) fx.Option {
 				),
 				httpServer: &http.Server{
 					Addr:      opts.BindAddress,
-					Handler:   logging.NewMiddleware(rootHandler),
+					Handler:   newLoggingMiddleware(rootHandler),
 					TLSConfig: opts.TlsConfig,
 				},
 			}
