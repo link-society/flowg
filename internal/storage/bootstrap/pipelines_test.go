@@ -7,9 +7,9 @@ import (
 	"go.uber.org/fx/fxtest"
 
 	"link-society.com/flowg/internal/storage"
-	"link-society.com/flowg/internal/storage/backends/badger/config"
+	"link-society.com/flowg/internal/storage/backends/badger/concrete/config"
 
-	"link-society.com/flowg/internal/app/bootstrap"
+	"link-society.com/flowg/internal/storage/bootstrap"
 )
 
 func TestDefaultPipeline(t *testing.T) {

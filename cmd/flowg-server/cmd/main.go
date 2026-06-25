@@ -9,9 +9,10 @@ import (
 	"go.uber.org/fx"
 
 	"link-society.com/flowg/internal/app/featureflags"
-	"link-society.com/flowg/internal/app/logging"
 	"link-society.com/flowg/internal/app/metrics"
 	"link-society.com/flowg/internal/app/server"
+
+	"link-society.com/flowg/cmd/flowg-server/logging"
 )
 
 var ExitCode int = 0

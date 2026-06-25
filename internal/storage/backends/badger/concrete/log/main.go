@@ -13,8 +13,8 @@ import (
 
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage"
+	"link-society.com/flowg/internal/storage/backends/badger/concrete/log/transactions"
 	"link-society.com/flowg/internal/storage/backends/badger/kvstore"
-	"link-society.com/flowg/internal/storage/backends/badger/log/transactions"
 
 	"link-society.com/flowg/internal/utils/langs/filtering"
 )

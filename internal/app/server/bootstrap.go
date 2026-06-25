@@ -7,7 +7,7 @@ import (
 
 	"link-society.com/flowg/internal/storage"
 
-	"link-society.com/flowg/internal/app/bootstrap"
+	"link-society.com/flowg/internal/storage/bootstrap"
 )
 
 type bootstrapHandler struct {

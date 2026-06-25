@@ -1,7 +1,7 @@
 # auth
 
 The package at `internal/storage/backends/badger/auth` implements the
-`AuthStorage` contract from [internal/storage](../../../) on top of
+`AuthStorage` contract from [internal/storage](../../../../) on top of
 [BadgerDB](https://github.com/dgraph-io/badger).
 
 It is the default authentication and authorization backend. It owns the
@@ -12,7 +12,7 @@ identity purely through the `AuthStorage` interface.
 ## Responsibilities
 
 - **Persistence** — stores users, roles and personal access tokens in a
-  dedicated [kvstore](../kvstore), keeping the auth key space isolated from the
+  dedicated [kvstore](../../kvstore), keeping the auth key space isolated from the
   other domains.
 - **Credentials** — verifies passwords and tokens, hashing secrets so plaintext
   is never persisted.

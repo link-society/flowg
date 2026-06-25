@@ -6,11 +6,11 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 
-	"link-society.com/flowg/internal/app/bootstrap"
-	"link-society.com/flowg/internal/app/logging"
+	"link-society.com/flowg/cmd/flowg-server/logging"
+	"link-society.com/flowg/internal/storage/bootstrap"
 
 	"link-society.com/flowg/internal/storage"
-	"link-society.com/flowg/internal/storage/backends/badger/config"
+	"link-society.com/flowg/internal/storage/backends/badger/concrete/config"
 )
 
 func TestDefaultSystemConfig(t *testing.T) {

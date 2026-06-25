@@ -1,7 +1,7 @@
 # log
 
 The package at `internal/storage/backends/badger/log` implements the
-`LogStorage` contract from [internal/storage](../../../) on top of
+`LogStorage` contract from [internal/storage](../../../../) on top of
 [BadgerDB](https://github.com/dgraph-io/badger).
 
 It is the default log backend. It owns the persistence, indexing and querying
@@ -11,7 +11,7 @@ ingestion pipeline and query API never depend on BadgerDB directly.
 ## Responsibilities
 
 - **Ingestion** — appends log records to a stream, persisting them in a
-  dedicated [kvstore](../kvstore).
+  dedicated [kvstore](../../kvstore).
 - **Indexing** — maintains per-field indices so records can be looked up by
   their fields rather than scanned in full.
 - **Querying** — answers bounded, filtered searches over a stream's records.
