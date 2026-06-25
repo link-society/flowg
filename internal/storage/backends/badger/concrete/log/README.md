@@ -26,5 +26,5 @@ ingestion pipeline and query API never depend on BadgerDB directly.
 
 - **main.go** — the `LogStorage` implementation and its `fx` wiring.
 - **gc.go** — the background garbage collection of expired records.
-- **transactions/** — the low-level read/write and indexing operations against
+- **[transactions/](transactions)** — the low-level read/write and indexing operations against
   the key space.

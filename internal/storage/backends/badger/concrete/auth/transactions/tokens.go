@@ -12,6 +12,10 @@ import (
 	"link-society.com/flowg/internal/storage/backends/badger/concrete/auth/secret"
 )
 
+// CreateToken issues a fresh PAT for an existing user. It confirms the user
+// exists through their "index:user:<username>" marker, then stores the token
+// hash under a new "pat:<username>:<uuid>" key and returns the plaintext token
+// (shown to the caller this one time only) along with its UUID.
 func CreateToken(txn *badger.Txn, username string) (string, string, error) {
 	token, err := secret.NewSecret("pat", 32)
 	if err != nil {
@@ -44,6 +48,11 @@ func CreateToken(txn *badger.Txn, username string) (string, string, error) {
 	return token, tokenUuid, nil
 }
 
+// VerifyToken resolves a plaintext token back to its owning user. Tokens are
+// not addressable by their value, so it scans every "pat:" key and bcrypt-
+// compares the candidate against each stored hash; on a match it returns the
+// owning user (the username is the key segment between the "pat:" prefix and the
+// trailing UUID).
 func VerifyToken(txn *badger.Txn, token string) (*models.User, error) {
 	var username string
 	found := false
@@ -89,6 +98,8 @@ func VerifyToken(txn *badger.Txn, token string) (*models.User, error) {
 	return FetchUser(txn, username)
 }
 
+// ListTokens returns the UUIDs of every PAT owned by a user by scanning the
+// "pat:<username>:" prefix. Only the keys are needed, so values are not fetched.
 func ListTokens(txn *badger.Txn, username string) []string {
 	tokenUUIDs := []string{}
 
@@ -106,6 +117,7 @@ func ListTokens(txn *badger.Txn, username string) []string {
 	return tokenUUIDs
 }
 
+// DeleteToken removes a single PAT, identified by its UUID, from a user.
 func DeleteToken(txn *badger.Txn, username string, tokenUUID string) error {
 	key := []byte(fmt.Sprintf("pat:%s:%s", username, tokenUUID))
 	err := txn.Delete(key)

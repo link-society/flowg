@@ -24,4 +24,4 @@ interface so the engines and API never depend on BadgerDB directly.
 
 - **main.go** — the `ConfigStorage` implementation and its `fx` wiring.
 - **migrator.go** — schema migrations applied when the database is opened.
-- **transactions/** — the low-level read/write operations against the key space.
+- **[transactions/](transactions)** — the low-level read/write operations against the key space.

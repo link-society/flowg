@@ -18,6 +18,10 @@ type fieldIndex struct {
 	keyPrefix []byte
 }
 
+// IndexField back-fills the inverted index for an already-populated stream: it
+// scans every record, and for each one records its value of the given field,
+// carrying over the entry's remaining retention so the index key expires with
+// the entry.
 func IndexField(txn *badger.Txn, stream, field string) error {
 	opts := badger.DefaultIteratorOptions
 	opts.PrefetchValues = true
@@ -59,6 +63,8 @@ func IndexField(txn *badger.Txn, stream, field string) error {
 	return nil
 }
 
+// UnindexField drops the entire inverted index for a field by deleting every
+// "index:<stream>:field:<field>:*" key.
 func UnindexField(txn *badger.Txn, stream, field string) error {
 	opts := badger.DefaultIteratorOptions
 	opts.PrefetchValues = false
@@ -77,6 +83,9 @@ func UnindexField(txn *badger.Txn, stream, field string) error {
 	return nil
 }
 
+// Distinct returns, per indexed field, the set of distinct values present in a
+// stream. It reads them straight from the index keys (decoding the base64 value
+// segment) without ever touching the log records themselves.
 func Distinct(txn *badger.Txn, stream string) (map[string][]string, error) {
 	indices := make(map[string][]string)
 	seenValuesPerField := make(map[string]map[string]struct{})
@@ -119,6 +128,8 @@ func Distinct(txn *badger.Txn, stream string) (map[string][]string, error) {
 	return indices, nil
 }
 
+// newFieldIndex builds the index key prefix for one (stream, field, value)
+// triple, base64-encoding the value as it appears in the stored keys.
 func newFieldIndex(txn *badger.Txn, stream, field, value string) *fieldIndex {
 	encodedValue := base64.StdEncoding.EncodeToString([]byte(value))
 
@@ -131,6 +142,8 @@ func newFieldIndex(txn *badger.Txn, stream, field, value string) *fieldIndex {
 	}
 }
 
+// AddKey records that entryKey carries this (stream, field, value), giving the
+// index key the entry's remaining TTL so the two expire together.
 func (index *fieldIndex) AddKey(entryKey []byte, retentionTime int64) error {
 	indexKey := []byte(fmt.Sprintf("%s%s", index.keyPrefix, entryKey))
 	entry := badger.NewEntry(indexKey, []byte{})
@@ -142,6 +155,8 @@ func (index *fieldIndex) AddKey(entryKey []byte, retentionTime int64) error {
 	return index.txn.SetEntry(entry)
 }
 
+// IterKeys yields the entry keys recorded under this (stream, field, value)
+// index prefix.
 func (index *fieldIndex) IterKeys(fn func(key string)) {
 	opts := badger.DefaultIteratorOptions
 	opts.PrefetchValues = false
@@ -156,6 +171,9 @@ func (index *fieldIndex) IterKeys(fn func(key string)) {
 	}
 }
 
+// purgeEntryFromFieldIndex removes every inverted-index reference to a deleted
+// entry by scanning the stream's field index and dropping the keys whose
+// trailing entry-key segment matches it.
 func purgeEntryFromFieldIndex(txn *badger.Txn, stream string, key []byte) error {
 	suffix := fmt.Sprintf(":%s", string(key))
 
@@ -182,6 +200,8 @@ func purgeEntryFromFieldIndex(txn *badger.Txn, stream string, key []byte) error 
 	return nil
 }
 
+// encodeIndexingMap base64-encodes the requested filter values so they line up
+// with how values are encoded inside the index keys.
 func encodeIndexingMap(indexing map[string][]string) map[string][]string {
 	encodedMap := make(map[string][]string, len(indexing))
 
@@ -201,6 +221,10 @@ func encodeIndexingMap(indexing map[string][]string) map[string][]string {
 	return encodedMap
 }
 
+// matchesIndexingForKey reports whether an entry satisfies the requested field
+// filter: for every field the entry must match at least one of the requested
+// values (i.e. the corresponding index key must exist). Values are OR-ed within
+// a field and the fields are AND-ed together.
 func matchesIndexingForKey(
 	txn *badger.Txn,
 	stream string,
