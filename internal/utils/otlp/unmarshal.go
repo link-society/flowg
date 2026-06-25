@@ -9,6 +9,8 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
+// UnmarshalJSON decodes an OTLP/HTTP logs export request encoded as protobuf
+// JSON and converts it into FlowG log records.
 func UnmarshalJSON(body []byte) ([]*models.LogRecord, error) {
 	message := collectlogs.ExportLogsServiceRequest{}
 	err := protojson.Unmarshal(body, &message)
@@ -20,6 +22,8 @@ func UnmarshalJSON(body []byte) ([]*models.LogRecord, error) {
 	return logRecords, nil
 }
 
+// UnmarshalProtobuf decodes an OTLP/HTTP logs export request encoded as binary
+// protobuf and converts it into FlowG log records.
 func UnmarshalProtobuf(body []byte) ([]*models.LogRecord, error) {
 	message := collectlogs.ExportLogsServiceRequest{}
 	err := proto.Unmarshal(body, &message)
