@@ -14,7 +14,6 @@ import (
 	"link-society.com/flowg/api/operations"
 
 	"link-society.com/flowg/cmd/flowg-client/utils"
-	"link-society.com/flowg/internal/utils/timex"
 )
 
 func NewStreamTailCommand() *cobra.Command {
@@ -33,7 +32,7 @@ func NewStreamTailCommand() *cobra.Command {
 		Use:   "tail",
 		Short: "Fetch logs until now",
 		Run: func(cmd *cobra.Command, args []string) {
-			period, err := timex.ParseDuration(opts.period)
+			period, err := utils.ParseDuration(opts.period)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not parse period: %v\n", err)
 				ExitCode = 1
