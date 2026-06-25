@@ -16,6 +16,8 @@ type forwarderStateClickhouseV2 struct {
 	insertQuery string
 }
 
+// ForwarderClickhouseV2 inserts records into a ClickHouse table, creating it on
+// first use. Each record becomes a row of (id, timestamp, fields map).
 type ForwarderClickhouseV2 struct {
 	Type     string `json:"type" enum:"clickhouse" required:"true"`
 	Address  string `json:"address" required:"true" pattern:"^(([a-zA-Z0-9.-]+)|(\\[[0-9A-Fa-f:]+\\])):[0-9]{1,5}$"`

@@ -7,11 +7,17 @@ import (
 	"encoding/json"
 )
 
+// ForwarderV2 is the current forwarder model: a destination a router/forward
+// node can send records to. The concrete destination lives in Config, which is a
+// tagged union of one backend type.
 type ForwarderV2 struct {
 	Version int               `json:"version" default:"2"`
 	Config  ForwarderConfigV2 `json:"config" required:"true"`
 }
 
+// ForwarderConfigV2 is a tagged union: exactly one field is non-nil, selecting
+// the forwarder backend. It marshals to/from the backend's own JSON (discriminated
+// by a "type" field) rather than nesting under the field name.
 type ForwarderConfigV2 struct {
 	Http       *ForwarderHttpV2       `json:"-"`
 	Syslog     *ForwarderSyslogV2     `json:"-"`
@@ -24,6 +30,8 @@ type ForwarderConfigV2 struct {
 	CloudWatch *ForwarderCloudWatchV2 `json:"-"`
 }
 
+// JSONSchemaOneOf advertises every backend variant so the generated OpenAPI
+// schema models Config as a "oneOf".
 func (ForwarderConfigV2) JSONSchemaOneOf() []any {
 	return []any{
 		ForwarderHttpV2{},
@@ -38,6 +46,8 @@ func (ForwarderConfigV2) JSONSchemaOneOf() []any {
 	}
 }
 
+// Init prepares the active backend (e.g. opens a connection pool) before any
+// record is forwarded.
 func (f *ForwarderV2) Init(ctx context.Context) error {
 	switch {
 	case f.Config.Http != nil:
@@ -63,6 +73,7 @@ func (f *ForwarderV2) Init(ctx context.Context) error {
 	}
 }
 
+// Close releases whatever the active backend acquired in Init.
 func (f *ForwarderV2) Close(ctx context.Context) error {
 	switch {
 	case f.Config.Http != nil:
@@ -88,6 +99,7 @@ func (f *ForwarderV2) Close(ctx context.Context) error {
 	}
 }
 
+// Call forwards a single record to the active backend.
 func (f *ForwarderV2) Call(ctx context.Context, record *LogRecord) error {
 	switch {
 	case f.Config.Http != nil:
@@ -113,6 +125,7 @@ func (f *ForwarderV2) Call(ctx context.Context, record *LogRecord) error {
 	}
 }
 
+// MarshalJSON serialises the union as the JSON of whichever backend is set.
 func (cfg *ForwarderConfigV2) MarshalJSON() ([]byte, error) {
 	switch {
 	case cfg.Http != nil:
@@ -147,6 +160,8 @@ func (cfg *ForwarderConfigV2) MarshalJSON() ([]byte, error) {
 	}
 }
 
+// UnmarshalJSON resets the union and decodes into the backend selected by the
+// payload's "type" discriminator.
 func (cfg *ForwarderConfigV2) UnmarshalJSON(data []byte) error {
 	cfg.Http = nil
 	cfg.Syslog = nil

@@ -6,6 +6,9 @@ import (
 	"encoding/json"
 )
 
+// ConvertForwarder decodes a stored forwarder of any supported version and
+// returns it as a ForwarderV2. The boolean reports whether an upgrade happened,
+// so callers can persist the migrated form.
 func ConvertForwarder(content []byte) (*ForwarderV2, bool, error) {
 	var data map[string]any
 	if err := json.Unmarshal(content, &data); err != nil {
@@ -41,6 +44,8 @@ func ConvertForwarder(content []byte) (*ForwarderV2, bool, error) {
 	}
 }
 
+// forwarderFromV1ToV2 upgrades a V1 forwarder to V2 by wrapping its URL and
+// headers in the HTTP backend.
 func forwarderFromV1ToV2(objV1 *ForwarderV1) *ForwarderV2 {
 	return &ForwarderV2{
 		Version: 2,

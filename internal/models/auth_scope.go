@@ -2,6 +2,9 @@ package models
 
 import "fmt"
 
+// Scope is a single, fine-grained permission (e.g. read pipelines, send logs).
+// Scopes are the atomic unit of authorization; roles are sets of them and
+// Permissions are their boolean projection.
 type Scope string
 
 const (
@@ -20,6 +23,8 @@ const (
 	SCOPE_WRITE_SYSTEM_CONFIGURATION Scope = "write_system_configuration"
 )
 
+// ParseScope converts a wire string into a Scope, returning an error for unknown
+// values.
 func ParseScope(s string) (Scope, error) {
 	switch s {
 	case "read_pipelines":
@@ -53,6 +58,7 @@ func ParseScope(s string) (Scope, error) {
 	}
 }
 
+// Enum lists every valid scope; it feeds JSON-schema/OpenAPI enum generation.
 func (s Scope) Enum() []any {
 	return []any{
 		SCOPE_READ_PIPELINES,

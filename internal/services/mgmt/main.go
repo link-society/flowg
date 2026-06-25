@@ -14,15 +14,21 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
+// ServerOptions configures the management server: where to bind and an optional
+// TLS configuration (nil serves plain HTTP).
 type ServerOptions struct {
 	BindAddress string
 	TlsConfig   *tls.Config
 }
 
+// Server is the running management HTTP service.
 type Server struct {
 	httpServer *http.Server
 }
 
+// NewServer returns an fx module exposing the operational endpoints on a
+// separate port: "/health" for liveness, "/metrics" for Prometheus, and (in
+// debug builds) the pprof profiler. It is bound to the application lifecycle.
 func NewServer(opts ServerOptions) fx.Option {
 	logger := slog.Default().With(
 		slog.String("channel", "mgmt"),

@@ -17,6 +17,8 @@ type forwarderStateSyslogV2 struct {
 	messageProg  *vm.Program
 }
 
+// ForwarderSyslogV2 forwards records to a syslog server over TCP or UDP. Tag,
+// severity, facility and message are dynamic fields evaluated per record.
 type ForwarderSyslogV2 struct {
 	Type     string                         `json:"type" enum:"syslog" required:"true"`
 	Network  string                         `json:"network" enum:"tcp,udp" required:"true"`

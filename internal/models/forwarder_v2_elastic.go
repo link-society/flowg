@@ -14,6 +14,8 @@ type forwarderStateElasticV2 struct {
 	client *elasticsearch.Client
 }
 
+// ForwarderElasticV2 indexes records into an Elasticsearch index, optionally
+// trusting a custom CA certificate.
 type ForwarderElasticV2 struct {
 	Type      string   `json:"type" enum:"elastic" required:"true"`
 	Index     string   `json:"index" required:"true" minLength:"1"`

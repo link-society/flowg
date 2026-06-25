@@ -1,5 +1,8 @@
 package models
 
+// Permissions is the boolean, UI-facing view of what an identity is allowed to
+// do. It is derived from a set of Scopes and is what the web UI consumes to show
+// or hide features.
 type Permissions struct {
 	CanViewPipelines bool `json:"can_view_pipelines" required:"true"`
 	CanEditPipelines bool `json:"can_edit_pipelines" required:"true"`
@@ -22,6 +25,8 @@ type Permissions struct {
 	CanWriteSystemConfiguration bool `json:"can_write_system_configuration" required:"true"`
 }
 
+// PermissionsFromScopes projects a flat list of scopes into the Permissions
+// struct, flipping on each capability the scopes grant.
 func PermissionsFromScopes(scopes []Scope) Permissions {
 	permissions := Permissions{}
 	for _, scope := range scopes {

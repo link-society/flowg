@@ -10,12 +10,14 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
+// MockNotifier is a testify mock implementation of LogNotifier for use in tests.
 type MockNotifier struct {
 	mock.Mock
 }
 
 var _ LogNotifier = (*MockNotifier)(nil)
 
+// NewMockNotifier returns a LogNotifier whose calls can be stubbed and asserted.
 func NewMockNotifier() LogNotifier {
 	return &MockNotifier{}
 }

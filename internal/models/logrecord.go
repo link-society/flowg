@@ -11,11 +11,17 @@ import (
 	otlplogmodels "go.opentelemetry.io/proto/otlp/logs/v1"
 )
 
+// LogRecord is the canonical in-memory representation of a log entry throughout
+// FlowG: a timestamp plus a flat map of string fields. Every ingestion source
+// (text, structured, OTLP, syslog) is normalised into this shape before it
+// enters a pipeline.
 type LogRecord struct {
 	Timestamp time.Time         `json:"timestamp" required:"true" format:"date-time"`
 	Fields    map[string]string `json:"fields" required:"true"`
 }
 
+// NewLogRecord builds a record from a field map, stamping it with the current
+// time.
 func NewLogRecord(fields map[string]string) *LogRecord {
 	return &LogRecord{
 		Timestamp: time.Now(),
@@ -23,6 +29,9 @@ func NewLogRecord(fields map[string]string) *LogRecord {
 	}
 }
 
+// NewFromOTLP flattens an OpenTelemetry log record into a LogRecord, promoting
+// the well-known OTLP fields to top-level names and prefixing each attribute
+// with "attr.".
 func NewFromOTLP(logRecord *otlplogmodels.LogRecord) *LogRecord {
 	fields := map[string]string{
 		"severity_number":          logRecord.SeverityNumber.String(),
@@ -47,6 +56,10 @@ func NewFromOTLP(logRecord *otlplogmodels.LogRecord) *LogRecord {
 	}
 }
 
+// NewDbKey builds the time-ordered storage key for the record in a stream:
+// "entry:<stream>:<unix-millis, 20-digit zero-padded>:<uuid>". The padding makes
+// a lexical scan walk the stream in chronological order and the uuid keeps
+// same-millisecond records distinct.
 func (e *LogRecord) NewDbKey(stream string) []byte {
 	return []byte(fmt.Sprintf(
 		"entry:%s:%020d:%s",
@@ -56,6 +69,8 @@ func (e *LogRecord) NewDbKey(stream string) []byte {
 	))
 }
 
+// otlpValueParser renders an arbitrary OTLP AnyValue as a string so it can live
+// in a LogRecord's flat field map.
 func otlpValueParser(v *otlpcommonmodels.AnyValue) string {
 	switch v.Value.(type) {
 	case *otlpcommonmodels.AnyValue_StringValue:
