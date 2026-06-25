@@ -7,6 +7,9 @@ var (
 	pipelineLogCounter *prometheus.CounterVec
 )
 
+// Setup creates the FlowG metrics and registers them with the default
+// Prometheus registry. It must be called once during startup before any of the
+// Inc* helpers are used.
 func Setup() {
 	streamLogCounter = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
@@ -29,10 +32,14 @@ func Setup() {
 	)
 }
 
+// IncStreamLogCounter records that one log record was ingested into the given
+// stream.
 func IncStreamLogCounter(stream string) {
 	streamLogCounter.WithLabelValues(stream).Inc()
 }
 
+// IncPipelineLogCounter records that one log record was processed by the given
+// pipeline, labelling the sample as a success or an error.
 func IncPipelineLogCounter(pipeline string, success bool) {
 	var status string
 	if success {

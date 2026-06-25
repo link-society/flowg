@@ -10,11 +10,12 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/api"
+	"link-society.com/flowg/api/operations"
 
-	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewSystemConfigUpdateCommand builds the "update" command, which updates the system configuration.
 func NewSystemConfigUpdateCommand() *cobra.Command {
 	type options struct {
 		SyslogAllowedOrigins []string
@@ -27,7 +28,7 @@ func NewSystemConfigUpdateCommand() *cobra.Command {
 		Use:   "update",
 		Short: "Update system configuration",
 		Run: func(cmd *cobra.Command, args []string) {
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			url := "/api/v1/system-configuration"
 			req, err := http.NewRequest(http.MethodGet, url, nil)
 			if err != nil {
@@ -50,7 +51,7 @@ func NewSystemConfigUpdateCommand() *cobra.Command {
 				return
 			}
 
-			var data api.GetSystemConfigurationResponse
+			var data operations.GetSystemConfigurationResponse
 			if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not decode response: %v\n", err)
 				ExitCode = 1

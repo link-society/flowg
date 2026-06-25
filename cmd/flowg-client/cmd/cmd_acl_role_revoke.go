@@ -10,12 +10,13 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/api"
+	"link-society.com/flowg/api/operations"
 
+	"link-society.com/flowg/cmd/flowg-client/utils"
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/utils/client"
 )
 
+// NewAclRoleRevokeCommand builds the "revoke" command, which revokes a permission from a role.
 func NewAclRoleRevokeCommand() *cobra.Command {
 	type options struct {
 		name       string
@@ -35,7 +36,7 @@ func NewAclRoleRevokeCommand() *cobra.Command {
 				return
 			}
 
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 
 			url := fmt.Sprintf("/api/v1/roles/%s", opts.name)
 			req, err := http.NewRequest(http.MethodGet, url, nil)
@@ -59,7 +60,7 @@ func NewAclRoleRevokeCommand() *cobra.Command {
 				return
 			}
 
-			var data api.GetRoleResponse
+			var data operations.GetRoleResponse
 			if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not decode response: %v\n", err)
 				ExitCode = 1

@@ -11,31 +11,29 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/api"
+	"link-society.com/flowg/api/operations"
 
-	"link-society.com/flowg/internal/utils/client"
-	"link-society.com/flowg/internal/utils/client/flags"
-	"link-society.com/flowg/internal/utils/client/log"
-	"link-society.com/flowg/internal/utils/timex"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewStreamTailCommand builds the "tail" command, which fetches logs until now.
 func NewStreamTailCommand() *cobra.Command {
 	type options struct {
 		name     string
 		filter   string
 		period   string
-		indexing flags.IndexMap
+		indexing utils.IndexMap
 	}
 
 	opts := &options{
-		indexing: make(flags.IndexMap),
+		indexing: make(utils.IndexMap),
 	}
 
 	cmd := &cobra.Command{
 		Use:   "tail",
 		Short: "Fetch logs until now",
 		Run: func(cmd *cobra.Command, args []string) {
-			period, err := timex.ParseDuration(opts.period)
+			period, err := utils.ParseDuration(opts.period)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not parse period: %v\n", err)
 				ExitCode = 1
@@ -46,7 +44,7 @@ func NewStreamTailCommand() *cobra.Command {
 			from := to.Add(-period)
 
 			url := fmt.Sprintf("/api/v1/streams/%s/logs", opts.name)
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			req, err := http.NewRequest(http.MethodGet, url, nil)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not prepare request: %v\n", err)
@@ -91,9 +89,9 @@ func NewStreamTailCommand() *cobra.Command {
 				return
 			}
 
-			printer := log.NewPrinter()
+			printer := utils.NewPrinter()
 
-			var data api.QueryStreamResponse
+			var data operations.QueryStreamResponse
 
 			if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not decode response: %v\n", err)

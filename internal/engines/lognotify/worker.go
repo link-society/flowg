@@ -9,6 +9,9 @@ import (
 
 type subscriberSet map[actor.MailboxSender[LogMessage]]struct{}
 
+// worker is the single actor that owns the subscriber registry. Keeping all
+// mutations on one goroutine means the per-stream subscriber sets need no
+// locking.
 type worker struct {
 	subscribers map[string]subscriberSet
 	subMbox     actor.MailboxReceiver[SubscribeMessage]
@@ -17,6 +20,10 @@ type worker struct {
 
 var _ actor.Worker = (*worker)(nil)
 
+// DoWork handles one subscription or one broadcast per invocation: it registers
+// new subscribers (wiring their teardown to DoneC) and fans incoming records out
+// to every subscriber of the target stream, logging — but not failing on —
+// individual delivery errors.
 func (w *worker) DoWork(ctx actor.Context) actor.WorkerStatus {
 	select {
 	case <-ctx.Done():

@@ -12,21 +12,20 @@ import (
 
 	"link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/internal/utils/client"
-	"link-society.com/flowg/internal/utils/client/flags"
-	"link-society.com/flowg/internal/utils/client/log"
-	"link-society.com/flowg/internal/utils/client/sse"
+	"link-society.com/flowg/cmd/flowg-client/utils"
+	"link-society.com/flowg/cmd/flowg-client/utils/sse"
 )
 
+// NewStreamWatchCommand builds the "watch" command, which watches logs in real-time.
 func NewStreamWatchCommand() *cobra.Command {
 	type options struct {
 		name     string
 		filter   string
-		indexing flags.IndexMap
+		indexing utils.IndexMap
 	}
 
 	opts := &options{
-		indexing: make(flags.IndexMap),
+		indexing: make(utils.IndexMap),
 	}
 
 	cmd := &cobra.Command{
@@ -34,7 +33,7 @@ func NewStreamWatchCommand() *cobra.Command {
 		Short: "Watch logs in real-time",
 		Run: func(cmd *cobra.Command, args []string) {
 			url := fmt.Sprintf("/api/v1/streams/%s/logs/watch", opts.name)
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			req, err := http.NewRequest(http.MethodGet, url, nil)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not prepare request: %v\n", err)
@@ -75,7 +74,7 @@ func NewStreamWatchCommand() *cobra.Command {
 				return
 			}
 
-			printer := log.NewPrinter()
+			printer := utils.NewPrinter()
 			stream := sse.NewEventStreamReader(resp.Body)
 			for {
 				event, err := stream.Next()

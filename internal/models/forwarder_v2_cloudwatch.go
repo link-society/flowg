@@ -16,6 +16,8 @@ type forwarderStateCloudWatchV2 struct {
 	client *cloudwatchlogs.Client
 }
 
+// ForwarderCloudWatchV2 forwards records to an AWS CloudWatch Logs stream,
+// authenticating with static credentials.
 type ForwarderCloudWatchV2 struct {
 	Type     string `json:"type" enum:"cloudwatch" required:"true"`
 	AppID    string `json:"app_id"`

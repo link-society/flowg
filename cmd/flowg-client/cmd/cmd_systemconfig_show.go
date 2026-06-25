@@ -9,17 +9,18 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/api"
+	"link-society.com/flowg/api/operations"
 
-	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewSystemConfigShowCommand builds the "show" command, which shows the system configuration.
 func NewSystemConfigShowCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "show",
 		Short: "Show system configuration",
 		Run: func(cmd *cobra.Command, args []string) {
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			url := "/api/v1/system-configuration"
 			req, err := http.NewRequest(http.MethodGet, url, nil)
 			if err != nil {
@@ -42,7 +43,7 @@ func NewSystemConfigShowCommand() *cobra.Command {
 				return
 			}
 
-			var data api.GetSystemConfigurationResponse
+			var data operations.GetSystemConfigurationResponse
 			if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not decode response: %v\n", err)
 				ExitCode = 1

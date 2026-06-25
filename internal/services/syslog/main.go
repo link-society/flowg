@@ -12,21 +12,28 @@ import (
 
 	gosyslog "gopkg.in/mcuadros/go-syslog.v2"
 
-	"link-society.com/flowg/internal/storage/config"
+	"link-society.com/flowg/internal/storage"
 
 	"link-society.com/flowg/internal/engines/pipelines"
 )
 
+// ServerOptions configures the syslog server: UDP (default) or TCP, where to
+// bind, and an optional TLS configuration (TCP only).
 type ServerOptions struct {
 	TcpMode     bool
 	BindAddress string
 	TlsConfig   *tls.Config
 }
 
+// Server is the running syslog service: an actor that drains received messages
+// into the pipeline engine.
 type Server struct {
 	actor.Actor
 }
 
+// NewServer returns an fx module that listens for syslog messages (auto-detecting
+// the format) and feeds each one, through the worker actor, into every pipeline's
+// syslog entrypoint. Listener and actor are bound to the application lifecycle.
 func NewServer(opts ServerOptions) fx.Option {
 	proto := "udp"
 	if opts.TcpMode {
@@ -93,7 +100,7 @@ func NewServer(opts ServerOptions) fx.Option {
 		fx.Provide(func(
 			lc fx.Lifecycle,
 			channel gosyslog.LogPartsChannel,
-			configStorage config.Storage,
+			configStorage storage.ConfigStorage,
 			pipelineRunner pipelines.Runner,
 		) *Server {
 			srv := &Server{

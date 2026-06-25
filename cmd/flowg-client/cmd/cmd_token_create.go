@@ -9,17 +9,18 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/api"
+	"link-society.com/flowg/api/operations"
 
-	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewTokenCreateCommand builds the "create" command, which creates Personal Access Tokens.
 func NewTokenCreateCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "create",
 		Short: "Create Personal Access Tokens",
 		Run: func(cmd *cobra.Command, args []string) {
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			url := "/api/v1/token"
 			req, err := http.NewRequest(http.MethodPost, url, nil)
 			if err != nil {
@@ -42,7 +43,7 @@ func NewTokenCreateCommand() *cobra.Command {
 				return
 			}
 
-			var data api.CreateTokenResponse
+			var data operations.CreateTokenResponse
 			if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not decode response: %v\n", err)
 				ExitCode = 1

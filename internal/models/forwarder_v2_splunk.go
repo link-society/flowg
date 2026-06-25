@@ -18,6 +18,8 @@ type forwarderStateSplunkV2 struct {
 	host   *vm.Program
 }
 
+// ForwarderSplunkV2 forwards records to a Splunk HTTP Event Collector. The
+// source and host fields are dynamic fields evaluated per record.
 type ForwarderSplunkV2 struct {
 	Type     string                       `json:"type" enum:"splunk" required:"true"`
 	Endpoint string                       `json:"endpoint" required:"true" format:"uri"`

@@ -9,6 +9,9 @@ import (
 	"link-society.com/flowg/internal/app/server"
 )
 
+// newServerConfig validates the parsed CLI options and turns them into a
+// server.Options, loading the TLS certificates for the services that enable TLS
+// and rejecting unsupported combinations (e.g. TLS over syslog UDP).
 func newServerConfig(opts *options) (server.Options, error) {
 	var (
 		httpTlsConfig   *tls.Config

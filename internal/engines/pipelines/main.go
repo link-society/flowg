@@ -8,15 +8,23 @@ import (
 
 	"link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/internal/storage/config"
-	"link-society.com/flowg/internal/storage/log"
+	"link-society.com/flowg/internal/storage"
 
 	"link-society.com/flowg/internal/engines/lognotify"
 )
 
+// Runner executes pipelines against incoming log records. It is the public entry
+// point of the engine: callers submit a record to a named pipeline and the
+// runner drives it through the pipeline's node graph.
 type Runner interface {
+	// Run pushes a record through pipelineName, starting at entrypoint (e.g.
+	// "direct" or "syslog"), and blocks until processing completes.
 	Run(ctx context.Context, pipelineName string, entrypoint string, record *models.LogRecord) error
+	// InvalidateCachedBuild drops the compiled build of a single pipeline so the
+	// next Run rebuilds it from storage; call it after the pipeline changes.
 	InvalidateCachedBuild(ctx context.Context, pipelineName string) error
+	// InvalidateAllCachedBuilds drops every compiled pipeline, e.g. on shutdown
+	// or after a bulk configuration import.
 	InvalidateAllCachedBuilds(ctx context.Context) error
 }
 
@@ -27,13 +35,16 @@ type runnerImpl struct {
 type deps struct {
 	fx.In
 
-	ConfigStorage config.Storage
-	LogStorage    log.Storage
+	ConfigStorage storage.ConfigStorage
+	LogStorage    storage.LogStorage
 	LogNotifier   lognotify.LogNotifier
 }
 
 var _ Runner = (*runnerImpl)(nil)
 
+// NewRunner returns an fx module providing a Runner backed by a single actor.
+// The actor owns the pipeline build cache; on shutdown every cached build is
+// invalidated (closing forwarders and transformers) before the actor stops.
 func NewRunner() fx.Option {
 	return fx.Module(
 		"pipelineRunner",
@@ -83,6 +94,9 @@ func NewRunner() fx.Option {
 	)
 }
 
+// Run sends a processing request to the actor and waits for the result. The
+// active tracer (if any, set via WithTracer) is forwarded so dry runs can record
+// per-node traces.
 func (r *runnerImpl) Run(
 	ctx context.Context,
 	pipelineName string,
@@ -106,6 +120,8 @@ func (r *runnerImpl) Run(
 	return <-replyTo
 }
 
+// InvalidateCachedBuild asks the actor to evict and close the cached build of a
+// single pipeline.
 func (r *runnerImpl) InvalidateCachedBuild(
 	ctx context.Context,
 	pipelineName string,
@@ -123,6 +139,8 @@ func (r *runnerImpl) InvalidateCachedBuild(
 	return <-replyTo
 }
 
+// InvalidateAllCachedBuilds asks the actor to evict and close every cached
+// pipeline build.
 func (r *runnerImpl) InvalidateAllCachedBuilds(
 	ctx context.Context,
 ) error {

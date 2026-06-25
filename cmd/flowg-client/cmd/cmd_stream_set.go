@@ -10,12 +10,13 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/api"
+	"link-society.com/flowg/api/operations"
 
+	"link-society.com/flowg/cmd/flowg-client/utils"
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/utils/client"
 )
 
+// NewStreamSetCommand builds the "set" command, which sets stream properties.
 func NewStreamSetCommand() *cobra.Command {
 	type options struct {
 		name          string
@@ -30,7 +31,7 @@ func NewStreamSetCommand() *cobra.Command {
 		Short: "Set stream properties",
 		Run: func(cmd *cobra.Command, args []string) {
 			url := fmt.Sprintf("/api/v1/streams/%s", opts.name)
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			req, err := http.NewRequest(http.MethodGet, url, nil)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not prepare request: %v\n", err)
@@ -52,7 +53,7 @@ func NewStreamSetCommand() *cobra.Command {
 				return
 			}
 
-			var data api.GetStreamResponse
+			var data operations.GetStreamResponse
 			if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not decode response: %v\n", err)
 				ExitCode = 1

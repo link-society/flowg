@@ -9,17 +9,18 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/api"
+	"link-society.com/flowg/api/operations"
 
-	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewTransformerListCommand builds the "ls" command, which lists transformers.
 func NewTransformerListCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "ls",
 		Short: "List transformers",
 		Run: func(cmd *cobra.Command, args []string) {
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			url := "/api/v1/transformers"
 			req, err := http.NewRequest(http.MethodGet, url, nil)
 			if err != nil {
@@ -42,7 +43,7 @@ func NewTransformerListCommand() *cobra.Command {
 				return
 			}
 
-			var data api.ListTransformersResponse
+			var data operations.ListTransformersResponse
 			if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not decode response: %v\n", err)
 				ExitCode = 1

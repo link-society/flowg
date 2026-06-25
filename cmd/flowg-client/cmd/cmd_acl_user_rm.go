@@ -8,9 +8,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewAclUserDeleteCommand builds the "rm" command, which removes a user.
 func NewAclUserDeleteCommand() *cobra.Command {
 	type options struct {
 		username string
@@ -22,7 +23,7 @@ func NewAclUserDeleteCommand() *cobra.Command {
 		Use:   "rm",
 		Short: "Remove user",
 		Run: func(cmd *cobra.Command, args []string) {
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			url := fmt.Sprintf("/api/v1/users/%s", opts.username)
 			req, err := http.NewRequest(http.MethodDelete, url, nil)
 			if err != nil {

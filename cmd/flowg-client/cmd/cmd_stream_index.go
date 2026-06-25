@@ -10,14 +10,15 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/api"
+	"link-society.com/flowg/api/operations"
 
 	"slices"
 
+	"link-society.com/flowg/cmd/flowg-client/utils"
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/utils/client"
 )
 
+// NewStreamIndexCommand builds the "index" command, which creates or removes indexed fields for a stream.
 func NewStreamIndexCommand() *cobra.Command {
 	type options struct {
 		name   string
@@ -32,7 +33,7 @@ func NewStreamIndexCommand() *cobra.Command {
 		Short: "Create or remove indexed fields for a stream",
 		Run: func(cmd *cobra.Command, args []string) {
 			url := fmt.Sprintf("/api/v1/streams/%s", opts.name)
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			req, err := http.NewRequest(http.MethodGet, url, nil)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not prepare request: %v\n", err)
@@ -54,7 +55,7 @@ func NewStreamIndexCommand() *cobra.Command {
 				return
 			}
 
-			var data api.GetStreamResponse
+			var data operations.GetStreamResponse
 			if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not decode response: %v\n", err)
 				ExitCode = 1

@@ -8,9 +8,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewTransformerDeleteCommand builds the "rm" command, which deletes a transformer.
 func NewTransformerDeleteCommand() *cobra.Command {
 	type options struct {
 		name string
@@ -22,7 +23,7 @@ func NewTransformerDeleteCommand() *cobra.Command {
 		Use:   "rm",
 		Short: "Delete a transformer",
 		Run: func(cmd *cobra.Command, args []string) {
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			url := fmt.Sprintf("/api/v1/transformers/%s", opts.name)
 			req, err := http.NewRequest(http.MethodDelete, url, nil)
 			if err != nil {

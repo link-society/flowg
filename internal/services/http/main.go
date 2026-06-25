@@ -8,56 +8,56 @@ import (
 
 	"crypto/tls"
 	"net"
-	gohttp "net/http"
+	"net/http"
 
 	"go.uber.org/fx"
 
 	"link-society.com/flowg/api"
 	"link-society.com/flowg/web"
-
-	"link-society.com/flowg/internal/app/logging"
 )
 
+// ServerOptions configures the HTTP server: where to bind, the path everything
+// is mounted under, and an optional TLS configuration (nil serves plain HTTP).
 type ServerOptions struct {
 	BindAddress string
 	MountPath   string
 	TlsConfig   *tls.Config
 }
 
+// Server is the running HTTP service: the standard library server plus its
+// pre-scoped logger.
 type Server struct {
 	logger     *slog.Logger
-	httpServer *gohttp.Server
+	httpServer *http.Server
 }
 
+// handlers collects the API and web handlers provided by their respective fx
+// modules, distinguished by name.
 type handlers struct {
 	fx.In
 
-	ApiHandler gohttp.Handler `name:"service-http-api"`
-	WebHandler gohttp.Handler `name:"service-http-web"`
+	ApiHandler http.Handler `name:"service-http-api"`
+	WebHandler http.Handler `name:"service-http-web"`
 }
 
+// NewServer returns an fx module that mounts the API under "<mount>/api/" and
+// the web UI under "<mount>/web/" (with the root redirecting to the UI), wraps
+// everything in the access-log middleware, and binds the server to the
+// application lifecycle.
 func NewServer(opts ServerOptions) fx.Option {
 	return fx.Module(
 		"services.http",
-		fx.Provide(fx.Annotate(
-			api.NewHandler,
-			fx.ResultTags(`name:"service-http-api"`),
-		)),
-		fx.Provide(fx.Annotate(
-			func() gohttp.Handler {
-				return web.NewHandler(opts.MountPath)
-			},
-			fx.ResultTags(`name:"service-http-web"`),
-		)),
+		api.Module("service-http-api"),
+		web.Module("service-http-web", opts.MountPath),
 		fx.Provide(func(lc fx.Lifecycle, h handlers) *Server {
-			rootHandler := gohttp.NewServeMux()
-			rootHandler.Handle(opts.MountPath+"/api/", gohttp.StripPrefix(opts.MountPath, h.ApiHandler))
-			rootHandler.Handle(opts.MountPath+"/web/", gohttp.StripPrefix(opts.MountPath, h.WebHandler))
+			rootHandler := http.NewServeMux()
+			rootHandler.Handle(opts.MountPath+"/api/", http.StripPrefix(opts.MountPath, h.ApiHandler))
+			rootHandler.Handle(opts.MountPath+"/web/", http.StripPrefix(opts.MountPath, h.WebHandler))
 
 			rootHandler.HandleFunc(
 				"GET "+opts.MountPath+"/{$}",
-				func(w gohttp.ResponseWriter, r *gohttp.Request) {
-					gohttp.Redirect(w, r, opts.MountPath+"/web/", gohttp.StatusPermanentRedirect)
+				func(w http.ResponseWriter, r *http.Request) {
+					http.Redirect(w, r, opts.MountPath+"/web/", http.StatusPermanentRedirect)
 				},
 			)
 
@@ -68,9 +68,9 @@ func NewServer(opts ServerOptions) fx.Option {
 						slog.String("bind", opts.BindAddress),
 					),
 				),
-				httpServer: &gohttp.Server{
+				httpServer: &http.Server{
 					Addr:      opts.BindAddress,
-					Handler:   logging.NewMiddleware(rootHandler),
+					Handler:   newLoggingMiddleware(rootHandler),
 					TLSConfig: opts.TlsConfig,
 				},
 			}

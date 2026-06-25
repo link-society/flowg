@@ -11,17 +11,18 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/api"
+	"link-society.com/flowg/api/operations"
 
-	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewAclUserListCommand builds the "ls" command, which lists all users.
 func NewAclUserListCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "ls",
 		Short: "List all users",
 		Run: func(cmd *cobra.Command, args []string) {
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			url := "/api/v1/users"
 			req, err := http.NewRequest(http.MethodGet, url, nil)
 			if err != nil {
@@ -44,7 +45,7 @@ func NewAclUserListCommand() *cobra.Command {
 				return
 			}
 
-			var data api.ListUsersResponse
+			var data operations.ListUsersResponse
 			if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Failed to decode response: %v\n", err)
 				ExitCode = 1

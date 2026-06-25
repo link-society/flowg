@@ -20,6 +20,8 @@ type forwarderStateAmqpV2 struct {
 	body       *vm.Program
 }
 
+// ForwarderAmqpV2 publishes records to an AMQP (e.g. RabbitMQ) exchange. The
+// exchange, routing key and body are dynamic fields evaluated per record.
 type ForwarderAmqpV2 struct {
 	Type       string                         `json:"type" enum:"amqp" required:"true"`
 	Url        string                         `json:"url" required:"true" format:"uri"`

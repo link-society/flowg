@@ -13,11 +13,12 @@ import (
 	"github.com/google/shlex"
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/api"
+	"link-society.com/flowg/api/operations"
 
-	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewTransformerEditCommand builds the "edit" command, which edits a transformer's code.
 func NewTransformerEditCommand() *cobra.Command {
 	type options struct {
 		name string
@@ -29,7 +30,7 @@ func NewTransformerEditCommand() *cobra.Command {
 		Use:   "edit",
 		Short: "Edit a transformer's code",
 		Run: func(cmd *cobra.Command, args []string) {
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			url := fmt.Sprintf("/api/v1/transformers/%s", opts.name)
 			req, err := http.NewRequest(http.MethodGet, url, nil)
 			if err != nil {
@@ -50,7 +51,7 @@ func NewTransformerEditCommand() *cobra.Command {
 
 			switch resp.StatusCode {
 			case http.StatusOK:
-				var data api.GetTransformerResponse
+				var data operations.GetTransformerResponse
 				if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 					fmt.Fprintf(os.Stderr, "ERROR: Could not decode response: %v\n", err)
 					ExitCode = 1

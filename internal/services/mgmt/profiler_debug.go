@@ -7,6 +7,8 @@ import (
 	"net/http/pprof"
 )
 
+// registerProfiler mounts the net/http/pprof endpoints under "/debug/pprof/".
+// This file is only compiled with the "debug" build tag.
 func registerProfiler(mux *http.ServeMux) {
 	mux.HandleFunc("/debug/pprof/", pprof.Index)
 	mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)

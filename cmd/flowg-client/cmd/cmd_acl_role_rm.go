@@ -8,9 +8,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewAclRoleDeleteCommand builds the "rm" command, which removes a role.
 func NewAclRoleDeleteCommand() *cobra.Command {
 	type options struct {
 		name string
@@ -22,7 +23,7 @@ func NewAclRoleDeleteCommand() *cobra.Command {
 		Use:   "rm",
 		Short: "Remove role",
 		Run: func(cmd *cobra.Command, args []string) {
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			url := fmt.Sprintf("/api/v1/roles/%s", opts.name)
 			req, err := http.NewRequest(http.MethodDelete, url, nil)
 			if err != nil {

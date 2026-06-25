@@ -9,11 +9,12 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/api"
+	"link-society.com/flowg/api/operations"
 
-	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewTransformerCatCommand builds the "cat" command, which prints a transformer's code.
 func NewTransformerCatCommand() *cobra.Command {
 	type options struct {
 		name string
@@ -25,7 +26,7 @@ func NewTransformerCatCommand() *cobra.Command {
 		Use:   "cat",
 		Short: "Print a transformer's code",
 		Run: func(cmd *cobra.Command, args []string) {
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			url := fmt.Sprintf("/api/v1/transformers/%s", opts.name)
 			req, err := http.NewRequest(http.MethodGet, url, nil)
 			if err != nil {
@@ -48,7 +49,7 @@ func NewTransformerCatCommand() *cobra.Command {
 				return
 			}
 
-			var data api.GetTransformerResponse
+			var data operations.GetTransformerResponse
 			if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not decode response: %v\n", err)
 				ExitCode = 1

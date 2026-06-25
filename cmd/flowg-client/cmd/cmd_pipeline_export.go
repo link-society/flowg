@@ -12,11 +12,12 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/api"
+	"link-society.com/flowg/api/operations"
 
-	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewPipelineExportCommand builds the "export" command, which exports a pipeline.
 func NewPipelineExportCommand() *cobra.Command {
 	type options struct {
 		name   string
@@ -38,7 +39,7 @@ func NewPipelineExportCommand() *cobra.Command {
 				return
 			}
 
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			url := fmt.Sprintf("/api/v1/pipelines/%s", opts.name)
 			req, err := http.NewRequest(http.MethodGet, url, nil)
 			if err != nil {
@@ -61,7 +62,7 @@ func NewPipelineExportCommand() *cobra.Command {
 				return
 			}
 
-			var data api.GetPipelineResponse
+			var data operations.GetPipelineResponse
 			if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not decode response: %v\n", err)
 				ExitCode = 1

@@ -16,12 +16,23 @@ import (
 	"github.com/vmihailenco/msgpack/v5"
 )
 
+// ScriptRunner is a compiled VRL (Vector Remap Language) program that can
+// transform log events.
+//
+// It wraps a handle to the Rust implementation through cgo, so it owns native
+// resources: call [ScriptRunner.Close] when done to release them. A runner is
+// not safe for concurrent use; serialize calls or use one runner per goroutine.
 type ScriptRunner struct {
 	ffiObject C.script_runner
 	buffer    bytes.Buffer
 	encoder   *msgpack.Encoder
 }
 
+// NewScriptRunner compiles the given VRL source into a [ScriptRunner].
+//
+// It returns a [*CompileError] if the source fails to compile. The returned
+// runner holds native resources and must be released with
+// [ScriptRunner.Close].
 func NewScriptRunner(source string) (*ScriptRunner, error) {
 	cSource := C.CString(source)
 	defer C.free(unsafe.Pointer(cSource))
@@ -39,6 +50,8 @@ func NewScriptRunner(source string) (*ScriptRunner, error) {
 	return self, nil
 }
 
+// Close releases the native resources held by the runner. It is safe to call
+// more than once.
 func (sr *ScriptRunner) Close() {
 	if sr.ffiObject != nil {
 		C.drop_script_runner(sr.ffiObject)
@@ -46,6 +59,13 @@ func (sr *ScriptRunner) Close() {
 	}
 }
 
+// TransformLog runs the compiled program against a single log event.
+//
+// The event is passed as a flat map of field names to string values. Because a
+// VRL program may emit zero, one or several events, the result is always a
+// slice; nested objects and arrays produced by the program are flattened into
+// dotted field names. It returns a [*EvalError] if the program fails at
+// runtime.
 func (sr *ScriptRunner) TransformLog(logEvent map[string]string) ([]map[string]string, error) {
 	sr.buffer.Reset()
 

@@ -1,4 +1,4 @@
-package middlewares_test
+package middlewares
 
 import (
 	"testing"
@@ -12,30 +12,19 @@ import (
 
 	"github.com/elastic/go-elasticsearch/v9"
 
-	"link-society.com/flowg/internal/engines/lognotify"
 	"link-society.com/flowg/internal/engines/pipelines"
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
-	"link-society.com/flowg/internal/storage/log"
-
-	"link-society.com/flowg/api/middlewares"
+	"link-society.com/flowg/internal/storage"
 )
 
 func TestElasticEndpoint(t *testing.T) {
-	mockAuthStorage := auth.NewMockStorage().(*auth.MockStorage)
-	mockLogStorage := log.NewMockStorage().(*log.MockStorage)
-	mockConfigStorage := config.NewMockStorage().(*config.MockStorage)
-
-	mockLogNotifier := lognotify.NewMockNotifier().(*lognotify.MockNotifier)
+	mockAuthStorage := storage.NewMockAuthStorage().(*storage.MockAuthStorage)
+	mockConfigStorage := storage.NewMockConfigStorage().(*storage.MockConfigStorage)
 	mockPipelineRunner := pipelines.NewMockRunner().(*pipelines.MockRunner)
 
-	deps := &middlewares.Dependencies{
-		AuthStorage:   mockAuthStorage,
-		LogStorage:    mockLogStorage,
-		ConfigStorage: mockConfigStorage,
-
-		LogNotifier:    mockLogNotifier,
+	deps := ElasticDeps{
+		AuthStorage:    mockAuthStorage,
+		ConfigStorage:  mockConfigStorage,
 		PipelineRunner: mockPipelineRunner,
 	}
 
@@ -58,7 +47,7 @@ func TestElasticEndpoint(t *testing.T) {
 	mockPipelineRunner.On("Run", mock.Anything, "test", pipelines.DIRECT_ENTRYPOINT, mock.Anything).
 		Return(nil)
 
-	handler := middlewares.NewHandler(deps)
+	handler := newElasticHandler(deps)
 
 	server := httptest.NewServer(handler)
 	defer server.Close()
@@ -97,9 +86,6 @@ func TestElasticEndpoint(t *testing.T) {
 	}
 
 	mockAuthStorage.AssertExpectations(t)
-	mockLogStorage.AssertExpectations(t)
 	mockConfigStorage.AssertExpectations(t)
-
-	mockLogNotifier.AssertExpectations(t)
 	mockPipelineRunner.AssertExpectations(t)
 }

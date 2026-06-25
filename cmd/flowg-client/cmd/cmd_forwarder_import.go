@@ -13,9 +13,10 @@ import (
 
 	"link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewForwarderImportCommand builds the "import" command, which imports a forwarder.
 func NewForwarderImportCommand() *cobra.Command {
 	type options struct {
 		name string
@@ -60,7 +61,7 @@ func NewForwarderImportCommand() *cobra.Command {
 				return
 			}
 
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			url := fmt.Sprintf("/api/v1/forwarders/%s", opts.name)
 			req, err := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(payload))
 			if err != nil {

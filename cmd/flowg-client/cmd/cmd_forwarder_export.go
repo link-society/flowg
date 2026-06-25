@@ -9,11 +9,12 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/api"
+	"link-society.com/flowg/api/operations"
 
-	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewForwarderExportCommand builds the "export" command, which exports a forwarder.
 func NewForwarderExportCommand() *cobra.Command {
 	type options struct {
 		name string
@@ -25,7 +26,7 @@ func NewForwarderExportCommand() *cobra.Command {
 		Use:   "export",
 		Short: "Export forwarder",
 		Run: func(cmd *cobra.Command, args []string) {
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			url := fmt.Sprintf("/api/v1/forwarders/%s", opts.name)
 			req, err := http.NewRequest(http.MethodGet, url, nil)
 			if err != nil {
@@ -48,7 +49,7 @@ func NewForwarderExportCommand() *cobra.Command {
 				return
 			}
 
-			var data api.GetForwarderResponse
+			var data operations.GetForwarderResponse
 			if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not decode response: %v\n", err)
 				ExitCode = 1

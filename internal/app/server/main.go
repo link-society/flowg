@@ -8,9 +8,10 @@ import (
 
 	"go.uber.org/fx"
 
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
-	"link-society.com/flowg/internal/storage/log"
+	"link-society.com/flowg/internal/storage"
+	"link-society.com/flowg/internal/storage/backends/badger/concrete/auth"
+	"link-society.com/flowg/internal/storage/backends/badger/concrete/config"
+	"link-society.com/flowg/internal/storage/backends/badger/concrete/log"
 
 	"link-society.com/flowg/internal/engines/lognotify"
 	"link-society.com/flowg/internal/engines/pipelines"
@@ -20,6 +21,9 @@ import (
 	"link-society.com/flowg/internal/services/syslog"
 )
 
+// Options configures the FlowG server: the bind addresses and TLS settings of
+// each network service, the on-disk locations of the three storage backends,
+// and the initial/reset credentials applied during bootstrap.
 type Options struct {
 	HttpBindAddress string
 	HttpMountPath   string
@@ -44,6 +48,10 @@ type Options struct {
 	AuthResetPassword string
 }
 
+// NewServer assembles the complete FlowG server as a single fx module. It wires
+// the three storage backends, the engine layer (log notifier and pipeline
+// runner) and the network services (HTTP, management, syslog) together, and
+// registers a bootstrap handler that seeds the default configuration on start.
 func NewServer(opts Options) fx.Option {
 	return fx.Module(
 		"app.server",
@@ -83,9 +91,9 @@ func NewServer(opts Options) fx.Option {
 		}),
 		fx.Provide(func(
 			lc fx.Lifecycle,
-			authStorage auth.Storage,
-			configStorage config.Storage,
-			logStorage log.Storage,
+			authStorage storage.AuthStorage,
+			configStorage storage.ConfigStorage,
+			logStorage storage.LogStorage,
 		) *bootstrapHandler {
 			h := &bootstrapHandler{
 				logger:                      slog.Default().With(slog.String("channel", "bootstrap")),
@@ -110,9 +118,9 @@ func NewServer(opts Options) fx.Option {
 			fx.In
 
 			// Storage layer
-			AuthStorage   auth.Storage
-			ConfigStorage config.Storage
-			LogStorage    log.Storage
+			AuthStorage   storage.AuthStorage
+			ConfigStorage storage.ConfigStorage
+			LogStorage    storage.LogStorage
 			// Engine layer
 			LogNotifier     lognotify.LogNotifier
 			PipelinesRunner pipelines.Runner

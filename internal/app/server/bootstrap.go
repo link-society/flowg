@@ -5,17 +5,19 @@ import (
 	"fmt"
 	"log/slog"
 
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
+	"link-society.com/flowg/internal/storage"
 
-	"link-society.com/flowg/internal/app/bootstrap"
+	"link-society.com/flowg/internal/storage/bootstrap"
 )
 
+// bootstrapHandler seeds a fresh (or upgraded) instance on startup: it applies
+// the default system configuration, roles and users, and pipeline, and performs
+// the optional admin-credential reset requested through the CLI.
 type bootstrapHandler struct {
 	logger *slog.Logger
 
-	authStorage   auth.Storage
-	configStorage config.Storage
+	authStorage   storage.AuthStorage
+	configStorage storage.ConfigStorage
 
 	initialSyslogAllowedOrigins []string
 
@@ -26,6 +28,9 @@ type bootstrapHandler struct {
 	resetPassword string
 }
 
+// Run applies all bootstrap steps in order: default system configuration,
+// default roles and users, default pipeline, and the optional user-password
+// reset. It is invoked from the module's OnStart lifecycle hook.
 func (h *bootstrapHandler) Run(ctx context.Context) error {
 	err := bootstrap.DefaultSystemConfig(ctx, h.configStorage, bootstrap.BootstrapSystemOptions{
 		InitialSyslogAllowedOrigins: h.initialSyslogAllowedOrigins,

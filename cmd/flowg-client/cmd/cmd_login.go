@@ -15,10 +15,11 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 
-	"link-society.com/flowg/api"
-	"link-society.com/flowg/internal/utils/client"
+	"link-society.com/flowg/api/operations"
+	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewLoginCommand builds the "login" command, which gets a temporary JSON Web Token for authentication.
 func NewLoginCommand() *cobra.Command {
 	type options struct {
 		username string
@@ -69,7 +70,7 @@ func NewLoginCommand() *cobra.Command {
 				return
 			}
 
-			client := cmd.Context().Value(ApiClient).(*client.Client)
+			client := cmd.Context().Value(ApiClient).(*utils.Client)
 			url := "/api/v1/auth/login"
 			req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(payload))
 			if err != nil {
@@ -92,7 +93,7 @@ func NewLoginCommand() *cobra.Command {
 				return
 			}
 
-			var data api.LoginResponse
+			var data operations.LoginResponse
 			if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Failed to decode response: %v\n", err)
 				ExitCode = 1
