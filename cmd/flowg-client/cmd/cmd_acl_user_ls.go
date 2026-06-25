@@ -16,6 +16,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewAclUserListCommand builds the "ls" command, which lists all users.
 func NewAclUserListCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "ls",

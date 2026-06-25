@@ -16,6 +16,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewStreamTailCommand builds the "tail" command, which fetches logs until now.
 func NewStreamTailCommand() *cobra.Command {
 	type options struct {
 		name     string

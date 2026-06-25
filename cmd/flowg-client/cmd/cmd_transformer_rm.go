@@ -11,6 +11,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewTransformerDeleteCommand builds the "rm" command, which deletes a transformer.
 func NewTransformerDeleteCommand() *cobra.Command {
 	type options struct {
 		name string

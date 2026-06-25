@@ -16,6 +16,7 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
+// NewStreamSetCommand builds the "set" command, which sets stream properties.
 func NewStreamSetCommand() *cobra.Command {
 	type options struct {
 		name          string

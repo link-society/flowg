@@ -17,6 +17,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewPipelineExportCommand builds the "export" command, which exports a pipeline.
 func NewPipelineExportCommand() *cobra.Command {
 	type options struct {
 		name   string

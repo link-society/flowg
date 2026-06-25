@@ -11,6 +11,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewTokenRevokeCommand builds the "revoke" command, which revokes a Personal Access Token.
 func NewTokenRevokeCommand() *cobra.Command {
 	type options struct {
 		uuid string

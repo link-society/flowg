@@ -19,6 +19,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewLoginCommand builds the "login" command, which gets a temporary JSON Web Token for authentication.
 func NewLoginCommand() *cobra.Command {
 	type options struct {
 		username string

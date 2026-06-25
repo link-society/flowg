@@ -13,6 +13,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewAclUserAddCommand builds the "add" command, which adds a new user.
 func NewAclUserAddCommand() *cobra.Command {
 	type options struct {
 		username string

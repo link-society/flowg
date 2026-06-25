@@ -14,6 +14,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewAdminRestoreCommand builds the "restore" command, which restores FlowG data.
 func NewAdminRestoreCommand() *cobra.Command {
 	type options struct {
 		src string

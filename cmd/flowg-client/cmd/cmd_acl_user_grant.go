@@ -15,6 +15,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewAclUserGrantCommand builds the "grant" command, which grants a role to a user.
 func NewAclUserGrantCommand() *cobra.Command {
 	type options struct {
 		username string

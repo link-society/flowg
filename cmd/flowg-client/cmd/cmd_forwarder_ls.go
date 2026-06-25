@@ -14,6 +14,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewForwarderListCommand builds the "ls" command, which lists forwarders.
 func NewForwarderListCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "ls",

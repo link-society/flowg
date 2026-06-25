@@ -14,6 +14,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewAdminBackupCommand builds the "backup" command, which backs up FlowG data.
 func NewAdminBackupCommand() *cobra.Command {
 	type options struct {
 		dest string

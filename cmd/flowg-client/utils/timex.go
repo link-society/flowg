@@ -18,6 +18,8 @@ var unitMap = map[string]time.Duration{
 	"y":  365 * 24 * 60 * 60 * 1e9,
 }
 
+// ParseDuration parses a duration string consisting of a number followed by a
+// unit (ns, us/µs, ms, s, m, h, d, w, y) into a time.Duration; an empty string yields 0.
 func ParseDuration(s string) (time.Duration, error) {
 	if s == "" {
 		return 0, nil

@@ -16,6 +16,7 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
+// NewAclRoleGrantCommand builds the "grant" command, which grants a permission to a role.
 func NewAclRoleGrantCommand() *cobra.Command {
 	type options struct {
 		name       string

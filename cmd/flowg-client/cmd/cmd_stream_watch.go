@@ -16,6 +16,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils/sse"
 )
 
+// NewStreamWatchCommand builds the "watch" command, which watches logs in real-time.
 func NewStreamWatchCommand() *cobra.Command {
 	type options struct {
 		name     string

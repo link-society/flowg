@@ -13,6 +13,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewAclRoleAddCommand builds the "add" command, which adds a new role.
 func NewAclRoleAddCommand() *cobra.Command {
 	type options struct {
 		name string

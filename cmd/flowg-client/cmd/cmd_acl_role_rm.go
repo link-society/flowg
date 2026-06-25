@@ -11,6 +11,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewAclRoleDeleteCommand builds the "rm" command, which removes a role.
 func NewAclRoleDeleteCommand() *cobra.Command {
 	type options struct {
 		name string

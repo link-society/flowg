@@ -16,6 +16,7 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
+// NewAclRoleRevokeCommand builds the "revoke" command, which revokes a permission from a role.
 func NewAclRoleRevokeCommand() *cobra.Command {
 	type options struct {
 		name       string

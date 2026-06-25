@@ -4,6 +4,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// options holds the raw CLI flag values for flowg-server: the bind addresses,
+// TLS settings and mount path of each service, the storage directories, the
+// logging controls, and the initial/reset admin credentials.
 type options struct {
 	demoMode bool
 
@@ -40,6 +43,8 @@ type options struct {
 	authResetPassword string
 }
 
+// defineCliOptions registers every flowg-server flag on cmd, each defaulting to
+// its corresponding environment variable.
 func (opts *options) defineCliOptions(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(
 		&opts.demoMode,
