@@ -16,14 +16,14 @@ import (
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/internal/models"
 
-	authStorage "link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage"
 )
 
 // WhoamiDeps lists the dependencies of [NewWhoamiUsecase].
 type WhoamiDeps struct {
 	fx.In
 
-	AuthStorage authStorage.Storage
+	AuthStorage storage.AuthStorage
 }
 
 // WhoamiRequest is empty: the caller is identified by their credentials.

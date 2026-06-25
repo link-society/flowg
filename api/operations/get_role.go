@@ -16,14 +16,14 @@ import (
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/internal/models"
 
-	authStorage "link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage"
 )
 
 // GetRoleDeps lists the dependencies of [NewGetRoleUsecase].
 type GetRoleDeps struct {
 	fx.In
 
-	AuthStorage authStorage.Storage
+	AuthStorage storage.AuthStorage
 }
 
 // GetRoleRequest identifies the role to retrieve.

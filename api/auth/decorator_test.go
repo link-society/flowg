@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"link-society.com/flowg/internal/models"
-	authStorage "link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage"
 
 	"link-society.com/flowg/api/auth"
 )
@@ -26,7 +26,7 @@ func authorizedContext() context.Context {
 func TestRequireScopeAllowsAuthorizedCaller(t *testing.T) {
 	// Contract: when the caller holds the scope, next is invoked and its
 	// result is returned unchanged.
-	mockStorage := authStorage.NewMockStorage().(*authStorage.MockStorage)
+	mockStorage := storage.NewMockAuthStorage().(*storage.MockAuthStorage)
 	mockStorage.On(
 		"VerifyUserPermission",
 		mock.Anything, "alice", models.SCOPE_READ_PIPELINES,
@@ -52,7 +52,7 @@ func TestRequireScopeAllowsAuthorizedCaller(t *testing.T) {
 func TestRequireScopeRejectsUnauthorizedCaller(t *testing.T) {
 	// Contract: when the caller lacks the scope, next is not invoked and an
 	// error is returned.
-	mockStorage := authStorage.NewMockStorage().(*authStorage.MockStorage)
+	mockStorage := storage.NewMockAuthStorage().(*storage.MockAuthStorage)
 	mockStorage.On(
 		"VerifyUserPermission",
 		mock.Anything, "alice", models.SCOPE_READ_PIPELINES,
@@ -76,7 +76,7 @@ func TestRequireScopeRejectsUnauthorizedCaller(t *testing.T) {
 func TestRequireScopeForwardsLookupFailure(t *testing.T) {
 	// Contract: when permission resolution fails, the error is surfaced and
 	// next is not invoked.
-	mockStorage := authStorage.NewMockStorage().(*authStorage.MockStorage)
+	mockStorage := storage.NewMockAuthStorage().(*storage.MockAuthStorage)
 	mockStorage.On(
 		"VerifyUserPermission",
 		mock.Anything, "alice", models.SCOPE_READ_PIPELINES,
@@ -100,7 +100,7 @@ func TestRequireScopeForwardsLookupFailure(t *testing.T) {
 func TestRequireScopesWithoutScopesRunsNextUnchanged(t *testing.T) {
 	// Contract: an empty scope list imposes no requirement; next runs and no
 	// permission lookups are performed.
-	mockStorage := authStorage.NewMockStorage().(*authStorage.MockStorage)
+	mockStorage := storage.NewMockAuthStorage().(*storage.MockAuthStorage)
 
 	called := false
 	next := func(ctx context.Context, r req, w *resp) error {
@@ -121,7 +121,7 @@ func TestRequireScopesWithoutScopesRunsNextUnchanged(t *testing.T) {
 func TestRequireScopesRequiresEveryScope(t *testing.T) {
 	// Contract: authorization is conjunctive; next runs only when all scopes
 	// are satisfied.
-	mockStorage := authStorage.NewMockStorage().(*authStorage.MockStorage)
+	mockStorage := storage.NewMockAuthStorage().(*storage.MockAuthStorage)
 	mockStorage.On(
 		"VerifyUserPermission",
 		mock.Anything, "alice", models.SCOPE_READ_PIPELINES,
@@ -152,7 +152,7 @@ func TestRequireScopesRequiresEveryScope(t *testing.T) {
 func TestRequireScopesRejectsWhenOneScopeMissing(t *testing.T) {
 	// Contract: a single missing scope short-circuits and prevents next from
 	// running.
-	mockStorage := authStorage.NewMockStorage().(*authStorage.MockStorage)
+	mockStorage := storage.NewMockAuthStorage().(*storage.MockAuthStorage)
 	mockStorage.On(
 		"VerifyUserPermission",
 		mock.Anything, "alice", models.SCOPE_READ_PIPELINES,

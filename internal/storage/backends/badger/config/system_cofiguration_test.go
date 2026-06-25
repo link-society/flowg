@@ -5,6 +5,8 @@ import (
 
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
+
+	"link-society.com/flowg/internal/storage"
 )
 
 func TestReadSystemConfig(t *testing.T) {
@@ -13,7 +15,7 @@ func TestReadSystemConfig(t *testing.T) {
 	confOpts := DefaultOptions()
 	confOpts.InMemory = true
 
-	var confStorage Storage
+	var confStorage storage.ConfigStorage
 
 	app := fxtest.New(
 		t,

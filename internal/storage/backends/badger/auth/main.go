@@ -12,34 +12,11 @@ import (
 
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage"
-	"link-society.com/flowg/internal/storage/auth/transactions"
-	"link-society.com/flowg/internal/utils/kvstore"
+	"link-society.com/flowg/internal/storage/backends/badger/auth/transactions"
+	"link-society.com/flowg/internal/storage/backends/badger/kvstore"
 )
 
-type Storage interface {
-	storage.Streamable
-
-	ListRoles(ctx context.Context) ([]models.Role, error)
-	FetchRole(ctx context.Context, name string) (*models.Role, error)
-	SaveRole(ctx context.Context, role models.Role) error
-	DeleteRole(ctx context.Context, name string) error
-
-	ListUsers(ctx context.Context) ([]models.User, error)
-	FetchUser(ctx context.Context, name string) (*models.User, error)
-	ListUserScopes(ctx context.Context, name string) ([]models.Scope, error)
-	SaveUser(ctx context.Context, user models.User, password string) error
-	PatchUserRoles(ctx context.Context, user models.User) error
-	DeleteUser(ctx context.Context, name string) error
-
-	VerifyUserPassword(ctx context.Context, name, password string) (bool, error)
-	VerifyUserPermission(ctx context.Context, username string, scope models.Scope) (bool, error)
-
-	CreateToken(ctx context.Context, username string) (string, string, error)
-	VerifyToken(ctx context.Context, token string) (*models.User, error)
-	ListTokens(ctx context.Context, username string) ([]string, error)
-	DeleteToken(ctx context.Context, username string, tokenUUID string) error
-}
-
+// Options configures the badger-backed authentication storage.
 type Options struct {
 	Directory string
 	InMemory  bool
@@ -56,8 +33,9 @@ type deps struct {
 	S kvstore.Storage `name:"storage.auth"`
 }
 
-var _ Storage = (*storageImpl)(nil)
+var _ storage.AuthStorage = (*storageImpl)(nil)
 
+// DefaultOptions returns the default [Options] for the authentication storage.
 func DefaultOptions() Options {
 	return Options{
 		Directory: "",
@@ -66,6 +44,8 @@ func DefaultOptions() Options {
 	}
 }
 
+// NewStorage returns an fx module providing a badger-backed
+// [storage.AuthStorage] configured with the given options.
 func NewStorage(opts Options) fx.Option {
 	kvOpts := kvstore.DefaultOptions()
 	kvOpts.LogChannel = "storage.auth"
@@ -76,12 +56,12 @@ func NewStorage(opts Options) fx.Option {
 	return fx.Module(
 		"storage.auth",
 		kvstore.NewStorage(kvOpts),
-		fx.Provide(func(lc fx.Lifecycle, d deps) Storage {
-			storage := &storageImpl{kvStore: d.S}
+		fx.Provide(func(lc fx.Lifecycle, d deps) storage.AuthStorage {
+			impl := &storageImpl{kvStore: d.S}
 
 			lc.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {
-					if err := migrateAlertScopes(ctx, storage.kvStore); err != nil {
+					if err := migrateAlertScopes(ctx, impl.kvStore); err != nil {
 						return fmt.Errorf("failed to migrate alerts: %w", err)
 					}
 
@@ -89,7 +69,7 @@ func NewStorage(opts Options) fx.Option {
 				},
 			})
 
-			return storage
+			return impl
 		}),
 	)
 }

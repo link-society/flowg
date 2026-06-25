@@ -17,14 +17,14 @@ import (
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/internal/models"
 
-	authStorage "link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage"
 )
 
 // BackupAuthDeps lists the dependencies of [NewBackupAuthUsecase].
 type BackupAuthDeps struct {
 	fx.In
 
-	AuthStorage authStorage.Storage
+	AuthStorage storage.AuthStorage
 }
 
 // BackupAuthRequest is empty: the whole authentication database is exported.

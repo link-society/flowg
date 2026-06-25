@@ -16,14 +16,14 @@ import (
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/internal/models"
 
-	authStorage "link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage"
 )
 
 // PatchUserRolesDeps lists the dependencies of [NewPatchUserRolesUsecase].
 type PatchUserRolesDeps struct {
 	fx.In
 
-	AuthStorage authStorage.Storage
+	AuthStorage storage.AuthStorage
 }
 
 // PatchUserRolesRequest carries the user and the roles to assign it.

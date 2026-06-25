@@ -8,8 +8,7 @@ import (
 
 	"link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/internal/storage/config"
-	"link-society.com/flowg/internal/storage/log"
+	"link-society.com/flowg/internal/storage"
 
 	"link-society.com/flowg/internal/engines/lognotify"
 )
@@ -27,8 +26,8 @@ type runnerImpl struct {
 type deps struct {
 	fx.In
 
-	ConfigStorage config.Storage
-	LogStorage    log.Storage
+	ConfigStorage storage.ConfigStorage
+	LogStorage    storage.LogStorage
 	LogNotifier   lognotify.LogNotifier
 }
 

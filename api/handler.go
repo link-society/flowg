@@ -17,7 +17,7 @@ import (
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/internal/app"
 
-	authStorage "link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage"
 )
 
 // handlerParams gathers everything [NewHandler] needs from the
@@ -27,7 +27,7 @@ import (
 type handlerParams struct {
 	fx.In
 
-	AuthStorage authStorage.Storage
+	AuthStorage storage.AuthStorage
 
 	Operations  []routing.Operation  `group:"operations"`
 	Middlewares []routing.Middleware `group:"middlewares"`

@@ -5,14 +5,14 @@ import (
 	"fmt"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/config"
+	"link-society.com/flowg/internal/storage"
 )
 
 type BootstrapSystemOptions struct {
 	InitialSyslogAllowedOrigins []string
 }
 
-func DefaultSystemConfig(ctx context.Context, configStorage config.Storage, opts BootstrapSystemOptions) error {
+func DefaultSystemConfig(ctx context.Context, configStorage storage.ConfigStorage, opts BootstrapSystemOptions) error {
 	hasConfig, err := configStorage.HasSystemConfig(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to check if system config exists: %w", err)

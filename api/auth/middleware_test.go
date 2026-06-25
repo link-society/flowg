@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"link-society.com/flowg/internal/models"
-	authStorage "link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage"
 
 	"link-society.com/flowg/api/auth"
 )
@@ -25,7 +25,7 @@ func newCapturingHandler(captured **models.User) http.Handler {
 func TestApiMiddlewareRejectsMissingCredential(t *testing.T) {
 	// Contract: a request without an Authorization header never reaches the
 	// next handler and is answered with an Unauthenticated status.
-	mockStorage := authStorage.NewMockStorage().(*authStorage.MockStorage)
+	mockStorage := storage.NewMockAuthStorage().(*storage.MockAuthStorage)
 
 	nextCalled := false
 	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -45,7 +45,7 @@ func TestApiMiddlewareRejectsMissingCredential(t *testing.T) {
 func TestApiMiddlewareAuthenticatesPersonalAccessToken(t *testing.T) {
 	// Contract: a valid personal access token resolves the user and binds it
 	// to the context handed to the next handler.
-	mockStorage := authStorage.NewMockStorage().(*authStorage.MockStorage)
+	mockStorage := storage.NewMockAuthStorage().(*storage.MockAuthStorage)
 	user := &models.User{Name: "alice", Roles: []string{"admin"}}
 	mockStorage.On("VerifyToken", mock.Anything, "pat_secret").
 		Return(user, nil)
@@ -67,7 +67,7 @@ func TestApiMiddlewareAuthenticatesPersonalAccessToken(t *testing.T) {
 func TestApiMiddlewareRejectsUnknownPersonalAccessToken(t *testing.T) {
 	// Contract: a personal access token that resolves to no user is treated
 	// as invalid and stops the chain.
-	mockStorage := authStorage.NewMockStorage().(*authStorage.MockStorage)
+	mockStorage := storage.NewMockAuthStorage().(*storage.MockAuthStorage)
 	mockStorage.On("VerifyToken", mock.Anything, "pat_unknown").
 		Return((*models.User)(nil), nil)
 
@@ -89,7 +89,7 @@ func TestApiMiddlewareRejectsUnknownPersonalAccessToken(t *testing.T) {
 func TestApiMiddlewareAuthenticatesJWT(t *testing.T) {
 	// Contract: a valid JWT resolves the subject through the user store and
 	// binds the user to the context handed to the next handler.
-	mockStorage := authStorage.NewMockStorage().(*authStorage.MockStorage)
+	mockStorage := storage.NewMockAuthStorage().(*storage.MockAuthStorage)
 	user := &models.User{Name: "bob", Roles: []string{"reader"}}
 	mockStorage.On("FetchUser", mock.Anything, "bob").
 		Return(user, nil)
@@ -113,7 +113,7 @@ func TestApiMiddlewareAuthenticatesJWT(t *testing.T) {
 
 func TestApiMiddlewareRejectsUnknownScheme(t *testing.T) {
 	// Contract: a credential that matches no supported scheme is rejected.
-	mockStorage := authStorage.NewMockStorage().(*authStorage.MockStorage)
+	mockStorage := storage.NewMockAuthStorage().(*storage.MockAuthStorage)
 
 	nextCalled := false
 	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

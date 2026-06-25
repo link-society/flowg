@@ -16,14 +16,14 @@ import (
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/internal/models"
 
-	authStorage "link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage"
 )
 
 // DeleteRoleDeps lists the dependencies of [NewDeleteRoleUsecase].
 type DeleteRoleDeps struct {
 	fx.In
 
-	AuthStorage authStorage.Storage
+	AuthStorage storage.AuthStorage
 }
 
 // DeleteRoleRequest identifies the role to remove.

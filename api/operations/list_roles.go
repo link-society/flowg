@@ -16,14 +16,14 @@ import (
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/internal/models"
 
-	authStorage "link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage"
 )
 
 // ListRolesDeps lists the dependencies of [NewListRolesUsecase].
 type ListRolesDeps struct {
 	fx.In
 
-	AuthStorage authStorage.Storage
+	AuthStorage storage.AuthStorage
 }
 
 // ListRolesRequest is empty: listing roles takes no parameters.

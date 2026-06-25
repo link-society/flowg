@@ -16,16 +16,15 @@ import (
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/internal/models"
 
-	authStorage "link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/log"
+	"link-society.com/flowg/internal/storage"
 )
 
 // GetStreamUsageDeps lists the dependencies of [NewGetStreamUsageUsecase].
 type GetStreamUsageDeps struct {
 	fx.In
 
-	AuthStorage authStorage.Storage
-	LogStorage  log.Storage
+	AuthStorage storage.AuthStorage
+	LogStorage  storage.LogStorage
 }
 
 // GetStreamUsageRequest identifies the stream whose disk usage is requested.

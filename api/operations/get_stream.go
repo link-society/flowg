@@ -16,16 +16,15 @@ import (
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/internal/models"
 
-	authStorage "link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/log"
+	"link-society.com/flowg/internal/storage"
 )
 
 // GetStreamDeps lists the dependencies of [NewGetStreamUsecase].
 type GetStreamDeps struct {
 	fx.In
 
-	AuthStorage authStorage.Storage
-	LogStorage  log.Storage
+	AuthStorage storage.AuthStorage
+	LogStorage  storage.LogStorage
 }
 
 // GetStreamRequest identifies the stream whose configuration is requested.

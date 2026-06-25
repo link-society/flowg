@@ -14,19 +14,37 @@ import (
 	"link-society.com/flowg/internal/app/logging"
 )
 
+// Storage is a concurrency-safe wrapper around a BadgerDB database.
+//
+// All access goes through an actor mailbox, so transactions issued from
+// different goroutines are serialized onto a single worker. This keeps the
+// higher-level storage backends free of locking concerns while still allowing
+// them to share one underlying database.
 type Storage interface {
 	actor.Actor
 
+	// Backup streams an incremental snapshot of the database to w, returning the
+	// version up to which data was written so it can be passed as since on a
+	// subsequent call.
 	Backup(ctx context.Context, w io.Writer, since uint64) (uint64, error)
+	// Restore loads a snapshot previously produced by Backup from r.
 	Restore(ctx context.Context, r io.Reader) error
+	// View runs txnFn inside a read-only transaction.
 	View(ctx context.Context, txnFn func(txn *badger.Txn) error) error
+	// Update runs txnFn inside a read-write transaction.
 	Update(ctx context.Context, txnFn func(txn *badger.Txn) error) error
 }
+
+// Options configures how the underlying BadgerDB database is opened.
 type Options struct {
+	// LogChannel names the logging channel and the fx module the store lives in.
 	LogChannel string
-	Directory  string
-	InMemory   bool
-	ReadOnly   bool
+	// Directory is the on-disk location of the database; ignored when InMemory.
+	Directory string
+	// InMemory keeps the whole database in memory, useful for tests.
+	InMemory bool
+	// ReadOnly opens the database without allowing writes.
+	ReadOnly bool
 }
 type storageImpl struct {
 	actor.Actor
@@ -36,6 +54,8 @@ type storageImpl struct {
 
 var _ Storage = (*storageImpl)(nil)
 
+// DefaultOptions returns the baseline [Options] used when a caller does not
+// override them: an on-disk store logging on the "kv" channel.
 func DefaultOptions() Options {
 	return Options{
 		LogChannel: "kv",
@@ -45,6 +65,12 @@ func DefaultOptions() Options {
 	}
 }
 
+// NewStorage builds an fx module that provides a [Storage] backed by BadgerDB.
+//
+// The module wires together the database handle, the actor mailbox and the
+// worker that drains it, binding their lifecycles to the fx application. The
+// resulting [Storage] is published under the name given by Options.LogChannel
+// so several stores can coexist in the same container.
 func NewStorage(opts Options) fx.Option {
 	makeDB := func(lc fx.Lifecycle) (*badger.DB, error) {
 		var dbDir string
@@ -151,6 +177,7 @@ func NewStorage(opts Options) fx.Option {
 	)
 }
 
+// Backup implements [Storage.Backup].
 func (kv *storageImpl) Backup(
 	ctx context.Context,
 	w io.Writer,
@@ -178,6 +205,7 @@ func (kv *storageImpl) Backup(
 	return op.since, nil
 }
 
+// Restore implements [Storage.Restore].
 func (kv *storageImpl) Restore(
 	ctx context.Context,
 	r io.Reader,
@@ -198,6 +226,7 @@ func (kv *storageImpl) Restore(
 	return <-replyTo
 }
 
+// View implements [Storage.View].
 func (kv *storageImpl) View(
 	ctx context.Context,
 	txnFn func(txn *badger.Txn) error,
@@ -218,6 +247,7 @@ func (kv *storageImpl) View(
 	return <-replyTo
 }
 
+// Update implements [Storage.Update].
 func (kv *storageImpl) Update(
 	ctx context.Context,
 	txnFn func(txn *badger.Txn) error,

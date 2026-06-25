@@ -8,7 +8,7 @@ import (
 
 	"github.com/dgraph-io/badger/v4"
 
-	"link-society.com/flowg/internal/utils/kvstore"
+	"link-society.com/flowg/internal/storage/backends/badger/kvstore"
 )
 
 func migrateAlertScopes(ctx context.Context, kvStore kvstore.Storage) error {

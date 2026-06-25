@@ -13,37 +13,13 @@ import (
 
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage"
-	"link-society.com/flowg/internal/storage/log/transactions"
-	"link-society.com/flowg/internal/utils/kvstore"
+	"link-society.com/flowg/internal/storage/backends/badger/kvstore"
+	"link-society.com/flowg/internal/storage/backends/badger/log/transactions"
 
 	"link-society.com/flowg/internal/utils/langs/filtering"
 )
 
-type Storage interface {
-	storage.Streamable
-
-	ListStreamConfigs(ctx context.Context) (map[string]models.StreamConfig, error)
-	ListStreamFields(ctx context.Context, stream string) ([]string, error)
-	GetOrCreateStreamConfig(ctx context.Context, stream string) (models.StreamConfig, error)
-	ConfigureStream(ctx context.Context, stream string, config models.StreamConfig) error
-	DeleteStream(ctx context.Context, stream string) error
-	StreamUsage(ctx context.Context, stream string) (int64, error)
-
-	IndexField(ctx context.Context, stream, field string) error
-	UnindexField(ctx context.Context, stream, field string) error
-	Distinct(ctx context.Context, stream string) (map[string][]string, error)
-
-	Ingest(ctx context.Context, stream string, logRecord *models.LogRecord) ([]byte, error)
-
-	FetchLogs(
-		ctx context.Context,
-		stream string,
-		from, to time.Time,
-		filter filtering.Filter,
-		indexing map[string][]string,
-	) ([]models.LogRecord, error)
-}
-
+// Options configures the badger-backed log storage.
 type Options struct {
 	Directory  string
 	InMemory   bool
@@ -61,8 +37,9 @@ type deps struct {
 	S kvstore.Storage `name:"storage.log"`
 }
 
-var _ Storage = (*storageImpl)(nil)
+var _ storage.LogStorage = (*storageImpl)(nil)
 
+// DefaultOptions returns the default [Options] for the log storage.
 func DefaultOptions() Options {
 	return Options{
 		Directory:  "",
@@ -72,6 +49,9 @@ func DefaultOptions() Options {
 	}
 }
 
+// NewStorage returns an fx module providing a badger-backed [storage.LogStorage]
+// configured with the given options. It also starts a background worker that
+// periodically runs the value-log garbage collector.
 func NewStorage(opts Options) fx.Option {
 	kvOpts := kvstore.DefaultOptions()
 	kvOpts.LogChannel = "storage.log"
@@ -82,8 +62,8 @@ func NewStorage(opts Options) fx.Option {
 	return fx.Module(
 		"storage.log",
 		kvstore.NewStorage(kvOpts),
-		fx.Provide(func(lc fx.Lifecycle, d deps) Storage {
-			storage := &storageImpl{
+		fx.Provide(func(lc fx.Lifecycle, d deps) storage.LogStorage {
+			impl := &storageImpl{
 				kvStore: d.S,
 			}
 
@@ -103,7 +83,7 @@ func NewStorage(opts Options) fx.Option {
 				},
 			})
 
-			return storage
+			return impl
 		}),
 	)
 }

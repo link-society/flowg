@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"link-society.com/flowg/internal/storage/config"
+	"link-society.com/flowg/internal/storage"
 )
 
-func DefaultPipeline(ctx context.Context, configStorage config.Storage) error {
+func DefaultPipeline(ctx context.Context, configStorage storage.ConfigStorage) error {
 	pipelines, err := configStorage.ListPipelines(ctx)
 	if err != nil {
 		return err

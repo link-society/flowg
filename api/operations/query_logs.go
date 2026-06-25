@@ -18,16 +18,15 @@ import (
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/utils/langs/filtering"
 
-	authStorage "link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/log"
+	"link-society.com/flowg/internal/storage"
 )
 
 // QueryStreamDeps lists the dependencies of [NewQueryStreamUsecase].
 type QueryStreamDeps struct {
 	fx.In
 
-	AuthStorage authStorage.Storage
-	LogStorage  log.Storage
+	AuthStorage storage.AuthStorage
+	LogStorage  storage.LogStorage
 }
 
 // QueryStreamRequest describes a bounded search over a stream's logs.

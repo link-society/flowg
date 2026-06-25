@@ -14,13 +14,12 @@ import (
 
 	"link-society.com/flowg/internal/engines/pipelines"
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
+	"link-society.com/flowg/internal/storage"
 )
 
 func TestElasticEndpoint(t *testing.T) {
-	mockAuthStorage := auth.NewMockStorage().(*auth.MockStorage)
-	mockConfigStorage := config.NewMockStorage().(*config.MockStorage)
+	mockAuthStorage := storage.NewMockAuthStorage().(*storage.MockAuthStorage)
+	mockConfigStorage := storage.NewMockConfigStorage().(*storage.MockConfigStorage)
 	mockPipelineRunner := pipelines.NewMockRunner().(*pipelines.MockRunner)
 
 	deps := ElasticDeps{

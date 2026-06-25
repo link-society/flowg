@@ -18,33 +18,9 @@ import (
 
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage"
-	"link-society.com/flowg/internal/storage/config/transactions"
-	"link-society.com/flowg/internal/utils/kvstore"
+	"link-society.com/flowg/internal/storage/backends/badger/config/transactions"
+	"link-society.com/flowg/internal/storage/backends/badger/kvstore"
 )
-
-type Storage interface {
-	storage.Streamable
-
-	ListTransformers(ctx context.Context) ([]string, error)
-	ReadTransformer(ctx context.Context, name string) (string, error)
-	WriteTransformer(ctx context.Context, name string, content string) error
-	DeleteTransformer(ctx context.Context, name string) error
-
-	ListPipelines(ctx context.Context) ([]string, error)
-	ReadPipeline(ctx context.Context, name string) (*models.FlowGraphV2, error)
-	WritePipeline(ctx context.Context, name string, flow *models.FlowGraphV2) error
-	WriteRawPipeline(ctx context.Context, name string, content string) error
-	DeletePipeline(ctx context.Context, name string) error
-
-	ListForwarders(ctx context.Context) ([]string, error)
-	ReadForwarder(ctx context.Context, name string) (*models.ForwarderV2, error)
-	WriteForwarder(ctx context.Context, name string, forwarder *models.ForwarderV2) error
-	DeleteForwarder(ctx context.Context, name string) error
-
-	HasSystemConfig(ctx context.Context) (bool, error)
-	ReadSystemConfig(ctx context.Context) (*models.SystemConfiguration, error)
-	WriteSystemConfig(ctx context.Context, config *models.SystemConfiguration) error
-}
 
 const (
 	transformerItemType = "transformer"
@@ -53,6 +29,7 @@ const (
 	systemItemType      = "system"
 )
 
+// Options configures the badger-backed configuration storage.
 type Options struct {
 	Directory string
 	InMemory  bool
@@ -71,8 +48,9 @@ type deps struct {
 	S kvstore.Storage `name:"storage.config"`
 }
 
-var _ Storage = (*storageImpl)(nil)
+var _ storage.ConfigStorage = (*storageImpl)(nil)
 
+// DefaultOptions returns the default [Options] for the configuration storage.
 func DefaultOptions() Options {
 	return Options{
 		Directory: "",
@@ -81,6 +59,8 @@ func DefaultOptions() Options {
 	}
 }
 
+// NewStorage returns an fx module providing a badger-backed
+// [storage.ConfigStorage] configured with the given options.
 func NewStorage(opts Options) fx.Option {
 	kvOpts := kvstore.DefaultOptions()
 	kvOpts.LogChannel = "storage.config"
@@ -91,8 +71,8 @@ func NewStorage(opts Options) fx.Option {
 	return fx.Module(
 		"storage.config",
 		kvstore.NewStorage(kvOpts),
-		fx.Provide(func(lc fx.Lifecycle, d deps) Storage {
-			storage := &storageImpl{
+		fx.Provide(func(lc fx.Lifecycle, d deps) storage.ConfigStorage {
+			impl := &storageImpl{
 				kvStore:               d.S,
 				lock:                  &sync.Mutex{},
 				configurationInstance: nil,
@@ -104,7 +84,7 @@ func NewStorage(opts Options) fx.Option {
 						return fmt.Errorf("failed to migrate alerts: %w", err)
 					}
 
-					if err := migrateToBadger(ctx, opts.Directory, storage); err != nil {
+					if err := migrateToBadger(ctx, opts.Directory, impl); err != nil {
 						return fmt.Errorf("failed to migrate to badger: %w", err)
 					}
 
@@ -112,7 +92,7 @@ func NewStorage(opts Options) fx.Option {
 				},
 			})
 
-			return storage
+			return impl
 		}),
 	)
 }

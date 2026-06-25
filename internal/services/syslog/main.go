@@ -12,7 +12,7 @@ import (
 
 	gosyslog "gopkg.in/mcuadros/go-syslog.v2"
 
-	"link-society.com/flowg/internal/storage/config"
+	"link-society.com/flowg/internal/storage"
 
 	"link-society.com/flowg/internal/engines/pipelines"
 )
@@ -93,7 +93,7 @@ func NewServer(opts ServerOptions) fx.Option {
 		fx.Provide(func(
 			lc fx.Lifecycle,
 			channel gosyslog.LogPartsChannel,
-			configStorage config.Storage,
+			configStorage storage.ConfigStorage,
 			pipelineRunner pipelines.Runner,
 		) *Server {
 			srv := &Server{

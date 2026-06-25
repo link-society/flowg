@@ -22,14 +22,14 @@ import (
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/utils/langs/filtering"
 
-	authStorage "link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage"
 )
 
 // WatchLogsDeps lists the dependencies of [NewWatchLogsUsecase].
 type WatchLogsDeps struct {
 	fx.In
 
-	AuthStorage authStorage.Storage
+	AuthStorage storage.AuthStorage
 	LogNotifier lognotify.LogNotifier
 }
 

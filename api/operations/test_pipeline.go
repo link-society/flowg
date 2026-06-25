@@ -19,14 +19,14 @@ import (
 	"link-society.com/flowg/internal/engines/pipelines"
 	"link-society.com/flowg/internal/models"
 
-	authStorage "link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage"
 )
 
 // TestPipelineDeps lists the dependencies of [NewTestPipelineUsecase].
 type TestPipelineDeps struct {
 	fx.In
 
-	AuthStorage    authStorage.Storage
+	AuthStorage    storage.AuthStorage
 	PipelineRunner pipelines.Runner
 }
 

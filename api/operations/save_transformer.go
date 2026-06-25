@@ -17,16 +17,15 @@ import (
 	"link-society.com/flowg/internal/engines/pipelines"
 	"link-society.com/flowg/internal/models"
 
-	authStorage "link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
+	"link-society.com/flowg/internal/storage"
 )
 
 // SaveTransformerDeps lists the dependencies of [NewSaveTransformerUsecase].
 type SaveTransformerDeps struct {
 	fx.In
 
-	AuthStorage    authStorage.Storage
-	ConfigStorage  config.Storage
+	AuthStorage    storage.AuthStorage
+	ConfigStorage  storage.ConfigStorage
 	PipelineRunner pipelines.Runner
 }
 

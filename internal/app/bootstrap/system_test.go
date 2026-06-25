@@ -9,7 +9,8 @@ import (
 	"link-society.com/flowg/internal/app/bootstrap"
 	"link-society.com/flowg/internal/app/logging"
 
-	"link-society.com/flowg/internal/storage/config"
+	"link-society.com/flowg/internal/storage"
+	"link-society.com/flowg/internal/storage/backends/badger/config"
 )
 
 func TestDefaultSystemConfig(t *testing.T) {
@@ -20,7 +21,7 @@ func TestDefaultSystemConfig(t *testing.T) {
 	confOpts := config.DefaultOptions()
 	confOpts.InMemory = true
 
-	var confStorage config.Storage
+	var confStorage storage.ConfigStorage
 
 	app := fxtest.New(
 		t,

@@ -8,7 +8,7 @@ import (
 	"link-society.com/flowg/internal/app/featureflags"
 	"link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage"
 )
 
 type BootstrapAuthOptions struct {
@@ -21,7 +21,7 @@ type ResetUserOptions struct {
 	Password string
 }
 
-func DefaultRolesAndUsers(ctx context.Context, authStorage auth.Storage, opts BootstrapAuthOptions) error {
+func DefaultRolesAndUsers(ctx context.Context, authStorage storage.AuthStorage, opts BootstrapAuthOptions) error {
 	roles, err := authStorage.ListRoles(ctx)
 	if err != nil {
 		return err
@@ -93,7 +93,7 @@ func DefaultRolesAndUsers(ctx context.Context, authStorage auth.Storage, opts Bo
 	return nil
 }
 
-func ResetUser(ctx context.Context, authStorage auth.Storage, opts ResetUserOptions) error {
+func ResetUser(ctx context.Context, authStorage storage.AuthStorage, opts ResetUserOptions) error {
 	if opts.User == "" || opts.Password == "" {
 		return nil
 	}

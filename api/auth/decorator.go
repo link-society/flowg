@@ -8,7 +8,7 @@ import (
 
 	"link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage"
 )
 
 // RequireScopeApiDecorator guards a use-case interactor so that it only runs
@@ -26,7 +26,7 @@ import (
 //   - the user holds the scope: next is invoked and its result is returned
 //     unchanged.
 func RequireScopeApiDecorator[Req any, Resp any](
-	authStorage auth.Storage,
+	authStorage storage.AuthStorage,
 	scope models.Scope,
 	next func(context.Context, Req, *Resp) error,
 ) func(context.Context, Req, *Resp) error {
@@ -72,7 +72,7 @@ func RequireScopeApiDecorator[Req any, Resp any](
 // unresolvable scope short-circuits with [status.PermissionDenied]. An empty
 // scope list imposes no requirement and yields next unchanged.
 func RequireScopesApiDecorator[Req any, Resp any](
-	authStorage auth.Storage,
+	authStorage storage.AuthStorage,
 	scopes []models.Scope,
 	next func(context.Context, Req, *Resp) error,
 ) func(context.Context, Req, *Resp) error {
