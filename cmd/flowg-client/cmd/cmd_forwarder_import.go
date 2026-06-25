@@ -16,6 +16,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewForwarderImportCommand builds the "import" command, which imports a forwarder.
 func NewForwarderImportCommand() *cobra.Command {
 	type options struct {
 		name string

@@ -11,6 +11,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewForwarderDeleteCommand builds the "rm" command, which deletes a forwarder.
 func NewForwarderDeleteCommand() *cobra.Command {
 	type options struct {
 		name string

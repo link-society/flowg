@@ -11,6 +11,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewAclUserDeleteCommand builds the "rm" command, which removes a user.
 func NewAclUserDeleteCommand() *cobra.Command {
 	type options struct {
 		username string

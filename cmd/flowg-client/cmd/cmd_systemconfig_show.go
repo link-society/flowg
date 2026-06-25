@@ -14,6 +14,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewSystemConfigShowCommand builds the "show" command, which shows the system configuration.
 func NewSystemConfigShowCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "show",

@@ -17,8 +17,13 @@ type options struct {
 	pid int
 }
 
+// ExitCode is the process exit code; it is set to 1 when the health check fails.
 var ExitCode int = 0
 
+// NewRootCommand builds the root flowg-health command. It inspects the target
+// flowg-server process's command line to discover the management bind address
+// and TLS mode, then probes the management /health endpoint, exiting non-zero if
+// the probe fails.
 func NewRootCommand() *cobra.Command {
 	opts := &options{}
 
@@ -44,7 +49,7 @@ func NewRootCommand() *cobra.Command {
 			var mgmtTlsEnabled bool
 
 			flags := pflag.NewFlagSet("flowg-server", pflag.ContinueOnError)
-			flags.ParseErrorsWhitelist.UnknownFlags = true
+			flags.ParseErrorsAllowlist.UnknownFlags = true
 			flags.StringVar(&mgmtBindAddress, "mgmt-bind", defaultMgmtBindAddress, "")
 			flags.BoolVar(&mgmtTlsEnabled, "mgmt-tls", defaultMgmtTlsEnabled, "")
 

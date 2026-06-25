@@ -16,6 +16,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewStreamHistoryCommand builds the "history" command, which fetches logs using a time window.
 func NewStreamHistoryCommand() *cobra.Command {
 	type options struct {
 		name     string

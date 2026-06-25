@@ -16,6 +16,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewPipelineImportCommand builds the "import" command, which imports a pipeline.
 func NewPipelineImportCommand() *cobra.Command {
 	type options struct {
 		name string

@@ -14,6 +14,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewTransformerListCommand builds the "ls" command, which lists transformers.
 func NewTransformerListCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "ls",

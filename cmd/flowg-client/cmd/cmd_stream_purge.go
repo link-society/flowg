@@ -11,6 +11,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewStreamPurgeCommand builds the "purge" command, which deletes a stream.
 func NewStreamPurgeCommand() *cobra.Command {
 	type options struct {
 		name string

@@ -11,6 +11,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewPipelineDeleteCommand builds the "rm" command, which deletes a pipeline.
 func NewPipelineDeleteCommand() *cobra.Command {
 	type options struct {
 		name string

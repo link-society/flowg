@@ -16,6 +16,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewStreamListCommand builds the "ls" command, which lists streams.
 func NewStreamListCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "ls",

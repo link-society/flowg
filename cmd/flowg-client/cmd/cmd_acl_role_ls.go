@@ -16,6 +16,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewAclRoleListCommand builds the "ls" command, which lists all roles.
 func NewAclRoleListCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "ls",

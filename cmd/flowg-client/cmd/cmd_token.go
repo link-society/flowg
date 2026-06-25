@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// NewTokenCommand builds the "token" command group, which gathers the Personal Access Token subcommands.
 func NewTokenCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "token",

@@ -15,6 +15,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewSystemConfigUpdateCommand builds the "update" command, which updates the system configuration.
 func NewSystemConfigUpdateCommand() *cobra.Command {
 	type options struct {
 		SyslogAllowedOrigins []string

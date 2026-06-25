@@ -14,6 +14,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewPipelineListCommand builds the "ls" command, which lists pipelines.
 func NewPipelineListCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "ls",

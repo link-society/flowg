@@ -18,6 +18,7 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
+// NewStreamIndexCommand builds the "index" command, which creates or removes indexed fields for a stream.
 func NewStreamIndexCommand() *cobra.Command {
 	type options struct {
 		name   string

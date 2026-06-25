@@ -15,6 +15,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewAclUserRevokeCommand builds the "revoke" command, which revokes a role from a user.
 func NewAclUserRevokeCommand() *cobra.Command {
 	type options struct {
 		username string

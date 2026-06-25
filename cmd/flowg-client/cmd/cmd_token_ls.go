@@ -14,6 +14,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewTokenListCommand builds the "ls" command, which lists Personal Access Tokens.
 func NewTokenListCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "ls",

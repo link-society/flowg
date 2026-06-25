@@ -14,6 +14,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewTransformerCatCommand builds the "cat" command, which prints a transformer's code.
 func NewTransformerCatCommand() *cobra.Command {
 	type options struct {
 		name string

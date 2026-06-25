@@ -18,6 +18,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewTransformerEditCommand builds the "edit" command, which edits a transformer's code.
 func NewTransformerEditCommand() *cobra.Command {
 	type options struct {
 		name string

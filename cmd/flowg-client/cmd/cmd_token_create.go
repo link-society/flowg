@@ -14,6 +14,7 @@ import (
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
+// NewTokenCreateCommand builds the "create" command, which creates Personal Access Tokens.
 func NewTokenCreateCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "create",

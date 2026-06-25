@@ -44,6 +44,8 @@ var (
 	defaultAuthResetPassword = getEnvString("FLOWG_AUTH_RESET_PASSWORD", "")
 )
 
+// getEnvListString reads a comma-separated environment variable into a slice,
+// trimming whitespace around each item, or returns defaultValue when unset.
 func getEnvListString(key string, defaultValue []string) []string {
 	value := os.Getenv(key)
 	if value == "" {
@@ -58,6 +60,8 @@ func getEnvListString(key string, defaultValue []string) []string {
 	return items
 }
 
+// getEnvString returns the value of the environment variable key, or
+// defaultValue when it is unset or empty.
 func getEnvString(key string, defaultValue string) string {
 	value := os.Getenv(key)
 	if value == "" {
@@ -66,6 +70,8 @@ func getEnvString(key string, defaultValue string) string {
 	return value
 }
 
+// getEnvBool parses the environment variable key as a boolean, falling back to
+// defaultValue when it is unset and to false when it cannot be parsed.
 func getEnvBool(key string, defaultValue bool) bool {
 	stringVal := os.Getenv(key)
 	if stringVal == "" {
