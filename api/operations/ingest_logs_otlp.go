@@ -26,14 +26,14 @@ import (
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/utils/otlp"
 
-	authStorage "link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage"
 )
 
 // IngestLogsOTLPDeps lists the dependencies of [NewIngestLogsOTLPUsecase].
 type IngestLogsOTLPDeps struct {
 	fx.In
 
-	AuthStorage    authStorage.Storage
+	AuthStorage    storage.AuthStorage
 	PipelineRunner pipelines.Runner
 }
 

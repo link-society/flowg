@@ -13,9 +13,7 @@ import (
 
 	"link-society.com/flowg/api"
 
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
-	"link-society.com/flowg/internal/storage/log"
+	"link-society.com/flowg/internal/storage"
 
 	"link-society.com/flowg/internal/engines/lognotify"
 	"link-society.com/flowg/internal/engines/pipelines"
@@ -29,9 +27,9 @@ func main() {
 
 		// The schema generation only inspects the route table, so nil backends
 		// are enough to build the handler.
-		fx.Provide(func() auth.Storage { return nil }),
-		fx.Provide(func() config.Storage { return nil }),
-		fx.Provide(func() log.Storage { return nil }),
+		fx.Provide(func() storage.AuthStorage { return nil }),
+		fx.Provide(func() storage.ConfigStorage { return nil }),
+		fx.Provide(func() storage.LogStorage { return nil }),
 		fx.Provide(func() lognotify.LogNotifier { return nil }),
 		fx.Provide(func() pipelines.Runner { return nil }),
 

@@ -6,8 +6,7 @@ import (
 
 	"github.com/vladopajic/go-actor/actor"
 
-	"link-society.com/flowg/internal/storage/config"
-	"link-society.com/flowg/internal/storage/log"
+	"link-society.com/flowg/internal/storage"
 
 	"link-society.com/flowg/internal/engines/lognotify"
 )
@@ -15,8 +14,8 @@ import (
 type worker struct {
 	mbox actor.MailboxReceiver[message]
 
-	configStorage config.Storage
-	logStorage    log.Storage
+	configStorage storage.ConfigStorage
+	logStorage    storage.LogStorage
 	logNotifier   lognotify.LogNotifier
 
 	cache   map[string]*Pipeline

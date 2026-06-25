@@ -15,14 +15,14 @@ import (
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 
-	authStorage "link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage"
 )
 
 // DeleteTokenDeps lists the dependencies of [NewDeleteTokenUsecase].
 type DeleteTokenDeps struct {
 	fx.In
 
-	AuthStorage authStorage.Storage
+	AuthStorage storage.AuthStorage
 }
 
 // DeleteTokenRequest identifies the token to revoke.

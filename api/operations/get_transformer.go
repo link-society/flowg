@@ -16,16 +16,15 @@ import (
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/internal/models"
 
-	authStorage "link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
+	"link-society.com/flowg/internal/storage"
 )
 
 // GetTransformerDeps lists the dependencies of [NewGetTransformerUsecase].
 type GetTransformerDeps struct {
 	fx.In
 
-	AuthStorage   authStorage.Storage
-	ConfigStorage config.Storage
+	AuthStorage   storage.AuthStorage
+	ConfigStorage storage.ConfigStorage
 }
 
 // GetTransformerRequest identifies the transformer to retrieve.

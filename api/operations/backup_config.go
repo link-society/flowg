@@ -17,16 +17,15 @@ import (
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/internal/models"
 
-	authStorage "link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
+	"link-society.com/flowg/internal/storage"
 )
 
 // BackupConfigDeps lists the dependencies of [NewBackupConfigUsecase].
 type BackupConfigDeps struct {
 	fx.In
 
-	AuthStorage   authStorage.Storage
-	ConfigStorage config.Storage
+	AuthStorage   storage.AuthStorage
+	ConfigStorage storage.ConfigStorage
 }
 
 // BackupConfigRequest is empty: the whole configuration database is exported.

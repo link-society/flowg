@@ -12,13 +12,13 @@ import (
 	"github.com/vladopajic/go-actor/actor"
 
 	"link-society.com/flowg/internal/engines/pipelines"
-	"link-society.com/flowg/internal/storage/config"
+	"link-society.com/flowg/internal/storage"
 )
 
 type worker struct {
 	logger         *slog.Logger
 	channel        gosyslog.LogPartsChannel
-	configStorage  config.Storage
+	configStorage  storage.ConfigStorage
 	pipelineRunner pipelines.Runner
 }
 

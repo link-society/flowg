@@ -17,14 +17,14 @@ import (
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/utils/langs/vrl"
 
-	authStorage "link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage"
 )
 
 // TestTransformerDeps lists the dependencies of [NewTestTransformerUsecase].
 type TestTransformerDeps struct {
 	fx.In
 
-	AuthStorage authStorage.Storage
+	AuthStorage storage.AuthStorage
 }
 
 // TestTransformerRequest carries the transformer source and a sample record to

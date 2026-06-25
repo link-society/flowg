@@ -8,7 +8,8 @@ import (
 
 	"link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage"
+	"link-society.com/flowg/internal/storage/backends/badger/auth"
 
 	"link-society.com/flowg/internal/app/bootstrap"
 	"link-society.com/flowg/internal/app/logging"
@@ -22,7 +23,7 @@ func TestDefaultRolesAndUsers(t *testing.T) {
 	authOpts := auth.DefaultOptions()
 	authOpts.InMemory = true
 
-	var authStorage auth.Storage
+	var authStorage storage.AuthStorage
 
 	app := fxtest.New(
 		t,

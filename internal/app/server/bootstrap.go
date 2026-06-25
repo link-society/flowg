@@ -5,8 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
+	"link-society.com/flowg/internal/storage"
 
 	"link-society.com/flowg/internal/app/bootstrap"
 )
@@ -14,8 +13,8 @@ import (
 type bootstrapHandler struct {
 	logger *slog.Logger
 
-	authStorage   auth.Storage
-	configStorage config.Storage
+	authStorage   storage.AuthStorage
+	configStorage storage.ConfigStorage
 
 	initialSyslogAllowedOrigins []string
 

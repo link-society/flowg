@@ -6,7 +6,8 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 
-	"link-society.com/flowg/internal/storage/config"
+	"link-society.com/flowg/internal/storage"
+	"link-society.com/flowg/internal/storage/backends/badger/config"
 
 	"link-society.com/flowg/internal/app/bootstrap"
 )
@@ -14,7 +15,7 @@ import (
 func TestDefaultPipeline(t *testing.T) {
 	ctx := t.Context()
 
-	var configStorage config.Storage
+	var configStorage storage.ConfigStorage
 
 	configOpts := config.DefaultOptions()
 	configOpts.InMemory = true

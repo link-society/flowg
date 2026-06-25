@@ -17,16 +17,15 @@ import (
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/internal/models"
 
-	authStorage "link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/log"
+	"link-society.com/flowg/internal/storage"
 )
 
 // RestoreLogsDeps lists the dependencies of [NewRestoreLogsUsecase].
 type RestoreLogsDeps struct {
 	fx.In
 
-	AuthStorage authStorage.Storage
-	LogStorage  log.Storage
+	AuthStorage storage.AuthStorage
+	LogStorage  storage.LogStorage
 }
 
 // RestoreLogsRequest carries the log database snapshot to load.

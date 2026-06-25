@@ -15,14 +15,14 @@ import (
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 
-	authStorage "link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage"
 )
 
 // CreateTokenDeps lists the dependencies of [NewCreateTokenUsecase].
 type CreateTokenDeps struct {
 	fx.In
 
-	AuthStorage authStorage.Storage
+	AuthStorage storage.AuthStorage
 }
 
 // CreateTokenRequest is empty: the token is issued for the calling user.

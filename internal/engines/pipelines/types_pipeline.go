@@ -7,7 +7,7 @@ import (
 	"link-society.com/flowg/internal/app/metrics"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/config"
+	"link-society.com/flowg/internal/storage"
 )
 
 type Pipeline struct {
@@ -16,7 +16,7 @@ type Pipeline struct {
 	nodes       map[string]Node
 }
 
-func BuildFromStorage(ctx context.Context, configStorage config.Storage, name string) (*Pipeline, error) {
+func BuildFromStorage(ctx context.Context, configStorage storage.ConfigStorage, name string) (*Pipeline, error) {
 	flowGraph, err := configStorage.ReadPipeline(ctx, name)
 	if err != nil {
 		return nil, err
@@ -25,7 +25,7 @@ func BuildFromStorage(ctx context.Context, configStorage config.Storage, name st
 	return BuildFlow(ctx, configStorage, name, flowGraph)
 }
 
-func BuildFlow(ctx context.Context, configStorage config.Storage, name string, flowGraph *models.FlowGraphV2) (*Pipeline, error) {
+func BuildFlow(ctx context.Context, configStorage storage.ConfigStorage, name string, flowGraph *models.FlowGraphV2) (*Pipeline, error) {
 	var (
 		pipelineNodes   = make(map[string]Node)
 		flowNodesByID   = make(map[string]*models.FlowNodeV2)

@@ -17,14 +17,14 @@ import (
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/internal/models"
 
-	authStorage "link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage"
 )
 
 // RestoreAuthDeps lists the dependencies of [NewRestoreAuthUsecase].
 type RestoreAuthDeps struct {
 	fx.In
 
-	AuthStorage authStorage.Storage
+	AuthStorage storage.AuthStorage
 }
 
 // RestoreAuthRequest carries the authentication database snapshot to load.

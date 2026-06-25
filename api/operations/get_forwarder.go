@@ -16,16 +16,15 @@ import (
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/internal/models"
 
-	authStorage "link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
+	"link-society.com/flowg/internal/storage"
 )
 
 // GetForwarderDeps lists the dependencies of [NewGetForwarderUsecase].
 type GetForwarderDeps struct {
 	fx.In
 
-	AuthStorage   authStorage.Storage
-	ConfigStorage config.Storage
+	AuthStorage   storage.AuthStorage
+	ConfigStorage storage.ConfigStorage
 }
 
 // GetForwarderRequest identifies the forwarder to retrieve.

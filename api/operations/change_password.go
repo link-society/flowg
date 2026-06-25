@@ -17,14 +17,14 @@ import (
 	"link-society.com/flowg/api/routing"
 	applog "link-society.com/flowg/internal/app/logging"
 
-	authStorage "link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage"
 )
 
 // ChangePasswordDeps lists the dependencies of [NewChangePasswordUsecase].
 type ChangePasswordDeps struct {
 	fx.In
 
-	AuthStorage authStorage.Storage
+	AuthStorage storage.AuthStorage
 }
 
 // ChangePasswordRequest carries the caller's current and desired passwords.

@@ -16,16 +16,15 @@ import (
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/internal/models"
 
-	authStorage "link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
+	"link-society.com/flowg/internal/storage"
 )
 
 // DeleteTransformerDeps lists the dependencies of [NewDeleteTransformerUsecase].
 type DeleteTransformerDeps struct {
 	fx.In
 
-	AuthStorage   authStorage.Storage
-	ConfigStorage config.Storage
+	AuthStorage   storage.AuthStorage
+	ConfigStorage storage.ConfigStorage
 }
 
 // DeleteTransformerRequest identifies the transformer to remove.

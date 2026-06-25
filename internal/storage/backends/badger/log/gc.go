@@ -7,9 +7,9 @@ import (
 
 	"github.com/vladopajic/go-actor/actor"
 
-	"link-society.com/flowg/internal/utils/kvstore"
+	"link-society.com/flowg/internal/storage/backends/badger/kvstore"
 
-	"link-society.com/flowg/internal/storage/log/transactions"
+	"link-society.com/flowg/internal/storage/backends/badger/log/transactions"
 )
 
 type gcWorker struct {

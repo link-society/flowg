@@ -15,14 +15,14 @@ import (
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 
-	authStorage "link-society.com/flowg/internal/storage/auth"
+	"link-society.com/flowg/internal/storage"
 )
 
 // ListTokensDeps lists the dependencies of [NewListTokensUsecase].
 type ListTokensDeps struct {
 	fx.In
 
-	AuthStorage authStorage.Storage
+	AuthStorage storage.AuthStorage
 }
 
 // ListTokensRequest is empty: tokens are listed for the calling user.

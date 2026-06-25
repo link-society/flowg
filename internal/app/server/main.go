@@ -8,9 +8,10 @@ import (
 
 	"go.uber.org/fx"
 
-	"link-society.com/flowg/internal/storage/auth"
-	"link-society.com/flowg/internal/storage/config"
-	"link-society.com/flowg/internal/storage/log"
+	"link-society.com/flowg/internal/storage"
+	"link-society.com/flowg/internal/storage/backends/badger/auth"
+	"link-society.com/flowg/internal/storage/backends/badger/config"
+	"link-society.com/flowg/internal/storage/backends/badger/log"
 
 	"link-society.com/flowg/internal/engines/lognotify"
 	"link-society.com/flowg/internal/engines/pipelines"
@@ -83,9 +84,9 @@ func NewServer(opts Options) fx.Option {
 		}),
 		fx.Provide(func(
 			lc fx.Lifecycle,
-			authStorage auth.Storage,
-			configStorage config.Storage,
-			logStorage log.Storage,
+			authStorage storage.AuthStorage,
+			configStorage storage.ConfigStorage,
+			logStorage storage.LogStorage,
 		) *bootstrapHandler {
 			h := &bootstrapHandler{
 				logger:                      slog.Default().With(slog.String("channel", "bootstrap")),
@@ -110,9 +111,9 @@ func NewServer(opts Options) fx.Option {
 			fx.In
 
 			// Storage layer
-			AuthStorage   auth.Storage
-			ConfigStorage config.Storage
-			LogStorage    log.Storage
+			AuthStorage   storage.AuthStorage
+			ConfigStorage storage.ConfigStorage
+			LogStorage    storage.LogStorage
 			// Engine layer
 			LogNotifier     lognotify.LogNotifier
 			PipelinesRunner pipelines.Runner
