@@ -8,7 +8,7 @@ import (
 
 	"crypto/tls"
 	"net"
-	gohttp "net/http"
+	"net/http"
 
 	"go.uber.org/fx"
 
@@ -26,35 +26,30 @@ type ServerOptions struct {
 
 type Server struct {
 	logger     *slog.Logger
-	httpServer *gohttp.Server
+	httpServer *http.Server
 }
 
 type handlers struct {
 	fx.In
 
-	ApiHandler gohttp.Handler `name:"service-http-api"`
-	WebHandler gohttp.Handler `name:"service-http-web"`
+	ApiHandler http.Handler `name:"service-http-api"`
+	WebHandler http.Handler `name:"service-http-web"`
 }
 
 func NewServer(opts ServerOptions) fx.Option {
 	return fx.Module(
 		"services.http",
 		api.Module("service-http-api"),
-		fx.Provide(fx.Annotate(
-			func() gohttp.Handler {
-				return web.NewHandler(opts.MountPath)
-			},
-			fx.ResultTags(`name:"service-http-web"`),
-		)),
+		web.Module("service-http-web", opts.MountPath),
 		fx.Provide(func(lc fx.Lifecycle, h handlers) *Server {
-			rootHandler := gohttp.NewServeMux()
-			rootHandler.Handle(opts.MountPath+"/api/", gohttp.StripPrefix(opts.MountPath, h.ApiHandler))
-			rootHandler.Handle(opts.MountPath+"/web/", gohttp.StripPrefix(opts.MountPath, h.WebHandler))
+			rootHandler := http.NewServeMux()
+			rootHandler.Handle(opts.MountPath+"/api/", http.StripPrefix(opts.MountPath, h.ApiHandler))
+			rootHandler.Handle(opts.MountPath+"/web/", http.StripPrefix(opts.MountPath, h.WebHandler))
 
 			rootHandler.HandleFunc(
 				"GET "+opts.MountPath+"/{$}",
-				func(w gohttp.ResponseWriter, r *gohttp.Request) {
-					gohttp.Redirect(w, r, opts.MountPath+"/web/", gohttp.StatusPermanentRedirect)
+				func(w http.ResponseWriter, r *http.Request) {
+					http.Redirect(w, r, opts.MountPath+"/web/", http.StatusPermanentRedirect)
 				},
 			)
 
@@ -65,7 +60,7 @@ func NewServer(opts ServerOptions) fx.Option {
 						slog.String("bind", opts.BindAddress),
 					),
 				),
-				httpServer: &gohttp.Server{
+				httpServer: &http.Server{
 					Addr:      opts.BindAddress,
 					Handler:   logging.NewMiddleware(rootHandler),
 					TLSConfig: opts.TlsConfig,

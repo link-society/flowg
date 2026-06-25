@@ -18,10 +18,26 @@ import (
 	"link-society.com/flowg/internal/app/featureflags"
 )
 
+// staticfiles holds the pre-built, gzip-compressed assets of the web UI,
+// embedded into the binary at build time.
+//
 //go:embed public/**/*.gz
 //go:embed public/*.gz
 var staticfiles embed.FS
 
+// NewHandler builds the HTTP handler that serves FlowG's single-page web UI.
+//
+// The handler is mounted under "/web/" and serves two kinds of requests:
+//
+//   - Requests under "assets/" are served as static, immutable files straight
+//     from the embedded filesystem, with long-lived cache headers.
+//   - Every other request returns the SPA entry point ("index.html"), rendered
+//     as a Go template so runtime values — the enabled feature flags and the
+//     mountPath the UI is served from — can be injected into the page.
+//
+// All assets are stored and served gzip-compressed, so clients must advertise
+// gzip support through the Accept-Encoding header; requests that do not are
+// rejected with http.StatusNotAcceptable.
 func NewHandler(mountPath string) http.Handler {
 	return http.StripPrefix(
 		"/web/",
