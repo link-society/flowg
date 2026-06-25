@@ -9,7 +9,12 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
+// Filter is a compiled boolean predicate over a log record, produced by
+// [Compile]. It decides whether a record matches a query.
 type Filter interface {
+	// Evaluate reports whether record satisfies the filter expression. The
+	// record's fields are exposed to the expression as variables; referencing an
+	// undefined field is allowed and yields a nil value rather than an error.
 	Evaluate(record *models.LogRecord) (bool, error)
 }
 
