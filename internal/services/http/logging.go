@@ -12,12 +12,15 @@ import (
 	applog "link-society.com/flowg/internal/app/logging"
 )
 
+// loggingMiddleware is the access-log middleware wrapping the root handler.
 type loggingMiddleware struct {
 	handler gohttp.Handler
 }
 
 var _ gohttp.Handler = (*loggingMiddleware)(nil)
 
+// loggingResponseWriter wraps the real ResponseWriter to capture the status code
+// and, in verbose mode, buffer the response body for dumping on failure.
 type loggingResponseWriter struct {
 	ctx        context.Context
 	parent     gohttp.ResponseWriter
@@ -42,6 +45,8 @@ func newLoggingMiddleware(handler gohttp.Handler) gohttp.Handler {
 	return &loggingMiddleware{handler: handler}
 }
 
+// ServeHTTP assigns a correlation id, runs the wrapped handler and emits the
+// access-log record (at debug level for requests marked sensitive).
 func (m *loggingMiddleware) ServeHTTP(w gohttp.ResponseWriter, r *gohttp.Request) {
 	correlationId := r.Header.Get("X-Correlation-Id")
 	ctx := applog.WithSensitiveMarker(applog.WithCorrelationId(r.Context(), correlationId))

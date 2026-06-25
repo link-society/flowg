@@ -21,6 +21,9 @@ type forwarderStateDatadogV2 struct {
 	serviceProg  *vm.Program
 }
 
+// ForwarderDatadogV2 forwards records to the Datadog logs intake. The ddsource,
+// ddtags, hostname, message and service attributes are dynamic fields evaluated
+// per record.
 type ForwarderDatadogV2 struct {
 	Type     string                          `json:"type" enum:"datadog" required:"true"`
 	Url      string                          `json:"url" required:"true" format:"uri"`

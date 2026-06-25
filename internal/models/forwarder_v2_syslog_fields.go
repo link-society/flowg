@@ -2,6 +2,10 @@ package models
 
 import "github.com/swaggest/jsonschema-go"
 
+// The Forwarder*Field types below are the syslog forwarder's per-record fields:
+// each is either a literal value or a DynamicField ("@expr:" expression), as
+// advertised by their JSONSchemaAnyOf methods. The *EnumType helpers constrain
+// the literal form of severity and facility to their allowed keywords.
 type ForwarderSyslogV2TagField string
 type ForwarderSyslogV2SeverityField string
 type ForwarderSyslogV2FacilityField string

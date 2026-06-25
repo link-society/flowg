@@ -11,6 +11,10 @@ import (
 	"github.com/expr-lang/expr/parser/lexer"
 )
 
+// ConvertFlowGraph decodes a stored flow graph of any supported version and
+// returns it as the latest FlowGraphV2 (2.1). The boolean reports whether an
+// upgrade happened, so callers can persist the migrated form. Supported inputs
+// are V1, V2.0 and V2.1.
 func ConvertFlowGraph(content []byte) (*FlowGraphV2, bool, error) {
 	var data map[string]any
 	if err := json.Unmarshal(content, &data); err != nil {
@@ -69,6 +73,8 @@ func ConvertFlowGraph(content []byte) (*FlowGraphV2, bool, error) {
 	}
 }
 
+// flowGraphFromV2ToV2m1 upgrades a 2.0 graph to 2.1 by translating each switch
+// node's condition from the legacy filter DSL to expr-lang.
 func flowGraphFromV2ToV2m1(objV2 *FlowGraphV2) (*FlowGraphV2, error) {
 	objV2.MajorVersion = 2
 	objV2.MinorVersion = 1
@@ -88,6 +94,9 @@ func flowGraphFromV2ToV2m1(objV2 *FlowGraphV2) (*FlowGraphV2, error) {
 	return objV2, nil
 }
 
+// flowGraphFromV1ToV2 upgrades a V1 graph to V2.0, mapping the old "alert" node
+// type onto the "forwarder" node and copying nodes and edges across otherwise
+// unchanged.
 func flowGraphFromV1ToV2(objV1 *FlowGraphV1) *FlowGraphV2 {
 	objV2 := &FlowGraphV2{MajorVersion: 2, MinorVersion: 0}
 
@@ -136,6 +145,9 @@ func flowGraphFromV1ToV2(objV1 *FlowGraphV1) *FlowGraphV2 {
 	return objV2
 }
 
+// convertFilterdslToExprlang rewrites a legacy filter-DSL expression into an
+// equivalent expr-lang one, the only structural change being the single "="
+// equality operator becoming "==".
 func convertFilterdslToExprlang(input string) (string, error) {
 	tokens, err := lexer.Lex(file.NewSource(input))
 	if err != nil {

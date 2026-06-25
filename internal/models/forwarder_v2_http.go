@@ -20,6 +20,9 @@ type forwarderStateHttpV2 struct {
 	body *vm.Program
 }
 
+// ForwarderHttpV2 forwards records to an arbitrary HTTP endpoint via POST. The
+// request body is produced by evaluating the Body dynamic field (defaulting to
+// the record serialised as JSON).
 type ForwarderHttpV2 struct {
 	Type    string                   `json:"type" enum:"http" required:"true"`
 	Url     string                   `json:"url" required:"true" format:"uri"`

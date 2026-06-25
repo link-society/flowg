@@ -1,5 +1,8 @@
 package models
 
+// The Forwarder*Field types below are the Datadog forwarder's per-record
+// attributes: each is either a literal string or a DynamicField ("@expr:"
+// expression), as advertised by their JSONSchemaAnyOf methods.
 type ForwarderDatadogV2DDsourceField string
 type ForwarderDatadogV2DDtagsField string
 type ForwarderDatadogV2HostnameField string

@@ -11,17 +11,28 @@ import (
 	"link-society.com/flowg/internal/utils/langs/vrl"
 )
 
+// Node is one vertex of a compiled pipeline. Records flow through nodes from a
+// source to its successors; each node transforms, filters, routes or forwards
+// the record before passing it on.
 type Node interface {
+	// Init prepares the node (compile scripts, open connections) before any
+	// record is processed.
 	Init(ctx context.Context) error
+	// Close releases whatever Init acquired.
 	Close(ctx context.Context) error
+	// Process handles one record and forwards it to the node's successors.
 	Process(ctx context.Context, record *models.LogRecord) error
 }
 
+// SourceNode is a pipeline entrypoint; it simply forwards records to its
+// successors.
 type SourceNode struct {
 	ID   string
 	Next []Node
 }
 
+// TransformNode runs a VRL transformer, which may emit zero, one or many records
+// for each input, forwarding each to its successors.
 type TransformNode struct {
 	ID          string
 	Transformer string
@@ -30,6 +41,8 @@ type TransformNode struct {
 	runner *vrl.ScriptRunner
 }
 
+// SwitchNode forwards a record to its successors only when the record matches
+// its filtering condition.
 type SwitchNode struct {
 	ID        string
 	Condition string
@@ -38,16 +51,20 @@ type SwitchNode struct {
 	runner filtering.Filter
 }
 
+// PipelineNode delegates processing to another named pipeline.
 type PipelineNode struct {
 	ID       string
 	Pipeline string
 }
 
+// ForwardNode sends the record to an external destination through a forwarder.
 type ForwardNode struct {
 	ID        string
 	Forwarder *models.ForwarderV2
 }
 
+// RouterNode persists the record into a log stream and notifies live
+// subscribers; it is a terminal node.
 type RouterNode struct {
 	ID     string
 	Stream string
@@ -60,6 +77,8 @@ var _ Node = (*PipelineNode)(nil)
 var _ Node = (*ForwardNode)(nil)
 var _ Node = (*RouterNode)(nil)
 
+// sendRecordToNextNodes processes a record through every successor concurrently
+// and joins their errors.
 func sendRecordToNextNodes(ctx context.Context, next []Node, record *models.LogRecord) error {
 	errC := make(chan error, len(next))
 	wg := sync.WaitGroup{}
@@ -86,6 +105,8 @@ func sendRecordToNextNodes(ctx context.Context, next []Node, record *models.LogR
 	return errors.Join(errs...)
 }
 
+// traceNode appends a per-node trace entry when a tracer is active (dry runs);
+// it is a no-op during normal processing.
 func traceNode(
 	ctx context.Context,
 	nodeID string,
@@ -104,6 +125,8 @@ func traceNode(
 	}
 }
 
+// isDryRun reports whether the context carries a tracer, in which case nodes
+// skip their side effects (forwarding, ingestion) and only record traces.
 func isDryRun(ctx context.Context) bool {
 	return GetTracer(ctx) != nil
 }

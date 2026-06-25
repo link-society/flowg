@@ -10,12 +10,16 @@ import (
 	"link-society.com/flowg/internal/storage"
 )
 
+// Pipeline is a compiled, ready-to-run flow: a graph of Nodes indexed by ID,
+// with the subset of source nodes that act as named entrypoints.
 type Pipeline struct {
 	Name        string
 	Entrypoints map[string]Node
 	nodes       map[string]Node
 }
 
+// BuildFromStorage loads the persisted flow graph for name and compiles it into
+// a runnable Pipeline.
 func BuildFromStorage(ctx context.Context, configStorage storage.ConfigStorage, name string) (*Pipeline, error) {
 	flowGraph, err := configStorage.ReadPipeline(ctx, name)
 	if err != nil {
@@ -25,6 +29,10 @@ func BuildFromStorage(ctx context.Context, configStorage storage.ConfigStorage, 
 	return BuildFlow(ctx, configStorage, name, flowGraph)
 }
 
+// BuildFlow compiles a flow graph into a Pipeline: it turns each flow node into
+// the matching Node implementation (resolving referenced transformers and
+// forwarders from storage), then wires the edges as each node's successors.
+// Source nodes become entrypoints keyed by their declared type.
 func BuildFlow(ctx context.Context, configStorage storage.ConfigStorage, name string, flowGraph *models.FlowGraphV2) (*Pipeline, error) {
 	var (
 		pipelineNodes   = make(map[string]Node)
@@ -173,6 +181,8 @@ func BuildFlow(ctx context.Context, configStorage storage.ConfigStorage, name st
 	}, nil
 }
 
+// Init initialises every node (compiling VRL transformers, opening forwarder
+// connections, ...), joining all errors so callers see every failure.
 func (p *Pipeline) Init(ctx context.Context) error {
 	var errs []error
 
@@ -189,6 +199,7 @@ func (p *Pipeline) Init(ctx context.Context) error {
 	return nil
 }
 
+// Close releases every node's resources, joining all errors.
 func (p *Pipeline) Close(ctx context.Context) error {
 	var errs []error
 
@@ -205,6 +216,8 @@ func (p *Pipeline) Close(ctx context.Context) error {
 	return nil
 }
 
+// Process feeds a record into the node selected by entrypoint and records the
+// pipeline-level success metric.
 func (p *Pipeline) Process(
 	ctx context.Context,
 	entrypoint string,

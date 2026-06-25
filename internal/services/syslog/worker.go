@@ -15,6 +15,8 @@ import (
 	"link-society.com/flowg/internal/storage"
 )
 
+// worker is the syslog service's actor body. It drains the message channel and
+// drives each message through the pipeline engine.
 type worker struct {
 	logger         *slog.Logger
 	channel        gosyslog.LogPartsChannel
@@ -24,6 +26,10 @@ type worker struct {
 
 var _ actor.Worker = (*worker)(nil)
 
+// DoWork handles one received syslog message: it enforces the configured
+// allowed-origin list (exact IPs or CIDR ranges), then runs the message through
+// every pipeline's syslog entrypoint concurrently, logging but not aborting on
+// per-pipeline errors.
 func (w *worker) DoWork(ctx actor.Context) actor.WorkerStatus {
 	select {
 	case <-ctx.Done():

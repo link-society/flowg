@@ -11,6 +11,9 @@ import (
 	"link-society.com/flowg/internal/engines/lognotify"
 )
 
+// worker is the runner's actor body. It owns the cache of compiled pipelines and
+// the storage handles every node needs; serialising message handling keeps cache
+// access safe.
 type worker struct {
 	mbox actor.MailboxReceiver[message]
 
@@ -40,6 +43,9 @@ func (w *worker) DoWork(ctx actor.Context) actor.WorkerStatus {
 	}
 }
 
+// getOrBuildPipeline returns the cached build for a pipeline, compiling and
+// initialising it from storage on first use. The build is closed again if
+// initialisation fails.
 func (w *worker) getOrBuildPipeline(ctx context.Context, pipelineName string) (*Pipeline, error) {
 	w.cacheMu.Lock()
 	defer w.cacheMu.Unlock()

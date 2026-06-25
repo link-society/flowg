@@ -8,14 +8,23 @@ import (
 )
 
 const (
+	// DIRECT_ENTRYPOINT is the default source type, used when a record is
+	// submitted directly (e.g. via the ingestion API or a parent pipeline).
 	DIRECT_ENTRYPOINT = "direct"
+	// SYSLOG_ENTRYPOINT is the source type for records arriving from the syslog
+	// service.
 	SYSLOG_ENTRYPOINT = "syslog"
 )
 
+// message is a request handled by the runner actor; each variant knows how to
+// service itself against the worker.
 type message interface {
 	handle(ctx context.Context, w *worker)
 }
 
+// logMessage requests that a record be processed by a pipeline. When tracer is
+// set the run is a dry run that rebuilds the pipeline from the traced flow and
+// records per-node traces.
 type logMessage struct {
 	replyTo chan<- error
 
@@ -25,11 +34,13 @@ type logMessage struct {
 	tracer       *NodeTracer
 }
 
+// invalidateCacheMessage requests eviction of a single pipeline's cached build.
 type invalidateCacheMessage struct {
 	replyTo      chan<- error
 	pipelineName string
 }
 
+// invalidateAllCacheMessage requests eviction of every cached pipeline build.
 type invalidateAllCacheMessage struct {
 	replyTo chan<- error
 }

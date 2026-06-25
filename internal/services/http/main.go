@@ -16,17 +16,23 @@ import (
 	"link-society.com/flowg/web"
 )
 
+// ServerOptions configures the HTTP server: where to bind, the path everything
+// is mounted under, and an optional TLS configuration (nil serves plain HTTP).
 type ServerOptions struct {
 	BindAddress string
 	MountPath   string
 	TlsConfig   *tls.Config
 }
 
+// Server is the running HTTP service: the standard library server plus its
+// pre-scoped logger.
 type Server struct {
 	logger     *slog.Logger
 	httpServer *http.Server
 }
 
+// handlers collects the API and web handlers provided by their respective fx
+// modules, distinguished by name.
 type handlers struct {
 	fx.In
 
@@ -34,6 +40,10 @@ type handlers struct {
 	WebHandler http.Handler `name:"service-http-web"`
 }
 
+// NewServer returns an fx module that mounts the API under "<mount>/api/" and
+// the web UI under "<mount>/web/" (with the root redirecting to the UI), wraps
+// everything in the access-log middleware, and binds the server to the
+// application lifecycle.
 func NewServer(opts ServerOptions) fx.Option {
 	return fx.Module(
 		"services.http",

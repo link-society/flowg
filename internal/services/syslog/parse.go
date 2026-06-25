@@ -8,6 +8,8 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
+// parseLogParts converts the loosely-typed fields parsed by the syslog library
+// into a LogRecord, stringifying every value so it fits the flat field map.
 func parseLogParts(logParts gosyslogformat.LogParts) *models.LogRecord {
 	fields := make(map[string]string, len(logParts))
 
