@@ -6,6 +6,8 @@ import (
 	"github.com/dgraph-io/badger/v4"
 )
 
+// EstimateStorage sums Badger's estimated on-disk size of every entry in a
+// stream ("entry:<stream>:*").
 func EstimateStorage(txn *badger.Txn, stream string) (int64, error) {
 	storage := int64(0)
 
@@ -23,6 +25,10 @@ func EstimateStorage(txn *badger.Txn, stream string) (int64, error) {
 	return storage, nil
 }
 
+// CollectGarbage evicts the oldest records of any stream that has grown past its
+// configured size budget. For each over-budget stream it walks the entries from
+// oldest to newest (the key order), deleting them and their inverted-index
+// references until the stream fits within its retention size again.
 func CollectGarbage(txn *badger.Txn) error {
 	streams, err := FetchStreamConfigs(txn)
 	if err != nil {

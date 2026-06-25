@@ -9,6 +9,10 @@ import (
 	"encoding/base64"
 )
 
+// migrateAlerts is the on-disk counterpart of the auth "alerts" -> "forwarders"
+// rename: legacy deployments stored forwarder definitions in an "alerts"
+// directory, so this moves every file from "<baseDir>/alerts" into
+// "<baseDir>/forwarders" before the rest of the migration runs.
 func migrateAlerts(baseDir string) error {
 	alertsDir := filepath.Join(baseDir, "alerts")
 	forwardersDir := filepath.Join(baseDir, "forwarders")
@@ -43,6 +47,12 @@ func migrateAlerts(baseDir string) error {
 	return nil
 }
 
+// migrateToBadger imports the legacy file-based configuration into Badger.
+// Early versions kept transformers, pipelines and forwarders as individual files
+// on disk (forwarders being base64-encoded); this walks each of those
+// directories, decodes the content where needed, writes it under the matching
+// item type in the key/value store and removes the original file so the import
+// is not repeated.
 func migrateToBadger(ctx context.Context, baseDir string, storage *storageImpl) error {
 	fileStorages := []struct {
 		dir       string

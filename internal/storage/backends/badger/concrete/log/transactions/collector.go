@@ -11,6 +11,12 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
+// Ingest stores one log record and, in the same transaction, maintains the
+// secondary data that makes it queryable. It writes the record under its
+// "entry:<stream>:..." key with the stream's retention TTL, registers each of
+// its fields in the stream's field set ("stream:field:<stream>:<field>"), and,
+// for every field the stream is configured to index, adds an inverted-index key
+// pointing back at the record.
 func Ingest(txn *badger.Txn, stream string, logRecord *models.LogRecord, key []byte) error {
 	val, err := json.Marshal(logRecord)
 	if err != nil {

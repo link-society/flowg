@@ -11,6 +11,11 @@ import (
 	"link-society.com/flowg/internal/storage/backends/badger/kvstore"
 )
 
+// migrateAlertScopes renames the legacy "alerts" permission to "forwarders".
+// FlowG used to call forwarders "alerts", so older databases still hold
+// "role:<name>:read_alerts" / "role:<name>:write_alerts" scope keys. This pass
+// scans every role, and for each affected grant writes the equivalent
+// "*_forwarders" key and deletes the obsolete "*_alerts" one.
 func migrateAlertScopes(ctx context.Context, kvStore kvstore.Storage) error {
 	return kvStore.Update(ctx, func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions

@@ -18,6 +18,9 @@ var demoStreamConfig = models.StreamConfig{
 	IndexedFields: []string{},
 }
 
+// FetchStreamConfigs returns the configuration of every stream, keyed by stream
+// name. In demo mode the fixed demo configuration is substituted for all of
+// them.
 func FetchStreamConfigs(txn *badger.Txn) (map[string]models.StreamConfig, error) {
 	streams := map[string]models.StreamConfig{}
 
@@ -57,10 +60,12 @@ func FetchStreamConfigs(txn *badger.Txn) (map[string]models.StreamConfig, error)
 	return streams, nil
 }
 
+// FetchStreamFields lists the field names recorded for a stream from its
+// "stream:field:<stream>:" existence markers.
 func FetchStreamFields(txn *badger.Txn, stream string) []string {
 	fields := []string{}
 
-	prefix := []byte(fmt.Sprintf("stream:field:%s:", stream))
+	prefix := fmt.Appendf(nil, "stream:field:%s:", stream)
 	opts := badger.DefaultIteratorOptions
 	opts.PrefetchValues = false
 	opts.Prefix = prefix
@@ -78,6 +83,9 @@ func FetchStreamFields(txn *badger.Txn, stream string) []string {
 	return fields
 }
 
+// GetOrCreateStreamConfig returns a stream's configuration, lazily creating an
+// empty (default) config the first time a stream is referenced so later writes
+// have something to update. Demo mode short-circuits to the fixed config.
 func GetOrCreateStreamConfig(txn *badger.Txn, stream string) (models.StreamConfig, error) {
 	if featureflags.GetDemoMode() {
 		return demoStreamConfig, nil
@@ -85,7 +93,7 @@ func GetOrCreateStreamConfig(txn *badger.Txn, stream string) (models.StreamConfi
 
 	var streamConfig models.StreamConfig
 
-	streamKey := []byte(fmt.Sprintf("stream:config:%s", stream))
+	streamKey := fmt.Appendf(nil, "stream:config:%s", stream)
 	switch streamConfigItem, err := txn.Get(streamKey); {
 	case err != nil && err != badger.ErrKeyNotFound:
 		return models.StreamConfig{}, fmt.Errorf(
@@ -126,6 +134,10 @@ func GetOrCreateStreamConfig(txn *badger.Txn, stream string) (models.StreamConfi
 	return streamConfig, nil
 }
 
+// ConfigureStream stores a new stream configuration and reconciles its indexed
+// fields against the previous one: fields newly added to the index are back-
+// filled over existing records, and fields removed from it have their index
+// dropped.
 func ConfigureStream(txn *badger.Txn, stream string, config models.StreamConfig) error {
 	if config.IndexedFields == nil {
 		config.IndexedFields = []string{}
@@ -136,7 +148,7 @@ func ConfigureStream(txn *badger.Txn, stream string, config models.StreamConfig)
 		return fmt.Errorf("could not fetch old stream config '%s': %w", stream, err)
 	}
 
-	streamKey := []byte(fmt.Sprintf("stream:config:%s", stream))
+	streamKey := fmt.Appendf(nil, "stream:config:%s", stream)
 	configVal, err := json.Marshal(config)
 	if err != nil {
 		return fmt.Errorf("could not marshal stream config '%s': %w", stream, err)
@@ -161,6 +173,9 @@ func ConfigureStream(txn *badger.Txn, stream string, config models.StreamConfig)
 	return nil
 }
 
+// DeleteStream removes everything belonging to a stream: its log entries
+// ("entry:<stream>:*"), inverted indexes ("index:<stream>:*"), field markers
+// ("stream:field:<stream>:*") and its configuration key.
 func DeleteStream(txn *badger.Txn, stream string) error {
 	prefixes := []string{
 		fmt.Sprintf("entry:%s:", stream),
@@ -187,7 +202,7 @@ func DeleteStream(txn *badger.Txn, stream string) error {
 		}
 	}
 
-	streamKey := []byte(fmt.Sprintf("stream:config:%s", stream))
+	streamKey := fmt.Appendf(nil, "stream:config:%s", stream)
 	if err := txn.Delete(streamKey); err != nil {
 		return fmt.Errorf("could not delete stream config '%s': %w", stream, err)
 	}

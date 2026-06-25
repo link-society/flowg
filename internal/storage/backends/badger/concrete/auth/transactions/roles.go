@@ -8,6 +8,7 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
+// ListRoles loads every role together with the scopes it grants.
 func ListRoles(txn *badger.Txn) ([]models.Role, error) {
 	roles := []models.Role{}
 	roleNames := fetchRoleNames(txn)
@@ -26,6 +27,8 @@ func ListRoles(txn *badger.Txn) ([]models.Role, error) {
 	return roles, nil
 }
 
+// FetchRole reconstructs a single role by collecting its "role:<name>:*" scope
+// keys; the key itself carries the scope, so values are never read.
 func FetchRole(txn *badger.Txn, name string) (*models.Role, error) {
 	role := &models.Role{Name: name}
 
@@ -49,6 +52,10 @@ func FetchRole(txn *badger.Txn, name string) (*models.Role, error) {
 	return role, nil
 }
 
+// SaveRole persists a role and reconciles its scope keys against what is already
+// stored: it writes the "index:role:<name>" marker, then converges the existing
+// "role:<name>:*" keys towards the desired scope set by adding the missing ones
+// and deleting the obsolete ones.
 func SaveRole(txn *badger.Txn, role models.Role) error {
 	key := []byte(fmt.Sprintf("index:role:%s", role.Name))
 	err := txn.Set(key, []byte{})
@@ -67,6 +74,8 @@ func SaveRole(txn *badger.Txn, role models.Role) error {
 
 	obsoleteScopes := map[models.Scope][]byte{}
 
+	// Collect the scopes currently stored for the role, tentatively flagging any
+	// that are no longer part of the desired set as obsolete.
 	for it.Rewind(); it.Valid(); it.Next() {
 		key := it.Item().KeyCopy(nil)
 		scopeName := string(key[len(role.Name)+6:])
@@ -80,6 +89,8 @@ func SaveRole(txn *badger.Txn, role models.Role) error {
 		}
 	}
 
+	// Persist the desired scopes: create the ones that are missing and clear the
+	// obsolete flag on the ones that already exist.
 	for _, scope := range role.Scopes {
 		if _, exists := obsoleteScopes[scope]; !exists {
 			key := []byte(fmt.Sprintf("role:%s:%s", role.Name, scope))
@@ -95,6 +106,7 @@ func SaveRole(txn *badger.Txn, role models.Role) error {
 		}
 	}
 
+	// Whatever scope keys remain flagged are no longer granted and get removed.
 	for scope, key := range obsoleteScopes {
 		err := txn.Delete(key)
 		if err != nil {
@@ -108,6 +120,8 @@ func SaveRole(txn *badger.Txn, role models.Role) error {
 	return nil
 }
 
+// DeleteRole removes a role entirely: every "role:<name>:*" scope key plus its
+// "index:role:<name>" marker.
 func DeleteRole(txn *badger.Txn, name string) error {
 	opts := badger.DefaultIteratorOptions
 	opts.PrefetchValues = false
@@ -142,6 +156,7 @@ func DeleteRole(txn *badger.Txn, name string) error {
 	return nil
 }
 
+// fetchRoleNames lists existing role names from their "index:role:" markers.
 func fetchRoleNames(txn *badger.Txn) []string {
 	roleNames := []string{}
 

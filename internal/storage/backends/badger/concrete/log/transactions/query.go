@@ -13,6 +13,10 @@ import (
 	"link-society.com/flowg/internal/utils/langs/filtering"
 )
 
+// FetchLogs returns the records of a stream between two timestamps, newest
+// first. It gathers the candidate keys in the time window, narrows them to those
+// present in the requested field indexes, then decodes each surviving record and
+// keeps the ones the filter accepts.
 func FetchLogs(
 	txn *badger.Txn,
 	stream string,
@@ -65,6 +69,10 @@ func FetchLogs(
 	return results, nil
 }
 
+// fetchKeysByTime collects the entry keys whose embedded timestamp falls in
+// [from, to). Because the timestamp is zero-padded in the key, it can seek
+// straight to the lower bound and stop as soon as a key sorts past the upper
+// bound instead of scanning the whole stream.
 func fetchKeysByTime(txn *badger.Txn, stream string, from, to time.Time) []string {
 	keys := []string{}
 
@@ -92,6 +100,7 @@ func fetchKeysByTime(txn *badger.Txn, stream string, from, to time.Time) []strin
 	return keys
 }
 
+// fetchRecord loads and JSON-decodes a single log record by its key.
 func fetchRecord(txn *badger.Txn, stream string, key string) (models.LogRecord, error) {
 	item, err := txn.Get([]byte(key))
 	if err != nil {

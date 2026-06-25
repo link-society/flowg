@@ -10,6 +10,7 @@ import (
 	"link-society.com/flowg/internal/storage/backends/badger/concrete/auth/hash"
 )
 
+// ListUsers loads every user together with their assigned roles.
 func ListUsers(txn *badger.Txn) ([]models.User, error) {
 	usernames, err := fetchUsernames(txn)
 	if err != nil {
@@ -32,6 +33,9 @@ func ListUsers(txn *badger.Txn) ([]models.User, error) {
 	return users, err
 }
 
+// FetchUser loads a single user, returning nil when no "index:user:<name>"
+// marker exists. The user's roles are gathered from their "user:<name>:role:*"
+// keys.
 func FetchUser(txn *badger.Txn, name string) (*models.User, error) {
 	_, err := txn.Get([]byte(fmt.Sprintf("index:user:%s", name)))
 	if err != nil {
@@ -59,6 +63,8 @@ func FetchUser(txn *badger.Txn, name string) (*models.User, error) {
 	return user, nil
 }
 
+// SaveUser stores the user's password hash under "user:<name>:password" and then
+// reconciles their role assignments via PatchUserRoles.
 func SaveUser(txn *badger.Txn, user models.User, password string) error {
 	passwordHash, err := hash.HashPassword(password)
 	if err != nil {
@@ -74,6 +80,10 @@ func SaveUser(txn *badger.Txn, user models.User, password string) error {
 	return PatchUserRoles(txn, user)
 }
 
+// PatchUserRoles writes the "index:user:<name>" marker and converges the stored
+// "user:<name>:role:*" keys towards the user's desired role set, adding the
+// missing assignments and deleting the obsolete ones (the password is left
+// untouched).
 func PatchUserRoles(txn *badger.Txn, user models.User) error {
 	key := []byte(fmt.Sprintf("index:user:%s", user.Name))
 	err := txn.Set(key, []byte{})
@@ -89,6 +99,8 @@ func PatchUserRoles(txn *badger.Txn, user models.User) error {
 
 	obsoleteRoles := map[string][]byte{}
 
+	// Collect the roles currently assigned, tentatively flagging any that are no
+	// longer part of the desired set as obsolete.
 	for it.Rewind(); it.Valid(); it.Next() {
 		key := it.Item().KeyCopy(nil)
 		roleName := string(key[len(user.Name)+11:])
@@ -97,6 +109,8 @@ func PatchUserRoles(txn *badger.Txn, user models.User) error {
 		}
 	}
 
+	// Persist the desired roles: create the ones missing and clear the obsolete
+	// flag on the ones already assigned.
 	for _, role := range user.Roles {
 		if _, exists := obsoleteRoles[role]; !exists {
 			key := []byte(fmt.Sprintf("user:%s:role:%s", user.Name, role))
@@ -112,6 +126,7 @@ func PatchUserRoles(txn *badger.Txn, user models.User) error {
 		}
 	}
 
+	// Whatever role keys remain flagged are no longer assigned and get removed.
 	for role, key := range obsoleteRoles {
 		err := txn.Delete(key)
 		if err != nil && err != badger.ErrKeyNotFound {
@@ -125,6 +140,9 @@ func PatchUserRoles(txn *badger.Txn, user models.User) error {
 	return nil
 }
 
+// DeleteUser removes everything tied to a user: all "user:<name>:*" keys (roles
+// and password), all of their "pat:<name>:*" tokens, and the
+// "index:user:<name>" marker.
 func DeleteUser(txn *badger.Txn, name string) error {
 	keys := make([][]byte, 0)
 
@@ -173,6 +191,8 @@ func DeleteUser(txn *badger.Txn, name string) error {
 	return nil
 }
 
+// VerifyUserPassword bcrypt-compares a candidate password against the hash
+// stored under "user:<name>:password".
 func VerifyUserPassword(txn *badger.Txn, name, password string) (bool, error) {
 	isValid := false
 
@@ -197,6 +217,10 @@ func VerifyUserPassword(txn *badger.Txn, name, password string) (bool, error) {
 	return isValid, nil
 }
 
+// VerifyUserPermission reports whether a user holds a given scope. It walks the
+// user's roles ("user:<name>:role:*") and, for each, the scopes it grants
+// ("role:<role>:*"), returning true on a direct match or when the user holds the
+// matching write scope for a requested read scope (write implies read).
 func VerifyUserPermission(txn *badger.Txn, name string, scope models.Scope) (bool, error) {
 	opts := badger.DefaultIteratorOptions
 	opts.PrefetchValues = false
@@ -252,6 +276,9 @@ func VerifyUserPermission(txn *badger.Txn, name string, scope models.Scope) (boo
 	return false, nil
 }
 
+// ListUserScopes returns the de-duplicated set of scopes a user effectively
+// holds, resolved through their roles. Each write scope additionally pulls in
+// its corresponding read scope.
 func ListUserScopes(txn *badger.Txn, username string) ([]models.Scope, error) {
 	scopeMap := map[models.Scope]struct{}{}
 
@@ -319,6 +346,7 @@ func ListUserScopes(txn *badger.Txn, username string) ([]models.Scope, error) {
 	return scopes, nil
 }
 
+// fetchUsernames lists existing usernames from their "index:user:" markers.
 func fetchUsernames(txn *badger.Txn) ([]string, error) {
 	usernames := []string{}
 
