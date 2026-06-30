@@ -12,6 +12,7 @@ import ForwarderEditorAwsloudWatch from '@/components/ForwarderEditorAwsCloudWat
 import ForwarderEditorClickhouse from '@/components/ForwarderEditorClickhouse/component'
 import ForwarderEditorDatadog from '@/components/ForwarderEditorDatadog/component'
 import ForwarderEditorElastic from '@/components/ForwarderEditorElastic/component'
+import ForwarderEditorGoogleCloudLogging from '@/components/ForwarderEditorGoogleCloudLogging/component'
 import ForwarderEditorHttp from '@/components/ForwarderEditorHttp/component'
 import ForwarderEditorOtlp from '@/components/ForwarderEditorOtlp/component'
 import ForwarderEditorSplunk from '@/components/ForwarderEditorSplunk/component'
@@ -30,6 +31,7 @@ const editors = {
   splunk: ForwarderEditorSplunk,
   syslog: ForwarderEditorSyslog,
   awscloudwatch: ForwarderEditorAwsloudWatch,
+  googlecloudlogging: ForwarderEditorGoogleCloudLogging,
 }
 
 const ForwarderEditor = ({
