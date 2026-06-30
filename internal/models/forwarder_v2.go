@@ -19,15 +19,15 @@ type ForwarderV2 struct {
 // the forwarder backend. It marshals to/from the backend's own JSON (discriminated
 // by a "type" field) rather than nesting under the field name.
 type ForwarderConfigV2 struct {
-	Http       *ForwarderHttpV2       `json:"-"`
-	Syslog     *ForwarderSyslogV2     `json:"-"`
-	Datadog    *ForwarderDatadogV2    `json:"-"`
-	Amqp       *ForwarderAmqpV2       `json:"-"`
-	Splunk     *ForwarderSplunkV2     `json:"-"`
-	Otlp       *ForwarderOtlpV2       `json:"-"`
-	Elastic    *ForwarderElasticV2    `json:"-"`
-	Clickhouse *ForwarderClickhouseV2 `json:"-"`
-	CloudWatch *ForwarderCloudWatchV2 `json:"-"`
+	Http          *ForwarderHttpV2          `json:"-"`
+	Syslog        *ForwarderSyslogV2        `json:"-"`
+	Datadog       *ForwarderDatadogV2       `json:"-"`
+	Amqp          *ForwarderAmqpV2          `json:"-"`
+	Splunk        *ForwarderSplunkV2        `json:"-"`
+	Otlp          *ForwarderOtlpV2          `json:"-"`
+	Elastic       *ForwarderElasticV2       `json:"-"`
+	Clickhouse    *ForwarderClickhouseV2    `json:"-"`
+	AwsCloudWatch *ForwarderAwsCloudWatchV2 `json:"-"`
 }
 
 // JSONSchemaOneOf advertises every backend variant so the generated OpenAPI
@@ -42,7 +42,7 @@ func (ForwarderConfigV2) JSONSchemaOneOf() []any {
 		ForwarderOtlpV2{},
 		ForwarderElasticV2{},
 		ForwarderClickhouseV2{},
-		ForwarderCloudWatchV2{},
+		ForwarderAwsCloudWatchV2{},
 	}
 }
 
@@ -66,8 +66,8 @@ func (f *ForwarderV2) Init(ctx context.Context) error {
 		return f.Config.Elastic.init(ctx)
 	case f.Config.Clickhouse != nil:
 		return f.Config.Clickhouse.init(ctx)
-	case f.Config.CloudWatch != nil:
-		return f.Config.CloudWatch.init(ctx)
+	case f.Config.AwsCloudWatch != nil:
+		return f.Config.AwsCloudWatch.init(ctx)
 	default:
 		return fmt.Errorf("unsupported forwarder type")
 	}
@@ -92,8 +92,8 @@ func (f *ForwarderV2) Close(ctx context.Context) error {
 		return f.Config.Elastic.close(ctx)
 	case f.Config.Clickhouse != nil:
 		return f.Config.Clickhouse.close(ctx)
-	case f.Config.CloudWatch != nil:
-		return f.Config.CloudWatch.close(ctx)
+	case f.Config.AwsCloudWatch != nil:
+		return f.Config.AwsCloudWatch.close(ctx)
 	default:
 		return fmt.Errorf("unsupported forwarder type")
 	}
@@ -118,8 +118,8 @@ func (f *ForwarderV2) Call(ctx context.Context, record *LogRecord) error {
 		return f.Config.Elastic.call(ctx, record)
 	case f.Config.Clickhouse != nil:
 		return f.Config.Clickhouse.call(ctx, record)
-	case f.Config.CloudWatch != nil:
-		return f.Config.CloudWatch.call(ctx, record)
+	case f.Config.AwsCloudWatch != nil:
+		return f.Config.AwsCloudWatch.call(ctx, record)
 	default:
 		return fmt.Errorf("unsupported forwarder type")
 	}
@@ -152,8 +152,8 @@ func (cfg *ForwarderConfigV2) MarshalJSON() ([]byte, error) {
 	case cfg.Clickhouse != nil:
 		return json.Marshal(&cfg.Clickhouse)
 
-	case cfg.CloudWatch != nil:
-		return json.Marshal(&cfg.CloudWatch)
+	case cfg.AwsCloudWatch != nil:
+		return json.Marshal(&cfg.AwsCloudWatch)
 
 	default:
 		return nil, fmt.Errorf("unsupported forwarder type")
@@ -171,7 +171,7 @@ func (cfg *ForwarderConfigV2) UnmarshalJSON(data []byte) error {
 	cfg.Otlp = nil
 	cfg.Elastic = nil
 	cfg.Clickhouse = nil
-	cfg.CloudWatch = nil
+	cfg.AwsCloudWatch = nil
 
 	var typeInfo struct {
 		Type string `json:"type" required:"true"`
@@ -206,8 +206,8 @@ func (cfg *ForwarderConfigV2) UnmarshalJSON(data []byte) error {
 	case "clickhouse":
 		return json.Unmarshal(data, &cfg.Clickhouse)
 
-	case "cloudwatch":
-		return json.Unmarshal(data, &cfg.CloudWatch)
+	case "awscloudwatch":
+		return json.Unmarshal(data, &cfg.AwsCloudWatch)
 
 	default:
 		return fmt.Errorf("unsupported forwarder type: %s", typeInfo.Type)

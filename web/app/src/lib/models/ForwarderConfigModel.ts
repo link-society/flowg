@@ -6,8 +6,8 @@ import ForwarderConfigAmqpModel, {
 import ForwarderConfigClickhouseModel, {
   factory as ForwarderConfigClickhouseFactory,
 } from '@/lib/models/ForwarderConfigClickhouseModel'
-import ForwarderConfigCloudWatchModel, {
-  factory as ForwarderConfigCloudWatchFactory,
+import ForwarderConfigAwsCloudWatchModel, {
+  factory as ForwarderConfigAwsCloudWatchFactory,
 } from '@/lib/models/ForwarderConfigCloudWatchModel'
 import ForwarderConfigDatadogModel, {
   factory as ForwarderConfigDatadogFactory,
@@ -29,8 +29,8 @@ import ForwarderConfigSyslogModel, {
 } from '@/lib/models/ForwarderConfigSyslogModel'
 
 import ForwarderIconAmqp from '@/components/icons/ForwarderIconAmqp/component'
+import ForwarderIconAwsCloudWatch from '@/components/icons/ForwarderIconAwsCloudWatch/component'
 import ForwarderIconClickhouse from '@/components/icons/ForwarderIconClickhouse/component'
-import ForwarderIconCloudWatch from '@/components/icons/ForwarderIconCloudWatch/component'
 import ForwarderIconDatadog from '@/components/icons/ForwarderIconDatadog/component'
 import ForwarderIconElastic from '@/components/icons/ForwarderIconElastic/component'
 import ForwarderIconHttp from '@/components/icons/ForwarderIconHttp/component'
@@ -47,7 +47,7 @@ type ForwarderConfigModel =
   | ForwarderConfigOtlpModel
   | ForwarderConfigElasticModel
   | ForwarderConfigClickhouseModel
-  | ForwarderConfigCloudWatchModel
+  | ForwarderConfigAwsCloudWatchModel
 
 export type ForwarderConfigTypes = ForwarderConfigModel['type']
 
@@ -60,7 +60,11 @@ export const ForwarderConfigTypeValues = [
   { key: 'otlp', label: 'OpenTelemetry', icon: ForwarderIconOtlp },
   { key: 'elastic', label: 'Elastic Search', icon: ForwarderIconElastic },
   { key: 'clickhouse', label: 'Clickhouse', icon: ForwarderIconClickhouse },
-  { key: 'cloudwatch', label: 'Cloudwatch', icon: ForwarderIconCloudWatch },
+  {
+    key: 'awscloudwatch',
+    label: 'AWS Cloudwatch',
+    icon: ForwarderIconAwsCloudWatch,
+  },
 ] as const
 
 export const ForwarderConfigTypeLabelMap = ForwarderConfigTypeValues.reduce(
@@ -90,7 +94,7 @@ const factories: Record<ForwarderConfigTypes, () => ForwarderConfigModel> = {
   otlp: ForwarderConfigOtlpFactory,
   elastic: ForwarderConfigElasticFactory,
   clickhouse: ForwarderConfigClickhouseFactory,
-  cloudwatch: ForwarderConfigCloudWatchFactory,
+  awscloudwatch: ForwarderConfigAwsCloudWatchFactory,
 }
 
 export const factory = (type: ForwarderConfigTypes): ForwarderConfigModel => {

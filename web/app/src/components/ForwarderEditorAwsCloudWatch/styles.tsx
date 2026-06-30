@@ -1,6 +1,6 @@
 import { styled } from '@mui/material'
 
-export const ForwarderEditorCloudWatchRoot = styled('div')(({ theme }) => ({
+export const ForwarderEditorAwsCloudWatchRoot = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',

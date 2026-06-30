@@ -8,8 +8,8 @@ import ForwarderConfigModel, {
 } from '@/lib/models/ForwarderConfigModel'
 
 import ForwarderEditorAmqp from '@/components/ForwarderEditorAmqp/component'
+import ForwarderEditorAwsloudWatch from '@/components/ForwarderEditorAwsCloudWatch/component.tsx'
 import ForwarderEditorClickhouse from '@/components/ForwarderEditorClickhouse/component'
-import ForwarderEditorCloudWatch from '@/components/ForwarderEditorCloudWatch/component.tsx'
 import ForwarderEditorDatadog from '@/components/ForwarderEditorDatadog/component'
 import ForwarderEditorElastic from '@/components/ForwarderEditorElastic/component'
 import ForwarderEditorHttp from '@/components/ForwarderEditorHttp/component'
@@ -29,7 +29,7 @@ const editors = {
   otlp: ForwarderEditorOtlp,
   splunk: ForwarderEditorSplunk,
   syslog: ForwarderEditorSyslog,
-  cloudwatch: ForwarderEditorCloudWatch,
+  awscloudwatch: ForwarderEditorAwsloudWatch,
 }
 
 const ForwarderEditor = ({

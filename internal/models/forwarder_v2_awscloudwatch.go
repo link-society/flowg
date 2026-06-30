@@ -12,14 +12,14 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
 )
 
-type forwarderStateCloudWatchV2 struct {
+type forwarderStateAwsCloudWatchV2 struct {
 	client *cloudwatchlogs.Client
 }
 
 // ForwarderCloudWatchV2 forwards records to an AWS CloudWatch Logs stream,
 // authenticating with static credentials.
-type ForwarderCloudWatchV2 struct {
-	Type     string `json:"type" enum:"cloudwatch" required:"true"`
+type ForwarderAwsCloudWatchV2 struct {
+	Type     string `json:"type" enum:"awscloudwatch" required:"true"`
 	AppID    string `json:"app_id"`
 	Endpoint string `json:"endpoint" required:"true"`
 
@@ -32,10 +32,10 @@ type ForwarderCloudWatchV2 struct {
 	Group  string `json:"group" required:"true"`
 	Stream string `json:"stream" required:"true"`
 
-	state *forwarderStateCloudWatchV2
+	state *forwarderStateAwsCloudWatchV2
 }
 
-func (f *ForwarderCloudWatchV2) init(ctx context.Context) error {
+func (f *ForwarderAwsCloudWatchV2) init(ctx context.Context) error {
 	cfg, err := config.LoadDefaultConfig(ctx,
 		config.WithCredentialsProvider(
 			credentials.NewStaticCredentialsProvider(f.AccessKeyID, f.SecretAccessKey, f.SessionToken),
@@ -46,7 +46,7 @@ func (f *ForwarderCloudWatchV2) init(ctx context.Context) error {
 		return fmt.Errorf("failed to acquire credentials: %w", err)
 	}
 
-	f.state = &forwarderStateCloudWatchV2{
+	f.state = &forwarderStateAwsCloudWatchV2{
 		client: cloudwatchlogs.New(cloudwatchlogs.Options{
 			AppID:        f.AppID,
 			BaseEndpoint: &f.Endpoint,
@@ -58,11 +58,11 @@ func (f *ForwarderCloudWatchV2) init(ctx context.Context) error {
 	return nil
 }
 
-func (f *ForwarderCloudWatchV2) close(context.Context) error {
+func (f *ForwarderAwsCloudWatchV2) close(context.Context) error {
 	return nil
 }
 
-func (f *ForwarderCloudWatchV2) call(ctx context.Context, record *LogRecord) error {
+func (f *ForwarderAwsCloudWatchV2) call(ctx context.Context, record *LogRecord) error {
 	message, err := json.Marshal(record.Fields)
 	if err != nil {
 		return fmt.Errorf("failed to marshal record: %w", err)

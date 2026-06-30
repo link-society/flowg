@@ -1,5 +1,5 @@
-type ForwarderConfigCloudWatchModel = {
-  type: 'cloudwatch'
+type ForwarderConfigAwsCloudWatchModel = {
+  type: 'awscloudwatch'
   app_id?: string
   endpoint: string
   region?: string
@@ -10,10 +10,10 @@ type ForwarderConfigCloudWatchModel = {
   stream: string
 }
 
-export default ForwarderConfigCloudWatchModel
+export default ForwarderConfigAwsCloudWatchModel
 
-export const factory = (): ForwarderConfigCloudWatchModel => ({
-  type: 'cloudwatch',
+export const factory = (): ForwarderConfigAwsCloudWatchModel => ({
+  type: 'awscloudwatch',
   app_id: 'flowg',
   endpoint: '',
   region: '',

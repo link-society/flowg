@@ -7,14 +7,14 @@ import { useInput } from '@/lib/hooks/input'
 
 import * as validators from '@/lib/validators'
 
-import { ForwarderEditorCloudWatchRoot } from './styles'
-import { ForwarderEditorCloudWatchProps } from './types'
+import { ForwarderEditorAwsCloudWatchRoot } from './styles'
+import { ForwarderEditorAwsCloudWatchProps } from './types'
 
-const ForwarderEditorCloudWatch = ({
+const ForwarderEditorAwsCloudWatch = ({
   config,
   onConfigChange,
   onValidationChange,
-}: ForwarderEditorCloudWatchProps) => {
+}: ForwarderEditorAwsCloudWatchProps) => {
   const [app_id, setAppID] = useInput(config.app_id)
 
   const [endpoint, setEndpoint] = useInput(config.endpoint, [
@@ -35,7 +35,7 @@ const ForwarderEditorCloudWatch = ({
 
     if (valid) {
       onConfigChange({
-        type: 'cloudwatch',
+        type: 'awscloudwatch',
         app_id: app_id.value,
         endpoint: endpoint.value,
         region: region.value,
@@ -49,7 +49,7 @@ const ForwarderEditorCloudWatch = ({
   }, [app_id, endpoint, region, akid, access_key, token, group, stream])
 
   return (
-    <ForwarderEditorCloudWatchRoot id="container:editor.forwarders.cloudwatch">
+    <ForwarderEditorAwsCloudWatchRoot id="container:editor.forwarders.cloudwatch">
       <TextField
         id="input:editor.forwarders.cloudwatch.app_id"
         label="App ID"
@@ -149,8 +149,8 @@ const ForwarderEditorCloudWatch = ({
           setStream(e.target.value)
         }}
       />
-    </ForwarderEditorCloudWatchRoot>
+    </ForwarderEditorAwsCloudWatchRoot>
   )
 }
 
-export default ForwarderEditorCloudWatch
+export default ForwarderEditorAwsCloudWatch
