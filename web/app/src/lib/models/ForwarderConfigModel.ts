@@ -15,6 +15,9 @@ import ForwarderConfigDatadogModel, {
 import ForwarderConfigElasticModel, {
   factory as ForwarderConfigElasticFactory,
 } from '@/lib/models/ForwarderConfigElasticModel'
+import ForwarderConfigGoogleCloudLoggingModel, {
+  factory as ForwarderConfigGoogleCloudLoggingFactory,
+} from '@/lib/models/ForwarderConfigGoogleCloudLoggingModel'
 import ForwarderConfigHttpModel, {
   factory as ForwarderConfigHttpFactory,
 } from '@/lib/models/ForwarderConfigHttpModel'
@@ -33,6 +36,7 @@ import ForwarderIconAwsCloudWatch from '@/components/icons/ForwarderIconAwsCloud
 import ForwarderIconClickhouse from '@/components/icons/ForwarderIconClickhouse/component'
 import ForwarderIconDatadog from '@/components/icons/ForwarderIconDatadog/component'
 import ForwarderIconElastic from '@/components/icons/ForwarderIconElastic/component'
+import ForwarderIconGoogleLog from '@/components/icons/ForwarderIconGoogleLog/component.tsx'
 import ForwarderIconHttp from '@/components/icons/ForwarderIconHttp/component'
 import ForwarderIconOtlp from '@/components/icons/ForwarderIconOtlp/component'
 import ForwarderIconSplunk from '@/components/icons/ForwarderIconSplunk/component'
@@ -48,6 +52,7 @@ type ForwarderConfigModel =
   | ForwarderConfigElasticModel
   | ForwarderConfigClickhouseModel
   | ForwarderConfigAwsCloudWatchModel
+  | ForwarderConfigGoogleCloudLoggingModel
 
 export type ForwarderConfigTypes = ForwarderConfigModel['type']
 
@@ -64,6 +69,11 @@ export const ForwarderConfigTypeValues = [
     key: 'awscloudwatch',
     label: 'AWS Cloudwatch',
     icon: ForwarderIconAwsCloudWatch,
+  },
+  {
+    key: 'googlecloudlogging',
+    label: 'Google Log',
+    icon: ForwarderIconGoogleLog,
   },
 ] as const
 
@@ -95,6 +105,7 @@ const factories: Record<ForwarderConfigTypes, () => ForwarderConfigModel> = {
   elastic: ForwarderConfigElasticFactory,
   clickhouse: ForwarderConfigClickhouseFactory,
   awscloudwatch: ForwarderConfigAwsCloudWatchFactory,
+  googlecloudlogging: ForwarderConfigGoogleCloudLoggingFactory,
 }
 
 export const factory = (type: ForwarderConfigTypes): ForwarderConfigModel => {
