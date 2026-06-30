@@ -1,6 +1,6 @@
 import SvgIcon from '@mui/material/SvgIcon'
 
-const ForwarderIconCloudWatch = () => (
+const ForwarderIconAwsCloudWatch = () => (
   <SvgIcon
     fill="#000000"
     viewBox="0 0 80 80"
@@ -13,4 +13,4 @@ const ForwarderIconCloudWatch = () => (
   </SvgIcon>
 )
 
-export default ForwarderIconCloudWatch
+export default ForwarderIconAwsCloudWatch
