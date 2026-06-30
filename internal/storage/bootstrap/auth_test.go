@@ -47,12 +47,36 @@ func TestDefaultRolesAndUsers(t *testing.T) {
 		t.Fatalf("failed to list roles: %v", err)
 	}
 
-	if len(roles) != 1 {
-		t.Fatalf("expected 1 role, got %d", len(roles))
+	if len(roles) != 2 {
+		t.Fatalf("expected 2 roles, got %d", len(roles))
 	}
 
-	if roles[0].Name != "admin" {
-		t.Fatalf("expected role name to be admin, got %s", roles[0].Name)
+	var adminRole *models.Role
+	var viewerRole *models.Role
+
+	for i := range roles {
+		switch roles[i].Name {
+		case "admin":
+			adminRole = &roles[i]
+		case "viewer":
+			viewerRole = &roles[i]
+		}
+	}
+
+	if adminRole == nil {
+		t.Fatal("expected admin role to exist")
+	}
+
+	if viewerRole == nil {
+		t.Fatal("expected viewer role to exist")
+	}
+
+	if !viewerRole.HasScope(models.SCOPE_READ_STREAMS) {
+		t.Fatal("expected viewer role to have scope read_streams")
+	}
+
+	if viewerRole.HasScope(models.SCOPE_WRITE_STREAMS) {
+		t.Fatal("expected viewer role to NOT have scope write_streams")
 	}
 
 	expected := []models.Scope{
@@ -65,8 +89,8 @@ func TestDefaultRolesAndUsers(t *testing.T) {
 	}
 
 	for _, scope := range expected {
-		if !roles[0].HasScope(scope) {
-			t.Fatalf("expected role to have scope %s", scope)
+		if !adminRole.HasScope(scope) {
+			t.Fatalf("expected admin role to have scope %s", scope)
 		}
 	}
 }

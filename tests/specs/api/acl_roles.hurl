@@ -11,8 +11,9 @@ Authorization: Bearer {{admin_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true
-jsonpath "$.roles" count == 1
+jsonpath "$.roles" count == 2
 jsonpath "$.roles[*].name" contains "admin"
+jsonpath "$.roles[*].name" contains "viewer"
 
 # -----------------------------------------------------------------------------
 # TEST:
@@ -42,7 +43,7 @@ Authorization: Bearer {{admin_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true
-jsonpath "$.roles" count == 2
+jsonpath "$.roles" count == 3
 jsonpath "$.roles[*].name" contains "test"
 
 PUT http://localhost:5080/api/v1/users/guest
@@ -96,5 +97,5 @@ Authorization: Bearer {{admin_token}}
 HTTP 200
 [Asserts]
 jsonpath "$.success" == true
-jsonpath "$.roles" count == 1
+jsonpath "$.roles" count == 2
 jsonpath "$.roles[*].name" not contains "test"
