@@ -45,6 +45,17 @@ func DefaultRolesAndUsers(ctx context.Context, authStorage storage.AuthStorage, 
 		if err := authStorage.SaveRole(ctx, adminRole); err != nil {
 			return fmt.Errorf("failed to bootstrap admin role: %w", err)
 		}
+
+		viewerRole := models.Role{
+			Name: "viewer",
+			Scopes: []models.Scope{
+				models.SCOPE_READ_STREAMS,
+			},
+		}
+
+		if err := authStorage.SaveRole(ctx, viewerRole); err != nil {
+			return fmt.Errorf("failed to bootstrap viewer role: %w", err)
+		}
 	}
 
 	users, err := authStorage.ListUsers(ctx)
