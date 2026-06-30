@@ -18,7 +18,8 @@ tasks:
     env:
       FLOWG_TEST_SUITES: api
       FLOWG_TEST_DOCKER_IMAGE_NAME: linksociety/flowg:localdev
-      FLOCI_TEST_DOCKER_IMAGE_NAME: floci/floci:latest
+      FLOCI_AWS_TEST_DOCKER_IMAGE_NAME: floci/floci:latest
+      FLOCI_GCP_TEST_DOCKER_IMAGE_NAME: floci/floci-gcp:latest
 
   "e2e:web":
     desc: "Run Web end-to-end tests"

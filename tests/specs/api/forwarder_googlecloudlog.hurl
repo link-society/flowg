@@ -1,28 +1,23 @@
 ###############################################################################
-# DESCRIPTION: Test CloudWatch Forwarder
+# DESCRIPTION: Test Google Cloud Log Forwarder
 ###############################################################################
 
 # -----------------------------------------------------------------------------
 # TEST:
-#  - Create CloudWatch Forwarder
+#  - Create Google Cloud Log Forwarder
 #  - Send a record to the forwarder and verify it succeeds
 #  - Delete the forwarder
 
-PUT http://localhost:5080/api/v1/forwarders/cloudwatch-success
+PUT http://localhost:5080/api/v1/forwarders/google-success
 Authorization: Bearer {{admin_token}}
 Content-Type: application/json
 {
   "forwarder":{
     "config":{
-      "type":"awscloudwatch",
-      "app_id":"flowg",
-      "endpoint":"http://floci-aws-test-server:4566",
-      "region":"us-east-1",
-      "access_key_id":"test",
-      "secret_access_key":"test",
-      "session_token":"",
-      "group":"flowg",
-      "stream":"logs"
+      "type":"googlecloudlogging",
+      "project_id":"flowg",
+      "log_id":"flowg",
+      "endpoint":"floci-gcp-test-server:4588"
     }
   }
 }
@@ -30,7 +25,7 @@ HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 
-POST http://localhost:5080/api/v1/test/forwarders/cloudwatch-success
+POST http://localhost:5080/api/v1/test/forwarders/google-success
 Authorization: Bearer {{admin_token}}
 Content-Type: application/json
 {
@@ -42,7 +37,7 @@ HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 
-DELETE http://localhost:5080/api/v1/forwarders/cloudwatch-success
+DELETE http://localhost:5080/api/v1/forwarders/google-success
 Authorization: Bearer {{admin_token}}
 HTTP 200
 [Asserts]
