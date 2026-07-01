@@ -7,6 +7,8 @@ sidebar_position: 6
 The configuration file format is the
 [Hashicorp Configuration Language](https://github.com/hashicorp/hcl).
 
+## Example
+
 Here is an exhaustive example of the configuration file:
 
 ```hcl
