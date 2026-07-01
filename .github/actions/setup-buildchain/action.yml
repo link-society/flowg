@@ -13,7 +13,7 @@ runs:
   using: composite
   steps:
     - name: setup@go
-      uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00
+      uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
       with:
         go-version: '1.26'
         check-latest: true
@@ -22,7 +22,7 @@ runs:
           go.sum
 
     - name: setup@node
-      uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903
+      uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
       with:
         node-version: '24'
         cache: npm
@@ -32,7 +32,7 @@ runs:
           docs/slides/package-lock.json
 
     - name: setup@rust
-      uses: actions-rust-lang/setup-rust-toolchain@1780873c7b576612439a134613cc4cc74ce5538c
+      uses: actions-rust-lang/setup-rust-toolchain@166cdcfd11aee3cb47222f9ddb555ce30ddb9659 # v1.17.0
       with:
         target: ${{ inputs.rstarget }}
         cache: true
@@ -40,6 +40,6 @@ runs:
           internal/util/langs/vrl/rust-crate/
 
     - name: setup@task
-      uses: arduino/setup-task@b91d5d2c96a56797b48ac1e0e89220bf64044611
+      uses: arduino/setup-task@c0bc642852239c2689f73f4ea6459c29405f3c52 # v3.0.0
       with:
         repo-token: ${{ inputs.ghtoken }}

@@ -41,7 +41,7 @@ runs:
         DOCKER_IMAGE_TAG: ${{ inputs.ref }}-linux-amd64
 
     - name: report-success@status
-      uses: guibranco/github-status-action-v2@631f55ea0251f0fb284525ad86c30e9f7a8dd284
+      uses: guibranco/github-status-action-v2@77639353504055053524efa7a3719aaf0b731ce9 # v1.2.4
       if: ${{ success() }}
       with:
         authToken: ${{ inputs.ghtoken }}
@@ -51,7 +51,7 @@ runs:
         sha: ${{ inputs.ref }}
 
     - name: report-failure@status
-      uses: guibranco/github-status-action-v2@631f55ea0251f0fb284525ad86c30e9f7a8dd284
+      uses: guibranco/github-status-action-v2@77639353504055053524efa7a3719aaf0b731ce9 # v1.2.4
       if: ${{ failure() }}
       with:
         authToken: ${{ inputs.ghtoken }}

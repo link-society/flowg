@@ -31,7 +31,7 @@ jobs:
     steps:
       - name: cache@image
         id: cache
-        uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: image.tar
           key: docker-image-${{ env.ARTIFACT_ID }}
@@ -66,7 +66,7 @@ jobs:
         run: docker save "${ARTIFACT_BASENAME}/docker:${ARTIFACT_ID}" -o image.tar
 
       - name: upload@artifact
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: docker-image-${{ env.ARTIFACT_ID }}
           path: image.tar

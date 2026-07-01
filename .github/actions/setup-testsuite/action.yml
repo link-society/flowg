@@ -14,7 +14,7 @@ runs:
         python-version: '3.13'
 
     - name: setup@sys-deps
-      uses: gacts/install-hurl@8c80c69c281b4b618858de1e1a9ce931e9e61c97
+      uses: gacts/install-hurl@ab6d0234456944b022ef7d1f594845af9561357d # v1.3.4
       with:
         version: '7.1.0'
         github-token: ${{ github.token }}
@@ -25,7 +25,7 @@ runs:
       run: pdm install
 
     - name: download@image
-      uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16
+      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
       with:
         name: docker-image-${{ inputs.ref }}-linux-amd64
 

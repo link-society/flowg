@@ -38,7 +38,7 @@ runs:
         report_path: "./tests/reports/${{ inputs.testsuite }}/"
 
     - name: report-success@status
-      uses: guibranco/github-status-action-v2@631f55ea0251f0fb284525ad86c30e9f7a8dd284
+      uses: guibranco/github-status-action-v2@77639353504055053524efa7a3719aaf0b731ce9 # v1.2.4
       if: ${{ success() }}
       with:
         authToken: ${{ inputs.ghtoken }}
@@ -48,7 +48,7 @@ runs:
         sha: ${{ inputs.ref }}
 
     - name: report-failure@status
-      uses: guibranco/github-status-action-v2@631f55ea0251f0fb284525ad86c30e9f7a8dd284
+      uses: guibranco/github-status-action-v2@77639353504055053524efa7a3719aaf0b731ce9 # v1.2.4
       if: ${{ failure() }}
       with:
         authToken: ${{ inputs.ghtoken }}
@@ -59,7 +59,7 @@ runs:
 
     - name: upload-logs@artifact
       if: ${{ failure() }}
-      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: ${{ inputs.testsuite }}-e2e-reports
         path: "./tests/reports/${{ inputs.testsuite }}/"
