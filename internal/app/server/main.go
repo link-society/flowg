@@ -9,9 +9,6 @@ import (
 	"go.uber.org/fx"
 
 	"link-society.com/flowg/internal/storage"
-	"link-society.com/flowg/internal/storage/backends/badger/concrete/auth"
-	"link-society.com/flowg/internal/storage/backends/badger/concrete/config"
-	"link-society.com/flowg/internal/storage/backends/badger/concrete/log"
 
 	"link-society.com/flowg/internal/engines/lognotify"
 	"link-society.com/flowg/internal/engines/pipelines"
@@ -37,15 +34,24 @@ type Options struct {
 	SyslogTlsConfig             *tls.Config
 	SyslogInitialAllowedOrigins []string
 
-	AuthStorageDir   string
-	ConfigStorageDir string
-	LogStorageDir    string
+	Storage StorageOptions
 
 	AuthInitialUser     string
 	AuthInitialPassword string
 
 	AuthResetUser     string
 	AuthResetPassword string
+}
+
+// StorageOptions is an interface that abstracts the storage backend
+// configuration.
+type StorageOptions interface {
+	// AuthModule returns an fx module that provides the auth storage backend.
+	AuthModule() fx.Option
+	// ConfigModule returns an fx module that provides the config storage backend.
+	ConfigModule() fx.Option
+	// LogModule returns an fx module that provides the log storage backend.
+	LogModule() fx.Option
 }
 
 // NewServer assembles the complete FlowG server as a single fx module. It wires
@@ -56,21 +62,9 @@ func NewServer(opts Options) fx.Option {
 	return fx.Module(
 		"app.server",
 		// Storage Layer
-		auth.NewStorage(func() auth.Options {
-			authOpts := auth.DefaultOptions()
-			authOpts.Directory = opts.AuthStorageDir
-			return authOpts
-		}()),
-		config.NewStorage(func() config.Options {
-			configOpts := config.DefaultOptions()
-			configOpts.Directory = opts.ConfigStorageDir
-			return configOpts
-		}()),
-		log.NewStorage(func() log.Options {
-			logOpts := log.DefaultOptions()
-			logOpts.Directory = opts.LogStorageDir
-			return logOpts
-		}()),
+		opts.Storage.AuthModule(),
+		opts.Storage.ConfigModule(),
+		opts.Storage.LogModule(),
 		// Engine Layer
 		lognotify.NewLogNotifier(),
 		pipelines.NewRunner(),
