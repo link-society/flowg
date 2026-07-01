@@ -124,7 +124,7 @@ const config: Config = {
     prism: {
       theme: prismMonokaiTheme as any,
       darkTheme: prismMonokaiTheme as any,
-      additionalLanguages: ['bash', 'ini', 'apacheconf', 'nginx'],
+      additionalLanguages: ['bash', 'ini', 'apacheconf', 'nginx', 'hcl'],
     },
     imageZoom: {
       selector: '.markdown div.with-zoom img',
