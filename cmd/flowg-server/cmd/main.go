@@ -29,8 +29,6 @@ func NewRootCommand() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:   "flowg-server",
 		Short: "Low-Code log management solution",
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		},
 		Run: func(cmd *cobra.Command, args []string) {
 			config := DefaultConfig()
 
