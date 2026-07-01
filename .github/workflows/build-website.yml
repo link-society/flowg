@@ -1,5 +1,5 @@
 ---
-name: build-docker
+name: build-website
 
 on:
   workflow_call:
@@ -15,56 +15,47 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
 
     steps:
-      - name: setup@oras
-        uses: oras-project/setup-oras@38de303aac69abb66f3e6255b7198bff35f323e3
-
-      - name: login@oras
-        env:
-          GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          printf '%s' "${GITHUB_TOKEN}" | oras login ghcr.io -u ${GITHUB_ACTOR} --password-stdin
-
-      - name: need-website@oras
-        id: need-website
-        run: |
-          if oras repo tags ${ARTIFACT_BASENAME}/website 2>/dev/null | grep -qx "${ARTIFACT_ID}"
-          then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
-
       - name: checkout@scm
-        if: steps.need-website.outputs.exists == 'false'
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
         with:
           ref: ${{ inputs.ref }}
 
+      - name: cache@build
+        id: cache
+        uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a
+        with:
+          key: website-${{ env.ARTIFACT_ID }}
+          path: website/build
+
       - name: setup@buildchain
-        if: steps.need-website.outputs.exists == 'false'
+        if: steps.cache.outputs.cache-hit != 'true'
         uses: ./.github/actions/setup-buildchain
         with:
           ghtoken: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: download@oras
-        if: steps.need-website.outputs.exists == 'false'
-        env:
-          DEP_ARTIFACT_ID: ${{ inputs.ref }}-linux-amd64
-        run: |
-          oras pull ${ARTIFACT_BASENAME}/doc-cli:${DEP_ARTIFACT_ID}
-          oras pull ${ARTIFACT_BASENAME}/doc-openapi:${DEP_ARTIFACT_ID}
+      - name: download-doc-cli@artifact
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16
+        with:
+          name: doc-cli-${{ inputs.ref }}-linux-amd64
+          path: website/docs/technical/cli
+
+      - name: download-doc-openapi@artifact
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16
+        with:
+          name: doc-openapi-${{ inputs.ref }}-linux-amd64
+          path: website/src
 
       - name: build@website
-        if: steps.need-website.outputs.exists == 'false'
+        if: steps.cache.outputs.cache-hit != 'true'
         run: task www:build
 
-      - name: upload@oras
-        if: steps.need-website.outputs.exists == 'false'
-        run: |
-          oras push ${ARTIFACT_BASENAME}/website:${ARTIFACT_ID} \
-            website/build
+      - name: upload@artifact
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: website-${{ env.ARTIFACT_ID }}
+          path: website/build
+          retention-days: 1

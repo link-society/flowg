@@ -31,65 +31,32 @@ env:
 jobs:
   build:
     runs-on: ${{ inputs.gh-runner }}
-    permissions:
-      packages: write
 
     steps:
-      - name: setup@oras
-        uses: oras-project/setup-oras@38de303aac69abb66f3e6255b7198bff35f323e3
-
-      - name: login@oras
-        env:
-          GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          printf '%s' "${GITHUB_TOKEN}" | oras login ghcr.io -u ${GITHUB_ACTOR} --password-stdin
-
-      - name: need-binaries@oras
-        id: need-binaries
-        run: |
-          if oras repo tags ${ARTIFACT_BASENAME}/binaries 2>/dev/null | grep -qx "${ARTIFACT_ID}"
-          then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: need-doc-cli@oras
-        id: need-doc-cli
-        run: |
-          if oras repo tags ${ARTIFACT_BASENAME}/doc-cli 2>/dev/null | grep -qx "${ARTIFACT_ID}"
-          then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: need-doc-openapi@oras
-        id: need-doc-openapi
-        run: |
-          if oras repo tags ${ARTIFACT_BASENAME}/doc-openapi 2>/dev/null | grep -qx "${ARTIFACT_ID}"
-          then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
-
       - name: checkout@scm
-        if: steps.need-binaries.outputs.exists == 'false' || steps.need-doc-cli.outputs.exists == 'false' || steps.need-doc-openapi.outputs.exists == 'false'
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
         with:
           ref: ${{ inputs.ref }}
 
+      - name: cache@build
+        id: cache
+        uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a
+        with:
+          key: binaries-${{ env.ARTIFACT_ID }}
+          path: |
+            bin
+            website/docs/technical/cli
+            website/src/openapi.json
+
       - name: setup@buildchain
-        if: steps.need-binaries.outputs.exists == 'false' || steps.need-doc-cli.outputs.exists == 'false' || steps.need-doc-openapi.outputs.exists == 'false'
+        if: steps.cache.outputs.cache-hit != 'true'
         uses: ./.github/actions/setup-buildchain
         with:
           ghtoken: ${{ secrets.GITHUB_TOKEN }}
           rstarget: ${{ inputs.rust-target }}
 
       - name: build@binary
-        if: steps.need-binaries.outputs.exists == 'false' || steps.need-doc-cli.outputs.exists == 'false' || steps.need-doc-openapi.outputs.exists == 'false'
+        if: steps.cache.outputs.cache-hit != 'true'
         run: task build:all doc:gen:cli doc:gen:openapi
         env:
           GOOS: ${{ inputs.goos }}
@@ -98,27 +65,30 @@ jobs:
           MACOSX_DEPLOYMENT_TARGET: "26.0"
 
       - name: compress@binary
-        if: inputs.goos != 'darwin' && (steps.need-binaries.outputs.exists == 'false' || steps.need-doc-cli.outputs.exists == 'false' || steps.need-doc-openapi.outputs.exists == 'false')
+        if: inputs.goos != 'darwin' && steps.cache.outputs.cache-hit != 'true'
         uses: crazy-max/ghaction-upx@c83f378efc804f828e988debb88ed6116feb2368
         with:
           files: bin/*
 
-      - name: upload-binaries@oras
-        if: steps.need-binaries.outputs.exists == 'false'
-        run: |
-          oras push ${ARTIFACT_BASENAME}/binaries:${ARTIFACT_ID} \
-            bin/* LICENSE.txt
+      - name: upload-binaries@artifact
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: binaries-${{ env.ARTIFACT_ID }}
+          path: |
+            bin
+            LICENSE.txt
+          retention-days: 1
 
-      - name: upload-doc-cli
-        if: steps.need-doc-cli.outputs.exists == 'false'
-        run: |
-          oras push ${ARTIFACT_BASENAME}/doc-cli:${ARTIFACT_ID} \
-            website/docs/technical/cli/flowg-client/*.md \
-            website/docs/technical/cli/flowg-health/*.md \
-            website/docs/technical/cli/flowg-server/*.md
+      - name: upload-doc-cli@artifact
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: doc-cli-${{ env.ARTIFACT_ID }}
+          path: website/docs/technical/cli
+          retention-days: 1
 
-      - name: upload-doc-openapi
-        if: steps.need-doc-openapi.outputs.exists == 'false'
-        run: |
-          oras push ${ARTIFACT_BASENAME}/doc-openapi:${ARTIFACT_ID} \
-            website/src/openapi.json
+      - name: upload-doc-openapi@artifact
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: doc-openapi-${{ env.ARTIFACT_ID }}
+          path: website/src/openapi.json
+          retention-days: 1

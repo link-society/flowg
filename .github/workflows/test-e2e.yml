@@ -15,7 +15,6 @@ jobs:
   api:
     runs-on: ubuntu-latest
     permissions:
-      packages: read
       contents: write
       checks: write
       pull-requests: write
@@ -31,8 +30,6 @@ jobs:
         uses: ./.github/actions/setup-testsuite
         with:
           ref: ${{ inputs.ref }}
-          ghactor: ${{ github.actor }}
-          ghtoken: ${{ secrets.GITHUB_TOKEN }}
 
       - name: run@testsuite
         uses: ./.github/actions/run-hurl-testsuite
@@ -46,7 +43,6 @@ jobs:
   web:
     runs-on: ubuntu-latest
     permissions:
-      packages: read
       contents: write
       checks: write
       pull-requests: write
@@ -62,8 +58,6 @@ jobs:
         uses: ./.github/actions/setup-testsuite
         with:
           ref: ${{ inputs.ref }}
-          ghactor: ${{ github.actor }}
-          ghtoken: ${{ secrets.GITHUB_TOKEN }}
 
       - name: run@testsuite
         uses: ./.github/actions/run-robotframework-testsuite
@@ -77,7 +71,6 @@ jobs:
   k8s:
     runs-on: ubuntu-latest
     permissions:
-      packages: read
       contents: write
       checks: write
       pull-requests: write
@@ -93,8 +86,6 @@ jobs:
         uses: ./.github/actions/setup-testsuite
         with:
           ref: ${{ inputs.ref }}
-          ghactor: ${{ github.actor }}
-          ghtoken: ${{ secrets.GITHUB_TOKEN }}
 
       - name: setup@k8s
         uses: ./.github/actions/setup-k8s

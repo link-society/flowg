@@ -5,12 +5,6 @@ inputs:
   ref:
     description: Git reference (commit, branch or tag)
     required: true
-  ghactor:
-    description: GitHub Actor
-    required: true
-  ghtoken:
-    description: GitHub Token
-    required: true
 runs:
   using: composite
   steps:
@@ -23,24 +17,18 @@ runs:
       uses: gacts/install-hurl@8c80c69c281b4b618858de1e1a9ce931e9e61c97
       with:
         version: '7.1.0'
-        github-token: ${{ inputs.ghtoken }}
+        github-token: ${{ github.token }}
 
     - name: setup@env
       shell: bash
       working-directory: ./tests
       run: pdm install
 
-    - name: login@docker
-      uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef
+    - name: download@image
+      uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16
       with:
-        registry: ghcr.io
-        username: ${{ inputs.ghactor }}
-        password: ${{ inputs.ghtoken }}
+        name: docker-image-${{ inputs.ref }}-linux-amd64
 
-    - name: download@artifacts
+    - name: load@image
       shell: bash
-      env:
-        ARTIFACT_ID: ${{ inputs.ref }}-linux-amd64
-        ARTIFACT_BASENAME: ghcr.io/link-society/flowg/ci-artifacts
-      run: |
-        docker pull ${ARTIFACT_BASENAME}/docker:${ARTIFACT_ID}
+      run: docker load -i image.tar

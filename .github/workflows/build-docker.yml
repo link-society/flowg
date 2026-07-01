@@ -27,50 +27,27 @@ env:
 jobs:
   build:
     runs-on: ${{ inputs.gh-runner }}
-    permissions:
-      packages: write
 
     steps:
-      - name: setup@oras
-        uses: oras-project/setup-oras@38de303aac69abb66f3e6255b7198bff35f323e3
-
-      - name: login@oras
-        env:
-          GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          printf '%s' "${GITHUB_TOKEN}" | oras login ghcr.io -u ${GITHUB_ACTOR} --password-stdin
-
-      - name: need-docker@oras
-        id: need-docker
-        run: |
-          if oras repo tags ${ARTIFACT_BASENAME}/docker 2>/dev/null | grep -qx "${ARTIFACT_ID}"
-          then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
+      - name: cache@image
+        id: cache
+        uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a
+        with:
+          path: image.tar
+          key: docker-image-${{ env.ARTIFACT_ID }}
 
       - name: checkout@scm
-        if: steps.need-docker.outputs.exists == 'false'
+        if: steps.cache.outputs.cache-hit != 'true'
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
         with:
           ref: ${{ inputs.ref }}
 
       - name: setup@docker
-        if: steps.need-docker.outputs.exists == 'false'
+        if: steps.cache.outputs.cache-hit != 'true'
         uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5
 
-      - name: login@docker
-        if: steps.need-docker.outputs.exists == 'false'
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: build@docker
-        if: steps.need-docker.outputs.exists == 'false'
+        if: steps.cache.outputs.cache-hit != 'true'
         uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf
         with:
           context: .
@@ -79,6 +56,19 @@ jobs:
             UPX_ARCH=${{ inputs.arch }}
             UPX_OS=${{ inputs.os }}
           tags: ${{ env.ARTIFACT_BASENAME }}/docker:${{ env.ARTIFACT_ID }}
-          push: true
+          push: false
+          load: true
           cache-from: type=gha,scope=flowg-${{ inputs.os }}-${{ inputs.arch }}
           cache-to: type=gha,mode=max,scope=flowg-${{ inputs.os }}-${{ inputs.arch }}
+
+      - name: save@image
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: docker save "${ARTIFACT_BASENAME}/docker:${ARTIFACT_ID}" -o image.tar
+
+      - name: upload@artifact
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: docker-image-${{ env.ARTIFACT_ID }}
+          path: image.tar
+          retention-days: 1
+          compression-level: 0
