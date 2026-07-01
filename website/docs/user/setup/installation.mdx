@@ -21,19 +21,14 @@ sudo install -m 755 ./bin/flowg-server /usr/local/bin/flowg-server
 Then, start the server with:
 
 ```bash
-flowg-server \
-  --auth-dir /var/lib/flowg/data/auth \
-  --log-dir /var/lib/flowg/logs \
-  --config-dir /var/lib/flowg/config \
-  --http-bind 127.0.0.1:5080 \
-  --mgmt-bind 127.0.0.1:9113 \
-  --syslog-bind 127.0.0.1:5514
+flowg-server
 ```
-
-> **NB:** All the options are optional and default to the values shown above.
 
 For more informations about the command line interface, please consult
 [this document](/docs/technical/cli/flowg-server).
+
+For more informations about the configuration, please consult
+[this document](/docs/technical/configuration).
 
 ### From Sources
 
@@ -93,13 +88,25 @@ undesirable, you can:
 By using the Syslog protocol `tcp+tls` instead of `udp` (the default), you can
 require Client certificate authentication:
 
+**1)** Create a configuration file `config.hcl`:
+
+```hcl
+services {
+  syslog {
+    protocol = "tcp"
+
+    tls {
+      cert = "/path/to/cert.pem"
+      key  = "/path/to/cert.key"
+      auth = true
+    }
+  }
+}
+```
+
+**2)** Start the server with the configuration file:
 ```bash
-flowg-server \
-  --syslog-proto="tcp" \
-  --syslog-tls \
-  --syslog-tls-cert="/path/to/cert.pem" \
-  --syslog-tls-key="/path/to/cert.key" \
-  --syslog-tls-auth
+flowg-server --config config.hcl
 ```
 
 ### Configure allowed origins

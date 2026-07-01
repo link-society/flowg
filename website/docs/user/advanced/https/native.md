@@ -6,40 +6,83 @@ sidebar_position: 3
 
 ## When deployed manually
 
-Run **FlowG** with:
+Create a file named `/etc/flowg/config.hcl`:
+
+```hcl
+services {
+  http {
+    bind = "127.0.0.1:5080"
+
+    tls {
+      cert = "/etc/ssl/certs/logs.example.com.crt"
+      key  = "/etc/ssl/private/logs.example.key"
+    }
+  }
+
+  management {
+    bind = "127.0.0.1:9113"
+
+    tls {
+      cert = "/etc/ssl/certs/mgmt.example.com.crt"
+      key  = "/etc/ssl/private/mgmt.example.com.key"
+    }
+  }
+
+  syslog {
+    bind = "127.0.0.1:5514"
+  }
+}
+
+storage {
+  backend "badgerdb" {
+    auth_dir = "/var/lib/flowg/auth"
+    log_dir = "/var/lib/flowg/logs"
+    config_dir = "/var/lib/flowg/config"
+  }
+}
+```
+
+Then, run **FlowG** with:
 
 ```bash
-flowg-server \
-  --auth-dir /var/lib/flowg/data/auth \
-  --log-dir /var/lib/flowg/logs \
-  --config-dir /var/lib/flowg/config \
-  --http-bind 127.0.0.1:5080 \
-  --http-tls \
-  --http-tls-cert /etc/ssl/certs/logs.example.com.crt \
-  --http-tls-key /etc/ssl/private/logs.example.com.key \
-  --mgmt-bind 127.0.0.1:9113 \
-  --mgmt-tls \
-  --mgmt-tls-cert /etc/ssl/certs/mgmt.example.com.crt \
-  --mgmt-tls-key /etc/ssl/private/mgmt.example.com.key \
-  --syslog-bind 127.0.0.1:5514
+flowg-server --config /etc/flowg/config.hcl
 ```
 
 Or if using Certbot:
 
-```bash
-flowg-server \
-  --auth-dir /var/lib/flowg/data/auth \
-  --log-dir /var/lib/flowg/logs \
-  --config-dir /var/lib/flowg/config \
-  --http-bind 127.0.0.1:5080 \
-  --http-tls \
-  --http-tls-cert /etc/letsencrypt/live/logs.example.com/fullchain.pem \
-  --http-tls-key /etc/letsencrypt/live/logs.example.com/privkey.pem \
-  --mgmt-bind 127.0.0.1:9113 \
-  --mgmt-tls \
-  --mgmt-tls-cert /etc/letsencrypt/live/mgmt.example.com/fullchain.pem \
-  --mgmt-tls-key /etc/letsencrypt/live/mgmt.example.com/privkey.key \
-  --syslog-bind 127.0.0.1:5514
+```hcl
+
+services {
+  http {
+    bind = "127.0.0.1:5080"
+
+    tls {
+      cert = "/etc/letsencrypt/live/logs.example.com/fullchain.pem"
+      key  = "/etc/letsencrypt/live/logs.example.com/privkey.pem"
+    }
+  }
+
+  management {
+    bind = "127.0.0.1:9113"
+
+    tls {
+      cert = "/etc/letsencrypt/live/mgmt.example.com/fullchain.pem"
+      key  = "/etc/letsencrypt/live/mgmt.example.com/privkey.key"
+    }
+  }
+
+  syslog {
+    bind = "127.0.0.1:5514"
+  }
+}
+
+storage {
+  backend "badgerdb" {
+    auth_dir = "/var/lib/flowg/auth"
+    log_dir = "/var/lib/flowg/logs"
+    config_dir = "/var/lib/flowg/config"
+  }
+}
 ```
 
 ## When deployed via Docker
@@ -64,13 +107,13 @@ docker run \
   -p 5514:5514/udp \
   -v flowg-data:/data \
   -v /opt/flowg/ssl:/data/ssl \
-  linksociety/flowg:latest serve \
-    --http-tls \
-    --http-tls-cert /data/ssl/tls.crt \
-    --http-tls-key /data/ssl/tls.key \
-    --mgmt-tls \
-    --mgmt-tls-cert /data/ssl/tls-mgmt.crt \
-    --mgmt-tls-key /data/ssl/tls-mgmt.key
+  -e FLOWG_HTTP_TLS_ENABLED=true \
+  -e FLOWG_HTTP_TLS_CERT=/data/ssl/tls.crt \
+  -e FLOWG_HTTP_TLS_KEY=/data/ssl/tls.key \
+  -e FLOWG_MGMT_TLS_ENABLED=true \
+  -e FLOWG_MGMT_TLS_CERT=/data/ssl/tls-mgmt.crt \
+  -e FLOWG_MGMT_TLS_KEY=/data/ssl/tls-mgmt.key \
+  linksociety/flowg:latest
 ```
 
 ## When deployed on Kubernetes

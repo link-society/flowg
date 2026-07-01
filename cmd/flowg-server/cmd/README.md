@@ -13,6 +13,6 @@ configuration the application is built from.
 - **`main.go`** — `NewRootCommand`, which assembles the root command, runs the
   startup hooks (umask, logging, demo mode, metrics) and starts the fx
   application.
-- **`env.go`** — the per-flag defaults, each resolved from an environment
-  variable via the `getEnv*` helpers.
+- **`env.go`** — default settings, each resolved from an environment variable
+  via the `getEnv*` helpers.
 - **`config.go`** — parses the configuration file

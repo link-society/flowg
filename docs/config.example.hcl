@@ -40,7 +40,7 @@ services {
 storage {
   backend "badgerdb" {
     auth_dir = "./data/auth"
-    logs_dir = "./data/logs"
+    log_dir = "./data/logs"
     config_dir = "./data/config"
   }
 
