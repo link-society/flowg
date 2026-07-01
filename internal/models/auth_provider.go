@@ -5,23 +5,28 @@ import (
 	"fmt"
 )
 
+// AuthProvider is the current authentication provider model for delegated
+// authentication. The concrete provider lives in Config, which is a tagged
+// union of one backend type.
 type AuthProvider struct {
 	Name        string             `json:"name" required:"true"`
 	DisplayName string             `json:"display_name" required:"true"`
 	Config      AuthProviderConfig `json:"config" required:"true"`
 }
 
+// AuthProviderConfig is a tagged union: exactly one field is non-nil, selecting
+// the authentication provider backend.
 type AuthProviderConfig struct {
-	Oidc *OidcAuthProvider `json:"-"`
-	Saml *SamlAuthProvider `json:"-"`
+	Oidc *AuthProviderOidc `json:"-"`
+	Saml *AuthProviderSaml `json:"-"`
 }
 
 // JSONSchemaOneOf advertises every provider variant so the generated OpenAPI
 // schema models Config as a "oneOf".
 func (AuthProviderConfig) JSONSchemaOneOf() []any {
 	return []any{
-		OidcAuthProvider{},
-		SamlAuthProvider{},
+		AuthProviderOidc{},
+		AuthProviderSaml{},
 	}
 }
 

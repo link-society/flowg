@@ -11,7 +11,7 @@ func TestAuthProvider_RoundTrip_Oidc(t *testing.T) {
 		Name:        "my-oidc",
 		DisplayName: "My OIDC Provider",
 		Config: AuthProviderConfig{
-			Oidc: &OidcAuthProvider{
+			Oidc: &AuthProviderOidc{
 				Type:         "oidc",
 				Issuer:       "https://accounts.example.com",
 				ClientID:     "client-123",
@@ -40,7 +40,7 @@ func TestAuthProvider_RoundTrip_Saml(t *testing.T) {
 		Name:        "my-saml",
 		DisplayName: "My SAML Provider",
 		Config: AuthProviderConfig{
-			Saml: &SamlAuthProvider{
+			Saml: &AuthProviderSaml{
 				Type:           "saml",
 				IdpMetadataURL: "https://idp.example.com/metadata",
 			},
