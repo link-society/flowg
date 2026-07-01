@@ -6,9 +6,9 @@ inputs:
   ref:
     description: Git reference (commit, branch or tag)
     required: true
-  ghtoken:
-    description: GitHub Token
-    required: true
+  pr:
+    description: Pull Request ID
+    required: false
   checkname:
     description: Name of the check
     required: true
@@ -40,27 +40,38 @@ runs:
         DOCKER_IMAGE_REPOSITORY: ghcr.io/link-society/flowg/ci-artifacts/docker
         DOCKER_IMAGE_TAG: ${{ inputs.ref }}-linux-amd64
 
-    - name: report-success@status
-      uses: guibranco/github-status-action-v2@77639353504055053524efa7a3719aaf0b731ce9 # v1.2.4
-      if: ${{ success() }}
-      with:
-        authToken: ${{ inputs.ghtoken }}
-        context: '${{ inputs.checkname }}'
-        description: 'Passed'
-        state: 'success'
-        sha: ${{ inputs.ref }}
+    - name: write@metadata
+      if: ${{ !cancelled() }}
+      shell: bash
+      env:
+        META_SHA: ${{ inputs.ref }}
+        META_PR: ${{ inputs.pr }}
+        META_CHECKNAME: ${{ inputs.checkname }}
+      run: |
+        mkdir -p ./tests/reports/k8s
+        echo -n "${META_SHA}" > ./tests/reports/k8s/meta.sha
+        echo -n "${META_PR}" > ./tests/reports/k8s/meta.pr
+        echo -n "${META_CHECKNAME}" > ./tests/reports/k8s/meta.checkname
 
-    - name: report-failure@status
-      uses: guibranco/github-status-action-v2@77639353504055053524efa7a3719aaf0b731ce9 # v1.2.4
+    - name: write-success@outcome
+      if: ${{ success() }}
+      shell: bash
+      run: echo -n "success" > ./tests/reports/k8s/meta.outcome
+
+    - name: write-failure@outcome
       if: ${{ failure() }}
+      shell: bash
+      run: echo -n "failure" > ./tests/reports/k8s/meta.outcome
+
+    - name: upload@artifact
+      if: ${{ !cancelled() }}
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
-        authToken: ${{ inputs.ghtoken }}
-        context: '${{ inputs.checkname }}'
-        description: 'Failure'
-        state: 'failure'
-        sha: ${{ inputs.ref }}
+        name: e2e-report-k8s
+        path: "./tests/reports/k8s/"
+        retention-days: 1
 
     - name: report@fail
-      shell: bash
       if: ${{ failure() }}
+      shell: bash
       run: exit 1

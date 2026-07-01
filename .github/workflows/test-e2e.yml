@@ -15,10 +15,7 @@ jobs:
   api:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      checks: write
-      pull-requests: write
-      statuses: write
+      contents: read
 
     steps:
       - name: checkout@scm
@@ -36,17 +33,13 @@ jobs:
         with:
           ref: ${{ inputs.ref }}
           pr: ${{ inputs.pr }}
-          ghtoken: ${{ secrets.GITHUB_TOKEN }}
           testsuite: api
           checkname: "API End-To-End Test Report"
 
   web:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      checks: write
-      pull-requests: write
-      statuses: write
+      contents: read
 
     steps:
       - name: checkout@scm
@@ -64,17 +57,13 @@ jobs:
         with:
           ref: ${{ inputs.ref }}
           pr: ${{ inputs.pr }}
-          ghtoken: ${{ secrets.GITHUB_TOKEN }}
           testsuite: web
           checkname: "Web End-To-End Test Report"
 
   k8s:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      checks: write
-      pull-requests: write
-      statuses: write
+      contents: read
 
     steps:
       - name: checkout@scm
@@ -95,5 +84,4 @@ jobs:
         with:
           ref: ${{ inputs.ref }}
           pr: ${{ inputs.pr }}
-          ghtoken: ${{ secrets.GITHUB_TOKEN }}
           checkname: "Kubernetes End-To-End Test Report"
