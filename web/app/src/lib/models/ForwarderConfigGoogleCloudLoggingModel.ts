@@ -3,6 +3,7 @@ type ForwarderConfigGoogleCloudLoggingModel = {
   project_id: string
   log_id: string
   endpoint: string
+  auth_json?: string
 }
 
 export default ForwarderConfigGoogleCloudLoggingModel
