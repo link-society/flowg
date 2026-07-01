@@ -8,8 +8,6 @@ import (
 )
 
 var (
-	defaultConfig = getEnvString("FLOWG_CONFIG", "")
-
 	defaultDemoMode = getEnvBool("FLOWG_DEMO_MODE", false)
 
 	defaultVerbose  = getEnvBool("FLOWG_VERBOSE", false)
