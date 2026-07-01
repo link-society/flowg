@@ -39,16 +39,15 @@ env:
 jobs:
   publish:
     runs-on: ${{ inputs.gh-runner }}
-    permissions:
-      packages: read
 
     steps:
-      - name: login-ghcr@docker
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
+      - name: download@artifact
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          name: docker-image-${{ env.ARTIFACT_ID }}
+
+      - name: load@image
+        run: docker load -i image.tar
 
       - name: login-dockerhub@docker
         uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
@@ -62,7 +61,6 @@ jobs:
           DOCKERHUB_TAG_LATEST: latest${{ inputs.docker-image-tag-suffix }}
           DOCKERHUB_TAG_VERSION: ${{ inputs.version }}${{ inputs.docker-image-tag-suffix }}
         run: |
-          docker pull ${ARTIFACT_BASENAME}/docker:${ARTIFACT_ID}
           docker tag ${ARTIFACT_BASENAME}/docker:${ARTIFACT_ID} ${DOCKERHUB_REPO}:${DOCKERHUB_TAG_LATEST}
           docker tag ${ARTIFACT_BASENAME}/docker:${ARTIFACT_ID} ${DOCKERHUB_REPO}:${DOCKERHUB_TAG_VERSION}
 
