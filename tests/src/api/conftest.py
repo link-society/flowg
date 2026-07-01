@@ -13,24 +13,29 @@ from .._lib import docker_utils
 
 
 @pytest.fixture(scope='module')
-def floci_image():
-    img = os.getenv("FLOCI_TEST_DOCKER_IMAGE_NAME", "floci/floci:latest")
+def floci_aws_image():
+    img = os.getenv("FLOCI_AWS_TEST_DOCKER_IMAGE_NAME", "floci/floci:latest")
     print(f"Using floci Docker image: {img}")
     return img
 
+@pytest.fixture(scope='module')
+def floci_gcp_image():
+    img = os.getenv("FLOCI_GCP_TEST_DOCKER_IMAGE_NAME", "floci/floci-gcp:latest")
+    print(f"Using floci Docker image: {img}")
+    return img
 
 @pytest.fixture(scope='module')
-def floci_container(
+def floci_aws_container(
         docker_client,
         flowg_network,
         report_dir,
-        floci_image
+        floci_aws_image
 ):
-    name = "floci-test-server"
+    name = "floci-aws-test-server"
 
     print(f"Creating Container: {name}")
     container = docker_client.containers.run(
-        image=floci_image,
+        image=floci_aws_image,
         name=name,
         network=flowg_network.name,
         hostname=name,
@@ -44,9 +49,34 @@ def floci_container(
 
     docker_utils.teardown_container(container, report_dir)
 
+@pytest.fixture(scope='module')
+def floci_gcp_container(
+        docker_client,
+        flowg_network,
+        report_dir,
+        floci_gcp_image
+):
+    name = "floci-gcp-test-server"
+
+    print(f"Creating Container: {name}")
+    container = docker_client.containers.run(
+        image=floci_gcp_image,
+        name=name,
+        network=flowg_network.name,
+        hostname=name,
+        ports={
+            "4588/tcp": 4588
+        },
+        detach=True,
+    )
+
+    yield
+
+    docker_utils.teardown_container(container, report_dir)
+
 
 @pytest.fixture(scope="module")
-def cloudwatch_log_stream(floci_container):
+def cloudwatch_log_stream(floci_aws_container):
     print("Creating CloudWatch log stream")
     client = boto3.client(
         "logs",
