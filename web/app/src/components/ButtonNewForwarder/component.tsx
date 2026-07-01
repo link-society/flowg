@@ -16,8 +16,7 @@ const ButtonNewForwarder = (props: ButtonNewForwarderProps) => {
 
   const [handleClick] = useApiOperation(async () => {
     const forwarderName = (await dialogs.open(DialogNewForwarder)) as
-      | string
-      | null
+      string | null
     if (forwarderName !== null) {
       props.onForwarderCreated(forwarderName)
 

@@ -16,8 +16,7 @@ const ButtonNewPipeline = (props: ButtonNewPipelineProps) => {
 
   const [handleClick] = useApiOperation(async () => {
     const pipelineName = (await dialogs.open(DialogNewPipeline)) as
-      | string
-      | null
+      string | null
     if (pipelineName !== null) {
       props.onPipelineCreated(pipelineName)
 

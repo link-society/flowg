@@ -16,8 +16,7 @@ const ButtonNewStreamConfig = (props: ButtonNewStreamConfigProps) => {
 
   const [handleClick] = useApiOperation(async () => {
     const streamName = (await dialogs.open(DialogNewStreamConfig)) as
-      | string
-      | null
+      string | null
     if (streamName !== null) {
       props.onStreamConfigCreated(streamName)
 

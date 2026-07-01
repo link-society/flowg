@@ -18,8 +18,7 @@ const ButtonNewTransformer = ({
 
   const [handleClick] = useApiOperation(async () => {
     const transformerName = (await dialogs.open(DialogNewTransformer)) as
-      | string
-      | null
+      string | null
     if (transformerName !== null) {
       onTransformerCreated(transformerName)
 

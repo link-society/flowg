@@ -1,11 +1,7 @@
 import { ContainerProps } from '@mui/material'
 
 type AppContainerVariant =
-  | 'default'
-  | 'page'
-  | 'section'
-  | 'compact'
-  | 'toolbar'
+  'default' | 'page' | 'section' | 'compact' | 'toolbar'
 
 export type AppContainerProps = Omit<ContainerProps, 'maxWidth'> & {
   variant?: AppContainerVariant
