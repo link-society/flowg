@@ -12,6 +12,6 @@
   margin-bottom: 0 !important;
 }
 
-code {
+:not(pre) > code {
   white-space: nowrap;
 }
