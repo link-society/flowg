@@ -24,7 +24,7 @@ var ExitCode int = 0
 // Prometheus metrics; its run hook turns the CLI options into a server
 // configuration and starts the fx application.
 func NewRootCommand() *cobra.Command {
-	configPath := ""
+	var configPath string
 
 	rootCmd := &cobra.Command{
 		Use:   "flowg-server",
@@ -61,7 +61,7 @@ func NewRootCommand() *cobra.Command {
 	rootCmd.Flags().StringVar(
 		&configPath,
 		"config",
-		defaultConfig,
+		"",
 		"Path to the configuration file",
 	)
 
