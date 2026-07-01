@@ -8,9 +8,9 @@ tasks:
     env:
       FLOWG_DEMO_MODE: "true"
       FLOWG_SECRET_KEY: "s3cr3!"
-      FLOWG_AUTH_DIR: "./data/node0/auth"
-      FLOWG_CONFIG_DIR: "./data/node0/config"
-      FLOWG_LOG_DIR: "./data/node0/logs"
+      FLOWG_BADGER_AUTH_DIR: "./data/node0/auth"
+      FLOWG_BADGER_CONFIG_DIR: "./data/node0/config"
+      FLOWG_BADGER_LOG_DIR: "./data/node0/logs"
 
   node:
     desc: "Run the project"
@@ -18,6 +18,6 @@ tasks:
       - ./bin/flowg-server
     env:
       FLOWG_SECRET_KEY: "s3cr3!"
-      FLOWG_AUTH_DIR: "./data/node0/auth"
-      FLOWG_CONFIG_DIR: "./data/node0/config"
-      FLOWG_LOG_DIR: "./data/node0/logs"
+      FLOWG_BADGER_AUTH_DIR: "./data/node0/auth"
+      FLOWG_BADGER_CONFIG_DIR: "./data/node0/config"
+      FLOWG_BADGER_LOG_DIR: "./data/node0/logs"
