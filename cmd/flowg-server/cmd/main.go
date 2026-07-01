@@ -24,30 +24,46 @@ var ExitCode int = 0
 // Prometheus metrics; its run hook turns the CLI options into a server
 // configuration and starts the fx application.
 func NewRootCommand() *cobra.Command {
-	opts := &options{}
+	configPath := ""
 
 	rootCmd := &cobra.Command{
 		Use:   "flowg-server",
 		Short: "Low-Code log management solution",
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			syscall.Umask(0077)
-			logging.Setup(opts.verbose, opts.loglevel)
-			featureflags.SetDemoMode(opts.demoMode)
-			metrics.Setup()
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			opts, err := newServerConfig(opts)
+			config := DefaultConfig()
+
+			if configPath != "" {
+				if err := config.Load(configPath); err != nil {
+					fmt.Printf("ERROR: %v\n", err)
+					ExitCode = 1
+					return
+				}
+			}
+
+			opts, err := config.AsServerOptions()
 			if err != nil {
 				fmt.Printf("ERROR: %v\n", err)
 				ExitCode = 1
 				return
 			}
 
+			syscall.Umask(0077)
+			logging.Setup(config.Logging.Verbose, config.Logging.Level)
+			featureflags.SetDemoMode(config.DemoMode)
+			metrics.Setup()
+
 			fx.New(fx.NopLogger, server.NewServer(opts)).Run()
 		},
 	}
 
-	opts.defineCliOptions(rootCmd)
+	rootCmd.Flags().StringVar(
+		&configPath,
+		"config",
+		defaultConfig,
+		"Path to the configuration file",
+	)
 
 	return rootCmd
 }
