@@ -188,9 +188,10 @@ func DefaultConfig() *RootConfig {
 				Tls:         defaultMgmtTlsConfig,
 			},
 			Syslog: &SyslogConfig{
-				Bind:     defaultSyslogBindAddr,
-				Protocol: defaultSyslogProtocol,
-				Tls:      defaultSyslogTlsConfig,
+				Bind:                  defaultSyslogBindAddr,
+				Protocol:              defaultSyslogProtocol,
+				Tls:                   defaultSyslogTlsConfig,
+				InitialAllowedOrigins: defaultSyslogInitialAllowedOrigins,
 			},
 		},
 		Storage: &StorageConfig{
