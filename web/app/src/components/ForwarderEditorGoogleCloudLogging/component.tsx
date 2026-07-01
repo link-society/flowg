@@ -1,8 +1,17 @@
-import { useEffect } from 'react'
+import { useColorMode } from '@/theme'
+
+import { useEffect, useState } from 'react'
 
 import TextField from '@mui/material/TextField'
 
+import Editor, { useMonaco } from '@monaco-editor/react'
+
 import { useInput } from '@/lib/hooks/input'
+
+import {
+  vrlThemeDarkDefinition,
+  vrlThemeDefinition,
+} from '@/lib/vrl-highlighter.ts'
 
 import { ForwarderEditorGoogleCloudLoggingRoot } from './styles'
 import { ForwarderEditorGoogleCloudLoggingProps } from './types'
@@ -15,6 +24,21 @@ const ForwarderEditorGoogleCloudLogging = ({
   const [endpoint, setEndpoint] = useInput(config.endpoint)
   const [project_id, setProjectID] = useInput(config.project_id)
   const [log_id, setLogID] = useInput(config.log_id)
+  const [auth_json, setAuthJson] = useState(config.auth_json)
+
+  const monaco = useMonaco()
+  const { mode } = useColorMode()
+
+  useEffect(() => {
+    if (!monaco) return
+
+    monaco.languages.register({ id: 'json' })
+    monaco.editor.defineTheme('vrl-theme-light', vrlThemeDefinition as any)
+    monaco.editor.defineTheme('vrl-theme-dark', vrlThemeDarkDefinition as any)
+    monaco.editor.setTheme(
+      mode === 'dark' ? 'vrl-theme-dark' : 'vrl-theme-light'
+    )
+  }, [monaco, mode])
 
   useEffect(() => {
     const valid = true
@@ -26,9 +50,10 @@ const ForwarderEditorGoogleCloudLogging = ({
         endpoint: endpoint.value,
         project_id: project_id.value,
         log_id: log_id.value,
+        auth_json,
       })
     }
-  }, [project_id, log_id, endpoint])
+  }, [endpoint, project_id, log_id, auth_json])
 
   return (
     <ForwarderEditorGoogleCloudLoggingRoot id="container:editor.forwarders.googlelog">
@@ -66,6 +91,16 @@ const ForwarderEditorGoogleCloudLogging = ({
         onChange={(e) => {
           setLogID(e.target.value)
         }}
+      />
+
+      <label>Auth JSON</label>
+      <Editor
+        defaultValue={auth_json}
+        defaultLanguage="json"
+        height="10rem"
+        theme={mode === 'dark' ? 'vrl-theme-dark' : 'vrl-theme-light'}
+        onChange={setAuthJson}
+        options={{ minimap: { enabled: false } }}
       />
     </ForwarderEditorGoogleCloudLoggingRoot>
   )
