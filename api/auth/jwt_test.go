@@ -42,13 +42,21 @@ func TestVerifyJWTRejectsTamperedToken(t *testing.T) {
 	token, err := auth.NewJWT("alice")
 	require.NoError(t, err)
 
-	// Flip the last character of the signature segment to break the signature.
-	tampered := token[:len(token)-1]
-	if strings.HasSuffix(token, "a") {
-		tampered += "b"
+	// Break the signature by mutating the first character of its segment.
+	// The final base64url character of a 32-byte HMAC signature only carries
+	// 4 significant bits (the trailing 2 are discarded on decode), so flipping
+	// it can decode to the same bytes and leave the signature valid. The first
+	// character's bits are always significant, guaranteeing a real change.
+	parts := strings.Split(strings.TrimPrefix(token, "jwt_"), ".")
+	require.Len(t, parts, 3)
+
+	sig := parts[2]
+	if sig[0] == 'A' {
+		parts[2] = "B" + sig[1:]
 	} else {
-		tampered += "a"
+		parts[2] = "A" + sig[1:]
 	}
+	tampered := "jwt_" + strings.Join(parts, ".")
 
 	_, err = auth.VerifyJWT(tampered)
 	require.Error(t, err)
