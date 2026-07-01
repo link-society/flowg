@@ -99,13 +99,7 @@ task build:all
 Then, start the server with:
 
 ```bash
-./bin/flowg-server \
-  --auth-dir ./data/auth \
-  --log-dir ./data/logs \
-  --config-dir ./data/config \
-  --http-bind 127.0.0.1:5080 \
-  --mgmt-bind 127.0.0.1:9113 \
-  --syslog-bind 127.0.0.1:5514
+./bin/flowg-server
 ```
 
 Now, you can access:
