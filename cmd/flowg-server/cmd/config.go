@@ -109,7 +109,7 @@ var (
 // key-value store.
 type StorageBackendBadgerDbConfig struct {
 	AuthDir   string `hcl:"auth_dir,optional"`
-	LogDir    string `hcl:"logs_dir,optional"`
+	LogDir    string `hcl:"log_dir,optional"`
 	ConfigDir string `hcl:"config_dir,optional"`
 }
 
