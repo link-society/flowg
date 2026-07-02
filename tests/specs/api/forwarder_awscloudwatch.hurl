@@ -14,7 +14,7 @@ Content-Type: application/json
 {
   "forwarder":{
     "config":{
-      "type":"cloudwatch",
+      "type":"awscloudwatch",
       "app_id":"flowg",
       "endpoint":"http://floci-test-server:4566",
       "region":"us-east-1",
