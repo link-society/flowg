@@ -36,7 +36,7 @@ type ElasticDeps struct {
 
 func init() {
 	routing.RegisterMiddleware(
-		newElasticHandler,
+		NewElasticHandler,
 		"/api/v1/middlewares/elastic/",
 	)
 }
@@ -96,10 +96,10 @@ func elasticAuth(deps ElasticDeps, next http.Handler) http.Handler {
 	})
 }
 
-// newElasticHandler serves the subset of the Elasticsearch API that log
+// NewElasticHandler serves the subset of the Elasticsearch API that log
 // shippers exercise: checking that an index (a FlowG pipeline) exists, and
 // indexing a document (running a log record through that pipeline).
-func newElasticHandler(deps ElasticDeps) http.Handler {
+func NewElasticHandler(deps ElasticDeps) http.Handler {
 	logger := slog.Default().With(slog.String("channel", "input.middleware.elastic"))
 	mux := http.NewServeMux()
 

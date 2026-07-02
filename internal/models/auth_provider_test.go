@@ -1,17 +1,20 @@
-package models
+package models_test
 
 import (
-	"encoding/json"
 	"reflect"
 	"testing"
+
+	"encoding/json"
+
+	"link-society.com/flowg/internal/models"
 )
 
 func TestAuthProvider_RoundTrip_Oidc(t *testing.T) {
-	original := AuthProvider{
+	original := models.AuthProvider{
 		Name:        "my-oidc",
 		DisplayName: "My OIDC Provider",
-		Config: AuthProviderConfig{
-			Oidc: &AuthProviderOidc{
+		Config: models.AuthProviderConfig{
+			Oidc: &models.AuthProviderOidc{
 				Type:         "oidc",
 				Issuer:       "https://accounts.example.com",
 				ClientID:     "client-123",
@@ -25,7 +28,7 @@ func TestAuthProvider_RoundTrip_Oidc(t *testing.T) {
 		t.Fatalf("failed to marshal AuthProvider: %v", err)
 	}
 
-	var decoded AuthProvider
+	var decoded models.AuthProvider
 	if err := json.Unmarshal(data, &decoded); err != nil {
 		t.Fatalf("failed to unmarshal AuthProvider: %v", err)
 	}
@@ -36,11 +39,11 @@ func TestAuthProvider_RoundTrip_Oidc(t *testing.T) {
 }
 
 func TestAuthProvider_RoundTrip_Saml(t *testing.T) {
-	original := AuthProvider{
+	original := models.AuthProvider{
 		Name:        "my-saml",
 		DisplayName: "My SAML Provider",
-		Config: AuthProviderConfig{
-			Saml: &AuthProviderSaml{
+		Config: models.AuthProviderConfig{
+			Saml: &models.AuthProviderSaml{
 				Type:           "saml",
 				IdpMetadataURL: "https://idp.example.com/metadata",
 			},
@@ -52,7 +55,7 @@ func TestAuthProvider_RoundTrip_Saml(t *testing.T) {
 		t.Fatalf("failed to marshal AuthProvider: %v", err)
 	}
 
-	var decoded AuthProvider
+	var decoded models.AuthProvider
 	if err := json.Unmarshal(data, &decoded); err != nil {
 		t.Fatalf("failed to unmarshal AuthProvider: %v", err)
 	}
@@ -63,7 +66,7 @@ func TestAuthProvider_RoundTrip_Saml(t *testing.T) {
 }
 
 func TestAuthProviderConfig_Marshal_NoVariant(t *testing.T) {
-	provider := AuthProvider{Name: "broken", DisplayName: "No variant"}
+	provider := models.AuthProvider{Name: "broken", DisplayName: "No variant"}
 	if _, err := json.Marshal(&provider); err == nil {
 		t.Fatal("expected an error marshalling an AuthProvider with no variant, got nil")
 	}
