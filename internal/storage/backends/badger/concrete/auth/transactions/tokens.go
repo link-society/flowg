@@ -8,8 +8,8 @@ import (
 
 	"link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/internal/storage/backends/badger/concrete/auth/hash"
-	"link-society.com/flowg/internal/storage/backends/badger/concrete/auth/secret"
+	"link-society.com/flowg/internal/utils/hash"
+	"link-society.com/flowg/internal/utils/secret"
 )
 
 // CreateToken issues a fresh PAT for an existing user. It confirms the user

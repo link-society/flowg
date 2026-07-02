@@ -9,12 +9,15 @@ import (
 
 const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
+var alphabetSize = big.NewInt(int64(len(alphabet)))
+
+// NewSecret generates a new secret with the given prefix and length.
+// The secret is composed of random characters from a predefined alphabet.
 func NewSecret(prefix string, length int) (string, error) {
 	result := make([]byte, length)
-	charsetLen := big.NewInt(int64(len(alphabet)))
 
-	for i := 0; i < length; i++ {
-		r, err := rand.Int(rand.Reader, charsetLen)
+	for i := range result {
+		r, err := rand.Int(rand.Reader, alphabetSize)
 		if err != nil {
 			return "", err
 		}

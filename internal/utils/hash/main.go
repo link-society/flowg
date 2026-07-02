@@ -19,6 +19,8 @@ type hashParams struct {
 	keyLength   uint32
 }
 
+// HashPassword hashes a password using the Argon2id algorithm and returns the
+// hash in a specific format.
 func HashPassword(password string) (string, error) {
 	hp := hashParams{
 		memory:      1, // 1 kB
@@ -53,6 +55,9 @@ func HashPassword(password string) (string, error) {
 	), nil
 }
 
+// VerifyPassword verifies a password against a given hash. It returns true if
+// the password matches the hash, and false otherwise. If an error occurs during
+// the verification process, it returns false and the error.
 func VerifyPassword(password, hash string) (bool, error) {
 	hp, salt, key, err := decodeHash(hash)
 	if err != nil {
