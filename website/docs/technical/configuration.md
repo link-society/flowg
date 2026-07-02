@@ -86,7 +86,7 @@ storage {
     auth_dir = "./data/auth"
 
     # env: FLOWG_BADGER_LOG_DIR (default: "./data/logs")
-    logs_dir = "./data/logs"
+    log_dir = "./data/logs"
 
     # env: FLOWG_BADGER_CONFIG_DIR (default: "./data/config")
     config_dir = "./data/config"
