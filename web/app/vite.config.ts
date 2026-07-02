@@ -32,10 +32,20 @@ export default defineConfig({
     },
     {
       name: 'go-template-substitution',
-      transformIndexHtml(html) {
-        return html
-          .replace(/\{\{\s*\.MountPath\s*\}\}/g, '')
-          .replace(/\{\{\s*\.FeatureFlags\.DemoMode\s*\}\}/g, 'false')
+      transformIndexHtml: {
+        order: 'pre',
+        handler(html, ctx) {
+          // Only substitute Go template placeholders when running the Vite dev
+          // server. During a production build the placeholders must be left
+          // intact so the Go backend can inject the real values at runtime.
+          if (!ctx.server) {
+            return html
+          }
+
+          return html
+            .replace(/\{\{\s*\.MountPath\s*\}\}/g, '')
+            .replace(/\{\{\s*\.FeatureFlags\.DemoMode\s*\}\}/g, 'false')
+        },
       },
     },
   ],
