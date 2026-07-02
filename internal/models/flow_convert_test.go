@@ -1,7 +1,9 @@
-package models
+package models_test
 
 import (
 	"testing"
+
+	"link-society.com/flowg/internal/models"
 )
 
 func TestConvert_FilterDSL_to_ExprLang(t *testing.T) {
@@ -25,7 +27,7 @@ func TestConvert_FilterDSL_to_ExprLang(t *testing.T) {
 		t.Run(tc.input, func(t *testing.T) {
 			t.Parallel()
 
-			got, err := convertFilterdslToExprlang(tc.input)
+			got, err := models.ConvertFilterdslToExprlang(tc.input)
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}

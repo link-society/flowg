@@ -1,4 +1,4 @@
-package middlewares
+package middlewares_test
 
 import (
 	"testing"
@@ -15,6 +15,8 @@ import (
 	"link-society.com/flowg/internal/engines/pipelines"
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage"
+
+	"link-society.com/flowg/api/middlewares"
 )
 
 func TestElasticEndpoint(t *testing.T) {
@@ -22,7 +24,7 @@ func TestElasticEndpoint(t *testing.T) {
 	mockConfigStorage := storage.NewMockConfigStorage().(*storage.MockConfigStorage)
 	mockPipelineRunner := pipelines.NewMockRunner().(*pipelines.MockRunner)
 
-	deps := ElasticDeps{
+	deps := middlewares.ElasticDeps{
 		AuthStorage:    mockAuthStorage,
 		ConfigStorage:  mockConfigStorage,
 		PipelineRunner: mockPipelineRunner,
@@ -47,7 +49,7 @@ func TestElasticEndpoint(t *testing.T) {
 	mockPipelineRunner.On("Run", mock.Anything, "test", pipelines.DIRECT_ENTRYPOINT, mock.Anything).
 		Return(nil)
 
-	handler := newElasticHandler(deps)
+	handler := middlewares.NewElasticHandler(deps)
 
 	server := httptest.NewServer(handler)
 	defer server.Close()

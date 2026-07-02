@@ -82,7 +82,7 @@ func flowGraphFromV2ToV2m1(objV2 *FlowGraphV2) (*FlowGraphV2, error) {
 	for _, nodeV2 := range objV2.Nodes {
 		if nodeV2.Type == "switch" {
 			if condition, exists := nodeV2.Data["condition"]; exists {
-				translated, err := convertFilterdslToExprlang(condition)
+				translated, err := ConvertFilterdslToExprlang(condition)
 				if err != nil {
 					return nil, err
 				}
@@ -145,10 +145,10 @@ func flowGraphFromV1ToV2(objV1 *FlowGraphV1) *FlowGraphV2 {
 	return objV2
 }
 
-// convertFilterdslToExprlang rewrites a legacy filter-DSL expression into an
+// ConvertFilterdslToExprlang rewrites a legacy filter-DSL expression into an
 // equivalent expr-lang one, the only structural change being the single "="
 // equality operator becoming "==".
-func convertFilterdslToExprlang(input string) (string, error) {
+func ConvertFilterdslToExprlang(input string) (string, error) {
 	tokens, err := lexer.Lex(file.NewSource(input))
 	if err != nil {
 		return "", fmt.Errorf("failed to parse expression: %v", err)

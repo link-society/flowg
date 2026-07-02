@@ -1,4 +1,4 @@
-package config
+package config_test
 
 import (
 	"testing"
@@ -7,19 +7,21 @@ import (
 	"go.uber.org/fx/fxtest"
 
 	"link-society.com/flowg/internal/storage"
+
+	"link-society.com/flowg/internal/storage/backends/badger/concrete/config"
 )
 
 func TestReadSystemConfig(t *testing.T) {
 	ctx := t.Context()
 
-	confOpts := DefaultOptions()
+	confOpts := config.DefaultOptions()
 	confOpts.InMemory = true
 
 	var confStorage storage.ConfigStorage
 
 	app := fxtest.New(
 		t,
-		NewStorage(confOpts),
+		config.NewStorage(confOpts),
 		fx.Populate(&confStorage),
 		fx.NopLogger,
 	)
