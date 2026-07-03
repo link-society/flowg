@@ -1,0 +1,34 @@
+---
+name: deploy-demo
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+        default: "latest"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: demo
+      url: https://demo.flowg.cloud
+
+    steps:
+      - name: checkout@scm
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: deploy@render
+        uses: ./.github/actions/render-deploy
+        with:
+          render_api_key: ${{ secrets.RENDER_API_KEY }}
+          render_service_id: ${{ secrets.RENDER_SERVICE_ID }}
+          docker_image_name: "linksociety/flowg:${{ inputs.version }}"
