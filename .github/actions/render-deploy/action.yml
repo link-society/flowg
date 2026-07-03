@@ -1,0 +1,23 @@
+name: Deploy Render image
+description: Update a Render Docker image, wait for deployment, and create a GitHub deployment
+
+inputs:
+  render_api_key:
+    description: Render API key
+    required: true
+
+  render_service_id:
+    description: Render service ID
+    required: true
+
+  docker_image_name:
+    description: Complete Docker image name, including tag or digest
+    required: true
+
+outputs:
+  render_deploy_id:
+    description: Render deployment ID
+
+runs:
+  using: node24
+  main: index.js
