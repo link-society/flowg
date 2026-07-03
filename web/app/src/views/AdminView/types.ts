@@ -4,4 +4,5 @@ import UserModel from '@/lib/models/UserModel'
 export type LoaderData = {
   roles: RoleModel[]
   users: UserModel[]
+  defaultRoles: string[]
 }
