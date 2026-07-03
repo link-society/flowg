@@ -30,10 +30,10 @@ const DialogNewUser = ({
   open,
   payload,
   onClose,
-}: DialogProps<string[], UserModel | null>) => {
+}: DialogProps<{ roles: string[]; defaultRoles: string[] }, UserModel | null>) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [roles, setRoles] = useState<string[]>([])
+  const [roles, setRoles] = useState<string[]>(payload.defaultRoles)
 
   const [onSubmit, loading] = useApiOperation(async () => {
     const user = {
@@ -95,7 +95,8 @@ const DialogNewUser = ({
           <FieldStack id="field:admin.users.modal.roles">
             <FieldLabel variant="text">Roles:</FieldLabel>
             <InputTransferList<string>
-              choices={payload}
+              choices={payload.roles}
+              selected={payload.defaultRoles}
               getItemId={(v) => v}
               renderItem={(v) => (
                 <Tooltip title={v} placement="right-start">
