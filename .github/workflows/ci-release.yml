@@ -95,3 +95,12 @@ jobs:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
 
+  deploy-demo:
+    uses: ./.github/workflows/deploy-demo.yml
+    needs: release-docker
+    with:
+      ref: ${{ github.event.release.tag_name }}
+      version: ${{ github.event.release.tag_name }}
+    secrets:
+      RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+      RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
