@@ -28,23 +28,23 @@ type bootstrapHandler struct {
 	resetPassword string
 }
 
-// Run applies all bootstrap steps in order: default system configuration,
-// default roles and users, default pipeline, and the optional user-password
-// reset. It is invoked from the module's OnStart lifecycle hook.
+// Run applies all bootstrap steps in order: default roles and users,
+// default system configuration, default pipeline, and the optional
+// user-password reset. It is invoked from the module's OnStart lifecycle hook.
 func (h *bootstrapHandler) Run(ctx context.Context) error {
-	err := bootstrap.DefaultSystemConfig(ctx, h.configStorage, bootstrap.BootstrapSystemOptions{
-		InitialSyslogAllowedOrigins: h.initialSyslogAllowedOrigins,
-	})
-	if err != nil {
-		return fmt.Errorf("failed to bootstrap default system config: %w", err)
-	}
-
-	err = bootstrap.DefaultRolesAndUsers(ctx, h.authStorage, bootstrap.BootstrapAuthOptions{
+	err := bootstrap.DefaultRolesAndUsers(ctx, h.authStorage, bootstrap.BootstrapAuthOptions{
 		InitialUser:     h.initialUser,
 		InitialPassword: h.initialPassword,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to bootstrap default roles and users: %w", err)
+	}
+
+	err = bootstrap.DefaultSystemConfig(ctx, h.configStorage, bootstrap.BootstrapSystemOptions{
+		InitialSyslogAllowedOrigins: h.initialSyslogAllowedOrigins,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to bootstrap default system config: %w", err)
 	}
 
 	err = bootstrap.DefaultPipeline(ctx, h.configStorage)

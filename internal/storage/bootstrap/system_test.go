@@ -51,4 +51,12 @@ func TestDefaultSystemConfig(t *testing.T) {
 	if systemConfig.SyslogAllowedOrigins[0] != "127.0.0.1" {
 		t.Fatalf("expected allowed origin to be 127.0.0.1, got %s", systemConfig.SyslogAllowedOrigins[0])
 	}
+
+	if len(systemConfig.DefaultRoles) != 1 {
+		t.Fatalf("expected 1 default role, got %d", len(systemConfig.DefaultRoles))
+	}
+
+	if systemConfig.DefaultRoles[0] != "viewer" {
+		t.Fatalf("expected default role to be viewer, got %s", systemConfig.DefaultRoles[0])
+	}
 }
