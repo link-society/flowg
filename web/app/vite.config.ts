@@ -14,7 +14,7 @@ export default defineConfig({
     compression({
       algorithms: ['gzip'],
       include: [
-        /\.(html|css|js|map|ico|png|woff2?)$/,
+        /\.(html|css|js|json|map|ico|png|woff2?)$/,
       ],
       skipIfLargerOrEqual: false,
     }),
@@ -24,6 +24,10 @@ export default defineConfig({
         serve.middlewares.use((req, _res, next) => {
           if (req.url?.startsWith('/web/assets/')) {
             req.url = req.url?.replace('/web/assets', '/assets')
+          }
+
+          if (req.url?.startsWith('/web/locales/')) {
+            req.url = req.url?.replace('/web/locales', '/locales')
           }
 
           next()

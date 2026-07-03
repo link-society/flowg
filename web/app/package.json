@@ -4,9 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "i18n:compile": "mkdir -p static/locales/en && i18next-conv -l en -s src/locales/en.po -t static/locales/en/translation.json",
+    "predev": "npm run i18n:compile",
     "dev": "vite",
-    "build": "tsc -b && vite build",
-    "build:dev": "tsc -b && vite build --mode development",
+    "build": "npm run i18n:compile && tsc -b && vite build",
+    "build:dev": "npm run i18n:compile && tsc -b && vite build --mode development",
     "lint": "oxlint . && prettier --check .",
     "format": "oxlint --fix . && prettier --write ."
   },
@@ -23,6 +25,8 @@
     "dagre": "^0.8.5",
     "dayjs": "^1.11.21",
     "event-source-plus": "^0.1.15",
+    "i18next": "^26.3.4",
+    "i18next-http-backend": "^4.0.0",
     "react": "^19.2.7",
     "react-apexcharts": "^2.1.1",
     "react-dom": "^19.2.7",

@@ -1,0 +1,19 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: en\n"
+
+msgid "pages.home.title"
+msgstr "Welcome to FlowG"
+
+msgid "pages.home.stats.streams"
+msgstr "Streams"
+
+msgid "pages.home.stats.transformers"
+msgstr "Transformers"
+
+msgid "pages.home.stats.forwarders"
+msgstr "Forwarders"
+
+msgid "pages.home.stats.pipelines"
+msgstr "Pipelines"
