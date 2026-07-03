@@ -42,8 +42,11 @@ const intersection = <T,>(
 
 const InputTransferList = <T,>(props: InputTransferListProps<T>) => {
   const [checked, setChecked] = useState<T[]>([])
-  const [left, setLeft] = useState<T[]>(props.choices)
-  const [right, setRight] = useState<T[]>([])
+  const initialLeft = props.selected
+    ? not(props.choices, props.selected, props.getItemId)
+    : props.choices
+  const [left, setLeft] = useState<T[]>(initialLeft)
+  const [right, setRight] = useState<T[]>(props.selected ?? [])
 
   useEffect(() => props.onChoiceUpdate(right), [right])
 

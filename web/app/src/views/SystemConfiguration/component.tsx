@@ -64,6 +64,23 @@ const SystemConfiguration = () => {
           </SystemConfigurationCardContent>
         </SystemConfigurationCard>
 
+        <SystemConfigurationCard>
+          <SystemConfigurationCardHeader>
+            <SystemConfigurationCardTitle variant="titleSm">
+              Default Roles for New Users
+            </SystemConfigurationCardTitle>
+          </SystemConfigurationCardHeader>
+          <SystemConfigurationCardContent>
+            <ListEdit
+              id="editor.config.default_roles"
+              list={config.default_roles ?? []}
+              setList={(list) =>
+                setConfig({ ...config, default_roles: list })
+              }
+            />
+          </SystemConfigurationCardContent>
+        </SystemConfigurationCard>
+
         <Button
           variant="contained"
           color="secondary"
