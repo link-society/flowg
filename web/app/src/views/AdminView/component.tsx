@@ -32,7 +32,11 @@ const AdminView = () => {
         <RoleTable roles={roles} />
       </AdminViewPanel>
       <AdminViewPanel>
-        <UserTable roles={roles.map((role) => role.name)} users={users} defaultRoles={defaultRoles} />
+        <UserTable
+          roles={roles.map((role) => role.name)}
+          users={users}
+          defaultRoles={defaultRoles}
+        />
       </AdminViewPanel>
     </AdminViewContainer>
   )

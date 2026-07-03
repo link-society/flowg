@@ -30,7 +30,10 @@ const DialogNewUser = ({
   open,
   payload,
   onClose,
-}: DialogProps<{ roles: string[]; defaultRoles: string[] }, UserModel | null>) => {
+}: DialogProps<
+  { roles: string[]; defaultRoles: string[] },
+  UserModel | null
+>) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [roles, setRoles] = useState<string[]>(payload.defaultRoles)
