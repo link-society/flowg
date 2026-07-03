@@ -74,9 +74,7 @@ const SystemConfiguration = () => {
             <ListEdit
               id="editor.config.default_roles"
               list={config.default_roles ?? []}
-              setList={(list) =>
-                setConfig({ ...config, default_roles: list })
-              }
+              setList={(list) => setConfig({ ...config, default_roles: list })}
             />
           </SystemConfigurationCardContent>
         </SystemConfigurationCard>

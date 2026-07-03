@@ -12,12 +12,19 @@ import DialogNewUser from '@/components/DialogNewUser/component'
 
 import { ButtonNewUserProps } from './types'
 
-const ButtonNewUser = ({ roles, defaultRoles, onUserCreated }: ButtonNewUserProps) => {
+const ButtonNewUser = ({
+  roles,
+  defaultRoles,
+  onUserCreated,
+}: ButtonNewUserProps) => {
   const dialogs = useDialogs()
   const notify = useNotify()
 
   const [handleClick] = useApiOperation(async () => {
-    const user = (await dialogs.open(DialogNewUser, { roles, defaultRoles })) as UserModel | null
+    const user = (await dialogs.open(DialogNewUser, {
+      roles,
+      defaultRoles,
+    })) as UserModel | null
     if (user !== null) {
       onUserCreated(user)
       notify.success('User created')

@@ -120,7 +120,11 @@ const UserTable = ({ roles, users, defaultRoles }: UserTableProps) => {
               <Typography variant="titleSm">Users</Typography>
             </UserTableCardHeaderTitleText>
             {permissions.can_edit_acls && (
-              <ButtonNewUser roles={roles} defaultRoles={defaultRoles} onUserCreated={onNewUser} />
+              <ButtonNewUser
+                roles={roles}
+                defaultRoles={defaultRoles}
+                onUserCreated={onNewUser}
+              />
             )}
           </UserTableCardHeaderTitle>
         }
