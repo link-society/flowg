@@ -17,6 +17,8 @@ import {
   provideGlobalGridOptions,
 } from 'ag-grid-community'
 
+import '@/lib/i18n'
+
 import App from '@/App'
 
 ModuleRegistry.registerModules([AllCommunityModule])

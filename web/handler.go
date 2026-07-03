@@ -58,6 +58,16 @@ func NewHandler(mountPath string) http.Handler {
 				w.Header().Set("ETag", base64.StdEncoding.EncodeToString([]byte(r.URL.Path)))
 
 				http.FileServer(http.FS(staticfiles)).ServeHTTP(w, r)
+			} else if strings.HasPrefix(r.URL.Path, "locales/") {
+				reqpath := "public/" + r.URL.Path
+				realpath := reqpath + ".gz"
+				r.URL.Path = realpath
+
+				w.Header().Set("Content-Encoding", "gzip")
+				w.Header().Set("Content-Type", mime.TypeByExtension(path.Ext(reqpath)))
+				w.Header().Set("Cache-Control", "no-cache")
+
+				http.FileServer(http.FS(staticfiles)).ServeHTTP(w, r)
 			} else {
 				htmlTemplateFile, err := staticfiles.Open("public/index.html.gz")
 				if err != nil {

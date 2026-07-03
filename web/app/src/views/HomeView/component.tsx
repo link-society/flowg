@@ -1,5 +1,6 @@
 import { Typography } from '@mui/material'
 
+import { useTranslation } from 'react-i18next'
 import { LoaderFunction, useLoaderData } from 'react-router'
 
 import AccountTreeIcon from '@mui/icons-material/AccountTree'
@@ -34,13 +35,14 @@ export const loader: LoaderFunction = loginRequired(async () => {
 })
 
 const HomeView = () => {
+  const { t } = useTranslation()
   const { streams, transformers, forwarders, pipelines } =
     useLoaderData<HomeViewData>()
 
   return (
     <HomeViewContainer variant="page">
       <Typography variant="titleLg" component="h1">
-        <span>Welcome to FlowG</span>
+        <span>{t('pages.home.title')}</span>
         <img src={buildUrl('/assets/logo.png')} alt="Logo FlowG" />
       </Typography>
 
@@ -48,7 +50,7 @@ const HomeView = () => {
         {streams !== null && (
           <StatCard
             icon={<StorageIcon />}
-            title="Streams"
+            title={t('pages.home.stats.streams')}
             value={Object.keys(streams).length}
             to={buildUrl('/streams')}
           />
@@ -56,7 +58,7 @@ const HomeView = () => {
         {transformers !== null && (
           <StatCard
             icon={<FilterAltIcon />}
-            title="Transformers"
+            title={t('pages.home.stats.transformers')}
             value={transformers.length}
             to={buildUrl('/transformers')}
           />
@@ -64,7 +66,7 @@ const HomeView = () => {
         {forwarders !== null && (
           <StatCard
             icon={<ForwardToInboxIcon />}
-            title="Forwarders"
+            title={t('pages.home.stats.forwarders')}
             value={forwarders.length}
             to={buildUrl('/forwarders')}
           />
@@ -72,7 +74,7 @@ const HomeView = () => {
         {pipelines !== null && (
           <StatCard
             icon={<AccountTreeIcon />}
-            title="Pipelines"
+            title={t('pages.home.stats.pipelines')}
             value={pipelines.length}
             to={buildUrl('/pipelines')}
           />
