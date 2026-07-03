@@ -12,6 +12,8 @@ HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 jsonpath "$.configuration.syslog_allowed_origins" count == 0
+jsonpath "$.configuration.default_roles" count == 1
+jsonpath "$.configuration.default_roles[0]" == "viewer"
 
 # -----------------------------------------------------------------------------
 # TEST:
@@ -23,6 +25,10 @@ Content-Type: application/json
 {
   "syslog_allowed_origins": [
     "192.168.1.1"
+  ],
+  "default_roles": [
+    "viewer",
+    "admin"
   ]
 }
 HTTP 200
@@ -40,3 +46,6 @@ HTTP 200
 jsonpath "$.success" == true
 jsonpath "$.configuration.syslog_allowed_origins" count == 1
 jsonpath "$.configuration.syslog_allowed_origins[0]" == "192.168.1.1"
+jsonpath "$.configuration.default_roles" count == 2
+jsonpath "$.configuration.default_roles[0]" == "viewer"
+jsonpath "$.configuration.default_roles[1]" == "admin"
