@@ -21,6 +21,7 @@ func DefaultSystemConfig(ctx context.Context, configStorage storage.ConfigStorag
 	if !hasConfig {
 		defaultConfig := &models.SystemConfiguration{
 			SyslogAllowedOrigins: opts.InitialSyslogAllowedOrigins,
+			DefaultRoles:         []string{"viewer"},
 		}
 
 		if err := configStorage.WriteSystemConfig(ctx, defaultConfig); err != nil {

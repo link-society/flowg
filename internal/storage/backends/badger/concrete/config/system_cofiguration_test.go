@@ -81,4 +81,32 @@ func TestReadSystemConfig(t *testing.T) {
 	if systemConfig.SyslogAllowedOrigins[0] != "192.168.1.1" {
 		t.Fatal("systemConfig.AllowedOrigins[0] != 192.168.1.1")
 	}
+
+	systemConfig.DefaultRoles = []string{"viewer", "admin"}
+
+	if err := confStorage.WriteSystemConfig(ctx, systemConfig); err != nil {
+		t.Fatal(err)
+	}
+
+	systemConfig, err = confStorage.ReadSystemConfig(ctx)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if systemConfig == nil {
+		t.Fatal("systemConfig is nil")
+	}
+
+	if len(systemConfig.DefaultRoles) != 2 {
+		t.Fatalf("len(DefaultRoles) = %d != 2", len(systemConfig.DefaultRoles))
+	}
+
+	if systemConfig.DefaultRoles[0] != "viewer" {
+		t.Fatal("systemConfig.DefaultRoles[0] != viewer")
+	}
+
+	if systemConfig.DefaultRoles[1] != "admin" {
+		t.Fatal("systemConfig.DefaultRoles[1] != admin")
+	}
 }
