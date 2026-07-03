@@ -20,6 +20,7 @@ func NewSystemConfigUpdateCommand() *cobra.Command {
 	type options struct {
 		SyslogAllowedOrigins []string
 		SyslogAllowAll       bool
+		DefaultRoles         []string
 	}
 
 	opts := &options{}
@@ -66,6 +67,10 @@ func NewSystemConfigUpdateCommand() *cobra.Command {
 				data.Configuration.SyslogAllowedOrigins = []string{}
 			}
 
+			if cmd.Flags().Changed("default-role") {
+				data.Configuration.DefaultRoles = opts.DefaultRoles
+			}
+
 			payload, err := json.Marshal(data.Configuration)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Could not encode request body: %v\n", err)
@@ -108,6 +113,13 @@ func NewSystemConfigUpdateCommand() *cobra.Command {
 		"syslog-allow-all",
 		false,
 		"Allow all origins for syslog (overrides --syslog-allowed-origin)",
+	)
+
+	cmd.Flags().StringArrayVar(
+		&opts.DefaultRoles,
+		"default-role",
+		[]string{},
+		"List of default roles assigned to new users",
 	)
 
 	return cmd
