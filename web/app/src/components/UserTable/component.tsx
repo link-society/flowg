@@ -39,7 +39,7 @@ const RolesCell = (props: RolesCellProps) => (
   </RolesCellRoot>
 )
 
-const UserTable = ({ roles, users }: UserTableProps) => {
+const UserTable = ({ roles, users, defaultRoles }: UserTableProps) => {
   const { permissions } = useProfile()
   const notify = useNotify()
 
@@ -120,7 +120,7 @@ const UserTable = ({ roles, users }: UserTableProps) => {
               <Typography variant="titleSm">Users</Typography>
             </UserTableCardHeaderTitleText>
             {permissions.can_edit_acls && (
-              <ButtonNewUser roles={roles} onUserCreated={onNewUser} />
+              <ButtonNewUser roles={roles} defaultRoles={defaultRoles} onUserCreated={onNewUser} />
             )}
           </UserTableCardHeaderTitle>
         }

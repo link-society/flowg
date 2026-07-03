@@ -1,6 +1,7 @@
 import { LoaderFunction, useLoaderData } from 'react-router'
 
 import * as aclApi from '@/lib/api/operations/acls'
+import { getSystemConfiguration } from '@/lib/api/operations/config'
 
 import { loginRequired } from '@/lib/decorators/loaders'
 
@@ -12,17 +13,18 @@ import { LoaderData } from './types'
 
 export const loader: LoaderFunction = loginRequired(
   async (): Promise<LoaderData> => {
-    const [roles, users] = await Promise.all([
+    const [roles, users, systemConfig] = await Promise.all([
       aclApi.listRoles(),
       aclApi.listUsers(),
+      getSystemConfiguration(),
     ])
 
-    return { roles, users }
+    return { roles, users, defaultRoles: systemConfig.default_roles ?? [] }
   }
 )
 
 const AdminView = () => {
-  const { roles, users } = useLoaderData() as LoaderData
+  const { roles, users, defaultRoles } = useLoaderData() as LoaderData
 
   return (
     <AdminViewContainer variant="page">
@@ -30,7 +32,7 @@ const AdminView = () => {
         <RoleTable roles={roles} />
       </AdminViewPanel>
       <AdminViewPanel>
-        <UserTable roles={roles.map((role) => role.name)} users={users} />
+        <UserTable roles={roles.map((role) => role.name)} users={users} defaultRoles={defaultRoles} />
       </AdminViewPanel>
     </AdminViewContainer>
   )
