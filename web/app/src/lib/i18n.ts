@@ -9,7 +9,7 @@ i18n
   .init({
     lng: 'en',
     fallbackLng: 'en',
-    backend: { loadPath: './locales/{{lng}}/{{ns}}.json' },
+    backend: { loadPath: './assets/locales/{{lng}}/{{ns}}.json' },
     interpolation: { escapeValue: false },
     react: { useSuspense: true },
   })

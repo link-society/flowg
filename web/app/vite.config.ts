@@ -26,10 +26,6 @@ export default defineConfig({
             req.url = req.url?.replace('/web/assets', '/assets')
           }
 
-          if (req.url?.startsWith('/web/locales/')) {
-            req.url = req.url?.replace('/web/locales', '/locales')
-          }
-
           next()
         })
       }
