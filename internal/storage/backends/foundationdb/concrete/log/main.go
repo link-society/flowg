@@ -2,7 +2,6 @@ package log
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"time"
 
@@ -18,7 +17,6 @@ import (
 
 	fdb "github.com/apple/foundationdb/bindings/go/src/fdb"
 	"github.com/apple/foundationdb/bindings/go/src/fdb/subspace"
-	"github.com/apple/foundationdb/bindings/go/src/fdb/tuple"
 )
 
 // Options configures the FoundationDB-backed log storage.
@@ -63,10 +61,21 @@ func NewStorage(opts Options) fx.Option {
 	}
 	kvOpts.InMemory = opts.InMemory
 
+	// Root subspace for log data. When empty the subspaces live at the root
+	// of the database (backwards-compatible); when set they are namespaced
+	// under <prefix> so multiple storage domains can coexist.
+	var rootPrefix []byte
+	if opts.Prefix != "" {
+		rootPrefix = []byte(opts.Prefix)
+	}
+
 	return fx.Module(
 		"storage.log.fdb",
 		fdbkvstore.NewStorage(kvOpts),
 		fx.Provide(func(lc fx.Lifecycle, d deps) storage.LogStorage {
+			root := subspace.FromBytes(rootPrefix)
+			transactions.Init(root)
+
 			impl := &storageImpl{
 				kvStore: d.S,
 			}
@@ -224,21 +233,11 @@ func (s *storageImpl) Distinct(ctx context.Context, stream string) (map[string][
 	return indices, nil
 }
 
-// packEntryKey builds the FDB-packed entry key for a (stream, timestamp, uuid).
-// The key encodes as: <entrySS><stream_bytes><padded_timestamp><uuid> via the
-// subspace/tuple layer so that keys sort by timestamp within each stream.
+// packEntryKey delegates to the transactions package which owns the canonical
+// entry subspace (initialized under the configured prefix).
 func packEntryKey(stream string, ts time.Time, uuidStr string) []byte {
-	streamEntrySS := entrySS.Sub(subspace.FromBytes([]byte(stream)))
-	paddedTs := fmt.Sprintf("%020d", ts.UnixMilli())
-	return streamEntrySS.Pack(tuple.Tuple{paddedTs, uuidStr})
+	return transactions.PackEntryKey(stream, ts, uuidStr)
 }
-
-// Note: subspaces are defined here and also in the transactions package.
-// They must be kept in sync. In a future refactor they could be extracted
-// to a shared package.
-var (
-	entrySS = subspace.FromBytes([]byte("entry"))
-)
 
 func (s *storageImpl) Ingest(ctx context.Context, stream string, logRecord *models.LogRecord) ([]byte, error) {
 	key := packEntryKey(stream, logRecord.Timestamp, uuid.New().String())

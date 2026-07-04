@@ -52,8 +52,16 @@ func ListRoles(tr fdb.ReadTransaction) ([]models.Role, error) {
 
 // FetchRole reconstructs a single role by collecting its
 // <root>/role/<name>/<scope> keys; the key itself carries the scope, so values
-// are never read.
+// are never read. Returns nil when the role does not exist.
 func FetchRole(tr fdb.ReadTransaction, name string) (*models.Role, error) {
+	val, err := tr.Get(indexRoleSub.Pack(tuple.Tuple{name})).Get()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get index of role '%s': %w", name, err)
+	}
+	if val == nil {
+		return nil, nil
+	}
+
 	role := &models.Role{Name: name}
 	sub := roleSub.Sub(name)
 

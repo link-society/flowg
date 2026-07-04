@@ -47,7 +47,7 @@ func ListUsers(tr fdb.ReadTransaction) ([]models.User, error) {
 		}
 	}
 
-	return users, err
+	return users, nil
 }
 
 // FetchUser loads a single user, returning nil when no index marker exists.
@@ -153,12 +153,16 @@ func DeleteUser(tr fdb.Transaction, name string) error {
 }
 
 // VerifyUserPassword argon2id-compares a candidate password against the hash
-// stored under <root>/user/<name>/"password".
+// stored under <root>/user/<name>/"password". Returns an error when the user
+// does not exist or the stored hash is corrupt.
 func VerifyUserPassword(tr fdb.ReadTransaction, name, password string) (bool, error) {
 	key := userSub.Sub(name).Pack(tuple.Tuple{"password"})
 	val, err := tr.Get(key).Get()
 	if err != nil {
 		return false, fmt.Errorf("failed to get password of user '%s': %w", name, err)
+	}
+	if val == nil {
+		return false, fmt.Errorf("user '%s' not found", name)
 	}
 
 	passwordHash := string(val)

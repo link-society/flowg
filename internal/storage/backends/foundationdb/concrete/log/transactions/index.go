@@ -97,45 +97,72 @@ func Distinct(txn fdb.ReadTransaction, stream string) (map[string][]string, erro
 
 // parseIndexKey extracts field and base64-encoded value from an index key.
 //
-// The key is structured as subspace hierarchy:
+// The key is structured as subspace hierarchy where each element is appended
+// via Sub() which packs it as a tuple-encoded byte string:
 //
 //	<indexSS prefix>
-//	<stream subspace payload: 1-byte-len + stream bytes>
-//	<field subspace payload:  1-byte-len + field bytes>
-//	<base64 subspace payload: 1-byte-len + b64 bytes>
-//	<tuple-encoded entry key>
+//	<tuple: stream:      0x01 + stream bytes + 0x00>
+//	<tuple: field:       0x01 + field bytes  + 0x00>
+//	<tuple: base64 value: 0x01 + b64 bytes   + 0x00>
+//	<tuple-encoded entry key (rest)>
 //
-// Each subspace.FromBytes([]byte(x)) appends len(x) as 1 byte then x bytes.
+// The 0x01 is the FDB tuple type code for byte strings, and 0x00 is the
+// null terminator that ends every byte-string element. There is no separate
+// length field — the null terminator delimits the end of each byte string.
 func parseIndexKey(key fdb.Key) (field string, encodedValue string, ok bool) {
 	rest := key[len(indexSS.Bytes()):]
 	if len(rest) < 3 {
 		return "", "", false
 	}
 
-	// Skip stream: 1 byte length + stream bytes.
-	streamLen := int(rest[0])
-	rest = rest[1+streamLen:]
+	// Skip stream: type(0x01) + stream bytes + null(0x00)
+	if rest[0] != 0x01 {
+		return "", "", false
+	}
+	rest = rest[1:] // skip type code
+	i := 0
+	for i < len(rest) && rest[i] != 0x00 {
+		i++
+	}
+	if i >= len(rest) {
+		return "", "", false
+	}
+	rest = rest[i+1:] // skip stream bytes + null
 	if len(rest) < 3 {
 		return "", "", false
 	}
 
-	// Read field: 1 byte length + field bytes.
-	fieldLen := int(rest[0])
-	if fieldLen < 1 || 1+fieldLen > len(rest) {
+	// Read field: type(0x01) + field bytes + null(0x00)
+	if rest[0] != 0x01 {
 		return "", "", false
 	}
-	field = string(rest[1 : 1+fieldLen])
-	rest = rest[1+fieldLen:]
+	rest = rest[1:] // skip type code
+	i = 0
+	for i < len(rest) && rest[i] != 0x00 {
+		i++
+	}
+	if i >= len(rest) {
+		return "", "", false
+	}
+	field = string(rest[:i])
+	rest = rest[i+1:] // skip field + null
 	if len(rest) < 3 {
 		return "", "", false
 	}
 
-	// Read base64 value: 1 byte length + b64 bytes.
-	b64Len := int(rest[0])
-	if b64Len < 1 || 1+b64Len > len(rest) {
+	// Read base64 value: type(0x01) + b64 bytes + null(0x00)
+	if rest[0] != 0x01 {
 		return "", "", false
 	}
-	encodedValue = string(rest[1 : 1+b64Len])
+	rest = rest[1:] // skip type code
+	i = 0
+	for i < len(rest) && rest[i] != 0x00 {
+		i++
+	}
+	if i >= len(rest) {
+		return "", "", false
+	}
+	encodedValue = string(rest[:i])
 
 	return field, encodedValue, true
 }

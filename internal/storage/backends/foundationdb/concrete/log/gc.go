@@ -24,16 +24,16 @@ func (w *gcWorker) DoWork(ctx actor.Context) actor.WorkerStatus {
 		return actor.WorkerEnd
 
 	case <-time.After(w.gcInterval):
-		go func() {
-			if err := w.kvStore.Update(ctx, transactions.CollectGarbage); err != nil {
-				slog.ErrorContext(
-					ctx,
-					"failed to collect garbage",
-					slog.String("channel", "logstorage"),
-					slog.String("error", err.Error()),
-				)
-			}
-		}()
+		// Run synchronously inside the actor goroutine so we never stack
+		// multiple GC passes when one takes longer than the interval.
+		if err := w.kvStore.Update(ctx, transactions.CollectGarbage); err != nil {
+			slog.ErrorContext(
+				ctx,
+				"failed to collect garbage",
+				slog.String("channel", "logstorage"),
+				slog.String("error", err.Error()),
+			)
+		}
 
 		return actor.WorkerContinue
 	}

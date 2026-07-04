@@ -41,8 +41,11 @@ func CreateToken(tr fdb.Transaction, username string) (string, string, error) {
 	tokenUuid := uuid.New().String()
 
 	// Verify user exists
-	_, err = tr.Get(indexUserSub.Pack(tuple.Tuple{username})).Get()
+	val, err := tr.Get(indexUserSub.Pack(tuple.Tuple{username})).Get()
 	if err != nil {
+		return "", "", fmt.Errorf("failed to check user '%s': %w", username, err)
+	}
+	if val == nil {
 		return "", "", fmt.Errorf("user '%s' does not exist", username)
 	}
 
