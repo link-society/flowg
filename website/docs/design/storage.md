@@ -4,8 +4,10 @@ sidebar_position: 1
 
 # How Logs Are Stored?
 
-The storage backend of **FlowG** is the key/value store
-[BadgerDB](https://github.com/dgraph-io/badger).
+The storage backend of **FlowG** is a pluggable key/value store. The default
+backend is [BadgerDB](https://github.com/dgraph-io/badger) (embedded), with an
+optional [FoundationDB](https://www.foundationdb.org) backend (distributed) for
+clustered deployments.
 
 ## Streams
 

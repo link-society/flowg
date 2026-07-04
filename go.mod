@@ -4,6 +4,7 @@ go 1.26.0
 
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.47.0
+	github.com/apple/foundationdb/bindings/go v0.0.0-20250221231555-5140696da2df
 	github.com/aws/aws-sdk-go-v2/config v1.32.26
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.25
 	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.78.1

@@ -24,6 +24,7 @@ Notable dependencies:
 | [go.uber.org/fx](https://github.com/uber-go/fx) | dependency injection and application lifecycle management |
 | [go-actor](https://github.com/vladopajic/go-actor) | Actor model |
 | [BadgerDB](https://github.com/dgraph-io/badger) | embedded key/value store |
+| [FoundationDB](https://www.foundationdb.org) | distributed key-value store (optional, replaces BadgerDB for clustered deployments) |
 | [swaggest](https://github.com/swaggest) | OpenAPI framework |
 
 ### Log Transformation Engine — Rust
@@ -136,7 +137,7 @@ flowg/
 │   ├── engines/          # Processing engines (lognotify, pipelines)
 │   ├── models/           # Domain models (auth, flows, forwarders, log records, ...)
 │   ├── services/         # Long-running services (http, mgmt, syslog)
-│   ├── storage/          # Storage backends (auth, config, log) over BadgerDB
+│   ├── storage/          # Storage backends (auth, config, log) over BadgerDB or FoundationDB
 │   └── utils/            # Shared utilities (api, auth, client, kvstore, langs, otlp, ...)
 │       └── langs/vrl/    # VRL bindings, including the Rust crate (rust-crate/)
 ├── web/                  # Embedded Web UI

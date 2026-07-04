@@ -92,6 +92,13 @@ storage {
     config_dir = "./data/config"
   }
 
+  # Alternatively, use FoundationDB for clustered deployments:
+  # backend "foundationdb" {
+  #   # env: FLOWG_FOUNDATIONDB_CONNECTION_STRING (default: "")
+  #   # Empty string means the default FDB cluster file is used.
+  #   connection_string = ""
+  # }
+
   seed {
     auth {
       # env: FLOWG_AUTH_INITIAL_USER (default: "root")

@@ -38,10 +38,16 @@ services {
 }
 
 storage {
-  backend "badgerdb" {
-    auth_dir = "./data/auth"
-    log_dir = "./data/logs"
-    config_dir = "./data/config"
+  # For a local, embedded database (no clustering):
+  # backend "badgerdb" {
+  #   auth_dir   = "./data/auth"
+  #   log_dir    = "./data/logs"
+  #   config_dir = "./data/config"
+  # }
+
+  # For a clustered, distributed deployment:
+  backend "foundationdb" {
+    connection_string = ""
   }
 
   seed {

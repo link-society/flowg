@@ -38,6 +38,8 @@ var (
 	defaultBadgerConfigDir = getEnvString("FLOWG_BADGER_CONFIG_DIR", "./data/config")
 	defaultBadgerLogDir    = getEnvString("FLOWG_BADGER_LOG_DIR", "./data/logs")
 
+	defaultFoundationDbConnectionString = getEnvString("FLOWG_FOUNDATIONDB_CONNECTION_STRING", "")
+
 	defaultAuthInitialUser     = getEnvString("FLOWG_AUTH_INITIAL_USER", "root")
 	defaultAuthInitialPassword = getEnvString("FLOWG_AUTH_INITIAL_PASSWORD", "root")
 

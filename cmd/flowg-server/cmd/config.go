@@ -90,7 +90,8 @@ type StorageBackendConfig struct {
 	Backend string   `hcl:"backend,label"`
 	Body    hcl.Body `hcl:",remain"`
 
-	BadgerDB *StorageBackendBadgerDbConfig
+	BadgerDB     *StorageBackendBadgerDbConfig
+	FoundationDB *StorageBackendFoundationDbConfig
 }
 
 // Constants defining the supported storage backends.
@@ -104,6 +105,12 @@ var (
 	ErrNoStorageBackend        = errors.New("no storage backend configured")
 	ErrMultipleStorageBackends = errors.New("multiple storage backends configured")
 )
+
+// Configuration for the FoundationDB storage backend, which is a distributed
+// key-value store.
+type StorageBackendFoundationDbConfig struct {
+	ConnectionString string `hcl:"connection_string,optional"`
+}
 
 // Configuration for the BadgerDB storage backend, which is an embedded
 // key-value store.
@@ -168,7 +175,7 @@ func DefaultConfig() *RootConfig {
 		storageBackendConfig.BadgerDB = DefaultStorageBackendBadgerDbConfig()
 
 	case StorageBackendFoundationDb:
-		panic("not implemented")
+		storageBackendConfig.FoundationDB = DefaultStorageBackendFoundationDbConfig()
 	}
 
 	return &RootConfig{
@@ -218,6 +225,14 @@ func DefaultStorageBackendBadgerDbConfig() *StorageBackendBadgerDbConfig {
 	}
 }
 
+// Returns a default configuration for the FoundationDB storage backend, which
+// is inherited from environment variables.
+func DefaultStorageBackendFoundationDbConfig() *StorageBackendFoundationDbConfig {
+	return &StorageBackendFoundationDbConfig{
+		ConnectionString: defaultFoundationDbConnectionString,
+	}
+}
+
 // Validates the root configuration, ensuring that all required fields are set
 // and that the storage backend is properly configured. Returns an error if the
 // configuration is invalid.
@@ -251,7 +266,14 @@ func (c *StorageBackendConfig) Resolve() hcl.Diagnostics {
 		return diags
 
 	case StorageBackendFoundationDb:
-		panic("not implemented")
+		config := DefaultStorageBackendFoundationDbConfig()
+
+		diags := gohcl.DecodeBody(c.Body, nil, config)
+		if diags.HasErrors() {
+			c.FoundationDB = config
+		}
+
+		return diags
 
 	default:
 		return hcl.Diagnostics{
@@ -271,6 +293,10 @@ func (c *StorageBackendConfig) Validate() error {
 	count := 0
 
 	if c.BadgerDB != nil {
+		count++
+	}
+
+	if c.FoundationDB != nil {
 		count++
 	}
 
@@ -378,7 +404,10 @@ func (cfg *RootConfig) AsServerOptions() (server.Options, error) {
 		}
 
 	case StorageBackendFoundationDb:
-		panic("not implemented")
+		storageOptions = &server.FoundationDbStorageOptions{
+			ConnectionString: cfg.Storage.Backend.FoundationDB.ConnectionString,
+			Prefix:           []byte{},
+		}
 	}
 
 	opts := server.Options{
