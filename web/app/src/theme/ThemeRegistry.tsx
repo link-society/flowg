@@ -5,6 +5,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from 'react'
@@ -54,6 +55,18 @@ export default function ThemeRegistry({ children }: ThemeRegistryProps) {
       localStorage.setItem('colorMode', next)
       return next
     })
+  }, [])
+
+  useEffect(() => {
+    const mediaQuery = globalThis.matchMedia('(prefers-color-scheme: dark)')
+    const handleChange = (e: MediaQueryListEvent) => {
+      const saved = localStorage.getItem('colorMode')
+      if (!saved) {
+        setMode(e.matches ? 'dark' : 'light')
+      }
+    }
+    mediaQuery.addEventListener('change', handleChange)
+    return () => mediaQuery.removeEventListener('change', handleChange)
   }, [])
 
   const theme = useMemo(() => createAppTheme(mode), [mode])
