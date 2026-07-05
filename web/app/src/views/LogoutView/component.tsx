@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { redirect } from 'react-router'
 
 import Typography from '@mui/material/Typography'
@@ -14,9 +15,11 @@ export const loader = async () => {
 }
 
 const LogoutView = () => {
+  const { t } = useTranslation()
+
   return (
     <LogoutViewRoot>
-      <Typography variant="text">You are being logged out...</Typography>
+      <Typography variant="text">{t('pages.logout.message')}</Typography>
     </LogoutViewRoot>
   )
 }

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { LoaderFunction, useLoaderData } from 'react-router'
 
 import Button from '@mui/material/Button'
@@ -38,6 +39,7 @@ export const loader: LoaderFunction = loginRequired(
 )
 
 const UploadView = () => {
+  const { t } = useTranslation()
   const notify = useNotify()
 
   const { pipelines } = useLoaderData() as LoaderData
@@ -54,7 +56,7 @@ const UploadView = () => {
     }
 
     await logsApi.uploadTextLogs(pipeline, file)
-    notify.success('Logs uploaded successfully')
+    notify.success(t('pages.upload.notifications.success'))
 
     setPipeline('')
     setFile(null)
@@ -64,7 +66,7 @@ const UploadView = () => {
     <UploadViewRoot variant="page">
       <UploadViewHeader>
         <UploadFileIcon />
-        <Typography variant="titleLg">Upload Logs</Typography>
+        <Typography variant="titleLg">{t('pages.upload.title')}</Typography>
       </UploadViewHeader>
 
       <UploadViewCard>
@@ -76,13 +78,13 @@ const UploadView = () => {
         >
           <FormControl fullWidth>
             <InputLabel id="label:upload.field.pipeline">
-              Select Pipeline
+              {t('pages.upload.selectPipeline')}
             </InputLabel>
             <Select
               labelId="label:upload.field.pipeline"
               id="select:upload.field.pipeline"
               value={pipeline}
-              label="Pipeline"
+              label={t('pages.upload.pipelineLabel')}
               onChange={onSelectPipeline}
             >
               {pipelines.map((p) => (
@@ -100,7 +102,11 @@ const UploadView = () => {
             variant="contained"
             startIcon={<AttachFileIcon />}
           >
-            {file === null ? <>Select log file</> : <>{file.name}</>}
+            {file === null ? (
+              <>{t('pages.upload.selectFile')}</>
+            ) : (
+              <>{file.name}</>
+            )}
             <VisuallyHiddenInput
               id="input:upload.field.file"
               type="file"
@@ -123,7 +129,7 @@ const UploadView = () => {
             {loading ? (
               <CircularProgress color="inherit" size={24} />
             ) : (
-              <>Upload</>
+              <>{t('pages.upload.submit')}</>
             )}
           </Button>
         </UploadViewForm>

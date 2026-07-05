@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
 
 import Button from '@mui/material/Button'
@@ -13,6 +14,7 @@ import {
 } from './styles'
 
 const NotFoundView = () => {
+  const { t } = useTranslation()
   const navigate = useNavigate()
 
   return (
@@ -22,11 +24,11 @@ const NotFoundView = () => {
       <NotFoundTitle variant="titleLg">404</NotFoundTitle>
 
       <Typography variant="titleMd" component="h2">
-        Page not found
+        {t('pages.notFound.title')}
       </Typography>
 
       <NotFoundHint variant="text">
-        The page you are looking for does not exist or has been moved.
+        {t('pages.notFound.description')}
       </NotFoundHint>
 
       <Button
@@ -34,7 +36,7 @@ const NotFoundView = () => {
         color="secondary"
         onClick={() => navigate(buildUrl('/'))}
       >
-        Back to home
+        {t('pages.notFound.backHome')}
       </Button>
     </NotFoundViewContainer>
   )

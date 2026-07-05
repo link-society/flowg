@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { LoaderFunction, useLoaderData, useNavigate } from 'react-router'
 
 import Button from '@mui/material/Button'
@@ -77,6 +78,7 @@ export const loader: LoaderFunction = loginRequired(
 )
 
 const PipelineDetailView = () => {
+  const { t } = useTranslation()
   const notify = useNotify()
 
   const { permissions } = useProfile()
@@ -120,7 +122,7 @@ const PipelineDetailView = () => {
     }
 
     await configApi.savePipeline(currentPipeline.name, savedFlow)
-    notify.success('Pipeline saved')
+    notify.success(t('pages.pipelines.notifications.saved'))
   }, [flow, currentPipeline])
 
   const [onTest, testLoading] = useApiOperation(async () => {
@@ -143,9 +145,11 @@ const PipelineDetailView = () => {
     if (output.success) {
       setTestResult(output.trace)
       if (output.error) {
-        notify.error(`Test failed: ${output.error}`)
+        notify.error(
+          t('common.notifications.testFailed', { error: output.error })
+        )
       } else {
-        notify.success('Test passed')
+        notify.success(t('common.notifications.testPassed'))
       }
     } else {
       setTestResult(null)
@@ -159,7 +163,7 @@ const PipelineDetailView = () => {
         <PipelineDetailViewHeader variant="toolbar">
           <PipelineDetailViewHeaderLeft>
             <HeaderNameInput
-              label="Pipeline name"
+              label={t('pages.pipelines.nameLabel')}
               value={currentPipeline.name}
               type="text"
               variant="outlined"
@@ -179,7 +183,7 @@ const PipelineDetailView = () => {
               target="_blank"
               startIcon={<HelpIcon />}
             >
-              Documentation
+              {t('common.actions.documentation')}
             </Button>
 
             <Button
@@ -190,7 +194,7 @@ const PipelineDetailView = () => {
               target="_blank"
               startIcon={<HelpIcon />}
             >
-              Switch Expression Documentation
+              {t('pages.pipelines.switchExpressionDocs')}
             </Button>
           </PipelineDetailViewHeaderLeft>
 
@@ -203,7 +207,7 @@ const PipelineDetailView = () => {
                 onClick={() => setTestOpen(true)}
                 startIcon={<ScienceIcon />}
               >
-                Test
+                {t('common.actions.test')}
               </Button>
             </PipelineDetailViewHeaderTest>
 
@@ -217,7 +221,11 @@ const PipelineDetailView = () => {
                   disabled={deleteLoading}
                   startIcon={!deleteLoading && <DeleteIcon />}
                 >
-                  {deleteLoading ? <CircularProgress size={24} /> : <>Delete</>}
+                  {deleteLoading ? (
+                    <CircularProgress size={24} />
+                  ) : (
+                    <>{t('common.actions.delete')}</>
+                  )}
                 </Button>
 
                 <Button
@@ -228,7 +236,11 @@ const PipelineDetailView = () => {
                   disabled={saveLoading}
                   startIcon={!saveLoading && <SaveIcon />}
                 >
-                  {saveLoading ? <CircularProgress size={24} /> : <>Save</>}
+                  {saveLoading ? (
+                    <CircularProgress size={24} />
+                  ) : (
+                    <>{t('common.actions.save')}</>
+                  )}
                 </Button>
               </PipelineDetailViewHeaderActions>
             )}
@@ -264,15 +276,19 @@ const PipelineDetailView = () => {
 
       <Dialog open={testOpen} scroll="paper" onClose={() => setTestOpen(false)}>
         <DialogTitle>
-          <Typography variant="titleMd">Test the pipeline</Typography>
+          <Typography variant="titleMd">
+            {t('common.testDialog.title')}
+          </Typography>
         </DialogTitle>
         <DialogContent>
           <TestDialogHint>
-            <Typography variant="text">Input Record:</Typography>
+            <Typography variant="text">
+              {t('common.testDialog.inputRecord')}
+            </Typography>
           </TestDialogHint>
           <InputKeyValue
             id="kv:transformers.test.record"
-            keyLabel="Field"
+            keyLabel={t('common.testDialog.fieldLabel')}
             keyValues={testRecords}
             onChange={setTestRecords}
           />
@@ -284,7 +300,7 @@ const PipelineDetailView = () => {
             onClick={() => setTestOpen(false)}
             disabled={testLoading}
           >
-            Cancel
+            {t('common.actions.cancel')}
           </Button>
           <Button
             id="btn:transformers.test.run"
@@ -294,7 +310,11 @@ const PipelineDetailView = () => {
             disabled={testLoading}
             onClick={() => onTest()}
           >
-            {testLoading ? <CircularProgress size={24} /> : <>Run</>}
+            {testLoading ? (
+              <CircularProgress size={24} />
+            ) : (
+              <>{t('common.actions.run')}</>
+            )}
           </Button>
         </DialogActions>
       </Dialog>

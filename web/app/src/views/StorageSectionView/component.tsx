@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { LoaderFunction, useLoaderData, useNavigate } from 'react-router'
 
 import Typography from '@mui/material/Typography'
@@ -24,6 +25,7 @@ export const loader: LoaderFunction = loginRequired(async () => {
 })
 
 const StorageSectionView = () => {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { redirectTo } = useLoaderData<{ redirectTo: string | null }>()
 
@@ -36,7 +38,7 @@ const StorageSectionView = () => {
   return (
     <StorageSectionViewRoot>
       <Typography variant="titleLg" component="h1">
-        No stream found, create one
+        {t('pages.storage.empty')}
       </Typography>
 
       <ButtonNewStreamConfig

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { LoaderFunction, useLoaderData, useNavigate } from 'react-router'
 
 import Button from '@mui/material/Button'
@@ -52,6 +53,7 @@ export const loader: LoaderFunction = loginRequired(async ({ params }) => {
 })
 
 const StorageDetailView = () => {
+  const { t } = useTranslation()
   const featureFlags = useFeatureFlags()
   const notify = useNotify()
 
@@ -76,7 +78,7 @@ const StorageDetailView = () => {
 
   const [onSave, saveLoading] = useApiOperation(async () => {
     await configApi.configureStream(currentStream, streamConfig)
-    notify.success('Stream saved')
+    notify.success(t('pages.storage.notifications.saved'))
   }, [streamConfig, currentStream])
 
   return (
@@ -91,12 +93,12 @@ const StorageDetailView = () => {
             target="_blank"
             startIcon={<HelpIcon />}
           >
-            Documentation
+            {t('common.actions.documentation')}
           </Button>
 
           {featureFlags.demoMode && (
             <DemoModeBanner variant="text">
-              Demo Mode Active, changes will be ignored.
+              {t('pages.storage.demoModeBanner')}
             </DemoModeBanner>
           )}
         </StorageDetailViewHeaderLeft>
@@ -114,7 +116,11 @@ const StorageDetailView = () => {
               disabled={deleteLoading}
               startIcon={!deleteLoading && <DeleteIcon />}
             >
-              {deleteLoading ? <CircularProgress size={24} /> : <>Delete</>}
+              {deleteLoading ? (
+                <CircularProgress size={24} />
+              ) : (
+                <>{t('common.actions.delete')}</>
+              )}
             </Button>
 
             <Button
@@ -126,7 +132,11 @@ const StorageDetailView = () => {
               disabled={saveLoading}
               startIcon={!saveLoading && <SaveIcon />}
             >
-              {saveLoading ? <CircularProgress size={24} /> : <>Save</>}
+              {saveLoading ? (
+                <CircularProgress size={24} />
+              ) : (
+                <>{t('common.actions.save')}</>
+              )}
             </Button>
           </StorageDetailViewHeaderActions>
         )}
