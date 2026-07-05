@@ -1,5 +1,6 @@
 import { Typography } from '@mui/material'
 
+import { useTranslation } from 'react-i18next'
 import { LoaderFunction, redirect, useNavigate } from 'react-router'
 
 import * as configApi from '@/lib/api/operations/config'
@@ -22,12 +23,13 @@ export const loader: LoaderFunction = loginRequired(async () => {
 })
 
 const TransformerSectionView = () => {
+  const { t } = useTranslation()
   const navigate = useNavigate()
 
   return (
     <TransformerSectionViewContainer>
       <Typography variant="titleLg" component="h1">
-        No transformer found, create one
+        {t('pages.transformers.empty')}
       </Typography>
 
       <ButtonNewTransformer

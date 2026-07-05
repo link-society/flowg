@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { LoaderFunction, useLoaderData } from 'react-router'
 
 import Divider from '@mui/material/Divider'
@@ -50,6 +51,7 @@ export const loader: LoaderFunction = loginRequired(async ({ params }) => {
 })
 
 const StreamDetailView = () => {
+  const { t } = useTranslation()
   const notify = useNotify()
 
   const { streams, currentStream, fields, indices } =
@@ -60,7 +62,7 @@ const StreamDetailView = () => {
   >({})
 
   const timestampColumnDef = (): ColDef<LogEntryModel> => ({
-    headerName: 'Ingested At',
+    headerName: t('pages.streams.columns.ingestedAt'),
     headerClass: 'font-semibold',
     field: 'timestamp',
     valueFormatter: ({ value }) => {
@@ -171,7 +173,7 @@ const StreamDetailView = () => {
 
       bus.messages.addEventListener('exception', (event) => {
         const evt = event as CustomEvent
-        notify.error('An error occured while watching logs')
+        notify.error(t('pages.streams.notifications.watchError'))
         console.error(evt.detail.data)
       })
 

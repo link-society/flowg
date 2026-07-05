@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { LoaderFunction, redirect, useNavigate } from 'react-router'
 
 import Typography from '@mui/material/Typography'
@@ -22,12 +23,13 @@ export const loader: LoaderFunction = loginRequired(async () => {
 })
 
 const ForwarderSectionView = () => {
+  const { t } = useTranslation()
   const navigate = useNavigate()
 
   return (
     <ForwarderSectionViewRoot>
       <Typography variant="titleLg" component="h1">
-        No forwarder found, create one
+        {t('pages.forwarders.empty')}
       </Typography>
 
       <ButtonNewForwarder

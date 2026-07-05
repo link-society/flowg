@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { LoaderFunction, useLoaderData, useNavigate } from 'react-router'
 
 import Button from '@mui/material/Button'
@@ -55,6 +56,7 @@ export const loader: LoaderFunction = loginRequired(
 )
 
 const TransformerDetailView = () => {
+  const { t } = useTranslation()
   const notify = useNotify()
 
   const { permissions } = useProfile()
@@ -78,7 +80,7 @@ const TransformerDetailView = () => {
 
   const [onSave, saveLoading] = useApiOperation(async () => {
     await configApi.saveTransformer(currentTransformer.name, code)
-    notify.success('Transformer saved')
+    notify.success(t('pages.transformers.notifications.saved'))
   }, [code, currentTransformer])
 
   return (
@@ -93,7 +95,7 @@ const TransformerDetailView = () => {
             target="_blank"
             startIcon={<HelpIcon />}
           >
-            VRL Documentation
+            {t('pages.transformers.vrlDocs')}
           </Button>
         </TransformerDetailViewToolbarLeft>
 
@@ -110,7 +112,11 @@ const TransformerDetailView = () => {
               disabled={deleteLoading}
               startIcon={!deleteLoading && <DeleteIcon />}
             >
-              {deleteLoading ? <CircularProgress size={24} /> : <>Delete</>}
+              {deleteLoading ? (
+                <CircularProgress size={24} />
+              ) : (
+                <>{t('common.actions.delete')}</>
+              )}
             </Button>
 
             <Button
@@ -122,7 +128,11 @@ const TransformerDetailView = () => {
               disabled={saveLoading}
               startIcon={!saveLoading && <SaveIcon />}
             >
-              {saveLoading ? <CircularProgress size={24} /> : <>Save</>}
+              {saveLoading ? (
+                <CircularProgress size={24} />
+              ) : (
+                <>{t('common.actions.save')}</>
+              )}
             </Button>
           </TransformerDetailViewToolbarRight>
         )}

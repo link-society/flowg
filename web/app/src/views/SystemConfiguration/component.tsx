@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { LoaderFunction, useLoaderData } from 'react-router'
 
 import Button from '@mui/material/Button'
@@ -30,6 +31,7 @@ import { LoaderData } from './types'
 export const loader: LoaderFunction = loginRequired(getSystemConfiguration)
 
 const SystemConfiguration = () => {
+  const { t } = useTranslation()
   const receivedConfig = useLoaderData() as LoaderData
 
   const [config, setConfig] = useState(receivedConfig)
@@ -37,20 +39,22 @@ const SystemConfiguration = () => {
   const notify = useNotify()
   const [onSave, saveLoading] = useApiOperation(async () => {
     await saveSystemConfiguration(config)
-    notify.success('System configuration saved')
+    notify.success(t('pages.systemConfiguration.notifications.saved'))
   }, [])
 
   return (
     <SystemConfigurationRoot variant="page">
       <SystemConfigurationHeader>
-        <Typography variant="titleLg">System configuration</Typography>
+        <Typography variant="titleLg">
+          {t('pages.systemConfiguration.title')}
+        </Typography>
       </SystemConfigurationHeader>
 
       <SystemConfigurationWrapper>
         <SystemConfigurationCard>
           <SystemConfigurationCardHeader>
             <SystemConfigurationCardTitle variant="titleSm">
-              Allowed Syslog Origins
+              {t('pages.systemConfiguration.allowedSyslogOrigins')}
             </SystemConfigurationCardTitle>
           </SystemConfigurationCardHeader>
           <SystemConfigurationCardContent>
@@ -85,7 +89,7 @@ const SystemConfiguration = () => {
           onClick={onSave}
           disabled={saveLoading}
         >
-          Save
+          {t('common.actions.save')}
         </Button>
       </SystemConfigurationWrapper>
     </SystemConfigurationRoot>

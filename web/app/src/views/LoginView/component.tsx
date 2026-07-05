@@ -1,6 +1,7 @@
 import { Typography } from '@mui/material'
 
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
 
 import Button from '@mui/material/Button'
@@ -28,6 +29,7 @@ import {
 } from './styles'
 
 const LoginView = () => {
+  const { t } = useTranslation()
   const featureFlags = useFeatureFlags()
   const navigate = useNavigate()
   const notify = useNotify()
@@ -40,7 +42,7 @@ const LoginView = () => {
       await authApi.login(username, password)
     } catch (error) {
       if (error instanceof UnauthenticatedError) {
-        notify.error('Invalid credentials')
+        notify.error(t('pages.login.invalidCredentials'))
         return
       } else {
         throw error
@@ -54,7 +56,7 @@ const LoginView = () => {
     <LoginViewContainer variant="page">
       <header>
         <img src={buildUrl('/assets/logo.png')} alt="Logo flowG" />
-        <Typography variant="h1">FlowG</Typography>
+        <Typography variant="h1">{t('pages.login.brand')}</Typography>
       </header>
 
       <LoginViewCard>
@@ -65,7 +67,7 @@ const LoginView = () => {
           }}
         >
           <header>
-            <Typography variant="h2">Sign In with your account</Typography>
+            <Typography variant="h2">{t('pages.login.subtitle')}</Typography>
           </header>
 
           {featureFlags.demoMode && (
@@ -73,7 +75,7 @@ const LoginView = () => {
               <Divider />
 
               <Typography variant="body1">
-                Demo Mode Enabled, login with <code>demo</code> /{' '}
+                {t('pages.login.demoModeHint')} <code>demo</code> /{' '}
                 <code>demo</code>.
               </Typography>
             </>
@@ -86,7 +88,7 @@ const LoginView = () => {
               <AccountCircleIcon className="icon" color="action" />
               <TextField
                 id="input:login.username"
-                label="Username"
+                label={t('pages.login.username')}
                 value={username}
                 type="text"
                 onChange={(e) => setUsername(e.target.value)}
@@ -100,7 +102,7 @@ const LoginView = () => {
               <LockIcon className="icon" color="action" />
               <TextField
                 id="input:login.password"
-                label="Password"
+                label={t('pages.login.password')}
                 value={password}
                 type="password"
                 onChange={(e) => setPassword(e.target.value)}
@@ -125,7 +127,7 @@ const LoginView = () => {
             {loading ? (
               <CircularProgress color="inherit" size={24} />
             ) : (
-              <>Sign In</>
+              <>{t('pages.login.submit')}</>
             )}
           </Button>
         </form>

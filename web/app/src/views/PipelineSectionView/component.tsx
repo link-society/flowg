@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { LoaderFunction, redirect, useNavigate } from 'react-router'
 
 import Typography from '@mui/material/Typography'
@@ -22,12 +23,13 @@ export const loader: LoaderFunction = loginRequired(async () => {
 })
 
 const PipelineSectionView = () => {
+  const { t } = useTranslation()
   const navigate = useNavigate()
 
   return (
     <PipelineSectionViewRoot>
       <Typography variant="titleLg" component="h1">
-        No pipeline found, create one
+        {t('pages.pipelines.empty')}
       </Typography>
 
       <ButtonNewPipeline

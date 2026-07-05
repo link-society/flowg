@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { LoaderFunction, useLoaderData, useNavigate } from 'react-router'
 
 import Button from '@mui/material/Button'
@@ -68,6 +69,7 @@ export const loader: LoaderFunction = loginRequired(
 )
 
 const ForwarderDetailView = () => {
+  const { t } = useTranslation()
   const notify = useNotify()
 
   const { permissions } = useProfile()
@@ -84,7 +86,7 @@ const ForwarderDetailView = () => {
     const input = Object.fromEntries(testRecords)
     await configApi.testForwarder(currentForwarder.name, input)
 
-    notify.success('Test passed')
+    notify.success(t('common.notifications.testPassed'))
 
     setTestOpen(false)
   }, [testRecords])
@@ -104,7 +106,7 @@ const ForwarderDetailView = () => {
 
   const [onSave, saveLoading] = useApiOperation(async () => {
     await configApi.saveForwarder(currentForwarder.name, forwarder)
-    notify.success('Forwarder saved')
+    notify.success(t('pages.forwarders.notifications.saved'))
   }, [forwarder, currentForwarder])
 
   return (
@@ -120,7 +122,7 @@ const ForwarderDetailView = () => {
               target="_blank"
               startIcon={<HelpIcon />}
             >
-              Documentation
+              {t('common.actions.documentation')}
             </Button>
           </ForwarderDetailViewHeaderLeft>
 
@@ -133,7 +135,7 @@ const ForwarderDetailView = () => {
                 onClick={() => setTestOpen(true)}
                 startIcon={<ScienceIcon />}
               >
-                Test
+                {t('common.actions.test')}
               </Button>
             </ForwarderDetailViewHeaderTest>
 
@@ -150,7 +152,11 @@ const ForwarderDetailView = () => {
                   disabled={deleteLoading}
                   startIcon={!deleteLoading && <DeleteIcon />}
                 >
-                  {deleteLoading ? <CircularProgress size={24} /> : <>Delete</>}
+                  {deleteLoading ? (
+                    <CircularProgress size={24} />
+                  ) : (
+                    <>{t('common.actions.delete')}</>
+                  )}
                 </Button>
 
                 <Button
@@ -162,7 +168,11 @@ const ForwarderDetailView = () => {
                   disabled={saveLoading || !valid}
                   startIcon={!saveLoading && <SaveIcon />}
                 >
-                  {saveLoading ? <CircularProgress size={24} /> : <>Save</>}
+                  {saveLoading ? (
+                    <CircularProgress size={24} />
+                  ) : (
+                    <>{t('common.actions.save')}</>
+                  )}
                 </Button>
               </ForwarderDetailViewHeaderActions>
             )}
@@ -192,15 +202,19 @@ const ForwarderDetailView = () => {
 
       <Dialog open={testOpen} scroll="paper" onClose={() => setTestOpen(false)}>
         <DialogTitle>
-          <Typography variant="titleMd">Test the pipeline</Typography>
+          <Typography variant="titleMd">
+            {t('common.testDialog.title')}
+          </Typography>
         </DialogTitle>
         <DialogContent>
           <TestDialogHint>
-            <Typography variant="text">Input Record:</Typography>
+            <Typography variant="text">
+              {t('common.testDialog.inputRecord')}
+            </Typography>
           </TestDialogHint>
           <InputKeyValue
             id="kv:transformers.test.record"
-            keyLabel="Field"
+            keyLabel={t('common.testDialog.fieldLabel')}
             keyValues={testRecords}
             onChange={setTestRecords}
           />
@@ -212,7 +226,7 @@ const ForwarderDetailView = () => {
             onClick={() => setTestOpen(false)}
             disabled={testLoading}
           >
-            Cancel
+            {t('common.actions.cancel')}
           </Button>
           <Button
             id="btn:transformers.test.run"
@@ -222,7 +236,11 @@ const ForwarderDetailView = () => {
             disabled={testLoading}
             onClick={() => onTest()}
           >
-            {testLoading ? <CircularProgress size={24} /> : <>Run</>}
+            {testLoading ? (
+              <CircularProgress size={24} />
+            ) : (
+              <>{t('common.actions.run')}</>
+            )}
           </Button>
         </DialogActions>
       </Dialog>
