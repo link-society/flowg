@@ -1,7 +1,0 @@
-{
-    "pages.home.title": "Welcome to FlowG",
-    "pages.home.stats.streams": "Streams",
-    "pages.home.stats.transformers": "Transformers",
-    "pages.home.stats.forwarders": "Forwarders",
-    "pages.home.stats.pipelines": "Pipelines"
-}
