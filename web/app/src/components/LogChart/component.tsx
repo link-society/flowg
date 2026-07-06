@@ -20,6 +20,7 @@ const LogChart = ({ rowData, from, to }: LogChartProps) => {
       },
       dataLabels: { enabled: false },
       xaxis: { type: 'datetime' },
+      tooltip: { theme: mode, x: { format: 'dd MMM HH:mm:ss' } },
     }),
     [mode]
   )
