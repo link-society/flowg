@@ -33,10 +33,12 @@ var (
 	defaultSyslogTlsAuthEnabled        = getEnvBool("FLOWG_SYSLOG_TLS_AUTH", false)
 	defaultSyslogInitialAllowedOrigins = getEnvListString("FLOWG_SYSLOG_INITIAL_ALLOWED_ORIGINS", []string{})
 
-	defaultStorageBackend  = getEnvString("FLOWG_STORAGE_BACKEND", "badgerdb")
-	defaultBadgerAuthDir   = getEnvString("FLOWG_BADGER_AUTH_DIR", "./data/auth")
-	defaultBadgerConfigDir = getEnvString("FLOWG_BADGER_CONFIG_DIR", "./data/config")
-	defaultBadgerLogDir    = getEnvString("FLOWG_BADGER_LOG_DIR", "./data/logs")
+	defaultStorageBackend          = getEnvString("FLOWG_STORAGE_BACKEND", "badgerdb")
+	defaultBadgerAuthDir           = getEnvString("FLOWG_BADGER_AUTH_DIR", "./data/auth")
+	defaultBadgerConfigDir         = getEnvString("FLOWG_BADGER_CONFIG_DIR", "./data/config")
+	defaultBadgerLogDir            = getEnvString("FLOWG_BADGER_LOG_DIR", "./data/logs")
+	defaultFoundationDbClusterFile = getEnvString("FLOWG_FOUNDATIONDB_CLUSTER_FILE", "/etc/foundationdb/fdb.cluster")
+	defaultFoundationDbKeySpace    = getEnvString("FLOWG_FOUNDATIONDB_KEY_SPACE", "flowg")
 
 	defaultAuthInitialUser     = getEnvString("FLOWG_AUTH_INITIAL_USER", "root")
 	defaultAuthInitialPassword = getEnvString("FLOWG_AUTH_INITIAL_PASSWORD", "root")

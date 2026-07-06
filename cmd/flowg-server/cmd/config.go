@@ -90,7 +90,8 @@ type StorageBackendConfig struct {
 	Backend string   `hcl:"backend,label"`
 	Body    hcl.Body `hcl:",remain"`
 
-	BadgerDB *StorageBackendBadgerDbConfig
+	BadgerDB     *StorageBackendBadgerDbConfig
+	FoundationDB *StorageBackendFoundationDbConfig
 }
 
 // Constants defining the supported storage backends.
@@ -111,6 +112,13 @@ type StorageBackendBadgerDbConfig struct {
 	AuthDir   string `hcl:"auth_dir,optional"`
 	LogDir    string `hcl:"log_dir,optional"`
 	ConfigDir string `hcl:"config_dir,optional"`
+}
+
+// Configuration for the FoundationDB storage backend, which is a distributed
+// key-value store.
+type StorageBackendFoundationDbConfig struct {
+	ClusterFile string `hcl:"cluster_file"`
+	KeySpace    string `hcl:"key_space,optional"`
 }
 
 // Configuration for seeding the storage backend with initial data. This is
@@ -168,7 +176,10 @@ func DefaultConfig() *RootConfig {
 		storageBackendConfig.BadgerDB = DefaultStorageBackendBadgerDbConfig()
 
 	case StorageBackendFoundationDb:
-		panic("not implemented")
+		storageBackendConfig.FoundationDB = &StorageBackendFoundationDbConfig{
+			ClusterFile: defaultFoundationDbClusterFile,
+			KeySpace:    defaultFoundationDbKeySpace,
+		}
 	}
 
 	return &RootConfig{
@@ -218,6 +229,15 @@ func DefaultStorageBackendBadgerDbConfig() *StorageBackendBadgerDbConfig {
 	}
 }
 
+// Returns a default configuration for the FoundationDB storage backend, which
+// is inherited from environment variables.
+func DefaultStorageBackendFoundationDbConfig() *StorageBackendFoundationDbConfig {
+	return &StorageBackendFoundationDbConfig{
+		ClusterFile: defaultFoundationDbClusterFile,
+		KeySpace:    defaultFoundationDbKeySpace,
+	}
+}
+
 // Validates the root configuration, ensuring that all required fields are set
 // and that the storage backend is properly configured. Returns an error if the
 // configuration is invalid.
@@ -251,7 +271,14 @@ func (c *StorageBackendConfig) Resolve() hcl.Diagnostics {
 		return diags
 
 	case StorageBackendFoundationDb:
-		panic("not implemented")
+		config := DefaultStorageBackendFoundationDbConfig()
+
+		diags := gohcl.DecodeBody(c.Body, nil, config)
+		if diags.HasErrors() {
+			c.FoundationDB = config
+		}
+
+		return diags
 
 	default:
 		return hcl.Diagnostics{
@@ -271,6 +298,10 @@ func (c *StorageBackendConfig) Validate() error {
 	count := 0
 
 	if c.BadgerDB != nil {
+		count++
+	}
+
+	if c.FoundationDB != nil {
 		count++
 	}
 
@@ -378,7 +409,10 @@ func (cfg *RootConfig) AsServerOptions() (server.Options, error) {
 		}
 
 	case StorageBackendFoundationDb:
-		panic("not implemented")
+		storageOptions = &server.FoundationDbStorageOptions{
+			ClusterFile: cfg.Storage.Backend.FoundationDB.ClusterFile,
+			KeySpace:    cfg.Storage.Backend.FoundationDB.KeySpace,
+		}
 	}
 
 	opts := server.Options{
