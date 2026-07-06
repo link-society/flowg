@@ -92,6 +92,7 @@ const StreamDetailView = () => {
   const logTableRef = useRef<LogTableHandle>(null)
 
   const [rowData, setRowData] = useState<LogEntryModel[]>([])
+  const [chartData, setChartData] = useState<LogEntryModel[]>([])
   const [columnDefs, setColumnDefs] = useState<ColDef<LogEntryModel>[]>([
     timestampColumnDef(),
     ...fields.map(fieldToColumnDef),
@@ -107,6 +108,7 @@ const StreamDetailView = () => {
         selectedIndices
       )
       setRowData(logs)
+      setChartData(logs)
       setTimeWindow({ from, to })
       setWatcher({ enabled: live, filter })
     },
@@ -179,6 +181,7 @@ const StreamDetailView = () => {
 
         if (newRows.length > 0) {
           logTableRef.current?.appendRows(newRows)
+          setChartData((prev) => [...prev, ...newRows])
         }
 
         setColumnDefs(incomingState.columnDefs)
@@ -211,7 +214,7 @@ const StreamDetailView = () => {
           <LogQueryPanel loading={loading} onFetchRequested={fetchLogs} />
           <Divider />
           <LogChart
-            rowData={rowData}
+            rowData={chartData}
             from={timeWindow.from}
             to={timeWindow.to}
           />
