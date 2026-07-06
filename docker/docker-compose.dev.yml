@@ -1,0 +1,51 @@
+services:
+  local-aws:
+    image: floci/floci:latest
+    ports:
+      - "4566:4566"
+
+  local-azure:
+    image: floci/floci-az:latest
+    ports:
+      - "4577:4577"
+
+  local-gcp:
+    image: floci/floci-gcp:latest
+    ports:
+      - "4588:4588"
+
+  foundationdb:
+    image: foundationdb/foundationdb:7.3.77
+    ports:
+      - "4500:4500"
+    environment:
+      FDB_NETWORKING_MODE: "host"
+      FDB_PORT: "4500"
+      FDB_CLUSTER_FILE: "/etc/foundationdb/fdb.cluster"
+    volumes:
+      - ../data/foundationdb/data:/var/fdb/data
+      - ../data/foundationdb/conf:/etc/foundationdb
+
+  foundationdb-init:
+    image: foundationdb/foundationdb:7.3.77
+    depends_on:
+      foundationdb:
+        condition: service_started
+    network_mode: "service:foundationdb"
+    entrypoint: ["/bin/bash", "-ec"]
+    command:
+      - |
+        until test -s /etc/foundationdb/fdb.cluster
+        do
+          sleep 1
+        done
+
+        until fdbcli -C /etc/foundationdb/fdb.cluster --exec "status" --timeout 2
+        do
+          fdbcli -C /etc/foundationdb/fdb.cluster --exec "configure new single ssd" --timeout 10 || true
+        done
+
+        fdbcli -C /etc/foundationdb/fdb.cluster --exec "status"
+    volumes:
+      - ../data/foundationdb/conf:/etc/foundationdb
+    restart: "no"
