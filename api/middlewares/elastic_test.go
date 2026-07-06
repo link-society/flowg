@@ -14,15 +14,17 @@ import (
 
 	"link-society.com/flowg/internal/engines/pipelines"
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage"
+
+	pipelinesMocks "link-society.com/flowg/internal/engines/pipelines/mocks"
+	storageMocks "link-society.com/flowg/internal/storage/mocks"
 
 	"link-society.com/flowg/api/middlewares"
 )
 
 func TestElasticEndpoint(t *testing.T) {
-	mockAuthStorage := storage.NewMockAuthStorage().(*storage.MockAuthStorage)
-	mockConfigStorage := storage.NewMockConfigStorage().(*storage.MockConfigStorage)
-	mockPipelineRunner := pipelines.NewMockRunner().(*pipelines.MockRunner)
+	mockAuthStorage := storageMocks.NewMockAuthStorage().(*storageMocks.MockAuthStorage)
+	mockConfigStorage := storageMocks.NewMockConfigStorage().(*storageMocks.MockConfigStorage)
+	mockPipelineRunner := pipelinesMocks.NewMockRunner().(*pipelinesMocks.MockRunner)
 
 	deps := middlewares.ElasticDeps{
 		AuthStorage:    mockAuthStorage,
