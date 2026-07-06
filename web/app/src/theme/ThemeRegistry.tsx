@@ -23,15 +23,18 @@ interface ThemeRegistryProps {
 }
 
 type ColorMode = 'light' | 'dark'
+export type ColorPreference = 'light' | 'dark' | 'system'
 
 interface ColorModeContextValue {
   mode: ColorMode
-  toggle: () => void
+  preference: ColorPreference
+  setPreference: (preference: ColorPreference) => void
 }
 
 export const ColorModeContext = createContext<ColorModeContextValue>({
   mode: 'light',
-  toggle: () => {},
+  preference: 'system',
+  setPreference: () => {},
 })
 
 export function useColorMode() {
@@ -41,36 +44,39 @@ export function useColorMode() {
 export default function ThemeRegistry({ children }: ThemeRegistryProps) {
   const cache = useMemo(() => createEmotionCache(), [])
 
-  const [mode, setMode] = useState<ColorMode>(() => {
+  const [preference, setPreference] = useState<ColorPreference>(() => {
     const saved = localStorage.getItem('colorMode')
-    if (saved === 'dark' || saved === 'light') return saved
-    return globalThis.matchMedia('(prefers-color-scheme: dark)').matches
-      ? 'dark'
-      : 'light'
+    if (saved === 'dark' || saved === 'light' || saved === 'system') return saved
+    return 'system'
   })
 
-  const toggle = useCallback(() => {
-    setMode((prev) => {
-      const next: ColorMode = prev === 'light' ? 'dark' : 'light'
-      localStorage.setItem('colorMode', next)
-      return next
-    })
+  const [systemMode, setSystemMode] = useState<ColorMode>(() =>
+    globalThis.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light',
+  )
+
+  const mode: ColorMode = preference === 'system' ? systemMode : preference
+
+  const setColorPreference = useCallback((next: ColorPreference) => {
+    localStorage.setItem('colorMode', next)
+    setPreference(next)
   }, [])
 
   useEffect(() => {
     const mediaQuery = globalThis.matchMedia('(prefers-color-scheme: dark)')
     const handleChange = (e: MediaQueryListEvent) => {
-      const saved = localStorage.getItem('colorMode')
-      if (!saved) {
-        setMode(e.matches ? 'dark' : 'light')
-      }
+      setSystemMode(e.matches ? 'dark' : 'light')
     }
     mediaQuery.addEventListener('change', handleChange)
     return () => mediaQuery.removeEventListener('change', handleChange)
   }, [])
 
   const theme = useMemo(() => createAppTheme(mode), [mode])
-  const colorModeValue = useMemo(() => ({ mode, toggle }), [mode, toggle])
+  const colorModeValue = useMemo(
+    () => ({ mode, preference, setPreference: setColorPreference }),
+    [mode, preference, setColorPreference],
+  )
 
   return (
     <ColorModeContext.Provider value={colorModeValue}>
