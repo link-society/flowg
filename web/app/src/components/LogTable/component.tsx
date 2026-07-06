@@ -8,6 +8,7 @@ import { LogTableContainer, LogTableDetailPre, LogTableDrawer } from './styles'
 import { LogTableHandle, LogTableProps } from './types'
 
 const LogTable = forwardRef<LogTableHandle, LogTableProps>((props, ref) => {
+  const containerRef = useRef<HTMLDivElement>(null)
   const gridRef = useRef<AgGridReact<LogEntryModel>>(null)
   const [selectedRow, setSelectedRow] = useState<LogEntryModel | undefined>(
     undefined
@@ -20,29 +21,30 @@ const LogTable = forwardRef<LogTableHandle, LogTableProps>((props, ref) => {
         return
       }
 
-      const scrollTop = api.getVerticalPixelRange().top
+      const viewport = containerRef.current?.querySelector<HTMLElement>(
+        '.ag-body-vertical-scroll-viewport'
+      )
+      const scrollTop = viewport?.scrollTop ?? 0
       const atTop = scrollTop <= 1
+      const rowHeight = api.getDisplayedRowAtIndex(0)?.rowHeight ?? 0
 
       api.applyTransaction({ add: rows })
 
-      if (!atTop) {
-        const rowHeight = api.getDisplayedRowAtIndex(0)?.rowHeight ?? 0
-        if (rowHeight > 0) {
-          const firstVisibleIndex = Math.round(scrollTop / rowHeight)
-          api.ensureIndexVisible(firstVisibleIndex + rows.length, 'top')
-        }
+      if (viewport && !atTop && rowHeight > 0) {
+        viewport.scrollTop = scrollTop + rows.length * rowHeight
       }
     },
   }))
 
   return (
-    <LogTableContainer className="ag-theme-balham">
+    <LogTableContainer ref={containerRef} className="ag-theme-balham">
       <AgGridReact<LogEntryModel>
         ref={gridRef}
         rowData={props.rowData}
         columnDefs={props.columnDefs}
         suppressFieldDotNotation
         enableCellTextSelection
+        animateRows={false}
         autoSizeStrategy={{ type: 'fitCellContents' }}
         onRowDoubleClicked={(e) => {
           setSelectedRow(e.data)
