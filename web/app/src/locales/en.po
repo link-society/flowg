@@ -3,113 +3,38 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language: en\n"
 
-msgid "common.actions.save"
-msgstr "Save"
+msgid "common.actions.cancel"
+msgstr "Cancel"
 
 msgid "common.actions.delete"
 msgstr "Delete"
 
-msgid "common.actions.cancel"
-msgstr "Cancel"
+msgid "common.actions.documentation"
+msgstr "Documentation"
 
 msgid "common.actions.run"
 msgstr "Run"
 
+msgid "common.actions.save"
+msgstr "Save"
+
 msgid "common.actions.test"
 msgstr "Test"
-
-msgid "common.actions.documentation"
-msgstr "Documentation"
-
-msgid "common.notifications.testPassed"
-msgstr "Test passed"
 
 msgid "common.notifications.testFailed"
 msgstr "Test failed: {{error}}"
 
-msgid "common.testDialog.title"
-msgstr "Test the pipeline"
-
-msgid "common.testDialog.inputRecord"
-msgstr "Input Record:"
+msgid "common.notifications.testPassed"
+msgstr "Test passed"
 
 msgid "common.testDialog.fieldLabel"
 msgstr "Field"
 
-msgid "pages.home.title"
-msgstr "Welcome to FlowG"
+msgid "common.testDialog.inputRecord"
+msgstr "Input Record:"
 
-msgid "pages.home.stats.streams"
-msgstr "Streams"
-
-msgid "pages.home.stats.transformers"
-msgstr "Transformers"
-
-msgid "pages.home.stats.forwarders"
-msgstr "Forwarders"
-
-msgid "pages.home.stats.pipelines"
-msgstr "Pipelines"
-
-msgid "pages.login.brand"
-msgstr "FlowG"
-
-msgid "pages.login.subtitle"
-msgstr "Sign In with your account"
-
-msgid "pages.login.demoModeHint"
-msgstr "Demo Mode Enabled, login with"
-
-msgid "pages.login.username"
-msgstr "Username"
-
-msgid "pages.login.password"
-msgstr "Password"
-
-msgid "pages.login.submit"
-msgstr "Sign In"
-
-msgid "pages.login.invalidCredentials"
-msgstr "Invalid credentials"
-
-msgid "pages.logout.message"
-msgstr "You are being logged out..."
-
-msgid "pages.notFound.title"
-msgstr "Page not found"
-
-msgid "pages.notFound.description"
-msgstr "The page you are looking for does not exist or has been moved."
-
-msgid "pages.notFound.backHome"
-msgstr "Back to home"
-
-msgid "pages.upload.title"
-msgstr "Upload Logs"
-
-msgid "pages.upload.selectPipeline"
-msgstr "Select Pipeline"
-
-msgid "pages.upload.pipelineLabel"
-msgstr "Pipeline"
-
-msgid "pages.upload.selectFile"
-msgstr "Select log file"
-
-msgid "pages.upload.submit"
-msgstr "Upload"
-
-msgid "pages.upload.notifications.success"
-msgstr "Logs uploaded successfully"
-
-msgid "pages.systemConfiguration.title"
-msgstr "System configuration"
-
-msgid "pages.systemConfiguration.allowedSyslogOrigins"
-msgstr "Allowed Syslog Origins"
-
-msgid "pages.systemConfiguration.notifications.saved"
-msgstr "System configuration saved"
+msgid "common.testDialog.title"
+msgstr "Test the pipeline"
 
 msgid "pages.forwarders.empty"
 msgstr "No forwarder found, create one"
@@ -117,41 +42,116 @@ msgstr "No forwarder found, create one"
 msgid "pages.forwarders.notifications.saved"
 msgstr "Forwarder saved"
 
+msgid "pages.home.stats.forwarders"
+msgstr "Forwarders"
+
+msgid "pages.home.stats.pipelines"
+msgstr "Pipelines"
+
+msgid "pages.home.stats.streams"
+msgstr "Streams"
+
+msgid "pages.home.stats.transformers"
+msgstr "Transformers"
+
+msgid "pages.home.title"
+msgstr "Welcome to FlowG"
+
+msgid "pages.login.brand"
+msgstr "FlowG"
+
+msgid "pages.login.demoModeHint"
+msgstr "Demo Mode Enabled, login with"
+
+msgid "pages.login.invalidCredentials"
+msgstr "Invalid credentials"
+
+msgid "pages.login.password"
+msgstr "Password"
+
+msgid "pages.login.submit"
+msgstr "Sign In"
+
+msgid "pages.login.subtitle"
+msgstr "Sign In with your account"
+
+msgid "pages.login.username"
+msgstr "Username"
+
+msgid "pages.logout.message"
+msgstr "You are being logged out..."
+
+msgid "pages.notFound.backHome"
+msgstr "Back to home"
+
+msgid "pages.notFound.description"
+msgstr "The page you are looking for does not exist or has been moved."
+
+msgid "pages.notFound.title"
+msgstr "Page not found"
+
 msgid "pages.pipelines.empty"
 msgstr "No pipeline found, create one"
 
 msgid "pages.pipelines.nameLabel"
 msgstr "Pipeline name"
 
-msgid "pages.pipelines.switchExpressionDocs"
-msgstr "Switch Expression Documentation"
-
 msgid "pages.pipelines.notifications.saved"
 msgstr "Pipeline saved"
 
-msgid "pages.transformers.empty"
-msgstr "No transformer found, create one"
-
-msgid "pages.transformers.vrlDocs"
-msgstr "VRL Documentation"
-
-msgid "pages.transformers.notifications.saved"
-msgstr "Transformer saved"
-
-msgid "pages.storage.empty"
-msgstr "No stream found, create one"
+msgid "pages.pipelines.switchExpressionDocs"
+msgstr "Switch Expression Documentation"
 
 msgid "pages.storage.demoModeBanner"
 msgstr "Demo Mode Active, changes will be ignored."
 
+msgid "pages.storage.empty"
+msgstr "No stream found, create one"
+
 msgid "pages.storage.notifications.saved"
 msgstr "Stream saved"
-
-msgid "pages.streams.empty"
-msgstr "No stream found, send some logs."
 
 msgid "pages.streams.columns.ingestedAt"
 msgstr "Ingested At"
 
+msgid "pages.streams.empty"
+msgstr "No stream found, send some logs."
+
 msgid "pages.streams.notifications.watchError"
 msgstr "An error occured while watching logs"
+
+msgid "pages.systemConfiguration.allowedSyslogOrigins"
+msgstr "Allowed Syslog Origins"
+
+msgid "pages.systemConfiguration.notifications.saved"
+msgstr "System configuration saved"
+
+msgid "pages.systemConfiguration.title"
+msgstr "System configuration"
+
+msgid "pages.transformers.empty"
+msgstr "No transformer found, create one"
+
+msgid "pages.transformers.notifications.saved"
+msgstr "Transformer saved"
+
+msgid "pages.transformers.vrlDocs"
+msgstr "VRL Documentation"
+
+msgid "pages.upload.notifications.success"
+msgstr "Logs uploaded successfully"
+
+msgid "pages.upload.pipelineLabel"
+msgstr "Pipeline"
+
+msgid "pages.upload.selectFile"
+msgstr "Select log file"
+
+msgid "pages.upload.selectPipeline"
+msgstr "Select Pipeline"
+
+msgid "pages.upload.submit"
+msgstr "Upload"
+
+msgid "pages.upload.title"
+msgstr "Upload Logs"
