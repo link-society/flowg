@@ -1,10 +1,12 @@
-package pipelines
+package mocks
 
 import (
-	"github.com/stretchr/testify/mock"
-	"link-society.com/flowg/internal/models"
-
 	"context"
+
+	"github.com/stretchr/testify/mock"
+
+	"link-society.com/flowg/internal/engines/pipelines"
+	"link-society.com/flowg/internal/models"
 )
 
 // MockRunner is a testify mock implementation of Runner for use in tests.
@@ -12,10 +14,10 @@ type MockRunner struct {
 	mock.Mock
 }
 
-var _ Runner = (*MockRunner)(nil)
+var _ pipelines.Runner = (*MockRunner)(nil)
 
 // NewMockRunner returns a Runner whose calls can be stubbed and asserted.
-func NewMockRunner() Runner {
+func NewMockRunner() pipelines.Runner {
 	return &MockRunner{}
 }
 

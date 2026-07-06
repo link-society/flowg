@@ -1,4 +1,4 @@
-package storage
+package mocks
 
 import (
 	"github.com/stretchr/testify/mock"
@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/storage"
 	"link-society.com/flowg/internal/utils/langs/filtering"
 )
 
@@ -17,10 +18,10 @@ type MockLogStorage struct {
 	mock.Mock
 }
 
-var _ LogStorage = (*MockLogStorage)(nil)
+var _ storage.LogStorage = (*MockLogStorage)(nil)
 
 // NewMockLogStorage returns a new, unconfigured [MockLogStorage].
-func NewMockLogStorage() LogStorage {
+func NewMockLogStorage() storage.LogStorage {
 	return &MockLogStorage{}
 }
 

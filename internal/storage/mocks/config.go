@@ -1,4 +1,4 @@
-package storage
+package mocks
 
 import (
 	"github.com/stretchr/testify/mock"
@@ -7,6 +7,7 @@ import (
 	"io"
 
 	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/storage"
 )
 
 // MockConfigStorage is a testify-based mock implementation of [ConfigStorage].
@@ -14,10 +15,10 @@ type MockConfigStorage struct {
 	mock.Mock
 }
 
-var _ ConfigStorage = (*MockConfigStorage)(nil)
+var _ storage.ConfigStorage = (*MockConfigStorage)(nil)
 
 // NewMockConfigStorage returns a new, unconfigured [MockConfigStorage].
-func NewMockConfigStorage() ConfigStorage {
+func NewMockConfigStorage() storage.ConfigStorage {
 	return &MockConfigStorage{}
 }
 
