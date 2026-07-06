@@ -15,3 +15,5 @@ technology without changing any of its consumers.
   [BadgerDB](https://github.com/dgraph-io/badger). It contains one package per
   domain interface plus the shared `kvstore` that wraps the embedded key-value
   database they all build upon.
+- **[foundation](foundation)** - third-party backend, built on
+  [FoundationDB](https://www.foundationdb.org/).
