@@ -46,14 +46,15 @@ export default function ThemeRegistry({ children }: ThemeRegistryProps) {
 
   const [preference, setPreference] = useState<ColorPreference>(() => {
     const saved = localStorage.getItem('colorMode')
-    if (saved === 'dark' || saved === 'light' || saved === 'system') return saved
+    if (saved === 'dark' || saved === 'light' || saved === 'system')
+      return saved
     return 'system'
   })
 
   const [systemMode, setSystemMode] = useState<ColorMode>(() =>
     globalThis.matchMedia('(prefers-color-scheme: dark)').matches
       ? 'dark'
-      : 'light',
+      : 'light'
   )
 
   const mode: ColorMode = preference === 'system' ? systemMode : preference
@@ -75,7 +76,7 @@ export default function ThemeRegistry({ children }: ThemeRegistryProps) {
   const theme = useMemo(() => createAppTheme(mode), [mode])
   const colorModeValue = useMemo(
     () => ({ mode, preference, setPreference: setColorPreference }),
-    [mode, preference, setColorPreference],
+    [mode, preference, setColorPreference]
   )
 
   return (

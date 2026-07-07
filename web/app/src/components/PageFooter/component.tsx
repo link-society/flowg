@@ -1,16 +1,17 @@
-import { useState } from 'react'
-
 import { type ColorPreference, useColorMode } from '@/theme'
 
-import Check from '@mui/icons-material/Check'
-import DarkModeIcon from '@mui/icons-material/DarkMode'
-import LightModeIcon from '@mui/icons-material/LightMode'
-import SettingsBrightnessIcon from '@mui/icons-material/SettingsBrightness'
+import { useState } from 'react'
+
 import IconButton from '@mui/material/IconButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
+
+import Check from '@mui/icons-material/Check'
+import DarkModeIcon from '@mui/icons-material/DarkMode'
+import LightModeIcon from '@mui/icons-material/LightMode'
+import SettingsBrightnessIcon from '@mui/icons-material/SettingsBrightness'
 
 import { useFeatureFlags } from '@/lib/hooks/featureflags'
 
@@ -60,7 +61,8 @@ const PageFooter = () => {
         transformOrigin={{ vertical: 'bottom', horizontal: 'left' }}
       >
         {PREFERENCE_ORDER.map((value) => {
-          const { icon: OptionIcon, label: optionLabel } = PREFERENCE_META[value]
+          const { icon: OptionIcon, label: optionLabel } =
+            PREFERENCE_META[value]
           return (
             <MenuItem
               key={value}
