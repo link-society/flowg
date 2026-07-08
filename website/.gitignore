@@ -10,6 +10,7 @@
 docs/technical/cli/**/*.md
 src/openapi.json
 static/slides
+static/img/slides
 
 # Misc
 .DS_Store
