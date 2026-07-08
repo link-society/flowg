@@ -26,6 +26,7 @@
 
 .buttons {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 1rem;
@@ -58,4 +59,81 @@
 
   padding-left: 1rem;
   padding-right: 1rem;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+
+  height: 6rem;
+
+  border: 1px solid #D7E0EC;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+
+  padding: 2rem;
+  background-color: #FFFFFF;
+
+  transition: all 250ms ease-in-out;
+
+  &:hover {
+    box-shadow: 0 1px 2px 0 rgb(0 255 0 / 0.05);
+    border-color: #14B8A6;
+  }
+}
+
+.card svg {
+  width: auto;
+  height: auto;
+  min-width: 0;
+  max-width: 100%;
+  max-height: 3.35rem;
+}
+
+.cardIcon {
+  width: 3.35rem;
+  height: 3.35rem;
+
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+
+  font-weight: 750;
+  letter-spacing: -0.03em;
+
+  background-color: #EFF6FF;
+}
+
+.cardLabel {
+  font-size: 1.05rem;
+  flex-grow: 1;
+}
+
+.pipeline {
+  position: relative;
+  flex-wrap: nowrap !important;
+}
+
+.pipeline :global(.col) {
+  flex: 1 1 0 !important;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pipeline img {
+  width: 100%;
+  height: auto;
+  max-width: 220px;
+}
+
+.pipelineConnector {
+  position: absolute;
+  top: 50%;
+  left: 5%;
+  width: 90%;
+  border-top: 2px dashed var(--ifm-color-emphasis-400);
+  z-index: -1;
 }
