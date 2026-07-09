@@ -8,8 +8,8 @@ import (
 
 	"link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/internal/storage"
 	"link-society.com/flowg/internal/storage/backends/badger/concrete/auth"
+	storage "link-society.com/flowg/internal/storage/interfaces"
 
 	"link-society.com/flowg/cmd/flowg-server/logging"
 	"link-society.com/flowg/internal/storage/bootstrap"

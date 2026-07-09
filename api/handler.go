@@ -17,7 +17,7 @@ import (
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/internal/app"
 
-	"link-society.com/flowg/internal/storage"
+	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
 // handlerParams gathers everything [NewHandler] needs from the

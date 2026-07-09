@@ -22,7 +22,7 @@ import (
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/utils/langs/filtering"
 
-	"link-society.com/flowg/internal/storage"
+	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
 // WatchLogsDeps lists the dependencies of [NewWatchLogsUsecase].

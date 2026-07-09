@@ -9,8 +9,8 @@ import (
 	"link-society.com/flowg/cmd/flowg-server/logging"
 	"link-society.com/flowg/internal/storage/bootstrap"
 
-	"link-society.com/flowg/internal/storage"
 	"link-society.com/flowg/internal/storage/backends/badger/concrete/config"
+	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
 func TestDefaultSystemConfig(t *testing.T) {

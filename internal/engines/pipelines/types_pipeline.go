@@ -7,7 +7,7 @@ import (
 	"link-society.com/flowg/internal/app/metrics"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage"
+	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
 // Pipeline is a compiled, ready-to-run flow: a graph of Nodes indexed by ID,

@@ -1,4 +1,4 @@
-package storage
+package interfaces
 
 import (
 	"context"
@@ -42,7 +42,7 @@ type AuthStorage interface {
 
 	// VerifyUserPassword reports whether the given password matches the stored
 	// credentials of the named user.
-	VerifyUserPassword(ctx context.Context, name, password string) (bool, error)
+	VerifyUserPassword(ctx context.Context, name string, password string) (bool, error)
 	// VerifyUserPermission reports whether the named user has been granted the
 	// given permission scope.
 	VerifyUserPermission(ctx context.Context, username string, scope models.Scope) (bool, error)

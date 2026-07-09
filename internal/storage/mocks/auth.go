@@ -7,7 +7,7 @@ import (
 	"io"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage"
+	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
 // MockAuthStorage is a testify-based mock implementation of [AuthStorage].

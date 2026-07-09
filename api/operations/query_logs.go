@@ -18,7 +18,7 @@ import (
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/utils/langs/filtering"
 
-	"link-society.com/flowg/internal/storage"
+	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
 // QueryStreamDeps lists the dependencies of [NewQueryStreamUsecase].

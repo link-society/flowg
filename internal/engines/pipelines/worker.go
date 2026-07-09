@@ -6,7 +6,7 @@ import (
 
 	"github.com/vladopajic/go-actor/actor"
 
-	"link-society.com/flowg/internal/storage"
+	storage "link-society.com/flowg/internal/storage/interfaces"
 
 	"link-society.com/flowg/internal/engines/lognotify"
 )

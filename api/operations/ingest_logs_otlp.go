@@ -26,7 +26,7 @@ import (
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/utils/otlp"
 
-	"link-society.com/flowg/internal/storage"
+	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
 // IngestLogsOTLPDeps lists the dependencies of [NewIngestLogsOTLPUsecase].

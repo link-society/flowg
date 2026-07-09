@@ -6,8 +6,8 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 
-	"link-society.com/flowg/internal/storage"
 	"link-society.com/flowg/internal/storage/backends/badger/concrete/config"
+	storage "link-society.com/flowg/internal/storage/interfaces"
 
 	"link-society.com/flowg/internal/storage/bootstrap"
 )
