@@ -19,9 +19,9 @@ import (
 	"github.com/apple/foundationdb/bindings/go/src/fdb/subspace"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage"
 	"link-society.com/flowg/internal/storage/backends/foundation/config/transactions"
 	"link-society.com/flowg/internal/storage/backends/foundation/kvstore"
+	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
 var ErrNotSupported = errors.New("operation not supported")

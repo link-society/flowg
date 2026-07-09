@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 
-	"link-society.com/flowg/internal/storage"
+	storage "link-society.com/flowg/internal/storage/interfaces"
 
 	"link-society.com/flowg/internal/storage/bootstrap"
 )

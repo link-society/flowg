@@ -20,7 +20,7 @@ import (
 	"link-society.com/flowg/internal/engines/pipelines"
 	"link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/internal/storage"
+	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
 // ElasticDeps lists the dependencies of [newElasticHandler]: the backends it

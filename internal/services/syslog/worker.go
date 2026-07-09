@@ -12,7 +12,7 @@ import (
 	"github.com/vladopajic/go-actor/actor"
 
 	"link-society.com/flowg/internal/engines/pipelines"
-	"link-society.com/flowg/internal/storage"
+	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
 // worker is the syslog service's actor body. It drains the message channel and

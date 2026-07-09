@@ -17,7 +17,7 @@ import (
 	"link-society.com/flowg/api/routing"
 	applog "link-society.com/flowg/internal/app/logging"
 
-	"link-society.com/flowg/internal/storage"
+	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
 // ChangePasswordDeps lists the dependencies of [NewChangePasswordUsecase].

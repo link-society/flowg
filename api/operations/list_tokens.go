@@ -15,7 +15,7 @@ import (
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 
-	"link-society.com/flowg/internal/storage"
+	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
 // ListTokensDeps lists the dependencies of [NewListTokensUsecase].

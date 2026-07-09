@@ -12,7 +12,7 @@ import (
 
 	gosyslog "gopkg.in/mcuadros/go-syslog.v2"
 
-	"link-society.com/flowg/internal/storage"
+	storage "link-society.com/flowg/internal/storage/interfaces"
 
 	"link-society.com/flowg/internal/engines/pipelines"
 )

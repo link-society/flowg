@@ -16,7 +16,7 @@ import (
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/internal/storage"
+	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
 // DeletePipelineDeps lists the dependencies of [NewDeletePipelineUsecase].

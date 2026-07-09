@@ -8,7 +8,7 @@ import (
 
 	"link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/internal/storage"
+	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
 // RequireScopeApiDecorator guards a use-case interactor so that it only runs

@@ -9,8 +9,9 @@ import (
 	"time"
 
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage"
 	"link-society.com/flowg/internal/utils/langs/filtering"
+
+	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
 // MockLogStorage is a testify-based mock implementation of [LogStorage].
