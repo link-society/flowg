@@ -11,6 +11,7 @@ import (
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/utils/langs/filtering"
 
+	"link-society.com/flowg/internal/storage/generic/kv"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -99,9 +100,9 @@ func (m *MockLogStorage) Distinct(ctx context.Context, stream string) (map[strin
 	return args.Get(0).(map[string][]string), args.Error(1)
 }
 
-func (m *MockLogStorage) Ingest(ctx context.Context, stream string, logRecord *models.LogRecord) ([]byte, error) {
+func (m *MockLogStorage) Ingest(ctx context.Context, stream string, logRecord *models.LogRecord) (kv.Key, error) {
 	args := m.Called(ctx, stream, logRecord)
-	return args.Get(0).([]byte), args.Error(1)
+	return args.Get(0).(kv.Key), args.Error(1)
 }
 
 func (m *MockLogStorage) FetchLogs(ctx context.Context, stream string, from time.Time, to time.Time, filter filtering.Filter, indexing map[string][]string) ([]models.LogRecord, error) {
