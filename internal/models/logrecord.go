@@ -9,6 +9,8 @@ import (
 
 	otlpcommonmodels "go.opentelemetry.io/proto/otlp/common/v1"
 	otlplogmodels "go.opentelemetry.io/proto/otlp/logs/v1"
+
+	"link-society.com/flowg/internal/storage/generic/kv"
 )
 
 // LogRecord is the canonical in-memory representation of a log entry throughout
@@ -60,13 +62,13 @@ func NewFromOTLP(logRecord *otlplogmodels.LogRecord) *LogRecord {
 // "entry:<stream>:<unix-millis, 20-digit zero-padded>:<uuid>". The padding makes
 // a lexical scan walk the stream in chronological order and the uuid keeps
 // same-millisecond records distinct.
-func (e *LogRecord) NewDbKey(stream string) []byte {
-	return []byte(fmt.Sprintf(
-		"entry:%s:%020d:%s",
+func (e *LogRecord) NewDbKey(stream string) kv.Key {
+	return kv.Key{
+		"entry",
 		stream,
-		e.Timestamp.UnixMilli(),
+		fmt.Sprintf("%020d", e.Timestamp.UnixMilli()),
 		uuid.New().String(),
-	))
+	}
 }
 
 // otlpValueParser renders an arbitrary OTLP AnyValue as a string so it can live
