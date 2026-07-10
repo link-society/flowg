@@ -3,6 +3,7 @@ package pipelines
 import (
 	"context"
 	"errors"
+	"strings"
 	"sync"
 
 	"link-society.com/flowg/internal/app/metrics"
@@ -270,7 +271,7 @@ func (n *RouterNode) Process(ctx context.Context, record *models.LogRecord) erro
 
 	key, err := w.logStorage.Ingest(ctx, n.Stream, record)
 	if err == nil {
-		err = w.logNotifier.Notify(ctx, n.Stream, string(key), *record)
+		err = w.logNotifier.Notify(ctx, n.Stream, strings.Join(key, ":"), *record)
 	}
 	if err == nil {
 		metrics.IncStreamLogCounter(n.Stream)
