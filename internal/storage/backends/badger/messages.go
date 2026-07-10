@@ -1,4 +1,4 @@
-package kvstore
+package badger
 
 import (
 	"io"
@@ -25,11 +25,11 @@ type restoreOperation struct {
 }
 
 type viewOperation struct {
-	txnFn func(txn *badger.Txn) error
+	txnFn func(txn *BadgerTx) error
 }
 
 type updateOperation struct {
-	txnFn func(txn *badger.Txn) error
+	txnFn func(txn *BadgerTx) error
 }
 
 var _ operation = (*backupOperation)(nil)
@@ -52,12 +52,16 @@ func (m *restoreOperation) Handle(db *badger.DB) error {
 }
 
 func (m *viewOperation) Handle(db *badger.DB) error {
-	return db.View(m.txnFn)
+	return db.View(func(txn *badger.Txn) error {
+		return m.txnFn(&BadgerTx{concrete: txn})
+	})
 }
 
 func (m *updateOperation) Handle(db *badger.DB) error {
 	for {
-		err := db.Update(m.txnFn)
+		err := db.Update(func(txn *badger.Txn) error {
+			return m.txnFn(&BadgerTx{concrete: txn})
+		})
 
 		switch err {
 		case nil:

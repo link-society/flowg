@@ -4,11 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"strings"
-
-	"github.com/dgraph-io/badger/v4"
-
-	"link-society.com/flowg/internal/storage/backends/badger/kvstore"
+	"link-society.com/flowg/internal/storage/backends/badger"
+	"link-society.com/flowg/internal/storage/generic/kv"
 )
 
 // migrateAlertScopes renames the legacy "alerts" permission to "forwarders".
@@ -16,23 +13,16 @@ import (
 // "role:<name>:read_alerts" / "role:<name>:write_alerts" scope keys. This pass
 // scans every role, and for each affected grant writes the equivalent
 // "*_forwarders" key and deletes the obsolete "*_alerts" one.
-func migrateAlertScopes(ctx context.Context, kvStore kvstore.Storage) error {
-	return kvStore.Update(ctx, func(txn *badger.Txn) error {
-		opts := badger.DefaultIteratorOptions
-		opts.PrefetchValues = false
-		opts.Prefix = []byte("role:")
-		it := txn.NewIterator(opts)
-
+func migrateAlertScopes(ctx context.Context, adapter *badger.BadgerAdapter) error {
+	return adapter.Update(ctx, func(txn *badger.BadgerTx) error {
 		roleNames := struct {
 			readers []string
 			writers []string
 		}{}
 
-		for it.Rewind(); it.Valid(); it.Next() {
-			key := it.Item().Key()
-			parts := strings.Split(string(key[5:]), ":")
-			roleName := parts[0]
-			scopeName := parts[1]
+		for key := range txn.IterKeys(kv.Key{"role"}, kv.KeyRange{}) {
+			roleName := key[1]
+			scopeName := key[2]
 
 			switch scopeName {
 			case "read_alerts":
@@ -41,8 +31,6 @@ func migrateAlertScopes(ctx context.Context, kvStore kvstore.Storage) error {
 				roleNames.writers = append(roleNames.writers, roleName)
 			}
 		}
-
-		it.Close()
 
 		updates := []struct {
 			scopeType string
@@ -54,14 +42,14 @@ func migrateAlertScopes(ctx context.Context, kvStore kvstore.Storage) error {
 
 		for _, update := range updates {
 			for _, roleName := range update.roles {
-				oldKey := fmt.Sprintf("role:%s:%s_alerts", roleName, update.scopeType)
-				newKey := fmt.Sprintf("role:%s:%s_forwarders", roleName, update.scopeType)
+				oldKey := kv.Key{"role", roleName, fmt.Sprintf("%s_alerts", update.scopeType)}
+				newKey := kv.Key{"role", roleName, fmt.Sprintf("%s_forwarders", update.scopeType)}
 
-				if err := txn.Set([]byte(newKey), []byte{}); err != nil {
+				if err := txn.Set(newKey, []byte{}); err != nil {
 					return fmt.Errorf("could not migrate old scope '%s' to new scope '%s': %w", oldKey, newKey, err)
 				}
 
-				if err := txn.Delete([]byte(oldKey)); err != nil {
+				if err := txn.Clear(oldKey); err != nil {
 					return fmt.Errorf("could not delete old scope '%s': %w", oldKey, err)
 				}
 			}
