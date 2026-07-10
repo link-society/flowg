@@ -37,6 +37,7 @@ type Pair interface {
 	ExpiresAt() uint64
 }
 
+// HasSuffix reports whether the key ends with the given sequence of segments.
 func (k Key) HasSuffix(suffix Key) bool {
 	if len(k) < len(suffix) {
 		return false
@@ -51,10 +52,13 @@ func (k Key) HasSuffix(suffix Key) bool {
 	return true
 }
 
+// Len returns the number of keys in the slice, implementing [sort.Interface].
 func (ks KeySlice) Len() int {
 	return len(ks)
 }
 
+// Less reports whether the key at index i sorts before the one at index j,
+// comparing segment by segment, implementing [sort.Interface].
 func (ks KeySlice) Less(i, j int) bool {
 	for x := 0; x < len(ks[i]) && x < len(ks[j]); x++ {
 		if ks[i][x] < ks[j][x] {
@@ -67,6 +71,7 @@ func (ks KeySlice) Less(i, j int) bool {
 	return len(ks[i]) < len(ks[j])
 }
 
+// Swap exchanges the keys at indices i and j, implementing [sort.Interface].
 func (ks KeySlice) Swap(i, j int) {
 	ks[i], ks[j] = ks[j], ks[i]
 }
