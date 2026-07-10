@@ -4,30 +4,36 @@ The packages under `internal/storage/backends/badger` implement FlowG's storage
 contracts on top of [BadgerDB](https://github.com/dgraph-io/badger), an
 embedded key-value database.
 
-They are the default backend wired into the application. Each domain interface
-declared in [internal/storage](../../) has its own package here, and they all
-share a single key-value primitive so they behave consistently and can be
-managed through the same lifecycle.
-
-## Layout
-
-- **logging.go** — `BadgerLogger`, the adapter that routes BadgerDB's internal
-  logs into FlowG's `slog` output.
-- **[kvstore](kvstore)** — the shared, concurrency-safe wrapper around a
-  BadgerDB database. Every domain store is built on top of it.
-- **[concrete](concrete)** — the per-domain implementations of the storage
-  interfaces:
-  - **[auth](concrete/auth)** — implements `AuthStorage`: users, roles, personal
-    access tokens and the password/permission checks around them.
-  - **[config](concrete/config)** — implements `ConfigStorage`: pipelines,
-    transformers, forwarders and system configuration.
-  - **[log](concrete/log)** — implements `LogStorage`: ingestion, indexing and
-    querying of log records.
+This is the default backend wired into the application. It provides a single
+BadgerDB-backed [kv.Adapter](../../generic/kv), which the backend-agnostic domain
+stores under [databases](../../databases) run on unchanged. The per-domain
+packages under [concrete](concrete) assemble the adapter and the matching domain
+store into ready-to-use `fx` modules.
 
 ## Design
 
-Each domain package exposes the same shape: an `Options` struct, a
-`DefaultOptions` constructor and a `NewStorage` function that returns an `fx`
-module. `NewStorage` provisions a dedicated `kvstore` and adapts its
-transactions into the domain interface, so the rest of the application only ever
-sees the interface from [internal/storage](../../), never BadgerDB itself.
+`NewAdapter` returns an `fx` module that provides a `BadgerAdapter`, a
+`kv.Adapter` implementation. All database access is serialized through an actor
+mailbox: `View`, `Update`, `Backup` and `Restore` each enqueue an operation that
+a single worker goroutine applies to the BadgerDB handle, and write transactions
+are transparently retried on conflict. Composite `kv.Key`s are joined with `:`
+into BadgerDB's flat key space, and a `BadgerTx` adapts a BadgerDB transaction to
+the `kv.QueryTx` / `kv.MutationTx` contracts.
+
+## Layout
+
+- **adapter.go** — `BadgerAdapter` and `NewAdapter`, plus `AdapterOptions`. The
+  actor-based `kv.Adapter` and the `fx` module that wires its lifecycle.
+- **txn.go** — `BadgerTx`, the transaction adapter implementing `kv.QueryTx` and
+  `kv.MutationTx`.
+- **types.go** — the key encoding and the `kv.Pair` adapter over BadgerDB items.
+- **messages.go** — the internal operations (view, update, backup, restore) sent
+  through the actor mailbox.
+- **logging.go** — the adapter that routes BadgerDB's internal logs into FlowG's
+  `slog` output.
+- **[concrete](concrete)** — the per-domain `fx` modules that combine the adapter
+  with a domain store (and its startup migrations):
+  - **[auth](concrete/auth)** — provides `AuthStorage`.
+  - **[config](concrete/config)** — provides `ConfigStorage`.
+  - **[log](concrete/log)** — provides `LogStorage` and its retention garbage
+    collector.

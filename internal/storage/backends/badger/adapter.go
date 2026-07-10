@@ -1,8 +1,9 @@
-package kvstore
+package badger
 
 import (
 	"context"
 	"fmt"
+
 	"io"
 
 	"github.com/vladopajic/go-actor/actor"
@@ -11,32 +12,11 @@ import (
 	"github.com/dgraph-io/badger/v4"
 	badgerOptions "github.com/dgraph-io/badger/v4/options"
 
-	badgerlog "link-society.com/flowg/internal/storage/backends/badger"
+	"link-society.com/flowg/internal/storage/generic/kv"
 )
 
-// Storage is a concurrency-safe wrapper around a BadgerDB database.
-//
-// All access goes through an actor mailbox, so transactions issued from
-// different goroutines are serialized onto a single worker. This keeps the
-// higher-level storage backends free of locking concerns while still allowing
-// them to share one underlying database.
-type Storage interface {
-	actor.Actor
-
-	// Backup streams an incremental snapshot of the database to w, returning the
-	// version up to which data was written so it can be passed as since on a
-	// subsequent call.
-	Backup(ctx context.Context, w io.Writer, since uint64) (uint64, error)
-	// Restore loads a snapshot previously produced by Backup from r.
-	Restore(ctx context.Context, r io.Reader) error
-	// View runs txnFn inside a read-only transaction.
-	View(ctx context.Context, txnFn func(txn *badger.Txn) error) error
-	// Update runs txnFn inside a read-write transaction.
-	Update(ctx context.Context, txnFn func(txn *badger.Txn) error) error
-}
-
-// Options configures how the underlying BadgerDB database is opened.
-type Options struct {
+// Configures how the underlying BadgerDB database is opened.
+type AdapterOptions struct {
 	// LogChannel names the logging channel and the fx module the store lives in.
 	LogChannel string
 	// Directory is the on-disk location of the database; ignored when InMemory.
@@ -46,32 +26,27 @@ type Options struct {
 	// ReadOnly opens the database without allowing writes.
 	ReadOnly bool
 }
-type storageImpl struct {
+
+// BadgerAdapter is a [kv.Adapter] backed by BadgerDB. All database access is
+// serialized through an actor mailbox so a single goroutine touches the handle
+// at a time.
+type BadgerAdapter struct {
 	actor.Actor
 
 	mbox actor.Mailbox[message]
 }
 
-var _ Storage = (*storageImpl)(nil)
+var _ kv.Adapter[*BadgerTx, *BadgerTx] = (*BadgerAdapter)(nil)
 
-// DefaultOptions returns the baseline [Options] used when a caller does not
-// override them: an on-disk store logging on the "kv" channel.
-func DefaultOptions() Options {
-	return Options{
-		LogChannel: "kv",
-		Directory:  "",
-		InMemory:   false,
-		ReadOnly:   false,
-	}
-}
-
-// NewStorage builds an fx module that provides a [Storage] backed by BadgerDB.
+// NewAdapter builds an fx module that provides a [kv.Adapter] backed by
+// BadgerDB.
 //
 // The module wires together the database handle, the actor mailbox and the
 // worker that drains it, binding their lifecycles to the fx application. The
-// resulting [Storage] is published under the name given by Options.LogChannel
-// so several stores can coexist in the same container.
-func NewStorage(opts Options) fx.Option {
+// resulting [kv.Adapter] is published under the name given by
+// AdapterOptions.LogChannel so several adapters can coexist in the same
+// container.
+func NewAdapter(opts AdapterOptions) fx.Option {
 	makeDB := func(lc fx.Lifecycle) (*badger.DB, error) {
 		var dbDir string
 		if !opts.InMemory {
@@ -80,7 +55,7 @@ func NewStorage(opts Options) fx.Option {
 
 		dbOpts := badger.
 			DefaultOptions(dbDir).
-			WithLogger(&badgerlog.BadgerLogger{Channel: opts.LogChannel}).
+			WithLogger(&badgerLogger{Channel: opts.LogChannel}).
 			WithCompression(badgerOptions.ZSTD).
 			WithInMemory(opts.InMemory).
 			WithReadOnly(opts.ReadOnly)
@@ -120,7 +95,7 @@ func NewStorage(opts Options) fx.Option {
 		lc fx.Lifecycle,
 		db *badger.DB,
 		mbox actor.Mailbox[message],
-	) Storage {
+	) *BadgerAdapter {
 		worker := actor.NewWorker(func(ctx actor.Context) actor.WorkerStatus {
 			select {
 			case <-ctx.Done():
@@ -141,26 +116,26 @@ func NewStorage(opts Options) fx.Option {
 			}
 		})
 
-		storage := &storageImpl{
+		adapter := &BadgerAdapter{
 			Actor: actor.New(worker),
 			mbox:  mbox,
 		}
 
 		lc.Append(fx.Hook{
 			OnStart: func(ctx context.Context) error {
-				storage.Start()
+				adapter.Start()
 				return nil
 			},
 			OnStop: func(ctx context.Context) error {
-				storage.Stop()
+				adapter.Stop()
 				return nil
 			},
 		})
 
-		return storage
+		return adapter
 	}
 
-	module := fmt.Sprintf("kvstore.%s", opts.LogChannel)
+	module := fmt.Sprintf("kv.adapter.%s", opts.LogChannel)
 	tag := func(s string) string { return fmt.Sprintf(`name:"%s.%s"`, module, s) }
 
 	return fx.Module(
@@ -177,16 +152,12 @@ func NewStorage(opts Options) fx.Option {
 	)
 }
 
-// Backup implements [Storage.Backup].
-func (kv *storageImpl) Backup(
-	ctx context.Context,
-	w io.Writer,
-	since uint64,
-) (uint64, error) {
+// Backup implements [kv.Adapter.Backup].
+func (a *BadgerAdapter) Backup(ctx context.Context, w io.Writer, since uint64) (uint64, error) {
 	replyTo := make(chan error, 1)
 	op := &backupOperation{w: w, since: since}
 
-	err := kv.mbox.Send(
+	err := a.mbox.Send(
 		ctx,
 		message{
 			replyTo:   replyTo,
@@ -205,14 +176,11 @@ func (kv *storageImpl) Backup(
 	return op.since, nil
 }
 
-// Restore implements [Storage.Restore].
-func (kv *storageImpl) Restore(
-	ctx context.Context,
-	r io.Reader,
-) error {
+// Restore implements [kv.Adapter.Restore].
+func (a *BadgerAdapter) Restore(ctx context.Context, r io.Reader) error {
 	replyTo := make(chan error, 1)
 
-	err := kv.mbox.Send(
+	err := a.mbox.Send(
 		ctx,
 		message{
 			replyTo:   replyTo,
@@ -226,14 +194,11 @@ func (kv *storageImpl) Restore(
 	return <-replyTo
 }
 
-// View implements [Storage.View].
-func (kv *storageImpl) View(
-	ctx context.Context,
-	txnFn func(txn *badger.Txn) error,
-) error {
+// View implements [kv.Adapter.View].
+func (a *BadgerAdapter) View(ctx context.Context, txnFn func(txn *BadgerTx) error) error {
 	replyTo := make(chan error, 1)
 
-	err := kv.mbox.Send(
+	err := a.mbox.Send(
 		ctx,
 		message{
 			replyTo:   replyTo,
@@ -247,14 +212,11 @@ func (kv *storageImpl) View(
 	return <-replyTo
 }
 
-// Update implements [Storage.Update].
-func (kv *storageImpl) Update(
-	ctx context.Context,
-	txnFn func(txn *badger.Txn) error,
-) error {
+// Update implements [kv.Adapter.Update].
+func (a *BadgerAdapter) Update(ctx context.Context, txnFn func(txn *BadgerTx) error) error {
 	replyTo := make(chan error, 1)
 
-	err := kv.mbox.Send(
+	err := a.mbox.Send(
 		ctx,
 		message{
 			replyTo:   replyTo,

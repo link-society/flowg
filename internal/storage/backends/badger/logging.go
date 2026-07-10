@@ -8,13 +8,13 @@ import (
 	"github.com/dgraph-io/badger/v4"
 )
 
-type BadgerLogger struct {
+type badgerLogger struct {
 	Channel string
 }
 
-var _ badger.Logger = (*BadgerLogger)(nil)
+var _ badger.Logger = (*badgerLogger)(nil)
 
-func (l *BadgerLogger) Errorf(format string, v ...interface{}) {
+func (l *badgerLogger) Errorf(format string, v ...interface{}) {
 	content := fmt.Sprintf(format, v...)
 	lines := strings.FieldsFunc(content, func(c rune) bool { return c == '\n' || c == '\r' })
 	for _, line := range lines {
@@ -22,7 +22,7 @@ func (l *BadgerLogger) Errorf(format string, v ...interface{}) {
 	}
 }
 
-func (l *BadgerLogger) Warningf(format string, v ...interface{}) {
+func (l *badgerLogger) Warningf(format string, v ...interface{}) {
 	content := fmt.Sprintf(format, v...)
 	lines := strings.FieldsFunc(content, func(c rune) bool { return c == '\n' || c == '\r' })
 	for _, line := range lines {
@@ -30,11 +30,11 @@ func (l *BadgerLogger) Warningf(format string, v ...interface{}) {
 	}
 }
 
-func (l *BadgerLogger) Infof(format string, v ...interface{}) {
+func (l *badgerLogger) Infof(format string, v ...interface{}) {
 	l.Debugf(format, v...)
 }
 
-func (l *BadgerLogger) Debugf(format string, v ...interface{}) {
+func (l *badgerLogger) Debugf(format string, v ...interface{}) {
 	content := fmt.Sprintf(format, v...)
 	lines := strings.FieldsFunc(content, func(c rune) bool { return c == '\n' || c == '\r' })
 	for _, line := range lines {

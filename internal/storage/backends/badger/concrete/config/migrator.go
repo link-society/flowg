@@ -2,11 +2,15 @@ package config
 
 import (
 	"context"
+
 	"os"
 	"path/filepath"
-	"strings"
 
 	"encoding/base64"
+	"strings"
+
+	"link-society.com/flowg/internal/models"
+	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
 // migrateAlerts is the on-disk counterpart of the auth "alerts" -> "forwarders"
@@ -53,7 +57,7 @@ func migrateAlerts(baseDir string) error {
 // directories, decodes the content where needed, writes it under the matching
 // item type in the key/value store and removes the original file so the import
 // is not repeated.
-func migrateToBadger(ctx context.Context, baseDir string, storage *storageImpl) error {
+func migrateToBadger(ctx context.Context, baseDir string, storage storage.ConfigStorage) error {
 	fileStorages := []struct {
 		dir       string
 		extension string
@@ -63,14 +67,14 @@ func migrateToBadger(ctx context.Context, baseDir string, storage *storageImpl) 
 			dir:       "transformers",
 			extension: ".vrl",
 			converter: func(name string, content []byte) error {
-				return storage.writeItem(ctx, transformerItemType, name, content)
+				return storage.WriteTransformer(ctx, name, string(content))
 			},
 		},
 		{
 			dir:       "pipelines",
 			extension: ".json",
 			converter: func(name string, content []byte) error {
-				return storage.writeItem(ctx, pipelineItemType, name, content)
+				return storage.WriteRawPipeline(ctx, name, string(content))
 			},
 		},
 		{
@@ -83,7 +87,12 @@ func migrateToBadger(ctx context.Context, baseDir string, storage *storageImpl) 
 					return err
 				}
 
-				return storage.writeItem(ctx, forwarderItemType, name, content[:n])
+				forwarder, _, err := models.ConvertForwarder(content[:n])
+				if err != nil {
+					return err
+				}
+
+				return storage.WriteForwarder(ctx, name, forwarder)
 			},
 		},
 	}
