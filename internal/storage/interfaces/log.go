@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/storage/generic/kv"
 	"link-society.com/flowg/internal/utils/langs/filtering"
 )
 
@@ -43,7 +44,7 @@ type LogStorage interface {
 
 	// Ingest stores a log record in the named stream and returns the key it was
 	// stored under.
-	Ingest(ctx context.Context, stream string, logRecord *models.LogRecord) ([]byte, error)
+	Ingest(ctx context.Context, stream string, logRecord *models.LogRecord) (kv.Key, error)
 
 	// FetchLogs returns the records of the named stream within the [from, to]
 	// time range that satisfy the given filter and indexing constraints.
