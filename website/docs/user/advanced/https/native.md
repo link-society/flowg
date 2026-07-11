@@ -94,8 +94,8 @@ mkdir -p /opt/flowg/ssl
 cp /etc/ssl/certs/logs.example.com.crt /opt/flowg/ssl/tls.crt
 cp /etc/ssl/private/logs.example.com.key /opt/flowg/ssl/tls.key
 
-cp /etc/ssl/certs/mgmt.example.com.crt /opt/flowg/tls-mgmt.crt
-cp /etc/ssl/private/mgmt.example.com.key /opt/flowg/tls-mgmt.key
+cp /etc/ssl/certs/mgmt.example.com.crt /opt/flowg/ssl/tls-mgmt.crt
+cp /etc/ssl/private/mgmt.example.com.key /opt/flowg/ssl/tls-mgmt.key
 ```
 
 Then run the Docker image with:
