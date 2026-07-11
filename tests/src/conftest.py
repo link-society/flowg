@@ -71,7 +71,7 @@ def flowg_node0_container(
     flowg_node0_volume,
     flowg_image,
 ):
-    with flowg_utils.container(
+    with flowg_utils.badgerdb_container(
         docker_client,
         name="test-flowg-node0",
         network=flowg_network,

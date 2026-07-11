@@ -25,7 +25,7 @@ def volume(docker_client, *, name):
 
 
 @contextmanager
-def container(
+def badgerdb_container(
     docker_client,
     *,
     name,
@@ -54,6 +54,53 @@ def container(
         ports=ports,
         volumes={
             volume.name: {"bind": "/data", "mode": "rw"}
+        },
+        detach=True,
+    )
+    print(f"Starting container: {name}")
+    container.start()
+
+    try:
+        print(f"Waiting for healthcheck: {name}")
+        docker_utils.wait_for_healthcheck(container)
+
+    except RuntimeError as err:
+        docker_utils.teardown_container(container, report_dir)
+        pytest.fail(f"{err}", pytrace=False)
+
+    yield
+
+    docker_utils.teardown_container(container, report_dir)
+
+
+@contextmanager
+def foundationdb_container(
+    docker_client,
+    *,
+    name,
+    network,
+    conf_dir,
+    image,
+    ports,
+    report_dir,
+):
+    env = {
+        "FLOWG_SECRET_KEY": "s3cr3!",
+        "FLOWG_STORAGE_BACKEND": "foundationdb",
+        "FLOWG_FOUNDATIONDB_CLUSTER_FILE": "/etc/foundationdb/fdb.cluster",
+        "FLOWG_FOUNDATIONDB_KEY_SPACE": "flowg",
+    }
+
+    print(f"Creating container: {name}")
+    container = docker_client.containers.create(
+        image=image,
+        name=name,
+        environment=env,
+        network=network.name,
+        hostname=name,
+        ports=ports,
+        volumes={
+            str(conf_dir): {"bind": "/etc/foundationdb", "mode": "ro"}
         },
         detach=True,
     )
