@@ -45,6 +45,7 @@ jobs:
           key: binaries-${{ env.ARTIFACT_ID }}
           path: |
             bin
+            lib
             website/docs/technical/cli
             website/src/openapi.json
 
@@ -64,6 +65,17 @@ jobs:
           NODE_ENV: "production"
           MACOSX_DEPLOYMENT_TARGET: "26.0"
 
+      - name: bundle-fdb-lib@binary
+        if: steps.cache.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          mkdir -p lib
+          if [ "${{ inputs.goos }}" = "darwin" ]; then
+            cp "third-party/foundationdb/7.3.77/lib/${{ inputs.goos }}/${{ inputs.goarch }}/libfdb_c.dylib" lib/libfdb_c.dylib
+          else
+            cp "third-party/foundationdb/7.3.77/lib/${{ inputs.goos }}/${{ inputs.goarch }}/libfdb_c.so" lib/libfdb_c.so
+          fi
+
       - name: compress@binary
         if: inputs.goos != 'darwin' && steps.cache.outputs.cache-hit != 'true'
         uses: crazy-max/ghaction-upx@c83f378efc804f828e988debb88ed6116feb2368
@@ -76,6 +88,7 @@ jobs:
           name: binaries-${{ env.ARTIFACT_ID }}
           path: |
             bin
+            lib
             LICENSE.txt
           retention-days: 1
 
