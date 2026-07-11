@@ -52,7 +52,11 @@ func NewRootCommand() *cobra.Command {
 			featureflags.SetDemoMode(config.DemoMode)
 			metrics.Setup()
 
-			fx.New(fx.NopLogger, server.NewServer(opts)).Run()
+			if getEnvBool("DEBUG", false) {
+				fx.New(server.NewServer(opts)).Run()
+			} else {
+				fx.New(fx.NopLogger, server.NewServer(opts)).Run()
+			}
 		},
 	}
 
