@@ -1,11 +1,17 @@
 version: '3'
 
+vars:
+  GOARCH:
+    sh: go env GOARCH
+  FDB: "{{ .ROOT_DIR }}/third-party/foundationdb/7.3.77"
+
 tasks:
   demo:
     desc: "Run the project in demo mode"
     cmds:
       - ./bin/flowg-server
     env:
+      LD_LIBRARY_PATH: "{{ .FDB }}/lib/{{ .GOARCH }}"
       FLOWG_DEMO_MODE: "true"
       FLOWG_SECRET_KEY: "s3cr3!"
       FLOWG_BADGER_AUTH_DIR: "./data/node0/auth"
@@ -17,6 +23,7 @@ tasks:
     cmds:
       - ./bin/flowg-server
     env:
+      LD_LIBRARY_PATH: "{{ .FDB }}/lib/{{ .GOARCH }}"
       FLOWG_SECRET_KEY: "s3cr3!"
       FLOWG_BADGER_AUTH_DIR: "./data/node0/auth"
       FLOWG_BADGER_CONFIG_DIR: "./data/node0/config"
