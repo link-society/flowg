@@ -19,15 +19,25 @@ tasks:
 
   backend:
     desc: "Build backend"
+    vars:
+      GOARCH:
+        sh: go env GOARCH
+      FDB: "{{ .ROOT_DIR }}/third-party/foundationdb/7.3.77"
+
     cmds:
       - task: "backend:vrl"
       - go generate ./...
       - go build -tags debug -ldflags="-s -w" -o bin/ ./cmd/...
     env:
       MACOSX_DEPLOYMENT_TARGET: "26.0"
+      CGO_ENABLED: "1"
+      CGO_CFLAGS: "-I{{ .FDB }}/include"
+      CGO_LDFLAGS: "-L{{ .FDB }}/lib/{{ .GOARCH }}"
 
   "backend:vrl":
     desc: "Build libvrl Rust crate"
     dir: ./internal/utils/langs/vrl/rust-crate
     cmds:
       - cargo build --release
+    env:
+      MACOSX_DEPLOYMENT_TARGET: "26.0"
