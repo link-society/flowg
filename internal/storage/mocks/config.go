@@ -37,9 +37,13 @@ func (m *MockConfigStorage) ListTransformers(ctx context.Context) ([]string, err
 	return args.Get(0).([]string), args.Error(1)
 }
 
-func (m *MockConfigStorage) ReadTransformer(ctx context.Context, name string) (string, error) {
+func (m *MockConfigStorage) ReadTransformer(ctx context.Context, name string) (*string, error) {
 	args := m.Called(ctx, name)
-	return args.String(0), args.Error(1)
+	var script *string
+	if v := args.Get(0); v != nil {
+		script = v.(*string)
+	}
+	return script, args.Error(1)
 }
 
 func (m *MockConfigStorage) WriteTransformer(ctx context.Context, name string, content string) error {
