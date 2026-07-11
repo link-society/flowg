@@ -137,6 +137,11 @@ RUN set -ex && \
     chmod 0755 /usr/local/lib/libfdb_c.so && \
     ldconfig
 
+RUN set -ex && \
+    mkdir -p /data && \
+    chown 10001:10001 /data
+VOLUME /data
+USER 10001:10001
 
 ENV FLOWG_SECRET_KEY=""
 ENV FLOWG_VERBOSE=false
@@ -163,7 +168,7 @@ ENV FLOWG_BADGER_AUTH_DIR="/data/auth"
 ENV FLOWG_BADGER_CONFIG_DIR="/data/config"
 ENV FLOWG_BADGER_LOG_DIR="/data/logs"
 
-ENTRYPOINT ["/docker-entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/flowg-server"]
 CMD []
 
 HEALTHCHECK --interval=5s --timeout=1s --retries=3 CMD ["/usr/local/bin/flowg-health", "--pid", "1"]
