@@ -53,7 +53,6 @@ jobs:
           context: .
           file: ./docker/flowg.dockerfile
           build-args: |
-            UPX_ARCH=${{ inputs.arch }}
             UPX_OS=${{ inputs.os }}
           tags: ${{ env.ARTIFACT_BASENAME }}/docker:${{ env.ARTIFACT_ID }}
           push: false
