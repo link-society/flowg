@@ -2,6 +2,7 @@ package operations
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 
 	"net/http"
@@ -67,11 +68,19 @@ func NewGetTransformerUsecase(deps GetTransformerDeps) usecase.Interactor {
 					)
 
 					resp.Success = false
-					return status.Wrap(err, status.NotFound)
+					return status.Wrap(err, status.Internal)
+				}
+
+				if script == nil {
+					resp.Success = false
+					return status.Wrap(
+						fmt.Errorf("transformer %q not found", req.Transformer),
+						status.NotFound,
+					)
 				}
 
 				resp.Success = true
-				resp.Script = script
+				resp.Script = *script
 
 				return nil
 			},
@@ -83,7 +92,7 @@ func NewGetTransformerUsecase(deps GetTransformerDeps) usecase.Interactor {
 	u.SetDescription("Get Transformer")
 	u.SetTags("transformers")
 
-	u.SetExpectedErrors(status.PermissionDenied, status.NotFound)
+	u.SetExpectedErrors(status.PermissionDenied, status.NotFound, status.Internal)
 
 	return u
 }

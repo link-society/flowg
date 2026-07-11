@@ -16,8 +16,9 @@ type ConfigStorage interface {
 
 	// ListTransformers returns the names of every stored transformer.
 	ListTransformers(ctx context.Context) ([]string, error)
-	// ReadTransformer returns the VRL source of the named transformer.
-	ReadTransformer(ctx context.Context, name string) (string, error)
+	// ReadTransformer returns the VRL source of the named transformer, or nil if
+	// no transformer with that name exists.
+	ReadTransformer(ctx context.Context, name string) (*string, error)
 	// WriteTransformer creates or replaces the named transformer with the given
 	// VRL source.
 	WriteTransformer(ctx context.Context, name string, content string) error

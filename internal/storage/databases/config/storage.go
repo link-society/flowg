@@ -65,13 +65,18 @@ func (s *Storage[QTx, MTx]) ListTransformers(ctx context.Context) ([]string, err
 }
 
 // ReadTransformer implements [storage.ConfigStorage].
-func (s *Storage[QTx, MTx]) ReadTransformer(ctx context.Context, name string) (string, error) {
+func (s *Storage[QTx, MTx]) ReadTransformer(ctx context.Context, name string) (*string, error) {
 	content, err := s.readItem(ctx, transformerItemType, name)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return string(content), nil
+	if content == nil {
+		return nil, nil
+	}
+
+	script := string(content)
+	return &script, nil
 }
 
 // WriteTransformer implements [storage.ConfigStorage].

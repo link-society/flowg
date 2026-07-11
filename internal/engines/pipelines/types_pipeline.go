@@ -3,6 +3,7 @@ package pipelines
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"link-society.com/flowg/internal/app/metrics"
 
@@ -58,10 +59,13 @@ func BuildFlow(ctx context.Context, configStorage storage.ConfigStorage, name st
 			if err != nil {
 				return nil, err
 			}
+			if transformer == nil {
+				return nil, fmt.Errorf("transformer %q not found", transformerName)
+			}
 
 			pipelineNode := &TransformNode{
 				ID:          flowNode.ID,
-				Transformer: transformer,
+				Transformer: *transformer,
 			}
 			pipelineNodes[flowNode.ID] = pipelineNode
 
