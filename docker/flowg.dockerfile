@@ -1,7 +1,8 @@
 # syntax=docker/dockerfile:1.7-labs
 
+ARG DEBIAN_RELEASE="trixie"
+
 ARG UPX_VERSION="4.2.4"
-ARG UPX_ARCH="amd64"
 ARG UPX_OS="linux"
 
 ##############################
@@ -43,9 +44,7 @@ ADD internal/utils/langs/vrl/rust-crate /src/internal/utils/langs/vrl/rust-crate
 ##############################
 
 ## VRL
-FROM rust:1.96-alpine3.24 AS builder-rust-vrl
-
-RUN apk add --no-cache musl-dev
+FROM rust:1.96-slim-${DEBIAN_RELEASE} AS builder-rust-vrl
 
 RUN mkdir -p /workspace/internal/utils/langs/vrl/rust-crate
 WORKDIR /workspace/internal/utils/langs/vrl/rust-crate
@@ -64,7 +63,7 @@ RUN cargo test
 ## BUILD JS DEPENDENCIES
 ##############################
 
-FROM node:26-alpine3.24 AS builder-js
+FROM node:26-${DEBIAN_RELEASE}-slim AS builder-js
 
 RUN mkdir -p /workspace/web/app
 WORKDIR /workspace/web/app
@@ -81,18 +80,25 @@ RUN NODE_ENV="production" npm run build
 ## BUILD GO CODE
 ##############################
 
-FROM golang:1.26-alpine3.24 AS builder-go
+FROM golang:1.26-${DEBIAN_RELEASE} AS builder-go
+ARG TARGETARCH
 ARG UPX_VERSION
-ARG UPX_ARCH
 ARG UPX_OS
 
-RUN apk add --no-cache gcc musl-dev curl
+RUN set -ex && \
+    apt update && \
+    apt install -y --no-install-recommends \
+        build-essential \
+        curl \
+        ca-certificates \
+      && \
+    rm -rf /var/lib/apt/lists/*
 
-ADD https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-${UPX_VERSION}-${UPX_ARCH}_${UPX_OS}.tar.xz /tmp/upx.tar.xz
+ADD https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-${UPX_VERSION}-${TARGETARCH}_${UPX_OS}.tar.xz /tmp/upx.tar.xz
 RUN set -ex && \
     tar -xvf /tmp/upx.tar.xz && \
-    mv upx-${UPX_VERSION}-${UPX_ARCH}_${UPX_OS}/upx /usr/local/bin/ && \
-    rm -rf /tmp/upx.tar.xz upx-${UPX_VERSION}-${UPX_ARCH}_${UPX_OS}
+    mv upx-${UPX_VERSION}-${TARGETARCH}_${UPX_OS}/upx /usr/local/bin/ && \
+    rm -rf /tmp/upx.tar.xz upx-${UPX_VERSION}-${TARGETARCH}_${UPX_OS}
 
 RUN mkdir -p /workspace
 WORKDIR /workspace
@@ -120,9 +126,8 @@ RUN upx bin/*
 ## FINAL ARTIFACT
 ##############################
 
-FROM alpine:3.24 AS runner
-
-RUN apk add --no-cache libgcc su-exec
+FROM debian:${DEBIAN_RELEASE}-slim AS runner
+ARG TARGETARCH
 
 COPY --from=builder-go /workspace/bin/flowg-server /usr/local/bin/flowg-server
 COPY --from=builder-go /workspace/bin/flowg-health /usr/local/bin/flowg-health
