@@ -5,10 +5,11 @@ go 1.26.0
 require (
 	cloud.google.com/go/logging v1.18.0
 	github.com/ClickHouse/clickhouse-go/v2 v2.47.0
-	github.com/aws/aws-sdk-go-v2/config v1.32.28
-	github.com/aws/aws-sdk-go-v2/credentials v1.19.27
-	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.79.0
-	github.com/dgraph-io/badger/v4 v4.9.3
+	github.com/apple/foundationdb/bindings/go v0.0.0-20260416192139-3ea44ce1d900
+	github.com/aws/aws-sdk-go-v2/config v1.32.26
+	github.com/aws/aws-sdk-go-v2/credentials v1.19.25
+	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.78.1
+	github.com/dgraph-io/badger/v4 v4.9.2
 	github.com/elastic/go-elasticsearch/v9 v9.4.2
 	github.com/expr-lang/expr v1.17.8
 	github.com/go-chi/chi/v5 v5.3.1
