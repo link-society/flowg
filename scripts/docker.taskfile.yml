@@ -7,9 +7,15 @@ tasks:
       - docker build -t linksociety/flowg:localdev -f docker/flowg.dockerfile .
 
   run:
+    vars:
+      UID:
+        sh: id -u
+      GID:
+        sh: id -g
     desc: "Run the docker image"
     cmds:
-      - docker run --rm -v ./data:/data -p 5080:5080/tcp -p 5514:5514/udp linksociety/flowg:localdev serve
+      - mkdir -p ./data/docker/singlenode
+      - docker run --rm -v ./data/docker/singlenode:/data -p 5080:5080/tcp -p 5514:5514/udp --user {{ .UID }}:{{ .GID }} linksociety/flowg:localdev
 
   dev:
     desc: "Run the docker stack dev environment"

@@ -9,22 +9,24 @@ tasks:
   demo:
     desc: "Run the project in demo mode"
     cmds:
+      - mkdir -p ./data/host/demo
       - ./bin/flowg-server
     env:
       LD_LIBRARY_PATH: "{{ .FDB }}/lib/{{ .GOARCH }}"
       FLOWG_DEMO_MODE: "true"
       FLOWG_SECRET_KEY: "s3cr3!"
-      FLOWG_BADGER_AUTH_DIR: "./data/node0/auth"
-      FLOWG_BADGER_CONFIG_DIR: "./data/node0/config"
-      FLOWG_BADGER_LOG_DIR: "./data/node0/logs"
+      FLOWG_BADGER_AUTH_DIR: "./data/host/demo/auth"
+      FLOWG_BADGER_CONFIG_DIR: "./data/host/demo/config"
+      FLOWG_BADGER_LOG_DIR: "./data/host/demo/logs"
 
-  node:
+  singlenode:
     desc: "Run the project"
     cmds:
+      - mkdir -p ./data/host/singlenode
       - ./bin/flowg-server
     env:
       LD_LIBRARY_PATH: "{{ .FDB }}/lib/{{ .GOARCH }}"
       FLOWG_SECRET_KEY: "s3cr3!"
-      FLOWG_BADGER_AUTH_DIR: "./data/node0/auth"
-      FLOWG_BADGER_CONFIG_DIR: "./data/node0/config"
-      FLOWG_BADGER_LOG_DIR: "./data/node0/logs"
+      FLOWG_BADGER_AUTH_DIR: "./data/host/singlenode/auth"
+      FLOWG_BADGER_CONFIG_DIR: "./data/host/singlenode/config"
+      FLOWG_BADGER_LOG_DIR: "./data/host/singlenode/logs"
