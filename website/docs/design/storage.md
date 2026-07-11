@@ -4,8 +4,22 @@ sidebar_position: 1
 
 # How Logs Are Stored?
 
-The storage backend of **FlowG** is the key/value store
-[BadgerDB](https://github.com/dgraph-io/badger).
+**FlowG** stores everything in a **composite key/value** model: each key is an
+ordered list of string segments, and each value is an opaque blob.
+
+This logical model is backend-agnostic. **FlowG** ships with two storage
+backends that implement it:
+
+ - [BadgerDB](https://github.com/dgraph-io/badger) (the default): an embedded,
+   single-node key/value store.
+ - [FoundationDB](https://www.foundationdb.org/): a distributed, horizontally
+   scalable key/value store.
+
+Throughout the sections below, keys are written using the **BadgerDB**
+representation, where the segments of a composite key are joined with a colon
+(`:`). For example, the composite key `["entry", "test", ...]` is written
+`entry:test:...`. See [FoundationDB Backend](#foundationdb-backend) for how the
+same keys are mapped when using FoundationDB.
 
 ## Streams
 
@@ -114,3 +128,37 @@ Because of the internal structure of *BadgerDB*, this operation is fast.
 
 Then, if a [filter](/docs/user/guides/filtering) is given, we match the log
 record to the filter expression to determine if it should be returned.
+
+## FoundationDB Backend
+
+When configured to use **FoundationDB**, the exact same composite keys described
+above are mapped onto FoundationDB's native key space:
+
+ - Each composite key is packed into a
+   [tuple](https://apple.github.io/foundationdb/data-modeling.html#tuples)
+   inside a
+   [subspace](https://apple.github.io/foundationdb/developer-guide.html#subspaces)
+   scoped to `<keyspace>/<namespace>`. Logs live in the `flowg/log` subspace
+   (`flowg` being the default keyspace).
+ - The subspace prefix is transparently prepended on write and stripped on read,
+   so it never leaks into the logical keys. In other words, the code still works
+   with `entry:<stream>:...`, `index:<stream>:...`, etc.
+ - Tuple packing preserves the lexicographic ordering of the segments, so the
+   time-window range scans used by [Querying](#querying) remain fast.
+
+### Time-based retention
+
+Unlike BadgerDB, FoundationDB has no native TTL. Instead, every value is wrapped
+in an envelope whose first 8 bytes hold the expiration timestamp (unix seconds,
+big-endian; `0` meaning "no expiration"):
+
+```
+<8-byte expiry timestamp><payload>
+```
+
+Expiration is then enforced in two complementary ways:
+
+ - **Lazily on read:** expired entries are skipped when reading or iterating, so
+   they are never returned even before being physically removed.
+ - **Eagerly via garbage collection:** a background collector periodically scans
+   for expired keys and deletes them to reclaim space.
