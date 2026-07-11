@@ -6,7 +6,8 @@ distributed, transactional key-value database.
 
 It provides a FoundationDB-backed [kv.Adapter](../../generic/kv), which the
 backend-agnostic domain stores under [databases](../../databases) run on
-unchanged.
+unchanged. The per-domain packages under [concrete](concrete) assemble the
+adapter and the matching domain store into ready-to-use `fx` modules.
 
 > **Note:** the Go bindings are cgo wrappers around the FoundationDB client
 > library, so building this backend requires `libfdb_c` and its headers (the
@@ -55,3 +56,9 @@ taken out-of-band with the `fdbbackup` / `fdbrestore` tooling instead.
   the `kv.Pair` adapter over FoundationDB key-value pairs.
 - **gc.go** — `NewGarbageCollector`, the background worker that periodically
   deletes keys whose embedded TTL has expired.
+- **[concrete](concrete)** — the per-domain `fx` modules that combine the adapter
+  with a domain store:
+  - **[auth](concrete/auth)** — provides `AuthStorage`.
+  - **[config](concrete/config)** — provides `ConfigStorage`.
+  - **[log](concrete/log)** — provides `LogStorage` and its retention garbage
+    collector.
