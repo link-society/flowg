@@ -11,6 +11,8 @@ ARG UPX_OS="linux"
 ## Golang sources
 FROM scratch AS sources-go
 
+ADD third-party /src/third-party
+
 ADD VERSION.txt /src/VERSION.txt
 ADD api /src/api
 ADD cmd /src/cmd
@@ -104,8 +106,14 @@ COPY --from=builder-rust-vrl /workspace/internal/utils/langs/vrl/rust-crate/targ
 COPY --from=builder-js /workspace/web/app/dist /workspace/web/public
 
 RUN go generate ./...
-RUN go test -timeout 500ms -v ./...
-RUN go build -ldflags="-s -w" -o bin/ ./cmd/...
+RUN CGO_ENABLED=1 \
+    CGO_CFLAGS="-I/workspace/third-party/foundationdb/7.3.77/include" \
+    CGO_LDFLAGS="-L/workspace/third-party/foundationdb/7.3.77/lib/$(go env GOARCH)" \
+    go test -timeout 500ms -v ./...
+RUN CGO_ENABLED=1 \
+    CGO_CFLAGS="-I/workspace/third-party/foundationdb/7.3.77/include" \
+    CGO_LDFLAGS="-L/workspace/third-party/foundationdb/7.3.77/lib/$(go env GOARCH)" \
+    go build -ldflags="-s -w" -o bin/ ./cmd/...
 RUN upx bin/*
 
 ##############################
@@ -119,11 +127,11 @@ RUN apk add --no-cache libgcc su-exec
 COPY --from=builder-go /workspace/bin/flowg-server /usr/local/bin/flowg-server
 COPY --from=builder-go /workspace/bin/flowg-health /usr/local/bin/flowg-health
 
-ADD docker/docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod 0700 /docker-entrypoint.sh
+COPY --from=builder-go /workspace/third-party/foundationdb/7.3.77/lib/${TARGETARCH}/libfdb_c.so /usr/local/lib/libfdb_c.so
+RUN set -ex && \
+    chmod 0755 /usr/local/lib/libfdb_c.so && \
+    ldconfig
 
-RUN addgroup -S flowg && adduser -S -G flowg -h /app flowg
-WORKDIR /app
 
 ENV FLOWG_SECRET_KEY=""
 ENV FLOWG_VERBOSE=false
