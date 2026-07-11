@@ -1,6 +1,8 @@
 version: '3'
 
 vars:
+  GOOS:
+    sh: go env GOOS
   GOARCH:
     sh: go env GOARCH
   FDB: "{{ .ROOT_DIR }}/third-party/foundationdb/7.3.77"
@@ -12,7 +14,8 @@ tasks:
       - mkdir -p ./data/host/demo
       - ./bin/flowg-server
     env:
-      LD_LIBRARY_PATH: "{{ .FDB }}/lib/{{ .GOARCH }}"
+      LD_LIBRARY_PATH: "{{ .FDB }}/lib/{{ .GOOS }}/{{ .GOARCH }}"
+      DYLD_LIBRARY_PATH: "{{ .FDB }}/lib/{{ .GOOS }}/{{ .GOARCH }}"
       FLOWG_DEMO_MODE: "true"
       FLOWG_SECRET_KEY: "s3cr3!"
       FLOWG_BADGER_AUTH_DIR: "./data/host/demo/auth"
@@ -25,7 +28,8 @@ tasks:
       - mkdir -p ./data/host/singlenode
       - ./bin/flowg-server
     env:
-      LD_LIBRARY_PATH: "{{ .FDB }}/lib/{{ .GOARCH }}"
+      LD_LIBRARY_PATH: "{{ .FDB }}/lib/{{ .GOOS }}/{{ .GOARCH }}"
+      DYLD_LIBRARY_PATH: "{{ .FDB }}/lib/{{ .GOOS }}/{{ .GOARCH }}"
       FLOWG_SECRET_KEY: "s3cr3!"
       FLOWG_BADGER_AUTH_DIR: "./data/host/singlenode/auth"
       FLOWG_BADGER_CONFIG_DIR: "./data/host/singlenode/config"

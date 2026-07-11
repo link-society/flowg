@@ -114,11 +114,11 @@ COPY --from=builder-js /workspace/web/app/dist /workspace/web/public
 RUN go generate ./...
 RUN CGO_ENABLED=1 \
     CGO_CFLAGS="-I/workspace/third-party/foundationdb/7.3.77/include" \
-    CGO_LDFLAGS="-L/workspace/third-party/foundationdb/7.3.77/lib/$(go env GOARCH)" \
+    CGO_LDFLAGS="-L/workspace/third-party/foundationdb/7.3.77/lib/linux/$(go env GOARCH)" \
     go test -timeout 500ms -v ./...
 RUN CGO_ENABLED=1 \
     CGO_CFLAGS="-I/workspace/third-party/foundationdb/7.3.77/include" \
-    CGO_LDFLAGS="-L/workspace/third-party/foundationdb/7.3.77/lib/$(go env GOARCH)" \
+    CGO_LDFLAGS="-L/workspace/third-party/foundationdb/7.3.77/lib/linux/$(go env GOARCH)" \
     go build -ldflags="-s -w" -o bin/ ./cmd/...
 RUN upx bin/*
 
@@ -132,7 +132,7 @@ ARG TARGETARCH
 COPY --from=builder-go /workspace/bin/flowg-server /usr/local/bin/flowg-server
 COPY --from=builder-go /workspace/bin/flowg-health /usr/local/bin/flowg-health
 
-COPY --from=builder-go /workspace/third-party/foundationdb/7.3.77/lib/${TARGETARCH}/libfdb_c.so /usr/local/lib/libfdb_c.so
+COPY --from=builder-go /workspace/third-party/foundationdb/7.3.77/lib/linux/${TARGETARCH}/libfdb_c.so /usr/local/lib/libfdb_c.so
 RUN set -ex && \
     chmod 0755 /usr/local/lib/libfdb_c.so && \
     ldconfig
