@@ -17,6 +17,7 @@ tasks:
       CGO_ENABLED: "1"
       CGO_CFLAGS: "-I{{ .FDB }}/include"
       CGO_LDFLAGS: "-L{{ .FDB }}/lib/{{ .GOOS }}/{{ .GOARCH }}"
+      LD_LIBRARY_PATH: "{{ .FDB }}/lib/{{ .GOOS }}/{{ .GOARCH }}"
 
   "gen:openapi":
     desc: "Generate OpenAPI documentation"
@@ -27,4 +28,4 @@ tasks:
       CGO_ENABLED: "1"
       CGO_CFLAGS: "-I{{ .FDB }}/include"
       CGO_LDFLAGS: "-L{{ .FDB }}/lib/{{ .GOOS }}/{{ .GOARCH }}"
-
+      LD_LIBRARY_PATH: "{{ .FDB }}/lib/{{ .GOOS }}/{{ .GOARCH }}"
