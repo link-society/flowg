@@ -1,6 +1,12 @@
 package server
 
-import "go.uber.org/fx"
+import (
+	"go.uber.org/fx"
+
+	"link-society.com/flowg/internal/storage/backends/foundation/concrete/auth"
+	"link-society.com/flowg/internal/storage/backends/foundation/concrete/config"
+	"link-society.com/flowg/internal/storage/backends/foundation/concrete/log"
+)
 
 // FoundationDbStorageOptions implements the StorageOptions interface for the
 // FoundationDB storage backend. It provides the fx modules that wire up the
@@ -11,13 +17,31 @@ type FoundationDbStorageOptions struct {
 }
 
 func (o FoundationDbStorageOptions) AuthModule() fx.Option {
-	panic("not implemented") // TODO: Implement FoundationDB auth module
+	storageOpts := auth.DefaultOptions()
+	storageOpts.ClusterFile = o.ClusterFile
+	if o.KeySpace != "" {
+		storageOpts.KeySpace = o.KeySpace
+	}
+
+	return auth.NewStorage(storageOpts)
 }
 
 func (o FoundationDbStorageOptions) ConfigModule() fx.Option {
-	panic("not implemented") // TODO: Implement FoundationDB config module
+	storageOpts := config.DefaultOptions()
+	storageOpts.ClusterFile = o.ClusterFile
+	if o.KeySpace != "" {
+		storageOpts.KeySpace = o.KeySpace
+	}
+
+	return config.NewStorage(storageOpts)
 }
 
 func (o FoundationDbStorageOptions) LogModule() fx.Option {
-	panic("not implemented") // TODO: Implement FoundationDB log module
+	storageOpts := log.DefaultOptions()
+	storageOpts.ClusterFile = o.ClusterFile
+	if o.KeySpace != "" {
+		storageOpts.KeySpace = o.KeySpace
+	}
+
+	return log.NewStorage(storageOpts)
 }
