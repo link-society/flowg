@@ -1,13 +1,30 @@
 version: '3'
 
+vars:
+  GOOS:
+    sh: go env GOOS
+  GOARCH:
+    sh: go env GOARCH
+  FDB: "{{ .ROOT_DIR }}/third-party/foundationdb/7.3.77"
+
 tasks:
   "gen:cli":
     desc: "Generate CLI documentation"
     cmds:
       - go run scripts/gen/cli/main.go
+    env:
+      MACOSX_DEPLOYMENT_TARGET: "26.0"
+      CGO_ENABLED: "1"
+      CGO_CFLAGS: "-I{{ .FDB }}/include"
+      CGO_LDFLAGS: "-L{{ .FDB }}/lib/{{ .GOOS }}/{{ .GOARCH }}"
 
   "gen:openapi":
     desc: "Generate OpenAPI documentation"
     cmds:
       - go run scripts/gen/openapi/main.go
+    env:
+      MACOSX_DEPLOYMENT_TARGET: "26.0"
+      CGO_ENABLED: "1"
+      CGO_CFLAGS: "-I{{ .FDB }}/include"
+      CGO_LDFLAGS: "-L{{ .FDB }}/lib/{{ .GOOS }}/{{ .GOARCH }}"
 
