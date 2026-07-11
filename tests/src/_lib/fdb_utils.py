@@ -23,6 +23,9 @@ def container(
     network,
     report_dir,
 ):
+    print(f"Pulling FoundationDB image: {FDB_IMAGE}")
+    docker_client.images.pull(FDB_IMAGE)
+
     print(f"Creating container: {name}")
     container = docker_client.containers.create(
         image=FDB_IMAGE,
