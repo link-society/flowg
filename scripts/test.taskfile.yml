@@ -42,6 +42,16 @@ tasks:
       FLOWG_TEST_SUITES: bench
       FLOWG_TEST_DOCKER_IMAGE_NAME: linksociety/flowg:localdev
 
+  "e2e:cluster":
+    desc: "Run Cluster end-to-end tests"
+    dir: ./tests
+    cmds:
+      - pdm install
+      - pdm run pytest
+    env:
+      FLOWG_TEST_SUITES: cluster
+      FLOWG_TEST_DOCKER_IMAGE_NAME: linksociety/flowg:localdev
+
   "test:unit:go":
     internal: true
     cmds:
