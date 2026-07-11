@@ -36,6 +36,30 @@ jobs:
           testsuite: api
           checkname: "API End-To-End Test Report"
 
+  cluster:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: checkout@scm
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          ref: "${{ inputs.ref }}"
+
+      - name: setup@testsuite
+        uses: ./.github/actions/setup-testsuite
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: run@testsuite
+        uses: ./.github/actions/run-hurl-testsuite
+        with:
+          ref: ${{ inputs.ref }}
+          pr: ${{ inputs.pr }}
+          testsuite: cluster
+          checkname: "Cluster End-To-End Test Report"
+
   web:
     runs-on: ubuntu-latest
     permissions:

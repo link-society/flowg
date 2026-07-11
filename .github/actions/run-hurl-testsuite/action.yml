@@ -10,7 +10,7 @@ inputs:
     description: Pull Request ID
     required: false
   testsuite:
-    description: Test suite to run (api, web, k8s)
+    description: Test suite to run (api, cluster, web, k8s)
     required: true
   checkname:
     description: Name of the check
