@@ -36,7 +36,7 @@ jobs:
 
       - name: upload@assets
         run: |
-          tar -czf ${ARCHIVE_NAME} bin/ LICENSE.txt lib/
+          tar -czf ${ARCHIVE_NAME} bin/ LICENSE.txt lib/ share/
           gh release upload ${RELEASE_NAME} ${ARCHIVE_NAME} --repo ${{ github.repository }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
