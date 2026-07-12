@@ -25,10 +25,29 @@ so the same logic runs on top of any backend that provides an `Adapter`.
   `Backup` and `Restore`. It is parametrized by the concrete transaction types so
   backends can expose their own transaction implementations.
 
+## Limits
+
+Backends adopt FoundationDB's hard size limits as part of the contract, so a
+mutation that would be rejected by one engine is rejected by all of them up
+front rather than failing deep inside a commit:
+
+- **`MaxKeySize`** (10 KB) — the maximum size of an encoded key. `Set` /
+  `SetWithTTL` return `ErrKeyTooLarge` when exceeded.
+- **`MaxValueSize`** (100 KB) — the maximum size of an encoded value (including
+  any envelope a backend adds, such as FoundationDB's expiry header). `Set` /
+  `SetWithTTL` return `ErrValueTooLarge` when exceeded.
+
+Backends validate the size of the key and value **as they will be stored** using
+`CheckKeySize` / `CheckValueSize`.
+
+
 ## Layout
 
 - **types.go** — `Key`, `KeyRange`, `KeySlice`, `Value` and the `Pair` contract.
 - **txn.go** — the `QueryTx` and `MutationTx` transaction contracts.
 - **adapter.go** — the `Adapter` contract binding transactions to a backend and
   exposing backup/restore.
-- **errors.go** — shared sentinel errors such as `ErrNotSupported`.
+- **errors.go** — shared sentinel errors such as `ErrNotSupported`,
+  `ErrKeyTooLarge` and `ErrValueTooLarge`.
+- **limits.go** — the `MaxKeySize` / `MaxValueSize` limits and the
+  `CheckKeySize` / `CheckValueSize` helpers backends use to enforce them.
