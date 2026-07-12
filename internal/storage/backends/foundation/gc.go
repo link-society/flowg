@@ -42,16 +42,14 @@ func (w *gcWorker) DoWork(ctx actor.Context) actor.WorkerStatus {
 		return actor.WorkerEnd
 
 	case <-time.After(w.gcInterval):
-		go func() {
-			if err := collectExpired(ctx, w.adapter.db, w.adapter.sub); err != nil {
-				slog.ErrorContext(
-					ctx,
-					"failed to collect expired keys",
-					slog.String("channel", "storage.foundation"),
-					slog.String("error", err.Error()),
-				)
-			}
-		}()
+		if err := collectExpired(ctx, w.adapter.db, w.adapter.sub); err != nil && ctx.Err() == nil {
+			slog.ErrorContext(
+				ctx,
+				"failed to collect expired keys",
+				slog.String("channel", "storage.foundation"),
+				slog.String("error", err.Error()),
+			)
+		}
 
 		return actor.WorkerContinue
 	}
