@@ -168,7 +168,7 @@ func txnIterPairs(read fdb.ReadTransaction, sub subspace.Subspace, prefix kv.Key
 			begin = keyToFdb(sub, keyRange.From)
 		}
 		if keyRange.To != nil {
-			end = keyToFdb(sub, keyRange.To)
+			_, end = sub.Sub(keyToTuple(keyRange.To)...).FDBRangeKeys()
 		}
 
 		r := fdb.KeyRange{Begin: begin, End: end}

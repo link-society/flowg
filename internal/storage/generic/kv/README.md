@@ -12,8 +12,8 @@ so the same logic runs on top of any backend that provides an `Adapter`.
 
 - **`Key` / `KeyRange` / `KeySlice`** — a key is an ordered list of string
   segments (`Key`), joined by the backend into its native key format. `KeyRange`
-  bounds an iteration (`From` inclusive, `To` exclusive) and `KeySlice` is a
-  sortable sequence of keys.
+  bounds an iteration (`From` and `To` are both inclusive of their subtree) and
+  `KeySlice` is a sortable sequence of keys.
 - **`Value` / `Pair`** — `Value` is an arbitrary byte payload; `Pair` exposes a
   stored key together with its value, size estimate and expiration time during
   iteration.

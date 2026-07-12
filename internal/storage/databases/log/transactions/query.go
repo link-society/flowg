@@ -72,7 +72,7 @@ func FetchLogs(
 }
 
 // fetchKeysByTime collects the entry keys whose embedded timestamp falls in
-// [from, to). Because the timestamp is zero-padded in the key, it can seek
+// [from, to]. Because the timestamp is zero-padded in the key, it can seek
 // straight to the lower bound and stop as soon as a key sorts past the upper
 // bound instead of scanning the whole stream.
 func fetchKeysByTime(txn kv.QueryTx, stream string, from, to time.Time) []kv.Key {

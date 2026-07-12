@@ -9,7 +9,7 @@ type Key []string
 type KeyRange struct {
 	// The start of the range (inclusive), ignored if nil
 	From Key
-	// The end of the range (exclusive), ignored if nil
+	// The end of the range (inclusive), ignored if nil
 	To Key
 }
 

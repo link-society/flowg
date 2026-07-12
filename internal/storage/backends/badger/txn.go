@@ -3,6 +3,7 @@ package badger
 import (
 	"fmt"
 	"iter"
+	"strings"
 	"time"
 
 	"github.com/dgraph-io/badger/v4"
@@ -79,15 +80,15 @@ func (txn *BadgerTx) IterKeys(prefix kv.Key, keyRange kv.KeyRange) iter.Seq[kv.K
 		for it.Valid() {
 			item := &badgerPair{concrete: it.Item()}
 
-			if !yield(item.Key()) {
-				return
-			}
-
 			if toPrefix != "" {
 				key := string(item.concrete.Key())
-				if key >= toPrefix {
+				if key >= toPrefix && !strings.HasPrefix(key, toPrefix) {
 					break
 				}
+			}
+
+			if !yield(item.Key()) {
+				return
 			}
 
 			it.Next()
@@ -125,15 +126,15 @@ func (txn *BadgerTx) IterPairs(prefix kv.Key, keyRange kv.KeyRange) iter.Seq[kv.
 		for it.Valid() {
 			item := &badgerPair{concrete: it.Item()}
 
-			if !yield(item) {
-				return
-			}
-
 			if toPrefix != "" {
 				key := string(item.concrete.Key())
-				if key >= toPrefix {
+				if key >= toPrefix && !strings.HasPrefix(key, toPrefix) {
 					break
 				}
+			}
+
+			if !yield(item) {
+				return
 			}
 
 			it.Next()
