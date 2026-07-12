@@ -16,7 +16,10 @@ database. The implementation is backend-agnostic: it runs on top of any
   retention TTL, tracking each stream's field set as records arrive.
 - **Indexing** — maintains inverted indices for the fields a stream is configured
   to index, back-filling and dropping them as the configuration changes, so
-  queries can narrow candidates without scanning every record.
+  queries can narrow candidates without scanning every record. A field value that
+  is too large to fit in an index key (see `kv.MaxKeySize`) is left unindexed
+  rather than failing ingestion; the record is still stored and queryable by
+  time.
 - **Querying** — returns the records of a stream within a time range that satisfy
   a filter and the requested indexed-field constraints.
 - **Retention** — enforces each stream's size budget through a background garbage

@@ -105,7 +105,12 @@ func (txn *FoundationMutationTx) Clear(key kv.Key) error {
 
 // txnGet reads a single key through read, honoring lazy TTL expiry.
 func txnGet(read fdb.ReadTransaction, sub subspace.Subspace, key kv.Key) (kv.Value, error) {
-	raw, err := read.Get(keyToFdb(sub, key)).Get()
+	fkey := keyToFdb(sub, key)
+	if err := kv.CheckKeySize(len(fkey)); err != nil {
+		return nil, err
+	}
+
+	raw, err := read.Get(fkey).Get()
 	if err != nil {
 		return nil, err
 	}

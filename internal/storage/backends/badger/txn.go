@@ -24,7 +24,12 @@ var _ kv.MutationTx = (*BadgerTx)(nil)
 // []byte for an empty-valued key — so callers can use a nil check to test for
 // existence.
 func (txn *BadgerTx) Get(key kv.Key) (kv.Value, error) {
-	item, err := txn.concrete.Get(keyToBadger(key))
+	bkey := keyToBadger(key)
+	if err := kv.CheckKeySize(len(bkey)); err != nil {
+		return nil, err
+	}
+
+	item, err := txn.concrete.Get(bkey)
 	if err != nil {
 		if err == badger.ErrKeyNotFound {
 			return nil, nil
