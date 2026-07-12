@@ -188,15 +188,15 @@ func matchesIndexingForKey(
 			indexKey = append(indexKey, entryKey...)
 
 			val, err := txn.Get(indexKey)
-			if err == nil {
-				matched = true
-				break
-			}
-			if val == nil {
+			if err != nil {
 				return false, fmt.Errorf(
 					"could not check existence of index key '%s': %w",
 					indexKey, err,
 				)
+			}
+			if val != nil {
+				matched = true
+				break
 			}
 		}
 
