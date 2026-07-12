@@ -102,6 +102,16 @@ HTTP 200
 jsonpath "$.success" == true
 jsonpath "$.records" count == 0
 
+# The distinct values of each indexed field are exposed (query-builder autocomplete)
+GET http://localhost:5080/api/v1/streams/default/indices
+Authorization: Bearer {{admin_token}}
+HTTP 200
+[Asserts]
+jsonpath "$.success" == true
+jsonpath "$.indices.level" count == 2
+jsonpath "$.indices.level" contains "error"
+jsonpath "$.indices.level" contains "info"
+
 DELETE http://localhost:5080/api/v1/streams/default
 Authorization: Bearer {{admin_token}}
 HTTP 200
