@@ -133,6 +133,7 @@ COPY --from=builder-go /workspace/bin/flowg-server /usr/local/bin/flowg-server
 COPY --from=builder-go /workspace/bin/flowg-health /usr/local/bin/flowg-health
 
 COPY --from=builder-go /workspace/third-party/foundationdb/7.3.77/lib/linux/${TARGETARCH}/libfdb_c.so /usr/local/lib/libfdb_c.so
+COPY --from=builder-go /workspace/third-party/foundationdb/7.3.77/share/licenses /usr/local/share/licenses/foundationdb
 RUN set -ex && \
     chmod 0755 /usr/local/lib/libfdb_c.so && \
     ldconfig
