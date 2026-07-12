@@ -112,66 +112,94 @@ func GetOrCreateStreamConfig(txn kv.MutationTx, stream string) (models.StreamCon
 	return streamConfig, nil
 }
 
-// ConfigureStream stores a new stream configuration and reconciles its indexed
-// fields against the previous one: fields newly added to the index are back-
-// filled over existing records, and fields removed from it have their index
-// dropped.
-func ConfigureStream(txn kv.MutationTx, stream string, config models.StreamConfig) error {
+// SaveStreamConfig stores a new stream configuration and computes how its
+// indexed fields differ from the previous one. It returns the fields newly
+// added to the index (whose existing records must be back-filled) and the
+// fields removed from it (whose index must be dropped).
+//
+// The actual back-fill and index removal are performed separately, in their own
+// batched transactions, because on a large stream they can exceed a single
+// transaction's size and time limits.
+func SaveStreamConfig(
+	txn kv.MutationTx,
+	stream string,
+	config models.StreamConfig,
+) (toIndex []string, toUnindex []string, err error) {
 	if config.IndexedFields == nil {
 		config.IndexedFields = []string{}
 	}
 
 	oldConfig, err := GetOrCreateStreamConfig(txn, stream)
 	if err != nil {
-		return fmt.Errorf("could not fetch old stream config '%s': %w", stream, err)
+		return nil, nil, fmt.Errorf("could not fetch old stream config '%s': %w", stream, err)
 	}
 
 	streamKey := kv.Key{"stream", "config", stream}
 	configVal, err := json.Marshal(config)
 	if err != nil {
-		return fmt.Errorf("could not marshal stream config '%s': %w", stream, err)
+		return nil, nil, fmt.Errorf("could not marshal stream config '%s': %w", stream, err)
 	}
 
 	if err := txn.Set(streamKey, configVal); err != nil {
-		return fmt.Errorf("could not save stream config '%s': %w", stream, err)
+		return nil, nil, fmt.Errorf("could not save stream config '%s': %w", stream, err)
 	}
 
 	for _, field := range config.IndexedFields {
 		if !oldConfig.IsFieldIndexed(field) {
-			IndexField(txn, stream, field)
+			toIndex = append(toIndex, field)
 		}
 	}
 
 	for _, field := range oldConfig.IndexedFields {
 		if !config.IsFieldIndexed(field) {
-			UnindexField(txn, stream, field)
+			toUnindex = append(toUnindex, field)
 		}
 	}
 
-	return nil
+	return toIndex, toUnindex, nil
 }
 
-// DeleteStream removes everything belonging to a stream: its log entries
-// ("entry:<stream>:*"), inverted indexes ("index:<stream>:*"), field markers
-// ("stream:field:<stream>:*") and its configuration key.
-func DeleteStream(txn kv.MutationTx, stream string) error {
+// DeleteStreamDataBatch deletes up to limit of a stream's data keys — its log
+// entries ("entry:<stream>:*"), inverted indexes ("index:<stream>:*") and field
+// markers ("stream:field:<stream>:*") — and reports how many it deleted. A count
+// of zero means all data is gone (the configuration key is removed separately by
+// [DeleteStreamConfig]). Callers loop until it returns zero so the work stays
+// within the backend's transaction limits.
+func DeleteStreamDataBatch(txn kv.MutationTx, stream string, limit int) (int, error) {
 	prefixes := []kv.Key{
 		{"entry", stream},
 		{"index", stream},
 		{"stream", "field", stream},
 	}
 
+	var keys []kv.Key
 	for _, prefix := range prefixes {
 		for key := range txn.IterKeys(prefix, kv.KeyRange{}) {
-			if err := txn.Clear(key); err != nil {
-				return fmt.Errorf(
-					"could not delete key '%s' from stream '%s': %w",
-					key, stream, err,
-				)
+			keys = append(keys, key)
+			if len(keys) >= limit {
+				break
 			}
+		}
+		if len(keys) >= limit {
+			break
 		}
 	}
 
+	for _, key := range keys {
+		if err := txn.Clear(key); err != nil {
+			return len(keys), fmt.Errorf(
+				"could not delete key '%s' from stream '%s': %w",
+				key, stream, err,
+			)
+		}
+	}
+
+	return len(keys), nil
+}
+
+// DeleteStreamConfig removes a stream's configuration key. It is cleared last,
+// after all the stream's data, so an interrupted deletion can be resumed.
+func DeleteStreamConfig(txn kv.MutationTx, stream string) error {
 	streamKey := kv.Key{"stream", "config", stream}
 	if err := txn.Clear(streamKey); err != nil {
 		return fmt.Errorf("could not delete stream config '%s': %w", stream, err)

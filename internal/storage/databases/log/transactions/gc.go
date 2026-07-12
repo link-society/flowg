@@ -1,8 +1,10 @@
 package transactions
 
 import (
+	"encoding/json"
 	"fmt"
 
+	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage/generic/kv"
 )
 
@@ -18,48 +20,58 @@ func EstimateStorage(txn kv.QueryTx, stream string) (int64, error) {
 	return storage, nil
 }
 
-// CollectGarbage evicts the oldest records of any stream that has grown past its
-// configured size budget. For each over-budget stream it walks the entries from
-// oldest to newest (the key order), deleting them and their inverted-index
-// references until the stream fits within its retention size again.
-func CollectGarbage(txn kv.MutationTx) error {
-	streams, err := FetchStreamConfigs(txn)
-	if err != nil {
-		return err
+// EvictOldestBatch deletes up to limit of the oldest entries of a stream
+// (walking entry keys in chronological order), stopping early once the freed
+// bytes reach toFree. It also drops each deleted entry's inverted-index
+// references. It returns the number of bytes freed and the number of entries
+// deleted; a deleted count of zero means the stream has no more entries.
+//
+// Callers loop across successive transactions — subtracting the freed bytes
+// from their running size estimate — so retention enforcement stays within the
+// backend's transaction size and time limits.
+func EvictOldestBatch(txn kv.MutationTx, stream string, toFree int64, limit int) (int64, int, error) {
+	type victim struct {
+		key    kv.Key
+		record models.LogRecord
 	}
 
-	for stream, config := range streams {
-		retentionSize := config.RetentionSize * 1024 * 1024 // MB to bytes
+	var (
+		victims []victim
+		freed   int64
+	)
 
-		if retentionSize > 0 {
-			streamSize := int64(0)
+	for pair := range txn.IterPairs(kv.Key{"entry", stream}, kv.KeyRange{}) {
+		if len(victims) >= limit || freed >= toFree {
+			break
+		}
 
-			for pair := range txn.IterPairs(kv.Key{"entry", stream}, kv.KeyRange{}) {
-				streamSize += pair.EstimateSize()
-			}
+		key := pair.Key()
 
-			if streamSize > retentionSize {
-				for pair := range txn.IterPairs(kv.Key{"entry", stream}, kv.KeyRange{}) {
-					streamSize -= pair.EstimateSize()
+		var record models.LogRecord
+		if err := json.Unmarshal(pair.Value(), &record); err != nil {
+			return freed, len(victims), fmt.Errorf(
+				"could not unmarshal log entry '%s': %w", key, err,
+			)
+		}
 
-					key := pair.Key()
+		victims = append(victims, victim{key: key, record: record})
+		freed += pair.EstimateSize()
+	}
 
-					if err := txn.Clear(key); err != nil {
-						return fmt.Errorf(
-							"could not delete key '%s' from stream '%s': %w",
-							key, stream, err,
-						)
-					}
+	for i := range victims {
+		key := victims[i].key
 
-					purgeEntryFromFieldIndex(txn, stream, key)
+		if err := txn.Clear(key); err != nil {
+			return freed, len(victims), fmt.Errorf(
+				"could not delete key '%s' from stream '%s': %w",
+				key, stream, err,
+			)
+		}
 
-					if streamSize <= retentionSize {
-						break
-					}
-				}
-			}
+		if err := purgeEntryFromFieldIndex(txn, stream, key, &victims[i].record); err != nil {
+			return freed, len(victims), err
 		}
 	}
 
-	return nil
+	return freed, len(victims), nil
 }
