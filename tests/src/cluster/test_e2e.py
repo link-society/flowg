@@ -22,6 +22,7 @@ def test_hurl(
     subprocess.check_call(
         f"""
         hurl \
+            --file-root={spec_dir} \
             --variable admin_token={flowg_admin_token} \
             --variable node0_url=http://localhost:5080 \
             --variable node1_url=http://localhost:5081 \

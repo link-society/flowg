@@ -1,0 +1,2 @@
+flowg backup/restore 501 test fixture — contents are irrelevant because the
+FoundationDB backend rejects restore before reading the uploaded file.
