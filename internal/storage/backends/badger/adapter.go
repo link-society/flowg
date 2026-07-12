@@ -65,6 +65,13 @@ func NewAdapter(opts AdapterOptions) fx.Option {
 			return nil, fmt.Errorf("failed to open database: %w", err)
 		}
 
+		if !opts.ReadOnly {
+			if err := migrateKeySeparator(db); err != nil {
+				db.Close()
+				return nil, fmt.Errorf("failed to migrate key separator: %w", err)
+			}
+		}
+
 		lc.Append(fx.Hook{
 			OnStop: func(ctx context.Context) error {
 				return db.Close()

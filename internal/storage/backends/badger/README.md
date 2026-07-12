@@ -16,9 +16,12 @@ store into ready-to-use `fx` modules.
 `kv.Adapter` implementation. All database access is serialized through an actor
 mailbox: `View`, `Update`, `Backup` and `Restore` each enqueue an operation that
 a single worker goroutine applies to the BadgerDB handle, and write transactions
-are transparently retried on conflict. Composite `kv.Key`s are joined with `:`
-into BadgerDB's flat key space, and a `BadgerTx` adapts a BadgerDB transaction to
-the `kv.QueryTx` / `kv.MutationTx` contracts.
+are transparently retried on conflict. Composite `kv.Key`s are joined into
+BadgerDB's flat key space with a reserved separator byte — the ASCII `ESC`
+control byte (`0x1B`, the `keySeparator` constant in `types.go`) — which the
+segment values FlowG stores (stream names, field names, item names) never
+contain, so the join/split is lossless. A `BadgerTx` adapts a BadgerDB
+transaction to the `kv.QueryTx` / `kv.MutationTx` contracts.
 
 ## Layout
 
