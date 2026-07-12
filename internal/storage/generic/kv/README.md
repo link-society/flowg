@@ -31,14 +31,21 @@ Backends adopt FoundationDB's hard size limits as part of the contract, so a
 mutation that would be rejected by one engine is rejected by all of them up
 front rather than failing deep inside a commit:
 
-- **`MaxKeySize`** (10 KB) — the maximum size of an encoded key. `Set` /
-  `SetWithTTL` return `ErrKeyTooLarge` when exceeded.
+- **`MaxKeySize`** (10 KB) — the maximum size of an encoded key. Every key-
+  addressed operation (`Get`, `Set`, `SetWithTTL`, `Clear`) returns
+  `ErrKeyTooLarge` when exceeded, so an oversized key can neither be written,
+  read nor deleted.
 - **`MaxValueSize`** (100 KB) — the maximum size of an encoded value (including
   any envelope a backend adds, such as FoundationDB's expiry header). `Set` /
   `SetWithTTL` return `ErrValueTooLarge` when exceeded.
 
 Backends validate the size of the key and value **as they will be stored** using
 `CheckKeySize` / `CheckValueSize`.
+
+Consumers may treat `ErrKeyTooLarge` / `ErrValueTooLarge` as a signal to degrade
+gracefully rather than fail: the log storage, for instance, skips indexing a
+field value that would overflow an index key instead of rejecting the record
+(see [databases/log/transactions](../../databases/log/transactions)).
 
 
 ## Layout
