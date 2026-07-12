@@ -1,9 +1,12 @@
 package badger
 
 import (
-	"errors"
-	"strings"
 	"testing"
+
+	"errors"
+
+	"slices"
+	"strings"
 	"time"
 
 	"github.com/dgraph-io/badger/v4"
@@ -78,5 +81,120 @@ func TestSetAcceptsWithinLimits(t *testing.T) {
 	}
 	if len(got) != kv.MaxValueSize {
 		t.Fatalf("expected %d bytes, got %d", kv.MaxValueSize, len(got))
+	}
+}
+
+// seedEntries writes entry-like keys ("entry:s:<ms>:u") for the given
+// timestamp segments.
+func seedEntries(t *testing.T, txn *BadgerTx, timestamps ...string) {
+	t.Helper()
+	for _, ms := range timestamps {
+		if err := txn.Set(kv.Key{"entry", "s", ms, "u"}, kv.Value("x")); err != nil {
+			t.Fatalf("failed to seed entry %q: %v", ms, err)
+		}
+	}
+}
+
+// iterKeyTimestamps collects the timestamp segment of every key IterKeys yields.
+func iterKeyTimestamps(txn *BadgerTx, keyRange kv.KeyRange) []string {
+	var got []string
+	for key := range txn.IterKeys(kv.Key{"entry", "s"}, keyRange) {
+		got = append(got, key[2])
+	}
+	return got
+}
+
+// TestIterKeysInclusiveTo checks that To is inclusive: the whole To subtree is
+// returned (every record at the boundary timestamp) and nothing past it. This is
+// the record that used to leak out inconsistently between backends.
+func TestIterKeysInclusiveTo(t *testing.T) {
+	txn := newTestTx(t)
+
+	// Two records share the boundary timestamp 003; both must be returned.
+	for _, key := range []kv.Key{
+		{"entry", "s", "001", "a"},
+		{"entry", "s", "002", "a"},
+		{"entry", "s", "003", "a"},
+		{"entry", "s", "003", "b"},
+		{"entry", "s", "004", "a"},
+	} {
+		if err := txn.Set(key, kv.Value("x")); err != nil {
+			t.Fatalf("failed to seed %v: %v", key, err)
+		}
+	}
+
+	got := iterKeyTimestamps(txn, kv.KeyRange{
+		From: kv.Key{"entry", "s", "002"},
+		To:   kv.Key{"entry", "s", "003"},
+	})
+
+	want := []string{"002", "003", "003"} // both 003 records, never 004
+	if !slices.Equal(got, want) {
+		t.Fatalf("expected %v, got %v", want, got)
+	}
+}
+
+// TestIterKeysInclusiveFrom checks that the From bound is inclusive, matching the
+// FoundationDB backend.
+func TestIterKeysInclusiveFrom(t *testing.T) {
+	txn := newTestTx(t)
+	seedEntries(t, txn, "001", "002", "003")
+
+	got := iterKeyTimestamps(txn, kv.KeyRange{From: kv.Key{"entry", "s", "002"}})
+
+	want := []string{"002", "003"}
+	if !slices.Equal(got, want) {
+		t.Fatalf("expected %v, got %v", want, got)
+	}
+}
+
+// TestIterKeysToBoundSegmentBoundary guards the trailing-':' segment boundary:
+// an inclusive To of {"role","foo"} returns the "role:foo" subtree, but a sibling
+// like "role:foobar" (which shares the "foo" byte prefix) sorts past the boundary
+// and never leaks in.
+func TestIterKeysToBoundSegmentBoundary(t *testing.T) {
+	txn := newTestTx(t)
+
+	for _, key := range []kv.Key{
+		{"role", "bar", "perm"},
+		{"role", "foo", "perm"},
+		{"role", "foobar", "perm"},
+	} {
+		if err := txn.Set(key, kv.Value("x")); err != nil {
+			t.Fatalf("failed to seed %v: %v", key, err)
+		}
+	}
+
+	// [role:bar, role:foo]: "bar" and the "foo" subtree; "foobar" is excluded.
+	var got []string
+	for key := range txn.IterKeys(kv.Key{"role"}, kv.KeyRange{
+		From: kv.Key{"role", "bar"},
+		To:   kv.Key{"role", "foo"},
+	}) {
+		got = append(got, key[1])
+	}
+
+	want := []string{"bar", "foo"}
+	if !slices.Equal(got, want) {
+		t.Fatalf("expected %v, got %v", want, got)
+	}
+}
+
+// TestIterPairsInclusiveTo mirrors TestIterKeysInclusiveTo for IterPairs.
+func TestIterPairsInclusiveTo(t *testing.T) {
+	txn := newTestTx(t)
+	seedEntries(t, txn, "001", "002", "003", "004")
+
+	var got []string
+	for pair := range txn.IterPairs(kv.Key{"entry", "s"}, kv.KeyRange{
+		From: kv.Key{"entry", "s", "002"},
+		To:   kv.Key{"entry", "s", "003"},
+	}) {
+		got = append(got, pair.Key()[2])
+	}
+
+	want := []string{"002", "003"} // 003 (To) included, 004 excluded
+	if !slices.Equal(got, want) {
+		t.Fatalf("expected %v, got %v", want, got)
 	}
 }
