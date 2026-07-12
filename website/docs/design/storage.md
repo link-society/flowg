@@ -101,6 +101,41 @@ Example:
 index:test:field:foo:YmFy:entry:test:00000001724140167373:057804d1-832f-45bf-8e70-7acbf22ec480
 ```
 
+### Index value size limit
+
+The field value lives *inside* the index key (base64-encoded), and every backend
+caps the size of a key — FoundationDB rejects any key larger than 10&nbsp;KB. If
+an indexed value is large enough to push the index key past that limit, the
+record is still stored, but that value is **not** indexed (the write is skipped
+with a logged warning rather than failing ingestion). Such records are returned
+by time-range queries but never match an exact-value filter on that field.
+
+The threshold is deterministic. The index key is
+
+```
+index / <stream> / field / <field> / <base64(value)> / entry / <stream> / <20-digit millis> / <36-char uuid>
+```
+
+so its encoded size grows with the stream name (which appears twice), the field
+name, and the base64-encoded value (≈ 4⁄3 of the raw value). Taking the stricter
+FoundationDB backend (tuple-encoded key inside the `flowg/log` subspace), a raw
+field value of `V` bytes is indexable as long as
+
+```
+101 + 2·len(stream) + len(field) + 4·⌈V/3⌉ ≤ 10000
+```
+
+which gives the maximum indexable value size
+
+```
+V_max = 3 · ⌊(9899 − 2·len(stream) − len(field)) / 4⌋   bytes
+```
+
+For example, stream `default` (7 chars) and field `level` (5 chars) yield
+`V_max ≈ 7410` bytes (~7.2&nbsp;KiB). Backends never rely on this estimate: each
+one checks the *actual* encoded key size, so the real threshold is always exact
+for the backend in use.
+
 ## Querying
 
 Each query must be made within a time-window.

@@ -32,7 +32,12 @@ its name.
   marker per (field, value) pair pointing back at a record, created only for the
   fields a stream is configured to index. The value segment is base64-encoded so
   it cannot collide with the `:` key separator, and index keys inherit the
-  referenced entry's TTL so the two expire together.
+  referenced entry's TTL so the two expire together. Because the value lives
+  inside the key, a value large enough to push the index key past the backend's
+  key-size limit (`kv.MaxKeySize`) cannot be indexed: `AddKey` catches
+  `kv.ErrKeyTooLarge`, logs a warning and skips that value, so ingestion still
+  succeeds and the record stays queryable by time — it just won't match an
+  exact-value filter on that field.
 
 ## Notes
 

@@ -1,7 +1,9 @@
 package transactions
 
 import (
+	"errors"
 	"fmt"
+	"log/slog"
 
 	"time"
 
@@ -15,6 +17,8 @@ import (
 
 type fieldIndex struct {
 	txn       kv.MutationTx
+	stream    string
+	field     string
 	keyPrefix kv.Key
 }
 
@@ -108,6 +112,8 @@ func newFieldIndex(txn kv.MutationTx, stream string, field string, value string)
 
 	return &fieldIndex{
 		txn:       txn,
+		stream:    stream,
+		field:     field,
 		keyPrefix: kv.Key{"index", stream, "field", field, encodedValue},
 	}
 }
@@ -125,6 +131,21 @@ func (index *fieldIndex) AddKey(entryKey kv.Key, retentionTime int64) error {
 		err = index.txn.Set(indexKey, []byte{})
 	}
 	if err != nil {
+		// An indexed field value is embedded in the index key. A large value
+		// (e.g. a message body) can push the key past the backend's size limit.
+		// Skip indexing that value rather than rejecting the whole record: the
+		// entry is still stored and queryable by time, it just won't be found by
+		// an exact-match filter on this oversized value.
+		if errors.Is(err, kv.ErrKeyTooLarge) {
+			slog.Warn(
+				"skipping oversized field index value",
+				slog.String("channel", "logstorage"),
+				slog.String("stream", index.stream),
+				slog.String("field", index.field),
+			)
+			return nil
+		}
+
 		return fmt.Errorf(
 			"could not add field index key '%s' for entry '%s': %w",
 			indexKey, entryKey, err,
@@ -192,6 +213,12 @@ func matchesIndexingForKey(
 
 			val, err := txn.Get(indexKey)
 			if err != nil {
+				// The value was too large to index (see AddKey), so no entry can
+				// carry it: treat it as a non-match rather than an error.
+				if errors.Is(err, kv.ErrKeyTooLarge) {
+					continue
+				}
+
 				return false, fmt.Errorf(
 					"could not check existence of index key '%s': %w",
 					indexKey, err,
