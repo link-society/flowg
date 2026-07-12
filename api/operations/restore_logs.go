@@ -2,6 +2,7 @@ package operations
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 
 	"mime/multipart"
@@ -17,6 +18,7 @@ import (
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/internal/models"
 
+	"link-society.com/flowg/internal/storage/generic/kv"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -62,6 +64,10 @@ func NewRestoreLogsUsecase(deps RestoreLogsDeps) usecase.Interactor {
 
 				err := deps.LogStorage.Load(ctx, req.Backup)
 				if err != nil {
+					if errors.Is(err, kv.ErrNotSupported) {
+						return status.Wrap(err, status.Unimplemented)
+					}
+
 					logger.ErrorContext(
 						ctx,
 						"Failed to restore logs database",
@@ -81,7 +87,7 @@ func NewRestoreLogsUsecase(deps RestoreLogsDeps) usecase.Interactor {
 	u.SetDescription("Upload a full snapshot of the logs database.")
 	u.SetTags("backup")
 
-	u.SetExpectedErrors(status.Unauthenticated, status.PermissionDenied, status.Internal)
+	u.SetExpectedErrors(status.Unauthenticated, status.PermissionDenied, status.Unimplemented, status.Internal)
 
 	return u
 }
