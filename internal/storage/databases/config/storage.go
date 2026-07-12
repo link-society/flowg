@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"sync"
+	"sync/atomic"
 
 	"encoding/json"
 	"strings"
@@ -34,7 +35,7 @@ type Storage[QTx kv.QueryTx, MTx kv.MutationTx] struct {
 	adapter kv.Adapter[QTx, MTx]
 
 	lock                  *sync.Mutex
-	configurationInstance *models.SystemConfiguration
+	configurationInstance atomic.Pointer[models.SystemConfiguration]
 }
 
 var _ storage.ConfigStorage = (*Storage[kv.QueryTx, kv.MutationTx])(nil)
@@ -43,9 +44,8 @@ var _ storage.ConfigStorage = (*Storage[kv.QueryTx, kv.MutationTx])(nil)
 // given key-value adapter.
 func NewStorage[QTx kv.QueryTx, MTx kv.MutationTx](adapter kv.Adapter[QTx, MTx]) *Storage[QTx, MTx] {
 	return &Storage[QTx, MTx]{
-		adapter:               adapter,
-		lock:                  &sync.Mutex{},
-		configurationInstance: nil,
+		adapter: adapter,
+		lock:    &sync.Mutex{},
 	}
 }
 
@@ -190,33 +190,31 @@ func (s *Storage[QTx, MTx]) HasSystemConfig(ctx context.Context) (bool, error) {
 
 // ReadSystemConfig implements [storage.ConfigStorage].
 func (s *Storage[QTx, MTx]) ReadSystemConfig(ctx context.Context) (*models.SystemConfiguration, error) {
-	if s.configurationInstance != nil {
-		return s.configurationInstance, nil
+	if config := s.configurationInstance.Load(); config != nil {
+		return config, nil
 	}
 
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
-	if s.configurationInstance == nil {
-		content, err := s.readItem(ctx, systemItemType, "config")
-		if err != nil {
-			return nil, err
-		}
-
-		if content == nil {
-			s.configurationInstance = &models.SystemConfiguration{}
-			return s.configurationInstance, nil
-		}
-
-		var config models.SystemConfiguration
-		if err := json.Unmarshal(content, &config); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal system configuration: %w", err)
-		}
-
-		s.configurationInstance = &config
+	if config := s.configurationInstance.Load(); config != nil {
+		return config, nil
 	}
 
-	return s.configurationInstance, nil
+	content, err := s.readItem(ctx, systemItemType, "config")
+	if err != nil {
+		return nil, err
+	}
+
+	config := &models.SystemConfiguration{}
+	if content != nil {
+		if err := json.Unmarshal(content, config); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal system configuration: %w", err)
+		}
+	}
+
+	s.configurationInstance.Store(config)
+	return config, nil
 }
 
 // WriteSystemConfig implements [storage.ConfigStorage].
@@ -239,7 +237,7 @@ func (s *Storage[QTx, MTx]) WriteSystemConfig(ctx context.Context, config *model
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
-	s.configurationInstance = nil
+	s.configurationInstance.Store(nil)
 
 	content, err := json.Marshal(config)
 	if err != nil {
