@@ -33,16 +33,14 @@ func (w *gcWorker[QTx, MTx]) DoWork(ctx actor.Context) actor.WorkerStatus {
 		return actor.WorkerEnd
 
 	case <-time.After(w.gcInterval):
-		go func() {
-			if err := w.storage.CollectGarbage(ctx); err != nil {
-				slog.ErrorContext(
-					ctx,
-					"failed to collect garbage",
-					slog.String("channel", "logstorage"),
-					slog.String("error", err.Error()),
-				)
-			}
-		}()
+		if err := w.storage.CollectGarbage(ctx); err != nil && ctx.Err() == nil {
+			slog.ErrorContext(
+				ctx,
+				"failed to collect garbage",
+				slog.String("channel", "logstorage"),
+				slog.String("error", err.Error()),
+			)
+		}
 
 		return actor.WorkerContinue
 	}
