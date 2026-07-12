@@ -19,6 +19,7 @@ type Options struct {
 	InMemory   bool
 	ReadOnly   bool
 	GCInterval time.Duration
+	BatchSize  int
 }
 
 type deps struct {
@@ -52,9 +53,9 @@ func NewStorage(opts Options) fx.Option {
 		"storage.log",
 		badger.NewAdapter(adapterOpts),
 		fx.Provide(func(lc fx.Lifecycle, d deps) storage.LogStorage {
-			storage := log.NewStorage(d.Adapter)
+			storage := log.NewStorage(d.Adapter, opts.BatchSize)
 
-			gc := actor.New(log.NewGarbageCollector(d.Adapter, opts.GCInterval))
+			gc := actor.New(log.NewGarbageCollector(storage, opts.GCInterval))
 
 			lc.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {

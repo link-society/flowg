@@ -9,7 +9,6 @@ import (
 
 	"encoding/base64"
 	"encoding/json"
-	"strings"
 
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage/generic/kv"
@@ -22,17 +21,42 @@ type fieldIndex struct {
 	keyPrefix kv.Key
 }
 
-// IndexField back-fills the inverted index for an already-populated stream: it
-// scans every record, and for each one records its value of the given field,
+// IndexFieldBatch back-fills the inverted index for at most limit entries of an
+// already-populated stream, resuming strictly after cursor (nil to start from
+// the beginning). For each entry it records its value of the given field,
 // carrying over the entry's remaining retention so the index key expires with
 // the entry.
-func IndexField(txn kv.MutationTx, stream string, field string) error {
-	for pair := range txn.IterPairs(kv.Key{"entry", stream}, kv.KeyRange{}) {
+//
+// It returns the last entry key it processed — to be passed as cursor on the
+// next call — and how many entries it processed. A processed count below limit
+// means the stream has been fully back-filled. Splitting the work this way keeps
+// each transaction within the backend's size and time limits.
+func IndexFieldBatch(
+	txn kv.MutationTx,
+	stream string,
+	field string,
+	cursor kv.Key,
+	limit int,
+) (kv.Key, int, error) {
+	var last kv.Key
+	processed := 0
+
+	for pair := range txn.IterPairs(kv.Key{"entry", stream}, kv.KeyRange{From: cursor}) {
 		key := pair.Key()
+
+		// KeyRange.From is inclusive on some backends and exclusive on others;
+		// skip the cursor itself so a batch always makes forward progress.
+		if cursor != nil && keysEqual(key, cursor) {
+			continue
+		}
+
+		if processed >= limit {
+			break
+		}
 
 		var entry models.LogRecord
 		if err := json.Unmarshal(pair.Value(), &entry); err != nil {
-			return fmt.Errorf("could not unmarshal log entry '%s': %w", key, err)
+			return last, processed, fmt.Errorf("could not unmarshal log entry '%s': %w", key, err)
 		}
 
 		ts := pair.ExpiresAt()
@@ -43,26 +67,39 @@ func IndexField(txn kv.MutationTx, stream string, field string) error {
 
 		index := newFieldIndex(txn, stream, field, entry.Fields[field])
 		if err := index.AddKey(key, retentionTime); err != nil {
-			return fmt.Errorf(
+			return last, processed, fmt.Errorf(
 				"could not index field '%s' for entry '%s': %w",
 				field, key, err,
 			)
 		}
+
+		last = key
+		processed++
 	}
 
-	return nil
+	return last, processed, nil
 }
 
-// UnindexField drops the entire inverted index for a field by deleting every
-// "index:<stream>:field:<field>:*" key.
-func UnindexField(txn kv.MutationTx, stream string, field string) error {
+// UnindexFieldBatch drops up to limit keys of a field's inverted index
+// ("index:<stream>:field:<field>:*") and reports how many it deleted. A count
+// below limit means the index has been fully removed. Callers loop until it
+// returns zero so the work stays within the backend's transaction limits.
+func UnindexFieldBatch(txn kv.MutationTx, stream string, field string, limit int) (int, error) {
+	var keys []kv.Key
 	for key := range txn.IterKeys(kv.Key{"index", stream, "field", field}, kv.KeyRange{}) {
-		if err := txn.Clear(key); err != nil {
-			return fmt.Errorf("could not delete index key '%s': %w", key, err)
+		keys = append(keys, key)
+		if len(keys) >= limit {
+			break
 		}
 	}
 
-	return nil
+	for _, key := range keys {
+		if err := txn.Clear(key); err != nil {
+			return len(keys), fmt.Errorf("could not delete index key '%s': %w", key, err)
+		}
+	}
+
+	return len(keys), nil
 }
 
 // Distinct returns, per indexed field, the set of distinct values present in a
@@ -108,15 +145,34 @@ func Distinct(txn kv.QueryTx, stream string) (map[string][]string, error) {
 // newFieldIndex builds the index key prefix for one (stream, field, value)
 // triple, base64-encoding the value as it appears in the stored keys.
 func newFieldIndex(txn kv.MutationTx, stream string, field string, value string) *fieldIndex {
-	encodedValue := base64.StdEncoding.EncodeToString([]byte(value))
-
 	return &fieldIndex{
 		txn:       txn,
 		stream:    stream,
 		field:     field,
-		keyPrefix: kv.Key{"index", stream, "field", field, encodedValue},
+		keyPrefix: fieldIndexPrefix(stream, field, value),
 	}
 }
+
+// fieldIndexPrefix builds the "index:<stream>:field:<field>:<base64(value)>"
+// prefix shared by every entry carrying that (stream, field, value).
+func fieldIndexPrefix(stream string, field string, value string) kv.Key {
+	encodedValue := base64.StdEncoding.EncodeToString([]byte(value))
+	return kv.Key{"index", stream, "field", field, encodedValue}
+}
+
+// keysEqual reports whether two composite keys have identical segments.
+func keysEqual(a, b kv.Key) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
 
 // AddKey records that entryKey carries this (stream, field, value), giving the
 // index key the entry's remaining TTL so the two expire together.
@@ -155,18 +211,30 @@ func (index *fieldIndex) AddKey(entryKey kv.Key, retentionTime int64) error {
 	return nil
 }
 
-// purgeEntryFromFieldIndex removes every inverted-index reference to a deleted
-// entry by scanning the stream's field index and dropping the keys whose
-// trailing entry-key segment matches it.
-func purgeEntryFromFieldIndex(txn kv.MutationTx, stream string, key kv.Key) error {
-	for indexKey := range txn.IterKeys(kv.Key{"index", stream, "field"}, kv.KeyRange{}) {
-		if indexKey.HasSuffix(key) {
-			if err := txn.Clear(indexKey); err != nil {
-				return fmt.Errorf(
-					"could not delete key '%s' from field index: %w",
-					strings.Join(key, ":"), err,
-				)
+// purgeEntryFromFieldIndex removes the inverted-index references of a deleted
+// entry. Because a log record is immutable, its stored fields fully determine
+// the index keys that can point at it, so each key is reconstructed and cleared
+// directly (O(fields)) instead of scanning the whole field index (O(index
+// size)). Clearing a key that was never indexed is a harmless no-op.
+func purgeEntryFromFieldIndex(txn kv.MutationTx, stream string, entryKey kv.Key, record *models.LogRecord) error {
+	for field, value := range record.Fields {
+		prefix := fieldIndexPrefix(stream, field, value)
+		indexKey := make(kv.Key, 0, len(prefix)+len(entryKey))
+		indexKey = append(indexKey, prefix...)
+		indexKey = append(indexKey, entryKey...)
+
+		if err := txn.Clear(indexKey); err != nil {
+			// A value too large to fit in an index key was never indexed (see
+			// AddKey), so there is nothing to purge for it. Fields that are not
+			// indexed at all simply have no key to clear (a harmless no-op).
+			if errors.Is(err, kv.ErrKeyTooLarge) {
+				continue
 			}
+
+			return fmt.Errorf(
+				"could not delete key '%s' from field index of stream '%s': %w",
+				indexKey, stream, err,
+			)
 		}
 	}
 

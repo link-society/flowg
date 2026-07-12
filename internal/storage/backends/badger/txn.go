@@ -168,5 +168,9 @@ func (txn *BadgerTx) SetWithTTL(key kv.Key, value kv.Value, ttl time.Duration) e
 
 // Clear implements [kv.MutationTx].
 func (txn *BadgerTx) Clear(key kv.Key) error {
-	return txn.concrete.Delete(keyToBadger(key))
+	bkey := keyToBadger(key)
+	if err := kv.CheckKeySize(len(bkey)); err != nil {
+		return err
+	}
+	return txn.concrete.Delete(bkey)
 }

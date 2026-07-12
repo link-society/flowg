@@ -99,7 +99,11 @@ func (txn *FoundationMutationTx) SetWithTTL(key kv.Key, value kv.Value, ttl time
 
 // Clear implements [kv.MutationTx].
 func (txn *FoundationMutationTx) Clear(key kv.Key) error {
-	txn.concrete.Clear(keyToFdb(txn.sub, key))
+	fkey := keyToFdb(txn.sub, key)
+	if err := kv.CheckKeySize(len(fkey)); err != nil {
+		return err
+	}
+	txn.concrete.Clear(fkey)
 	return nil
 }
 
