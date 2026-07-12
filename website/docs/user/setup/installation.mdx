@@ -78,6 +78,30 @@ docker run \
   linksociety/flowg:latest-linux-arm
 ```
 
+:::note Data volume ownership
+
+The container runs as the non-root user `10001:10001`. A **named volume**
+(`-v flowg-data:/data`, as shown above) inherits the image's ownership and works
+out of the box. If you instead **bind-mount a host directory**
+(`-v /srv/flowg:/data`), run the container as the user that owns that directory
+with `--user`, otherwise the server can't create its data directories on first
+boot:
+
+```bash
+docker run \
+  --user "$(id -u):$(id -g)" \
+  -p 5080:5080/tcp \
+  -p 9113:9113/tcp \
+  -p 5514:5514/udp \
+  -v /srv/flowg:/data \
+  linksociety/flowg:latest
+```
+
+On Kubernetes, the bundled Helm chart already sets `fsGroup: 10001` on the pod,
+so a freshly provisioned `PersistentVolumeClaim` is made writable automatically.
+
+:::
+
 ## Security considerations
 
 By default, the Syslog endpoint is open to everyone. If that behavior is
