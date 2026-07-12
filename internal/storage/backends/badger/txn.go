@@ -19,7 +19,10 @@ type BadgerTx struct {
 var _ kv.QueryTx = (*BadgerTx)(nil)
 var _ kv.MutationTx = (*BadgerTx)(nil)
 
-// Get implements [kv.QueryTx]. A missing key yields a nil value and no error.
+// Get implements [kv.QueryTx]. Only a missing key (badger.ErrKeyNotFound)
+// yields a nil value; a key that exists always yields a non-nil value — an empty
+// []byte for an empty-valued key — so callers can use a nil check to test for
+// existence.
 func (txn *BadgerTx) Get(key kv.Key) (kv.Value, error) {
 	item, err := txn.concrete.Get(keyToBadger(key))
 	if err != nil {
@@ -33,6 +36,9 @@ func (txn *BadgerTx) Get(key kv.Key) (kv.Value, error) {
 	content, err := item.ValueCopy(nil)
 	if err != nil {
 		return nil, err
+	}
+	if content == nil {
+		content = []byte{}
 	}
 	val := kv.Value(content)
 
