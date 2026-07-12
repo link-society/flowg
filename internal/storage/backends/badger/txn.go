@@ -138,12 +138,26 @@ func (txn *BadgerTx) IterPairs(prefix kv.Key, keyRange kv.KeyRange) iter.Seq[kv.
 
 // Set implements [kv.MutationTx].
 func (txn *BadgerTx) Set(key kv.Key, value kv.Value) error {
-	return txn.concrete.Set(keyToBadger(key), value)
+	bkey := keyToBadger(key)
+	if err := kv.CheckKeySize(len(bkey)); err != nil {
+		return err
+	}
+	if err := kv.CheckValueSize(len(value)); err != nil {
+		return err
+	}
+	return txn.concrete.Set(bkey, value)
 }
 
 // SetWithTTL implements [kv.MutationTx].
 func (txn *BadgerTx) SetWithTTL(key kv.Key, value kv.Value, ttl time.Duration) error {
-	entry := badger.NewEntry(keyToBadger(key), value).WithTTL(ttl)
+	bkey := keyToBadger(key)
+	if err := kv.CheckKeySize(len(bkey)); err != nil {
+		return err
+	}
+	if err := kv.CheckValueSize(len(value)); err != nil {
+		return err
+	}
+	entry := badger.NewEntry(bkey, value).WithTTL(ttl)
 	return txn.concrete.SetEntry(entry)
 }
 

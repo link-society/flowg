@@ -69,7 +69,14 @@ func (txn *FoundationMutationTx) IterPairs(prefix kv.Key, keyRange kv.KeyRange) 
 
 // Set implements [kv.MutationTx].
 func (txn *FoundationMutationTx) Set(key kv.Key, value kv.Value) error {
-	txn.concrete.Set(keyToFdb(txn.sub, key), encodeValue(value, 0))
+	fkey := keyToFdb(txn.sub, key)
+	if err := kv.CheckKeySize(len(fkey)); err != nil {
+		return err
+	}
+	if err := kv.CheckValueSize(expiryHeaderSize + len(value)); err != nil {
+		return err
+	}
+	txn.concrete.Set(fkey, encodeValue(value, 0))
 	return nil
 }
 
@@ -78,8 +85,15 @@ func (txn *FoundationMutationTx) Set(key kv.Key, value kv.Value) error {
 // FoundationDB has no native TTL, so the expiration is stored in the value
 // envelope and enforced lazily when the pair is read.
 func (txn *FoundationMutationTx) SetWithTTL(key kv.Key, value kv.Value, ttl time.Duration) error {
+	fkey := keyToFdb(txn.sub, key)
+	if err := kv.CheckKeySize(len(fkey)); err != nil {
+		return err
+	}
+	if err := kv.CheckValueSize(expiryHeaderSize + len(value)); err != nil {
+		return err
+	}
 	expiresAt := uint64(time.Now().Add(ttl).Unix())
-	txn.concrete.Set(keyToFdb(txn.sub, key), encodeValue(value, expiresAt))
+	txn.concrete.Set(fkey, encodeValue(value, expiresAt))
 	return nil
 }
 
