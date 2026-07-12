@@ -155,7 +155,7 @@ func encodeIndexingMap(indexing map[string][]string) map[string][]string {
 	encodedMap := make(map[string][]string, len(indexing))
 
 	for field, values := range indexing {
-		encodedValues := make([]string, len(values))
+		encodedValues := make([]string, 0, len(values))
 
 		for _, value := range values {
 			encodedValues = append(
