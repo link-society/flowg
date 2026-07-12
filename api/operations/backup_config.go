@@ -2,6 +2,7 @@ package operations
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 
 	"net/http"
@@ -17,6 +18,7 @@ import (
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/internal/models"
 
+	"link-society.com/flowg/internal/storage/generic/kv"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -67,8 +69,11 @@ func NewBackupConfigUsecase(deps BackupConfigDeps) usecase.Interactor {
 				resp.Writer.(http.ResponseWriter).Header().Set("Cache-Control", "no-cache")
 
 				_, err := deps.ConfigStorage.Dump(ctx, resp.Writer, 0)
-				resp.Writer.(http.Flusher).Flush()
 				if err != nil {
+					if errors.Is(err, kv.ErrNotSupported) {
+						return status.Wrap(err, status.Unimplemented)
+					}
+
 					logger.ErrorContext(
 						ctx,
 						"Failed to backup configuration database",
@@ -77,6 +82,8 @@ func NewBackupConfigUsecase(deps BackupConfigDeps) usecase.Interactor {
 
 					return status.Wrap(err, status.Internal)
 				}
+
+				resp.Writer.(http.Flusher).Flush()
 
 				return nil
 			},
@@ -88,7 +95,7 @@ func NewBackupConfigUsecase(deps BackupConfigDeps) usecase.Interactor {
 	u.SetDescription("Download a full snapshot of the configuration database.")
 	u.SetTags("backup")
 
-	u.SetExpectedErrors(status.Unauthenticated, status.PermissionDenied, status.Internal)
+	u.SetExpectedErrors(status.Unauthenticated, status.PermissionDenied, status.Unimplemented, status.Internal)
 
 	return u
 }
