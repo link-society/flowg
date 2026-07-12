@@ -69,7 +69,10 @@ func Distinct(txn kv.QueryTx, stream string) (map[string][]string, error) {
 	seenValuesPerField := make(map[string]map[string]struct{})
 
 	for key := range txn.IterKeys(kv.Key{"index", stream, "field"}, kv.KeyRange{}) {
-		if len(key) != 6 {
+		// index keys are "index:<stream>:field:<field>:<value>" followed by the
+		// full entry key, so anything shorter than that 5-segment prefix is not a
+		// value index key we can decode.
+		if len(key) < 5 {
 			continue
 		}
 
