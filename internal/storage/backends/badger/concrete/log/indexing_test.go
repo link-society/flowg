@@ -92,3 +92,62 @@ func TestFetchLogsIndexingFilter(t *testing.T) {
 		t.Fatalf("indexing {level:[debug]}: expected 0 records, got %d", len(none))
 	}
 }
+
+// TestStreamIndicesDistinct guards against Distinct() skipping every real index
+// key (which happens when the segment-count guard is wrong), returning an empty
+// map and breaking the stream-indices autocomplete endpoint.
+func TestStreamIndicesDistinct(t *testing.T) {
+	logging.Discard()
+
+	ctx := t.Context()
+
+	opts := badgerlog.DefaultOptions()
+	opts.InMemory = true
+
+	var logStorage storage.LogStorage
+
+	app := fxtest.New(
+		t,
+		badgerlog.NewStorage(opts),
+		fx.Populate(&logStorage),
+		fx.NopLogger,
+	)
+	app.RequireStart()
+	defer app.RequireStop()
+
+	const stream = "test"
+
+	if err := logStorage.ConfigureStream(ctx, stream, models.StreamConfig{
+		IndexedFields: []string{"level"},
+	}); err != nil {
+		t.Fatalf("failed to configure stream: %v", err)
+	}
+
+	for _, fields := range []map[string]string{
+		{"level": "error", "message": "boom"},
+		{"level": "info", "message": "hello"},
+		{"level": "info", "message": "world"},
+	} {
+		if _, err := logStorage.Ingest(ctx, stream, models.NewLogRecord(fields)); err != nil {
+			t.Fatalf("failed to ingest record: %v", err)
+		}
+	}
+
+	indices, err := logStorage.Distinct(ctx, stream)
+	if err != nil {
+		t.Fatalf("failed to get stream indices: %v", err)
+	}
+
+	values := indices["level"]
+	if len(values) != 2 {
+		t.Fatalf("expected 2 distinct values for 'level', got %d (%v)", len(values), values)
+	}
+
+	seen := map[string]bool{}
+	for _, v := range values {
+		seen[v] = true
+	}
+	if !seen["error"] || !seen["info"] {
+		t.Fatalf("expected distinct 'level' values to include error and info, got %v", values)
+	}
+}
