@@ -198,3 +198,28 @@ func TestIterPairsInclusiveTo(t *testing.T) {
 		t.Fatalf("expected %v, got %v", want, got)
 	}
 }
+
+// TestKeyRoundTripWithColonSegment guards the lossless key encoding: a segment
+// containing a ':' (e.g. a field named "com.acme:region") must round-trip
+// through Set and iteration without being mis-split — which the old ':'
+// separator would have done.
+func TestKeyRoundTripWithColonSegment(t *testing.T) {
+	txn := newTestTx(t)
+
+	key := kv.Key{"stream", "field", "s", "com.acme:region"}
+	if err := txn.Set(key, kv.Value("x")); err != nil {
+		t.Fatalf("failed to set key: %v", err)
+	}
+
+	var got []kv.Key
+	for pair := range txn.IterPairs(kv.Key{"stream", "field", "s"}, kv.KeyRange{}) {
+		got = append(got, pair.Key())
+	}
+
+	if len(got) != 1 {
+		t.Fatalf("expected 1 key, got %d: %v", len(got), got)
+	}
+	if !slices.Equal(got[0], key) {
+		t.Fatalf("expected %v, got %v", key, got[0])
+	}
+}

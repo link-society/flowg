@@ -21,6 +21,17 @@ representation, where the segments of a composite key are joined with a colon
 `entry:test:...`. See [FoundationDB Backend](#foundationdb-backend) for how the
 same keys are mapped when using FoundationDB.
 
+:::note
+
+The `:` shown here is only for readability. On disk, the **BadgerDB** backend
+joins the segments with a reserved control byte (ASCII `ESC`, `0x1B`) that
+stream names, field names and item names are not allowed to contain, so the
+encoding is lossless and no segment value can ever be mistaken for a separator.
+The **FoundationDB** backend avoids the question entirely by using its native,
+lossless tuple encoding.
+
+:::
+
 ## Streams
 
 A stream is the destination of log entries. The stream hold the configuration

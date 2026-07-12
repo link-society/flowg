@@ -1,7 +1,6 @@
 package badger
 
 import (
-	"fmt"
 	"iter"
 	"strings"
 	"time"
@@ -56,7 +55,7 @@ func (txn *BadgerTx) IterKeys(prefix kv.Key, keyRange kv.KeyRange) iter.Seq[kv.K
 	return func(yield func(kv.Key) bool) {
 		opts := badger.DefaultIteratorOptions
 		opts.PrefetchValues = false
-		opts.Prefix = fmt.Appendf(nil, "%s:", keyToBadger(prefix))
+		opts.Prefix = keyToBadgerPrefix(prefix)
 		it := txn.concrete.NewIterator(opts)
 		defer it.Close()
 
@@ -66,10 +65,10 @@ func (txn *BadgerTx) IterKeys(prefix kv.Key, keyRange kv.KeyRange) iter.Seq[kv.K
 		)
 
 		if keyRange.From != nil {
-			fromPrefix = fmt.Appendf(nil, "%s:", keyToBadger(keyRange.From))
+			fromPrefix = keyToBadgerPrefix(keyRange.From)
 		}
 		if keyRange.To != nil {
-			toPrefix = fmt.Sprintf("%s:", keyToBadger(keyRange.To))
+			toPrefix = string(keyToBadgerPrefix(keyRange.To))
 		}
 
 		if fromPrefix != nil {
@@ -101,7 +100,7 @@ func (txn *BadgerTx) IterPairs(prefix kv.Key, keyRange kv.KeyRange) iter.Seq[kv.
 	return func(yield func(kv.Pair) bool) {
 		opts := badger.DefaultIteratorOptions
 		opts.PrefetchValues = true
-		opts.Prefix = fmt.Appendf(nil, "%s:", keyToBadger(prefix))
+		opts.Prefix = keyToBadgerPrefix(prefix)
 		it := txn.concrete.NewIterator(opts)
 		defer it.Close()
 
@@ -111,10 +110,10 @@ func (txn *BadgerTx) IterPairs(prefix kv.Key, keyRange kv.KeyRange) iter.Seq[kv.
 		)
 
 		if keyRange.From != nil {
-			fromPrefix = fmt.Appendf(nil, "%s:", keyToBadger(keyRange.From))
+			fromPrefix = keyToBadgerPrefix(keyRange.From)
 		}
 		if keyRange.To != nil {
-			toPrefix = fmt.Sprintf("%s:", keyToBadger(keyRange.To))
+			toPrefix = string(keyToBadgerPrefix(keyRange.To))
 		}
 
 		if fromPrefix != nil {
