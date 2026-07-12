@@ -16,6 +16,10 @@ spec:
       labels:
         {{- include "flowg.labels" . | nindent 8 }}
     spec:
+      {{- with .Values.flowg.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.flowg.image.pullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -26,6 +30,10 @@ spec:
         - name: flowg
           image: "{{ .Values.flowg.image.repository }}:{{ .Values.flowg.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: "{{ .Values.flowg.image.pullPolicy }}"
+          {{- with .Values.flowg.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           env:
           {{- if .Values.flowg.https.enabled }}
             - name: FLOWG_HTTP_TLS_ENABLED
