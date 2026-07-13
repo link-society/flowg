@@ -39,10 +39,10 @@ func HashToken(token string) string {
 // hash in a specific format.
 func HashPassword(password string) (string, error) {
 	hp := hashParams{
-		memory:      1, // 1 kB
-		iterations:  1,
+		memory:      19456, // 19 MiB — OWASP-recommended Argon2id minimum
+		iterations:  2,
 		parallelism: 1,
-		saltLength:  4,
+		saltLength:  16,
 		keyLength:   32,
 	}
 
