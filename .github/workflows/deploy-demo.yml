@@ -11,6 +11,11 @@ on:
         required: true
         type: string
         default: "latest"
+    secrets:
+      RENDER_API_KEY:
+        required: true
+      RENDER_SERVICE_ID:
+        required: true
 
 jobs:
   deploy:
