@@ -36,4 +36,4 @@ jobs:
         with:
           render_api_key: ${{ secrets.RENDER_API_KEY }}
           render_service_id: ${{ secrets.RENDER_SERVICE_ID }}
-          docker_image_name: "linksociety/flowg:${{ inputs.version }}"
+          docker_image_name: "docker.io/linksociety/flowg:${{ inputs.version }}"
