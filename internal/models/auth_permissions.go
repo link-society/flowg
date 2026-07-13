@@ -23,6 +23,9 @@ type Permissions struct {
 
 	CanReadSystemConfiguration  bool `json:"can_read_system_configuration" required:"true"`
 	CanWriteSystemConfiguration bool `json:"can_write_system_configuration" required:"true"`
+
+	CanViewAuthProviders bool `json:"can_view_auth_providers" required:"true"`
+	CanEditAuthProviders bool `json:"can_edit_auth_providers" required:"true"`
 }
 
 // PermissionsFromScopes projects a flat list of scopes into the Permissions
@@ -57,6 +60,10 @@ func PermissionsFromScopes(scopes []Scope) Permissions {
 			permissions.CanReadSystemConfiguration = true
 		case SCOPE_WRITE_SYSTEM_CONFIGURATION:
 			permissions.CanWriteSystemConfiguration = true
+		case SCOPE_READ_AUTH_PROVIDERS:
+			permissions.CanViewAuthProviders = true
+		case SCOPE_WRITE_AUTH_PROVIDERS:
+			permissions.CanEditAuthProviders = true
 		}
 	}
 	return permissions
