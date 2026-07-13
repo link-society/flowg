@@ -26,10 +26,15 @@ assigns permissions to one or more of the following **scopes**:
 Each user is associated to one or more roles. A user has a required password,
 and can have zero or more personal access tokens.
 
-## Password and Token encryption
+## Password and Token hashing
 
-Any secret is hashed using the [Argon2](https://en.wikipedia.org/wiki/Argon2)
-algorithm.
+User **passwords** are low-entropy, human-chosen secrets, so they are hashed with
+the memory-hard [Argon2id](https://en.wikipedia.org/wiki/Argon2) key-derivation
+function to make offline brute-forcing expensive.
+
+**Personal Access Tokens** are long, randomly-generated high-entropy secrets that
+cannot be feasibly brute-forced regardless of hash speed, so they are hashed with
+a fast `SHA-256`.
 
 ## Storage
 
@@ -78,7 +83,7 @@ Each user will have a key containing the hashed password with the following
 format:
 
 ```
-user:<username>:password = argon2(password)
+user:<username>:password = argon2id(password)
 ```
 
 For example:
@@ -104,11 +109,18 @@ For each Personal Access Token associated to the user, there will be a key with
 the following format:
 
 ```
-pat:<username>:<uuid> = argon2(token)
+pat:<username>:<uuid> = sha256(token)
 ```
 
 For example:
 
 ```
 pat:guest:f6c2424a-bc1f-4030-9e42-7a09b96452a7
+```
+
+Additionally, a reverse index lets a token be resolved to its owner in constant
+time, without scanning every token:
+
+```
+index:pat:<sha256(token)> = <username>
 ```
