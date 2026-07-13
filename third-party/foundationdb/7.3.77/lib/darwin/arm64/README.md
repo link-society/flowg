@@ -34,3 +34,13 @@ otool -D libfdb_c.dylib   # verify the install name
 ```
 
 Then copy the resulting `libfdb_c.dylib` into this directory.
+
+## Making the release binary relocatable
+
+Keep the install name as `/usr/local/lib/libfdb_c.dylib` above: the backend build
+(`scripts/build.taskfile.yml`) relies on it to re-point `flowg-server` at
+`@rpath/libfdb_c.dylib` with `install_name_tool -change`, and links the binary
+with an `LC_RPATH` of `@loader_path/../lib`. Because the library sits at `../lib`
+relative to the binary in both the release tarball (`bin/` + `lib/`) and a system
+install (`/usr/local/bin` + `/usr/local/lib`), the same binary finds `libfdb_c`
+in either layout without `DYLD_LIBRARY_PATH`.
