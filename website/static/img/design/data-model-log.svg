@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="746 34 390 336" role="img" aria-label="log namespace entities: streams and their records">
+  <rect x="746" y="34" width="390" height="336" rx="10" fill="#ffffff"/>
+  <rect x="752" y="38" width="378" height="326" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="764" y="54" font-family="sans-serif" font-size="11" font-weight="bold" fill="#94a3b8">log</text>
+  <path d="M839,240 L819,104" fill="none" stroke="#94a3b8" stroke-width="1.4"/>
+  <path d="M918,291 L965,272" fill="none" stroke="#94a3b8" stroke-width="1.4"/>
+  <rect x="760" y="60" width="118" height="44" rx="6" fill="#eff6ff" stroke="#1e40af" stroke-width="1.5"/>
+  <path d="M760,66 a6,6 0 0 1 6,-6 h106 a6,6 0 0 1 6,6 v20 h-118 z" fill="#1e40af"/>
+  <text x="819" y="78" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#ffffff">FIELD</text>
+  <text x="770" y="100" font-family="monospace" font-size="12" fill="#1e293b">name</text>
+  <rect x="760" y="240" width="158" height="102" rx="6" fill="#eff6ff" stroke="#1e40af" stroke-width="1.5"/>
+  <path d="M760,246 a6,6 0 0 1 6,-6 h146 a6,6 0 0 1 6,6 v20 h-158 z" fill="#1e40af"/>
+  <text x="839" y="258" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#ffffff">STREAM</text>
+  <text x="770" y="280" font-family="monospace" font-size="12" fill="#1e293b">name</text>
+  <text x="770" y="299" font-family="monospace" font-size="12" fill="#1e293b">retention_time</text>
+  <text x="770" y="318" font-family="monospace" font-size="12" fill="#1e293b">retention_size</text>
+  <text x="770" y="337" font-family="monospace" font-size="12" fill="#1e293b">indexed_fields</text>
+  <rect x="965" y="240" width="150" height="64" rx="6" fill="#eff6ff" stroke="#1e40af" stroke-width="1.5"/>
+  <path d="M965,246 a6,6 0 0 1 6,-6 h138 a6,6 0 0 1 6,6 v20 h-150 z" fill="#1e40af"/>
+  <text x="1040" y="258" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#ffffff">LOGRECORD</text>
+  <text x="975" y="280" font-family="monospace" font-size="12" fill="#1e293b">timestamp</text>
+  <text x="975" y="299" font-family="monospace" font-size="12" fill="#1e293b">fields</text>
+  <circle cx="839" cy="240" r="3" fill="#94a3b8"/>
+  <circle cx="819" cy="104" r="3" fill="#94a3b8"/>
+  <circle cx="918" cy="291" r="3" fill="#94a3b8"/>
+  <circle cx="965" cy="272" r="3" fill="#94a3b8"/>
+  <text x="847" y="236" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="#475569">1</text>
+  <text x="827" y="120" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="#475569">N</text>
+  <text x="848" y="178" text-anchor="middle" font-family="sans-serif" font-size="9" font-style="italic" fill="#64748b">exposes</text>
+  <text x="922" y="286" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="#475569">1</text>
+  <text x="959" y="268" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="#475569">N</text>
+  <text x="941" y="262" text-anchor="middle" font-family="sans-serif" font-size="9" font-style="italic" fill="#64748b">stores</text>
+</svg>

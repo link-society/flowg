@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 770 150" role="img" aria-label="Pipeline entity mapped to key/value pairs">
+  <defs><marker id="ah-pipe" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" refX="4" refY="4"><circle cx="4" cy="4" r="3.5" fill="#ea580c"/></marker></defs>
+  <rect x="0" y="0" width="770" height="150" rx="10" fill="#ffffff"/>
+  <rect x="24" y="40" width="150" height="60" rx="6" fill="#eff6ff" stroke="#1e40af" stroke-width="1.5"/>
+  <path d="M24,46 a6,6 0 0 1 6,-6 h138 a6,6 0 0 1 6,6 v24 h-150 z" fill="#1e40af"/>
+  <text x="99" y="60" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="#ffffff">Pipeline</text>
+  <text x="40" y="90" font-family="monospace" font-size="13" fill="#1e293b">name</text>
+  <circle cx="174" cy="85" r="3.5" fill="#ea580c"/>
+  <rect x="340" y="50" width="120" height="24" fill="#dbeafe" stroke="#94a3b8"/>
+  <rect x="460" y="50" width="110" height="24" fill="#dbeafe" stroke="#94a3b8"/>
+  <rect x="570" y="50" width="180" height="24" fill="#dcfce7" stroke="#94a3b8"/>
+  <text x="400" y="66" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#475569">seg 0</text>
+  <text x="515" y="66" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#475569">seg 1</text>
+  <text x="660" y="66" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#166534">value</text>
+  <rect x="340" y="74" width="120" height="30" fill="#ffffff" stroke="#cbd5e1"/>
+  <rect x="460" y="74" width="110" height="30" fill="#fef9c3" stroke="#cbd5e1"/>
+  <rect x="570" y="74" width="180" height="30" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="400" y="93" text-anchor="middle" font-family="monospace" font-size="13" fill="#1e293b">pipeline</text>
+  <text x="515" y="93" text-anchor="middle" font-family="monospace" font-size="13" fill="#1e293b">ingest</text>
+  <text x="660" y="93" text-anchor="middle" font-family="monospace" font-size="13" fill="#1e293b">JSON flow graph</text>
+  <path d="M174,85 C205,128 515,128 515,105" fill="none" stroke="#ea580c" stroke-width="1.8" stroke-dasharray="4 3" marker-end="url(#ah-pipe)"/>
+</svg>

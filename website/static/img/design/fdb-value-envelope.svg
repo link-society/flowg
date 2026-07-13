@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 104" role="img" aria-label="FoundationDB value envelope: an 8-byte expiry header followed by the payload">
+  <rect x="0" y="0" width="560" height="104" rx="10" fill="#ffffff"/>
+  <text x="30" y="26" font-family="sans-serif" font-size="12" font-weight="bold" fill="#475569">stored value</text>
+  <rect x="30" y="38" width="180" height="46" rx="4" fill="#dbeafe" stroke="#94a3b8"/>
+  <rect x="210" y="38" width="320" height="46" rx="4" fill="#dcfce7" stroke="#94a3b8"/>
+  <text x="120" y="60" text-anchor="middle" font-family="monospace" font-size="13" font-weight="bold" fill="#1e293b">expiresAt</text>
+  <text x="120" y="76" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#64748b">8 bytes</text>
+  <text x="370" y="60" text-anchor="middle" font-family="monospace" font-size="13" font-weight="bold" fill="#1e293b">payload</text>
+  <text x="370" y="76" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#64748b">the real value</text>
+</svg>

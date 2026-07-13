@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="378 34 356 290" role="img" aria-label="config namespace entities: transformers, pipelines, forwarders">
+  <rect x="378" y="34" width="356" height="290" rx="10" fill="#ffffff"/>
+  <rect x="384" y="38" width="344" height="282" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="396" y="54" font-family="sans-serif" font-size="11" font-weight="bold" fill="#94a3b8">config</text>
+  <path d="M515,240 L469,124" fill="none" stroke="#94a3b8" stroke-width="1.4"/>
+  <path d="M595,240 L639,124" fill="none" stroke="#94a3b8" stroke-width="1.4"/>
+  <rect x="395" y="60" width="148" height="64" rx="6" fill="#eff6ff" stroke="#1e40af" stroke-width="1.5"/>
+  <path d="M395,66 a6,6 0 0 1 6,-6 h136 a6,6 0 0 1 6,6 v20 h-148 z" fill="#1e40af"/>
+  <text x="469" y="78" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#ffffff">TRANSFORMER</text>
+  <text x="405" y="100" font-family="monospace" font-size="12" fill="#1e293b">name</text>
+  <text x="405" y="119" font-family="monospace" font-size="12" fill="#1e293b">vrl_source</text>
+  <rect x="565" y="60" width="148" height="64" rx="6" fill="#eff6ff" stroke="#1e40af" stroke-width="1.5"/>
+  <path d="M565,66 a6,6 0 0 1 6,-6 h136 a6,6 0 0 1 6,6 v20 h-148 z" fill="#1e40af"/>
+  <text x="639" y="78" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#ffffff">FORWARDER</text>
+  <text x="575" y="100" font-family="monospace" font-size="12" fill="#1e293b">name</text>
+  <text x="575" y="119" font-family="monospace" font-size="12" fill="#1e293b">config</text>
+  <rect x="480" y="240" width="150" height="64" rx="6" fill="#eff6ff" stroke="#1e40af" stroke-width="1.5"/>
+  <path d="M480,246 a6,6 0 0 1 6,-6 h138 a6,6 0 0 1 6,6 v20 h-150 z" fill="#1e40af"/>
+  <text x="555" y="258" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#ffffff">PIPELINE</text>
+  <text x="490" y="280" font-family="monospace" font-size="12" fill="#1e293b">name</text>
+  <text x="490" y="299" font-family="monospace" font-size="12" fill="#1e293b">flow_graph</text>
+  <circle cx="515" cy="240" r="3" fill="#94a3b8"/>
+  <circle cx="469" cy="124" r="3" fill="#94a3b8"/>
+  <circle cx="595" cy="240" r="3" fill="#94a3b8"/>
+  <circle cx="639" cy="124" r="3" fill="#94a3b8"/>
+  <text x="508" y="234" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="#475569">N</text>
+  <text x="477" y="138" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="#475569">N</text>
+  <text x="478" y="186" text-anchor="middle" font-family="sans-serif" font-size="9" font-style="italic" fill="#64748b">uses</text>
+  <text x="602" y="234" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="#475569">N</text>
+  <text x="631" y="138" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="#475569">N</text>
+  <text x="632" y="186" text-anchor="middle" font-family="sans-serif" font-size="9" font-style="italic" fill="#64748b">uses</text>
+</svg>
