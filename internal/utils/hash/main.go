@@ -1,12 +1,15 @@
 package hash
 
 import (
-	"crypto/rand"
-	"crypto/subtle"
+	"fmt"
 	"strings"
 
+	"crypto/rand"
+	"crypto/sha256"
+	"crypto/subtle"
+
 	"encoding/base64"
-	"fmt"
+	"encoding/hex"
 
 	"golang.org/x/crypto/argon2"
 )
@@ -17,6 +20,19 @@ type hashParams struct {
 	parallelism uint8
 	saltLength  uint32
 	keyLength   uint32
+}
+
+// HashToken hashes a high-entropy API token with SHA-256 and returns its hex
+// digest.
+//
+// Unlike a user password, a token is a long random secret, so a fast
+// cryptographic hash is enough: it cannot be brute-forced regardless of the
+// hash's speed, and hashing this way lets a token be looked up directly by its
+// digest. A slow password KDF like Argon2id is neither needed nor desirable on
+// the token-verification hot path.
+func HashToken(token string) string {
+	sum := sha256.Sum256([]byte(token))
+	return hex.EncodeToString(sum[:])
 }
 
 // HashPassword hashes a password using the Argon2id algorithm and returns the

@@ -118,8 +118,8 @@ func PatchUserRoles(txn kv.MutationTx, user models.User) error {
 }
 
 // DeleteUser removes everything tied to a user: all "user:<name>:*" keys (roles
-// and password), all of their "pat:<name>:*" tokens, and the
-// "index:user:<name>" marker.
+// and password), all of their "pat:<name>:*" tokens (and each token's
+// "index:pat:<hash>" reverse-index entry), and the "index:user:<name>" marker.
 func DeleteUser(txn kv.MutationTx, name string) error {
 	keys := make([]kv.Key, 0)
 
@@ -127,8 +127,12 @@ func DeleteUser(txn kv.MutationTx, name string) error {
 		keys = append(keys, key)
 	}
 
-	for key := range txn.IterKeys(kv.Key{"pat", name}, kv.KeyRange{}) {
-		keys = append(keys, key)
+	for pair := range txn.IterPairs(kv.Key{"pat", name}, kv.KeyRange{}) {
+		keys = append(keys, pair.Key())
+
+		if tokenHash := pair.Value(); tokenHash != nil {
+			keys = append(keys, kv.Key{"index", "pat", string(tokenHash)})
+		}
 	}
 
 	for _, key := range keys {

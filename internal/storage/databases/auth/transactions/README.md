@@ -14,7 +14,7 @@ collection of keys that exist under a given prefix.
 ### Users
 
 - `index:user:<name>` — existence marker used to enumerate users.
-- `user:<name>:password` — bcrypt hash of the user's password.
+- `user:<name>:password` — Argon2id hash of the user's password.
 - `user:<name>:role:<role>` — one key per role assigned to the user.
 
 ### Roles
@@ -24,10 +24,13 @@ collection of keys that exist under a given prefix.
 
 ### Personal access tokens
 
-- `pat:<name>:<uuid>` — one key per token; its value is the bcrypt hash of the
-  token. The plaintext is returned to the caller only once, at creation, so
-  verification re-hashes the presented token and compares it against the stored
-  hashes.
+- `pat:<name>:<uuid>` — one key per token; its value is the SHA-256 hash of the
+  token. A fast hash is enough because the token is a long random secret, not a
+  low-entropy password.
+- `index:pat:<sha256(token)>` — reverse index mapping a token's hash back to its
+  owning `<name>`. The plaintext is returned to the caller only once, at
+  creation; verification hashes the presented token and resolves the owner with a
+  single O(1) lookup on this index (no per-token scan).
 
 ## Notes
 

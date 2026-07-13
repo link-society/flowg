@@ -22,6 +22,23 @@ func TestHashPassword(t *testing.T) {
 	}
 }
 
+func TestHashToken(t *testing.T) {
+	h := hash.HashToken("pat_abc123")
+
+	// SHA-256 hex is deterministic and 64 characters long.
+	if got := hash.HashToken("pat_abc123"); got != h {
+		t.Fatalf("HashToken() not deterministic: %q != %q", got, h)
+	}
+	if len(h) != 64 {
+		t.Fatalf("HashToken() length = %d; want 64", len(h))
+	}
+
+	// Distinct tokens hash to distinct digests.
+	if hash.HashToken("pat_other") == h {
+		t.Fatal("HashToken() collided for distinct tokens")
+	}
+}
+
 func BenchmarkHashPassword(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		_, err := hash.HashPassword("password")
