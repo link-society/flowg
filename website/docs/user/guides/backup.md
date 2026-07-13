@@ -4,6 +4,17 @@ sidebar_position: 5
 
 # Database Backup
 
+:::note[FoundationDB backend]
+
+The HTTP backup/restore API described here is backed by BadgerDB's snapshot
+streaming, so it is only available on the **default BadgerDB backend**. On the
+**FoundationDB backend** these endpoints return `501 Not Implemented`:
+FoundationDB is backed up out-of-band with its own cluster-wide tooling
+([`fdbbackup` / `fdbrestore`](https://apple.github.io/foundationdb/backups.html)).
+See the [clustering guide](/docs/user/advanced/cluster) for details.
+
+:::
+
 ## Performing a backup
 
 Using a Personal Access Token:

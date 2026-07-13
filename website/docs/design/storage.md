@@ -149,28 +149,29 @@ for the backend in use.
 
 ## Querying
 
-Each query must be made within a time-window.
+Each query is scoped to a time-window `[from, to]`, **inclusive on both ends**.
 
-We fetch the keys to lookup by iterating over all keys with the following
-prefix:
+We iterate over all keys with the prefix:
 
 ```
 entry:<stream name>:
 ```
 
-Then, we select all keys that are "higher" than
+seeking to the lower bound:
 
 ```
 entry:<stream name>:<from timestamp>:
 ```
 
-And "lower" than:
+and stopping only once a key sorts past the upper-bound subtree:
 
 ```
 entry:<stream name>:<to timestamp>:
 ```
 
-Because of the internal structure of *BadgerDB*, this operation is fast.
+so every record whose timestamp falls in `[from, to]` is returned — **including
+records at exactly `to`**. Because the timestamps are zero-padded and the keys
+are ordered, this is a fast bounded range scan rather than a full stream scan.
 
 Then, if a [filter](/docs/user/guides/filtering) is given, we match the log
 record to the filter expression to determine if it should be returned.
