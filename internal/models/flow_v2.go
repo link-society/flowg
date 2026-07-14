@@ -7,7 +7,7 @@ package models
 type FlowGraphV2 struct {
 	MajorVersion int           `json:"version" default:"2"`
 	MinorVersion int           `json:"version.minor" default:"1"`
-	HasLayout    bool          `json:"hasLayout" default:"true"`
+	HasLayout    bool          `json:"hasLayout" default:"false"`
 	Nodes        []*FlowNodeV2 `json:"nodes" required:"true"`
 	Edges        []*FlowEdgeV2 `json:"edges" required:"true"`
 }

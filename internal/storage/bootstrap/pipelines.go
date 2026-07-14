@@ -19,7 +19,6 @@ func DefaultPipeline(ctx context.Context, configStorage storage.ConfigStorage) e
 			"default",
 			`{
 				"version": 2,
-				"hasLayout": false,
 				"nodes": [
 					{
 						"id": "__builtin__source_direct",
