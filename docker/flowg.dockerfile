@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1.7-labs
 
 ARG DEBIAN_RELEASE="trixie"
+ARG DISTROLESS_RELEASE="debian13"
 
 ARG UPX_VERSION="4.2.4"
 ARG UPX_OS="linux"
@@ -123,24 +124,36 @@ RUN CGO_ENABLED=1 \
 RUN upx bin/*
 
 ##############################
+## STAGE RUNTIME FILESYSTEM
+##############################
+
+FROM debian:${DEBIAN_RELEASE}-slim AS staging
+ARG TARGETARCH
+
+COPY --from=sources-go /src/third-party/foundationdb/7.3.77 /tmp/foundationdb
+
+RUN set -ex && \
+    triplet="$(uname -m)-linux-gnu" && \
+    mkdir -p /staging/data "/staging/lib/${triplet}" && \
+    cp "/tmp/foundationdb/lib/linux/${TARGETARCH}/libfdb_c.so" "/staging/lib/${triplet}/libfdb_c.so" && \
+    cp "/usr/lib/${triplet}/libz.so.1" "/staging/lib/${triplet}/" && \
+    cp "/usr/lib/${triplet}/liblzma.so.5" "/staging/lib/${triplet}/" && \
+    chmod 0755 "/staging/lib/${triplet}"/* && \
+    cp -r /tmp/foundationdb/share/licenses /staging/licenses
+
+##############################
 ## FINAL ARTIFACT
 ##############################
 
-FROM debian:${DEBIAN_RELEASE}-slim AS runner
-ARG TARGETARCH
+FROM gcr.io/distroless/cc-${DISTROLESS_RELEASE}:latest AS runner
 
 COPY --from=builder-go /workspace/bin/flowg-server /usr/local/bin/flowg-server
 COPY --from=builder-go /workspace/bin/flowg-health /usr/local/bin/flowg-health
 
-COPY --from=builder-go /workspace/third-party/foundationdb/7.3.77/lib/linux/${TARGETARCH}/libfdb_c.so /usr/local/lib/libfdb_c.so
-COPY --from=builder-go /workspace/third-party/foundationdb/7.3.77/share/licenses /usr/local/share/licenses/foundationdb
-RUN set -ex && \
-    chmod 0755 /usr/local/lib/libfdb_c.so && \
-    ldconfig
+COPY --from=staging /staging/lib/ /usr/lib/
+COPY --from=staging /staging/licenses /usr/local/share/licenses/foundationdb
 
-RUN set -ex && \
-    mkdir -p /data && \
-    chown 10001:10001 /data
+COPY --from=staging --chown=10001:10001 /staging/data /data
 VOLUME /data
 USER 10001:10001
 
