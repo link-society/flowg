@@ -19,14 +19,11 @@ func DefaultPipeline(ctx context.Context, configStorage storage.ConfigStorage) e
 			"default",
 			`{
 				"version": 2,
+				"hasLayout": false,
 				"nodes": [
 					{
 						"id": "__builtin__source_direct",
 						"type": "source",
-						"position": {
-							"x": -45,
-							"y": 0
-						},
 						"data": {
 							"type": "direct"
 						}
@@ -34,10 +31,6 @@ func DefaultPipeline(ctx context.Context, configStorage storage.ConfigStorage) e
 					{
 						"id": "__builtin__source_syslog",
 						"type": "source",
-						"position": {
-							"x": -45,
-							"y": 120
-						},
 						"data": {
 							"type": "syslog"
 						}
@@ -45,10 +38,6 @@ func DefaultPipeline(ctx context.Context, configStorage storage.ConfigStorage) e
 					{
 						"id": "node-37da64b3-6243-4620-b0f2-ba484a71b053",
 						"type": "router",
-						"position": {
-							"x": 345,
-							"y": 60
-						},
 						"data": {
 							"stream": "default"
 						}
