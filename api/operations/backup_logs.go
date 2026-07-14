@@ -16,8 +16,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage/generic/kv"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
@@ -28,17 +29,6 @@ type BackupLogsDeps struct {
 
 	AuthStorage storage.AuthStorage
 	LogStorage  storage.LogStorage
-}
-
-// BackupLogsRequest is empty: the whole log database is exported.
-type BackupLogsRequest struct{}
-
-// BackupLogsResponse streams the log database snapshot to the client.
-//
-// It embeds the writer so the snapshot is streamed as a file download rather
-// than buffered in memory.
-type BackupLogsResponse struct {
-	usecase.OutputWithEmbeddedWriter
 }
 
 // NewBackupLogsUsecase streams a full snapshot of the log database as a
@@ -56,8 +46,8 @@ func NewBackupLogsUsecase(deps BackupLogsDeps) usecase.Interactor {
 			models.SCOPE_READ_STREAMS,
 			func(
 				ctx context.Context,
-				req BackupLogsRequest,
-				resp *BackupLogsResponse,
+				req schemas.BackupLogsRequest,
+				resp *schemas.BackupLogsResponse,
 			) error {
 				resp.Writer.(http.ResponseWriter).Header().Set("Content-Type", "application/octet-stream")
 				resp.Writer.(http.ResponseWriter).Header().Set("Content-Disposition", "attachment; filename=logs.db")

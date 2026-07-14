@@ -121,7 +121,7 @@ func traceNode(
 ) {
 	tracer := GetTracer(ctx)
 	if tracer != nil {
-		tracer.Trace = append(tracer.Trace, NodeTrace{
+		tracer.Trace = append(tracer.Trace, models.PipelineNodeTrace{
 			NodeID: nodeID,
 			Input:  input,
 			Output: output,

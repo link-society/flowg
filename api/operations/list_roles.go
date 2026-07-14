@@ -14,8 +14,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -24,17 +25,6 @@ type ListRolesDeps struct {
 	fx.In
 
 	AuthStorage storage.AuthStorage
-}
-
-// ListRolesRequest is empty: listing roles takes no parameters.
-type ListRolesRequest struct{}
-
-// ListRolesResponse carries every known role with its permissions.
-type ListRolesResponse struct {
-	// Success reports whether the listing completed.
-	Success bool `json:"success"`
-	// Roles holds every configured role and its granted permissions.
-	Roles []models.Role `json:"roles"`
 }
 
 // NewListRolesUsecase enumerates all configured roles with their permissions.
@@ -49,8 +39,8 @@ func NewListRolesUsecase(deps ListRolesDeps) usecase.Interactor {
 			models.SCOPE_READ_ACLS,
 			func(
 				ctx context.Context,
-				req ListRolesRequest,
-				resp *ListRolesResponse,
+				req schemas.ListRolesRequest,
+				resp *schemas.ListRolesResponse,
 			) error {
 				roles, err := deps.AuthStorage.ListRoles(ctx)
 				if err != nil {

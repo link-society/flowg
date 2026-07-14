@@ -14,8 +14,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -24,20 +25,6 @@ type GetUserDeps struct {
 	fx.In
 
 	AuthStorage storage.AuthStorage
-}
-
-// GetUserRequest identifies the user to retrieve.
-type GetUserRequest struct {
-	// Username is the name of the user to read.
-	Username string `path:"user" minLength:"1"`
-}
-
-// GetUserResponse carries the requested user account.
-type GetUserResponse struct {
-	// Success reports whether the user was found and returned.
-	Success bool `json:"success"`
-	// User is the account and its assigned roles.
-	User *models.User `json:"user"`
 }
 
 // NewGetUserUsecase returns a single user account along with its roles.
@@ -53,8 +40,8 @@ func NewGetUserUsecase(deps GetUserDeps) usecase.Interactor {
 			models.SCOPE_READ_ACLS,
 			func(
 				ctx context.Context,
-				req GetUserRequest,
-				resp *GetUserResponse,
+				req schemas.GetUserRequest,
+				resp *schemas.GetUserResponse,
 			) error {
 				user, err := deps.AuthStorage.FetchUser(ctx, req.Username)
 				if err != nil {

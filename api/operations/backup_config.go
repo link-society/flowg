@@ -16,8 +16,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage/generic/kv"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
@@ -28,18 +29,6 @@ type BackupConfigDeps struct {
 
 	AuthStorage   storage.AuthStorage
 	ConfigStorage storage.ConfigStorage
-}
-
-// BackupConfigRequest is empty: the whole configuration database is exported.
-type BackupConfigRequest struct{}
-
-// BackupConfigResponse streams the configuration database snapshot to the
-// client.
-//
-// It embeds the writer so the snapshot is streamed as a file download rather
-// than buffered in memory.
-type BackupConfigResponse struct {
-	usecase.OutputWithEmbeddedWriter
 }
 
 // NewBackupConfigUsecase streams a full snapshot of the configuration database
@@ -61,8 +50,8 @@ func NewBackupConfigUsecase(deps BackupConfigDeps) usecase.Interactor {
 			},
 			func(
 				ctx context.Context,
-				req BackupConfigRequest,
-				resp *BackupConfigResponse,
+				req schemas.BackupConfigRequest,
+				resp *schemas.BackupConfigResponse,
 			) error {
 				resp.Writer.(http.ResponseWriter).Header().Set("Content-Type", "application/octet-stream")
 				resp.Writer.(http.ResponseWriter).Header().Set("Content-Disposition", "attachment; filename=config.db")

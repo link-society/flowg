@@ -14,8 +14,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -25,20 +26,6 @@ type ConfigureStreamDeps struct {
 
 	AuthStorage storage.AuthStorage
 	LogStorage  storage.LogStorage
-}
-
-// ConfigureStreamRequest carries the stream name and its new configuration.
-type ConfigureStreamRequest struct {
-	// Stream is the name of the stream to configure.
-	Stream string `path:"stream" minLength:"1"`
-	// Config is the retention and indexing configuration to apply.
-	Config models.StreamConfig `json:"config" required:"true"`
-}
-
-// ConfigureStreamResponse reports the outcome of the configuration change.
-type ConfigureStreamResponse struct {
-	// Success reports whether the configuration was applied.
-	Success bool `json:"success"`
 }
 
 // NewConfigureStreamUsecase sets the retention and indexing configuration of a
@@ -54,8 +41,8 @@ func NewConfigureStreamUsecase(deps ConfigureStreamDeps) usecase.Interactor {
 			models.SCOPE_WRITE_STREAMS,
 			func(
 				ctx context.Context,
-				req ConfigureStreamRequest,
-				resp *ConfigureStreamResponse,
+				req schemas.ConfigureStreamRequest,
+				resp *schemas.ConfigureStreamResponse,
 			) error {
 				err := deps.LogStorage.ConfigureStream(ctx, req.Stream, req.Config)
 				if err != nil {

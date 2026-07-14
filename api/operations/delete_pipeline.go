@@ -14,8 +14,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -25,18 +26,6 @@ type DeletePipelineDeps struct {
 
 	AuthStorage   storage.AuthStorage
 	ConfigStorage storage.ConfigStorage
-}
-
-// DeletePipelineRequest identifies the pipeline to remove.
-type DeletePipelineRequest struct {
-	// Pipeline is the name of the pipeline to delete.
-	Pipeline string `path:"pipeline" minLength:"1"`
-}
-
-// DeletePipelineResponse reports the outcome of the deletion.
-type DeletePipelineResponse struct {
-	// Success reports whether the pipeline was removed.
-	Success bool `json:"success"`
 }
 
 // NewDeletePipelineUsecase removes a pipeline.
@@ -52,8 +41,8 @@ func NewDeletePipelineUsecase(deps DeletePipelineDeps) usecase.Interactor {
 			models.SCOPE_WRITE_PIPELINES,
 			func(
 				ctx context.Context,
-				req DeletePipelineRequest,
-				resp *DeletePipelineResponse,
+				req schemas.DeletePipelineRequest,
+				resp *schemas.DeletePipelineResponse,
 			) error {
 				err := deps.ConfigStorage.DeletePipeline(ctx, req.Pipeline)
 				if err != nil {

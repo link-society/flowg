@@ -14,8 +14,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -25,20 +26,6 @@ type GetStreamDeps struct {
 
 	AuthStorage storage.AuthStorage
 	LogStorage  storage.LogStorage
-}
-
-// GetStreamRequest identifies the stream whose configuration is requested.
-type GetStreamRequest struct {
-	// Stream is the name of the stream to read.
-	Stream string `path:"stream" minLength:"1"`
-}
-
-// GetStreamResponse carries the configuration of the requested stream.
-type GetStreamResponse struct {
-	// Success reports whether the configuration was returned.
-	Success bool `json:"success"`
-	// Config is the stream's retention and indexing configuration.
-	Config models.StreamConfig `json:"config"`
 }
 
 // NewGetStreamUsecase returns the configuration of a stream, creating it with
@@ -54,8 +41,8 @@ func NewGetStreamUsecase(deps GetStreamDeps) usecase.Interactor {
 			models.SCOPE_READ_STREAMS,
 			func(
 				ctx context.Context,
-				req GetStreamRequest,
-				resp *GetStreamResponse,
+				req schemas.GetStreamRequest,
+				resp *schemas.GetStreamResponse,
 			) error {
 				config, err := deps.LogStorage.GetOrCreateStreamConfig(ctx, req.Stream)
 				if err != nil {

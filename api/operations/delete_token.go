@@ -14,6 +14,7 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
+	"link-society.com/flowg/api/schemas"
 
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
@@ -23,18 +24,6 @@ type DeleteTokenDeps struct {
 	fx.In
 
 	AuthStorage storage.AuthStorage
-}
-
-// DeleteTokenRequest identifies the token to revoke.
-type DeleteTokenRequest struct {
-	// TokenUUID is the identifier of the caller's token to delete.
-	TokenUUID string `path:"token-uuid" format:"uuid"`
-}
-
-// DeleteTokenResponse reports the outcome of the revocation.
-type DeleteTokenResponse struct {
-	// Success reports whether the token was revoked.
-	Success bool `json:"success"`
 }
 
 // NewDeleteTokenUsecase revokes one of the calling user's personal access tokens.
@@ -47,8 +36,8 @@ func NewDeleteTokenUsecase(deps DeleteTokenDeps) usecase.Interactor {
 	u := usecase.NewInteractor(
 		func(
 			ctx context.Context,
-			req DeleteTokenRequest,
-			resp *DeleteTokenResponse,
+			req schemas.DeleteTokenRequest,
+			resp *schemas.DeleteTokenResponse,
 		) error {
 			user := auth.GetContextUser(ctx)
 

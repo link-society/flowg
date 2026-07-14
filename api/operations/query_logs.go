@@ -3,7 +3,6 @@ package operations
 import (
 	"context"
 	"log/slog"
-	"time"
 
 	"net/http"
 
@@ -15,10 +14,11 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/utils/langs/filtering"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
+	"link-society.com/flowg/internal/utils/langs/filtering"
 )
 
 // QueryStreamDeps lists the dependencies of [NewQueryStreamUsecase].
@@ -27,28 +27,6 @@ type QueryStreamDeps struct {
 
 	AuthStorage storage.AuthStorage
 	LogStorage  storage.LogStorage
-}
-
-// QueryStreamRequest describes a bounded search over a stream's logs.
-type QueryStreamRequest struct {
-	// Stream is the name of the stream to query.
-	Stream string `path:"stream" minLength:"1"`
-	// From is the inclusive lower bound of the time range.
-	From time.Time `query:"from" format:"date-time" required:"true"`
-	// To is the inclusive upper bound of the time range.
-	To time.Time `query:"to" format:"date-time" required:"true"`
-	// Filter is an optional filtering expression to match records against.
-	Filter *string `query:"filter"`
-	// Indexing narrows the search to specific values of indexed fields.
-	Indexing map[string][]string `query:"indexing" collectionFormat:"json"`
-}
-
-// QueryStreamResponse carries the records matching the query.
-type QueryStreamResponse struct {
-	// Success reports whether the query completed.
-	Success bool `json:"success"`
-	// Records holds the matching log records.
-	Records []models.LogRecord `json:"records"`
 }
 
 // NewQueryStreamUsecase retrieves the logs of a stream within a time range,
@@ -65,8 +43,8 @@ func NewQueryStreamUsecase(deps QueryStreamDeps) usecase.Interactor {
 			models.SCOPE_READ_STREAMS,
 			func(
 				ctx context.Context,
-				req QueryStreamRequest,
-				resp *QueryStreamResponse,
+				req schemas.QueryStreamRequest,
+				resp *schemas.QueryStreamResponse,
 			) error {
 				var filter filtering.Filter
 

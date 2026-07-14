@@ -11,8 +11,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/api/operations"
-
+	"link-society.com/flowg/api/schemas"
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
@@ -45,7 +44,7 @@ func NewAclUserListCommand() *cobra.Command {
 				return
 			}
 
-			var data operations.ListUsersResponse
+			var data schemas.ListUsersResponse
 			if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Failed to decode response: %v\n", err)
 				ExitCode = 1

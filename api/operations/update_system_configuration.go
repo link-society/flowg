@@ -14,8 +14,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -25,17 +26,6 @@ type UpdateSystemConfigurationDeps struct {
 
 	AuthStorage   storage.AuthStorage
 	ConfigStorage storage.ConfigStorage
-}
-
-// UpdateSystemConfigurationRequest is the new system configuration to store. It
-// aliases [models.SystemConfiguration] so the whole configuration is replaced
-// in one request.
-type UpdateSystemConfigurationRequest = models.SystemConfiguration
-
-// UpdateSystemConfigurationResponse reports the outcome of the update.
-type UpdateSystemConfigurationResponse = struct {
-	// Success reports whether the configuration was persisted.
-	Success bool `json:"success"`
 }
 
 // NewUpdateSystemConfigurationUsecase replaces the global system configuration.
@@ -50,8 +40,8 @@ func NewUpdateSystemConfigurationUsecase(deps UpdateSystemConfigurationDeps) use
 			models.SCOPE_WRITE_SYSTEM_CONFIGURATION,
 			func(
 				ctx context.Context,
-				req UpdateSystemConfigurationRequest,
-				resp *UpdateSystemConfigurationResponse,
+				req schemas.UpdateSystemConfigurationRequest,
+				resp *schemas.UpdateSystemConfigurationResponse,
 			) error {
 				err := deps.ConfigStorage.WriteSystemConfig(ctx, &req)
 				if err != nil {

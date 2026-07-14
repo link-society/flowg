@@ -14,8 +14,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -25,20 +26,6 @@ type GetForwarderDeps struct {
 
 	AuthStorage   storage.AuthStorage
 	ConfigStorage storage.ConfigStorage
-}
-
-// GetForwarderRequest identifies the forwarder to retrieve.
-type GetForwarderRequest struct {
-	// Forwarder is the name of the forwarder to read.
-	Forwarder string `path:"forwarder" minLength:"1"`
-}
-
-// GetForwarderResponse carries the definition of the requested forwarder.
-type GetForwarderResponse struct {
-	// Success reports whether the forwarder was found and returned.
-	Success bool `json:"success"`
-	// Forwarder is the forwarder's configuration.
-	Forwarder *models.ForwarderV2 `json:"forwarder"`
 }
 
 // NewGetForwarderUsecase returns the definition of a single forwarder.
@@ -54,8 +41,8 @@ func NewGetForwarderUsecase(deps GetForwarderDeps) usecase.Interactor {
 			models.SCOPE_READ_FORWARDERS,
 			func(
 				ctx context.Context,
-				req GetForwarderRequest,
-				resp *GetForwarderResponse,
+				req schemas.GetForwarderRequest,
+				resp *schemas.GetForwarderResponse,
 			) error {
 				forwarder, err := deps.ConfigStorage.ReadForwarder(ctx, req.Forwarder)
 				if err != nil {

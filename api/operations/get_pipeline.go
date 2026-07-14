@@ -14,8 +14,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -25,20 +26,6 @@ type GetPipelineDeps struct {
 
 	AuthStorage   storage.AuthStorage
 	ConfigStorage storage.ConfigStorage
-}
-
-// GetPipelineRequest identifies the pipeline to retrieve.
-type GetPipelineRequest struct {
-	// Pipeline is the name of the pipeline to read.
-	Pipeline string `path:"pipeline" minLength:"1"`
-}
-
-// GetPipelineResponse carries the flow graph of the requested pipeline.
-type GetPipelineResponse struct {
-	// Success reports whether the pipeline was found and returned.
-	Success bool `json:"success"`
-	// Flow is the pipeline's flow graph definition.
-	Flow *models.FlowGraphV2 `json:"flow"`
 }
 
 // NewGetPipelineUsecase returns the flow graph of a single pipeline.
@@ -54,8 +41,8 @@ func NewGetPipelineUsecase(deps GetPipelineDeps) usecase.Interactor {
 			models.SCOPE_READ_PIPELINES,
 			func(
 				ctx context.Context,
-				req GetPipelineRequest,
-				resp *GetPipelineResponse,
+				req schemas.GetPipelineRequest,
+				resp *schemas.GetPipelineResponse,
 			) error {
 				flowGraph, err := deps.ConfigStorage.ReadPipeline(ctx, req.Pipeline)
 				if err != nil {

@@ -14,8 +14,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -25,21 +26,6 @@ type GetStreamIndicesDeps struct {
 
 	AuthStorage storage.AuthStorage
 	LogStorage  storage.LogStorage
-}
-
-// GetStreamIndicesRequest identifies the stream whose index values are
-// requested.
-type GetStreamIndicesRequest struct {
-	// Stream is the name of the stream to inspect.
-	Stream string `path:"stream" minLength:"1"`
-}
-
-// GetStreamIndicesResponse carries the distinct values of each indexed field.
-type GetStreamIndicesResponse struct {
-	// Success reports whether the index values were returned.
-	Success bool `json:"success"`
-	// Indices maps each indexed field name to its known distinct values.
-	Indices map[string][]string `json:"indices"`
 }
 
 // NewGetStreamIndicesUsecase returns the distinct values held by each indexed
@@ -56,8 +42,8 @@ func NewGetStreamIndicesUsecase(deps GetStreamIndicesDeps) usecase.Interactor {
 			models.SCOPE_READ_STREAMS,
 			func(
 				ctx context.Context,
-				req GetStreamIndicesRequest,
-				resp *GetStreamIndicesResponse,
+				req schemas.GetStreamIndicesRequest,
+				resp *schemas.GetStreamIndicesResponse,
 			) error {
 				indices, err := deps.LogStorage.Distinct(ctx, req.Stream)
 				if err != nil {

@@ -14,8 +14,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -24,20 +25,6 @@ type SaveRoleDeps struct {
 	fx.In
 
 	AuthStorage storage.AuthStorage
-}
-
-// SaveRoleRequest carries the role name and the permissions to grant it.
-type SaveRoleRequest struct {
-	// Role is the name of the role to create or overwrite.
-	Role string `path:"role" minLength:"1"`
-	// Scopes are the names of the permissions to grant the role.
-	Scopes []string `json:"scopes" required:"true"`
-}
-
-// SaveRoleResponse reports the outcome of the save.
-type SaveRoleResponse struct {
-	// Success reports whether the role was persisted.
-	Success bool `json:"success"`
 }
 
 // NewSaveRoleUsecase creates or overwrites a role with a given set of permissions.
@@ -53,8 +40,8 @@ func NewSaveRoleUsecase(deps SaveRoleDeps) usecase.Interactor {
 			models.SCOPE_WRITE_ACLS,
 			func(
 				ctx context.Context,
-				req SaveRoleRequest,
-				resp *SaveRoleResponse,
+				req schemas.SaveRoleRequest,
+				resp *schemas.SaveRoleResponse,
 			) error {
 				scopes := make([]models.Scope, len(req.Scopes))
 

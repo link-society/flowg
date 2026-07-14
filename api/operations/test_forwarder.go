@@ -14,6 +14,7 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
+	"link-society.com/flowg/api/schemas"
 
 	"link-society.com/flowg/internal/engines/forwarders"
 	"link-society.com/flowg/internal/models"
@@ -26,21 +27,6 @@ type TestForwarderDeps struct {
 
 	AuthStorage   storage.AuthStorage
 	ConfigStorage storage.ConfigStorage
-}
-
-// TestForwarderRequest carries the forwarder name and a sample record to send
-// through it.
-type TestForwarderRequest struct {
-	// Forwarder is the name of the stored forwarder to exercise.
-	Forwarder string `path:"forwarder" minLength:"1"`
-	// Record is the sample log record to forward.
-	Record map[string]string `json:"record" required:"true"`
-}
-
-// TestForwarderResponse reports whether the trial delivery succeeded.
-type TestForwarderResponse struct {
-	// Success reports whether the record was delivered.
-	Success bool `json:"success"`
 }
 
 // NewTestForwarderUsecase delivers a sample record through a stored forwarder to
@@ -58,8 +44,8 @@ func NewTestForwarderUsecase(deps TestForwarderDeps) usecase.Interactor {
 			models.SCOPE_WRITE_FORWARDERS,
 			func(
 				ctx context.Context,
-				req TestForwarderRequest,
-				resp *TestForwarderResponse,
+				req schemas.TestForwarderRequest,
+				resp *schemas.TestForwarderResponse,
 			) error {
 				forwarder, err := deps.ConfigStorage.ReadForwarder(ctx, req.Forwarder)
 				if err != nil {

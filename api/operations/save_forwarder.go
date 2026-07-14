@@ -14,9 +14,10 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
+	"link-society.com/flowg/api/schemas"
+
 	"link-society.com/flowg/internal/engines/pipelines"
 	"link-society.com/flowg/internal/models"
-
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -27,20 +28,6 @@ type SaveForwarderDeps struct {
 	AuthStorage    storage.AuthStorage
 	ConfigStorage  storage.ConfigStorage
 	PipelineRunner pipelines.Runner
-}
-
-// SaveForwarderRequest carries the forwarder name and its new definition.
-type SaveForwarderRequest struct {
-	// Forwarder is the name of the forwarder to create or overwrite.
-	Forwarder string `path:"forwarder" minLength:"1"`
-	// Config is the forwarder definition to store under that name.
-	Config models.ForwarderV2 `json:"forwarder" required:"true"`
-}
-
-// SaveForwarderResponse reports the outcome of the save.
-type SaveForwarderResponse struct {
-	// Success reports whether the forwarder was persisted.
-	Success bool `json:"success"`
 }
 
 // NewSaveForwarderUsecase creates or overwrites a forwarder.
@@ -57,8 +44,8 @@ func NewSaveForwarderUsecase(deps SaveForwarderDeps) usecase.Interactor {
 			models.SCOPE_WRITE_FORWARDERS,
 			func(
 				ctx context.Context,
-				req SaveForwarderRequest,
-				resp *SaveForwarderResponse,
+				req schemas.SaveForwarderRequest,
+				resp *schemas.SaveForwarderResponse,
 			) error {
 				err := deps.ConfigStorage.WriteForwarder(ctx, req.Forwarder, &req.Config)
 				if err != nil {

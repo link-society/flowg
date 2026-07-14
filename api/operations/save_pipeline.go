@@ -14,9 +14,10 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
+	"link-society.com/flowg/api/schemas"
+
 	"link-society.com/flowg/internal/engines/pipelines"
 	"link-society.com/flowg/internal/models"
-
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -27,20 +28,6 @@ type SavePipelineDeps struct {
 	AuthStorage    storage.AuthStorage
 	ConfigStorage  storage.ConfigStorage
 	PipelineRunner pipelines.Runner
-}
-
-// SavePipelineRequest carries the pipeline name and its new flow graph.
-type SavePipelineRequest struct {
-	// Pipeline is the name of the pipeline to create or overwrite.
-	Pipeline string `path:"pipeline" minLength:"1"`
-	// Flow is the flow graph to store under that name.
-	Flow models.FlowGraphV2 `json:"flow" required:"true"`
-}
-
-// SavePipelineResponse reports the outcome of the save.
-type SavePipelineResponse struct {
-	// Success reports whether the pipeline was persisted.
-	Success bool `json:"success"`
 }
 
 // NewSavePipelineUsecase creates or overwrites a pipeline.
@@ -56,8 +43,8 @@ func NewSavePipelineUsecase(deps SavePipelineDeps) usecase.Interactor {
 			models.SCOPE_WRITE_PIPELINES,
 			func(
 				ctx context.Context,
-				req SavePipelineRequest,
-				resp *SavePipelineResponse,
+				req schemas.SavePipelineRequest,
+				resp *schemas.SavePipelineResponse,
 			) error {
 				if err := deps.ConfigStorage.WritePipeline(ctx, req.Pipeline, &req.Flow); err != nil {
 					logger.ErrorContext(

@@ -14,6 +14,8 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
+	"link-society.com/flowg/api/schemas"
+
 	applog "link-society.com/flowg/internal/app/logging"
 	"link-society.com/flowg/internal/engines/pipelines"
 	"link-society.com/flowg/internal/models"
@@ -27,22 +29,6 @@ type IngestLogsStructDeps struct {
 
 	AuthStorage    storage.AuthStorage
 	PipelineRunner pipelines.Runner
-}
-
-// IngestLogsStructRequest carries structured records to push through a pipeline.
-type IngestLogsStructRequest struct {
-	// Pipeline is the name of the pipeline to run the records through.
-	Pipeline string `path:"pipeline" minLength:"1"`
-	// Records are the structured log records to ingest.
-	Records []map[string]string `json:"records" required:"true"`
-}
-
-// IngestLogsStructResponse reports how many records were processed.
-type IngestLogsStructResponse struct {
-	// Success reports whether every record was processed.
-	Success bool `json:"success"`
-	// ProcessedCount is the number of records that ran through the pipeline.
-	ProcessedCount int `json:"processed_count"`
 }
 
 // NewIngestLogsStructUsecase pushes structured log records through a pipeline.
@@ -60,8 +46,8 @@ func NewIngestLogsStructUsecase(deps IngestLogsStructDeps) usecase.Interactor {
 			models.SCOPE_SEND_LOGS,
 			func(
 				ctx context.Context,
-				req IngestLogsStructRequest,
-				resp *IngestLogsStructResponse,
+				req *schemas.IngestLogsStructRequest,
+				resp *schemas.IngestLogsStructResponse,
 			) error {
 				applog.MarkSensitive(ctx)
 

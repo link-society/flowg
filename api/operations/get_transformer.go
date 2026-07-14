@@ -15,8 +15,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -26,20 +27,6 @@ type GetTransformerDeps struct {
 
 	AuthStorage   storage.AuthStorage
 	ConfigStorage storage.ConfigStorage
-}
-
-// GetTransformerRequest identifies the transformer to retrieve.
-type GetTransformerRequest struct {
-	// Transformer is the name of the transformer to read.
-	Transformer string `path:"transformer" minLength:"1"`
-}
-
-// GetTransformerResponse carries the source of the requested transformer.
-type GetTransformerResponse struct {
-	// Success reports whether the transformer was found and returned.
-	Success bool `json:"success"`
-	// Script is the VRL source code of the transformer.
-	Script string `json:"script"`
 }
 
 // NewGetTransformerUsecase returns the source code of a single transformer.
@@ -55,8 +42,8 @@ func NewGetTransformerUsecase(deps GetTransformerDeps) usecase.Interactor {
 			models.SCOPE_READ_TRANSFORMERS,
 			func(
 				ctx context.Context,
-				req GetTransformerRequest,
-				resp *GetTransformerResponse,
+				req schemas.GetTransformerRequest,
+				resp *schemas.GetTransformerResponse,
 			) error {
 				script, err := deps.ConfigStorage.ReadTransformer(ctx, req.Transformer)
 				if err != nil {
