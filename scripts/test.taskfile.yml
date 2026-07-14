@@ -54,8 +54,19 @@ tasks:
 
   "test:unit:go":
     internal: true
+    vars:
+      GOOS:
+        sh: go env GOOS
+      GOARCH:
+        sh: go env GOARCH
+      FDB: "{{ .ROOT_DIR }}/third-party/foundationdb/7.3.77"
+      RPATH: '{{ if eq .GOOS "darwin" }}@loader_path/../lib{{ else }}$ORIGIN/../lib{{ end }}'
     cmds:
       - go test -timeout 500ms -v -bench=. ./...
+    env:
+      CGO_ENABLED: "1"
+      CGO_CFLAGS: "-I{{ .FDB }}/include"
+      CGO_LDFLAGS: "-L{{ .FDB }}/lib/{{ .GOOS }}/{{ .GOARCH }} -Wl,-rpath,{{ .RPATH }}"
 
   "test:unit:rust:vrl":
     internal: true
