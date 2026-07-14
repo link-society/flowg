@@ -1,21 +1,5 @@
 package models
 
-import (
-	"context"
-	"fmt"
-
-	"encoding/json"
-
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/credentials"
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
-)
-
-type forwarderStateAwsCloudWatchV2 struct {
-	client *cloudwatchlogs.Client
-}
-
 // ForwarderAwsCloudWatchV2 forwards records to an AWS CloudWatch Logs stream,
 // authenticating with static credentials.
 type ForwarderAwsCloudWatchV2 struct {
@@ -31,53 +15,4 @@ type ForwarderAwsCloudWatchV2 struct {
 
 	Group  string `json:"group" required:"true"`
 	Stream string `json:"stream" required:"true"`
-
-	state *forwarderStateAwsCloudWatchV2
-}
-
-func (f *ForwarderAwsCloudWatchV2) init(ctx context.Context) error {
-	cfg, err := config.LoadDefaultConfig(ctx,
-		config.WithCredentialsProvider(
-			credentials.NewStaticCredentialsProvider(f.AccessKeyID, f.SecretAccessKey, f.SessionToken),
-		),
-	)
-
-	if err != nil {
-		return fmt.Errorf("failed to acquire credentials: %w", err)
-	}
-
-	f.state = &forwarderStateAwsCloudWatchV2{
-		client: cloudwatchlogs.New(cloudwatchlogs.Options{
-			AppID:        f.AppID,
-			BaseEndpoint: &f.Endpoint,
-			Credentials:  cfg.Credentials,
-			Region:       f.Region,
-		}),
-	}
-
-	return nil
-}
-
-func (f *ForwarderAwsCloudWatchV2) close(context.Context) error {
-	return nil
-}
-
-func (f *ForwarderAwsCloudWatchV2) call(ctx context.Context, record *LogRecord) error {
-	message, err := json.Marshal(record.Fields)
-	if err != nil {
-		return fmt.Errorf("failed to marshal record: %w", err)
-	}
-
-	event := types.InputLogEvent{
-		Message:   new(string(message)),
-		Timestamp: new(record.Timestamp.Unix()),
-	}
-
-	_, err = f.state.client.PutLogEvents(ctx, &cloudwatchlogs.PutLogEventsInput{
-		LogEvents:     []types.InputLogEvent{event},
-		LogGroupName:  &f.Group,
-		LogStreamName: &f.Stream,
-	})
-
-	return err
 }

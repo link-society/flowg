@@ -1,4 +1,4 @@
-package models_test
+package forwarders_test
 
 import (
 	"testing"
@@ -10,6 +10,7 @@ import (
 
 	"github.com/swaggest/jsonschema-go"
 
+	"link-society.com/flowg/internal/engines/forwarders"
 	"link-society.com/flowg/internal/models"
 )
 
@@ -42,7 +43,7 @@ func TestDynamicField_JSONSchemaShape(t *testing.T) {
 }
 
 func TestCompileDynamicField_Static(t *testing.T) {
-	prog, err := models.CompileDynamicField("foobar")
+	prog, err := forwarders.CompileDynamicField("foobar")
 	if err != nil {
 		t.Fatalf("failed to compile dynamic field: %v", err)
 	}
@@ -59,7 +60,7 @@ func TestCompileDynamicField_Static(t *testing.T) {
 }
 
 func TestCompileDynamicField_Expression(t *testing.T) {
-	prog, err := models.CompileDynamicField("@expr:foo")
+	prog, err := forwarders.CompileDynamicField("@expr:foo")
 	if err != nil {
 		t.Fatalf("failed to compile dynamic field: %v", err)
 	}

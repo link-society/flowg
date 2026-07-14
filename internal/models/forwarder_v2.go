@@ -1,7 +1,6 @@
 package models
 
 import (
-	"context"
 	"fmt"
 
 	"encoding/json"
@@ -47,97 +46,6 @@ func (ForwarderConfigV2) JSONSchemaOneOf() []any {
 		ForwarderAwsCloudWatchV2{},
 		ForwarderGoogleCloudLoggingV2{},
 		ForwarderAzureMonitorV2{},
-	}
-}
-
-// Init prepares the active backend (e.g. opens a connection pool) before any
-// record is forwarded.
-func (f *ForwarderV2) Init(ctx context.Context) error {
-	switch {
-	case f.Config.Http != nil:
-		return f.Config.Http.init(ctx)
-	case f.Config.Splunk != nil:
-		return f.Config.Splunk.init(ctx)
-	case f.Config.Syslog != nil:
-		return f.Config.Syslog.init(ctx)
-	case f.Config.Datadog != nil:
-		return f.Config.Datadog.init(ctx)
-	case f.Config.Amqp != nil:
-		return f.Config.Amqp.init(ctx)
-	case f.Config.Otlp != nil:
-		return f.Config.Otlp.init(ctx)
-	case f.Config.Elastic != nil:
-		return f.Config.Elastic.init(ctx)
-	case f.Config.Clickhouse != nil:
-		return f.Config.Clickhouse.init(ctx)
-	case f.Config.AwsCloudWatch != nil:
-		return f.Config.AwsCloudWatch.init(ctx)
-	case f.Config.GoogleCloudLogging != nil:
-		return f.Config.GoogleCloudLogging.init(ctx)
-	case f.Config.AzureMonitor != nil:
-		return f.Config.AzureMonitor.init(ctx)
-	default:
-		return fmt.Errorf("unsupported forwarder type")
-	}
-}
-
-// Close releases whatever the active backend acquired in Init.
-func (f *ForwarderV2) Close(ctx context.Context) error {
-	switch {
-	case f.Config.Http != nil:
-		return f.Config.Http.close(ctx)
-	case f.Config.Splunk != nil:
-		return f.Config.Splunk.close(ctx)
-	case f.Config.Syslog != nil:
-		return f.Config.Syslog.close(ctx)
-	case f.Config.Datadog != nil:
-		return f.Config.Datadog.close(ctx)
-	case f.Config.Amqp != nil:
-		return f.Config.Amqp.close(ctx)
-	case f.Config.Otlp != nil:
-		return f.Config.Otlp.close(ctx)
-	case f.Config.Elastic != nil:
-		return f.Config.Elastic.close(ctx)
-	case f.Config.Clickhouse != nil:
-		return f.Config.Clickhouse.close(ctx)
-	case f.Config.AwsCloudWatch != nil:
-		return f.Config.AwsCloudWatch.close(ctx)
-	case f.Config.GoogleCloudLogging != nil:
-		return f.Config.GoogleCloudLogging.close(ctx)
-	case f.Config.AzureMonitor != nil:
-		return f.Config.AzureMonitor.close(ctx)
-	default:
-		return fmt.Errorf("unsupported forwarder type")
-	}
-}
-
-// Call forwards a single record to the active backend.
-func (f *ForwarderV2) Call(ctx context.Context, record *LogRecord) error {
-	switch {
-	case f.Config.Http != nil:
-		return f.Config.Http.call(ctx, record)
-	case f.Config.Splunk != nil:
-		return f.Config.Splunk.call(ctx, record)
-	case f.Config.Syslog != nil:
-		return f.Config.Syslog.call(ctx, record)
-	case f.Config.Datadog != nil:
-		return f.Config.Datadog.call(ctx, record)
-	case f.Config.Amqp != nil:
-		return f.Config.Amqp.call(ctx, record)
-	case f.Config.Otlp != nil:
-		return f.Config.Otlp.call(ctx, record)
-	case f.Config.Elastic != nil:
-		return f.Config.Elastic.call(ctx, record)
-	case f.Config.Clickhouse != nil:
-		return f.Config.Clickhouse.call(ctx, record)
-	case f.Config.AwsCloudWatch != nil:
-		return f.Config.AwsCloudWatch.call(ctx, record)
-	case f.Config.GoogleCloudLogging != nil:
-		return f.Config.GoogleCloudLogging.call(ctx, record)
-	case f.Config.AzureMonitor != nil:
-		return f.Config.AzureMonitor.call(ctx, record)
-	default:
-		return fmt.Errorf("unsupported forwarder type")
 	}
 }
 
