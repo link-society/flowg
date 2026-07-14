@@ -9,6 +9,7 @@ import ForwarderConfigModel, {
 
 import ForwarderEditorAmqp from '@/components/ForwarderEditorAmqp/component'
 import ForwarderEditorAwsloudWatch from '@/components/ForwarderEditorAwsCloudWatch/component.tsx'
+import ForwarderEditorAzureMonitor from '@/components/ForwarderEditorAzureMonitor/component'
 import ForwarderEditorClickhouse from '@/components/ForwarderEditorClickhouse/component'
 import ForwarderEditorDatadog from '@/components/ForwarderEditorDatadog/component'
 import ForwarderEditorElastic from '@/components/ForwarderEditorElastic/component'
@@ -32,6 +33,7 @@ const editors = {
   syslog: ForwarderEditorSyslog,
   awscloudwatch: ForwarderEditorAwsloudWatch,
   googlecloudlogging: ForwarderEditorGoogleCloudLogging,
+  azuremonitor: ForwarderEditorAzureMonitor,
 }
 
 const ForwarderEditor = ({
