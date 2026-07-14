@@ -5,7 +5,6 @@ import (
 	"errors"
 	"log/slog"
 
-	"mime/multipart"
 	"net/http"
 
 	"go.uber.org/fx"
@@ -16,8 +15,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage/generic/kv"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
@@ -28,19 +28,6 @@ type RestoreConfigDeps struct {
 
 	AuthStorage   storage.AuthStorage
 	ConfigStorage storage.ConfigStorage
-}
-
-// RestoreConfigRequest carries the configuration database snapshot to load.
-type RestoreConfigRequest struct {
-	// Backup is the uploaded snapshot, as produced by
-	// [NewBackupConfigUsecase].
-	Backup multipart.File `formData:"backup"`
-}
-
-// RestoreConfigResponse reports the outcome of the restore.
-type RestoreConfigResponse struct {
-	// Success reports whether the snapshot was loaded.
-	Success bool `json:"success"`
 }
 
 // NewRestoreConfigUsecase loads a previously exported configuration database
@@ -61,8 +48,8 @@ func NewRestoreConfigUsecase(deps RestoreConfigDeps) usecase.Interactor {
 			},
 			func(
 				ctx context.Context,
-				req RestoreConfigRequest,
-				resp *RestoreConfigResponse,
+				req schemas.RestoreConfigRequest,
+				resp *schemas.RestoreConfigResponse,
 			) error {
 				defer req.Backup.Close()
 

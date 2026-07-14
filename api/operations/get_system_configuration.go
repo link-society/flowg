@@ -14,8 +14,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -25,17 +26,6 @@ type GetSystemConfigurationDeps struct {
 
 	AuthStorage   storage.AuthStorage
 	ConfigStorage storage.ConfigStorage
-}
-
-// GetSystemConfigurationRequest is empty: the system configuration is global.
-type GetSystemConfigurationRequest struct{}
-
-// GetSystemConfigurationResponse carries the current system configuration.
-type GetSystemConfigurationResponse = struct {
-	// Success reports whether the configuration was returned.
-	Success bool `json:"success"`
-	// Configuration is the current global system configuration.
-	Configuration models.SystemConfiguration `json:"configuration"`
 }
 
 // NewGetSystemConfigurationUsecase returns the global system configuration.
@@ -50,8 +40,8 @@ func NewGetSystemConfigurationUsecase(deps GetSystemConfigurationDeps) usecase.I
 			models.SCOPE_READ_SYSTEM_CONFIGURATION,
 			func(
 				ctx context.Context,
-				req GetSystemConfigurationRequest,
-				resp *GetSystemConfigurationResponse,
+				req schemas.GetSystemConfigurationRequest,
+				resp *schemas.GetSystemConfigurationResponse,
 			) error {
 				conf, err := deps.ConfigStorage.ReadSystemConfig(ctx)
 				if err != nil {

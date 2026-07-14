@@ -15,6 +15,7 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
+	"link-society.com/flowg/api/schemas"
 
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
@@ -24,22 +25,6 @@ type LoginDeps struct {
 	fx.In
 
 	AuthStorage storage.AuthStorage
-}
-
-// LoginRequest carries the credentials presented for authentication.
-type LoginRequest struct {
-	// Username is the account name to authenticate.
-	Username string `json:"username" required:"true"`
-	// Password is the account's password.
-	Password string `json:"password" required:"true"`
-}
-
-// LoginResponse carries the session token issued on success.
-type LoginResponse struct {
-	// Success reports whether authentication succeeded.
-	Success bool `json:"success"`
-	// Token is a JWT proving the caller's identity on subsequent requests.
-	Token string `json:"token"`
 }
 
 // NewLoginUsecase authenticates a user by password and issues a session token.
@@ -53,8 +38,8 @@ func NewLoginUsecase(deps LoginDeps) usecase.Interactor {
 	u := usecase.NewInteractor(
 		func(
 			ctx context.Context,
-			req LoginRequest,
-			resp *LoginResponse,
+			req schemas.LoginRequest,
+			resp *schemas.LoginResponse,
 		) error {
 			switch valid, err := deps.AuthStorage.VerifyUserPassword(ctx, req.Username, req.Password); {
 			case err != nil:

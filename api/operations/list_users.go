@@ -14,8 +14,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -24,17 +25,6 @@ type ListUsersDeps struct {
 	fx.In
 
 	AuthStorage storage.AuthStorage
-}
-
-// ListUsersRequest is empty: listing users takes no parameters.
-type ListUsersRequest struct{}
-
-// ListUsersResponse carries every known user with its roles.
-type ListUsersResponse struct {
-	// Success reports whether the listing completed.
-	Success bool `json:"success"`
-	// Users holds every account and its assigned roles.
-	Users []models.User `json:"users"`
 }
 
 // NewListUsersUsecase enumerates all user accounts with their roles.
@@ -49,8 +39,8 @@ func NewListUsersUsecase(deps ListUsersDeps) usecase.Interactor {
 			models.SCOPE_READ_ACLS,
 			func(
 				ctx context.Context,
-				req ListUsersRequest,
-				resp *ListUsersResponse,
+				req schemas.ListUsersRequest,
+				resp *schemas.ListUsersResponse,
 			) error {
 				users, err := deps.AuthStorage.ListUsers(ctx)
 				if err != nil {

@@ -14,10 +14,11 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/utils/langs/vrl"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
+	"link-society.com/flowg/internal/utils/langs/vrl"
 )
 
 // TestTransformerDeps lists the dependencies of [NewTestTransformerUsecase].
@@ -25,23 +26,6 @@ type TestTransformerDeps struct {
 	fx.In
 
 	AuthStorage storage.AuthStorage
-}
-
-// TestTransformerRequest carries the transformer source and a sample record to
-// run it against.
-type TestTransformerRequest struct {
-	// Code is the VRL source to evaluate, without persisting it.
-	Code string `json:"code" required:"true"`
-	// Record is the input log record fed to the transformer.
-	Record map[string]string `json:"record" required:"true"`
-}
-
-// TestTransformerResponse carries the records produced by the trial run.
-type TestTransformerResponse struct {
-	// Success reports whether the script compiled and ran.
-	Success bool `json:"success"`
-	// Records holds the output records emitted by the transformer.
-	Records []map[string]string `json:"records"`
 }
 
 // NewTestTransformerUsecase evaluates a transformer against a sample record
@@ -61,8 +45,8 @@ func NewTestTransformerUsecase(deps TestTransformerDeps) usecase.Interactor {
 			models.SCOPE_READ_TRANSFORMERS,
 			func(
 				ctx context.Context,
-				req TestTransformerRequest,
-				resp *TestTransformerResponse,
+				req schemas.TestTransformerRequest,
+				resp *schemas.TestTransformerResponse,
 			) error {
 				runner, err := vrl.NewScriptRunner(req.Code)
 				if err != nil {

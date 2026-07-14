@@ -14,8 +14,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -25,18 +26,6 @@ type DeleteForwarderDeps struct {
 
 	AuthStorage   storage.AuthStorage
 	ConfigStorage storage.ConfigStorage
-}
-
-// DeleteForwarderRequest identifies the forwarder to remove.
-type DeleteForwarderRequest struct {
-	// Forwarder is the name of the forwarder to delete.
-	Forwarder string `path:"forwarder" minLength:"1"`
-}
-
-// DeleteForwarderResponse reports the outcome of the deletion.
-type DeleteForwarderResponse struct {
-	// Success reports whether the forwarder was removed.
-	Success bool `json:"success"`
 }
 
 // NewDeleteForwarderUsecase removes a forwarder.
@@ -52,8 +41,8 @@ func NewDeleteForwarderUsecase(deps DeleteForwarderDeps) usecase.Interactor {
 			models.SCOPE_WRITE_FORWARDERS,
 			func(
 				ctx context.Context,
-				req DeleteForwarderRequest,
-				resp *DeleteForwarderResponse,
+				req schemas.DeleteForwarderRequest,
+				resp *schemas.DeleteForwarderResponse,
 			) error {
 				err := deps.ConfigStorage.DeleteForwarder(ctx, req.Forwarder)
 				if err != nil {

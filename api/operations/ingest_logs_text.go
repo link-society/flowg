@@ -16,6 +16,8 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
+	"link-society.com/flowg/api/schemas"
+
 	applog "link-society.com/flowg/internal/app/logging"
 	"link-society.com/flowg/internal/engines/pipelines"
 	"link-society.com/flowg/internal/models"
@@ -29,22 +31,6 @@ type IngestLogsTextDeps struct {
 
 	AuthStorage    storage.AuthStorage
 	PipelineRunner pipelines.Runner
-}
-
-// IngestLogsTextRequest carries a plain-text body to push through a pipeline.
-type IngestLogsTextRequest struct {
-	// Pipeline is the name of the pipeline to run the lines through.
-	Pipeline string `path:"pipeline" minLength:"1"`
-	// TextBody is the raw text payload; each non-empty line becomes one record.
-	TextBody string `contentType:"text/plain"`
-}
-
-// IngestLogsTextResponse reports how many lines were processed.
-type IngestLogsTextResponse struct {
-	// Success reports whether every line was processed.
-	Success bool `json:"success"`
-	// ProcessedCount is the number of lines that ran through the pipeline.
-	ProcessedCount int `json:"processed_count"`
 }
 
 // NewIngestLogsTextUsecase ingests a plain-text payload, treating each non-empty
@@ -63,8 +49,8 @@ func NewIngestLogsTextUsecase(deps IngestLogsTextDeps) usecase.Interactor {
 			models.SCOPE_SEND_LOGS,
 			func(
 				ctx context.Context,
-				req IngestLogsTextRequest,
-				resp *IngestLogsTextResponse,
+				req schemas.IngestLogsTextRequest,
+				resp *schemas.IngestLogsTextResponse,
 			) error {
 				applog.MarkSensitive(ctx)
 

@@ -14,8 +14,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -25,18 +26,6 @@ type DeleteTransformerDeps struct {
 
 	AuthStorage   storage.AuthStorage
 	ConfigStorage storage.ConfigStorage
-}
-
-// DeleteTransformerRequest identifies the transformer to remove.
-type DeleteTransformerRequest struct {
-	// Transformer is the name of the transformer to delete.
-	Transformer string `path:"transformer" minLength:"1"`
-}
-
-// DeleteTransformerResponse reports the outcome of the deletion.
-type DeleteTransformerResponse struct {
-	// Success reports whether the transformer was removed.
-	Success bool `json:"success"`
 }
 
 // NewDeleteTransformerUsecase removes a transformer.
@@ -52,8 +41,8 @@ func NewDeleteTransformerUsecase(deps DeleteTransformerDeps) usecase.Interactor 
 			models.SCOPE_WRITE_TRANSFORMERS,
 			func(
 				ctx context.Context,
-				req DeleteTransformerRequest,
-				resp *DeleteTransformerResponse,
+				req schemas.DeleteTransformerRequest,
+				resp *schemas.DeleteTransformerResponse,
 			) error {
 				err := deps.ConfigStorage.DeleteTransformer(ctx, req.Transformer)
 				if err != nil {

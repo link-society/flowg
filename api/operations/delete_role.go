@@ -14,8 +14,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -24,18 +25,6 @@ type DeleteRoleDeps struct {
 	fx.In
 
 	AuthStorage storage.AuthStorage
-}
-
-// DeleteRoleRequest identifies the role to remove.
-type DeleteRoleRequest struct {
-	// Role is the name of the role to delete.
-	Role string `path:"role" minLength:"1"`
-}
-
-// DeleteRoleResponse reports the outcome of the deletion.
-type DeleteRoleResponse struct {
-	// Success reports whether the role was removed.
-	Success bool `json:"success"`
 }
 
 // NewDeleteRoleUsecase removes a role.
@@ -51,8 +40,8 @@ func NewDeleteRoleUsecase(deps DeleteRoleDeps) usecase.Interactor {
 			models.SCOPE_WRITE_ACLS,
 			func(
 				ctx context.Context,
-				req DeleteRoleRequest,
-				resp *DeleteRoleResponse,
+				req schemas.DeleteRoleRequest,
+				resp *schemas.DeleteRoleResponse,
 			) error {
 				err := deps.AuthStorage.DeleteRole(ctx, req.Role)
 				if err != nil {

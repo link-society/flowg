@@ -16,8 +16,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage/generic/kv"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
@@ -27,17 +28,6 @@ type BackupAuthDeps struct {
 	fx.In
 
 	AuthStorage storage.AuthStorage
-}
-
-// BackupAuthRequest is empty: the whole authentication database is exported.
-type BackupAuthRequest struct{}
-
-// BackupAuthResponse streams the authentication database snapshot to the client.
-//
-// It embeds the writer so the snapshot is streamed as a file download rather
-// than buffered in memory.
-type BackupAuthResponse struct {
-	usecase.OutputWithEmbeddedWriter
 }
 
 // NewBackupAuthUsecase streams a full snapshot of the authentication database as a
@@ -55,8 +45,8 @@ func NewBackupAuthUsecase(deps BackupAuthDeps) usecase.Interactor {
 			models.SCOPE_READ_ACLS,
 			func(
 				ctx context.Context,
-				req BackupAuthRequest,
-				resp *BackupAuthResponse,
+				req schemas.BackupAuthRequest,
+				resp *schemas.BackupAuthResponse,
 			) error {
 				resp.Writer.(http.ResponseWriter).Header().Set("Content-Type", "application/octet-stream")
 				resp.Writer.(http.ResponseWriter).Header().Set("Content-Disposition", "attachment; filename=auth.db")

@@ -14,6 +14,7 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
+	"link-society.com/flowg/api/schemas"
 
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
@@ -23,19 +24,6 @@ type CreateTokenDeps struct {
 	fx.In
 
 	AuthStorage storage.AuthStorage
-}
-
-// CreateTokenRequest is empty: the token is issued for the calling user.
-type CreateTokenRequest struct{}
-
-// CreateTokenResponse carries the newly issued personal access token.
-type CreateTokenResponse struct {
-	// Success reports whether the token was created.
-	Success bool `json:"success"`
-	// Token is the secret value, returned only once at creation time.
-	Token string `json:"token"`
-	// TokenUUID identifies the token for later listing or deletion.
-	TokenUUID string `json:"token_uuid"`
 }
 
 // NewCreateTokenUsecase issues a new personal access token for the calling user.
@@ -49,8 +37,8 @@ func NewCreateTokenUsecase(deps CreateTokenDeps) usecase.Interactor {
 	u := usecase.NewInteractor(
 		func(
 			ctx context.Context,
-			req CreateTokenRequest,
-			resp *CreateTokenResponse,
+			req schemas.CreateTokenRequest,
+			resp *schemas.CreateTokenResponse,
 		) error {
 			user := auth.GetContextUser(ctx)
 

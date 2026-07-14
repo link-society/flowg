@@ -14,8 +14,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -24,18 +25,6 @@ type DeleteUserDeps struct {
 	fx.In
 
 	AuthStorage storage.AuthStorage
-}
-
-// DeleteUserRequest identifies the user to remove.
-type DeleteUserRequest struct {
-	// User is the name of the account to delete.
-	User string `path:"user" minLength:"1"`
-}
-
-// DeleteUserResponse reports the outcome of the deletion.
-type DeleteUserResponse struct {
-	// Success reports whether the user was removed.
-	Success bool `json:"success"`
 }
 
 // NewDeleteUserUsecase removes a user account.
@@ -51,8 +40,8 @@ func NewDeleteUserUsecase(deps DeleteUserDeps) usecase.Interactor {
 			models.SCOPE_WRITE_ACLS,
 			func(
 				ctx context.Context,
-				req DeleteUserRequest,
-				resp *DeleteUserResponse,
+				req schemas.DeleteUserRequest,
+				resp *schemas.DeleteUserResponse,
 			) error {
 				err := deps.AuthStorage.DeleteUser(ctx, req.User)
 				if err != nil {

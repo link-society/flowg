@@ -15,7 +15,7 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 
-	"link-society.com/flowg/api/operations"
+	"link-society.com/flowg/api/schemas"
 	"link-society.com/flowg/cmd/flowg-client/utils"
 )
 
@@ -93,7 +93,7 @@ func NewLoginCommand() *cobra.Command {
 				return
 			}
 
-			var data operations.LoginResponse
+			var data schemas.LoginResponse
 			if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: Failed to decode response: %v\n", err)
 				ExitCode = 1

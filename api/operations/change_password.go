@@ -15,8 +15,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	applog "link-society.com/flowg/internal/app/logging"
+	"link-society.com/flowg/api/schemas"
 
+	applog "link-society.com/flowg/internal/app/logging"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -25,21 +26,6 @@ type ChangePasswordDeps struct {
 	fx.In
 
 	AuthStorage storage.AuthStorage
-}
-
-// ChangePasswordRequest carries the caller's current and desired passwords.
-type ChangePasswordRequest struct {
-	// OldPassword is the caller's current password, required to authorize the
-	// change.
-	OldPassword string `json:"old_password" required:"true" minLength:"1"`
-	// NewPassword is the password to set.
-	NewPassword string `json:"new_password" required:"true" minLength:"1"`
-}
-
-// ChangePasswordResponse reports the outcome of the change.
-type ChangePasswordResponse struct {
-	// Success reports whether the password was updated.
-	Success bool `json:"success"`
 }
 
 // NewChangePasswordUsecase lets the authenticated user change their own password.
@@ -55,8 +41,8 @@ func NewChangePasswordUsecase(deps ChangePasswordDeps) usecase.Interactor {
 	u := usecase.NewInteractor(
 		func(
 			ctx context.Context,
-			req ChangePasswordRequest,
-			resp *ChangePasswordResponse,
+			req schemas.ChangePasswordRequest,
+			resp *schemas.ChangePasswordResponse,
 		) error {
 			applog.MarkSensitive(ctx)
 

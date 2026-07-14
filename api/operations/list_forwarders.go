@@ -14,8 +14,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -25,17 +26,6 @@ type ListForwardersDeps struct {
 
 	AuthStorage   storage.AuthStorage
 	ConfigStorage storage.ConfigStorage
-}
-
-// ListForwardersRequest is empty: listing forwarders takes no parameters.
-type ListForwardersRequest struct{}
-
-// ListForwardersResponse carries the names of the available forwarders.
-type ListForwardersResponse struct {
-	// Success reports whether the listing completed.
-	Success bool `json:"success"`
-	// Forwarders holds the name of every configured forwarder.
-	Forwarders []string `json:"forwarders"`
 }
 
 // NewListForwardersUsecase enumerates the names of all configured forwarders.
@@ -50,8 +40,8 @@ func NewListForwardersUsecase(deps ListForwardersDeps) usecase.Interactor {
 			models.SCOPE_READ_FORWARDERS,
 			func(
 				ctx context.Context,
-				req ListForwardersRequest,
-				resp *ListForwardersResponse,
+				req schemas.ListForwardersRequest,
+				resp *schemas.ListForwardersResponse,
 			) error {
 				forwarders, err := deps.ConfigStorage.ListForwarders(ctx)
 				if err != nil {

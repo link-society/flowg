@@ -14,8 +14,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -25,17 +26,6 @@ type ListStreamsDeps struct {
 
 	AuthStorage storage.AuthStorage
 	LogStorage  storage.LogStorage
-}
-
-// ListStreamsRequest is empty: listing streams takes no parameters.
-type ListStreamsRequest struct{}
-
-// ListStreamsResponse carries every known stream and its configuration.
-type ListStreamsResponse struct {
-	// Success reports whether the listing completed.
-	Success bool `json:"success"`
-	// Streams maps each stream name to its configuration.
-	Streams map[string]models.StreamConfig `json:"streams"`
 }
 
 // NewListStreamsUsecase enumerates all known streams with their configurations.
@@ -50,8 +40,8 @@ func NewListStreamsUsecase(deps ListStreamsDeps) usecase.Interactor {
 			models.SCOPE_READ_STREAMS,
 			func(
 				ctx context.Context,
-				req ListStreamsRequest,
-				resp *ListStreamsResponse,
+				req schemas.ListStreamsRequest,
+				resp *schemas.ListStreamsResponse,
 			) error {
 				streams, err := deps.LogStorage.ListStreamConfigs(ctx)
 				if err != nil {

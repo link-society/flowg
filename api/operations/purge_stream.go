@@ -14,8 +14,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -25,18 +26,6 @@ type PurgeStreamDeps struct {
 
 	AuthStorage storage.AuthStorage
 	LogStorage  storage.LogStorage
-}
-
-// PurgeStreamRequest identifies the stream to purge.
-type PurgeStreamRequest struct {
-	// Stream is the name of the stream to purge.
-	Stream string `path:"stream" minLength:"1"`
-}
-
-// PurgeStreamResponse reports the outcome of the purge.
-type PurgeStreamResponse struct {
-	// Success reports whether the stream was purged.
-	Success bool `json:"success"`
 }
 
 // NewPurgeStreamUsecase removes a stream along with all of its logs and indexes.
@@ -52,8 +41,8 @@ func NewPurgeStreamUsecase(deps PurgeStreamDeps) usecase.Interactor {
 			models.SCOPE_WRITE_STREAMS,
 			func(
 				ctx context.Context,
-				req PurgeStreamRequest,
-				resp *PurgeStreamResponse,
+				req schemas.PurgeStreamRequest,
+				resp *schemas.PurgeStreamResponse,
 			) error {
 				err := deps.LogStorage.DeleteStream(ctx, req.Stream)
 				if err != nil {

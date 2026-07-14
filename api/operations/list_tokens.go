@@ -14,6 +14,7 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
+	"link-society.com/flowg/api/schemas"
 
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
@@ -23,18 +24,6 @@ type ListTokensDeps struct {
 	fx.In
 
 	AuthStorage storage.AuthStorage
-}
-
-// ListTokensRequest is empty: tokens are listed for the calling user.
-type ListTokensRequest struct{}
-
-// ListTokensResponse carries the identifiers of the caller's tokens.
-type ListTokensResponse struct {
-	// Success reports whether the listing completed.
-	Success bool `json:"success"`
-	// TokenUUIDs identifies each of the caller's tokens; the secret values are
-	// never returned.
-	TokenUUIDs []string `json:"token_uuids"`
 }
 
 // NewListTokensUsecase enumerates the identifiers of the calling user's personal
@@ -48,8 +37,8 @@ func NewListTokensUsecase(deps ListTokensDeps) usecase.Interactor {
 	u := usecase.NewInteractor(
 		func(
 			ctx context.Context,
-			req ListTokensRequest,
-			resp *ListTokensResponse,
+			req schemas.ListTokensRequest,
+			resp *schemas.ListTokensResponse,
 		) error {
 			user := auth.GetContextUser(ctx)
 

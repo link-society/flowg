@@ -14,8 +14,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -25,17 +26,6 @@ type ListTransformersDeps struct {
 
 	AuthStorage   storage.AuthStorage
 	ConfigStorage storage.ConfigStorage
-}
-
-// ListTransformersRequest is empty: listing transformers takes no parameters.
-type ListTransformersRequest struct{}
-
-// ListTransformersResponse carries the names of the available transformers.
-type ListTransformersResponse struct {
-	// Success reports whether the listing completed.
-	Success bool `json:"success"`
-	// Transformers holds the name of every configured transformer.
-	Transformers []string `json:"transformers"`
 }
 
 // NewListTransformersUsecase enumerates the names of all configured transformers.
@@ -50,8 +40,8 @@ func NewListTransformersUsecase(deps ListTransformersDeps) usecase.Interactor {
 			models.SCOPE_READ_TRANSFORMERS,
 			func(
 				ctx context.Context,
-				req ListTransformersRequest,
-				resp *ListTransformersResponse,
+				req schemas.ListTransformersRequest,
+				resp *schemas.ListTransformersResponse,
 			) error {
 				transformers, err := deps.ConfigStorage.ListTransformers(ctx)
 				if err != nil {

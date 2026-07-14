@@ -14,9 +14,10 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
+	"link-society.com/flowg/api/schemas"
+
 	"link-society.com/flowg/internal/engines/pipelines"
 	"link-society.com/flowg/internal/models"
-
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -27,20 +28,6 @@ type SaveTransformerDeps struct {
 	AuthStorage    storage.AuthStorage
 	ConfigStorage  storage.ConfigStorage
 	PipelineRunner pipelines.Runner
-}
-
-// SaveTransformerRequest carries the transformer name and its new source.
-type SaveTransformerRequest struct {
-	// Transformer is the name of the transformer to create or overwrite.
-	Transformer string `path:"transformer" minLength:"1"`
-	// Script is the VRL source code to store under that name.
-	Script string `json:"script" required:"true"`
-}
-
-// SaveTransformerResponse reports the outcome of the save.
-type SaveTransformerResponse struct {
-	// Success reports whether the transformer was persisted.
-	Success bool `json:"success"`
 }
 
 // NewSaveTransformerUsecase creates or overwrites a transformer.
@@ -57,8 +44,8 @@ func NewSaveTransformerUsecase(deps SaveTransformerDeps) usecase.Interactor {
 			models.SCOPE_WRITE_TRANSFORMERS,
 			func(
 				ctx context.Context,
-				req SaveTransformerRequest,
-				resp *SaveTransformerResponse,
+				req schemas.SaveTransformerRequest,
+				resp *schemas.SaveTransformerResponse,
 			) error {
 				if err := deps.ConfigStorage.WriteTransformer(ctx, req.Transformer, req.Script); err != nil {
 					logger.ErrorContext(

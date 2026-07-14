@@ -18,11 +18,12 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
+	"link-society.com/flowg/api/schemas"
+
 	"link-society.com/flowg/internal/engines/lognotify"
 	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/utils/langs/filtering"
-
 	storage "link-society.com/flowg/internal/storage/interfaces"
+	"link-society.com/flowg/internal/utils/langs/filtering"
 )
 
 // WatchLogsDeps lists the dependencies of [NewWatchLogsUsecase].
@@ -31,23 +32,6 @@ type WatchLogsDeps struct {
 
 	AuthStorage storage.AuthStorage
 	LogNotifier lognotify.LogNotifier
-}
-
-// WatchLogsRequest describes a live subscription to a stream's logs.
-type WatchLogsRequest struct {
-	// Stream is the name of the stream to watch.
-	Stream string `path:"stream" minLength:"1"`
-	// Filter is an optional filtering expression; only matching records are
-	// streamed to the client.
-	Filter *string `query:"filter"`
-}
-
-// WatchLogsResponse streams matching records to the client as they arrive.
-//
-// It embeds the writer so the usecase can emit a Server-Sent Events stream
-// rather than a single buffered response.
-type WatchLogsResponse struct {
-	usecase.OutputWithEmbeddedWriter
 }
 
 // NewWatchLogsUsecase streams a stream's logs to the client in real time as
@@ -65,8 +49,8 @@ func NewWatchLogsUsecase(deps WatchLogsDeps) usecase.Interactor {
 			models.SCOPE_READ_STREAMS,
 			func(
 				ctx context.Context,
-				req WatchLogsRequest,
-				resp *WatchLogsResponse,
+				req schemas.WatchLogsRequest,
+				resp *schemas.WatchLogsResponse,
 			) error {
 				var filter filtering.Filter
 
@@ -126,9 +110,9 @@ func NewWatchLogsUsecase(deps WatchLogsDeps) usecase.Interactor {
 						var err error
 						matches, err = filter.Evaluate(&log.LogRecord)
 						if err != nil {
-							fmt.Fprintf(resp, "event: error\n")
+							fmt.Fprintf(resp.Writer, "event: error\n")
 							fmt.Fprintf(
-								resp,
+								resp.Writer,
 								"data: failed to evaluate filter for log entry '%s': %s\n\n",
 								log.LogKey,
 								err.Error(),
@@ -142,16 +126,16 @@ func NewWatchLogsUsecase(deps WatchLogsDeps) usecase.Interactor {
 					if matches {
 						payload, err := json.Marshal(log.LogRecord)
 						if err != nil {
-							fmt.Fprintf(resp, "event: error\n")
-							fmt.Fprintf(resp, "data: %s\n\n", err.Error())
+							fmt.Fprintf(resp.Writer, "event: error\n")
+							fmt.Fprintf(resp.Writer, "data: %s\n\n", err.Error())
 							resp.Writer.(http.Flusher).Flush()
 
 							return nil
 						}
 
-						fmt.Fprintf(resp, "id: %s\n", log.LogKey)
-						fmt.Fprintf(resp, "event: log\n")
-						fmt.Fprintf(resp, "data: %s\n\n", payload)
+						fmt.Fprintf(resp.Writer, "id: %s\n", log.LogKey)
+						fmt.Fprintf(resp.Writer, "event: log\n")
+						fmt.Fprintf(resp.Writer, "data: %s\n\n", payload)
 						resp.Writer.(http.Flusher).Flush()
 					}
 				}

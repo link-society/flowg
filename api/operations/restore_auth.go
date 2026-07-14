@@ -5,7 +5,6 @@ import (
 	"errors"
 	"log/slog"
 
-	"mime/multipart"
 	"net/http"
 
 	"go.uber.org/fx"
@@ -16,8 +15,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage/generic/kv"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
@@ -27,19 +27,6 @@ type RestoreAuthDeps struct {
 	fx.In
 
 	AuthStorage storage.AuthStorage
-}
-
-// RestoreAuthRequest carries the authentication database snapshot to load.
-type RestoreAuthRequest struct {
-	// Backup is the uploaded snapshot, as produced by
-	// [NewBackupAuthUsecase].
-	Backup multipart.File `formData:"backup"`
-}
-
-// RestoreAuthResponse reports the outcome of the restore.
-type RestoreAuthResponse struct {
-	// Success reports whether the snapshot was loaded.
-	Success bool `json:"success"`
 }
 
 // NewRestoreAuthUsecase loads a previously exported authentication database
@@ -56,8 +43,8 @@ func NewRestoreAuthUsecase(deps RestoreAuthDeps) usecase.Interactor {
 			models.SCOPE_WRITE_ACLS,
 			func(
 				ctx context.Context,
-				req RestoreAuthRequest,
-				resp *RestoreAuthResponse,
+				req schemas.RestoreAuthRequest,
+				resp *schemas.RestoreAuthResponse,
 			) error {
 				defer req.Backup.Close()
 

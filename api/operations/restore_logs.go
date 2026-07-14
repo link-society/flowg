@@ -5,7 +5,6 @@ import (
 	"errors"
 	"log/slog"
 
-	"mime/multipart"
 	"net/http"
 
 	"go.uber.org/fx"
@@ -16,8 +15,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage/generic/kv"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
@@ -28,19 +28,6 @@ type RestoreLogsDeps struct {
 
 	AuthStorage storage.AuthStorage
 	LogStorage  storage.LogStorage
-}
-
-// RestoreLogsRequest carries the log database snapshot to load.
-type RestoreLogsRequest struct {
-	// Backup is the uploaded snapshot, as produced by
-	// [NewBackupLogsUsecase].
-	Backup multipart.File `formData:"backup"`
-}
-
-// RestoreLogsResponse reports the outcome of the restore.
-type RestoreLogsResponse struct {
-	// Success reports whether the snapshot was loaded.
-	Success bool `json:"success"`
 }
 
 // NewRestoreLogsUsecase loads a previously exported log database snapshot,
@@ -57,8 +44,8 @@ func NewRestoreLogsUsecase(deps RestoreLogsDeps) usecase.Interactor {
 			models.SCOPE_WRITE_STREAMS,
 			func(
 				ctx context.Context,
-				req RestoreLogsRequest,
-				resp *RestoreLogsResponse,
+				req schemas.RestoreLogsRequest,
+				resp *schemas.RestoreLogsResponse,
 			) error {
 				defer req.Backup.Close()
 

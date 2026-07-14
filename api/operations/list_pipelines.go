@@ -14,8 +14,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -25,17 +26,6 @@ type ListPipelinesDeps struct {
 
 	AuthStorage   storage.AuthStorage
 	ConfigStorage storage.ConfigStorage
-}
-
-// ListPipelinesRequest is empty: listing pipelines takes no parameters.
-type ListPipelinesRequest struct{}
-
-// ListPipelinesResponse carries the names of the available pipelines.
-type ListPipelinesResponse struct {
-	// Success reports whether the listing completed.
-	Success bool `json:"success"`
-	// Pipelines holds the name of every configured pipeline.
-	Pipelines []string `json:"pipelines"`
 }
 
 // NewListPipelinesUsecase enumerates the names of all configured pipelines.
@@ -50,8 +40,8 @@ func NewListPipelinesUsecase(deps ListPipelinesDeps) usecase.Interactor {
 			models.SCOPE_READ_PIPELINES,
 			func(
 				ctx context.Context,
-				req ListPipelinesRequest,
-				resp *ListPipelinesResponse,
+				req schemas.ListPipelinesRequest,
+				resp *schemas.ListPipelinesResponse,
 			) error {
 				pipelines, err := deps.ConfigStorage.ListPipelines(ctx)
 				if err != nil {

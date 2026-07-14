@@ -15,10 +15,11 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
+	"link-society.com/flowg/api/schemas"
+
 	applog "link-society.com/flowg/internal/app/logging"
 	"link-society.com/flowg/internal/engines/pipelines"
 	"link-society.com/flowg/internal/models"
-
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -28,27 +29,6 @@ type TestPipelineDeps struct {
 
 	AuthStorage    storage.AuthStorage
 	PipelineRunner pipelines.Runner
-}
-
-// TestPipelineRequest carries a pipeline definition and sample records to run
-// through it.
-type TestPipelineRequest struct {
-	// Pipeline is the name used to resolve referenced configuration.
-	Pipeline string `path:"pipeline" minLength:"1"`
-	// Flow is the flow graph to execute, without persisting it.
-	Flow models.FlowGraphV2 `json:"flow" required:"true"`
-	// Records are the input log records fed to the pipeline.
-	Records []map[string]string `json:"records" required:"true"`
-}
-
-// TestPipelineResponse carries the execution trace of the trial run.
-type TestPipelineResponse struct {
-	// Success reports whether the trial run completed.
-	Success bool `json:"success"`
-	// Trace records the path each record took through the pipeline nodes.
-	Trace []pipelines.NodeTrace `json:"trace"`
-	// Error holds the message of the last record that failed, if any.
-	Error *string `json:"error,omitempty"`
 }
 
 // NewTestPipelineUsecase runs sample records through a pipeline definition and
@@ -66,8 +46,8 @@ func NewTestPipelineUsecase(deps TestPipelineDeps) usecase.Interactor {
 			models.SCOPE_SEND_LOGS,
 			func(
 				ctx context.Context,
-				req TestPipelineRequest,
-				resp *TestPipelineResponse,
+				req schemas.TestPipelineRequest,
+				resp *schemas.TestPipelineResponse,
 			) error {
 				tracer := pipelines.NodeTracer{
 					Flow: req.Flow,

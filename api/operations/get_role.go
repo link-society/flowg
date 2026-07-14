@@ -14,8 +14,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/api/schemas"
 
+	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -24,20 +25,6 @@ type GetRoleDeps struct {
 	fx.In
 
 	AuthStorage storage.AuthStorage
-}
-
-// GetRoleRequest identifies the role to retrieve.
-type GetRoleRequest struct {
-	// Role is the name of the role to read.
-	Role string `path:"role" minLength:"1"`
-}
-
-// GetRoleResponse carries the definition of the requested role.
-type GetRoleResponse struct {
-	// Success reports whether the role was found and returned.
-	Success bool `json:"success"`
-	// Role is the role and its granted permissions.
-	Role *models.Role `json:"role"`
 }
 
 // NewGetRoleUsecase returns the definition of a single role.
@@ -53,8 +40,8 @@ func NewGetRoleUsecase(deps GetRoleDeps) usecase.Interactor {
 			models.SCOPE_READ_ACLS,
 			func(
 				ctx context.Context,
-				req GetRoleRequest,
-				resp *GetRoleResponse,
+				req schemas.GetRoleRequest,
+				resp *schemas.GetRoleResponse,
 			) error {
 				role, err := deps.AuthStorage.FetchRole(ctx, req.Role)
 				if err != nil {
