@@ -3,6 +3,9 @@ import React from 'react'
 import ForwarderConfigAmqpModel, {
   factory as ForwarderConfigAmqpFactory,
 } from '@/lib/models/ForwarderConfigAmqpModel'
+import ForwarderConfigAzureMonitorModel, {
+  factory as ForwarderConfigAzureMonitorFactory,
+} from '@/lib/models/ForwarderConfigAzureMonitorModel'
 import ForwarderConfigClickhouseModel, {
   factory as ForwarderConfigClickhouseFactory,
 } from '@/lib/models/ForwarderConfigClickhouseModel'
@@ -33,6 +36,7 @@ import ForwarderConfigSyslogModel, {
 
 import ForwarderIconAmqp from '@/components/icons/ForwarderIconAmqp/component'
 import ForwarderIconAwsCloudWatch from '@/components/icons/ForwarderIconAwsCloudWatch/component'
+import ForwarderIconAzureMonitor from '@/components/icons/ForwarderIconAzureMonitor/component'
 import ForwarderIconClickhouse from '@/components/icons/ForwarderIconClickhouse/component'
 import ForwarderIconDatadog from '@/components/icons/ForwarderIconDatadog/component'
 import ForwarderIconElastic from '@/components/icons/ForwarderIconElastic/component'
@@ -53,6 +57,7 @@ type ForwarderConfigModel =
   | ForwarderConfigClickhouseModel
   | ForwarderConfigAwsCloudWatchModel
   | ForwarderConfigGoogleCloudLoggingModel
+  | ForwarderConfigAzureMonitorModel
 
 export type ForwarderConfigTypes = ForwarderConfigModel['type']
 
@@ -74,6 +79,11 @@ export const ForwarderConfigTypeValues = [
     key: 'googlecloudlogging',
     label: 'Google Log',
     icon: ForwarderIconGoogleLog,
+  },
+  {
+    key: 'azuremonitor',
+    label: 'Azure Monitor',
+    icon: ForwarderIconAzureMonitor,
   },
 ] as const
 
@@ -106,6 +116,7 @@ const factories: Record<ForwarderConfigTypes, () => ForwarderConfigModel> = {
   clickhouse: ForwarderConfigClickhouseFactory,
   awscloudwatch: ForwarderConfigAwsCloudWatchFactory,
   googlecloudlogging: ForwarderConfigGoogleCloudLoggingFactory,
+  azuremonitor: ForwarderConfigAzureMonitorFactory,
 }
 
 export const factory = (type: ForwarderConfigTypes): ForwarderConfigModel => {
