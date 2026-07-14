@@ -6,6 +6,12 @@ edition = "2021"
 [lib]
 crate-type = ["staticlib"]
 
+[profile.release]
+# Size optimizations:
+lto = true         # remove unused monomorphizations across the whole VRL dependency tree
+codegen-units = 1  # improves both size and runtime performance
+panic = "abort"    # drops unwinding landing pads (panics across the C FFI boundary abort anyway since Rust 1.71)
+
 [build-dependencies]
 cc = "1.2"
 
