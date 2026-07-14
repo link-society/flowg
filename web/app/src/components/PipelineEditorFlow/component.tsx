@@ -93,15 +93,19 @@ export const PipelineEditorFlow: React.FC<PipelineEditorFlowProps> = ({
     []
   )
 
-  const [nodes, setNodes] = useState<Node[]>(
-    flow.nodes.map((node) => {
+  const [nodes, setNodes] = useState<Node[]>(() => {
+    const initialNodes = flow.nodes.map((node) => {
       if (node.type === 'source') {
         node.deletable = false
       }
 
       return node
     })
-  )
+
+    return flow.hasLayout
+      ? initialNodes
+      : getLayoutedNodes(initialNodes, flow.edges)
+  })
 
   const [edges, setEdges] = useState<Edge[]>(flow.edges)
 
@@ -118,7 +122,7 @@ export const PipelineEditorFlow: React.FC<PipelineEditorFlowProps> = ({
         {}
       )
 
-      return initialNodes.map((node: Node) => {
+      const nextNodes = initialNodes.map((node: Node) => {
         const oldNode = oldNodesById[node.id]
         if (oldNode !== undefined && oldNode.measured) {
           node.measured = oldNode.measured
@@ -126,6 +130,10 @@ export const PipelineEditorFlow: React.FC<PipelineEditorFlowProps> = ({
 
         return node
       })
+
+      return flow.hasLayout
+        ? nextNodes
+        : getLayoutedNodes(nextNodes, initialEdges)
     })
     setEdges(initialEdges)
   }, [flow])
@@ -144,7 +152,7 @@ export const PipelineEditorFlow: React.FC<PipelineEditorFlowProps> = ({
   }, [pipelineTrace])
 
   useEffect(() => {
-    onFlowChange({ nodes, edges })
+    onFlowChange({ hasLayout: true, nodes, edges })
   }, [nodes, edges])
 
   const onNodesChange: OnNodesChange = (changes) =>

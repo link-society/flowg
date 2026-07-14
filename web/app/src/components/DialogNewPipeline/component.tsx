@@ -46,6 +46,7 @@ const DialogNewPipeline = ({
 
   const [onSubmit, loading] = useApiOperation(async () => {
     await configApi.savePipeline(name, {
+      hasLayout: true,
       nodes: defaultSourceNodes,
       edges: [],
     })
