@@ -12,7 +12,7 @@ func convertToLogRecords(message *collectlogs.ExportLogsServiceRequest) []*model
 	for _, resourceLogs := range message.GetResourceLogs() {
 		for _, scopeLogs := range resourceLogs.GetScopeLogs() {
 			for _, logRecord := range scopeLogs.GetLogRecords() {
-				logRecordModel := models.NewFromOTLP(logRecord)
+				logRecordModel := newLogRecord(logRecord)
 				logRecords = append(logRecords, logRecordModel)
 			}
 		}
