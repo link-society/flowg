@@ -29,6 +29,7 @@ type ForwarderConfigV2 struct {
 	Clickhouse         *ForwarderClickhouseV2         `json:"-"`
 	AwsCloudWatch      *ForwarderAwsCloudWatchV2      `json:"-"`
 	GoogleCloudLogging *ForwarderGoogleCloudLoggingV2 `json:"-"`
+	AzureMonitor       *ForwarderAzureMonitorV2       `json:"-"`
 }
 
 // JSONSchemaOneOf advertises every backend variant so the generated OpenAPI
@@ -45,6 +46,7 @@ func (ForwarderConfigV2) JSONSchemaOneOf() []any {
 		ForwarderClickhouseV2{},
 		ForwarderAwsCloudWatchV2{},
 		ForwarderGoogleCloudLoggingV2{},
+		ForwarderAzureMonitorV2{},
 	}
 }
 
@@ -72,6 +74,8 @@ func (f *ForwarderV2) Init(ctx context.Context) error {
 		return f.Config.AwsCloudWatch.init(ctx)
 	case f.Config.GoogleCloudLogging != nil:
 		return f.Config.GoogleCloudLogging.init(ctx)
+	case f.Config.AzureMonitor != nil:
+		return f.Config.AzureMonitor.init(ctx)
 	default:
 		return fmt.Errorf("unsupported forwarder type")
 	}
@@ -100,6 +104,8 @@ func (f *ForwarderV2) Close(ctx context.Context) error {
 		return f.Config.AwsCloudWatch.close(ctx)
 	case f.Config.GoogleCloudLogging != nil:
 		return f.Config.GoogleCloudLogging.close(ctx)
+	case f.Config.AzureMonitor != nil:
+		return f.Config.AzureMonitor.close(ctx)
 	default:
 		return fmt.Errorf("unsupported forwarder type")
 	}
@@ -128,6 +134,8 @@ func (f *ForwarderV2) Call(ctx context.Context, record *LogRecord) error {
 		return f.Config.AwsCloudWatch.call(ctx, record)
 	case f.Config.GoogleCloudLogging != nil:
 		return f.Config.GoogleCloudLogging.call(ctx, record)
+	case f.Config.AzureMonitor != nil:
+		return f.Config.AzureMonitor.call(ctx, record)
 	default:
 		return fmt.Errorf("unsupported forwarder type")
 	}
@@ -166,6 +174,9 @@ func (cfg *ForwarderConfigV2) MarshalJSON() ([]byte, error) {
 	case cfg.GoogleCloudLogging != nil:
 		return json.Marshal(&cfg.GoogleCloudLogging)
 
+	case cfg.AzureMonitor != nil:
+		return json.Marshal(&cfg.AzureMonitor)
+
 	default:
 		return nil, fmt.Errorf("unsupported forwarder type")
 	}
@@ -184,6 +195,7 @@ func (cfg *ForwarderConfigV2) UnmarshalJSON(data []byte) error {
 	cfg.Clickhouse = nil
 	cfg.AwsCloudWatch = nil
 	cfg.GoogleCloudLogging = nil
+	cfg.AzureMonitor = nil
 
 	var typeInfo struct {
 		Type string `json:"type" required:"true"`
@@ -223,6 +235,9 @@ func (cfg *ForwarderConfigV2) UnmarshalJSON(data []byte) error {
 
 	case "googlecloudlogging":
 		return json.Unmarshal(data, &cfg.GoogleCloudLogging)
+
+	case "azuremonitor":
+		return json.Unmarshal(data, &cfg.AzureMonitor)
 
 	default:
 		return fmt.Errorf("unsupported forwarder type: %s", typeInfo.Type)
