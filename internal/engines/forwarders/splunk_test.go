@@ -1,4 +1,4 @@
-package models_test
+package forwarders_test
 
 import (
 	"net/http/httptest"
@@ -6,6 +6,7 @@ import (
 
 	"net/http"
 
+	"link-society.com/flowg/internal/engines/forwarders"
 	"link-society.com/flowg/internal/models"
 )
 
@@ -39,7 +40,12 @@ func TestForwarderSplunk_Call(t *testing.T) {
 		},
 	}
 
-	if err := forwarder.Init(t.Context()); err != nil {
+	runtime, err := forwarders.NewRuntime(forwarder)
+	if err != nil {
+		t.Fatalf("failed to create runtime: %v", err)
+	}
+
+	if err := runtime.Init(t.Context()); err != nil {
 		t.Fatalf("failed to initialize forwarder: %v", err)
 	}
 
@@ -47,11 +53,11 @@ func TestForwarderSplunk_Call(t *testing.T) {
 		"message": "test message",
 		"host":    "test-host",
 	})
-	if err := forwarder.Call(t.Context(), record); err != nil {
+	if err := runtime.Call(t.Context(), record); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	if err := forwarder.Close(t.Context()); err != nil {
+	if err := runtime.Close(t.Context()); err != nil {
 		t.Fatalf("failed to close forwarder: %v", err)
 	}
 }
@@ -74,16 +80,21 @@ func TestForwarderSplunk_Call_Failure(t *testing.T) {
 		},
 	}
 
-	if err := forwarder.Init(t.Context()); err != nil {
+	runtime, err := forwarders.NewRuntime(forwarder)
+	if err != nil {
+		t.Fatalf("failed to create runtime: %v", err)
+	}
+
+	if err := runtime.Init(t.Context()); err != nil {
 		t.Fatalf("failed to initialize forwarder: %v", err)
 	}
 
 	record := models.NewLogRecord(map[string]string{})
-	if err := forwarder.Call(t.Context(), record); err == nil {
+	if err := runtime.Call(t.Context(), record); err == nil {
 		t.Fatalf("expected error")
 	}
 
-	if err := forwarder.Close(t.Context()); err != nil {
+	if err := runtime.Close(t.Context()); err != nil {
 		t.Fatalf("failed to close forwarder: %v", err)
 	}
 }

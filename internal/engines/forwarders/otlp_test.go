@@ -1,11 +1,13 @@
-package models_test
+package forwarders_test
 
 import (
+	"testing"
+
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"testing"
 
+	"link-society.com/flowg/internal/engines/forwarders"
 	"link-society.com/flowg/internal/models"
 )
 
@@ -47,7 +49,12 @@ func TestForwarderOtlpV2_Call_Success(t *testing.T) {
 		},
 	}
 
-	if err := forwarder.Init(t.Context()); err != nil {
+	runtime, err := forwarders.NewRuntime(forwarder)
+	if err != nil {
+		t.Fatalf("failed to create runtime: %v", err)
+	}
+
+	if err := runtime.Init(t.Context()); err != nil {
 		t.Fatalf("failed to initialize forwarder: %v", err)
 	}
 
@@ -55,11 +62,11 @@ func TestForwarderOtlpV2_Call_Success(t *testing.T) {
 		"body": "test log body",
 		"foo":  "bar",
 	})
-	if err := forwarder.Call(t.Context(), record); err != nil {
+	if err := runtime.Call(t.Context(), record); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	if err := forwarder.Close(t.Context()); err != nil {
+	if err := runtime.Close(t.Context()); err != nil {
 		t.Fatalf("failed to close forwarder: %v", err)
 	}
 }
@@ -82,18 +89,23 @@ func TestForwarderOtlpV2_Call_Failure(t *testing.T) {
 		},
 	}
 
-	if err := forwarder.Init(t.Context()); err != nil {
+	runtime, err := forwarders.NewRuntime(forwarder)
+	if err != nil {
+		t.Fatalf("failed to create runtime: %v", err)
+	}
+
+	if err := runtime.Init(t.Context()); err != nil {
 		t.Fatalf("failed to initialize forwarder: %v", err)
 	}
 
 	record := models.NewLogRecord(map[string]string{
 		"body": "test log body",
 	})
-	if err := forwarder.Call(t.Context(), record); err == nil {
+	if err := runtime.Call(t.Context(), record); err == nil {
 		t.Fatalf("expected error on failure response, got nil")
 	}
 
-	if err := forwarder.Close(t.Context()); err != nil {
+	if err := runtime.Close(t.Context()); err != nil {
 		t.Fatalf("failed to close forwarder: %v", err)
 	}
 }

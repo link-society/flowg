@@ -14,8 +14,9 @@ import (
 	"link-society.com/flowg/api/auth"
 	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/models"
 
+	"link-society.com/flowg/internal/engines/forwarders"
+	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
@@ -73,7 +74,20 @@ func NewTestForwarderUsecase(deps TestForwarderDeps) usecase.Interactor {
 					return status.Wrap(err, status.NotFound)
 				}
 
-				if err := forwarder.Init(ctx); err != nil {
+				runtime, err := forwarders.NewRuntime(forwarder)
+				if err != nil {
+					logger.ErrorContext(
+						ctx,
+						"Failed to create forwarder runtime",
+						slog.String("forwarder", req.Forwarder),
+						slog.String("error", err.Error()),
+					)
+
+					resp.Success = false
+					return status.Wrap(err, status.Internal)
+				}
+
+				if err := runtime.Init(ctx); err != nil {
 					logger.ErrorContext(
 						ctx,
 						"Failed to initialize forwarder",
@@ -86,7 +100,7 @@ func NewTestForwarderUsecase(deps TestForwarderDeps) usecase.Interactor {
 				}
 
 				defer func() {
-					if err := forwarder.Close(ctx); err != nil {
+					if err := runtime.Close(ctx); err != nil {
 						logger.WarnContext(
 							ctx,
 							"Failed to shutdown forwarder",
@@ -97,7 +111,7 @@ func NewTestForwarderUsecase(deps TestForwarderDeps) usecase.Interactor {
 				}()
 
 				logRecord := models.NewLogRecord(req.Record)
-				if err := forwarder.Call(ctx, logRecord); err != nil {
+				if err := runtime.Call(ctx, logRecord); err != nil {
 					logger.ErrorContext(
 						ctx,
 						"Failed to call forwarder",

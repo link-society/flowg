@@ -7,6 +7,8 @@ import (
 
 	"link-society.com/flowg/internal/app/metrics"
 
+	"link-society.com/flowg/internal/engines/forwarders"
+
 	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
@@ -113,9 +115,14 @@ func BuildFlow(ctx context.Context, configStorage storage.ConfigStorage, name st
 				return nil, err
 			}
 
+			runtime, err := forwarders.NewRuntime(forwarder)
+			if err != nil {
+				return nil, err
+			}
+
 			pipelineNode := &ForwardNode{
-				ID:        flowNode.ID,
-				Forwarder: forwarder,
+				ID:      flowNode.ID,
+				Runtime: runtime,
 			}
 			pipelineNodes[flowNode.ID] = pipelineNode
 

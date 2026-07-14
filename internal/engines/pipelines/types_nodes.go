@@ -7,7 +7,11 @@ import (
 	"sync"
 
 	"link-society.com/flowg/internal/app/metrics"
+
 	"link-society.com/flowg/internal/models"
+
+	"link-society.com/flowg/internal/engines/forwarders"
+
 	"link-society.com/flowg/internal/utils/langs/filtering"
 	"link-society.com/flowg/internal/utils/langs/vrl"
 )
@@ -60,8 +64,8 @@ type PipelineNode struct {
 
 // ForwardNode sends the record to an external destination through a forwarder.
 type ForwardNode struct {
-	ID        string
-	Forwarder *models.ForwarderV2
+	ID      string
+	Runtime forwarders.Runtime
 }
 
 // RouterNode persists the record into a log stream and notifies live
@@ -236,11 +240,11 @@ func (n *PipelineNode) Process(ctx context.Context, record *models.LogRecord) er
 
 // MARK: forward
 func (n *ForwardNode) Init(ctx context.Context) error {
-	return n.Forwarder.Init(ctx)
+	return n.Runtime.Init(ctx)
 }
 
 func (n *ForwardNode) Close(ctx context.Context) error {
-	return n.Forwarder.Close(ctx)
+	return n.Runtime.Close(ctx)
 }
 
 func (n *ForwardNode) Process(ctx context.Context, record *models.LogRecord) error {
@@ -249,7 +253,7 @@ func (n *ForwardNode) Process(ctx context.Context, record *models.LogRecord) err
 		return nil
 	}
 
-	return n.Forwarder.Call(ctx, record)
+	return n.Runtime.Call(ctx, record)
 }
 
 // MARK: router
