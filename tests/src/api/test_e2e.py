@@ -17,6 +17,8 @@ def test_hurl(
     floci_aws_container,
     cloudwatch_log_stream,
     floci_gcp_container,
+    floci_az_container,
+    azuremonitor_setup_dcr,
     otlp_pb,
 ):
     print("Running Hurl test suite:\n")
@@ -33,6 +35,7 @@ def test_hurl(
             --variable guest_token={flowg_guest_token} \
             --variable timewindow_begin={timewindow_begin} \
             --variable timewindow_end={timewindow_end} \
+            --variable azuremonitor_dcr={azuremonitor_setup_dcr} \
             --error-format long \
             --report-html {report_dir / 'html'} \
             --report-junit {report_dir / 'junit.xml'} \
