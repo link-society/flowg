@@ -309,7 +309,7 @@ func (s *Storage[QTx, MTx]) Distinct(ctx context.Context, stream string) (map[st
 
 // Ingest implements [storage.LogStorage].
 func (s *Storage[QTx, MTx]) Ingest(ctx context.Context, stream string, logRecord *models.LogRecord) (kv.Key, error) {
-	key := logRecord.NewDbKey(stream)
+	key := newDbKey(stream, logRecord)
 	err := s.adapter.Update(ctx, func(txn MTx) error {
 		return transactions.Ingest(txn, stream, logRecord, key)
 	})
