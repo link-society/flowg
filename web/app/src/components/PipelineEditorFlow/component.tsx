@@ -7,13 +7,16 @@ import React, {
   useMemo,
   useState,
 } from 'react'
+import { flushSync } from 'react-dom'
 
 import Typography from '@mui/material/Typography'
 
+import AccountTreeIcon from '@mui/icons-material/AccountTree'
 import DeviceHubIcon from '@mui/icons-material/DeviceHub'
 
 import {
   Background,
+  ControlButton,
   Controls,
   type Edge,
   type KeyCode,
@@ -40,6 +43,7 @@ import PipelineNodeSource from '@/components/PipelineNodeSource/component'
 import PipelineNodeSwitch from '@/components/PipelineNodeSwitch/component'
 import PipelineNodeTransformer from '@/components/PipelineNodeTransformer/component'
 
+import { getLayoutedNodes } from './layout'
 import {
   FlowPanelChips,
   FlowPanelLabel,
@@ -75,7 +79,7 @@ export const PipelineEditorFlow: React.FC<PipelineEditorFlowProps> = ({
   onFlowChange,
   pipelineTrace,
 }) => {
-  const { screenToFlowPosition } = useReactFlow()
+  const { screenToFlowPosition, fitView } = useReactFlow()
 
   const nodeTypes = useMemo(
     () => ({
@@ -150,6 +154,13 @@ export const PipelineEditorFlow: React.FC<PipelineEditorFlowProps> = ({
     setEdges((eds) => applyEdgeChanges(changes, eds))
 
   const onConnect: OnConnect = (conn) => setEdges((eds) => addEdge(conn, eds))
+
+  const onLayout = useCallback(() => {
+    flushSync(() => {
+      setNodes((nds) => getLayoutedNodes(nds, edges))
+    })
+    fitView()
+  }, [edges, fitView])
 
   const onDragOver: DragEventHandler<HTMLDivElement> = (event) => {
     event.preventDefault()
@@ -232,7 +243,11 @@ export const PipelineEditorFlow: React.FC<PipelineEditorFlowProps> = ({
           {...shortcuts}
         >
           <Background />
-          <Controls />
+          <Controls>
+            <ControlButton onClick={onLayout} title="Auto layout">
+              <AccountTreeIcon />
+            </ControlButton>
+          </Controls>
 
           <Panel position="top-left">
             <FlowPanelPaper variant="outlined">
