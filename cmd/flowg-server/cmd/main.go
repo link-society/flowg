@@ -6,6 +6,7 @@ import (
 	"syscall"
 
 	"github.com/spf13/cobra"
+	"go.uber.org/dig"
 	"go.uber.org/fx"
 
 	"link-society.com/flowg/internal/app/featureflags"
@@ -52,11 +53,14 @@ func NewRootCommand() *cobra.Command {
 			featureflags.SetDemoMode(config.DemoMode)
 			metrics.Setup()
 
-			if getEnvBool("DEBUG", false) {
-				fx.New(server.NewServer(opts)).Run()
-			} else {
-				fx.New(fx.NopLogger, server.NewServer(opts)).Run()
+			app := fx.New(fx.NopLogger, server.NewServer(opts))
+			if err := app.Err(); err != nil {
+				fmt.Printf("ERROR: %v\n", dig.RootCause(err))
+				ExitCode = 1
+				return
 			}
+
+			app.Run()
 		},
 	}
 
