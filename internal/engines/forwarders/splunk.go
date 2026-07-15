@@ -14,6 +14,8 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
+// splunkRuntime pushes records to a Splunk HTTP Event Collector, evaluating
+// the source and host dynamic fields per record.
 type splunkRuntime struct {
 	config *models.ForwarderSplunkV2
 

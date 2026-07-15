@@ -12,14 +12,24 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
+// ErrNotImplemented is returned by NewRuntime when the forwarder configuration
+// selects no known backend.
 var ErrNotImplemented = errors.New("runtime not implemented")
 
+// Runtime executes a forwarder: it delivers log records to the external
+// destination described by a forwarder configuration.
+//
+// Init compiles the configuration's dynamic fields and builds the backend
+// client; Call delivers one record; Close releases the connection for the
+// backends that hold one.
 type Runtime interface {
 	Init(ctx context.Context) error
 	Close(ctx context.Context) error
 	Call(ctx context.Context, record *models.LogRecord) error
 }
 
+// NewRuntime returns the Runtime implementation matching the configuration's
+// tagged union, or ErrNotImplemented when no backend is selected.
 func NewRuntime(cfg *models.ForwarderV2) (Runtime, error) {
 	switch {
 	case cfg.Config.Http != nil:

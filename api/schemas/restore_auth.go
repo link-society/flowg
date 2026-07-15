@@ -6,8 +6,8 @@ import (
 
 // RestoreAuthRequest carries the authentication database snapshot to load.
 type RestoreAuthRequest struct {
-	// Backup is the uploaded snapshot, as produced by
-	// [NewBackupAuthUsecase].
+	// Backup is the uploaded snapshot, as produced by the backup-auth
+	// endpoint (see [BackupAuthResponse]).
 	Backup multipart.File `formData:"backup"`
 }
 

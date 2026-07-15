@@ -6,8 +6,8 @@ import (
 
 // RestoreLogsRequest carries the log database snapshot to load.
 type RestoreLogsRequest struct {
-	// Backup is the uploaded snapshot, as produced by
-	// [NewBackupLogsUsecase].
+	// Backup is the uploaded snapshot, as produced by the backup-logs
+	// endpoint (see [BackupLogsResponse]).
 	Backup multipart.File `formData:"backup"`
 }
 

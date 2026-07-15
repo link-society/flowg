@@ -15,6 +15,8 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
+// clickhouseRuntime inserts records into a ClickHouse table, created at Init
+// if it does not exist.
 type clickhouseRuntime struct {
 	config *models.ForwarderClickhouseV2
 

@@ -12,6 +12,8 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
+// elasticRuntime indexes records into an Elasticsearch index, creating the
+// index on first delivery if it does not exist.
 type elasticRuntime struct {
 	config *models.ForwarderElasticV2
 

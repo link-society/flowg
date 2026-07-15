@@ -11,7 +11,7 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
-// newFromOTLP flattens an OpenTelemetry log record into a LogRecord, promoting
+// newLogRecord flattens an OpenTelemetry log record into a LogRecord, promoting
 // the well-known OTLP fields to top-level names and prefixing each attribute
 // with "attr.".
 func newLogRecord(logRecord *otlplogmodels.LogRecord) *models.LogRecord {
