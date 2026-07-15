@@ -15,7 +15,9 @@ dealt with in a single place.
 - **Protobuf ingestion** — `UnmarshalProtobuf` decodes the same request encoded
   as binary protobuf.
 - **Conversion** — both entry points flatten the resource/scope/record hierarchy
-  of an `ExportLogsServiceRequest` into a flat slice of FlowG log records.
+  of an `ExportLogsServiceRequest` into a flat slice of FlowG log records,
+  promoting the well-known OTLP fields to top-level names and prefixing each
+  attribute with `attr.`.
 
 ## Scope
 
