@@ -1,12 +1,12 @@
-import { Visibility } from '@mui/icons-material'
-import { Tab } from '@mui/material'
-
 import { useState } from 'react'
 
 import Button from '@mui/material/Button'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
+import Tab from '@mui/material/Tab'
+
+import VisibilityIcon from '@mui/icons-material/Visibility'
 
 import { TraceDialog, TraceDialogContent, TraceTabs } from './styles'
 import { PipelineTraceNodeButtonProps } from './types'
@@ -26,7 +26,7 @@ const PipelineTraceNodeButton = ({ traces }: PipelineTraceNodeButtonProps) => {
         variant="contained"
         size="small"
         color="primary"
-        startIcon={<Visibility />}
+        startIcon={<VisibilityIcon />}
         onClick={() => setOpen(true)}
       >
         Inspect
