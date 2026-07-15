@@ -73,9 +73,9 @@ While the use of AI to help write code, documentation and tests is not
 prohibited per-se, low-effort Pull Requests that are 100% vibecoded and do not
 even follow those contributing guidelines will be rejected without discussion.
 
-AI is a tool to help the developper write code and navigate a large codebase, it
+AI is a tool to help the developer write code and navigate a large codebase, it
 is not meant to replace human thought and reasoning. If no human can understand
-or explain the code, then no human can debug it. It's a can of worm we are not
+or explain the code, then no human can debug it. It's a can of worms we are not
 willing to open.
 
 In the Pull Request template, there is a section about "License Agreement",
