@@ -12,6 +12,8 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
+// syslogRuntime writes records to a syslog server over TCP or UDP, evaluating
+// the tag, severity, facility and message dynamic fields per record.
 type syslogRuntime struct {
 	config *models.ForwarderSyslogV2
 

@@ -14,6 +14,9 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
+// amqpRuntime publishes records to an AMQP (e.g. RabbitMQ) exchange over a
+// connection opened at Init, evaluating the exchange, routing key and body
+// dynamic fields per record.
 type amqpRuntime struct {
 	config *models.ForwarderAmqpV2
 

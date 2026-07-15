@@ -14,6 +14,8 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
+// awsCloudWatchRuntime sends records as log events to an AWS CloudWatch Logs
+// stream.
 type awsCloudWatchRuntime struct {
 	config *models.ForwarderAwsCloudWatchV2
 

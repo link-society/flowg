@@ -14,6 +14,8 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
+// googleCloudLoggingRuntime writes records to a Google Cloud Logging log,
+// authenticating with a service-account JSON when one is configured.
 type googleCloudLoggingRuntime struct {
 	config *models.ForwarderGoogleCloudLoggingV2
 

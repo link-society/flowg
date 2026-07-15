@@ -6,8 +6,8 @@ import (
 
 // RestoreConfigRequest carries the configuration database snapshot to load.
 type RestoreConfigRequest struct {
-	// Backup is the uploaded snapshot, as produced by
-	// [NewBackupConfigUsecase].
+	// Backup is the uploaded snapshot, as produced by the backup-config
+	// endpoint (see [BackupConfigResponse]).
 	Backup multipart.File `formData:"backup"`
 }
 

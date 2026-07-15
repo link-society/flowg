@@ -15,6 +15,8 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
+// datadogRuntime pushes records to the Datadog logs intake API, evaluating the
+// source, tags, hostname, message and service dynamic fields per record.
 type datadogRuntime struct {
 	config *models.ForwarderDatadogV2
 

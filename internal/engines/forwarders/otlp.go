@@ -16,6 +16,8 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
+// otlpRuntime exports records to an OpenTelemetry collector as OTLP/HTTP logs
+// requests.
 type otlpRuntime struct {
 	config *models.ForwarderOtlpV2
 

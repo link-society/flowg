@@ -16,6 +16,9 @@ import (
 	"link-society.com/flowg/internal/models"
 )
 
+// httpRuntime delivers records to an arbitrary HTTP endpoint via POST, with
+// the request body produced by the Body dynamic field (defaulting to the
+// record serialised as JSON).
 type httpRuntime struct {
 	config *models.ForwarderHttpV2
 
