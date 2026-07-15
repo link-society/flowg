@@ -13,6 +13,8 @@ being scattered across endpoints.
 
 - **[operations](operations)** — one use-case per endpoint, each registering
   itself with the routing table.
+- **[schemas](schemas)** — the request and response types of every endpoint,
+  shared with the API clients.
 - **[middlewares](middlewares)** — protocol-compatibility shims mounted beside
   the native operations.
 - **[routing](routing)** — the vocabulary endpoints use to contribute

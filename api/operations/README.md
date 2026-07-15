@@ -15,13 +15,15 @@ Each operation lives in its own file, declared in a fixed order:
 
 - a dependency struct (`XDeps`), an [fx.In] struct listing only the storage
   backends and engines that operation actually uses;
-- a request struct (`XRequest`) describing the inputs, with tags mapping fields
-  to path, query, header or body parameters;
-- a response struct (`XResponse`) describing the output;
 - a constructor (`NewXUsecase`) that builds the interactor wiring inputs to
   outputs;
 - an `init()` that calls `routing.RegisterOperation`, binding the constructor to
   its HTTP method, route pattern and any OpenAPI tweaks.
+
+The inputs and outputs themselves — a request struct (`XRequest`) and a
+response struct (`XResponse`) per endpoint — live in the sibling [schemas]
+package, so API clients can build requests without importing the operations'
+dependencies.
 
 The routing primitives live in the [routing] package: `RegisterOperation`
 records each endpoint as an `Operation` — the interactor bundled with its method,
@@ -31,12 +33,13 @@ injection group. The `api` package collects that group and mounts each
 an endpoint can be added, moved or removed by editing a single file.
 
 ```text
-fx ──▶ NewXUsecase(XDeps) ──▶ interactor(XRequest) ──▶ XResponse
- (injects deps)  (per endpoint)   (business logic)
+fx ──▶ NewXUsecase(XDeps) ──▶ interactor(schemas.XRequest) ──▶ schemas.XResponse
+ (injects deps)  (per endpoint)      (business logic)
 
 init() ──▶ routing.RegisterOperation ──▶ Operation{Method, Pattern, …} ──▶ group
 ```
 
+[schemas]: ../schemas
 [routing]: ../routing
 
 ## Authentication and authorization

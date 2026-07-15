@@ -31,6 +31,8 @@ database. The implementation is backend-agnostic: it runs on top of any
 
 - **storage.go** — the `Storage` type implementing `LogStorage`, delegating each
   operation to the `transactions` subpackage inside a read or write transaction.
+- **key.go** — the time-ordered key under which each ingested record is stored,
+  built from the stream name, the record's timestamp and a fresh uuid.
 - **gc.go** — `NewGarbageCollector`, the background worker that periodically
   enforces stream retention-size budgets.
 - **[transactions](transactions)** — the low-level read/write operations and the

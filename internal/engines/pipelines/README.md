@@ -11,7 +11,8 @@ and reused until its definition changes.
 ## Responsibilities
 
 - **Compilation** — turns a stored `FlowGraphV2` into a graph of `Node`s,
-  resolving the transformers and forwarders each node references.
+  resolving the transformers each node references and building a
+  [forwarders](../forwarders) runtime for each forward node.
 - **Execution** — feeds a record into a chosen entrypoint and propagates it
   through the graph, concurrently fanning out to each node's successors.
 - **Caching** — keeps compiled pipelines hot and exposes invalidation so changes
@@ -56,5 +57,6 @@ A compiled pipeline is a directed graph of nodes:
 
 When a `NodeTracer` is attached to the context (via `WithTracer`), processing
 switches to dry-run mode: side-effecting nodes (forward, router, nested
-pipeline) skip their effects and every node appends a `NodeTrace`, letting the UI
-show exactly how a record would travel through the pipeline.
+pipeline) skip their effects and every node appends a trace entry
+(`models.PipelineNodeTrace`), letting the UI show exactly how a record would
+travel through the pipeline.

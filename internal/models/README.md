@@ -18,7 +18,9 @@ conversion from older on-disk versions to the current one.
 - **Versioned migrations** — read legacy persisted formats and upgrade them to
   the current version on load.
 - **Self-contained behaviour** — provide the small helpers that belong with the
-  data (permission projection, dynamic-field compilation, OTLP flattening, ...).
+  data (permission projection, scope parsing, version upgrades, ...). Behaviour
+  that reaches outside the data — executing a forwarder, flattening OTLP
+  payloads, building storage keys — lives with the engine or layer that owns it.
 
 ## Layout
 
@@ -30,11 +32,14 @@ conversion from older on-disk versions to the current one.
 - **auth_user.go** — `User`, an account with assigned roles.
 - **auth_permissions.go** — `Permissions`, the boolean UI projection of a set of
   scopes.
+- **auth_provider.go** — `AuthProvider` and the `AuthProviderConfig` tagged
+  union for delegated authentication, with one file per backend
+  (**auth_provider_oidc.go**, **auth_provider_saml.go**).
 
 ### Logs and streams
 
-- **logrecord.go** — `LogRecord`, the canonical log entry, plus its OTLP
-  flattening and storage-key construction.
+- **logrecord.go** — `LogRecord`, the canonical log entry: a timestamp plus a
+  flat map of string fields.
 - **stream_config.go** — `StreamConfig`, a stream's retention and indexing
   policy.
 - **system_configuration.go** — `SystemConfiguration`, global server settings.
@@ -46,6 +51,8 @@ conversion from older on-disk versions to the current one.
 - **flow_v1.go** — the legacy V1 shape, kept for migration only.
 - **flow_convert.go** — `ConvertFlowGraph`, which loads any supported version and
   returns the latest, upgrading switch conditions to expr-lang along the way.
+- **pipeline_node_trace.go** — `PipelineNodeTrace`, the record of one node's
+  execution during a pipeline dry run.
 
 ### Forwarders
 
@@ -54,12 +61,13 @@ conversion from older on-disk versions to the current one.
 - **forwarder_v1.go** / **forwarder_convert.go** — the legacy V1 shape and its
   upgrade to V2.
 - **forwarder_v2_*.go** — one file per backend (http, syslog, datadog, amqp,
-  splunk, otlp, elastic, clickhouse, cloudwatch), each implementing
-  `init`/`close`/`call`.
-- **forwarder_v2_*_fields.go** — the per-record field types, each either a
-  literal value or a `DynamicField`.
+  splunk, otlp, elastic, clickhouse, awscloudwatch, googlecloudlogging), each
+  declaring its configuration shape and per-record field types (either a
+  literal value or a `DynamicField`). Their execution lives in the
+  [forwarders engine](../engines/forwarders).
 
 ### Helpers
 
 - **dynamic_field.go** — `DynamicField`, a forwarder value that may be a literal
-  or an [expr](https://expr-lang.org/) expression evaluated per record.
+  or an [expr](https://expr-lang.org/) expression, compiled and evaluated per
+  record by the forwarders engine.
