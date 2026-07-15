@@ -1,5 +1,3 @@
-import { Science } from '@mui/icons-material'
-
 import { useCallback, useState } from 'react'
 import { LoaderFunction, useLoaderData, useNavigate } from 'react-router'
 
@@ -16,6 +14,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import HelpIcon from '@mui/icons-material/Help'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import SaveIcon from '@mui/icons-material/Save'
+import ScienceIcon from '@mui/icons-material/Science'
 
 import { ReactFlowProvider } from '@xyflow/react'
 
@@ -202,7 +201,7 @@ const PipelineDetailView = () => {
                 color="primary"
                 size="small"
                 onClick={() => setTestOpen(true)}
-                startIcon={<Science />}
+                startIcon={<ScienceIcon />}
               >
                 Test
               </Button>
