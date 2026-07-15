@@ -67,6 +67,22 @@ take the time to edit your PR to make it fit our guidelines.
 They will be rendered by Github, giving a nice visual indicator of the kind of
 change you are submitting, and yet will still be easily "greppable".
 
+### Use of AI
+
+While the use of AI to help write code, documentation and tests is not
+prohibited per-se, low-effort Pull Requests that are 100% vibecoded and do not
+even follow those contributing guidelines will be rejected without discussion.
+
+AI is a tool to help the developper write code and navigate a large codebase, it
+is not meant to replace human thought and reasoning. If no human can understand
+or explain the code, then no human can debug it. It's a can of worm we are not
+willing to open.
+
+In the Pull Request template, there is a section about "License Agreement",
+asking you to make sure you have the rights on the code being submitted. Pull
+Requests that have been 100% vibecoded CANNOT check this box. And we don't want
+to rely on code with an incompatible license.
+
 ## License of your contributions
 
 This project is **Free** and **Open Source**. It is released under the terms of
