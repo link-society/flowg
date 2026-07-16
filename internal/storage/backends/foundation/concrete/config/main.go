@@ -12,6 +12,8 @@ import (
 type Options struct {
 	// ClusterFile is the path to the fdb.cluster file; empty uses the default.
 	ClusterFile string
+	// ConnectionString is the FoundationDB connection string; empty uses the default.
+	ConnectionString string
 	// KeySpace is the root prefix shared by every FlowG storage.
 	KeySpace string
 }
@@ -25,8 +27,9 @@ type deps struct {
 // DefaultOptions returns the default [Options] for the configuration storage.
 func DefaultOptions() Options {
 	return Options{
-		ClusterFile: "",
-		KeySpace:    "flowg",
+		ClusterFile:      "",
+		ConnectionString: "",
+		KeySpace:         "flowg",
 	}
 }
 
@@ -34,10 +37,11 @@ func DefaultOptions() Options {
 // [storage.ConfigStorage] configured with the given options.
 func NewStorage(opts Options) fx.Option {
 	adapterOpts := foundation.AdapterOptions{
-		LogChannel:  "storage.config",
-		ClusterFile: opts.ClusterFile,
-		KeySpace:    opts.KeySpace,
-		Namespace:   "config",
+		LogChannel:       "storage.config",
+		ClusterFile:      opts.ClusterFile,
+		ConnectionString: opts.ConnectionString,
+		KeySpace:         opts.KeySpace,
+		Namespace:        "config",
 	}
 
 	return fx.Module(

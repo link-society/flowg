@@ -30,6 +30,8 @@ type AdapterOptions struct {
 	LogChannel string
 	// ClusterFile is the path to the fdb.cluster file; empty uses the default.
 	ClusterFile string
+	// ConnectionString is the FoundationDB connection string; empty uses the default.
+	ConnectionString string
 	// KeySpace is the root prefix shared by every FlowG storage (e.g. "flowg").
 	KeySpace string
 	// Namespace is the subspace this storage owns (e.g. "config", "auth", "log").
@@ -62,7 +64,17 @@ func NewAdapter(opts AdapterOptions) fx.Option {
 			return nil, fmt.Errorf("failed to select FoundationDB API version: %w", err)
 		}
 
-		db, err := fdb.OpenDatabase(opts.ClusterFile)
+		var (
+			db  fdb.Database
+			err error
+		)
+		if opts.ConnectionString != "" {
+			db, err = fdb.OpenWithConnectionString(opts.ConnectionString)
+		} else if opts.ClusterFile != "" {
+			db, err = fdb.OpenDatabase(opts.ClusterFile)
+		} else {
+			err = fmt.Errorf("either ConnectionString or ClusterFile must be provided")
+		}
 		if err != nil {
 			return nil, fmt.Errorf("failed to open database: %w", err)
 		}

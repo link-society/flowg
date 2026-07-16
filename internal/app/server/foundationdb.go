@@ -12,13 +12,15 @@ import (
 // FoundationDB storage backend. It provides the fx modules that wire up the
 // FoundationDB storage backend with its respective cluster file and key space.
 type FoundationDbStorageOptions struct {
-	ClusterFile string
-	KeySpace    string
+	ClusterFile      string
+	ConnectionString string
+	KeySpace         string
 }
 
 func (o FoundationDbStorageOptions) AuthModule() fx.Option {
 	storageOpts := auth.DefaultOptions()
 	storageOpts.ClusterFile = o.ClusterFile
+	storageOpts.ConnectionString = o.ConnectionString
 	if o.KeySpace != "" {
 		storageOpts.KeySpace = o.KeySpace
 	}
@@ -29,6 +31,7 @@ func (o FoundationDbStorageOptions) AuthModule() fx.Option {
 func (o FoundationDbStorageOptions) ConfigModule() fx.Option {
 	storageOpts := config.DefaultOptions()
 	storageOpts.ClusterFile = o.ClusterFile
+	storageOpts.ConnectionString = o.ConnectionString
 	if o.KeySpace != "" {
 		storageOpts.KeySpace = o.KeySpace
 	}
@@ -39,6 +42,7 @@ func (o FoundationDbStorageOptions) ConfigModule() fx.Option {
 func (o FoundationDbStorageOptions) LogModule() fx.Option {
 	storageOpts := log.DefaultOptions()
 	storageOpts.ClusterFile = o.ClusterFile
+	storageOpts.ConnectionString = o.ConnectionString
 	if o.KeySpace != "" {
 		storageOpts.KeySpace = o.KeySpace
 	}

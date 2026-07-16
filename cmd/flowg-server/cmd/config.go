@@ -117,8 +117,9 @@ type StorageBackendBadgerDbConfig struct {
 // Configuration for the FoundationDB storage backend, which is a distributed
 // key-value store.
 type StorageBackendFoundationDbConfig struct {
-	ClusterFile string `hcl:"cluster_file"`
-	KeySpace    string `hcl:"key_space,optional"`
+	ClusterFile      string `hcl:"cluster_file,optional"`
+	ConnectionString string `hcl:"connection_string,optional"`
+	KeySpace         string `hcl:"key_space,optional"`
 }
 
 // Configuration for seeding the storage backend with initial data. This is
@@ -177,8 +178,9 @@ func DefaultConfig() *RootConfig {
 
 	case StorageBackendFoundationDb:
 		storageBackendConfig.FoundationDB = &StorageBackendFoundationDbConfig{
-			ClusterFile: defaultFoundationDbClusterFile,
-			KeySpace:    defaultFoundationDbKeySpace,
+			ClusterFile:      defaultFoundationDbClusterFile,
+			ConnectionString: defaultFoundationConnectionString,
+			KeySpace:         defaultFoundationDbKeySpace,
 		}
 	}
 
@@ -233,8 +235,9 @@ func DefaultStorageBackendBadgerDbConfig() *StorageBackendBadgerDbConfig {
 // is inherited from environment variables.
 func DefaultStorageBackendFoundationDbConfig() *StorageBackendFoundationDbConfig {
 	return &StorageBackendFoundationDbConfig{
-		ClusterFile: defaultFoundationDbClusterFile,
-		KeySpace:    defaultFoundationDbKeySpace,
+		ClusterFile:      defaultFoundationDbClusterFile,
+		ConnectionString: defaultFoundationConnectionString,
+		KeySpace:         defaultFoundationDbKeySpace,
 	}
 }
 
@@ -302,6 +305,10 @@ func (c *StorageBackendConfig) Validate() error {
 	}
 
 	if c.FoundationDB != nil {
+		if c.FoundationDB.ClusterFile == "" && c.FoundationDB.ConnectionString == "" {
+			return fmt.Errorf("FoundationDB backend requires either a cluster file or a connection string")
+		}
+
 		count++
 	}
 
@@ -410,8 +417,9 @@ func (cfg *RootConfig) AsServerOptions() (server.Options, error) {
 
 	case StorageBackendFoundationDb:
 		storageOptions = &server.FoundationDbStorageOptions{
-			ClusterFile: cfg.Storage.Backend.FoundationDB.ClusterFile,
-			KeySpace:    cfg.Storage.Backend.FoundationDB.KeySpace,
+			ClusterFile:      cfg.Storage.Backend.FoundationDB.ClusterFile,
+			ConnectionString: cfg.Storage.Backend.FoundationDB.ConnectionString,
+			KeySpace:         cfg.Storage.Backend.FoundationDB.KeySpace,
 		}
 	}
 
