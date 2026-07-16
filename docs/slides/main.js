@@ -1,9 +1,9 @@
-import Reveal from './node_modules/reveal.js/dist/reveal.esm.js';
+import Reveal from './node_modules/reveal.js/dist/reveal.mjs';
 
 import ExternalPlugin from './plugins/external.js';
-import MarkdownPlugin from './node_modules/reveal.js/plugin/markdown/markdown.esm.js';
-import HighlightPlugin from './node_modules/reveal.js/plugin/highlight/highlight.esm.js';
-import SpeakerNotesPlugin from './node_modules/reveal.js/plugin/notes/notes.esm.js';
+import MarkdownPlugin from './node_modules/reveal.js/dist/plugin/markdown.mjs';
+import HighlightPlugin from './node_modules/reveal.js/dist/plugin/highlight.mjs';
+import SpeakerNotesPlugin from './node_modules/reveal.js/dist/plugin/notes.mjs';
 import MermaidPlugin from './plugins/mermaid.js';
 
 Reveal.initialize({
