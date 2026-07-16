@@ -16,6 +16,8 @@ import (
 type Options struct {
 	// ClusterFile is the path to the fdb.cluster file; empty uses the default.
 	ClusterFile string
+	// ConnectionString is the FoundationDB connection string; empty uses the default.
+	ConnectionString string
 	// KeySpace is the root prefix shared by every FlowG storage.
 	KeySpace string
 	// GCInterval is how often the retention and TTL garbage collectors run.
@@ -34,9 +36,10 @@ type deps struct {
 // DefaultOptions returns the default [Options] for the log storage.
 func DefaultOptions() Options {
 	return Options{
-		ClusterFile: "",
-		KeySpace:    "flowg",
-		GCInterval:  5 * time.Minute,
+		ClusterFile:      "",
+		ConnectionString: "",
+		KeySpace:         "flowg",
+		GCInterval:       5 * time.Minute,
 	}
 }
 
@@ -45,11 +48,12 @@ func DefaultOptions() Options {
 // background worker that periodically enforces each stream's retention budget.
 func NewStorage(opts Options) fx.Option {
 	adapterOpts := foundation.AdapterOptions{
-		LogChannel:  "storage.log",
-		ClusterFile: opts.ClusterFile,
-		KeySpace:    opts.KeySpace,
-		Namespace:   "log",
-		GCInterval:  opts.GCInterval,
+		LogChannel:       "storage.log",
+		ClusterFile:      opts.ClusterFile,
+		ConnectionString: opts.ConnectionString,
+		KeySpace:         opts.KeySpace,
+		Namespace:        "log",
+		GCInterval:       opts.GCInterval,
 	}
 
 	return fx.Module(
