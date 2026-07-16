@@ -92,6 +92,21 @@ storage {
     config_dir = "./data/config"
   }
 
+  # env: FLOWG_STORAGE_BACKEND
+  backend "foundationdb" {
+    # env: FLOWG_FOUNDATIONDB_CLUSTER_FILE (default: "/etc/foundationdb/fdb.cluster")
+    cluster_file = "/etc/foundationdb/fdb.cluster"
+
+    # env: FLOWG_FOUNDATIONDB_CONNECTION_STRING (default: "")
+    # if set, has priority over `cluster_file`
+    connection_string = ""
+
+    # env: FLOWG_FOUNDATIONDB_KEY_SPACE (default: "flowg")
+    key_space = ""
+  }
+
+  # NB: only one storage backend section is allowed
+
   seed {
     auth {
       # env: FLOWG_AUTH_INITIAL_USER (default: "root")

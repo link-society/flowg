@@ -75,6 +75,8 @@ services {
 storage {
   backend "foundationdb" {
     cluster_file = "/etc/foundationdb/fdb.cluster"
+    ## Or:
+    # connection_string = "..."
     key_space    = "flowg"
   }
 }
