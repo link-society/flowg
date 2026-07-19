@@ -2,6 +2,7 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
 import dayjs from 'dayjs'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
@@ -31,10 +32,26 @@ import {
 export type { TimeWindowFactory } from './types'
 
 const RELATIVE_TIMEWINDOW_OPTIONS: RelTimeWindowOption[] = [
-  { key: 'last-15min', label: 'Last 15 Minutes', value: 15 * 60 * 1000 },
-  { key: 'last-1h', label: 'Last Hour', value: 60 * 60 * 1000 },
-  { key: 'last-day', label: 'Last Day', value: 24 * 60 * 60 * 1000 },
-  { key: 'last-week', label: 'Last Week', value: 7 * 24 * 60 * 60 * 1000 },
+  {
+    key: 'last-15min',
+    label: 'components.timeWindowSelector.last15Minutes',
+    value: 15 * 60 * 1000,
+  },
+  {
+    key: 'last-1h',
+    label: 'components.timeWindowSelector.lastHour',
+    value: 60 * 60 * 1000,
+  },
+  {
+    key: 'last-day',
+    label: 'components.timeWindowSelector.lastDay',
+    value: 24 * 60 * 60 * 1000,
+  },
+  {
+    key: 'last-week',
+    label: 'components.timeWindowSelector.lastWeek',
+    value: 7 * 24 * 60 * 60 * 1000,
+  },
 ]
 
 const RELATIVE_TIMEWINDOW_LABELS_BY_VALUE = RELATIVE_TIMEWINDOW_OPTIONS.reduce(
@@ -47,32 +64,44 @@ const RELATIVE_TIMEWINDOW_LABELS_BY_VALUE = RELATIVE_TIMEWINDOW_OPTIONS.reduce(
 
 export const DEFAULT_TIMEWINDOW_VALUE = RELATIVE_TIMEWINDOW_OPTIONS[0].value
 
-const LabelRenderer = (props: LabelRendererProps) => (
-  <LabelRow>
-    {props.live ? (
-      <>
-        <LabelStrong variant="text">From</LabelStrong>
-        <Typography variant="text">{props.from.toLocaleString()}</Typography>
-      </>
-    ) : props.timewindowType === 'relative' ? (
-      <Typography variant="text">
-        {RELATIVE_TIMEWINDOW_LABELS_BY_VALUE[props.relativeTimewindow] ??
-          '#ERR#'}
-      </Typography>
-    ) : (
-      <>
-        <LabelStrong variant="text">From</LabelStrong>
-        <Typography variant="text">{props.from.toLocaleString()}</Typography>
-        <LabelStrong variant="text">to</LabelStrong>
-        <Typography variant="text">{props.to.toLocaleString()}</Typography>
-      </>
-    )}
-  </LabelRow>
-)
+const LabelRenderer = (props: LabelRendererProps) => {
+  const { t } = useTranslation()
+  const relativeLabelKey =
+    RELATIVE_TIMEWINDOW_LABELS_BY_VALUE[props.relativeTimewindow]
+
+  return (
+    <LabelRow>
+      {props.live ? (
+        <>
+          <LabelStrong variant="text">
+            {t('components.timeWindowSelector.fromLabel')}
+          </LabelStrong>
+          <Typography variant="text">{props.from.toLocaleString()}</Typography>
+        </>
+      ) : props.timewindowType === 'relative' ? (
+        <Typography variant="text">
+          {relativeLabelKey ? t(relativeLabelKey) : '#ERR#'}
+        </Typography>
+      ) : (
+        <>
+          <LabelStrong variant="text">
+            {t('components.timeWindowSelector.fromLabel')}
+          </LabelStrong>
+          <Typography variant="text">{props.from.toLocaleString()}</Typography>
+          <LabelStrong variant="text">
+            {t('components.timeWindowSelector.toLabel')}
+          </LabelStrong>
+          <Typography variant="text">{props.to.toLocaleString()}</Typography>
+        </>
+      )}
+    </LabelRow>
+  )
+}
 
 const TimeWindowSelector = ({
   onTimeWindowChanged,
 }: TimeWindowSelectorProps) => {
+  const { t } = useTranslation()
   const now = useMemo(() => new Date(), [])
 
   const [menu, setMenu] = useState<HTMLElement | null>(null)
@@ -167,13 +196,13 @@ const TimeWindowSelector = ({
               id="btn:streams.timewindow-selector.type.relative"
               value="relative"
             >
-              Relative
+              {t('components.timeWindowSelector.relative')}
             </TimeWindowToggleButton>
             <TimeWindowToggleButton
               id="btn:streams.timewindow-selector.type.absolute"
               value="absolute"
             >
-              Absolute
+              {t('components.timeWindowSelector.absolute')}
             </TimeWindowToggleButton>
           </TimeWindowToggleGroup>
           <Divider />
@@ -196,7 +225,7 @@ const TimeWindowSelector = ({
                   key={option.key}
                   value={option.value}
                 >
-                  {option.label}
+                  {t(option.label)}
                 </ToggleButton>
               ))}
             </TimeWindowToggleGroup>
@@ -204,7 +233,7 @@ const TimeWindowSelector = ({
           {timeWindowType === 'absolute' && (
             <MenuSection>
               <DateTimePicker
-                label="From"
+                label={t('components.timeWindowSelector.fromLabel')}
                 value={dayjs(from)}
                 onChange={(date) => {
                   if (date !== null) {
@@ -214,7 +243,7 @@ const TimeWindowSelector = ({
               />
 
               <DateTimePicker
-                label="To"
+                label={t('components.timeWindowSelector.toDateLabel')}
                 value={dayjs(to)}
                 onChange={(date) => {
                   if (date !== null) {
@@ -240,7 +269,7 @@ const TimeWindowSelector = ({
               id="btn:streams.timewindow-selector.live"
               value={true}
             >
-              Watch Logs
+              {t('components.timeWindowSelector.watchLogs')}
             </ToggleButton>
           </TimeWindowToggleGroup>
 
@@ -253,7 +282,7 @@ const TimeWindowSelector = ({
               endIcon={<CheckIcon />}
               onClick={handleClose}
             >
-              Apply
+              {t('components.timeWindowSelector.apply')}
             </Button>
           </MenuPad>
         </MenuBody>

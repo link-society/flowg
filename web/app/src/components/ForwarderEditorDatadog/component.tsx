@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import Divider from '@mui/material/Divider'
 import TextField from '@mui/material/TextField'
@@ -19,6 +20,7 @@ const ForwarderEditorDatadog = ({
   onConfigChange,
   onValidationChange,
 }: ForwarderEditorDatadogProps) => {
+  const { t } = useTranslation()
   const [url, setUrl] = useInput(config.url, [
     validators.minLength(1),
     validators.formatUri,
@@ -69,7 +71,7 @@ const ForwarderEditorDatadog = ({
     <ForwarderEditorDatadogRoot id="container:editor.forwarders.datadog">
       <TextField
         id="input:editor.forwarders.datadog.url"
-        label="URL"
+        label={t('components.forwarderEditorDatadog.urlLabel')}
         variant="outlined"
         type="text"
         error={!url.valid}
@@ -83,7 +85,7 @@ const ForwarderEditorDatadog = ({
 
       <TextField
         id="input:editor.forwarders.datadog.apiKey"
-        label="ApiKey"
+        label={t('components.forwarderEditorDatadog.apiKeyLabel')}
         variant="outlined"
         type="password"
         error={!apiKey.valid}
@@ -95,7 +97,7 @@ const ForwarderEditorDatadog = ({
 
       <DynamicFieldControl
         id="input:editor.forwarders.datadog.source"
-        label="Source"
+        label={t('components.forwarderEditorDatadog.sourceLabel')}
         variant="outlined"
         error={!ddsource.valid}
         value={ddsource.value}
@@ -103,7 +105,7 @@ const ForwarderEditorDatadog = ({
       />
       <DynamicFieldControl
         id="input:editor.forwarders.datadog.tags"
-        label="Tags"
+        label={t('components.forwarderEditorDatadog.tagsLabel')}
         variant="outlined"
         error={!ddtags.valid}
         value={ddtags.value}
@@ -111,7 +113,7 @@ const ForwarderEditorDatadog = ({
       />
       <DynamicFieldControl
         id="input:editor.forwarders.datadog.hostname"
-        label="Hostname"
+        label={t('components.forwarderEditorDatadog.hostnameLabel')}
         variant="outlined"
         error={!hostname.valid}
         value={hostname.value}
@@ -119,7 +121,7 @@ const ForwarderEditorDatadog = ({
       />
       <DynamicFieldControl
         id="input:editor.forwarders.datadog.message"
-        label="Message"
+        label={t('components.forwarderEditorDatadog.messageLabel')}
         variant="outlined"
         error={!message.valid}
         value={message.value}
@@ -127,7 +129,7 @@ const ForwarderEditorDatadog = ({
       />
       <DynamicFieldControl
         id="input:editor.forwarders.datadog.service"
-        label="Service"
+        label={t('components.forwarderEditorDatadog.serviceLabel')}
         variant="outlined"
         error={!service.valid}
         value={service.value}

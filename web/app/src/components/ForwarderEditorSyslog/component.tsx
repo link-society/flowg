@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
@@ -35,6 +36,7 @@ const ForwarderEditorSyslog = ({
   onConfigChange,
   onValidationChange,
 }: ForwarderEditorSyslogProps) => {
+  const { t } = useTranslation()
   const [network, setNetwork] = useInput<SyslogNetwork>(config.network, [])
   const [address, setAddress] = useInput<string>(config.address, [
     validators.pattern(/^(([a-zA-Z0-9.-]+)|(\[[0-9A-Fa-f:]+\])):[0-9]{1,5}$/),
@@ -80,13 +82,13 @@ const ForwarderEditorSyslog = ({
       <ForwarderEditorSyslogRow>
         <FormControl>
           <InputLabel id="label:editor.forwarders.syslog.network">
-            Network
+            {t('components.forwarderEditorSyslog.networkLabel')}
           </InputLabel>
           <Select<SyslogNetwork>
             labelId="label:editor.forwarders.syslog.network"
             id="select:editor.forwarders.syslog.network"
             value={network.value}
-            label="Network"
+            label={t('components.forwarderEditorSyslog.networkLabel')}
             onChange={(e) => {
               setNetwork(e.target.value as SyslogNetwork)
             }}
@@ -105,7 +107,7 @@ const ForwarderEditorSyslog = ({
 
         <ForwarderEditorSyslogAddressField
           id="input:editor.forwarders.syslog.address"
-          label="Server Address"
+          label={t('components.forwarderEditorSyslog.addressLabel')}
           variant="outlined"
           type="text"
           error={!address.valid}
@@ -118,7 +120,7 @@ const ForwarderEditorSyslog = ({
 
       <DynamicFieldControl
         id="input:editor.forwarders.syslog.tag"
-        label="Tag"
+        label={t('components.forwarderEditorSyslog.tagLabel')}
         variant="outlined"
         type="text"
         error={!tag.valid}
@@ -132,7 +134,7 @@ const ForwarderEditorSyslog = ({
         <ForwarderEditorSyslogGrowFormControl>
           <DynamicFieldControl
             id="select:editor.forwarders.syslog.severity"
-            label="Severity"
+            label={t('components.forwarderEditorSyslog.severityLabel')}
             variant="outlined"
             select
             error={!severity.valid}
@@ -156,7 +158,7 @@ const ForwarderEditorSyslog = ({
         <ForwarderEditorSyslogGrowFormControl>
           <DynamicFieldControl
             id="select:editor.forwarders.syslog.facility"
-            label="Facility"
+            label={t('components.forwarderEditorSyslog.facilityLabel')}
             variant="outlined"
             select
             error={!facility.valid}
@@ -180,7 +182,7 @@ const ForwarderEditorSyslog = ({
 
       <DynamicFieldControl
         id="input:editor.forwarders.syslog.message"
-        label="Message"
+        label={t('components.forwarderEditorSyslog.messageLabel')}
         variant="outlined"
         error={!message.valid}
         value={message.value}

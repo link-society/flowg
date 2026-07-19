@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -19,6 +20,7 @@ import {
 import { LogQueryPanelProps } from './types'
 
 const LogQueryPanel = (props: LogQueryPanelProps) => {
+  const { t } = useTranslation()
   const [filter, setFilter] = useState('')
   const [timeWindowFactory, setTimeWindowFactory] =
     useState<TimeWindowFactory | null>(null)
@@ -44,7 +46,7 @@ const LogQueryPanel = (props: LogQueryPanelProps) => {
       >
         <TextField
           id="input:streams.filter"
-          label="Filter"
+          label={t('components.logQueryPanel.filterLabel')}
           variant="outlined"
           size="small"
           value={filter}
@@ -74,7 +76,7 @@ const LogQueryPanel = (props: LogQueryPanelProps) => {
           {props.loading ? (
             <CircularProgress color="inherit" size={24} />
           ) : (
-            <>Query Logs</>
+            <>{t('components.logQueryPanel.submit')}</>
           )}
         </Button>
       </LogQueryPanelActions>

@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import Divider from '@mui/material/Divider'
 import TextField from '@mui/material/TextField'
@@ -19,6 +20,8 @@ const ForwarderEditorAmqp = ({
   onConfigChange,
   onValidationChange,
 }: ForwarderEditorAmqpProps) => {
+  const { t } = useTranslation()
+
   const [url, setUrl] = useInput(config.url, [
     validators.minLength(1),
     validators.formatUri,
@@ -55,7 +58,7 @@ const ForwarderEditorAmqp = ({
     <ForwarderEditorAmqpRoot id="container:editor.forwarders.amqp">
       <TextField
         id="input:editor.forwarders.amqp.url"
-        label="URL"
+        label={t('components.forwarderEditorAmqp.urlLabel')}
         variant="outlined"
         type="text"
         error={!url.valid}
@@ -69,7 +72,7 @@ const ForwarderEditorAmqp = ({
 
       <DynamicFieldControl
         id="input:editor.forwarders.amqp.exchange"
-        label="Exchange"
+        label={t('components.forwarderEditorAmqp.exchangeLabel')}
         variant="outlined"
         type="text"
         error={!exchange.valid}
@@ -79,7 +82,7 @@ const ForwarderEditorAmqp = ({
 
       <DynamicFieldControl
         id="input:editor.forwarders.amqp.routing_key"
-        label="Routing Key"
+        label={t('components.forwarderEditorAmqp.routingKeyLabel')}
         variant="outlined"
         type="text"
         error={!routingKey.valid}
@@ -89,7 +92,7 @@ const ForwarderEditorAmqp = ({
 
       <DynamicFieldControl
         id="input:editor.forwarders.amqp.body"
-        label="Routing Key"
+        label={t('components.forwarderEditorAmqp.routingKeyLabel')}
         multiline
         variant="outlined"
         type="text"

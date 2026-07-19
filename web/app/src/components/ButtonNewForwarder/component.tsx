@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import Button from '@mui/material/Button'
 
 import AddIcon from '@mui/icons-material/Add'
@@ -11,6 +13,7 @@ import DialogNewForwarder from '@/components/DialogNewForwarder/component'
 import { ButtonNewForwarderProps } from './types'
 
 const ButtonNewForwarder = (props: ButtonNewForwarderProps) => {
+  const { t } = useTranslation()
   const dialogs = useDialogs()
   const notify = useNotify()
 
@@ -20,7 +23,7 @@ const ButtonNewForwarder = (props: ButtonNewForwarderProps) => {
     if (forwarderName !== null) {
       props.onForwarderCreated(forwarderName)
 
-      notify.success('Forwarder created')
+      notify.success(t('components.buttonNewForwarder.notifications.created'))
     }
   }, [props.onForwarderCreated])
 
@@ -33,7 +36,7 @@ const ButtonNewForwarder = (props: ButtonNewForwarderProps) => {
       onClick={() => handleClick()}
       startIcon={<AddIcon />}
     >
-      New
+      {t('components.buttonNewForwarder.label')}
     </Button>
   )
 }

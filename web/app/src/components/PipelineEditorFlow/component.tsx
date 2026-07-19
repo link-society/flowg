@@ -8,6 +8,7 @@ import React, {
   useState,
 } from 'react'
 import { flushSync } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 
 import Typography from '@mui/material/Typography'
 
@@ -79,6 +80,7 @@ export const PipelineEditorFlow: React.FC<PipelineEditorFlowProps> = ({
   onFlowChange,
   pipelineTrace,
 }) => {
+  const { t } = useTranslation()
   const { screenToFlowPosition, fitView } = useReactFlow()
 
   const nodeTypes = useMemo(
@@ -252,7 +254,10 @@ export const PipelineEditorFlow: React.FC<PipelineEditorFlowProps> = ({
         >
           <Background />
           <Controls>
-            <ControlButton onClick={onLayout} title="Auto layout">
+            <ControlButton
+              onClick={onLayout}
+              title={t('components.pipelineEditorFlow.autoLayout')}
+            >
               <AccountTreeIcon />
             </ControlButton>
           </Controls>
@@ -260,13 +265,15 @@ export const PipelineEditorFlow: React.FC<PipelineEditorFlowProps> = ({
           <Panel position="top-left">
             <FlowPanelPaper variant="outlined">
               <FlowPanelLabel>
-                <Typography variant="text">Other Nodes:</Typography>
+                <Typography variant="text">
+                  {t('components.pipelineEditorFlow.otherNodes')}
+                </Typography>
               </FlowPanelLabel>
 
               <FlowPanelChips>
                 <SwitchNodeChip
                   icon={<DeviceHubIcon />}
-                  label="switch"
+                  label={t('components.pipelineEditorFlow.switchNodeLabel')}
                   variant="outlined"
                   draggable
                   onDragStart={(evt) => {

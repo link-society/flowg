@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import Divider from '@mui/material/Divider'
 import TextField from '@mui/material/TextField'
@@ -17,6 +18,7 @@ const ForwarderEditorElastic = ({
   onConfigChange,
   onValidationChange,
 }: ForwarderEditorElasticProps) => {
+  const { t } = useTranslation()
   const [index, setIndex] = useInput(config.index, [validators.minLength(1)])
   const [username, setUsername] = useInput(config.username, [
     validators.minLength(1),
@@ -63,7 +65,7 @@ const ForwarderEditorElastic = ({
     <ForwarderEditorElasticRoot id="container:editor.forwarders.elastic">
       <TextField
         id="input:editor.forwarders.elastic.index"
-        label="Index"
+        label={t('components.forwarderEditorElastic.indexLabel')}
         variant="outlined"
         type="text"
         error={!index.valid}
@@ -75,7 +77,7 @@ const ForwarderEditorElastic = ({
 
       <TextField
         id="input:editor.forwarders.elastic.username"
-        label="Username"
+        label={t('components.forwarderEditorElastic.usernameLabel')}
         variant="outlined"
         type="text"
         error={!username.valid}
@@ -87,7 +89,7 @@ const ForwarderEditorElastic = ({
 
       <TextField
         id="input:editor.forwarders.elastic.password"
-        label="Password"
+        label={t('components.forwarderEditorElastic.passwordLabel')}
         variant="outlined"
         type="password"
         error={!password.valid}
@@ -101,7 +103,7 @@ const ForwarderEditorElastic = ({
 
       <InputList
         id="editor.forwarders.elastic.addresses"
-        itemLabel="Address"
+        itemLabel={t('components.forwarderEditorElastic.addressItemLabel')}
         items={config.addresses}
         itemValidators={[validators.minLength(1), validators.formatUri]}
         onChange={setAddresses}
@@ -111,7 +113,7 @@ const ForwarderEditorElastic = ({
 
       <TextField
         id="input:editor.forwarders.elastic.ca"
-        label="CA Certificate"
+        label={t('components.forwarderEditorElastic.caLabel')}
         variant="outlined"
         type="text"
         multiline

@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import Divider from '@mui/material/Divider'
 import TextField from '@mui/material/TextField'
@@ -19,6 +20,7 @@ const ForwarderEditorSplunk = ({
   onConfigChange,
   onValidationChange,
 }: ForwarderEditorSplunkProps) => {
+  const { t } = useTranslation()
   const [endpoint, setEndpoint] = useInput<string>(config.endpoint, [
     validators.minLength(1),
     validators.formatUri,
@@ -52,7 +54,7 @@ const ForwarderEditorSplunk = ({
     <ForwarderEditorSplunkRoot id="container:editor.forwarders.splunk">
       <TextField
         id="input:editor.forwarders.splunk.endpoint"
-        label="HTTP Event Collector Endpoint"
+        label={t('components.forwarderEditorSplunk.endpointLabel')}
         variant="outlined"
         type="text"
         error={!endpoint.valid}
@@ -66,7 +68,7 @@ const ForwarderEditorSplunk = ({
 
       <TextField
         id="input:editor.forwarders.splunk.token"
-        label="Token"
+        label={t('components.forwarderEditorSplunk.tokenLabel')}
         variant="outlined"
         type="password"
         error={!token.valid}
@@ -78,7 +80,7 @@ const ForwarderEditorSplunk = ({
 
       <DynamicFieldControl
         id="input:editor.forwarders.splunk.source"
-        label="Source"
+        label={t('components.forwarderEditorSplunk.sourceLabel')}
         variant="outlined"
         type="text"
         error={!source.valid}
@@ -88,7 +90,7 @@ const ForwarderEditorSplunk = ({
 
       <DynamicFieldControl
         id="input:editor.forwarders.splunk.host"
-        label="Host"
+        label={t('components.forwarderEditorSplunk.hostLabel')}
         variant="outlined"
         type="text"
         error={!host.valid}

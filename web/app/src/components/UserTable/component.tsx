@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import Chip from '@mui/material/Chip'
 import Typography from '@mui/material/Typography'
@@ -40,6 +41,7 @@ const RolesCell = (props: RolesCellProps) => (
 )
 
 const UserTable = ({ roles, users, defaultRoles }: UserTableProps) => {
+  const { t } = useTranslation()
   const { permissions } = useProfile()
   const notify = useNotify()
 
@@ -72,7 +74,7 @@ const UserTable = ({ roles, users, defaultRoles }: UserTableProps) => {
         })
       }
 
-      notify.success('User deleted')
+      notify.success(t('components.userTable.notifications.deleted'))
     },
     [gridRef]
   )
@@ -80,13 +82,13 @@ const UserTable = ({ roles, users, defaultRoles }: UserTableProps) => {
   const [rowData] = useState<UserModel[]>(users)
   const [columnDefs] = useState<ColDef<UserModel>[]>([
     {
-      headerName: 'Username',
+      headerName: t('components.userTable.columns.username'),
       field: 'name',
       suppressMovable: true,
       sortable: false,
     },
     {
-      headerName: 'Roles',
+      headerName: t('components.userTable.columns.roles'),
       field: 'roles',
       cellDataType: false,
       cellRenderer: RolesCell,
@@ -98,7 +100,7 @@ const UserTable = ({ roles, users, defaultRoles }: UserTableProps) => {
     },
     {
       hide: !permissions.can_edit_acls,
-      headerName: 'Actions',
+      headerName: t('common.tableColumns.actions'),
       headerClass: 'flowg-actions-header',
       cellClass: 'flowg-actions-cell',
       cellRenderer: TableActionsCell,
@@ -117,7 +119,9 @@ const UserTable = ({ roles, users, defaultRoles }: UserTableProps) => {
           <UserTableCardHeaderTitle>
             <AccountCircleIcon />
             <UserTableCardHeaderTitleText>
-              <Typography variant="titleSm">Users</Typography>
+              <Typography variant="titleSm">
+                {t('components.userTable.title')}
+              </Typography>
             </UserTableCardHeaderTitleText>
             {permissions.can_edit_acls && (
               <ButtonNewUser

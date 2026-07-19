@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -39,6 +40,7 @@ const Transition = React.forwardRef(function Transition(
 const DialogTransformerEditor = ({
   transformer,
 }: DialogTransformerEditorProps) => {
+  const { t } = useTranslation()
   const notify = useNotify()
 
   const [open, setOpen] = useState(false)
@@ -61,7 +63,7 @@ const DialogTransformerEditor = ({
 
   const [onSave, saveLoading] = useApiOperation(async () => {
     await configApi.saveTransformer(transformer, code)
-    notify.success('Transformer saved')
+    notify.success(t('pages.transformers.notifications.saved'))
   }, [transformer, code])
 
   return (
@@ -73,7 +75,7 @@ const DialogTransformerEditor = ({
         startIcon={<EditIcon />}
         onClick={() => setOpen(true)}
       >
-        Edit
+        {t('common.actions.edit')}
       </Button>
       <Dialog
         fullScreen
@@ -95,7 +97,7 @@ const DialogTransformerEditor = ({
 
             <TitleField>
               <TextField
-                label="Transformer name"
+                label={t('components.dialogTransformerEditor.nameLabel')}
                 value={transformer}
                 type="text"
                 variant="outlined"
@@ -128,7 +130,11 @@ const DialogTransformerEditor = ({
               disabled={saveLoading}
               startIcon={!saveLoading && <SaveIcon />}
             >
-              {saveLoading ? <CircularProgress size={24} /> : <>Save</>}
+              {saveLoading ? (
+                <CircularProgress size={24} />
+              ) : (
+                <>{t('common.actions.save')}</>
+              )}
             </Button>
           </EditorToolbar>
         </DialogAppBar>

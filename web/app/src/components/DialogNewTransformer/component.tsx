@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -23,6 +24,7 @@ const DialogNewTransformer = ({
   open,
   onClose,
 }: DialogProps<void, string | null>) => {
+  const { t } = useTranslation()
   const [name, setName] = useState('')
 
   const [onSubmit, loading] = useApiOperation(async () => {
@@ -46,12 +48,12 @@ const DialogNewTransformer = ({
         },
       }}
     >
-      <DialogTitle>Create new transformer</DialogTitle>
+      <DialogTitle>{t('components.dialogNewTransformer.title')}</DialogTitle>
       <DialogContent>
         <DialogFormBody>
           <TextField
             id="input:transformers.modal.name"
-            label="Transformer name"
+            label={t('components.dialogNewTransformer.nameLabel')}
             value={name}
             onChange={(e) => setName(e.target.value)}
             type="text"
@@ -69,7 +71,7 @@ const DialogNewTransformer = ({
           onClick={() => onClose(null)}
           disabled={loading}
         >
-          Cancel
+          {t('common.actions.cancel')}
         </Button>
         <Button
           id="btn:transformers.modal.save"
@@ -79,7 +81,11 @@ const DialogNewTransformer = ({
           disabled={loading}
           type="submit"
         >
-          {loading ? <CircularProgress color="inherit" size={24} /> : <>Save</>}
+          {loading ? (
+            <CircularProgress color="inherit" size={24} />
+          ) : (
+            <>{t('common.actions.save')}</>
+          )}
         </Button>
       </DialogActions>
     </Dialog>

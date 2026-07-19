@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
 
 import AccountTreeIcon from '@mui/icons-material/AccountTree'
@@ -12,12 +13,13 @@ import PipelineEditorNodeList from '@/components/PipelineEditorNodeList/componen
 import { buildUrl } from '@/router'
 
 const PipelineEditorNodeListPipeline = () => {
+  const { t } = useTranslation()
   const { permissions } = useProfile()
   const navigate = useNavigate()
 
   return (
     <PipelineEditorNodeList
-      title="Pipelines"
+      title={t('components.pipelineEditorNodeListPipeline.title')}
       newButton={(createdCb) => (
         <>
           {permissions.can_edit_pipelines && (

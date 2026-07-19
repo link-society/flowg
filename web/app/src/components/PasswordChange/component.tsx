@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -16,6 +17,7 @@ import { useNotify } from '@/lib/hooks/notify'
 import { FormRow, IconBox, Label } from './styles'
 
 const PasswordChange = () => {
+  const { t } = useTranslation()
   const notify = useNotify()
 
   const [oldPassword, setOldPassword] = useState('')
@@ -23,14 +25,14 @@ const PasswordChange = () => {
 
   const [onSubmit, loading] = useApiOperation(async () => {
     await authApi.changePassword(oldPassword, newPassword)
-    notify.success('Password changed')
+    notify.success(t('components.passwordChange.notifications.changed'))
     setOldPassword('')
     setNewPassword('')
   }, [oldPassword, newPassword, setOldPassword, setNewPassword])
 
   return (
     <Box>
-      <Label variant="text">Change password:</Label>
+      <Label variant="text">{t('components.passwordChange.title')}</Label>
 
       <FormRow
         onSubmit={(e) => {
@@ -44,7 +46,7 @@ const PasswordChange = () => {
 
         <TextField
           id="input:account.settings.change-password.old"
-          label="Old Password"
+          label={t('components.passwordChange.oldPasswordLabel')}
           value={oldPassword}
           type="password"
           onChange={(e) => setOldPassword(e.target.value)}
@@ -54,7 +56,7 @@ const PasswordChange = () => {
 
         <TextField
           id="input:account.settings.change-password.new"
-          label="New Password"
+          label={t('components.passwordChange.newPasswordLabel')}
           value={newPassword}
           type="password"
           onChange={(e) => setNewPassword(e.target.value)}

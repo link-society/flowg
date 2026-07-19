@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -40,6 +41,7 @@ const Transition = React.forwardRef(function Transition(
 })
 
 const DialogStreamEditor = ({ stream }: DialogStreamEditorProps) => {
+  const { t } = useTranslation()
   const notify = useNotify()
 
   const [open, setOpen] = useState(false)
@@ -70,7 +72,7 @@ const DialogStreamEditor = ({ stream }: DialogStreamEditorProps) => {
 
   const [onSave, saveLoading] = useApiOperation(async () => {
     await configApi.configureStream(stream, streamConfig)
-    notify.success('Stream saved')
+    notify.success(t('pages.storage.notifications.saved'))
   }, [stream, streamConfig])
 
   return (
@@ -82,7 +84,7 @@ const DialogStreamEditor = ({ stream }: DialogStreamEditorProps) => {
         startIcon={<EditIcon />}
         onClick={() => setOpen(true)}
       >
-        Edit
+        {t('common.actions.edit')}
       </Button>
       <Dialog
         fullScreen
@@ -104,7 +106,7 @@ const DialogStreamEditor = ({ stream }: DialogStreamEditorProps) => {
 
             <TitleField>
               <TextField
-                label="Stream name"
+                label={t('components.dialogStreamEditor.nameLabel')}
                 value={stream}
                 type="text"
                 variant="outlined"
@@ -137,7 +139,11 @@ const DialogStreamEditor = ({ stream }: DialogStreamEditorProps) => {
               disabled={saveLoading}
               startIcon={!saveLoading && <SaveIcon />}
             >
-              {saveLoading ? <CircularProgress size={24} /> : <>Save</>}
+              {saveLoading ? (
+                <CircularProgress size={24} />
+              ) : (
+                <>{t('common.actions.save')}</>
+              )}
             </Button>
           </EditorToolbar>
         </DialogAppBar>

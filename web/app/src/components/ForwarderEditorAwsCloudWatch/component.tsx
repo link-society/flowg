@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import Divider from '@mui/material/Divider'
 import TextField from '@mui/material/TextField'
@@ -15,6 +16,7 @@ const ForwarderEditorAwsCloudWatch = ({
   onConfigChange,
   onValidationChange,
 }: ForwarderEditorAwsCloudWatchProps) => {
+  const { t } = useTranslation()
   const [app_id, setAppID] = useInput(config.app_id)
 
   const [endpoint, setEndpoint] = useInput(config.endpoint, [
@@ -52,7 +54,7 @@ const ForwarderEditorAwsCloudWatch = ({
     <ForwarderEditorAwsCloudWatchRoot id="container:editor.forwarders.cloudwatch">
       <TextField
         id="input:editor.forwarders.cloudwatch.app_id"
-        label="App ID"
+        label={t('components.forwarderEditorAwsCloudWatch.appIdLabel')}
         variant="outlined"
         type="text"
         error={!app_id.valid}
@@ -64,7 +66,7 @@ const ForwarderEditorAwsCloudWatch = ({
 
       <TextField
         id="input:editor.forwarders.cloudwatch.webhook_url"
-        label="AWS endpoint"
+        label={t('components.forwarderEditorAwsCloudWatch.endpointLabel')}
         variant="outlined"
         type="text"
         error={!endpoint.valid}
@@ -76,7 +78,7 @@ const ForwarderEditorAwsCloudWatch = ({
 
       <TextField
         id="input:editor.forwarders.cloudwatch.region"
-        label="Region"
+        label={t('components.forwarderEditorAwsCloudWatch.regionLabel')}
         variant="outlined"
         type="text"
         error={!region.valid}
@@ -90,7 +92,7 @@ const ForwarderEditorAwsCloudWatch = ({
 
       <TextField
         id="input:editor.forwarders.cloudwatch.akid"
-        label="Access key ID"
+        label={t('components.forwarderEditorAwsCloudWatch.akidLabel')}
         variant="outlined"
         type="text"
         error={!akid.valid}
@@ -102,7 +104,7 @@ const ForwarderEditorAwsCloudWatch = ({
 
       <TextField
         id="input:editor.forwarders.cloudwatch.access_key"
-        label="Secret access key"
+        label={t('components.forwarderEditorAwsCloudWatch.accessKeyLabel')}
         variant="outlined"
         type="text"
         error={!access_key.valid}
@@ -114,7 +116,7 @@ const ForwarderEditorAwsCloudWatch = ({
 
       <TextField
         id="input:editor.forwarders.cloudwatch.token"
-        label="Session token"
+        label={t('components.forwarderEditorAwsCloudWatch.tokenLabel')}
         variant="outlined"
         type="text"
         error={!token.valid}
@@ -128,7 +130,7 @@ const ForwarderEditorAwsCloudWatch = ({
 
       <TextField
         id="input:editor.forwarders.cloudwatch.group"
-        label="Group"
+        label={t('components.forwarderEditorAwsCloudWatch.groupLabel')}
         variant="outlined"
         type="text"
         error={!group.valid}
@@ -140,7 +142,7 @@ const ForwarderEditorAwsCloudWatch = ({
 
       <TextField
         id="input:editor.forwarders.cloudwatch.stream"
-        label="Stream"
+        label={t('components.forwarderEditorAwsCloudWatch.streamLabel')}
         variant="outlined"
         type="text"
         error={!stream.valid}

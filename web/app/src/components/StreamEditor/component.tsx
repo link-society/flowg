@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import Divider from '@mui/material/Divider'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
@@ -20,6 +22,7 @@ const StreamEditor = ({
   storageUsage,
   onStreamConfigChange,
 }: StreamEditorProps) => {
+  const { t } = useTranslation()
   const usageMB = storageUsage / (1024 * 1024)
   const usagePercent = (usageMB * 100) / streamConfig.size
 
@@ -27,13 +30,17 @@ const StreamEditor = ({
     <StreamEditorRoot>
       <StreamEditorPanel>
         <StreamEditorPanelHeader>
-          <Typography variant="titleSm">Retention</Typography>
+          <Typography variant="titleSm">
+            {t('components.streamEditor.retentionTitle')}
+          </Typography>
         </StreamEditorPanelHeader>
         <Divider />
         <StreamEditorPanelBody>
           <StreamEditorUsageRow>
             <Typography variant="text">
-              Estimated storage usage: {usageMB.toFixed(2)}MB
+              {t('components.streamEditor.usageLabel', {
+                usage: usageMB.toFixed(2),
+              })}
             </Typography>
             {streamConfig.size > 0 && (
               <StreamEditorProgress
@@ -46,7 +53,7 @@ const StreamEditor = ({
 
           <TextField
             id="input:editor.streams.retention-size"
-            label="Retention size (in MB)"
+            label={t('components.streamEditor.retentionSizeLabel')}
             variant="outlined"
             type="number"
             value={streamConfig.size}
@@ -60,7 +67,7 @@ const StreamEditor = ({
 
           <TextField
             id="input:editor.streams.retention-ttl"
-            label="Retention time (in seconds)"
+            label={t('components.streamEditor.retentionTtlLabel')}
             variant="outlined"
             type="number"
             value={streamConfig.ttl}
@@ -73,14 +80,17 @@ const StreamEditor = ({
           />
 
           <StreamEditorHint variant="text">
-            Use <code>0</code> to disable
+            {t('components.streamEditor.disableHintPrefix')} <code>0</code>{' '}
+            {t('components.streamEditor.disableHintSuffix')}
           </StreamEditorHint>
         </StreamEditorPanelBody>
       </StreamEditorPanel>
 
       <StreamEditorPanel>
         <StreamEditorPanelHeader>
-          <Typography variant="titleSm">Indexes</Typography>
+          <Typography variant="titleSm">
+            {t('components.streamEditor.indexesTitle')}
+          </Typography>
         </StreamEditorPanelHeader>
         <Divider />
         <StreamEditorPanelBody>

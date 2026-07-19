@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import Button from '@mui/material/Button'
 
 import AddIcon from '@mui/icons-material/Add'
@@ -17,6 +19,7 @@ const ButtonNewUser = ({
   defaultRoles,
   onUserCreated,
 }: ButtonNewUserProps) => {
+  const { t } = useTranslation()
   const dialogs = useDialogs()
   const notify = useNotify()
 
@@ -27,7 +30,7 @@ const ButtonNewUser = ({
     })) as UserModel | null
     if (user !== null) {
       onUserCreated(user)
-      notify.success('User created')
+      notify.success(t('components.buttonNewUser.notifications.created'))
     }
   }, [onUserCreated])
 

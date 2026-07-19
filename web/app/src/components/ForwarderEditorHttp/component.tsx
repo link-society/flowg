@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import Divider from '@mui/material/Divider'
 import TextField from '@mui/material/TextField'
@@ -20,6 +21,7 @@ const ForwarderEditorHttp = ({
   onConfigChange,
   onValidationChange,
 }: ForwarderEditorHttpProps) => {
+  const { t } = useTranslation()
   const [url, setUrl] = useInput<string>(config.url, [
     validators.minLength(1),
     validators.formatUri,
@@ -57,7 +59,7 @@ const ForwarderEditorHttp = ({
     <ForwarderEditorHttpRoot id="container:editor.forwarders.http">
       <TextField
         id="input:editor.forwarders.http.webhook_url"
-        label="Webhook URL"
+        label={t('components.forwarderEditorHttp.urlLabel')}
         variant="outlined"
         type="text"
         error={!url.valid}
@@ -71,8 +73,8 @@ const ForwarderEditorHttp = ({
 
       <InputKeyValue
         id="field:editor.forwarders.http.headers"
-        keyLabel="HTTP Header"
-        valueLabel="Value"
+        keyLabel={t('components.forwarderEditorHttp.headerKeyLabel')}
+        valueLabel={t('components.forwarderEditorHttp.headerValueLabel')}
         keyValues={Object.entries(headers.value ?? {})}
         onChange={(pairs) => {
           setHeaders(Object.fromEntries(pairs))
@@ -81,7 +83,7 @@ const ForwarderEditorHttp = ({
 
       <DynamicFieldControl
         id="input:editor.forwarders.http.body"
-        label="Body"
+        label={t('components.forwarderEditorHttp.bodyLabel')}
         multiline
         variant="outlined"
         error={!body.valid}
@@ -91,7 +93,7 @@ const ForwarderEditorHttp = ({
 
       <TextField
         id="input:editor.forwarders.http.proxy_url"
-        label="Proxy URL"
+        label={t('components.forwarderEditorHttp.proxyLabel')}
         variant="outlined"
         type="text"
         error={proxy.value.length > 0 && !proxy.valid}

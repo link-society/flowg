@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useRouteError } from 'react-router'
 
 import TextField from '@mui/material/TextField'
@@ -17,6 +18,7 @@ const Heading = ({ title }: { title: string }) => (
 )
 
 const ErrorBoundary = () => {
+  const { t } = useTranslation()
   const error = useRouteError()
 
   if (error instanceof errors.InvalidResponseError) {
@@ -25,7 +27,7 @@ const ErrorBoundary = () => {
         <Heading title={error.message} />
 
         <TextField
-          label="Status Code"
+          label={t('components.errorBoundary.statusCodeLabel')}
           value={error.statusCode}
           variant="outlined"
           disabled
@@ -47,7 +49,9 @@ const ErrorBoundary = () => {
             <code>{error.stack}</code>
           </CodeBlock>
         ) : (
-          <Typography variant="text">No stacktrace available</Typography>
+          <Typography variant="text">
+            {t('components.errorBoundary.noStacktrace')}
+          </Typography>
         )}
       </ErrorRoot>
     )
@@ -57,9 +61,9 @@ const ErrorBoundary = () => {
 
   return (
     <ErrorRoot>
-      <Heading title="An unknown exception has been thrown." />
+      <Heading title={t('components.errorBoundary.unknownError')} />
       <Typography variant="text">
-        The exception has been logged to the console.
+        {t('components.errorBoundary.unknownErrorDetail')}
       </Typography>
     </ErrorRoot>
   )

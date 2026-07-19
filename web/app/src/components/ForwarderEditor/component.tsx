@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import InputAdornment from '@mui/material/InputAdornment'
 
@@ -42,6 +43,8 @@ const ForwarderEditor = ({
   onValidationChange,
   showType = true,
 }: ForwarderEditorProps) => {
+  const { t } = useTranslation()
+
   const onConfigChange = (config: ForwarderConfigModel) => {
     onForwarderChange({
       ...forwarder,
@@ -64,7 +67,7 @@ const ForwarderEditor = ({
       {showType && (
         <ForwarderEditorTypeField>
           <ForwarderEditorTextField
-            label="Forwarder Type"
+            label={t('components.forwarderEditor.typeLabel')}
             variant="outlined"
             type="text"
             value={typeLabel}

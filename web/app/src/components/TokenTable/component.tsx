@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import Typography from '@mui/material/Typography'
 
@@ -32,6 +33,7 @@ const TokenCell = (props: TokenCellProps) => (
 )
 
 const TokenTable = ({ tokens }: TokenTableProps) => {
+  const { t } = useTranslation()
   const notify = useNotify()
 
   const gridRef = useRef<AgGridReact<RowType>>(null!)
@@ -56,7 +58,7 @@ const TokenTable = ({ tokens }: TokenTableProps) => {
         })
       }
 
-      notify.success('Token deleted')
+      notify.success(t('components.tokenTable.notifications.deleted'))
     },
     [gridRef]
   )
@@ -64,7 +66,7 @@ const TokenTable = ({ tokens }: TokenTableProps) => {
   const [rowData] = useState<RowType[]>(tokens.map((token) => ({ token })))
   const [columnDefs] = useState<ColDef<RowType>[]>([
     {
-      headerName: 'Token',
+      headerName: t('components.tokenTable.columns.token'),
       field: 'token',
       cellRenderer: TokenCell,
       suppressMovable: true,
@@ -72,7 +74,7 @@ const TokenTable = ({ tokens }: TokenTableProps) => {
       flex: 1,
     },
     {
-      headerName: 'Actions',
+      headerName: t('common.tableColumns.actions'),
       headerClass: 'flowg-actions-header',
       cellRenderer: TableActionsCell,
       cellRendererParams: {
@@ -90,7 +92,9 @@ const TokenTable = ({ tokens }: TokenTableProps) => {
           <TokenTableCardHeaderTitle>
             <KeyIcon />
             <TokenTableCardHeaderTitleText>
-              <Typography variant="titleSm">API Tokens</Typography>
+              <Typography variant="titleSm">
+                {t('components.tokenTable.title')}
+              </Typography>
             </TokenTableCardHeaderTitleText>
             <ButtonNewToken onTokenCreated={onNewToken} />
           </TokenTableCardHeaderTitle>
