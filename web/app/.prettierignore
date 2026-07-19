@@ -4,3 +4,4 @@ tsconfig.app.json
 tsconfig.node.json
 eslint.config.js
 index.html
+static/assets/locales/**/translation.json
