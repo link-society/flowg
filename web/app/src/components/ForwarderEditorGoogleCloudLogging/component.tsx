@@ -1,6 +1,7 @@
 import { useColorMode } from '@/theme'
 
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import TextField from '@mui/material/TextField'
 
@@ -21,6 +22,7 @@ const ForwarderEditorGoogleCloudLogging = ({
   onConfigChange,
   onValidationChange,
 }: ForwarderEditorGoogleCloudLoggingProps) => {
+  const { t } = useTranslation()
   const [endpoint, setEndpoint] = useInput(config.endpoint)
   const [project_id, setProjectID] = useInput(config.project_id)
   const [log_id, setLogID] = useInput(config.log_id)
@@ -59,7 +61,7 @@ const ForwarderEditorGoogleCloudLogging = ({
     <ForwarderEditorGoogleCloudLoggingRoot id="container:editor.forwarders.googlelog">
       <TextField
         id="input:editor.forwarders.googlelog.endpoint"
-        label="Endpoint"
+        label={t('components.forwarderEditorGoogleCloudLogging.endpointLabel')}
         variant="outlined"
         type="text"
         error={!endpoint.valid}
@@ -71,7 +73,7 @@ const ForwarderEditorGoogleCloudLogging = ({
 
       <TextField
         id="input:editor.forwarders.googlelog.project_id"
-        label="Project ID"
+        label={t('components.forwarderEditorGoogleCloudLogging.projectIdLabel')}
         variant="outlined"
         type="text"
         error={!project_id.valid}
@@ -83,7 +85,7 @@ const ForwarderEditorGoogleCloudLogging = ({
 
       <TextField
         id="input:editor.forwarders.googlelog.log_id"
-        label="Log ID"
+        label={t('components.forwarderEditorGoogleCloudLogging.logIdLabel')}
         variant="outlined"
         type="text"
         error={!log_id.valid}
@@ -93,7 +95,9 @@ const ForwarderEditorGoogleCloudLogging = ({
         }}
       />
 
-      <label>Auth JSON</label>
+      <label>
+        {t('components.forwarderEditorGoogleCloudLogging.authJsonLabel')}
+      </label>
       <Editor
         defaultValue={auth_json}
         defaultLanguage="json"

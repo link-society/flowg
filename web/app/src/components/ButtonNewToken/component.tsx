@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 
@@ -14,6 +16,7 @@ import DialogNewToken from '@/components/DialogNewToken/component'
 import { ButtonNewTokenProps } from './types'
 
 const ButtonNewToken = ({ onTokenCreated }: ButtonNewTokenProps) => {
+  const { t } = useTranslation()
   const dialogs = useDialogs()
   const notify = useNotify()
 
@@ -21,7 +24,7 @@ const ButtonNewToken = ({ onTokenCreated }: ButtonNewTokenProps) => {
     const resp = await tokenApi.createToken()
     await dialogs.open(DialogNewToken, resp)
     onTokenCreated(resp.token_uuid)
-    notify.success('Token created')
+    notify.success(t('components.buttonNewToken.notifications.created'))
   }, [onTokenCreated])
 
   return (

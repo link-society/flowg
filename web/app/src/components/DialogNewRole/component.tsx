@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
@@ -28,6 +29,7 @@ const DialogNewRole = ({
   open,
   onClose,
 }: DialogProps<void, RoleModel | null>) => {
+  const { t } = useTranslation()
   const [name, setName] = useState('')
   const [scopes, setScopes] = useState<string[]>([])
 
@@ -57,12 +59,12 @@ const DialogNewRole = ({
         },
       }}
     >
-      <DialogTitle>Create a new role</DialogTitle>
+      <DialogTitle>{t('components.dialogNewRole.title')}</DialogTitle>
       <DialogContent>
         <FormStack>
           <FormTextField
             id="input:admin.roles.modal.name"
-            label="Name"
+            label={t('components.dialogNewRole.nameLabel')}
             value={name}
             onChange={(e) => setName(e.target.value)}
             type="text"
@@ -71,7 +73,9 @@ const DialogNewRole = ({
           />
 
           <FieldStack id="field:admin.roles.modal.scopes">
-            <FieldLabel variant="text">Permissions:</FieldLabel>
+            <FieldLabel variant="text">
+              {t('components.dialogNewRole.permissionsLabel')}
+            </FieldLabel>
             <InputTransferList<string>
               choices={Scopes}
               getItemId={(v) => v}
@@ -101,7 +105,7 @@ const DialogNewRole = ({
           onClick={() => onClose(null)}
           disabled={loading}
         >
-          Cancel
+          {t('common.actions.cancel')}
         </Button>
         <Button
           id="btn:admin.roles.modal.submit"
@@ -111,7 +115,11 @@ const DialogNewRole = ({
           disabled={loading}
           type="submit"
         >
-          {loading ? <CircularProgress color="inherit" size={24} /> : <>Save</>}
+          {loading ? (
+            <CircularProgress color="inherit" size={24} />
+          ) : (
+            <>{t('common.actions.save')}</>
+          )}
         </Button>
       </DialogActions>
     </Dialog>

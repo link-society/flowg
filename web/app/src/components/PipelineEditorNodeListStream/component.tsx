@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
 
 import StorageIcon from '@mui/icons-material/Storage'
@@ -12,12 +13,13 @@ import PipelineEditorNodeList from '@/components/PipelineEditorNodeList/componen
 import { buildUrl } from '@/router'
 
 const PipelineEditorNodeListStream = () => {
+  const { t } = useTranslation()
   const { permissions } = useProfile()
   const navigate = useNavigate()
 
   return (
     <PipelineEditorNodeList
-      title="Streams"
+      title={t('components.pipelineEditorNodeListStream.title')}
       newButton={(createCb) => (
         <>
           {permissions.can_edit_streams && (

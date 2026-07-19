@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import Checkbox from '@mui/material/Checkbox'
 import Divider from '@mui/material/Divider'
@@ -18,6 +19,7 @@ const ForwarderEditorAwsCloudWatch = ({
   onConfigChange,
   onValidationChange,
 }: ForwarderEditorAzureMonitorProps) => {
+  const { t } = useTranslation()
   const [endpoint, setEndpoint] = useInput(config.endpoint, [
     validators.minLength(1),
     validators.formatUri,
@@ -55,7 +57,7 @@ const ForwarderEditorAwsCloudWatch = ({
     <ForwarderEditorAzureMonitorRoot id="container:editor.forwarders.azuremonitor">
       <TextField
         id="input:editor.forwarders.azuremonitor.endpoint"
-        label="Endpoint"
+        label={t('components.forwarderEditorAzureMonitor.endpointLabel')}
         variant="outlined"
         type="text"
         error={!endpoint.valid}
@@ -67,7 +69,7 @@ const ForwarderEditorAwsCloudWatch = ({
 
       <TextField
         id="input:editor.forwarders.azuremonitor.token"
-        label="Token"
+        label={t('components.forwarderEditorAzureMonitor.tokenLabel')}
         variant="outlined"
         type="text"
         error={!token.valid}
@@ -79,7 +81,7 @@ const ForwarderEditorAwsCloudWatch = ({
 
       <TextField
         id="input:editor.forwarders.azuremonitor.expires_on"
-        label="Expires on"
+        label={t('components.forwarderEditorAzureMonitor.expiresOnLabel')}
         variant="outlined"
         type="text"
         error={!expires_on.valid}
@@ -93,7 +95,7 @@ const ForwarderEditorAwsCloudWatch = ({
 
       <TextField
         id="input:editor.forwarders.azuremonitor.rule_id"
-        label="Rule ID"
+        label={t('components.forwarderEditorAzureMonitor.ruleIdLabel')}
         variant="outlined"
         type="text"
         error={!rule_id.valid}
@@ -105,7 +107,7 @@ const ForwarderEditorAwsCloudWatch = ({
 
       <TextField
         id="input:editor.forwarders.azuremonitor.stream_name"
-        label="Stream name"
+        label={t('components.forwarderEditorAzureMonitor.streamNameLabel')}
         variant="outlined"
         type="text"
         error={!stream_name.valid}
@@ -126,7 +128,7 @@ const ForwarderEditorAwsCloudWatch = ({
               }}
             />
           }
-          label="Allow insecure connections"
+          label={t('components.forwarderEditorAzureMonitor.allowInsecureLabel')}
         />
       </FormGroup>
     </ForwarderEditorAzureMonitorRoot>

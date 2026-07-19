@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import Button from '@mui/material/Button'
 
 import AddIcon from '@mui/icons-material/Add'
@@ -13,6 +15,7 @@ import DialogNewRole from '@/components/DialogNewRole/component'
 import { ButtonNewRoleProps } from './types'
 
 const ButtonNewRole = ({ onRoleCreated }: ButtonNewRoleProps) => {
+  const { t } = useTranslation()
   const dialogs = useDialogs()
   const notify = useNotify()
 
@@ -20,7 +23,7 @@ const ButtonNewRole = ({ onRoleCreated }: ButtonNewRoleProps) => {
     const role = (await dialogs.open(DialogNewRole)) as RoleModel | null
     if (role !== null) {
       onRoleCreated(role)
-      notify.success('Role created')
+      notify.success(t('components.buttonNewRole.notifications.created'))
     }
   }, [onRoleCreated])
 

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import Button from '@mui/material/Button'
 import DialogActions from '@mui/material/DialogActions'
@@ -14,6 +15,7 @@ import { PipelineTraceNodeButtonProps } from './types'
 import NodeTraceTabPanel from '../NodeTraceTabPanel/component'
 
 const PipelineTraceNodeButton = ({ traces }: PipelineTraceNodeButtonProps) => {
+  const { t } = useTranslation()
   const [open, setOpen] = useState<boolean>(false)
   const [tab, setTab] = useState<number>(0)
 
@@ -29,16 +31,23 @@ const PipelineTraceNodeButton = ({ traces }: PipelineTraceNodeButtonProps) => {
         startIcon={<VisibilityIcon />}
         onClick={() => setOpen(true)}
       >
-        Inspect
+        {t('components.pipelineTraceNodeButton.inspect')}
       </Button>
 
       <TraceDialog open={open} onClose={() => setOpen(false)} maxWidth={false}>
-        <DialogTitle>Node traces</DialogTitle>
+        <DialogTitle>
+          {t('components.pipelineTraceNodeButton.title')}
+        </DialogTitle>
         <DialogContent>
           <TraceDialogContent>
             <TraceTabs variant="scrollable" value={tab} onChange={onTabChange}>
               {traces.map((_trace, index) => (
-                <Tab key={`tab-${index + 1}`} label={`Event #${index + 1}`} />
+                <Tab
+                  key={`tab-${index + 1}`}
+                  label={t('components.pipelineTraceNodeButton.eventLabel', {
+                    n: index + 1,
+                  })}
+                />
               ))}
             </TraceTabs>
 
@@ -53,7 +62,9 @@ const PipelineTraceNodeButton = ({ traces }: PipelineTraceNodeButtonProps) => {
           </TraceDialogContent>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpen(false)}>Close</Button>
+          <Button onClick={() => setOpen(false)}>
+            {t('common.actions.close')}
+          </Button>
         </DialogActions>
       </TraceDialog>
     </>

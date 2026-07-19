@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import TextField from '@mui/material/TextField'
 
@@ -20,6 +21,7 @@ const PipelineNodeSwitch = ({
   data,
   selected,
 }: NodeProps<PipelineNodeSwitchData>) => {
+  const { t } = useTranslation()
   const { setNodes } = usePipelineEditorHooks()
 
   const [code, setCode] = useState(data.condition)
@@ -58,7 +60,7 @@ const PipelineNodeSwitch = ({
         </NodeIcon>
         <NodeBody className="nodrag">
           <TextField
-            label="Condition"
+            label={t('components.pipelineNodeSwitch.label')}
             type="text"
             value={code}
             onChange={onChange}

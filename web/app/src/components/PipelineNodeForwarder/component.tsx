@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import TextField from '@mui/material/TextField'
 
 import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox'
@@ -16,46 +18,50 @@ const PipelineNodeForwarder = ({
   id,
   data,
   selected,
-}: NodeProps<PipelineNodeForwarderData>) => (
-  <>
-    {selected && (
-      <ToolbarRow>
-        <DialogForwarderEditor forwarderName={data.forwarder} />
-        <PipelineDeleteNodeButton nodeId={id} />
-        {data.traces && <PipelineTraceNodeButton traces={data.traces} />}
-      </ToolbarRow>
-    )}
+}: NodeProps<PipelineNodeForwarderData>) => {
+  const { t } = useTranslation()
 
-    <Handle type="target" position={Position.Left} style={handleStyle} />
-    <NodeRoot>
-      <NodeIcon>
-        <ForwardToInboxIcon />
-      </NodeIcon>
-      <NodeBody className="nodrag">
-        <TextField
-          label="Forwarder"
-          type="text"
-          value={data.forwarder}
-          slotProps={{
-            input: {
-              readOnly: true,
-            },
-          }}
-          variant="outlined"
-        />
-      </NodeBody>
-    </NodeRoot>
+  return (
+    <>
+      {selected && (
+        <ToolbarRow>
+          <DialogForwarderEditor forwarderName={data.forwarder} />
+          <PipelineDeleteNodeButton nodeId={id} />
+          {data.traces && <PipelineTraceNodeButton traces={data.traces} />}
+        </ToolbarRow>
+      )}
 
-    <PipelineTraceNodeIndicator
-      status={
-        data.traces
-          ? data.traces.some((trace) => trace.error)
-            ? 'error'
-            : 'success'
-          : null
-      }
-    />
-  </>
-)
+      <Handle type="target" position={Position.Left} style={handleStyle} />
+      <NodeRoot>
+        <NodeIcon>
+          <ForwardToInboxIcon />
+        </NodeIcon>
+        <NodeBody className="nodrag">
+          <TextField
+            label={t('components.pipelineNodeForwarder.label')}
+            type="text"
+            value={data.forwarder}
+            slotProps={{
+              input: {
+                readOnly: true,
+              },
+            }}
+            variant="outlined"
+          />
+        </NodeBody>
+      </NodeRoot>
+
+      <PipelineTraceNodeIndicator
+        status={
+          data.traces
+            ? data.traces.some((trace) => trace.error)
+              ? 'error'
+              : 'success'
+            : null
+        }
+      />
+    </>
+  )
+}
 
 export default PipelineNodeForwarder

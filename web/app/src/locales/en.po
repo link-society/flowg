@@ -6,11 +6,17 @@ msgstr ""
 msgid "common.actions.cancel"
 msgstr "Cancel"
 
+msgid "common.actions.close"
+msgstr "Close"
+
 msgid "common.actions.delete"
 msgstr "Delete"
 
 msgid "common.actions.documentation"
 msgstr "Documentation"
+
+msgid "common.actions.edit"
+msgstr "Edit"
 
 msgid "common.actions.run"
 msgstr "Run"
@@ -27,6 +33,9 @@ msgstr "Test failed: {{error}}"
 msgid "common.notifications.testPassed"
 msgstr "Test passed"
 
+msgid "common.tableColumns.actions"
+msgstr "Actions"
+
 msgid "common.testDialog.fieldLabel"
 msgstr "Field"
 
@@ -35,6 +44,531 @@ msgstr "Input Record:"
 
 msgid "common.testDialog.title"
 msgstr "Test the pipeline"
+
+msgid "components.buttonNewForwarder.label"
+msgstr "New"
+
+msgid "components.buttonNewForwarder.notifications.created"
+msgstr "Forwarder created"
+
+msgid "components.buttonNewPipeline.label"
+msgstr "New"
+
+msgid "components.buttonNewPipeline.notifications.created"
+msgstr "Pipeline created"
+
+msgid "components.buttonNewRole.notifications.created"
+msgstr "Role created"
+
+msgid "components.buttonNewStreamConfig.label"
+msgstr "New"
+
+msgid "components.buttonNewStreamConfig.notifications.created"
+msgstr "Stream created"
+
+msgid "components.buttonNewToken.notifications.created"
+msgstr "Token created"
+
+msgid "components.buttonNewTransformer.label"
+msgstr "New"
+
+msgid "components.buttonNewTransformer.notifications.created"
+msgstr "Transformer created"
+
+msgid "components.buttonNewUser.notifications.created"
+msgstr "User created"
+
+msgid "components.dialogForwarderEditor.nameLabel"
+msgstr "Forwarder name"
+
+msgid "components.dialogNewForwarder.nameLabel"
+msgstr "Forwarder name"
+
+msgid "components.dialogNewForwarder.title"
+msgstr "Create new forwarder"
+
+msgid "components.dialogNewForwarder.typeLabel"
+msgstr "Forwarder type"
+
+msgid "components.dialogNewPipeline.nameLabel"
+msgstr "Pipeline name"
+
+msgid "components.dialogNewPipeline.title"
+msgstr "Create new pipeline"
+
+msgid "components.dialogNewRole.nameLabel"
+msgstr "Name"
+
+msgid "components.dialogNewRole.permissionsLabel"
+msgstr "Permissions:"
+
+msgid "components.dialogNewRole.title"
+msgstr "Create a new role"
+
+msgid "components.dialogNewStreamConfig.nameLabel"
+msgstr "Stream name"
+
+msgid "components.dialogNewStreamConfig.title"
+msgstr "Create new stream"
+
+msgid "components.dialogNewToken.done"
+msgstr "Done"
+
+msgid "components.dialogNewToken.hint"
+msgstr "This token will be dislayed only once. Make sure to copy it before closing this dialog."
+
+msgid "components.dialogNewToken.title"
+msgstr "Your Personal Access Token"
+
+msgid "components.dialogNewToken.tokenLabel"
+msgstr "Token"
+
+msgid "components.dialogNewToken.tokenUuidLabel"
+msgstr "Token UUID"
+
+msgid "components.dialogNewTransformer.nameLabel"
+msgstr "Transformer name"
+
+msgid "components.dialogNewTransformer.title"
+msgstr "Create new transformer"
+
+msgid "components.dialogNewUser.passwordLabel"
+msgstr "Password"
+
+msgid "components.dialogNewUser.rolesLabel"
+msgstr "Roles:"
+
+msgid "components.dialogNewUser.title"
+msgstr "Create a new user"
+
+msgid "components.dialogNewUser.usernameLabel"
+msgstr "Username"
+
+msgid "components.dialogStreamEditor.nameLabel"
+msgstr "Stream name"
+
+msgid "components.dialogTransformerEditor.nameLabel"
+msgstr "Transformer name"
+
+msgid "components.errorBoundary.noStacktrace"
+msgstr "No stacktrace available"
+
+msgid "components.errorBoundary.statusCodeLabel"
+msgstr "Status Code"
+
+msgid "components.errorBoundary.unknownError"
+msgstr "An unknown exception has been thrown."
+
+msgid "components.errorBoundary.unknownErrorDetail"
+msgstr "The exception has been logged to the console."
+
+msgid "components.forwarderEditor.typeLabel"
+msgstr "Forwarder Type"
+
+msgid "components.forwarderEditorAmqp.exchangeLabel"
+msgstr "Exchange"
+
+msgid "components.forwarderEditorAmqp.routingKeyLabel"
+msgstr "Routing Key"
+
+msgid "components.forwarderEditorAmqp.urlLabel"
+msgstr "URL"
+
+msgid "components.forwarderEditorAwsCloudWatch.accessKeyLabel"
+msgstr "Secret access key"
+
+msgid "components.forwarderEditorAwsCloudWatch.akidLabel"
+msgstr "Access key ID"
+
+msgid "components.forwarderEditorAwsCloudWatch.appIdLabel"
+msgstr "App ID"
+
+msgid "components.forwarderEditorAwsCloudWatch.endpointLabel"
+msgstr "AWS endpoint"
+
+msgid "components.forwarderEditorAwsCloudWatch.groupLabel"
+msgstr "Group"
+
+msgid "components.forwarderEditorAwsCloudWatch.regionLabel"
+msgstr "Region"
+
+msgid "components.forwarderEditorAwsCloudWatch.streamLabel"
+msgstr "Stream"
+
+msgid "components.forwarderEditorAwsCloudWatch.tokenLabel"
+msgstr "Session token"
+
+msgid "components.forwarderEditorAzureMonitor.allowInsecureLabel"
+msgstr "Allow insecure connections"
+
+msgid "components.forwarderEditorAzureMonitor.endpointLabel"
+msgstr "Endpoint"
+
+msgid "components.forwarderEditorAzureMonitor.expiresOnLabel"
+msgstr "Expires on"
+
+msgid "components.forwarderEditorAzureMonitor.ruleIdLabel"
+msgstr "Rule ID"
+
+msgid "components.forwarderEditorAzureMonitor.streamNameLabel"
+msgstr "Stream name"
+
+msgid "components.forwarderEditorAzureMonitor.tokenLabel"
+msgstr "Token"
+
+msgid "components.forwarderEditorClickhouse.addressLabel"
+msgstr "Clickhouse Connection Address"
+
+msgid "components.forwarderEditorClickhouse.dbLabel"
+msgstr "Database Name"
+
+msgid "components.forwarderEditorClickhouse.passLabel"
+msgstr "Database Password"
+
+msgid "components.forwarderEditorClickhouse.tableLabel"
+msgstr "Table Name"
+
+msgid "components.forwarderEditorClickhouse.tlsLabel"
+msgstr "Use TLS"
+
+msgid "components.forwarderEditorClickhouse.userLabel"
+msgstr "Database Username"
+
+msgid "components.forwarderEditorDatadog.apiKeyLabel"
+msgstr "ApiKey"
+
+msgid "components.forwarderEditorDatadog.hostnameLabel"
+msgstr "Hostname"
+
+msgid "components.forwarderEditorDatadog.messageLabel"
+msgstr "Message"
+
+msgid "components.forwarderEditorDatadog.serviceLabel"
+msgstr "Service"
+
+msgid "components.forwarderEditorDatadog.sourceLabel"
+msgstr "Source"
+
+msgid "components.forwarderEditorDatadog.tagsLabel"
+msgstr "Tags"
+
+msgid "components.forwarderEditorDatadog.urlLabel"
+msgstr "URL"
+
+msgid "components.forwarderEditorElastic.addressItemLabel"
+msgstr "Address"
+
+msgid "components.forwarderEditorElastic.caLabel"
+msgstr "CA Certificate"
+
+msgid "components.forwarderEditorElastic.indexLabel"
+msgstr "Index"
+
+msgid "components.forwarderEditorElastic.passwordLabel"
+msgstr "Password"
+
+msgid "components.forwarderEditorElastic.usernameLabel"
+msgstr "Username"
+
+msgid "components.forwarderEditorGoogleCloudLogging.authJsonLabel"
+msgstr "Auth JSON"
+
+msgid "components.forwarderEditorGoogleCloudLogging.endpointLabel"
+msgstr "Endpoint"
+
+msgid "components.forwarderEditorGoogleCloudLogging.logIdLabel"
+msgstr "Log ID"
+
+msgid "components.forwarderEditorGoogleCloudLogging.projectIdLabel"
+msgstr "Project ID"
+
+msgid "components.forwarderEditorHttp.bodyLabel"
+msgstr "Body"
+
+msgid "components.forwarderEditorHttp.headerKeyLabel"
+msgstr "HTTP Header"
+
+msgid "components.forwarderEditorHttp.headerValueLabel"
+msgstr "Value"
+
+msgid "components.forwarderEditorHttp.proxyLabel"
+msgstr "Proxy URL"
+
+msgid "components.forwarderEditorHttp.urlLabel"
+msgstr "Webhook URL"
+
+msgid "components.forwarderEditorOtlp.endpointLabel"
+msgstr "Endpoint"
+
+msgid "components.forwarderEditorOtlp.headerNameLabel"
+msgstr "Header Name"
+
+msgid "components.forwarderEditorOtlp.headerValueLabel"
+msgstr "Header Value"
+
+msgid "components.forwarderEditorSplunk.endpointLabel"
+msgstr "HTTP Event Collector Endpoint"
+
+msgid "components.forwarderEditorSplunk.hostLabel"
+msgstr "Host"
+
+msgid "components.forwarderEditorSplunk.sourceLabel"
+msgstr "Source"
+
+msgid "components.forwarderEditorSplunk.tokenLabel"
+msgstr "Token"
+
+msgid "components.forwarderEditorSyslog.addressLabel"
+msgstr "Server Address"
+
+msgid "components.forwarderEditorSyslog.facilityLabel"
+msgstr "Facility"
+
+msgid "components.forwarderEditorSyslog.messageLabel"
+msgstr "Message"
+
+msgid "components.forwarderEditorSyslog.networkLabel"
+msgstr "Network"
+
+msgid "components.forwarderEditorSyslog.severityLabel"
+msgstr "Severity"
+
+msgid "components.forwarderEditorSyslog.tagLabel"
+msgstr "Tag"
+
+msgid "components.inputTransferList.moveAllLeft"
+msgstr "move all left"
+
+msgid "components.inputTransferList.moveAllRight"
+msgstr "move all right"
+
+msgid "components.inputTransferList.moveSelectedLeft"
+msgstr "move selected left"
+
+msgid "components.inputTransferList.moveSelectedRight"
+msgstr "move selected right"
+
+msgid "components.logQueryPanel.filterLabel"
+msgstr "Filter"
+
+msgid "components.logQueryPanel.submit"
+msgstr "Query Logs"
+
+msgid "components.notification.action"
+msgstr "Action"
+
+msgid "components.pageFooter.colorModeAriaLabel"
+msgstr "Color mode: {{label}}. Click to change."
+
+msgid "components.pageFooter.darkMode"
+msgstr "Dark mode"
+
+msgid "components.pageFooter.demoModeEnabled"
+msgstr "Demo Mode Enabled"
+
+msgid "components.pageFooter.lightMode"
+msgstr "Light mode"
+
+msgid "components.pageFooter.systemDefault"
+msgstr "System default"
+
+msgid "components.passwordChange.newPasswordLabel"
+msgstr "New Password"
+
+msgid "components.passwordChange.notifications.changed"
+msgstr "Password changed"
+
+msgid "components.passwordChange.oldPasswordLabel"
+msgstr "Old Password"
+
+msgid "components.passwordChange.title"
+msgstr "Change password:"
+
+msgid "components.permissionDisplay.editAcls"
+msgstr "Edit ACLs"
+
+msgid "components.permissionDisplay.editForwarders"
+msgstr "Edit Forwarders"
+
+msgid "components.permissionDisplay.editPipelines"
+msgstr "Edit Pipelines"
+
+msgid "components.permissionDisplay.editStreams"
+msgstr "Edit Streams"
+
+msgid "components.permissionDisplay.editTransformers"
+msgstr "Edit Transformers"
+
+msgid "components.permissionDisplay.readSystemConfiguration"
+msgstr "Read system configuration"
+
+msgid "components.permissionDisplay.sendLogs"
+msgstr "Send Logs"
+
+msgid "components.permissionDisplay.title"
+msgstr "Permissions:"
+
+msgid "components.permissionDisplay.viewAcls"
+msgstr "View ACLs"
+
+msgid "components.permissionDisplay.viewForwarders"
+msgstr "View Forwarders"
+
+msgid "components.permissionDisplay.viewPipelines"
+msgstr "View Pipelines"
+
+msgid "components.permissionDisplay.viewStreams"
+msgstr "View Streams"
+
+msgid "components.permissionDisplay.viewTransformers"
+msgstr "View Transformers"
+
+msgid "components.permissionDisplay.writeSystemConfiguration"
+msgstr "Write system configuration"
+
+msgid "components.pipelineEditorFlow.autoLayout"
+msgstr "Auto layout"
+
+msgid "components.pipelineEditorFlow.otherNodes"
+msgstr "Other Nodes:"
+
+msgid "components.pipelineEditorFlow.switchNodeLabel"
+msgstr "switch"
+
+msgid "components.pipelineEditorNodeListForwarder.title"
+msgstr "Forwarders"
+
+msgid "components.pipelineEditorNodeListPipeline.title"
+msgstr "Pipelines"
+
+msgid "components.pipelineEditorNodeListStream.title"
+msgstr "Streams"
+
+msgid "components.pipelineEditorNodeListTransformer.title"
+msgstr "Transformers"
+
+msgid "components.pipelineNodeForwarder.label"
+msgstr "Forwarder"
+
+msgid "components.pipelineNodePipeline.label"
+msgstr "Pipeline"
+
+msgid "components.pipelineNodeRouter.label"
+msgstr "Stream"
+
+msgid "components.pipelineNodeSource.label"
+msgstr "Source"
+
+msgid "components.pipelineNodeSwitch.label"
+msgstr "Condition"
+
+msgid "components.pipelineNodeTransformer.label"
+msgstr "Transformer"
+
+msgid "components.pipelineTraceNodeButton.eventLabel"
+msgstr "Event #{{n}}"
+
+msgid "components.pipelineTraceNodeButton.inspect"
+msgstr "Inspect"
+
+msgid "components.pipelineTraceNodeButton.title"
+msgstr "Node traces"
+
+msgid "components.profileInfo.title"
+msgstr "Account Information"
+
+msgid "components.roleTable.columns.permissions"
+msgstr "Permissions"
+
+msgid "components.roleTable.columns.role"
+msgstr "Role"
+
+msgid "components.roleTable.notifications.deleted"
+msgstr "Role deleted"
+
+msgid "components.roleTable.title"
+msgstr "Roles"
+
+msgid "components.streamEditor.disableHintPrefix"
+msgstr "Use"
+
+msgid "components.streamEditor.disableHintSuffix"
+msgstr "to disable"
+
+msgid "components.streamEditor.indexesTitle"
+msgstr "Indexes"
+
+msgid "components.streamEditor.retentionSizeLabel"
+msgstr "Retention size (in MB)"
+
+msgid "components.streamEditor.retentionTitle"
+msgstr "Retention"
+
+msgid "components.streamEditor.retentionTtlLabel"
+msgstr "Retention time (in seconds)"
+
+msgid "components.streamEditor.usageLabel"
+msgstr "Estimated storage usage: {{usage}}MB"
+
+msgid "components.timeWindowSelector.absolute"
+msgstr "Absolute"
+
+msgid "components.timeWindowSelector.apply"
+msgstr "Apply"
+
+msgid "components.timeWindowSelector.fromLabel"
+msgstr "From"
+
+msgid "components.timeWindowSelector.last15Minutes"
+msgstr "Last 15 Minutes"
+
+msgid "components.timeWindowSelector.lastDay"
+msgstr "Last Day"
+
+msgid "components.timeWindowSelector.lastHour"
+msgstr "Last Hour"
+
+msgid "components.timeWindowSelector.lastWeek"
+msgstr "Last Week"
+
+msgid "components.timeWindowSelector.relative"
+msgstr "Relative"
+
+msgid "components.timeWindowSelector.toDateLabel"
+msgstr "To"
+
+msgid "components.timeWindowSelector.toLabel"
+msgstr "to"
+
+msgid "components.timeWindowSelector.watchLogs"
+msgstr "Watch Logs"
+
+msgid "components.tokenTable.columns.token"
+msgstr "Token"
+
+msgid "components.tokenTable.notifications.deleted"
+msgstr "Token deleted"
+
+msgid "components.tokenTable.title"
+msgstr "API Tokens"
+
+msgid "components.transformerEditor.outputRecordLabel"
+msgstr "Output Record:"
+
+msgid "components.userTable.columns.roles"
+msgstr "Roles"
+
+msgid "components.userTable.columns.username"
+msgstr "Username"
+
+msgid "components.userTable.notifications.deleted"
+msgstr "User deleted"
+
+msgid "components.userTable.title"
+msgstr "Users"
+
+msgid "components.usernameDisplay.label"
+msgstr "Username"
 
 msgid "pages.forwarders.empty"
 msgstr "No forwarder found, create one"

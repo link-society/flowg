@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import Checkbox from '@mui/material/Checkbox'
 import FormControlLabel from '@mui/material/FormControlLabel'
@@ -17,6 +18,7 @@ const ForwarderEditorClickhouse = ({
   onConfigChange,
   onValidationChange,
 }: ForwarderEditorClickhouseProps) => {
+  const { t } = useTranslation()
   const [address, setAddress] = useInput(config.address, [
     validators.pattern(/^(([a-zA-Z0-9.-]+)|(\[[0-9A-Fa-f:]+\])):[0-9]{1,5}$/),
   ])
@@ -52,7 +54,7 @@ const ForwarderEditorClickhouse = ({
     <ForwarderEditorClickhouseRoot id="container:editor.forwarders.clickhouse">
       <TextField
         id="input:editor.forwarders.clickhouse.address"
-        label="Clickhouse Connection Address"
+        label={t('components.forwarderEditorClickhouse.addressLabel')}
         variant="outlined"
         type="text"
         error={!address.valid}
@@ -64,7 +66,7 @@ const ForwarderEditorClickhouse = ({
 
       <TextField
         id="input:editor.forwarders.clickhouse.db"
-        label="Database Name"
+        label={t('components.forwarderEditorClickhouse.dbLabel')}
         variant="outlined"
         type="text"
         error={!db.valid}
@@ -76,7 +78,7 @@ const ForwarderEditorClickhouse = ({
 
       <TextField
         id="input:editor.forwarders.clickhouse.table"
-        label="Table Name"
+        label={t('components.forwarderEditorClickhouse.tableLabel')}
         variant="outlined"
         type="text"
         error={!table.valid}
@@ -88,7 +90,7 @@ const ForwarderEditorClickhouse = ({
 
       <TextField
         id="input:editor.forwarders.clickhouse.user"
-        label="Database Username"
+        label={t('components.forwarderEditorClickhouse.userLabel')}
         variant="outlined"
         type="text"
         error={!user.valid}
@@ -100,7 +102,7 @@ const ForwarderEditorClickhouse = ({
 
       <TextField
         id="input:editor.forwarders.clickhouse.pass"
-        label="Database Password"
+        label={t('components.forwarderEditorClickhouse.passLabel')}
         variant="outlined"
         type="password"
         error={!pass.valid}
@@ -121,7 +123,7 @@ const ForwarderEditorClickhouse = ({
               }}
             />
           }
-          label="Use TLS"
+          label={t('components.forwarderEditorClickhouse.tlsLabel')}
         />
       </FormGroup>
     </ForwarderEditorClickhouseRoot>

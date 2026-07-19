@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import Button from '@mui/material/Button'
 
 import AddIcon from '@mui/icons-material/Add'
@@ -11,6 +13,7 @@ import DialogNewStreamConfig from '@/components/DialogNewStreamConfig/component'
 import { ButtonNewStreamConfigProps } from './types'
 
 const ButtonNewStreamConfig = (props: ButtonNewStreamConfigProps) => {
+  const { t } = useTranslation()
   const dialogs = useDialogs()
   const notify = useNotify()
 
@@ -20,7 +23,9 @@ const ButtonNewStreamConfig = (props: ButtonNewStreamConfigProps) => {
     if (streamName !== null) {
       props.onStreamConfigCreated(streamName)
 
-      notify.success('Stream created')
+      notify.success(
+        t('components.buttonNewStreamConfig.notifications.created')
+      )
     }
   }, [props.onStreamConfigCreated])
 
@@ -33,7 +38,7 @@ const ButtonNewStreamConfig = (props: ButtonNewStreamConfigProps) => {
       onClick={() => handleClick()}
       startIcon={<AddIcon />}
     >
-      New
+      {t('components.buttonNewStreamConfig.label')}
     </Button>
   )
 }

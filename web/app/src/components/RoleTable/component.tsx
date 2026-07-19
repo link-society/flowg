@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import Chip from '@mui/material/Chip'
 import Typography from '@mui/material/Typography'
@@ -45,6 +46,7 @@ const ScopesCell = (props: ScopesCellProps) => (
 )
 
 const RoleTable = ({ roles }: RoleTableProps) => {
+  const { t } = useTranslation()
   const { permissions } = useProfile()
   const notify = useNotify()
 
@@ -77,7 +79,7 @@ const RoleTable = ({ roles }: RoleTableProps) => {
         })
       }
 
-      notify.success('Role deleted')
+      notify.success(t('components.roleTable.notifications.deleted'))
     },
     [gridRef]
   )
@@ -86,7 +88,7 @@ const RoleTable = ({ roles }: RoleTableProps) => {
   const columnDefs = useMemo<ColDef<RoleModel>[]>(
     () => [
       {
-        headerName: 'Role',
+        headerName: t('components.roleTable.columns.role'),
         field: 'name',
         suppressMovable: true,
         sortable: false,
@@ -95,7 +97,7 @@ const RoleTable = ({ roles }: RoleTableProps) => {
         flex: 0,
       },
       {
-        headerName: 'Permissions',
+        headerName: t('components.roleTable.columns.permissions'),
         field: 'scopes',
         cellDataType: false,
         cellRenderer: ScopesCell,
@@ -108,7 +110,7 @@ const RoleTable = ({ roles }: RoleTableProps) => {
       },
       {
         hide: !permissions.can_edit_acls,
-        headerName: 'Actions',
+        headerName: t('common.tableColumns.actions'),
         headerClass: 'flowg-actions-header',
         cellClass: 'flowg-actions-cell',
         cellRenderer: TableActionsCell,
@@ -121,7 +123,7 @@ const RoleTable = ({ roles }: RoleTableProps) => {
         width: 100,
       },
     ],
-    [permissions.can_edit_acls, onDelete]
+    [permissions.can_edit_acls, onDelete, t]
   )
 
   return (
@@ -131,7 +133,9 @@ const RoleTable = ({ roles }: RoleTableProps) => {
           <RoleTableCardHeaderTitle>
             <AdminPanelSettingsIcon />
             <RoleTableCardHeaderTitleText>
-              <Typography variant="titleSm">Roles</Typography>
+              <Typography variant="titleSm">
+                {t('components.roleTable.title')}
+              </Typography>
             </RoleTableCardHeaderTitleText>
             {permissions.can_edit_acls && (
               <ButtonNewRole onRoleCreated={onNewRole} />

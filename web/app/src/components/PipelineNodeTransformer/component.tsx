@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import TextField from '@mui/material/TextField'
 
 import FilterAltIcon from '@mui/icons-material/FilterAlt'
@@ -19,6 +21,7 @@ const PipelineNodeTransformer = ({
   data,
   selected,
 }: NodeProps<PipelineNodeTransformerData>) => {
+  const { t } = useTranslation()
   const { permissions } = useProfile()
 
   return (
@@ -38,7 +41,7 @@ const PipelineNodeTransformer = ({
         </NodeIcon>
         <NodeBody className="nodrag">
           <TextField
-            label="Transformer"
+            label={t('components.pipelineNodeTransformer.label')}
             type="text"
             value={data.transformer}
             slotProps={{

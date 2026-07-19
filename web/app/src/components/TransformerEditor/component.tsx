@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -27,6 +28,7 @@ import {
 import { TransformerEditorProps } from './types'
 
 const TransformerEditor = (props: TransformerEditorProps) => {
+  const { t } = useTranslation()
   const [code, setCode] = useState(props.code)
   const [testRecord, setTestRecord] = useState<[string, string][]>([])
   const [testResult, setTestResult] = useState<string>('')
@@ -60,10 +62,12 @@ const TransformerEditor = (props: TransformerEditorProps) => {
       <EditorSide>
         <SidePanel>
           <SidePanelInner>
-            <SideLabel variant="text">Input Record:</SideLabel>
+            <SideLabel variant="text">
+              {t('common.testDialog.inputRecord')}
+            </SideLabel>
             <InputKeyValue
               id="kv:transformers.test.record"
-              keyLabel="Field"
+              keyLabel={t('common.testDialog.fieldLabel')}
               keyValues={testRecord}
               onChange={setTestRecord}
             />
@@ -78,12 +82,18 @@ const TransformerEditor = (props: TransformerEditorProps) => {
             disabled={testLoading}
             onClick={() => onTest()}
           >
-            {testLoading ? <CircularProgress size={24} /> : <>Run</>}
+            {testLoading ? (
+              <CircularProgress size={24} />
+            ) : (
+              <>{t('common.actions.run')}</>
+            )}
           </Button>
         </RunButtonRow>
         <SidePanel>
           <SidePanelOutput>
-            <SideLabel variant="text">Output Record:</SideLabel>
+            <SideLabel variant="text">
+              {t('components.transformerEditor.outputRecordLabel')}
+            </SideLabel>
             <ResultBox
               id="container:transformers.test.result"
               variant="outlined"

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import Button from '@mui/material/Button'
 
 import AddIcon from '@mui/icons-material/Add'
@@ -13,6 +15,7 @@ import { ButtonNewTransformerProps } from './types'
 const ButtonNewTransformer = ({
   onTransformerCreated,
 }: ButtonNewTransformerProps) => {
+  const { t } = useTranslation()
   const dialogs = useDialogs()
   const notify = useNotify()
 
@@ -22,7 +25,7 @@ const ButtonNewTransformer = ({
     if (transformerName !== null) {
       onTransformerCreated(transformerName)
 
-      notify.success('Transformer created')
+      notify.success(t('components.buttonNewTransformer.notifications.created'))
     }
   }, [onTransformerCreated])
 
@@ -35,7 +38,7 @@ const ButtonNewTransformer = ({
       onClick={() => handleClick()}
       startIcon={<AddIcon />}
     >
-      New
+      {t('components.buttonNewTransformer.label')}
     </Button>
   )
 }

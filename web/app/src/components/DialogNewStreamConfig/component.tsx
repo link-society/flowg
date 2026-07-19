@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -23,6 +24,7 @@ const DialogNewStreamConfig = ({
   open,
   onClose,
 }: DialogProps<void, string | null>) => {
+  const { t } = useTranslation()
   const [name, setName] = useState('')
 
   const [onSubmit, loading] = useApiOperation(async () => {
@@ -50,12 +52,12 @@ const DialogNewStreamConfig = ({
         },
       }}
     >
-      <DialogTitle>Create new stream</DialogTitle>
+      <DialogTitle>{t('components.dialogNewStreamConfig.title')}</DialogTitle>
       <DialogContent>
         <DialogFormBody>
           <TextField
             id="input:streams.modal.name"
-            label="Stream name"
+            label={t('components.dialogNewStreamConfig.nameLabel')}
             value={name}
             onChange={(e) => setName(e.target.value)}
             type="text"
@@ -73,7 +75,7 @@ const DialogNewStreamConfig = ({
           onClick={() => onClose(null)}
           disabled={loading}
         >
-          Cancel
+          {t('common.actions.cancel')}
         </Button>
         <Button
           id="btn:streams.modal.save"
@@ -83,7 +85,11 @@ const DialogNewStreamConfig = ({
           disabled={loading}
           type="submit"
         >
-          {loading ? <CircularProgress color="inherit" size={24} /> : <>Save</>}
+          {loading ? (
+            <CircularProgress color="inherit" size={24} />
+          ) : (
+            <>{t('common.actions.save')}</>
+          )}
         </Button>
       </DialogActions>
     </Dialog>

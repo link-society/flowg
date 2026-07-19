@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -40,6 +41,8 @@ const DialogNewForwarder = ({
   open,
   onClose,
 }: DialogProps<void, string | null>) => {
+  const { t } = useTranslation()
+
   const initialType: ForwarderConfigTypes = 'http'
 
   const [name, setName] = useInput<string>('', [validators.minLength(1)])
@@ -82,12 +85,12 @@ const DialogNewForwarder = ({
         },
       }}
     >
-      <DialogTitle>Create new forwarder</DialogTitle>
+      <DialogTitle>{t('components.dialogNewForwarder.title')}</DialogTitle>
       <DialogContent>
         <DialogFormBody>
           <TextField
             id="input:forwarder.modal.name"
-            label="Forwarder name"
+            label={t('components.dialogNewForwarder.nameLabel')}
             error={!name.valid}
             value={name.value}
             onChange={(e) => setName(e.target.value)}
@@ -99,13 +102,13 @@ const DialogNewForwarder = ({
 
           <FormControl fullWidth>
             <InputLabel id="label:forwarder.modal.type">
-              Forwarder type
+              {t('components.dialogNewForwarder.typeLabel')}
             </InputLabel>
             <Select<ForwarderConfigTypes>
               labelId="label:forwarder.modal.type"
               id="select:forwarder.modal.type"
               value={type}
-              label="Forwarder type"
+              label={t('components.dialogNewForwarder.typeLabel')}
               onChange={(e) =>
                 handleTypeChange(e.target.value as ForwarderConfigTypes)
               }
@@ -143,7 +146,7 @@ const DialogNewForwarder = ({
           onClick={() => onClose(null)}
           disabled={loading}
         >
-          Cancel
+          {t('common.actions.cancel')}
         </Button>
         <Button
           id="btn:forwarder.modal.save"
@@ -153,7 +156,11 @@ const DialogNewForwarder = ({
           disabled={loading || !valid}
           type="submit"
         >
-          {loading ? <CircularProgress color="inherit" size={24} /> : <>Save</>}
+          {loading ? (
+            <CircularProgress color="inherit" size={24} />
+          ) : (
+            <>{t('common.actions.save')}</>
+          )}
         </Button>
       </DialogActions>
     </Dialog>

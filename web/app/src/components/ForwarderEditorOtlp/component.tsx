@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { useInput } from '@/lib/hooks/input'
 
@@ -17,6 +18,7 @@ const ForwarderEditorOtlp = ({
   onConfigChange,
   onValidationChange,
 }: ForwarderEditorOtlpProps) => {
+  const { t } = useTranslation()
   const [endpoint, setEndpoint] = useInput<string>(config.endpoint, [
     validators.minLength(1),
     validators.formatUri,
@@ -43,7 +45,7 @@ const ForwarderEditorOtlp = ({
     <ForwarderEditorOtlpRoot id="container:editor.forwarders.otlp">
       <ForwarderEditorOtlpEndpointField
         id="input:editor.forwarders.otlp.endpoint"
-        label="Endpoint"
+        label={t('components.forwarderEditorOtlp.endpointLabel')}
         error={!endpoint.valid}
         value={endpoint.value}
         onChange={(e) => setEndpoint(e.target.value)}
@@ -54,8 +56,8 @@ const ForwarderEditorOtlp = ({
 
       <InputKeyValue
         id="input:editor.forwarders.otlp.headers"
-        keyLabel="Header Name"
-        valueLabel="Header Value"
+        keyLabel={t('components.forwarderEditorOtlp.headerNameLabel')}
+        valueLabel={t('components.forwarderEditorOtlp.headerValueLabel')}
         keyValues={Object.entries(headers.value ?? {})}
         onChange={(pairs) => {
           setHeaders(Object.fromEntries(pairs))

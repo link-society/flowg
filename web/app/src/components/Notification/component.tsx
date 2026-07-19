@@ -1,4 +1,5 @@
 import { Fragment, useCallback, useContext } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import useSlotProps from '@mui/utils/useSlotProps'
 
@@ -24,6 +25,7 @@ const Notification = ({
   message,
   options,
 }: NotificationProps) => {
+  const { t } = useTranslation()
   const { close } = useContext(NotificationsContext)
   const { severity, actionText, onAction, autoHideDuration } = options
 
@@ -42,13 +44,13 @@ const Notification = ({
     <Fragment>
       {onAction ? (
         <Button color="inherit" size="small" onClick={onAction}>
-          {actionText ?? 'Action'}
+          {actionText ?? t('components.notification.action')}
         </Button>
       ) : null}
       <IconButton
         size="small"
-        aria-label="close"
-        title="Close"
+        aria-label={t('common.actions.close')}
+        title={t('common.actions.close')}
         color="inherit"
         onClick={handleClose}
       >

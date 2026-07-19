@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import Button from '@mui/material/Button'
 
 import AddIcon from '@mui/icons-material/Add'
@@ -11,6 +13,7 @@ import DialogNewPipeline from '@/components/DialogNewPipeline/component'
 import { ButtonNewPipelineProps } from './types'
 
 const ButtonNewPipeline = (props: ButtonNewPipelineProps) => {
+  const { t } = useTranslation()
   const dialogs = useDialogs()
   const notify = useNotify()
 
@@ -20,7 +23,7 @@ const ButtonNewPipeline = (props: ButtonNewPipelineProps) => {
     if (pipelineName !== null) {
       props.onPipelineCreated(pipelineName)
 
-      notify.success('Pipeline created')
+      notify.success(t('components.buttonNewPipeline.notifications.created'))
     }
   }, [props.onPipelineCreated])
 
@@ -32,7 +35,7 @@ const ButtonNewPipeline = (props: ButtonNewPipelineProps) => {
       onClick={() => handleClick()}
       startIcon={<AddIcon />}
     >
-      New
+      {t('components.buttonNewPipeline.label')}
     </Button>
   )
 }

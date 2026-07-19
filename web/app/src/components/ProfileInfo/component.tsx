@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import Divider from '@mui/material/Divider'
 import Typography from '@mui/material/Typography'
 
@@ -15,24 +17,30 @@ import {
   ProfileInfoCardHeaderTitle,
 } from './styles'
 
-const ProfileInfo = () => (
-  <ProfileInfoCard>
-    <ProfileInfoCardHeader
-      title={
-        <ProfileInfoCardHeaderTitle>
-          <AccountCircleIcon />
-          <Typography variant="titleSm">Account Information</Typography>
-        </ProfileInfoCardHeaderTitle>
-      }
-    />
-    <ProfileInfoCardContent>
-      <UsernameDisplay />
-      <RolesDisplay />
-      <PermissionDisplay />
-      <Divider />
-      <PasswordChange />
-    </ProfileInfoCardContent>
-  </ProfileInfoCard>
-)
+const ProfileInfo = () => {
+  const { t } = useTranslation()
+
+  return (
+    <ProfileInfoCard>
+      <ProfileInfoCardHeader
+        title={
+          <ProfileInfoCardHeaderTitle>
+            <AccountCircleIcon />
+            <Typography variant="titleSm">
+              {t('components.profileInfo.title')}
+            </Typography>
+          </ProfileInfoCardHeaderTitle>
+        }
+      />
+      <ProfileInfoCardContent>
+        <UsernameDisplay />
+        <RolesDisplay />
+        <PermissionDisplay />
+        <Divider />
+        <PasswordChange />
+      </ProfileInfoCardContent>
+    </ProfileInfoCard>
+  )
+}
 
 export default ProfileInfo

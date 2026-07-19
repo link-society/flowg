@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import Box from '@mui/material/Box'
 import Checkbox from '@mui/material/Checkbox'
 import FormControlLabel from '@mui/material/FormControlLabel'
@@ -8,21 +10,30 @@ import { useProfile } from '@/lib/hooks/profile'
 import { Label, PermissionGrid, PermissionLabel } from './styles'
 
 const PermissionDisplay = () => {
+  const { t } = useTranslation()
   const { permissions } = useProfile()
 
   return (
     <Box>
-      <Label variant="text">Permissions:</Label>
+      <Label variant="text">{t('components.permissionDisplay.title')}</Label>
 
       <PermissionGrid>
         <FormGroup>
           <FormControlLabel
-            label={<PermissionLabel>View Pipelines</PermissionLabel>}
+            label={
+              <PermissionLabel>
+                {t('components.permissionDisplay.viewPipelines')}
+              </PermissionLabel>
+            }
             disabled
             control={<Checkbox checked={permissions.can_view_pipelines} />}
           />
           <FormControlLabel
-            label={<PermissionLabel>Edit Pipelines</PermissionLabel>}
+            label={
+              <PermissionLabel>
+                {t('components.permissionDisplay.editPipelines')}
+              </PermissionLabel>
+            }
             disabled
             control={<Checkbox checked={permissions.can_edit_pipelines} />}
           />
@@ -30,12 +41,20 @@ const PermissionDisplay = () => {
 
         <FormGroup>
           <FormControlLabel
-            label={<PermissionLabel>View Transformers</PermissionLabel>}
+            label={
+              <PermissionLabel>
+                {t('components.permissionDisplay.viewTransformers')}
+              </PermissionLabel>
+            }
             disabled
             control={<Checkbox checked={permissions.can_view_transformers} />}
           />
           <FormControlLabel
-            label={<PermissionLabel>Edit Transformers</PermissionLabel>}
+            label={
+              <PermissionLabel>
+                {t('components.permissionDisplay.editTransformers')}
+              </PermissionLabel>
+            }
             disabled
             control={<Checkbox checked={permissions.can_edit_transformers} />}
           />
@@ -43,12 +62,20 @@ const PermissionDisplay = () => {
 
         <FormGroup>
           <FormControlLabel
-            label={<PermissionLabel>View Streams</PermissionLabel>}
+            label={
+              <PermissionLabel>
+                {t('components.permissionDisplay.viewStreams')}
+              </PermissionLabel>
+            }
             disabled
             control={<Checkbox checked={permissions.can_view_streams} />}
           />
           <FormControlLabel
-            label={<PermissionLabel>Edit Streams</PermissionLabel>}
+            label={
+              <PermissionLabel>
+                {t('components.permissionDisplay.editStreams')}
+              </PermissionLabel>
+            }
             disabled
             control={<Checkbox checked={permissions.can_edit_streams} />}
           />
@@ -56,12 +83,20 @@ const PermissionDisplay = () => {
 
         <FormGroup>
           <FormControlLabel
-            label={<PermissionLabel>View Forwarders</PermissionLabel>}
+            label={
+              <PermissionLabel>
+                {t('components.permissionDisplay.viewForwarders')}
+              </PermissionLabel>
+            }
             disabled
             control={<Checkbox checked={permissions.can_view_forwarders} />}
           />
           <FormControlLabel
-            label={<PermissionLabel>Edit Forwarders</PermissionLabel>}
+            label={
+              <PermissionLabel>
+                {t('components.permissionDisplay.editForwarders')}
+              </PermissionLabel>
+            }
             disabled
             control={<Checkbox checked={permissions.can_edit_forwarders} />}
           />
@@ -69,12 +104,20 @@ const PermissionDisplay = () => {
 
         <FormGroup>
           <FormControlLabel
-            label={<PermissionLabel>View ACLs</PermissionLabel>}
+            label={
+              <PermissionLabel>
+                {t('components.permissionDisplay.viewAcls')}
+              </PermissionLabel>
+            }
             disabled
             control={<Checkbox checked={permissions.can_view_acls} />}
           />
           <FormControlLabel
-            label={<PermissionLabel>Edit ACLs</PermissionLabel>}
+            label={
+              <PermissionLabel>
+                {t('components.permissionDisplay.editAcls')}
+              </PermissionLabel>
+            }
             disabled
             control={<Checkbox checked={permissions.can_edit_acls} />}
           />
@@ -82,7 +125,11 @@ const PermissionDisplay = () => {
 
         <FormGroup>
           <FormControlLabel
-            label={<PermissionLabel>Read system configuration</PermissionLabel>}
+            label={
+              <PermissionLabel>
+                {t('components.permissionDisplay.readSystemConfiguration')}
+              </PermissionLabel>
+            }
             disabled
             control={
               <Checkbox checked={permissions.can_read_system_configuration} />
@@ -90,7 +137,9 @@ const PermissionDisplay = () => {
           />
           <FormControlLabel
             label={
-              <PermissionLabel>Write system configuration</PermissionLabel>
+              <PermissionLabel>
+                {t('components.permissionDisplay.writeSystemConfiguration')}
+              </PermissionLabel>
             }
             disabled
             control={
@@ -101,7 +150,11 @@ const PermissionDisplay = () => {
 
         <FormGroup>
           <FormControlLabel
-            label={<PermissionLabel>Send Logs</PermissionLabel>}
+            label={
+              <PermissionLabel>
+                {t('components.permissionDisplay.sendLogs')}
+              </PermissionLabel>
+            }
             disabled
             control={<Checkbox checked={permissions.can_send_logs} />}
           />

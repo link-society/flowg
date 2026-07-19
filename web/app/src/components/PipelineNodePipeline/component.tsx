@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import TextField from '@mui/material/TextField'
 
 import AccountTreeIcon from '@mui/icons-material/AccountTree'
@@ -15,44 +17,48 @@ const PipelineNodePipeline = ({
   id,
   data,
   selected,
-}: NodeProps<PipelineNodePipelineData>) => (
-  <>
-    {selected && (
-      <ToolbarRow>
-        <PipelineDeleteNodeButton nodeId={id} />
-        {data.traces && <PipelineTraceNodeButton traces={data.traces} />}
-      </ToolbarRow>
-    )}
-    <Handle type="target" position={Position.Left} style={handleStyle} />
-    <NodeRoot>
-      <NodeIcon>
-        <AccountTreeIcon />
-      </NodeIcon>
-      <NodeBody className="nodrag">
-        <TextField
-          label="Pipeline"
-          type="text"
-          value={data.pipeline}
-          slotProps={{
-            input: {
-              readOnly: true,
-            },
-          }}
-          variant="outlined"
-        />
-      </NodeBody>
-    </NodeRoot>
+}: NodeProps<PipelineNodePipelineData>) => {
+  const { t } = useTranslation()
 
-    <PipelineTraceNodeIndicator
-      status={
-        data.traces
-          ? data.traces.some((trace) => trace.error)
-            ? 'error'
-            : 'success'
-          : null
-      }
-    />
-  </>
-)
+  return (
+    <>
+      {selected && (
+        <ToolbarRow>
+          <PipelineDeleteNodeButton nodeId={id} />
+          {data.traces && <PipelineTraceNodeButton traces={data.traces} />}
+        </ToolbarRow>
+      )}
+      <Handle type="target" position={Position.Left} style={handleStyle} />
+      <NodeRoot>
+        <NodeIcon>
+          <AccountTreeIcon />
+        </NodeIcon>
+        <NodeBody className="nodrag">
+          <TextField
+            label={t('components.pipelineNodePipeline.label')}
+            type="text"
+            value={data.pipeline}
+            slotProps={{
+              input: {
+                readOnly: true,
+              },
+            }}
+            variant="outlined"
+          />
+        </NodeBody>
+      </NodeRoot>
+
+      <PipelineTraceNodeIndicator
+        status={
+          data.traces
+            ? data.traces.some((trace) => trace.error)
+              ? 'error'
+              : 'success'
+            : null
+        }
+      />
+    </>
+  )
+}
 
 export default PipelineNodePipeline

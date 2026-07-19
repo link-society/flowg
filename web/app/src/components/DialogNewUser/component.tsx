@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
@@ -34,6 +35,7 @@ const DialogNewUser = ({
   { roles: string[]; defaultRoles: string[] },
   UserModel | null
 >) => {
+  const { t } = useTranslation()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [roles, setRoles] = useState<string[]>(payload.defaultRoles)
@@ -64,14 +66,14 @@ const DialogNewUser = ({
         },
       }}
     >
-      <DialogTitle>Create a new user</DialogTitle>
+      <DialogTitle>{t('components.dialogNewUser.title')}</DialogTitle>
       <DialogContent>
         <FormStack>
           <FieldRow>
             <AccountCircleIcon />
             <TextField
               id="input:admin.users.modal.username"
-              label="Username"
+              label={t('components.dialogNewUser.usernameLabel')}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               type="text"
@@ -85,7 +87,7 @@ const DialogNewUser = ({
             <LockIcon />
             <TextField
               id="input:admin.users.modal.password"
-              label="Password"
+              label={t('components.dialogNewUser.passwordLabel')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               type="password"
@@ -96,7 +98,9 @@ const DialogNewUser = ({
           </FieldRow>
 
           <FieldStack id="field:admin.users.modal.roles">
-            <FieldLabel variant="text">Roles:</FieldLabel>
+            <FieldLabel variant="text">
+              {t('components.dialogNewUser.rolesLabel')}
+            </FieldLabel>
             <InputTransferList<string>
               choices={payload.roles}
               selected={payload.defaultRoles}
@@ -119,7 +123,7 @@ const DialogNewUser = ({
           onClick={() => onClose(null)}
           disabled={loading}
         >
-          Cancel
+          {t('common.actions.cancel')}
         </Button>
         <Button
           id="btn:admin.users.modal.submit"
@@ -129,7 +133,11 @@ const DialogNewUser = ({
           disabled={loading}
           type="submit"
         >
-          {loading ? <CircularProgress color="inherit" size={24} /> : <>Save</>}
+          {loading ? (
+            <CircularProgress color="inherit" size={24} />
+          ) : (
+            <>{t('common.actions.save')}</>
+          )}
         </Button>
       </DialogActions>
     </Dialog>

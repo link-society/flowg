@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import Button from '@mui/material/Button'
 import Checkbox from '@mui/material/Checkbox'
@@ -41,6 +42,7 @@ const intersection = <T,>(
 }
 
 const InputTransferList = <T,>(props: InputTransferListProps<T>) => {
+  const { t } = useTranslation()
   const [checked, setChecked] = useState<T[]>([])
   const initialLeft = props.selected
     ? not(props.choices, props.selected, props.getItemId)
@@ -135,7 +137,7 @@ const InputTransferList = <T,>(props: InputTransferListProps<T>) => {
           size="small"
           onClick={handleAllRight}
           disabled={left.length === 0}
-          aria-label="move all right"
+          aria-label={t('components.inputTransferList.moveAllRight')}
         >
           <KeyboardDoubleArrowRightIcon />
         </Button>
@@ -145,7 +147,7 @@ const InputTransferList = <T,>(props: InputTransferListProps<T>) => {
           size="small"
           onClick={handleCheckedRight}
           disabled={leftChecked.length === 0}
-          aria-label="move selected right"
+          aria-label={t('components.inputTransferList.moveSelectedRight')}
         >
           <KeyboardArrowRightIcon />
         </Button>
@@ -155,7 +157,7 @@ const InputTransferList = <T,>(props: InputTransferListProps<T>) => {
           size="small"
           onClick={handleCheckedLeft}
           disabled={rightChecked.length === 0}
-          aria-label="move selected left"
+          aria-label={t('components.inputTransferList.moveSelectedLeft')}
         >
           <KeyboardArrowLeftIcon />
         </Button>
@@ -165,7 +167,7 @@ const InputTransferList = <T,>(props: InputTransferListProps<T>) => {
           size="small"
           onClick={handleAllLeft}
           disabled={right.length === 0}
-          aria-label="move all left"
+          aria-label={t('components.inputTransferList.moveAllLeft')}
         >
           <KeyboardDoubleArrowLeftIcon />
         </Button>

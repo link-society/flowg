@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -44,6 +45,7 @@ type DialogForwarderEditorProps = Readonly<{
 const DialogForwarderEditor = ({
   forwarderName,
 }: DialogForwarderEditorProps) => {
+  const { t } = useTranslation()
   const notify = useNotify()
 
   const [open, setOpen] = useState(false)
@@ -67,7 +69,7 @@ const DialogForwarderEditor = ({
 
   const [onSave, saveLoading] = useApiOperation(async () => {
     await configApi.saveForwarder(forwarderName, forwarder)
-    notify.success('Forwarder saved')
+    notify.success(t('pages.forwarders.notifications.saved'))
   }, [forwarderName, forwarder])
 
   return (
@@ -79,7 +81,7 @@ const DialogForwarderEditor = ({
         startIcon={<EditIcon />}
         onClick={() => setOpen(true)}
       >
-        Edit
+        {t('common.actions.edit')}
       </Button>
       <Dialog
         fullScreen
@@ -101,7 +103,7 @@ const DialogForwarderEditor = ({
 
             <DialogToolbarName>
               <ToolbarNameInput
-                label="Forwarder name"
+                label={t('components.dialogForwarderEditor.nameLabel')}
                 value={forwarderName}
                 type="text"
                 variant="outlined"
@@ -122,7 +124,11 @@ const DialogForwarderEditor = ({
               disabled={saveLoading || !valid}
               startIcon={!saveLoading && <SaveIcon />}
             >
-              {saveLoading ? <CircularProgress size={24} /> : <>Save</>}
+              {saveLoading ? (
+                <CircularProgress size={24} />
+              ) : (
+                <>{t('common.actions.save')}</>
+              )}
             </Button>
           </DialogToolbar>
         </DialogAppBar>
