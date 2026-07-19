@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
-"Language: en\n"
+"Language: dummy\n"
 
 msgid "common.actions.cancel"
 msgstr "Cancel"
