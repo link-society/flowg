@@ -66,6 +66,13 @@ RUN cargo test
 
 FROM node:26-${DEBIAN_RELEASE}-slim AS builder-js
 
+RUN set -ex && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        gettext \
+      && \
+    rm -rf /var/lib/apt/lists/*
+
 RUN mkdir -p /workspace/web/app
 WORKDIR /workspace/web/app
 
