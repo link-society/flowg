@@ -162,6 +162,39 @@ msgstr "An unknown exception has been thrown."
 msgid "components.errorBoundary.unknownErrorDetail"
 msgstr "The exception has been logged to the console."
 
+msgid "components.forwarderConfigTypes.amqp"
+msgstr "AMQP"
+
+msgid "components.forwarderConfigTypes.awscloudwatch"
+msgstr "AWS Cloudwatch"
+
+msgid "components.forwarderConfigTypes.azuremonitor"
+msgstr "Azure Monitor"
+
+msgid "components.forwarderConfigTypes.clickhouse"
+msgstr "Clickhouse"
+
+msgid "components.forwarderConfigTypes.datadog"
+msgstr "Datadog"
+
+msgid "components.forwarderConfigTypes.elastic"
+msgstr "Elastic Search"
+
+msgid "components.forwarderConfigTypes.googlecloudlogging"
+msgstr "Google Log"
+
+msgid "components.forwarderConfigTypes.http"
+msgstr "Webhook"
+
+msgid "components.forwarderConfigTypes.otlp"
+msgstr "OpenTelemetry"
+
+msgid "components.forwarderConfigTypes.splunk"
+msgstr "Splunk"
+
+msgid "components.forwarderConfigTypes.syslog"
+msgstr "Syslog Server"
+
 msgid "components.forwarderEditor.typeLabel"
 msgstr "Forwarder Type"
 
@@ -351,11 +384,23 @@ msgstr "move selected right"
 msgid "components.languageSelect.ariaLabel"
 msgstr "Language: {{label}}. Click to change."
 
+msgid "components.logChart.seriesName"
+msgstr "Logs"
+
 msgid "components.logQueryPanel.filterLabel"
 msgstr "Filter"
 
 msgid "components.logQueryPanel.submit"
 msgstr "Query Logs"
+
+msgid "components.nodeTraceTabPanel.errorLabel"
+msgstr "Error:"
+
+msgid "components.nodeTraceTabPanel.inputLabel"
+msgstr "Input Record:"
+
+msgid "components.nodeTraceTabPanel.outputLabel"
+msgstr "Output Record(s):"
 
 msgid "components.notification.action"
 msgstr "Action"
@@ -491,6 +536,9 @@ msgstr "Role deleted"
 
 msgid "components.roleTable.title"
 msgstr "Roles"
+
+msgid "components.rolesDisplay.label"
+msgstr "Roles:"
 
 msgid "components.streamEditor.disableHintPrefix"
 msgstr "Use"
