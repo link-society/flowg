@@ -59,7 +59,7 @@ const ForwarderEditor = ({
     showType: boolean
   }>
 
-  const typeLabel = ForwarderConfigTypeLabelMap[forwarder.config.type]
+  const typeLabel = t(ForwarderConfigTypeLabelMap[forwarder.config.type])
   const ForwarderIcon = ForwarderConfigTypeIconMap[forwarder.config.type]
 
   return (

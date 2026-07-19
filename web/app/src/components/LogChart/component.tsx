@@ -3,6 +3,7 @@ import type { ApexOptions } from 'apexcharts'
 
 import { useMemo } from 'react'
 import ApexChart from 'react-apexcharts'
+import { useTranslation } from 'react-i18next'
 
 import { aggregateLogs } from '@/lib/timeserie'
 
@@ -10,6 +11,7 @@ import { LogChartContainer } from './styles'
 import { LogChartProps } from './types'
 
 const LogChart = ({ rowData, from, to }: LogChartProps) => {
+  const { t } = useTranslation()
   const { mode } = useColorMode()
 
   const options: ApexOptions = useMemo(
@@ -28,11 +30,11 @@ const LogChart = ({ rowData, from, to }: LogChartProps) => {
   const series = useMemo(
     () => [
       {
-        name: 'Logs',
+        name: t('components.logChart.seriesName'),
         data: aggregateLogs(rowData, from, to),
       },
     ],
-    [rowData, from, to]
+    [rowData, from, to, t]
   )
 
   return (

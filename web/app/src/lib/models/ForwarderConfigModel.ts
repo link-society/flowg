@@ -62,27 +62,59 @@ type ForwarderConfigModel =
 export type ForwarderConfigTypes = ForwarderConfigModel['type']
 
 export const ForwarderConfigTypeValues = [
-  { key: 'http', label: 'Webhook', icon: ForwarderIconHttp },
-  { key: 'syslog', label: 'Syslog Server', icon: ForwarderIconSyslog },
-  { key: 'datadog', label: 'Datadog', icon: ForwarderIconDatadog },
-  { key: 'splunk', label: 'Splunk', icon: ForwarderIconSplunk },
-  { key: 'amqp', label: 'AMQP', icon: ForwarderIconAmqp },
-  { key: 'otlp', label: 'OpenTelemetry', icon: ForwarderIconOtlp },
-  { key: 'elastic', label: 'Elastic Search', icon: ForwarderIconElastic },
-  { key: 'clickhouse', label: 'Clickhouse', icon: ForwarderIconClickhouse },
+  {
+    key: 'http',
+    label: 'components.forwarderConfigTypes.http',
+    icon: ForwarderIconHttp,
+  },
+  {
+    key: 'syslog',
+    label: 'components.forwarderConfigTypes.syslog',
+    icon: ForwarderIconSyslog,
+  },
+  {
+    key: 'datadog',
+    label: 'components.forwarderConfigTypes.datadog',
+    icon: ForwarderIconDatadog,
+  },
+  {
+    key: 'splunk',
+    label: 'components.forwarderConfigTypes.splunk',
+    icon: ForwarderIconSplunk,
+  },
+  {
+    key: 'amqp',
+    label: 'components.forwarderConfigTypes.amqp',
+    icon: ForwarderIconAmqp,
+  },
+  {
+    key: 'otlp',
+    label: 'components.forwarderConfigTypes.otlp',
+    icon: ForwarderIconOtlp,
+  },
+  {
+    key: 'elastic',
+    label: 'components.forwarderConfigTypes.elastic',
+    icon: ForwarderIconElastic,
+  },
+  {
+    key: 'clickhouse',
+    label: 'components.forwarderConfigTypes.clickhouse',
+    icon: ForwarderIconClickhouse,
+  },
   {
     key: 'awscloudwatch',
-    label: 'AWS Cloudwatch',
+    label: 'components.forwarderConfigTypes.awscloudwatch',
     icon: ForwarderIconAwsCloudWatch,
   },
   {
     key: 'googlecloudlogging',
-    label: 'Google Log',
+    label: 'components.forwarderConfigTypes.googlecloudlogging',
     icon: ForwarderIconGoogleLog,
   },
   {
     key: 'azuremonitor',
-    label: 'Azure Monitor',
+    label: 'components.forwarderConfigTypes.azuremonitor',
     icon: ForwarderIconAzureMonitor,
   },
 ] as const

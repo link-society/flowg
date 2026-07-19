@@ -113,15 +113,17 @@ const DialogNewForwarder = ({
                 handleTypeChange(e.target.value as ForwarderConfigTypes)
               }
             >
-              {ForwarderConfigTypeValues.map((t) => (
+              {ForwarderConfigTypeValues.map((forwarderType) => (
                 <MenuItem
-                  id={`option:forwarder.modal.type.${t.key}`}
-                  key={t.key}
-                  value={t.key}
+                  id={`option:forwarder.modal.type.${forwarderType.key}`}
+                  key={forwarderType.key}
+                  value={forwarderType.key}
                 >
                   <TypeOption>
-                    <t.icon />
-                    <Typography variant="text">{t.label}</Typography>
+                    <forwarderType.icon />
+                    <Typography variant="text">
+                      {t(forwarderType.label)}
+                    </Typography>
                   </TypeOption>
                 </MenuItem>
               ))}
