@@ -6,9 +6,14 @@ export const PageFooterContainer = styled('footer')`
   gap: ${({ theme }) => theme.spacing(1)};
   padding: ${({ theme }) => theme.spacing(1.5)};
   background-color: ${({ theme }) => theme.tokens.colors.borderLight};
+  place-content: space-between;
+`
 
-  > div {
-    margin-left: auto;
+export const PageFooterActions = styled('div')`
+  display: flex;
+  > div:nth-child(2) {
+    margin: 0 5px 0 10px;
+    background-color: ${({ theme }) => theme.tokens.colors.borderLight};
   }
 `
 
