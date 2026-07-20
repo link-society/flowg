@@ -12,6 +12,7 @@ Login With Valid Credentials
 
 Login With Invalid Credentials
     Open Browser              ${BASE_URL}/web/login  ${BROWSER}
+    Wait Until Element Is Visible  id=input:login.username
     Input Text                id=input:login.username  root
     Input Text                id=input:login.password  notroot
     Click Button              id=btn:login.submit
