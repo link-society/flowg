@@ -25,7 +25,8 @@ tasks:
     desc: "Run Web end-to-end tests"
     dir: ./tests
     cmds:
-      - sudo apt install libasound2t64  # required for Firefox webdriver
+      - cmd: sudo apt install libasound2t64  # required for Firefox webdriver
+        platforms: [linux]
       - pdm install
       - pdm run pytest
     env:
