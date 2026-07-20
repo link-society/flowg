@@ -7,6 +7,7 @@ Variables  vars.py
 Log as
     [Arguments]               ${username}  ${password}
     Go To                     url=${BASE_URL}/web/login
+    Wait Until Element Is Visible  id=input:login.username
     Input Text                id=input:login.username  ${username}
     Input Text                id=input:login.password  ${password}
     Click Element             id=btn:login.submit
