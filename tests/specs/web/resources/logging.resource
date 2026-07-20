@@ -1,5 +1,5 @@
 *** Settings ***
-Library    Process
+Library    ${CURDIR}/syslog_sender.py
 Library    SeleniumLibrary
 Library    RequestsLibrary
 
@@ -15,13 +15,13 @@ Send log via API
     API POST                         path=/api/v1/pipelines/default/logs/struct  token=${token}  body=${payload}  expected_status=200
 
 Send log via Syslog (RFC 5424)
-    [Arguments]              ${message}
-    ${result}=  Run Process  logger -n localhost -P 5514 -t robotframework --rfc5424 "${message}"  shell=True
+    [Arguments]         ${message}
+    Send Syslog Rfc5424  ${message}
 
 
 Send log via Syslog (RFC 3164)
-    [Arguments]              ${message}
-    ${result}=  Run Process  logger -n localhost -P 5514 -t robotframework --rfc3164 "${message}"  shell=True
+    [Arguments]         ${message}
+    Send Syslog Rfc3164  ${message}
 
 
 Purge stream
