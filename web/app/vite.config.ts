@@ -17,6 +17,7 @@ export default defineConfig({
         /\.(html|css|js|json|map|ico|png|woff2?)$/,
       ],
       skipIfLargerOrEqual: false,
+      deleteOriginalAssets: true,
     }),
     {
       name: 'rewrite-assets-path',
