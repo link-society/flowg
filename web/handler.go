@@ -20,14 +20,6 @@ import (
 
 // staticfiles holds the pre-built, gzip-compressed assets of the web UI,
 // embedded into the binary at build time.
-//
-// The whole public/ tree is embedded recursively: Go's embed patterns do not
-// support "**", so a suffix glob like "public/**/*.gz" only reaches a fixed
-// depth and would silently drop nested assets (e.g. the i18n locale files under
-// public/assets/locales/<lng>/). The build emits only gzip-compressed files, so
-// embedding the directory captures exactly the assets that are served.
-//
-//go:embed all:public
 var staticfiles embed.FS
 
 // NewHandler builds the HTTP handler that serves FlowG's single-page web UI.
