@@ -20,6 +20,8 @@ import (
 
 // staticfiles holds the pre-built, gzip-compressed assets of the web UI,
 // embedded into the binary at build time.
+//
+//go:embed all:public
 var staticfiles embed.FS
 
 // NewHandler builds the HTTP handler that serves FlowG's single-page web UI.
