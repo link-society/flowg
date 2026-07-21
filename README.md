@@ -90,6 +90,7 @@ Summary:
  - C Toolchain
  - Rust and Cargo (edition 2021)
  - NodeJS
+ - gettext (for `msgcat`)
 
 ```bash
 go install github.com/go-task/task/v3/cmd/task@latest
