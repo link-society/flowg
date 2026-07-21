@@ -29,16 +29,22 @@ func (rt *googleCloudLoggingRuntime) Init(ctx context.Context) error {
 	var err error
 
 	var opts []option.ClientOption
-	opts = append(opts, option.WithEndpoint(rt.config.Endpoint))
-	if len(rt.config.AuthJSON) == 0 {
+	opts = append(opts, option.WithEndpoint(rt.config.Endpoint+":"+rt.config.EndpointPort))
+
+	if len(rt.config.AuthJSON) > 0 {
+		opts = append(opts, option.WithAuthCredentialsJSON(option.ServiceAccount, []byte(rt.config.AuthJSON)))
+	}
+
+	if rt.config.DisableAuth {
 		opts = append(opts, option.WithoutAuthentication())
+	}
+
+	if rt.config.DisableTLS {
 		opts = append(opts,
 			option.WithGRPCDialOption(
 				grpc.WithTransportCredentials(insecure.NewCredentials()),
 			),
 		)
-	} else {
-		opts = append(opts, option.WithAuthCredentialsJSON(option.ServiceAccount, []byte(rt.config.AuthJSON)))
 	}
 
 	rt.client, err = logging.NewClient(

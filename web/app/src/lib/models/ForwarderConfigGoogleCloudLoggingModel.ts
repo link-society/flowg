@@ -3,6 +3,8 @@ type ForwarderConfigGoogleCloudLoggingModel = {
   project_id: string
   log_id: string
   endpoint: string
+  disable_tls: boolean
+  disable_auth: boolean
   auth_json?: string
 }
 
@@ -13,4 +15,6 @@ export const factory = (): ForwarderConfigGoogleCloudLoggingModel => ({
   project_id: 'flowg',
   log_id: 'flowg',
   endpoint: 'logging.googleapis.com',
+  disable_tls: false,
+  disable_auth: false,
 })
