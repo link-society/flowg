@@ -3,6 +3,7 @@ package forwarders
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"encoding/json"
 
@@ -29,7 +30,7 @@ func (rt *googleCloudLoggingRuntime) Init(ctx context.Context) error {
 	var err error
 
 	var opts []option.ClientOption
-	opts = append(opts, option.WithEndpoint(rt.config.Endpoint+":"+rt.config.EndpointPort))
+	opts = append(opts, option.WithEndpoint(rt.config.Host+":"+strconv.Itoa(rt.config.Port)))
 
 	if len(rt.config.AuthJSON) > 0 {
 		opts = append(opts, option.WithAuthCredentialsJSON(option.ServiceAccount, []byte(rt.config.AuthJSON)))
