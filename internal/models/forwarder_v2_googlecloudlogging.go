@@ -4,7 +4,8 @@ package models
 // authenticating with JSON credentials if available.
 type ForwarderGoogleCloudLoggingV2 struct {
 	Type        string `json:"type" enum:"googlecloudlogging" required:"true"`
-	Endpoint    string `json:"endpoint" required:"true"`
+	Host        string `json:"host" required:"true"`
+	Port        int    `json:"port" required:"true"`
 	ProjectID   string `json:"project_id" required:"true"`
 	LogID       string `json:"log_id" required:"true"`
 	DisableTLS  bool   `json:"disable_tls"`

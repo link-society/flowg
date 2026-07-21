@@ -33,7 +33,7 @@ type ForwarderConfigV2 struct {
 
 // JSONSchemaOneOf advertises every backend variant so the generated OpenAPI
 // schema models Config as a "oneOf".
-func (ForwarderConfigV2) JSONSchemaOneOf() []any {
+func (*ForwarderConfigV2) JSONSchemaOneOf() []any {
 	return []any{
 		ForwarderHttpV2{},
 		ForwarderSyslogV2{},

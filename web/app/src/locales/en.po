@@ -312,8 +312,14 @@ msgstr "Auth JSON"
 msgid "components.forwarderEditorGoogleCloudLogging.disableAuthLabel"
 msgstr "Disable Authentication"
 
+msgid "components.forwarderEditorGoogleCloudLogging.hostLabel"
+msgstr "Endpoint host"
+
 msgid "components.forwarderEditorGoogleCloudLogging.logIdLabel"
 msgstr "Log ID"
+
+msgid "components.forwarderEditorGoogleCloudLogging.portLabel"
+msgstr "Endpoint port"
 
 msgid "components.forwarderEditorGoogleCloudLogging.projectIdLabel"
 msgstr "Project ID"

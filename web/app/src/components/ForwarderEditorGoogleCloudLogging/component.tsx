@@ -17,7 +17,11 @@ import {
   vrlThemeDefinition,
 } from '@/lib/vrl-highlighter.ts'
 
-import {ForwarderEditorGoogleCloudLoggingRoot} from './styles'
+import {
+  ForwarderEditorGoogleCloudLoggingField,
+  ForwarderEditorGoogleCloudLoggingRoot,
+  ForwarderEditorGoogleCloudLoggingRow,
+} from './styles'
 import { ForwarderEditorGoogleCloudLoggingProps } from './types'
 
 const ForwarderEditorGoogleCloudLogging = ({
@@ -26,7 +30,9 @@ const ForwarderEditorGoogleCloudLogging = ({
   onValidationChange,
 }: ForwarderEditorGoogleCloudLoggingProps) => {
   const { t } = useTranslation()
-  const [endpoint, setEndpoint] = useInput(config.endpoint)
+
+  const [host, setHost] = useInput(config.host)
+  const [port, setPort] = useInput(config.port)
   const [project_id, setProjectID] = useInput(config.project_id)
   const [log_id, setLogID] = useInput(config.log_id)
   const [disable_tls, setDisableTls] = useInput(config.disable_tls)
@@ -54,7 +60,8 @@ const ForwarderEditorGoogleCloudLogging = ({
     if (valid) {
       onConfigChange({
         type: 'googlecloudlogging',
-        endpoint: endpoint.value,
+        host: host.value,
+        port: port.value,
         project_id: project_id.value,
         log_id: log_id.value,
         disable_auth: disable_auth.value,
@@ -62,28 +69,35 @@ const ForwarderEditorGoogleCloudLogging = ({
         auth_json,
       })
     }
-  }, [
-    endpoint,
-    project_id,
-    log_id,
-    disable_auth,
-    disable_tls,
-    auth_json,
-  ])
+  }, [host, port, project_id, log_id, disable_auth, disable_tls, auth_json])
 
   return (
     <ForwarderEditorGoogleCloudLoggingRoot id="container:editor.forwarders.googlelog">
-      <TextField
-        id="input:editor.forwarders.googlelog.endpoint"
-        label={t('components.forwarderEditorGoogleCloudLogging.endpointLabel')}
-        variant="outlined"
-        type="text"
-        error={!endpoint.valid}
-        value={endpoint.value}
-        onChange={(e) => {
-          setEndpoint(e.target.value)
-        }}
-      />
+      <ForwarderEditorGoogleCloudLoggingRow>
+        <ForwarderEditorGoogleCloudLoggingField
+          id="input:editor.forwarders.googlelog.endpoint"
+          label={t('components.forwarderEditorGoogleCloudLogging.hostLabel')}
+          variant="outlined"
+          type="text"
+          error={!host.valid}
+          value={host.value}
+          onChange={(e) => {
+            setHost(e.target.value)
+          }}
+        />
+
+        <ForwarderEditorGoogleCloudLoggingField
+          id="input:editor.forwarders.googlelog.endpoint_port"
+          label={t('components.forwarderEditorGoogleCloudLogging.portLabel')}
+          variant="outlined"
+          type="number"
+          error={!port.valid}
+          value={port.value}
+          onChange={(e) => {
+            setPort(+e.target.value)
+          }}
+        />
+      </ForwarderEditorGoogleCloudLoggingRow>
 
       <TextField
         id="input:editor.forwarders.googlelog.project_id"
