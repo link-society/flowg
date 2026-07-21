@@ -11,12 +11,12 @@ Login With Valid Credentials
 
 
 Login With Invalid Credentials
-    Open Browser              ${BASE_URL}/web/login  ${BROWSER}  options=set_preference("intl.accept_languages", "en-US")
+    Open Browser                   ${BASE_URL}/web/login  ${BROWSER}  options=set_preference("intl.accept_languages", "en-US")
     Wait Until Element Is Visible  id=input:login.username
-    Input Text                id=input:login.username  root
-    Input Text                id=input:login.password  notroot
-    Click Button              id=btn:login.submit
-    Wait Until Page Contains  Invalid credentials      timeout=5s
+    Input Text                     id=input:login.username  root
+    Input Text                     id=input:login.password  notroot
+    Click Button                   id=btn:login.submit
+    Wait Until Page Contains       Invalid credentials      timeout=5s
     Close Browser
 
 
