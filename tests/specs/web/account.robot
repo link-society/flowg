@@ -11,7 +11,7 @@ Resource   resources/components/table.resource
 
 *** Test Cases ***
 Create and Delete Personal Access Token
-    Open Browser                   ${BASE_URL}  ${BROWSER}
+    Open Browser                   ${BASE_URL}  ${BROWSER}  options=set_preference("intl.accept_languages", "en-US")
     Log as                         username=root  password=root
     Click Navbar Menu Item         id=menu:navbar.profile  id=link:navbar.profile.account
     Wait Until Page Contains       API Tokens  timeout=5s
@@ -34,7 +34,7 @@ Create and Delete Personal Access Token
     Close Browser
 
 Change Password
-    Open Browser              ${BASE_URL}  ${BROWSER}
+    Open Browser              ${BASE_URL}  ${BROWSER}  options=set_preference("intl.accept_languages", "en-US")
     Log as                    username=root  password=root
     Click Navbar Menu Item    id=menu:navbar.profile  id=link:navbar.profile.account
     Wait Until Page Contains  Account Information  timeout=5s
@@ -50,7 +50,7 @@ Change Password
 
 Restore Password
     Depends On Test           Change Password
-    Open Browser              ${BASE_URL}  ${BROWSER}
+    Open Browser              ${BASE_URL}  ${BROWSER}  options=set_preference("intl.accept_languages", "en-US")
     Log as                    username=root  password=rootroot
     Click Navbar Menu Item    id=menu:navbar.profile  id=link:navbar.profile.account
     Wait Until Page Contains  Account Information  timeout=5s

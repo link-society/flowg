@@ -9,7 +9,7 @@ Resource   resources/logging.resource
 
 *** Test Cases ***
 View logs sent on default pipeline
-    Open Browser              ${BASE_URL}  ${BROWSER}
+    Open Browser              ${BASE_URL}  ${BROWSER}  options=set_preference("intl.accept_languages", "en-US")
     Log as                    username=root  password=root
     Click Element             id=link:navbar.streams
     Wait Until Page Contains  No stream found  timeout=5s
@@ -22,7 +22,7 @@ View logs sent on default pipeline
 
 
 View logs sent via Syslog (RFC 5424)
-    Open Browser                    ${BASE_URL}  ${BROWSER}
+    Open Browser                    ${BASE_URL}  ${BROWSER}  options=set_preference("intl.accept_languages", "en-US")
     Log as                          username=root  password=root
     Click Element                   id=link:navbar.streams
     Wait Until Page Contains        No stream found  timeout=5s
@@ -35,7 +35,7 @@ View logs sent via Syslog (RFC 5424)
 
 
 View logs sent via Syslog (RFC 3164)
-    Open Browser                    ${BASE_URL}  ${BROWSER}
+    Open Browser                    ${BASE_URL}  ${BROWSER}  options=set_preference("intl.accept_languages", "en-US")
     Log as                          username=root  password=root
     Click Element                   id=link:navbar.streams
     Wait Until Page Contains        No stream found  timeout=5s
@@ -49,7 +49,7 @@ View logs sent via Syslog (RFC 3164)
 
 Watch logs
     Send log via Syslog (RFC 3164)     hello world
-    Open Browser                       ${BASE_URL}  ${BROWSER}
+    Open Browser                       ${BASE_URL}  ${BROWSER}  options=set_preference("intl.accept_languages", "en-US")
     Log as                             username=root  password=root
     Click Element                      id=link:navbar.streams
     Wait Until Page Contains           hello world  timeout=5s
