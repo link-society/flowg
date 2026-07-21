@@ -73,6 +73,6 @@ func (rt *googleCloudLoggingRuntime) Call(ctx context.Context, record *models.Lo
 
 	return rt.logger.LogSync(ctx, logging.Entry{
 		Timestamp: record.Timestamp,
-		Payload:   string(message),
+		Payload:   json.RawMessage(message),
 	})
 }
