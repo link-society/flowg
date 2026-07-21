@@ -11,7 +11,7 @@ Resource   resources/components/forms/code-editor.resource
 
 *** Test Cases ***
 Create new transformer
-    Open Browser                   ${BASE_URL}  ${BROWSER}
+    Open Browser                   ${BASE_URL}  ${BROWSER}  options=set_preference("intl.accept_languages", "en-US")
     Log as                         username=root  password=root
     Click Navbar Menu Item         id=menu:navbar.settings  id=link:navbar.settings.transformers
     Wait Until Page Contains       No transformer found  timeout=5s
@@ -25,7 +25,7 @@ Create new transformer
 
 Configure transformer
     Depends On Test                Create new transformer
-    Open Browser                   ${BASE_URL}  ${BROWSER}
+    Open Browser                   ${BASE_URL}  ${BROWSER}  options=set_preference("intl.accept_languages", "en-US")
     Log as                         username=root  password=root
     Click Navbar Menu Item         id=menu:navbar.settings  id=link:navbar.settings.transformers
     Wait Until Element Is Visible  id=label:transformers.list-item.test
@@ -43,7 +43,7 @@ Configure transformer
 
 Delete transformer
     Depends On Test                Configure transformer
-    Open Browser                   ${BASE_URL}  ${BROWSER}
+    Open Browser                   ${BASE_URL}  ${BROWSER}  options=set_preference("intl.accept_languages", "en-US")
     Log as                         username=root  password=root
     Click Navbar Menu Item         id=menu:navbar.settings  id=link:navbar.settings.transformers
     Wait Until Element Is Visible  id=label:transformers.list-item.test

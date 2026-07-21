@@ -9,7 +9,7 @@ Resource   resources/nav.resource
 
 *** Test Cases ***
 Create new stream
-    Open Browser                   ${BASE_URL}  ${BROWSER}
+    Open Browser                   ${BASE_URL}  ${BROWSER}  options=set_preference("intl.accept_languages", "en-US")
     Log as                         username=root  password=root
     Click Navbar Menu Item         id=menu:navbar.settings  id=link:navbar.settings.storage
     Wait Until Page Contains       No stream found  timeout=5s
@@ -23,7 +23,7 @@ Create new stream
 
 Configure stream
     Depends On Test                    Create new stream
-    Open Browser                       ${BASE_URL}  ${BROWSER}
+    Open Browser                       ${BASE_URL}  ${BROWSER}  options=set_preference("intl.accept_languages", "en-US")
     Log as                             username=root  password=root
     Click Navbar Menu Item             id=menu:navbar.settings  id=link:navbar.settings.storage
     Wait Until Element Is Visible      id=label:streams.list-item.test
@@ -44,7 +44,7 @@ Configure stream
 
 Delete stream
     Depends On Test                Configure stream
-    Open Browser                   ${BASE_URL}  ${BROWSER}
+    Open Browser                   ${BASE_URL}  ${BROWSER}  options=set_preference("intl.accept_languages", "en-US")
     Log as                         username=root  password=root
     Click Navbar Menu Item         id=menu:navbar.settings  id=link:navbar.settings.storage
     Wait Until Element Is Visible  id=label:streams.list-item.test

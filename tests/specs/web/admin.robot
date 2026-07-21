@@ -11,7 +11,7 @@ Resource   resources/components/table.resource
 
 *** Test Cases ***
 Create test role
-    Open Browser                   ${BASE_URL}  ${BROWSER}
+    Open Browser                   ${BASE_URL}  ${BROWSER}  options=set_preference("intl.accept_languages", "en-US")
     Log as                         username=root  password=root
     Click Navbar Menu Item         id=menu:navbar.profile  id=link:navbar.profile.admin
     Wait Until Page Contains       Roles
@@ -27,7 +27,7 @@ Create test role
 
 Create test user
     Depends On Test                Create test role
-    Open Browser                   ${BASE_URL}  ${BROWSER}
+    Open Browser                   ${BASE_URL}  ${BROWSER}  options=set_preference("intl.accept_languages", "en-US")
     Log as                         username=root  password=root
     Click Navbar Menu Item         id=menu:navbar.profile  id=link:navbar.profile.admin
     Wait Until Page Contains       Users
@@ -44,6 +44,6 @@ Create test user
 
 Log as test user
     Depends On Test  Create test user
-    Open Browser     ${BASE_URL}  ${BROWSER}
+    Open Browser     ${BASE_URL}  ${BROWSER}  options=set_preference("intl.accept_languages", "en-US")
     Log as           username=test  password=test
     Close Browser

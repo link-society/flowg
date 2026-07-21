@@ -11,7 +11,7 @@ Resource   resources/components/forms/transfer-list.resource
 
 *** Test Cases ***
 Create new forwarder
-    Open Browser                   ${BASE_URL}  ${BROWSER}
+    Open Browser                   ${BASE_URL}  ${BROWSER}  options=set_preference("intl.accept_languages", "en-US")
     Log as                         username=root  password=root
     Click Navbar Menu Item         id=menu:navbar.settings  id=link:navbar.settings.forwarders
     Wait Until Page Contains       No forwarder found  timeout=5s
@@ -27,7 +27,7 @@ Create new forwarder
 
 Configure forwarder
     Depends On Test                       Create new forwarder
-    Open Browser                          ${BASE_URL}  ${BROWSER}
+    Open Browser                          ${BASE_URL}  ${BROWSER}  options=set_preference("intl.accept_languages", "en-US")
     Log as                                username=root  password=root
     Click Navbar Menu Item                id=menu:navbar.settings  id=link:navbar.settings.forwarders
     Wait Until Element Is Visible         id=label:forwarders.list-item.test
@@ -45,7 +45,7 @@ Configure forwarder
 
 Delete forwarder
     Depends On Test                Configure forwarder
-    Open Browser                   ${BASE_URL}  ${BROWSER}
+    Open Browser                   ${BASE_URL}  ${BROWSER}  options=set_preference("intl.accept_languages", "en-US")
     Log as                         username=root  password=root
     Click Navbar Menu Item         id=menu:navbar.settings  id=link:navbar.settings.forwarders
     Wait Until Element Is Visible  id=label:forwarders.list-item.test
