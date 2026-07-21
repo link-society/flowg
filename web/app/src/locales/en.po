@@ -181,7 +181,7 @@ msgid "components.forwarderConfigTypes.elastic"
 msgstr "Elastic Search"
 
 msgid "components.forwarderConfigTypes.googlecloudlogging"
-msgstr "Google Log"
+msgstr "Google Cloud Logging"
 
 msgid "components.forwarderConfigTypes.http"
 msgstr "Webhook"
@@ -303,11 +303,14 @@ msgstr "Password"
 msgid "components.forwarderEditorElastic.usernameLabel"
 msgstr "Username"
 
+msgid "components.forwarderEditorGoogleCloudLogging.allowInsecureLabel"
+msgstr "Allow Insecure Connection"
+
 msgid "components.forwarderEditorGoogleCloudLogging.authJsonLabel"
 msgstr "Auth JSON"
 
-msgid "components.forwarderEditorGoogleCloudLogging.endpointLabel"
-msgstr "Endpoint"
+msgid "components.forwarderEditorGoogleCloudLogging.disableAuthLabel"
+msgstr "Disable Authentication"
 
 msgid "components.forwarderEditorGoogleCloudLogging.logIdLabel"
 msgstr "Log ID"

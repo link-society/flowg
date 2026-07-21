@@ -17,7 +17,9 @@ Content-Type: application/json
       "type":"googlecloudlogging",
       "project_id":"flowg",
       "log_id":"flowg",
-      "endpoint":"floci-gcp-test-server:4588"
+      "endpoint":"floci-gcp-test-server:4588",
+      "disable_tls": true,
+      "disable_auth": true
     }
   }
 }
