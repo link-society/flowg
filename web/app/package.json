@@ -32,7 +32,7 @@
     "react-apexcharts": "^2.1.1",
     "react-dom": "^19.2.8",
     "react-i18next": "^17.0.8",
-    "react-router": "^8.2.0",
+    "react-router": "^8.3.0",
     "uuid": "^14.0.1"
   },
   "devDependencies": {
