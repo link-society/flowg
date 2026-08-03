@@ -29,4 +29,6 @@ Purge stream
     Go To                          ${BASE_URL}/web/storage/${stream}
     Wait Until Element Is Visible  id=btn:streams.delete
     Click Element                  id=btn:streams.delete
+    Wait Until Element Is Visible  id=btn:confirm-dialog.confirm
+    Click Element                  id=btn:confirm-dialog.confirm
     Sleep                          1s
