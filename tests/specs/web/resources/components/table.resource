@@ -8,9 +8,11 @@ Wait Until Row Is Visible
 
 
 Remove Row
-    [Arguments]                ${table}  ${row}
-    Element Should Be Visible  xpath=//div[@id='${table}']//div[@role='row'][@row-id='${row}']
-    Click Element              xpath=//div[@id='${table}']//div[@role='row'][@row-id='${row}']//button[@data-ref='btn:generic.tablerow.actions.delete']
+    [Arguments]                     ${table}  ${row}
+    Element Should Be Visible       xpath=//div[@id='${table}']//div[@role='row'][@row-id='${row}']
+    Click Element                   xpath=//div[@id='${table}']//div[@role='row'][@row-id='${row}']//button[@data-ref='btn:generic.tablerow.actions.delete']
+    Wait Until Element Is Visible   id=btn:confirm-dialog.confirm
+    Click Element                   id=btn:confirm-dialog.confirm
 
 
 Row Should Not Be Visible

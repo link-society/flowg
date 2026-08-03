@@ -20,12 +20,14 @@ import ScienceIcon from '@mui/icons-material/Science'
 import * as configApi from '@/lib/api/operations/config'
 
 import { useApiOperation } from '@/lib/hooks/api'
+import { useDialogs } from '@/lib/hooks/dialogs'
 import { useNotify } from '@/lib/hooks/notify'
 import { useProfile } from '@/lib/hooks/profile'
 
 import { loginRequired } from '@/lib/decorators/loaders'
 
 import ButtonNewForwarder from '@/components/ButtonNewForwarder/component'
+import DialogConfirm from '@/components/DialogConfirm/component'
 import ForwarderEditor from '@/components/ForwarderEditor/component'
 import InputKeyValue from '@/components/InputKeyValue/component'
 import SideNavList from '@/components/SideNavList/component'
@@ -71,6 +73,7 @@ export const loader: LoaderFunction = loginRequired(
 const ForwarderDetailView = () => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const dialogs = useDialogs()
 
   const { permissions } = useProfile()
   const { forwarders, currentForwarder } = useLoaderData() as LoaderData
@@ -103,6 +106,19 @@ const ForwarderDetailView = () => {
       navigate(buildUrl('/forwarders'))
     })
   }, [currentForwarder])
+
+  const handleDeleteClick = async () => {
+    const confirmed = await dialogs.open(DialogConfirm, {
+      title: t('pages.forwarders.deleteConfirm.title'),
+      message: t('pages.forwarders.deleteConfirm.message'),
+      confirmLabel: t('common.actions.delete'),
+      danger: true,
+    })
+
+    if (confirmed) {
+      onDelete()
+    }
+  }
 
   const [onSave, saveLoading] = useApiOperation(async () => {
     await configApi.saveForwarder(currentForwarder.name, forwarder)
@@ -148,7 +164,7 @@ const ForwarderDetailView = () => {
                   variant="contained"
                   color="error"
                   size="small"
-                  onClick={onDelete}
+                  onClick={handleDeleteClick}
                   disabled={deleteLoading}
                   startIcon={!deleteLoading && <DeleteIcon />}
                 >

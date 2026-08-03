@@ -13,6 +13,7 @@ import * as configApi from '@/lib/api/operations/config'
 import * as logApi from '@/lib/api/operations/logs.ts'
 
 import { useApiOperation } from '@/lib/hooks/api'
+import { useDialogs } from '@/lib/hooks/dialogs'
 import { useFeatureFlags } from '@/lib/hooks/featureflags'
 import { useNotify } from '@/lib/hooks/notify'
 import { useProfile } from '@/lib/hooks/profile'
@@ -20,6 +21,7 @@ import { useProfile } from '@/lib/hooks/profile'
 import { loginRequired } from '@/lib/decorators/loaders'
 
 import ButtonNewStreamConfig from '@/components/ButtonNewStreamConfig/component'
+import DialogConfirm from '@/components/DialogConfirm/component'
 import SideNavList from '@/components/SideNavList/component'
 import StreamEditor from '@/components/StreamEditor/component'
 
@@ -56,6 +58,7 @@ const StorageDetailView = () => {
   const { t } = useTranslation()
   const featureFlags = useFeatureFlags()
   const notify = useNotify()
+  const dialogs = useDialogs()
 
   const { permissions } = useProfile()
   const { streams, usage, currentStream } = useLoaderData() as LoaderData
@@ -75,6 +78,19 @@ const StorageDetailView = () => {
       navigate(buildUrl('/storage'))
     })
   }, [currentStream])
+
+  const handleDeleteClick = async () => {
+    const confirmed = await dialogs.open(DialogConfirm, {
+      title: t('pages.storage.deleteConfirm.title'),
+      message: t('pages.storage.deleteConfirm.message'),
+      confirmLabel: t('common.actions.delete'),
+      danger: true,
+    })
+
+    if (confirmed) {
+      onDelete()
+    }
+  }
 
   const [onSave, saveLoading] = useApiOperation(async () => {
     await configApi.configureStream(currentStream, streamConfig)
@@ -112,7 +128,7 @@ const StorageDetailView = () => {
               variant="contained"
               color="error"
               size="small"
-              onClick={onDelete}
+              onClick={handleDeleteClick}
               disabled={deleteLoading}
               startIcon={!deleteLoading && <DeleteIcon />}
             >
