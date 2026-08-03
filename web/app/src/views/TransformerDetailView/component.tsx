@@ -13,6 +13,7 @@ import * as configApi from '@/lib/api/operations/config'
 
 import { useApiOperation } from '@/lib/hooks/api'
 import { useDialogs } from '@/lib/hooks/dialogs'
+import { useDirty } from '@/lib/hooks/dirty'
 import { useNotify } from '@/lib/hooks/notify'
 import { useProfile } from '@/lib/hooks/profile'
 
@@ -67,6 +68,8 @@ const TransformerDetailView = () => {
   const navigate = useNavigate()
 
   const [code, setCode] = useState(currentTransformer.script)
+  const [savedCode, setSavedCode] = useState(currentTransformer.script)
+  const dirty = useDirty(savedCode, code)
 
   const onCreate = (name: string) => {
     queueMicrotask(() => {
@@ -96,6 +99,7 @@ const TransformerDetailView = () => {
 
   const [onSave, saveLoading] = useApiOperation(async () => {
     await configApi.saveTransformer(currentTransformer.name, code)
+    setSavedCode(code)
     notify.success(t('pages.transformers.notifications.saved'))
   }, [code, currentTransformer])
 
@@ -141,7 +145,7 @@ const TransformerDetailView = () => {
               color="secondary"
               size="small"
               onClick={onSave}
-              disabled={saveLoading}
+              disabled={saveLoading || !dirty}
               startIcon={!saveLoading && <SaveIcon />}
             >
               {saveLoading ? (

@@ -112,7 +112,7 @@ const DialogNewRole = ({
           variant="contained"
           color="secondary"
           startIcon={!loading && <SaveIcon />}
-          disabled={loading}
+          disabled={loading || name.trim() === ''}
           type="submit"
         >
           {loading ? (

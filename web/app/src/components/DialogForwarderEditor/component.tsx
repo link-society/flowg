@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import Button from '@mui/material/Button'
@@ -15,6 +15,7 @@ import SaveIcon from '@mui/icons-material/Save'
 import * as configApi from '@/lib/api/operations/config'
 
 import { useApiOperation } from '@/lib/hooks/api'
+import { useDirty } from '@/lib/hooks/dirty'
 import { useNotify } from '@/lib/hooks/notify'
 
 import ForwarderModel from '@/lib/models/ForwarderModel'
@@ -52,11 +53,28 @@ const DialogForwarderEditor = ({
 
   const [valid, setValid] = useState(false)
   const [forwarder, setForwarder] = useState<ForwarderModel>(undefined!)
+  const [savedForwarder, setSavedForwarder] = useState<ForwarderModel>(
+    undefined!
+  )
+  const dirty = useDirty(savedForwarder, forwarder)
   const [forwarderPromise, setForwarderPromise] =
     useState<Promise<void> | null>(null)
 
+  // ForwarderEditor's sub-editors normalize their config on mount (filling
+  // in defaults for optional fields), which changes `forwarder` once before
+  // any real user edit. Treat that first change as the dirty baseline.
+  const initializedRef = useRef(false)
+  const handleForwarderChange = (newForwarder: ForwarderModel) => {
+    setForwarder(newForwarder)
+    if (!initializedRef.current) {
+      initializedRef.current = true
+      setSavedForwarder(newForwarder)
+    }
+  }
+
   const [onFetch] = useApiOperation(
     async (name: string) => {
+      initializedRef.current = false
       const forwarder = await configApi.getForwarder(name)
       setForwarder(forwarder)
     },
@@ -69,6 +87,7 @@ const DialogForwarderEditor = ({
 
   const [onSave, saveLoading] = useApiOperation(async () => {
     await configApi.saveForwarder(forwarderName, forwarder)
+    setSavedForwarder(forwarder)
     notify.success(t('pages.forwarders.notifications.saved'))
   }, [forwarderName, forwarder])
 
@@ -121,7 +140,7 @@ const DialogForwarderEditor = ({
               color="secondary"
               size="small"
               onClick={onSave}
-              disabled={saveLoading || !valid}
+              disabled={saveLoading || !valid || !dirty}
               startIcon={!saveLoading && <SaveIcon />}
             >
               {saveLoading ? (
@@ -145,7 +164,7 @@ const DialogForwarderEditor = ({
               <AuthenticatedAwait resolve={forwarderPromise}>
                 <ForwarderEditor
                   forwarder={forwarder}
-                  onForwarderChange={setForwarder}
+                  onForwarderChange={handleForwarderChange}
                   onValidationChange={setValid}
                 />
               </AuthenticatedAwait>
