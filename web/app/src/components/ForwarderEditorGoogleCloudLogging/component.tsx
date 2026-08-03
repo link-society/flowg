@@ -19,6 +19,8 @@ import {
 
 import {
   ForwarderEditorGoogleCloudLoggingField,
+  ForwarderEditorGoogleCloudLoggingJsonField,
+  ForwarderEditorGoogleCloudLoggingJsonLabel,
   ForwarderEditorGoogleCloudLoggingRoot,
   ForwarderEditorGoogleCloudLoggingRow,
 } from './styles'
@@ -156,19 +158,27 @@ const ForwarderEditorGoogleCloudLogging = ({
       </FormGroup>
 
       {!disable_auth.value && (
-        <>
-          <label>
+        <ForwarderEditorGoogleCloudLoggingJsonField id="input:editor.forwarders.googlelog.auth_json">
+          <ForwarderEditorGoogleCloudLoggingJsonLabel>
             {t('components.forwarderEditorGoogleCloudLogging.authJsonLabel')}
-          </label>
+          </ForwarderEditorGoogleCloudLoggingJsonLabel>
+
           <Editor
             defaultValue={auth_json}
             defaultLanguage="json"
             height="10rem"
             theme={mode === 'dark' ? 'vrl-theme-dark' : 'vrl-theme-light'}
             onChange={setAuthJson}
-            options={{ minimap: { enabled: false } }}
+            options={{
+              minimap: { enabled: false },
+              scrollBeyondLastLine: false,
+              fontSize: 13,
+              ariaLabel: t(
+                'components.forwarderEditorGoogleCloudLogging.authJsonLabel'
+              ),
+            }}
           />
-        </>
+        </ForwarderEditorGoogleCloudLoggingJsonField>
       )}
     </ForwarderEditorGoogleCloudLoggingRoot>
   )
