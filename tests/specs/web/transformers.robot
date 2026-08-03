@@ -49,5 +49,7 @@ Delete transformer
     Wait Until Element Is Visible  id=label:transformers.list-item.test
     Sleep                          1s
     Click Element                  id=btn:transformers.delete
+    Wait Until Element Is Visible  id=btn:confirm-dialog.confirm
+    Click Element                  id=btn:confirm-dialog.confirm
     Wait Until Page Contains       No transformer found  timeout=5s
     Close Browser

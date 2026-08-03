@@ -51,5 +51,7 @@ Delete forwarder
     Wait Until Element Is Visible  id=label:forwarders.list-item.test
     Sleep                          1s
     Click Element                  id=btn:forwarders.delete
+    Wait Until Element Is Visible  id=btn:confirm-dialog.confirm
+    Click Element                  id=btn:confirm-dialog.confirm
     Wait Until Page Contains       No forwarder found  timeout=5s
     Close Browser
