@@ -14,6 +14,7 @@ import * as logApi from '@/lib/api/operations/logs.ts'
 
 import { useApiOperation } from '@/lib/hooks/api'
 import { useDialogs } from '@/lib/hooks/dialogs'
+import { useDirty } from '@/lib/hooks/dirty'
 import { useFeatureFlags } from '@/lib/hooks/featureflags'
 import { useNotify } from '@/lib/hooks/notify'
 import { useProfile } from '@/lib/hooks/profile'
@@ -65,6 +66,10 @@ const StorageDetailView = () => {
   const navigate = useNavigate()
 
   const [streamConfig, setStreamConfig] = useState(streams[currentStream])
+  const [savedStreamConfig, setSavedStreamConfig] = useState(
+    streams[currentStream]
+  )
+  const dirty = useDirty(savedStreamConfig, streamConfig)
 
   const onCreate = (name: string) => {
     queueMicrotask(() => {
@@ -94,6 +99,7 @@ const StorageDetailView = () => {
 
   const [onSave, saveLoading] = useApiOperation(async () => {
     await configApi.configureStream(currentStream, streamConfig)
+    setSavedStreamConfig(streamConfig)
     notify.success(t('pages.storage.notifications.saved'))
   }, [streamConfig, currentStream])
 
@@ -145,7 +151,7 @@ const StorageDetailView = () => {
               color="secondary"
               size="small"
               onClick={onSave}
-              disabled={saveLoading}
+              disabled={saveLoading || !dirty}
               startIcon={!saveLoading && <SaveIcon />}
             >
               {saveLoading ? (

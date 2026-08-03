@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LoaderFunction, useLoaderData, useNavigate } from 'react-router'
 
@@ -23,6 +23,7 @@ import * as configApi from '@/lib/api/operations/config'
 
 import { useApiOperation } from '@/lib/hooks/api'
 import { useDialogs } from '@/lib/hooks/dialogs'
+import { useDirty } from '@/lib/hooks/dirty'
 import { useNotify } from '@/lib/hooks/notify'
 import { useProfile } from '@/lib/hooks/profile'
 
@@ -90,9 +91,16 @@ const PipelineDetailView = () => {
 
   const initialFlow = currentPipeline.flow
   const [flow, setFlow] = useState(initialFlow)
+  const [lastSavedFlow, setLastSavedFlow] = useState(initialFlow)
+  const dirty = useDirty(lastSavedFlow, flow)
   const [testOpen, setTestOpen] = useState(false)
   const [testRecords, setTestRecords] = useState<[string, string][]>([])
   const [testResult, setTestResult] = useState<PipelineTrace | null>(null)
+
+  // PipelineEditorFlow normalizes the flow on mount (layout, node metadata,
+  // `hasLayout: true`), which changes it once before any real user edit.
+  // Treat that first change as the dirty baseline.
+  const initializedRef = useRef(false)
 
   const onChange = useCallback(
     (newFlow: PipelineModel) => {
@@ -101,6 +109,11 @@ const PipelineDetailView = () => {
 
       if (serializedOldFlow !== serializedNewFlow) {
         setFlow(newFlow)
+      }
+
+      if (!initializedRef.current) {
+        initializedRef.current = true
+        setLastSavedFlow(newFlow)
       }
     },
     [flow]
@@ -138,6 +151,7 @@ const PipelineDetailView = () => {
     }
 
     await configApi.savePipeline(currentPipeline.name, savedFlow)
+    setLastSavedFlow(flow)
     notify.success(t('pages.pipelines.notifications.saved'))
   }, [flow, currentPipeline])
 
@@ -249,7 +263,7 @@ const PipelineDetailView = () => {
                   color="secondary"
                   size="small"
                   onClick={onSave}
-                  disabled={saveLoading}
+                  disabled={saveLoading || !dirty}
                   startIcon={!saveLoading && <SaveIcon />}
                 >
                   {saveLoading ? (

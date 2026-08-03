@@ -130,7 +130,7 @@ const DialogNewUser = ({
           variant="contained"
           color="secondary"
           startIcon={!loading && <SaveIcon />}
-          disabled={loading}
+          disabled={loading || username.trim() === '' || password === ''}
           type="submit"
         >
           {loading ? (

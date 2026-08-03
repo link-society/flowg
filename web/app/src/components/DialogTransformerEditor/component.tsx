@@ -16,6 +16,7 @@ import SaveIcon from '@mui/icons-material/Save'
 import * as configApi from '@/lib/api/operations/config'
 
 import { useApiOperation } from '@/lib/hooks/api'
+import { useDirty } from '@/lib/hooks/dirty'
 import { useNotify } from '@/lib/hooks/notify'
 
 import AuthenticatedAwait from '@/components/AuthenticatedAwait/component'
@@ -46,6 +47,8 @@ const DialogTransformerEditor = ({
   const [open, setOpen] = useState(false)
 
   const [code, setCode] = useState('')
+  const [savedCode, setSavedCode] = useState('')
+  const dirty = useDirty(savedCode, code)
   const [transformerPromise, setTransformerPromise] =
     useState<Promise<void> | null>(null)
 
@@ -53,6 +56,7 @@ const DialogTransformerEditor = ({
     async (transformer: string) => {
       const script = await configApi.getTransformer(transformer)
       setCode(script)
+      setSavedCode(script)
     },
     [transformer]
   )
@@ -63,6 +67,7 @@ const DialogTransformerEditor = ({
 
   const [onSave, saveLoading] = useApiOperation(async () => {
     await configApi.saveTransformer(transformer, code)
+    setSavedCode(code)
     notify.success(t('pages.transformers.notifications.saved'))
   }, [transformer, code])
 
@@ -127,7 +132,7 @@ const DialogTransformerEditor = ({
               color="secondary"
               size="small"
               onClick={onSave}
-              disabled={saveLoading}
+              disabled={saveLoading || !dirty}
               startIcon={!saveLoading && <SaveIcon />}
             >
               {saveLoading ? (

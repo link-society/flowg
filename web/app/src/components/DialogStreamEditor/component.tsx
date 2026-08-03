@@ -17,6 +17,7 @@ import * as configApi from '@/lib/api/operations/config'
 import * as logApi from '@/lib/api/operations/logs.ts'
 
 import { useApiOperation } from '@/lib/hooks/api'
+import { useDirty } from '@/lib/hooks/dirty'
 import { useNotify } from '@/lib/hooks/notify'
 
 import StreamConfigModel from '@/lib/models/StreamConfigModel'
@@ -51,6 +52,9 @@ const DialogStreamEditor = ({ stream }: DialogStreamEditorProps) => {
     size: 0,
     ttl: 0,
   })
+  const [savedStreamConfig, setSavedStreamConfig] =
+    useState<StreamConfigModel>(streamConfig)
+  const dirty = useDirty(savedStreamConfig, streamConfig)
   const [streamConfigPromise, setStreamConfigPromise] =
     useState<Promise<void> | null>(null)
   const [usage, setUsage] = useState<number>(0)
@@ -59,6 +63,7 @@ const DialogStreamEditor = ({ stream }: DialogStreamEditorProps) => {
     async (stream: string) => {
       const streamConfig = await configApi.getStreamConfig(stream)
       setStreamConfig(streamConfig)
+      setSavedStreamConfig(streamConfig)
 
       const estimated = await logApi.getStreamUsage(stream)
       setUsage(estimated)
@@ -72,6 +77,7 @@ const DialogStreamEditor = ({ stream }: DialogStreamEditorProps) => {
 
   const [onSave, saveLoading] = useApiOperation(async () => {
     await configApi.configureStream(stream, streamConfig)
+    setSavedStreamConfig(streamConfig)
     notify.success(t('pages.storage.notifications.saved'))
   }, [stream, streamConfig])
 
@@ -136,7 +142,7 @@ const DialogStreamEditor = ({ stream }: DialogStreamEditorProps) => {
               color="secondary"
               size="small"
               onClick={onSave}
-              disabled={saveLoading}
+              disabled={saveLoading || !dirty}
               startIcon={!saveLoading && <SaveIcon />}
             >
               {saveLoading ? (
