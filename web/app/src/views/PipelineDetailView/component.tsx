@@ -22,6 +22,7 @@ import { ReactFlowProvider } from '@xyflow/react'
 import * as configApi from '@/lib/api/operations/config'
 
 import { useApiOperation } from '@/lib/hooks/api'
+import { useDialogs } from '@/lib/hooks/dialogs'
 import { useNotify } from '@/lib/hooks/notify'
 import { useProfile } from '@/lib/hooks/profile'
 
@@ -30,6 +31,7 @@ import { PipelineTrace } from '@/lib/models/PipelineTrace.ts'
 
 import { loginRequired } from '@/lib/decorators/loaders'
 
+import DialogConfirm from '@/components/DialogConfirm/component'
 import InputKeyValue from '@/components/InputKeyValue/component'
 import PipelineEditorFlow from '@/components/PipelineEditorFlow/component'
 import PipelineEditorNodeListForwarder from '@/components/PipelineEditorNodeListForwarder/component'
@@ -80,6 +82,7 @@ export const loader: LoaderFunction = loginRequired(
 const PipelineDetailView = () => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const dialogs = useDialogs()
 
   const { permissions } = useProfile()
   const { currentPipeline } = useLoaderData() as LoaderData
@@ -110,6 +113,19 @@ const PipelineDetailView = () => {
       navigate(buildUrl('/pipelines'))
     })
   }, [currentPipeline])
+
+  const handleDeleteClick = async () => {
+    const confirmed = await dialogs.open(DialogConfirm, {
+      title: t('pages.pipelines.deleteConfirm.title'),
+      message: t('pages.pipelines.deleteConfirm.message'),
+      confirmLabel: t('common.actions.delete'),
+      danger: true,
+    })
+
+    if (confirmed) {
+      onDelete()
+    }
+  }
 
   const [onSave, saveLoading] = useApiOperation(async () => {
     const savedFlow = {
@@ -217,7 +233,7 @@ const PipelineDetailView = () => {
                   variant="contained"
                   color="error"
                   size="small"
-                  onClick={onDelete}
+                  onClick={handleDeleteClick}
                   disabled={deleteLoading}
                   startIcon={!deleteLoading && <DeleteIcon />}
                 >

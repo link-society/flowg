@@ -9,6 +9,9 @@ msgstr "Cancel"
 msgid "common.actions.close"
 msgstr "Close"
 
+msgid "common.actions.confirm"
+msgstr "Confirm"
+
 msgid "common.actions.delete"
 msgstr "Delete"
 
@@ -576,6 +579,12 @@ msgstr "Retention time (in seconds)"
 msgid "components.streamEditor.usageLabel"
 msgstr "Estimated storage usage: {{usage}}MB"
 
+msgid "components.tableActionsCell.deleteConfirm.message"
+msgstr "This action cannot be undone."
+
+msgid "components.tableActionsCell.deleteConfirm.title"
+msgstr "Delete this item?"
+
 msgid "components.timeWindowSelector.absolute"
 msgstr "Absolute"
 
@@ -636,6 +645,12 @@ msgstr "Users"
 msgid "components.usernameDisplay.label"
 msgstr "Username"
 
+msgid "pages.forwarders.deleteConfirm.message"
+msgstr "This action cannot be undone."
+
+msgid "pages.forwarders.deleteConfirm.title"
+msgstr "Delete this forwarder?"
+
 msgid "pages.forwarders.empty"
 msgstr "No forwarder found, create one"
 
@@ -690,6 +705,12 @@ msgstr "The page you are looking for does not exist or has been moved."
 msgid "pages.notFound.title"
 msgstr "Page not found"
 
+msgid "pages.pipelines.deleteConfirm.message"
+msgstr "This action cannot be undone."
+
+msgid "pages.pipelines.deleteConfirm.title"
+msgstr "Delete this pipeline?"
+
 msgid "pages.pipelines.empty"
 msgstr "No pipeline found, create one"
 
@@ -701,6 +722,12 @@ msgstr "Pipeline saved"
 
 msgid "pages.pipelines.switchExpressionDocs"
 msgstr "Switch Expression Documentation"
+
+msgid "pages.storage.deleteConfirm.message"
+msgstr "This action cannot be undone."
+
+msgid "pages.storage.deleteConfirm.title"
+msgstr "Delete this stream?"
 
 msgid "pages.storage.demoModeBanner"
 msgstr "Demo Mode Active, changes will be ignored."
@@ -728,6 +755,12 @@ msgstr "System configuration saved"
 
 msgid "pages.systemConfiguration.title"
 msgstr "System configuration"
+
+msgid "pages.transformers.deleteConfirm.message"
+msgstr "This action cannot be undone."
+
+msgid "pages.transformers.deleteConfirm.title"
+msgstr "Delete this transformer?"
 
 msgid "pages.transformers.empty"
 msgstr "No transformer found, create one"
