@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import Button from '@mui/material/Button'
@@ -21,6 +21,8 @@ import SaveIcon from '@mui/icons-material/Save'
 import * as configApi from '@/lib/api/operations/config'
 
 import { useApiOperation } from '@/lib/hooks/api'
+import { useDialogs } from '@/lib/hooks/dialogs'
+import { useDirty } from '@/lib/hooks/dirty'
 import { useInput } from '@/lib/hooks/input'
 
 import { DialogProps } from '@/lib/models/Dialog'
@@ -33,6 +35,7 @@ import ForwarderModel from '@/lib/models/ForwarderModel'
 
 import * as validators from '@/lib/validators'
 
+import DialogConfirm from '@/components/DialogConfirm/component'
 import ForwarderEditor from '@/components/ForwarderEditor/component'
 
 import { DialogFormBody, TypeOption } from './styles'
@@ -42,6 +45,7 @@ const DialogNewForwarder = ({
   onClose,
 }: DialogProps<void, string | null>) => {
   const { t } = useTranslation()
+  const dialogs = useDialogs()
 
   const initialType: ForwarderConfigTypes = 'http'
 
@@ -54,6 +58,22 @@ const DialogNewForwarder = ({
   const [forwarder, setForwarder] = useState<ForwarderModel>(() => ({
     config: ForwarderConfigFactory(initialType),
   }))
+  const [savedForwarder, setSavedForwarder] =
+    useState<ForwarderModel>(forwarder)
+  const configDirty = useDirty(savedForwarder, forwarder)
+  const dirty = name.value.trim() !== '' || type !== initialType || configDirty
+
+  // ForwarderEditor's sub-editors normalize their config on mount (filling
+  // in defaults for optional fields), which changes `forwarder` once before
+  // any real user edit. Treat that first change as the dirty baseline.
+  const initializedRef = useRef(false)
+  const handleForwarderChange = (newForwarder: ForwarderModel) => {
+    setForwarder(newForwarder)
+    if (!initializedRef.current) {
+      initializedRef.current = true
+      setSavedForwarder(newForwarder)
+    }
+  }
 
   const [onSubmit, loading] = useApiOperation(async () => {
     await configApi.saveForwarder(name.value, forwarder)
@@ -62,9 +82,25 @@ const DialogNewForwarder = ({
 
   const handleTypeChange = (newType: ForwarderConfigTypes) => {
     setType(newType)
-    setForwarder({
+    const resetForwarder = {
       config: ForwarderConfigFactory(newType),
-    })
+    }
+    setForwarder(resetForwarder)
+    setSavedForwarder(resetForwarder)
+    initializedRef.current = false
+  }
+
+  const handleClose = async () => {
+    if (dirty) {
+      const confirmed = await dialogs.open(DialogConfirm, {
+        title: t('common.discardConfirm.title'),
+        message: t('common.discardConfirm.message'),
+        confirmLabel: t('common.actions.discard'),
+        warning: true,
+      })
+      if (!confirmed) return
+    }
+    onClose(null)
   }
 
   return (
@@ -72,7 +108,7 @@ const DialogNewForwarder = ({
       maxWidth="lg"
       fullWidth
       open={open}
-      onClose={() => onClose(null)}
+      onClose={handleClose}
       slotProps={{
         paper: {
           component: 'form',
@@ -134,7 +170,7 @@ const DialogNewForwarder = ({
 
           <ForwarderEditor
             forwarder={forwarder}
-            onForwarderChange={setForwarder}
+            onForwarderChange={handleForwarderChange}
             onValidationChange={setConfigValid}
             showType={false}
           />
@@ -145,7 +181,7 @@ const DialogNewForwarder = ({
           id="btn:forwarder.modal.cancel"
           variant="contained"
           startIcon={<CancelIcon />}
-          onClick={() => onClose(null)}
+          onClick={handleClose}
           disabled={loading}
         >
           {t('common.actions.cancel')}

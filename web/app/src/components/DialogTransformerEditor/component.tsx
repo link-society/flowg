@@ -16,10 +16,12 @@ import SaveIcon from '@mui/icons-material/Save'
 import * as configApi from '@/lib/api/operations/config'
 
 import { useApiOperation } from '@/lib/hooks/api'
+import { useDialogs } from '@/lib/hooks/dialogs'
 import { useDirty } from '@/lib/hooks/dirty'
 import { useNotify } from '@/lib/hooks/notify'
 
 import AuthenticatedAwait from '@/components/AuthenticatedAwait/component'
+import DialogConfirm from '@/components/DialogConfirm/component'
 import TransformerEditor from '@/components/TransformerEditor/component'
 
 import {
@@ -43,6 +45,7 @@ const DialogTransformerEditor = ({
 }: DialogTransformerEditorProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const dialogs = useDialogs()
 
   const [open, setOpen] = useState(false)
 
@@ -71,6 +74,19 @@ const DialogTransformerEditor = ({
     notify.success(t('pages.transformers.notifications.saved'))
   }, [transformer, code])
 
+  const handleClose = async () => {
+    if (dirty) {
+      const confirmed = await dialogs.open(DialogConfirm, {
+        title: t('common.discardConfirm.title'),
+        message: t('common.discardConfirm.message'),
+        confirmLabel: t('common.actions.discard'),
+        warning: true,
+      })
+      if (!confirmed) return
+    }
+    setOpen(false)
+  }
+
   return (
     <>
       <Button
@@ -85,18 +101,14 @@ const DialogTransformerEditor = ({
       <Dialog
         fullScreen
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={handleClose}
         slots={{
           transition: Transition,
         }}
       >
         <DialogAppBar>
           <EditorToolbar>
-            <IconButton
-              edge="start"
-              color="inherit"
-              onClick={() => setOpen(false)}
-            >
+            <IconButton edge="start" color="inherit" onClick={handleClose}>
               <CloseIcon />
             </IconButton>
 

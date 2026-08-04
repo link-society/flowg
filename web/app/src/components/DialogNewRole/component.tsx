@@ -16,11 +16,13 @@ import SaveIcon from '@mui/icons-material/Save'
 import * as aclApi from '@/lib/api/operations/acls'
 
 import { useApiOperation } from '@/lib/hooks/api'
+import { useDialogs } from '@/lib/hooks/dialogs'
 
 import { DialogProps } from '@/lib/models/Dialog'
 import RoleModel from '@/lib/models/RoleModel'
 import { ScopeLabels, Scopes } from '@/lib/models/Scopes'
 
+import DialogConfirm from '@/components/DialogConfirm/component'
 import InputTransferList from '@/components/InputTransferList/component'
 
 import { FieldLabel, FieldStack, FormStack, FormTextField } from './styles'
@@ -30,8 +32,10 @@ const DialogNewRole = ({
   onClose,
 }: DialogProps<void, RoleModel | null>) => {
   const { t } = useTranslation()
+  const dialogs = useDialogs()
   const [name, setName] = useState('')
   const [scopes, setScopes] = useState<string[]>([])
+  const dirty = name.trim() !== '' || scopes.length > 0
 
   const [onSubmit, loading] = useApiOperation(async () => {
     const role = {
@@ -43,12 +47,25 @@ const DialogNewRole = ({
     onClose(role)
   }, [name, scopes, onClose])
 
+  const handleClose = async () => {
+    if (dirty) {
+      const confirmed = await dialogs.open(DialogConfirm, {
+        title: t('common.discardConfirm.title'),
+        message: t('common.discardConfirm.message'),
+        confirmLabel: t('common.actions.discard'),
+        warning: true,
+      })
+      if (!confirmed) return
+    }
+    onClose(null)
+  }
+
   return (
     <Dialog
       maxWidth="sm"
       fullWidth
       open={open}
-      onClose={() => onClose(null)}
+      onClose={handleClose}
       slotProps={{
         paper: {
           component: 'form',
@@ -102,7 +119,7 @@ const DialogNewRole = ({
           id="btn:admin.roles.modal.cancel"
           variant="contained"
           startIcon={<CancelIcon />}
-          onClick={() => onClose(null)}
+          onClick={handleClose}
           disabled={loading}
         >
           {t('common.actions.cancel')}

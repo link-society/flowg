@@ -10,6 +10,7 @@ import DialogTitle from '@mui/material/DialogTitle'
 import CancelIcon from '@mui/icons-material/Cancel'
 import CheckIcon from '@mui/icons-material/Check'
 import DeleteIcon from '@mui/icons-material/Delete'
+import UndoIcon from '@mui/icons-material/Undo'
 
 import { DialogProps } from '@/lib/models/Dialog'
 
@@ -21,7 +22,16 @@ const DialogConfirm = ({
   onClose,
 }: DialogProps<DialogConfirmPayload, boolean>) => {
   const { t } = useTranslation()
-  const { title, message, confirmLabel, danger = false } = payload
+  const {
+    title,
+    message,
+    confirmLabel,
+    danger = false,
+    warning = false,
+  } = payload
+
+  const color = danger ? 'error' : warning ? 'warning' : 'secondary'
+  const ConfirmIcon = danger ? DeleteIcon : warning ? UndoIcon : CheckIcon
 
   return (
     <Dialog open={open} onClose={() => onClose(false)} fullWidth maxWidth="xs">
@@ -41,8 +51,8 @@ const DialogConfirm = ({
         <Button
           id="btn:confirm-dialog.confirm"
           variant="contained"
-          color={danger ? 'error' : 'secondary'}
-          startIcon={danger ? <DeleteIcon /> : <CheckIcon />}
+          color={color}
+          startIcon={<ConfirmIcon />}
           onClick={() => onClose(true)}
           autoFocus
         >
