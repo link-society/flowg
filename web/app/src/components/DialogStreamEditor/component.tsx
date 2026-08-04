@@ -17,12 +17,14 @@ import * as configApi from '@/lib/api/operations/config'
 import * as logApi from '@/lib/api/operations/logs.ts'
 
 import { useApiOperation } from '@/lib/hooks/api'
+import { useDialogs } from '@/lib/hooks/dialogs'
 import { useDirty } from '@/lib/hooks/dirty'
 import { useNotify } from '@/lib/hooks/notify'
 
 import StreamConfigModel from '@/lib/models/StreamConfigModel'
 
 import AuthenticatedAwait from '@/components/AuthenticatedAwait/component'
+import DialogConfirm from '@/components/DialogConfirm/component'
 import StreamEditor from '@/components/StreamEditor/component'
 
 import {
@@ -44,6 +46,7 @@ const Transition = React.forwardRef(function Transition(
 const DialogStreamEditor = ({ stream }: DialogStreamEditorProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const dialogs = useDialogs()
 
   const [open, setOpen] = useState(false)
 
@@ -81,6 +84,19 @@ const DialogStreamEditor = ({ stream }: DialogStreamEditorProps) => {
     notify.success(t('pages.storage.notifications.saved'))
   }, [stream, streamConfig])
 
+  const handleClose = async () => {
+    if (dirty) {
+      const confirmed = await dialogs.open(DialogConfirm, {
+        title: t('common.discardConfirm.title'),
+        message: t('common.discardConfirm.message'),
+        confirmLabel: t('common.actions.discard'),
+        warning: true,
+      })
+      if (!confirmed) return
+    }
+    setOpen(false)
+  }
+
   return (
     <>
       <Button
@@ -95,18 +111,14 @@ const DialogStreamEditor = ({ stream }: DialogStreamEditorProps) => {
       <Dialog
         fullScreen
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={handleClose}
         slots={{
           transition: Transition,
         }}
       >
         <DialogAppBar>
           <EditorToolbar>
-            <IconButton
-              edge="start"
-              color="inherit"
-              onClick={() => setOpen(false)}
-            >
+            <IconButton edge="start" color="inherit" onClick={handleClose}>
               <CloseIcon />
             </IconButton>
 

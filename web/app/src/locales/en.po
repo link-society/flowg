@@ -15,6 +15,9 @@ msgstr "Confirm"
 msgid "common.actions.delete"
 msgstr "Delete"
 
+msgid "common.actions.discard"
+msgstr "Discard"
+
 msgid "common.actions.documentation"
 msgstr "Documentation"
 
@@ -29,6 +32,12 @@ msgstr "Save"
 
 msgid "common.actions.test"
 msgstr "Test"
+
+msgid "common.discardConfirm.message"
+msgstr "Your unsaved changes will be lost."
+
+msgid "common.discardConfirm.title"
+msgstr "Discard unsaved changes?"
 
 msgid "common.notifications.testFailed"
 msgstr "Test failed: {{error}}"

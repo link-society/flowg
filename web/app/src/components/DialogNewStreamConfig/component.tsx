@@ -15,8 +15,11 @@ import SaveIcon from '@mui/icons-material/Save'
 import * as configApi from '@/lib/api/operations/config'
 
 import { useApiOperation } from '@/lib/hooks/api'
+import { useDialogs } from '@/lib/hooks/dialogs'
 
 import { DialogProps } from '@/lib/models/Dialog'
+
+import DialogConfirm from '@/components/DialogConfirm/component'
 
 import { DialogFormBody } from './styles'
 
@@ -25,7 +28,9 @@ const DialogNewStreamConfig = ({
   onClose,
 }: DialogProps<void, string | null>) => {
   const { t } = useTranslation()
+  const dialogs = useDialogs()
   const [name, setName] = useState('')
+  const dirty = name.trim() !== ''
 
   const [onSubmit, loading] = useApiOperation(async () => {
     await configApi.configureStream(name, {
@@ -36,12 +41,25 @@ const DialogNewStreamConfig = ({
     onClose(name)
   }, [name])
 
+  const handleClose = async () => {
+    if (dirty) {
+      const confirmed = await dialogs.open(DialogConfirm, {
+        title: t('common.discardConfirm.title'),
+        message: t('common.discardConfirm.message'),
+        confirmLabel: t('common.actions.discard'),
+        warning: true,
+      })
+      if (!confirmed) return
+    }
+    onClose(null)
+  }
+
   return (
     <Dialog
       maxWidth="sm"
       fullWidth
       open={open}
-      onClose={() => onClose(null)}
+      onClose={handleClose}
       slotProps={{
         paper: {
           component: 'form',
@@ -72,7 +90,7 @@ const DialogNewStreamConfig = ({
           id="btn:streams.modal.cancel"
           variant="contained"
           startIcon={<CancelIcon />}
-          onClick={() => onClose(null)}
+          onClick={handleClose}
           disabled={loading}
         >
           {t('common.actions.cancel')}
