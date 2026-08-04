@@ -15,12 +15,14 @@ import SaveIcon from '@mui/icons-material/Save'
 import * as configApi from '@/lib/api/operations/config'
 
 import { useApiOperation } from '@/lib/hooks/api'
+import { useDialogs } from '@/lib/hooks/dialogs'
 import { useDirty } from '@/lib/hooks/dirty'
 import { useNotify } from '@/lib/hooks/notify'
 
 import ForwarderModel from '@/lib/models/ForwarderModel'
 
 import AuthenticatedAwait from '@/components/AuthenticatedAwait/component'
+import DialogConfirm from '@/components/DialogConfirm/component'
 import ForwarderEditor from '@/components/ForwarderEditor/component'
 
 import {
@@ -48,6 +50,7 @@ const DialogForwarderEditor = ({
 }: DialogForwarderEditorProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const dialogs = useDialogs()
 
   const [open, setOpen] = useState(false)
 
@@ -91,6 +94,19 @@ const DialogForwarderEditor = ({
     notify.success(t('pages.forwarders.notifications.saved'))
   }, [forwarderName, forwarder])
 
+  const handleClose = async () => {
+    if (dirty) {
+      const confirmed = await dialogs.open(DialogConfirm, {
+        title: t('common.discardConfirm.title'),
+        message: t('common.discardConfirm.message'),
+        confirmLabel: t('common.actions.discard'),
+        warning: true,
+      })
+      if (!confirmed) return
+    }
+    setOpen(false)
+  }
+
   return (
     <>
       <Button
@@ -105,18 +121,14 @@ const DialogForwarderEditor = ({
       <Dialog
         fullScreen
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={handleClose}
         slots={{
           transition: Transition,
         }}
       >
         <DialogAppBar>
           <DialogToolbar>
-            <IconButton
-              edge="start"
-              color="inherit"
-              onClick={() => setOpen(false)}
-            >
+            <IconButton edge="start" color="inherit" onClick={handleClose}>
               <CloseIcon />
             </IconButton>
 
