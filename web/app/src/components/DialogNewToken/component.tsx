@@ -28,8 +28,14 @@ const DialogNewToken = ({
 >) => {
   const { t } = useTranslation()
 
+  // This token is shown only once: closing via backdrop click or Escape is
+  // too easy to trigger by accident, so require the explicit "Done" click.
+  // MUI only invokes Dialog's onClose for those two reasons, so a no-op
+  // here blocks both while leaving the "Done" button free to call onClose.
+  const handleClose = () => {}
+
   return (
-    <Dialog maxWidth="sm" fullWidth open={open} onClose={() => onClose()}>
+    <Dialog maxWidth="sm" fullWidth open={open} onClose={handleClose}>
       <DialogTitle>{t('components.dialogNewToken.title')}</DialogTitle>
       <DialogContent>
         <FieldRow>

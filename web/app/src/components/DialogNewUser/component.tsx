@@ -19,10 +19,13 @@ import SaveIcon from '@mui/icons-material/Save'
 import * as aclApi from '@/lib/api/operations/acls'
 
 import { useApiOperation } from '@/lib/hooks/api'
+import { useDialogs } from '@/lib/hooks/dialogs'
+import { useDirty } from '@/lib/hooks/dirty'
 
 import { DialogProps } from '@/lib/models/Dialog'
 import UserModel from '@/lib/models/UserModel'
 
+import DialogConfirm from '@/components/DialogConfirm/component'
 import InputTransferList from '@/components/InputTransferList/component'
 
 import { FieldLabel, FieldRow, FieldStack, FormStack } from './styles'
@@ -36,9 +39,12 @@ const DialogNewUser = ({
   UserModel | null
 >) => {
   const { t } = useTranslation()
+  const dialogs = useDialogs()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [roles, setRoles] = useState<string[]>(payload.defaultRoles)
+  const rolesDirty = useDirty(payload.defaultRoles, roles)
+  const dirty = username.trim() !== '' || password !== '' || rolesDirty
 
   const [onSubmit, loading] = useApiOperation(async () => {
     const user = {
@@ -50,12 +56,25 @@ const DialogNewUser = ({
     onClose(user)
   }, [username, password, roles, onClose])
 
+  const handleClose = async () => {
+    if (dirty) {
+      const confirmed = await dialogs.open(DialogConfirm, {
+        title: t('common.discardConfirm.title'),
+        message: t('common.discardConfirm.message'),
+        confirmLabel: t('common.actions.discard'),
+        warning: true,
+      })
+      if (!confirmed) return
+    }
+    onClose(null)
+  }
+
   return (
     <Dialog
       maxWidth="sm"
       fullWidth
       open={open}
-      onClose={() => onClose(null)}
+      onClose={handleClose}
       slotProps={{
         paper: {
           component: 'form',
@@ -120,7 +139,7 @@ const DialogNewUser = ({
           id="btn:admin.users.modal.cancel"
           variant="contained"
           startIcon={<CancelIcon />}
-          onClick={() => onClose(null)}
+          onClick={handleClose}
           disabled={loading}
         >
           {t('common.actions.cancel')}
@@ -130,7 +149,7 @@ const DialogNewUser = ({
           variant="contained"
           color="secondary"
           startIcon={!loading && <SaveIcon />}
-          disabled={loading}
+          disabled={loading || username.trim() === '' || password === ''}
           type="submit"
         >
           {loading ? (

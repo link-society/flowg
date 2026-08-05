@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LoaderFunction, useLoaderData, useNavigate } from 'react-router'
 
@@ -20,12 +20,17 @@ import ScienceIcon from '@mui/icons-material/Science'
 import * as configApi from '@/lib/api/operations/config'
 
 import { useApiOperation } from '@/lib/hooks/api'
+import { useDialogs } from '@/lib/hooks/dialogs'
+import { useDirty } from '@/lib/hooks/dirty'
 import { useNotify } from '@/lib/hooks/notify'
 import { useProfile } from '@/lib/hooks/profile'
+
+import ForwarderModel from '@/lib/models/ForwarderModel'
 
 import { loginRequired } from '@/lib/decorators/loaders'
 
 import ButtonNewForwarder from '@/components/ButtonNewForwarder/component'
+import DialogConfirm from '@/components/DialogConfirm/component'
 import ForwarderEditor from '@/components/ForwarderEditor/component'
 import InputKeyValue from '@/components/InputKeyValue/component'
 import SideNavList from '@/components/SideNavList/component'
@@ -71,6 +76,7 @@ export const loader: LoaderFunction = loginRequired(
 const ForwarderDetailView = () => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const dialogs = useDialogs()
 
   const { permissions } = useProfile()
   const { forwarders, currentForwarder } = useLoaderData() as LoaderData
@@ -78,6 +84,22 @@ const ForwarderDetailView = () => {
 
   const [forwarder, setForwarder] = useState(currentForwarder.forwarder)
   const [valid, setValid] = useState(false)
+  const [savedForwarder, setSavedForwarder] = useState(
+    currentForwarder.forwarder
+  )
+  const dirty = useDirty(savedForwarder, forwarder)
+
+  // ForwarderEditor's sub-editors normalize their config on mount (filling
+  // in defaults for optional fields), which changes `forwarder` once before
+  // any real user edit. Treat that first change as the dirty baseline.
+  const initializedRef = useRef(false)
+  const handleForwarderChange = (newForwarder: ForwarderModel) => {
+    setForwarder(newForwarder)
+    if (!initializedRef.current) {
+      initializedRef.current = true
+      setSavedForwarder(newForwarder)
+    }
+  }
 
   const [testOpen, setTestOpen] = useState(false)
   const [testRecords, setTestRecords] = useState<[string, string][]>([])
@@ -104,8 +126,22 @@ const ForwarderDetailView = () => {
     })
   }, [currentForwarder])
 
+  const handleDeleteClick = async () => {
+    const confirmed = await dialogs.open(DialogConfirm, {
+      title: t('pages.forwarders.deleteConfirm.title'),
+      message: t('pages.forwarders.deleteConfirm.message'),
+      confirmLabel: t('common.actions.delete'),
+      danger: true,
+    })
+
+    if (confirmed) {
+      onDelete()
+    }
+  }
+
   const [onSave, saveLoading] = useApiOperation(async () => {
     await configApi.saveForwarder(currentForwarder.name, forwarder)
+    setSavedForwarder(forwarder)
     notify.success(t('pages.forwarders.notifications.saved'))
   }, [forwarder, currentForwarder])
 
@@ -148,7 +184,7 @@ const ForwarderDetailView = () => {
                   variant="contained"
                   color="error"
                   size="small"
-                  onClick={onDelete}
+                  onClick={handleDeleteClick}
                   disabled={deleteLoading}
                   startIcon={!deleteLoading && <DeleteIcon />}
                 >
@@ -165,7 +201,7 @@ const ForwarderDetailView = () => {
                   color="secondary"
                   size="small"
                   onClick={onSave}
-                  disabled={saveLoading || !valid}
+                  disabled={saveLoading || !valid || !dirty}
                   startIcon={!saveLoading && <SaveIcon />}
                 >
                   {saveLoading ? (
@@ -192,7 +228,7 @@ const ForwarderDetailView = () => {
             <ForwarderDetailViewEditorPaper>
               <ForwarderEditor
                 forwarder={forwarder}
-                onForwarderChange={setForwarder}
+                onForwarderChange={handleForwarderChange}
                 onValidationChange={setValid}
               />
             </ForwarderDetailViewEditorPaper>

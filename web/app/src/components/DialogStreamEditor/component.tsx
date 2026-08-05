@@ -17,11 +17,14 @@ import * as configApi from '@/lib/api/operations/config'
 import * as logApi from '@/lib/api/operations/logs.ts'
 
 import { useApiOperation } from '@/lib/hooks/api'
+import { useDialogs } from '@/lib/hooks/dialogs'
+import { useDirty } from '@/lib/hooks/dirty'
 import { useNotify } from '@/lib/hooks/notify'
 
 import StreamConfigModel from '@/lib/models/StreamConfigModel'
 
 import AuthenticatedAwait from '@/components/AuthenticatedAwait/component'
+import DialogConfirm from '@/components/DialogConfirm/component'
 import StreamEditor from '@/components/StreamEditor/component'
 
 import {
@@ -43,6 +46,7 @@ const Transition = React.forwardRef(function Transition(
 const DialogStreamEditor = ({ stream }: DialogStreamEditorProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const dialogs = useDialogs()
 
   const [open, setOpen] = useState(false)
 
@@ -51,6 +55,9 @@ const DialogStreamEditor = ({ stream }: DialogStreamEditorProps) => {
     size: 0,
     ttl: 0,
   })
+  const [savedStreamConfig, setSavedStreamConfig] =
+    useState<StreamConfigModel>(streamConfig)
+  const dirty = useDirty(savedStreamConfig, streamConfig)
   const [streamConfigPromise, setStreamConfigPromise] =
     useState<Promise<void> | null>(null)
   const [usage, setUsage] = useState<number>(0)
@@ -59,6 +66,7 @@ const DialogStreamEditor = ({ stream }: DialogStreamEditorProps) => {
     async (stream: string) => {
       const streamConfig = await configApi.getStreamConfig(stream)
       setStreamConfig(streamConfig)
+      setSavedStreamConfig(streamConfig)
 
       const estimated = await logApi.getStreamUsage(stream)
       setUsage(estimated)
@@ -72,8 +80,22 @@ const DialogStreamEditor = ({ stream }: DialogStreamEditorProps) => {
 
   const [onSave, saveLoading] = useApiOperation(async () => {
     await configApi.configureStream(stream, streamConfig)
+    setSavedStreamConfig(streamConfig)
     notify.success(t('pages.storage.notifications.saved'))
   }, [stream, streamConfig])
+
+  const handleClose = async () => {
+    if (dirty) {
+      const confirmed = await dialogs.open(DialogConfirm, {
+        title: t('common.discardConfirm.title'),
+        message: t('common.discardConfirm.message'),
+        confirmLabel: t('common.actions.discard'),
+        warning: true,
+      })
+      if (!confirmed) return
+    }
+    setOpen(false)
+  }
 
   return (
     <>
@@ -89,18 +111,14 @@ const DialogStreamEditor = ({ stream }: DialogStreamEditorProps) => {
       <Dialog
         fullScreen
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={handleClose}
         slots={{
           transition: Transition,
         }}
       >
         <DialogAppBar>
           <EditorToolbar>
-            <IconButton
-              edge="start"
-              color="inherit"
-              onClick={() => setOpen(false)}
-            >
+            <IconButton edge="start" color="inherit" onClick={handleClose}>
               <CloseIcon />
             </IconButton>
 
@@ -136,7 +154,7 @@ const DialogStreamEditor = ({ stream }: DialogStreamEditorProps) => {
               color="secondary"
               size="small"
               onClick={onSave}
-              disabled={saveLoading}
+              disabled={saveLoading || !dirty}
               startIcon={!saveLoading && <SaveIcon />}
             >
               {saveLoading ? (

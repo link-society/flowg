@@ -11,6 +11,7 @@ import {
 } from '@/lib/api/operations/config.ts'
 
 import { useApiOperation } from '@/lib/hooks/api.ts'
+import { useDirty } from '@/lib/hooks/dirty'
 import { useNotify } from '@/lib/hooks/notify.ts'
 
 import { loginRequired } from '@/lib/decorators/loaders'
@@ -35,12 +36,15 @@ const SystemConfiguration = () => {
   const receivedConfig = useLoaderData() as LoaderData
 
   const [config, setConfig] = useState(receivedConfig)
+  const [savedConfig, setSavedConfig] = useState(receivedConfig)
+  const dirty = useDirty(savedConfig, config)
 
   const notify = useNotify()
   const [onSave, saveLoading] = useApiOperation(async () => {
     await saveSystemConfiguration(config)
+    setSavedConfig(config)
     notify.success(t('pages.systemConfiguration.notifications.saved'))
-  }, [])
+  }, [config])
 
   return (
     <SystemConfigurationRoot variant="page">
@@ -87,7 +91,7 @@ const SystemConfiguration = () => {
           variant="contained"
           color="secondary"
           onClick={onSave}
-          disabled={saveLoading}
+          disabled={saveLoading || !dirty}
         >
           {t('common.actions.save')}
         </Button>

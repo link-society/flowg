@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import Button from '@mui/material/Button'
@@ -15,11 +15,14 @@ import SaveIcon from '@mui/icons-material/Save'
 import * as configApi from '@/lib/api/operations/config'
 
 import { useApiOperation } from '@/lib/hooks/api'
+import { useDialogs } from '@/lib/hooks/dialogs'
+import { useDirty } from '@/lib/hooks/dirty'
 import { useNotify } from '@/lib/hooks/notify'
 
 import ForwarderModel from '@/lib/models/ForwarderModel'
 
 import AuthenticatedAwait from '@/components/AuthenticatedAwait/component'
+import DialogConfirm from '@/components/DialogConfirm/component'
 import ForwarderEditor from '@/components/ForwarderEditor/component'
 
 import {
@@ -47,16 +50,34 @@ const DialogForwarderEditor = ({
 }: DialogForwarderEditorProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const dialogs = useDialogs()
 
   const [open, setOpen] = useState(false)
 
   const [valid, setValid] = useState(false)
   const [forwarder, setForwarder] = useState<ForwarderModel>(undefined!)
+  const [savedForwarder, setSavedForwarder] = useState<ForwarderModel>(
+    undefined!
+  )
+  const dirty = useDirty(savedForwarder, forwarder)
   const [forwarderPromise, setForwarderPromise] =
     useState<Promise<void> | null>(null)
 
+  // ForwarderEditor's sub-editors normalize their config on mount (filling
+  // in defaults for optional fields), which changes `forwarder` once before
+  // any real user edit. Treat that first change as the dirty baseline.
+  const initializedRef = useRef(false)
+  const handleForwarderChange = (newForwarder: ForwarderModel) => {
+    setForwarder(newForwarder)
+    if (!initializedRef.current) {
+      initializedRef.current = true
+      setSavedForwarder(newForwarder)
+    }
+  }
+
   const [onFetch] = useApiOperation(
     async (name: string) => {
+      initializedRef.current = false
       const forwarder = await configApi.getForwarder(name)
       setForwarder(forwarder)
     },
@@ -69,8 +90,22 @@ const DialogForwarderEditor = ({
 
   const [onSave, saveLoading] = useApiOperation(async () => {
     await configApi.saveForwarder(forwarderName, forwarder)
+    setSavedForwarder(forwarder)
     notify.success(t('pages.forwarders.notifications.saved'))
   }, [forwarderName, forwarder])
+
+  const handleClose = async () => {
+    if (dirty) {
+      const confirmed = await dialogs.open(DialogConfirm, {
+        title: t('common.discardConfirm.title'),
+        message: t('common.discardConfirm.message'),
+        confirmLabel: t('common.actions.discard'),
+        warning: true,
+      })
+      if (!confirmed) return
+    }
+    setOpen(false)
+  }
 
   return (
     <>
@@ -86,18 +121,14 @@ const DialogForwarderEditor = ({
       <Dialog
         fullScreen
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={handleClose}
         slots={{
           transition: Transition,
         }}
       >
         <DialogAppBar>
           <DialogToolbar>
-            <IconButton
-              edge="start"
-              color="inherit"
-              onClick={() => setOpen(false)}
-            >
+            <IconButton edge="start" color="inherit" onClick={handleClose}>
               <CloseIcon />
             </IconButton>
 
@@ -121,7 +152,7 @@ const DialogForwarderEditor = ({
               color="secondary"
               size="small"
               onClick={onSave}
-              disabled={saveLoading || !valid}
+              disabled={saveLoading || !valid || !dirty}
               startIcon={!saveLoading && <SaveIcon />}
             >
               {saveLoading ? (
@@ -145,7 +176,7 @@ const DialogForwarderEditor = ({
               <AuthenticatedAwait resolve={forwarderPromise}>
                 <ForwarderEditor
                   forwarder={forwarder}
-                  onForwarderChange={setForwarder}
+                  onForwarderChange={handleForwarderChange}
                   onValidationChange={setValid}
                 />
               </AuthenticatedAwait>

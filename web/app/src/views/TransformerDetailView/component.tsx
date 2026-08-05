@@ -12,12 +12,15 @@ import SaveIcon from '@mui/icons-material/Save'
 import * as configApi from '@/lib/api/operations/config'
 
 import { useApiOperation } from '@/lib/hooks/api'
+import { useDialogs } from '@/lib/hooks/dialogs'
+import { useDirty } from '@/lib/hooks/dirty'
 import { useNotify } from '@/lib/hooks/notify'
 import { useProfile } from '@/lib/hooks/profile'
 
 import { loginRequired } from '@/lib/decorators/loaders'
 
 import ButtonNewTransformer from '@/components/ButtonNewTransformer/component'
+import DialogConfirm from '@/components/DialogConfirm/component'
 import SideNavList from '@/components/SideNavList/component'
 import TransformerEditor from '@/components/TransformerEditor/component'
 
@@ -58,12 +61,15 @@ export const loader: LoaderFunction = loginRequired(
 const TransformerDetailView = () => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const dialogs = useDialogs()
 
   const { permissions } = useProfile()
   const { transformers, currentTransformer } = useLoaderData() as LoaderData
   const navigate = useNavigate()
 
   const [code, setCode] = useState(currentTransformer.script)
+  const [savedCode, setSavedCode] = useState(currentTransformer.script)
+  const dirty = useDirty(savedCode, code)
 
   const onCreate = (name: string) => {
     queueMicrotask(() => {
@@ -78,8 +84,22 @@ const TransformerDetailView = () => {
     })
   }, [currentTransformer])
 
+  const handleDeleteClick = async () => {
+    const confirmed = await dialogs.open(DialogConfirm, {
+      title: t('pages.transformers.deleteConfirm.title'),
+      message: t('pages.transformers.deleteConfirm.message'),
+      confirmLabel: t('common.actions.delete'),
+      danger: true,
+    })
+
+    if (confirmed) {
+      onDelete()
+    }
+  }
+
   const [onSave, saveLoading] = useApiOperation(async () => {
     await configApi.saveTransformer(currentTransformer.name, code)
+    setSavedCode(code)
     notify.success(t('pages.transformers.notifications.saved'))
   }, [code, currentTransformer])
 
@@ -108,7 +128,7 @@ const TransformerDetailView = () => {
               variant="contained"
               color="error"
               size="small"
-              onClick={onDelete}
+              onClick={handleDeleteClick}
               disabled={deleteLoading}
               startIcon={!deleteLoading && <DeleteIcon />}
             >
@@ -125,7 +145,7 @@ const TransformerDetailView = () => {
               color="secondary"
               size="small"
               onClick={onSave}
-              disabled={saveLoading}
+              disabled={saveLoading || !dirty}
               startIcon={!saveLoading && <SaveIcon />}
             >
               {saveLoading ? (

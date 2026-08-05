@@ -50,5 +50,7 @@ Delete stream
     Wait Until Element Is Visible  id=label:streams.list-item.test
     Sleep                          1s
     Click Element                  id=btn:streams.delete
+    Wait Until Element Is Visible  id=btn:confirm-dialog.confirm
+    Click Element                  id=btn:confirm-dialog.confirm
     Wait Until Page Contains       No stream found  timeout=5s
     Close Browser

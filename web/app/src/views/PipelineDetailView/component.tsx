@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LoaderFunction, useLoaderData, useNavigate } from 'react-router'
 
@@ -22,6 +22,8 @@ import { ReactFlowProvider } from '@xyflow/react'
 import * as configApi from '@/lib/api/operations/config'
 
 import { useApiOperation } from '@/lib/hooks/api'
+import { useDialogs } from '@/lib/hooks/dialogs'
+import { useDirty } from '@/lib/hooks/dirty'
 import { useNotify } from '@/lib/hooks/notify'
 import { useProfile } from '@/lib/hooks/profile'
 
@@ -30,6 +32,7 @@ import { PipelineTrace } from '@/lib/models/PipelineTrace.ts'
 
 import { loginRequired } from '@/lib/decorators/loaders'
 
+import DialogConfirm from '@/components/DialogConfirm/component'
 import InputKeyValue from '@/components/InputKeyValue/component'
 import PipelineEditorFlow from '@/components/PipelineEditorFlow/component'
 import PipelineEditorNodeListForwarder from '@/components/PipelineEditorNodeListForwarder/component'
@@ -80,6 +83,7 @@ export const loader: LoaderFunction = loginRequired(
 const PipelineDetailView = () => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const dialogs = useDialogs()
 
   const { permissions } = useProfile()
   const { currentPipeline } = useLoaderData() as LoaderData
@@ -87,9 +91,16 @@ const PipelineDetailView = () => {
 
   const initialFlow = currentPipeline.flow
   const [flow, setFlow] = useState(initialFlow)
+  const [lastSavedFlow, setLastSavedFlow] = useState(initialFlow)
+  const dirty = useDirty(lastSavedFlow, flow)
   const [testOpen, setTestOpen] = useState(false)
   const [testRecords, setTestRecords] = useState<[string, string][]>([])
   const [testResult, setTestResult] = useState<PipelineTrace | null>(null)
+
+  // PipelineEditorFlow normalizes the flow on mount (layout, node metadata,
+  // `hasLayout: true`), which changes it once before any real user edit.
+  // Treat that first change as the dirty baseline.
+  const initializedRef = useRef(false)
 
   const onChange = useCallback(
     (newFlow: PipelineModel) => {
@@ -98,6 +109,11 @@ const PipelineDetailView = () => {
 
       if (serializedOldFlow !== serializedNewFlow) {
         setFlow(newFlow)
+      }
+
+      if (!initializedRef.current) {
+        initializedRef.current = true
+        setLastSavedFlow(newFlow)
       }
     },
     [flow]
@@ -111,6 +127,19 @@ const PipelineDetailView = () => {
     })
   }, [currentPipeline])
 
+  const handleDeleteClick = async () => {
+    const confirmed = await dialogs.open(DialogConfirm, {
+      title: t('pages.pipelines.deleteConfirm.title'),
+      message: t('pages.pipelines.deleteConfirm.message'),
+      confirmLabel: t('common.actions.delete'),
+      danger: true,
+    })
+
+    if (confirmed) {
+      onDelete()
+    }
+  }
+
   const [onSave, saveLoading] = useApiOperation(async () => {
     const savedFlow = {
       ...flow,
@@ -122,6 +151,7 @@ const PipelineDetailView = () => {
     }
 
     await configApi.savePipeline(currentPipeline.name, savedFlow)
+    setLastSavedFlow(flow)
     notify.success(t('pages.pipelines.notifications.saved'))
   }, [flow, currentPipeline])
 
@@ -217,7 +247,7 @@ const PipelineDetailView = () => {
                   variant="contained"
                   color="error"
                   size="small"
-                  onClick={onDelete}
+                  onClick={handleDeleteClick}
                   disabled={deleteLoading}
                   startIcon={!deleteLoading && <DeleteIcon />}
                 >
@@ -233,7 +263,7 @@ const PipelineDetailView = () => {
                   color="secondary"
                   size="small"
                   onClick={onSave}
-                  disabled={saveLoading}
+                  disabled={saveLoading || !dirty}
                   startIcon={!saveLoading && <SaveIcon />}
                 >
                   {saveLoading ? (
