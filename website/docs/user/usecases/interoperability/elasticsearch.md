@@ -139,7 +139,7 @@ The name of the index maps to the name of a FlowG pipeline
 
 :::note
 
-Since FlowG's datamodel is flat, the document will be flattenned first:
+Since FlowG's data model is flat, the document will be flattened first:
 
 :::
 
