@@ -53,6 +53,10 @@ func (rt *awsCloudWatchRuntime) Close(context.Context) error {
 	return nil
 }
 
+func awsCloudWatchTimestamp(record *models.LogRecord) int64 {
+	return record.Timestamp.UnixMilli()
+}
+
 func (rt *awsCloudWatchRuntime) Call(ctx context.Context, record *models.LogRecord) error {
 	message, err := json.Marshal(record.Fields)
 	if err != nil {
@@ -61,7 +65,7 @@ func (rt *awsCloudWatchRuntime) Call(ctx context.Context, record *models.LogReco
 
 	event := types.InputLogEvent{
 		Message:   new(string(message)),
-		Timestamp: new(record.Timestamp.Unix()),
+		Timestamp: new(awsCloudWatchTimestamp(record)),
 	}
 
 	_, err = rt.client.PutLogEvents(ctx, &cloudwatchlogs.PutLogEventsInput{
