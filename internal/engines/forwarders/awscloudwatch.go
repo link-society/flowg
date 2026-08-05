@@ -61,7 +61,7 @@ func (rt *awsCloudWatchRuntime) Call(ctx context.Context, record *models.LogReco
 
 	event := types.InputLogEvent{
 		Message:   new(string(message)),
-		Timestamp: new(record.Timestamp.Unix()),
+		Timestamp: new(record.Timestamp.UnixMilli()),
 	}
 
 	_, err = rt.client.PutLogEvents(ctx, &cloudwatchlogs.PutLogEventsInput{
