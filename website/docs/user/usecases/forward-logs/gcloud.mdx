@@ -1,0 +1,139 @@
+---
+sidebar_position: 7
+---
+
+# Google Cloud Logging
+
+## Introduction
+
+[Google Cloud Logging](https://cloud.google.com/logging) is the log management
+service of the Google Cloud Platform. FlowG can write its log records to it, so
+they can be explored, alerted on, and exported alongside the rest of your Google
+Cloud telemetry.
+
+## Setting up Google Cloud Logging
+
+FlowG authenticates to the Cloud Logging API with a
+[Service Account](https://cloud.google.com/iam/docs/service-account-overview)
+key, in JSON format.
+
+First, enable the Cloud Logging API on your project:
+
+```bash
+gcloud services enable logging.googleapis.com --project my-project
+```
+
+Then, create a service account for FlowG:
+
+```bash
+gcloud iam service-accounts create flowg \
+  --display-name "FlowG" \
+  --project my-project
+```
+
+Grant it the "Logs Writer" role, which is the only permission needed to write
+log entries:
+
+```bash
+gcloud projects add-iam-policy-binding my-project \
+  --member "serviceAccount:flowg@my-project.iam.gserviceaccount.com" \
+  --role "roles/logging.logWriter"
+```
+
+Finally, create a key for that service account:
+
+```bash
+gcloud iam service-accounts keys create flowg-key.json \
+  --iam-account flowg@my-project.iam.gserviceaccount.com
+```
+
+The `flowg-key.json` file contains the credentials FlowG expects:
+
+```json
+{
+  "type": "service_account",
+  "project_id": "my-project",
+  "private_key_id": "...",
+  "private_key": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",
+  "client_email": "flowg@my-project.iam.gserviceaccount.com",
+  "client_id": "...",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/flowg%40my-project.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
+```
+
+:::note
+
+The same can be done from the
+[Google Cloud Console](https://console.cloud.google.com/iam-admin/serviceaccounts):
+create a service account, grant it the "Logs Writer" role, then in its "Keys"
+tab, choose "Add key" > "Create new key" > "JSON".
+
+:::
+
+## Setting up the FlowG pipeline
+
+import ForwarderGcloudUrl from '@site/static/img/guides/gcloud/forwarder-gcloud.png'
+import PipelineWithGcloudUrl from '@site/static/img/guides/gcloud/pipeline-with-gcloud.png'
+
+First, let's create a "Google Cloud Logging Forwarder" named `gcloud`, with the
+following configuration:
+
+| Property | Value | Comment |
+| --- | --- | --- |
+| Endpoint host | `logging.googleapis.com` | The Cloud Logging API endpoint |
+| Endpoint port | `443` | The default port of the Cloud Logging API |
+| Project ID | N/A | The ID of your Google Cloud project |
+| Log ID | `flowg` | The name of the log the records are written to, it is created on the first write |
+| Allow Insecure Connection | unchecked | Disables TLS, only useful when targeting a local emulator |
+| Disable Authentication | unchecked | Only useful when targeting a local emulator |
+| Auth JSON | N/A | The content of the `flowg-key.json` file created earlier |
+
+<div
+  style={{
+    textAlign: 'center',
+    border: '1px solid #CCCCCC',
+    margin: '2rem 0',
+    padding: '0.25rem',
+  }}
+>
+  <img src={ForwarderGcloudUrl} alt="Google Cloud Logging Forwarder Configuration" />
+</div>
+
+Then, create a pipeline that forwards logs received via Syslog to the `gcloud`
+forwarder:
+
+<div style={{ textAlign: 'center' }}>
+  <img src={PipelineWithGcloudUrl} alt="Pipeline with Google Cloud Logging Forwarder" />
+</div>
+
+And that's it!
+
+## Testing
+
+import GcloudLogsExplorerUrl from '@site/static/img/guides/gcloud/gcloud-logs-explorer.png'
+
+You can test the setup by sending a log to the pipeline using the `logger`
+command:
+
+```bash
+logger -n localhost -P 5514 -t myapp1 'hello world'
+```
+
+You can then find your logs in the
+[Logs Explorer](https://console.cloud.google.com/logs/query), using the
+following query:
+
+```
+logName="projects/my-project/logs/flowg"
+```
+
+<div style={{ textAlign: 'center' }} class="with-zoom">
+  <img src={GcloudLogsExplorerUrl} alt="FlowG logs in Google Cloud Logging" />
+</div>
+
+The fields of the log record are sent as the `jsonPayload` of the entry, and the
+timestamp of the record is used as the timestamp of the entry.
