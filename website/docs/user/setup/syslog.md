@@ -28,11 +28,15 @@ Configure the default log-driver in `/etc/docker/daemon.json`:
 }
 ```
 
-> **NB:** Changing the default logging driver or logging driver options in the
-> daemon configuration only affects containers that are created after the
-> configuration is changed. Existing containers retain the logging driver
-> options that were used when they were created. To update the logging driver
-> for a container, the container has to be re-created with the desired options.
+:::note
+
+Changing the default logging driver or logging driver options in the
+daemon configuration only affects containers that are created after the
+configuration is changed. Existing containers retain the logging driver
+options that were used when they were created. To update the logging driver
+for a container, the container has to be re-created with the desired options.
+
+:::
 
 ### Using syslog-ng
 

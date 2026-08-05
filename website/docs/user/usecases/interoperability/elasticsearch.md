@@ -13,7 +13,11 @@ The compatibility API is available under the follwing endpoint:
 
 ## Configure the ElasticSearch client
 
-> **NB:** Adapt the username/password and URL according to your setup.
+:::note
+
+Adapt the username/password and URL according to your setup.
+
+:::
 
 In Go:
 
@@ -70,7 +74,11 @@ https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-indices-ex
 HEAD /api/v1/middlewares/elastic/{index}
 ```
 
-> **NB:** The name of the index maps to the name of a FlowG pipeline
+:::note
+
+The name of the index maps to the name of a FlowG pipeline
+
+:::
 
 | Response | When |
 | --- | --- |
@@ -115,7 +123,11 @@ POST /api/v1/middlewares/elastic/{index}/_doc
 }
 ```
 
-> **NB:** The name of the index maps to the name of a FlowG pipeline
+:::note
+
+The name of the index maps to the name of a FlowG pipeline
+
+:::
 
 | Response | When |
 | --- | --- |
@@ -125,7 +137,11 @@ POST /api/v1/middlewares/elastic/{index}/_doc
 | `200 0K` | The document (in the request body) was successfully processed through the pipeline |
 | `500 Internal Server Error` | An error occured in FlowG |
 
-> **NB:** Since FlowG's datamodel is flat, the document will be flattenned first:
+:::note
+
+Since FlowG's datamodel is flat, the document will be flattenned first:
+
+:::
 
 ```json
 {

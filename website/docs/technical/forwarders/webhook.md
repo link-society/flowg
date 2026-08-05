@@ -28,10 +28,12 @@ erDiagram
   Configuration ||--o{ HttpHeader : has
 ```
 
-*Notes: *
+:::note
 
 1. This field is "dynamic", consult
    [this page](/docs/technical/dynamic-fields) for more information.
+
+:::
 
 ## Behavior
 

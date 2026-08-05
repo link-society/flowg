@@ -23,12 +23,14 @@ erDiagram
   }
 ```
 
-*Notes:*
+:::note
 
 1. The key is **NOT** encrypted in the database.
 2. Those fields are "dynamic", consult
    [this page](/docs/technical/dynamic-fields) for more information.
 3. For more information about Datadog parameters visit [this page](https://docs.datadoghq.com/api/latest/logs/#send-logs)
+
+:::
 
 ## Behavior
 

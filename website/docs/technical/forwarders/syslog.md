@@ -22,10 +22,12 @@ erDiagram
   }
 ```
 
-*Notes:*
+:::note
 
 1. Those fields are "dynamic", consult
 [this page](/docs/technical/dynamic-fields) for more information.
+
+:::
 
 ## Behavior
 

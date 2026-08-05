@@ -9,8 +9,12 @@ would require root privileges, which is not necessarily a good idea.
 
 Using a Reverse Proxy solves that issue, **FlowG** can still run on port `5080`.
 
-> **NB:** By default, the Management interface listens on port `9113`. It is not
-> recommended to expose it publicly.
+:::note
+
+By default, the Management interface listens on port `9113`. It is not
+recommended to expose it publicly.
+
+:::
 
 ## Using Apache2
 

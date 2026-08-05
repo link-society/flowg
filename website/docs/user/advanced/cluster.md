@@ -13,13 +13,17 @@ distributed key/value store. Every **FlowG** node then becomes stateless and
 reads/writes the same shared FoundationDB cluster, so any node can ingest and
 query logs.
 
-> **NB:** All nodes in the cluster **must** share the same `FLOWG_SECRET_KEY`.
-> This key is used to sign the JSON Web Tokens handed out on login. If the nodes
-> use different keys, a token issued by one node will be rejected by the others.
+:::note
+All nodes in the cluster **must** share the same `FLOWG_SECRET_KEY`. This key
+is used to sign the JSON Web Tokens handed out on login. If the nodes use
+different keys, a token issued by one node will be rejected by the others.
+:::
 
-> **NB:** **FlowG** is built against the FoundationDB **7.3** client library
-> (bundled in the release archives and in the Docker image). Make sure your
-> FoundationDB **server** uses a compatible **7.3.x** version.
+:::note
+**FlowG** is built against the FoundationDB **7.3** client library (bundled in
+the release archives and in the Docker image). Make sure your FoundationDB
+**server** uses a compatible **7.3.x** version.
+:::
 
 ## Without Docker
 
@@ -82,9 +86,13 @@ storage {
 }
 ```
 
-> **NB:** The `key_space` is optional and defaults to `flowg`. It lets multiple
-> **FlowG** clusters share the same FoundationDB cluster without interfering
-> with each other.
+:::note
+
+The `key_space` is optional and defaults to `flowg`. It lets multiple
+**FlowG** clusters share the same FoundationDB cluster without interfering
+with each other.
+
+:::
 
 ### 4. Start each node
 
@@ -212,9 +220,13 @@ docker compose up
 
 The three nodes are now available on ports `5080`, `5081` and `5082`.
 
-> **NB:** The `configure new single ssd` command creates a **single-node**
-> database with no redundancy, which is only suitable for testing. For a
-> production cluster, deploy multiple FoundationDB processes and use a redundant
-> mode such as `double` or `triple`. See the
-> [FoundationDB documentation](https://apple.github.io/foundationdb/configuration.html)
-> for details.
+:::note
+
+The `configure new single ssd` command creates a **single-node**
+database with no redundancy, which is only suitable for testing. For a
+production cluster, deploy multiple FoundationDB processes and use a redundant
+mode such as `double` or `triple`. See the
+[FoundationDB documentation](https://apple.github.io/foundationdb/configuration.html)
+for details.
+
+:::

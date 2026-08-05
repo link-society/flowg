@@ -14,8 +14,12 @@ In this tutorial, we will setup FlowG as a logging driver for:
  - specific Docker containers using Docker Compose
  - all Docker containers by configuring the Docker Daemon
 
-> **NB:** We will assume that FlowG is running on localhost with the Syslog
-> endpoint listening on `UDP:5514`. You can tune the configuration as you need.
+:::note
+
+We will assume that FlowG is running on localhost with the Syslog
+endpoint listening on `UDP:5514`. You can tune the configuration as you need.
+
+:::
 
 ## Setting up a Docker container
 
@@ -81,5 +85,9 @@ Then restart the Docker Daemon:
 sudo systemctl restart docker
 ```
 
-> **NB:** You will need to recreate your containers for the new logging driver
-> to take effect.
+:::note
+
+You will need to recreate your containers for the new logging driver
+to take effect.
+
+:::

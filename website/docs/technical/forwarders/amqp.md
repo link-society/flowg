@@ -21,11 +21,13 @@ erDiagram
   }
 ```
 
-*Notes:*
+:::note
 
 1. The token is **NOT** encrypted in the database.
 2. These fields are "dynamic", consult
    [this page](/docs/technical/dynamic-fields) for more information.
+
+:::
 
 ## Behavior
 
