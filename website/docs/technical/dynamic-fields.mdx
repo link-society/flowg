@@ -16,8 +16,12 @@ with `@expr:`, the rest of the string is treated as an expression to be
 evaluated for each log record. Otherwise, the string is treated as a static
 value.
 
-> **NB:** Not all fields are dynamic, consult the documentation of each
-> forwarder to know which fields support dynamic values.
+:::note
+
+Not all fields are dynamic, consult the documentation of each forwarder to know
+which fields support dynamic values.
+
+:::
 
 ## Edition mode
 
@@ -62,7 +66,9 @@ In expression mode, the user can enter an expression in the
 each log record processed by the forwarder, and the result will be used as the
 value of the field.
 
-> **NB:** The expression must evaluate to a string.
+:::note
+The expression must evaluate to a string.
+:::
 
 Under the hood, the value is sent to the API as a string prefixed with `@expr:`:
 

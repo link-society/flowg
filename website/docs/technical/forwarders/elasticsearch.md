@@ -7,8 +7,6 @@ sidebar_position: 7
 This forwarder is used to persist a log record in an
 [ElasticSearch](https://www.elastic.co/elasticsearch) index.
 
-> **NB:** If the target index does not exist, it will be created.
-
 ## Data Model
 
 ```mermaid
@@ -24,9 +22,12 @@ erDiagram
   }
 ```
 
-*Notes:*
+:::note
 
 1. The password is **NOT** encrypted in the database.
+2. If the target index does not exist, it will be created.
+
+:::
 
 ## Behavior
 

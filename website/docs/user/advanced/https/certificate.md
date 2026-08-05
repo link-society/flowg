@@ -11,8 +11,12 @@ your use case.
 In this guide, we will assume you are exposing **FlowG** via the
 `logs.example.com` hostname.
 
-> **NB:** If using Caddy as a reverse proxy, this step can be skipped as it
-> supports automatic ACME challenges.
+:::note
+
+If using Caddy as a reverse proxy, this step can be skipped as it
+supports automatic ACME challenges.
+
+:::
 
 ## Using a self-signed certificate
 
@@ -26,7 +30,11 @@ First, generate a private key:
 openssl genpkey -algorithm RSA -out server.key -aes256
 ```
 
-> **NB:** If you don't want to use a passphrase, omit the `-aes256` flag
+:::note
+
+If you don't want to use a passphrase, omit the `-aes256` flag
+
+:::
 
 Then, in a configuration file named `openssl.cnf`:
 
@@ -48,7 +56,11 @@ emailAddress = admin@logs.example.com
 [ v3_req ]
 ```
 
-> **NB:** Modify the fields to your convenience.
+:::note
+
+Modify the fields to your convenience.
+
+:::
 
 Finally, generate the certificate:
 
@@ -164,5 +176,9 @@ flowg:
 # ...
 ```
 
-> **NB:** The Helm Chart will not deploy an `Issuer` or `ClusterIssuer`
-> resource, it must exist prior to the Helm Chart's deployment.
+:::note
+
+The Helm Chart will not deploy an `Issuer` or `ClusterIssuer`
+resource, it must exist prior to the Helm Chart's deployment.
+
+:::
