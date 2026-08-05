@@ -17,3 +17,4 @@
  - [@HadiDawoud](https://github.com/HadiDawoud)
  - [@BlackPool25](https://github.com/BlackPool25)
  - [@devnoct](https://github.com/devnoct)
+ - [@nightcityblade](https://github.com/nightcityblade)
