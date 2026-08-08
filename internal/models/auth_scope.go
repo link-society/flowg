@@ -21,6 +21,8 @@ const (
 	SCOPE_SEND_LOGS                  Scope = "send_logs"
 	SCOPE_READ_SYSTEM_CONFIGURATION  Scope = "read_system_configuration"
 	SCOPE_WRITE_SYSTEM_CONFIGURATION Scope = "write_system_configuration"
+	SCOPE_READ_AUTH_PROVIDERS        Scope = "read_auth_providers"
+	SCOPE_WRITE_AUTH_PROVIDERS       Scope = "write_auth_providers"
 )
 
 // ParseScope converts a wire string into a Scope, returning an error for unknown
@@ -53,6 +55,10 @@ func ParseScope(s string) (Scope, error) {
 		return SCOPE_READ_SYSTEM_CONFIGURATION, nil
 	case "write_system_configuration":
 		return SCOPE_WRITE_SYSTEM_CONFIGURATION, nil
+	case "read_auth_providers":
+		return SCOPE_READ_AUTH_PROVIDERS, nil
+	case "write_auth_providers":
+		return SCOPE_WRITE_AUTH_PROVIDERS, nil
 	default:
 		return "", fmt.Errorf("invalid scope: %s", s)
 	}
@@ -74,5 +80,7 @@ func (s Scope) Enum() []any {
 		SCOPE_SEND_LOGS,
 		SCOPE_READ_SYSTEM_CONFIGURATION,
 		SCOPE_WRITE_SYSTEM_CONFIGURATION,
+		SCOPE_READ_AUTH_PROVIDERS,
+		SCOPE_WRITE_AUTH_PROVIDERS,
 	}
 }
