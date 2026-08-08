@@ -18,6 +18,9 @@ type PermissionsModel = {
 
   can_read_system_configuration: boolean
   can_write_system_configuration: boolean
+
+  can_read_auth_providers: boolean
+  can_write_auth_providers: boolean
 }
 
 export default PermissionsModel
