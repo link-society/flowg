@@ -12,6 +12,8 @@ export const ScopeLabels = {
   send_logs: 'Send Logs',
   read_system_configuration: 'View System Configuration',
   write_system_configuration: 'View & Edit System Configuration',
+  read_auth_providers: 'View Auth Providers',
+  write_auth_providers: 'View & Edit Auth Providers',
 }
 
 export const Scopes = Object.keys(ScopeLabels)
