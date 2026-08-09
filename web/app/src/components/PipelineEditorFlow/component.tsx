@@ -13,8 +13,8 @@ import { useTranslation } from 'react-i18next'
 import Typography from '@mui/material/Typography'
 
 import AccountTreeIcon from '@mui/icons-material/AccountTree'
-import DeviceHubIcon from '@mui/icons-material/DeviceHub'
 import BarChartIcon from '@mui/icons-material/BarChart'
+import DeviceHubIcon from '@mui/icons-material/DeviceHub'
 
 import {
   Background,
@@ -39,11 +39,11 @@ import { PipelineTrace } from '@/lib/models/PipelineTrace.ts'
 
 import PipelineEditorHooksProvider from '@/components/PipelineEditorHooksProvider/component'
 import PipelineNodeForwarder from '@/components/PipelineNodeForwarder/component'
+import PipelineNodeMetric from '@/components/PipelineNodeMetric/component'
 import PipelineNodePipeline from '@/components/PipelineNodePipeline/component'
 import PipelineNodeRouter from '@/components/PipelineNodeRouter/component'
 import PipelineNodeSource from '@/components/PipelineNodeSource/component'
 import PipelineNodeSwitch from '@/components/PipelineNodeSwitch/component'
-import PipelineNodeMetric from '@/components/PipelineNodeMetric/component'
 import PipelineNodeTransformer from '@/components/PipelineNodeTransformer/component'
 
 import { getLayoutedNodes } from './layout'
@@ -52,8 +52,8 @@ import {
   FlowPanelLabel,
   FlowPanelPaper,
   FlowRoot,
-  SwitchNodeChip,
   MetricNodeChip,
+  SwitchNodeChip,
 } from './styles'
 
 type ShortcutMap = {
