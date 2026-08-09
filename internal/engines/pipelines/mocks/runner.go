@@ -3,6 +3,8 @@ package mocks
 import (
 	"context"
 
+	"io"
+
 	"github.com/stretchr/testify/mock"
 
 	"link-society.com/flowg/internal/engines/pipelines"
@@ -23,6 +25,11 @@ func NewMockRunner() pipelines.Runner {
 
 func (m *MockRunner) Run(ctx context.Context, pipelineName string, entrypoint string, record *models.LogRecord) error {
 	args := m.Called(ctx, pipelineName, entrypoint, record)
+	return args.Error(0)
+}
+
+func (m *MockRunner) ScrapMetrics(ctx context.Context, pipelineName string, w io.Writer) error {
+	args := m.Called(ctx, pipelineName, w)
 	return args.Error(0)
 }
 

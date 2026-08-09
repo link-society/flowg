@@ -3,6 +3,8 @@ package pipelines
 import (
 	"context"
 
+	"io"
+
 	"github.com/vladopajic/go-actor/actor"
 	"go.uber.org/fx"
 
@@ -20,6 +22,8 @@ type Runner interface {
 	// Run pushes a record through pipelineName, starting at entrypoint (e.g.
 	// "direct" or "syslog"), and blocks until processing completes.
 	Run(ctx context.Context, pipelineName string, entrypoint string, record *models.LogRecord) error
+	// ScrapMetrics forwards a request to scrap metrics from a pipeline.
+	ScrapMetrics(ctx context.Context, pipelineName string, w io.Writer) error
 	// InvalidateCachedBuild drops the compiled build of a single pipeline so the
 	// next Run rebuilds it from storage; call it after the pipeline changes.
 	InvalidateCachedBuild(ctx context.Context, pipelineName string) error
@@ -112,6 +116,26 @@ func (r *runnerImpl) Run(
 		entrypoint:   entrypoint,
 		record:       record,
 		tracer:       GetTracer(ctx),
+	})
+	if err != nil {
+		return err
+	}
+
+	return <-replyTo
+}
+
+// ScrapMetrics sends a request to the actor to scrap metrics from a pipeline.
+func (r *runnerImpl) ScrapMetrics(
+	ctx context.Context,
+	pipelineName string,
+	w io.Writer,
+) error {
+	replyTo := make(chan error)
+
+	err := r.mbox.Send(ctx, scrapMetricsMessage{
+		replyTo:      replyTo,
+		pipelineName: pipelineName,
+		w:            w,
 	})
 	if err != nil {
 		return err

@@ -4,6 +4,10 @@ import (
 	"context"
 	"errors"
 
+	"io"
+
+	"github.com/prometheus/common/expfmt"
+
 	"link-society.com/flowg/internal/models"
 )
 
@@ -32,6 +36,14 @@ type logMessage struct {
 	entrypoint   string
 	record       *models.LogRecord
 	tracer       *NodeTracer
+}
+
+// scrapMetricsMessage forwards a request to scrap metrics from a pipeline.
+type scrapMetricsMessage struct {
+	replyTo chan<- error
+
+	pipelineName string
+	w            io.Writer
 }
 
 // invalidateCacheMessage requests eviction of a single pipeline's cached build.
@@ -86,6 +98,41 @@ func (msg logMessage) handle(ctx context.Context, w *worker) {
 		}
 
 		msg.replyTo <- err
+	}()
+}
+
+func (msg scrapMetricsMessage) handle(ctx context.Context, w *worker) {
+	go func() {
+		var pipeline *Pipeline
+		var err error
+		defer close(msg.replyTo)
+
+		pipeline, err = w.getOrBuildPipeline(ctx, msg.pipelineName)
+		if err != nil {
+			msg.replyTo <- err
+			return
+		}
+		if pipeline == nil {
+			msg.replyTo <- &PipelineNotFoundError{Pipeline: msg.pipelineName}
+			return
+		}
+
+		families, err := pipeline.Metrics.Gather()
+		if err != nil {
+			msg.replyTo <- err
+			return
+		}
+
+		encoder := expfmt.NewEncoder(msg.w, expfmt.NewFormat(expfmt.TypeTextPlain))
+
+		for _, family := range families {
+			if err := encoder.Encode(family); err != nil {
+				msg.replyTo <- err
+				return
+			}
+		}
+
+		msg.replyTo <- nil
 	}()
 }
 
