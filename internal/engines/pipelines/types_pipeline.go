@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"link-society.com/flowg/internal/app/metrics"
 
 	"link-society.com/flowg/internal/engines/forwarders"
@@ -19,6 +20,9 @@ type Pipeline struct {
 	Name        string
 	Entrypoints map[string]Node
 	nodes       map[string]Node
+
+	Metrics   *prometheus.Registry
+	TotalLogs prometheus.Counter
 }
 
 // BuildFromStorage loads the persisted flow graph for name and compiles it into
@@ -86,6 +90,21 @@ func BuildFlow(ctx context.Context, configStorage storage.ConfigStorage, name st
 			pipelineNode := &SwitchNode{
 				ID:        flowNode.ID,
 				Condition: condition,
+			}
+			pipelineNodes[flowNode.ID] = pipelineNode
+
+		case "metric":
+			metricName, exists := flowNode.Data["name"]
+			if !exists {
+				return nil, &MissingFlowNodeDataError{
+					NodeID: flowNode.ID,
+					Key:    "name",
+				}
+			}
+
+			pipelineNode := &MetricNode{
+				ID:         flowNode.ID,
+				MetricName: metricName,
 			}
 			pipelineNodes[flowNode.ID] = pipelineNode
 
@@ -203,6 +222,18 @@ func BuildFlow(ctx context.Context, configStorage storage.ConfigStorage, name st
 func (p *Pipeline) Init(ctx context.Context) error {
 	var errs []error
 
+	ctx = context.WithValue(ctx, pipelineKey, p)
+
+	p.Metrics = prometheus.NewRegistry()
+	p.TotalLogs = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: "pipeline",
+		Name:      "logs_total",
+		Help:      "Total number of logs processed by the pipeline since startup",
+	})
+	if err := p.Metrics.Register(p.TotalLogs); err != nil {
+		return fmt.Errorf("failed to register TotalLogs metric: %w", err)
+	}
+
 	for _, node := range p.nodes {
 		if err := node.Init(ctx); err != nil {
 			errs = append(errs, err)
@@ -220,11 +251,17 @@ func (p *Pipeline) Init(ctx context.Context) error {
 func (p *Pipeline) Close(ctx context.Context) error {
 	var errs []error
 
+	ctx = context.WithValue(ctx, pipelineKey, p)
+
 	for _, node := range p.nodes {
 		if err := node.Close(ctx); err != nil {
 			errs = append(errs, err)
 		}
 	}
+
+	p.Metrics.Unregister(p.TotalLogs)
+	p.Metrics = nil
+	p.TotalLogs = nil
 
 	if len(errs) > 0 {
 		return errors.Join(errs...)
@@ -240,12 +277,16 @@ func (p *Pipeline) Process(
 	entrypoint string,
 	record *models.LogRecord,
 ) error {
+	ctx = context.WithValue(ctx, pipelineKey, p)
+
 	rootNode, exists := p.Entrypoints[entrypoint]
 	if !exists {
 		return &InvalidEntrypointError{Entrypoint: entrypoint}
 	}
 
 	err := rootNode.Process(ctx, record)
+	p.TotalLogs.Inc()
 	metrics.IncPipelineLogCounter(p.Name, err == nil)
+
 	return err
 }
