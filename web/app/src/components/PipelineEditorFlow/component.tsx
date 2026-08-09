@@ -14,6 +14,7 @@ import Typography from '@mui/material/Typography'
 
 import AccountTreeIcon from '@mui/icons-material/AccountTree'
 import DeviceHubIcon from '@mui/icons-material/DeviceHub'
+import BarChartIcon from '@mui/icons-material/BarChart'
 
 import {
   Background,
@@ -42,6 +43,7 @@ import PipelineNodePipeline from '@/components/PipelineNodePipeline/component'
 import PipelineNodeRouter from '@/components/PipelineNodeRouter/component'
 import PipelineNodeSource from '@/components/PipelineNodeSource/component'
 import PipelineNodeSwitch from '@/components/PipelineNodeSwitch/component'
+import PipelineNodeMetric from '@/components/PipelineNodeMetric/component'
 import PipelineNodeTransformer from '@/components/PipelineNodeTransformer/component'
 
 import { getLayoutedNodes } from './layout'
@@ -51,6 +53,7 @@ import {
   FlowPanelPaper,
   FlowRoot,
   SwitchNodeChip,
+  MetricNodeChip,
 } from './styles'
 
 type ShortcutMap = {
@@ -91,6 +94,7 @@ export const PipelineEditorFlow: React.FC<PipelineEditorFlowProps> = ({
       pipeline: PipelineNodePipeline,
       forwarder: PipelineNodeForwarder,
       router: PipelineNodeRouter,
+      metric: PipelineNodeMetric,
     }),
     []
   )
@@ -187,6 +191,7 @@ export const PipelineEditorFlow: React.FC<PipelineEditorFlowProps> = ({
         forwarder: 'forwarder',
         pipeline: 'pipeline',
         switch: 'switch',
+        metric: 'metric',
       }
       const itemType = event.dataTransfer.getData(
         'item-type'
@@ -278,6 +283,17 @@ export const PipelineEditorFlow: React.FC<PipelineEditorFlowProps> = ({
                   draggable
                   onDragStart={(evt) => {
                     evt.dataTransfer.setData('item-type', 'switch')
+                    evt.dataTransfer.effectAllowed = 'move'
+                  }}
+                />
+
+                <MetricNodeChip
+                  icon={<BarChartIcon />}
+                  label={t('components.pipelineEditorFlow.metricNodeLabel')}
+                  variant="outlined"
+                  draggable
+                  onDragStart={(evt) => {
+                    evt.dataTransfer.setData('item-type', 'metric')
                     evt.dataTransfer.effectAllowed = 'move'
                   }}
                 />

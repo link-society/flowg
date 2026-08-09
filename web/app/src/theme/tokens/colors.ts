@@ -31,11 +31,17 @@ export type ColorsType = {
   switchChipBg: string
   switchChipBorder: string
 
+  // Metric node chip
+  metricChipBg: string
+  metricChipBorder: string
+
   // Pipeline nodes (bg = header band, border = node outline)
   nodeRouterBg: string
   nodeRouterBorder: string
   nodeSwitchBg: string
   nodeSwitchBorder: string
+  nodeMetricBg: string
+  nodeMetricBorder: string
   nodePipelineBg: string
   nodePipelineBorder: string
   nodeTransformerBg: string
@@ -79,11 +85,17 @@ export const lightColors: ColorsType = {
   switchChipBg: '#ffebee',
   switchChipBorder: '#f44336',
 
+  // Metric node chip
+  metricChipBg: '#e0f2f1',
+  metricChipBorder: '#009688',
+
   // Pipeline nodes
   nodeRouterBg: '#7e22ce',
   nodeRouterBorder: '#581c87',
   nodeSwitchBg: '#dc2626',
   nodeSwitchBorder: '#b91c1c',
+  nodeMetricBg: '#0a3c36',
+  nodeMetricBorder: '#004d40',
   nodePipelineBg: '#eab308',
   nodePipelineBorder: '#ca8a04',
   nodeTransformerBg: '#1d4ed8',
@@ -127,11 +139,17 @@ export const darkColors: ColorsType = {
   switchChipBg: '#450a0a',
   switchChipBorder: '#dc2626',
 
+  // Metric node chip
+  metricChipBg: '#0a3c36',
+  metricChipBorder: '#009688',
+
   // Pipeline nodes
   nodeRouterBg: '#7e22ce',
   nodeRouterBorder: '#a855f7',
   nodeSwitchBg: '#dc2626',
   nodeSwitchBorder: '#f87171',
+  nodeMetricBg: '#0a3c36',
+  nodeMetricBorder: '#009688',
   nodePipelineBg: '#ca8a04',
   nodePipelineBorder: '#fde047',
   nodeTransformerBg: '#1d4ed8',
