@@ -1,0 +1,49 @@
+---
+sidebar_position: 3
+---
+
+# Metric
+
+A metric node is used to count log records that goes through it. It exports a
+new `COUNTER` metric in the pipeline's Prometheus Exporter
+
+## Example
+
+import NodeMetricSyslogUrl from '@site/static/img/guides/pipelines/node-metric-syslog.png'
+
+<div
+  style={{
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'start',
+    justifyContent: 'center',
+    gap: '2rem',
+  }}
+>
+  <div
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}
+  >
+    <div>
+      ```json
+      {
+        "timestamp": "...",
+        "fields": {
+          "tag": "myapp",
+          "content": "hello world"
+        }
+      }
+      ```
+    </div>
+    <div style={{ fontSize: '4rem' }}>
+      &dArr;
+    </div>
+    <div>
+      <img src={NodeMetricSyslogUrl} alt="Switch node" />
+    </div>
+  </div>
+</div>
