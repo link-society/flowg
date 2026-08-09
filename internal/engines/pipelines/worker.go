@@ -58,6 +58,9 @@ func (w *worker) getOrBuildPipeline(ctx context.Context, pipelineName string) (*
 	if err != nil {
 		return nil, err
 	}
+	if pipeline == nil {
+		return nil, nil
+	}
 
 	if err := pipeline.Init(ctx); err != nil {
 		_ = pipeline.Close(ctx)

@@ -54,7 +54,11 @@ func NewGetForwarderUsecase(deps GetForwarderDeps) usecase.Interactor {
 					)
 
 					resp.Success = false
-					return status.Wrap(err, status.NotFound)
+					return status.Wrap(err, status.Internal)
+				}
+				if forwarder == nil {
+					resp.Success = false
+					return status.NotFound
 				}
 
 				resp.Success = true
@@ -70,7 +74,7 @@ func NewGetForwarderUsecase(deps GetForwarderDeps) usecase.Interactor {
 	u.SetDescription("Get forwarder")
 	u.SetTags("forwarders")
 
-	u.SetExpectedErrors(status.PermissionDenied, status.NotFound)
+	u.SetExpectedErrors(status.PermissionDenied, status.NotFound, status.Internal)
 
 	return u
 }

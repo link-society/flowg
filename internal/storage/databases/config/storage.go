@@ -100,6 +100,9 @@ func (s *Storage[QTx, MTx]) ReadPipeline(ctx context.Context, name string) (*mod
 	if err != nil {
 		return nil, err
 	}
+	if content == nil {
+		return nil, nil
+	}
 
 	flowGraph, changed, err := models.ConvertFlowGraph(content)
 	if err != nil {
@@ -146,6 +149,9 @@ func (s *Storage[QTx, MTx]) ReadForwarder(ctx context.Context, name string) (*mo
 	content, err := s.readItem(ctx, forwarderItemType, name)
 	if err != nil {
 		return nil, err
+	}
+	if content == nil {
+		return nil, nil
 	}
 
 	webhook, changed, err := models.ConvertForwarder(content)

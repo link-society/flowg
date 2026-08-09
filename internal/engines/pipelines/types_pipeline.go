@@ -28,6 +28,9 @@ func BuildFromStorage(ctx context.Context, configStorage storage.ConfigStorage, 
 	if err != nil {
 		return nil, err
 	}
+	if flowGraph == nil {
+		return nil, nil
+	}
 
 	return BuildFlow(ctx, configStorage, name, flowGraph)
 }
@@ -113,6 +116,9 @@ func BuildFlow(ctx context.Context, configStorage storage.ConfigStorage, name st
 			forwarder, err := configStorage.ReadForwarder(ctx, forwarderName)
 			if err != nil {
 				return nil, err
+			}
+			if forwarder == nil {
+				return nil, fmt.Errorf("forwarder %q not found", forwarderName)
 			}
 
 			runtime, err := forwarders.NewRuntime(forwarder)

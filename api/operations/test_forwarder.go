@@ -57,7 +57,11 @@ func NewTestForwarderUsecase(deps TestForwarderDeps) usecase.Interactor {
 					)
 
 					resp.Success = false
-					return status.Wrap(err, status.NotFound)
+					return status.Wrap(err, status.Internal)
+				}
+				if forwarder == nil {
+					resp.Success = false
+					return status.NotFound
 				}
 
 				runtime, err := forwarders.NewRuntime(forwarder)
