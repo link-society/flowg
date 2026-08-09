@@ -486,6 +486,9 @@ msgstr "Write system configuration"
 msgid "components.pipelineEditorFlow.autoLayout"
 msgstr "Auto layout"
 
+msgid "components.pipelineEditorFlow.metricNodeLabel"
+msgstr "metric"
+
 msgid "components.pipelineEditorFlow.otherNodes"
 msgstr "Other Nodes:"
 
@@ -506,6 +509,9 @@ msgstr "Transformers"
 
 msgid "components.pipelineNodeForwarder.label"
 msgstr "Forwarder"
+
+msgid "components.pipelineNodeMetric.label"
+msgstr "Name"
 
 msgid "components.pipelineNodePipeline.label"
 msgstr "Pipeline"

@@ -45,3 +45,12 @@ export const SwitchNodeChip = styled(Chip)(({ theme }) => ({
   fontFamily: 'monospace',
   '&:hover': { boxShadow: theme.shadows[4] },
 }))
+
+export const MetricNodeChip = styled(Chip)(({ theme }) => ({
+  backgroundColor: theme.tokens.colors.metricChipBg,
+  borderColor: theme.tokens.colors.metricChipBorder,
+  borderRadius: 0,
+  boxShadow: theme.shadows[1],
+  fontFamily: 'monospace',
+  '&:hover': { boxShadow: theme.shadows[4] },
+}))
