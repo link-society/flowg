@@ -138,14 +138,24 @@ async function renderApiRequest({ url, method = "GET", body = null, apiKey }) {
 async function updateService({ apiKey, serviceId, imageName }) {
   console.log(`⬆️ Update Render Service image to: ${imageName}`);
 
+  const service = await renderApiRequest({
+    url: renderBuildServiceUrl(serviceId),
+    apiKey,
+  });
+
+  const image = {
+    imagePath: imageName,
+    ownerId: service.ownerId,
+  };
+
+  if (service.registryCredential?.id) {
+    image.registryCredentialId = service.registryCredential.id;
+  }
+
   await renderApiRequest({
     url: renderBuildServiceUrl(serviceId),
     method: "PATCH",
-    body: {
-      image: {
-        name: imageName,
-      },
-    },
+    body: { image },
     apiKey,
   });
 }
