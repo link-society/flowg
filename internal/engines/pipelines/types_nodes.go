@@ -3,9 +3,13 @@ package pipelines
 import (
 	"context"
 	"errors"
+
+	"fmt"
 	"strings"
+
 	"sync"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"link-society.com/flowg/internal/app/metrics"
 
 	"link-society.com/flowg/internal/models"
@@ -75,12 +79,21 @@ type RouterNode struct {
 	Stream string
 }
 
+// MetricNode counts all records that pass through it
+type MetricNode struct {
+	ID         string
+	MetricName string
+
+	counter prometheus.Counter
+}
+
 var _ Node = (*SourceNode)(nil)
 var _ Node = (*TransformNode)(nil)
 var _ Node = (*SwitchNode)(nil)
 var _ Node = (*PipelineNode)(nil)
 var _ Node = (*ForwardNode)(nil)
 var _ Node = (*RouterNode)(nil)
+var _ Node = (*MetricNode)(nil)
 
 // sendRecordToNextNodes processes a record through every successor concurrently
 // and joins their errors.
@@ -282,4 +295,37 @@ func (n *RouterNode) Process(ctx context.Context, record *models.LogRecord) erro
 	}
 
 	return err
+}
+
+// MARK: metric
+func (n *MetricNode) Init(ctx context.Context) error {
+	pipeline := getPipeline(ctx)
+
+	n.counter = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: "node",
+		Name:      n.MetricName,
+		Help:      "Number of logs measured since startup",
+	})
+
+	if err := pipeline.Metrics.Register(n.counter); err != nil {
+		return fmt.Errorf("failed to register metric %s: %w", n.MetricName, err)
+	}
+
+	return nil
+}
+
+func (n *MetricNode) Close(ctx context.Context) error {
+	pipeline := getPipeline(ctx)
+	pipeline.Metrics.Unregister(n.counter)
+	return nil
+}
+
+func (n *MetricNode) Process(ctx context.Context, record *models.LogRecord) error {
+	traceNode(ctx, n.ID, nil, record.Fields, nil)
+	if isDryRun(ctx) {
+		return nil
+	}
+
+	n.counter.Inc()
+	return nil
 }
