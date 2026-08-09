@@ -2,6 +2,7 @@ package operations
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 
 	"net/http"
@@ -60,6 +61,11 @@ func NewIngestLogsStructUsecase(deps IngestLogsStructDeps) usecase.Interactor {
 						record,
 					)
 					if err != nil {
+						if errors.Is(err, &pipelines.PipelineNotFoundError{}) {
+							resp.Success = false
+							return status.Wrap(err, status.NotFound)
+						}
+
 						logger.DebugContext(
 							ctx,
 							"Failed to process log entry",
@@ -91,7 +97,7 @@ func NewIngestLogsStructUsecase(deps IngestLogsStructDeps) usecase.Interactor {
 	u.SetDescription("Run structured logs through a pipeline")
 	u.SetTags("pipelines")
 
-	u.SetExpectedErrors(status.PermissionDenied, status.Internal)
+	u.SetExpectedErrors(status.PermissionDenied, status.NotFound, status.Internal)
 
 	return u
 }

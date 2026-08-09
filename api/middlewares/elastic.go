@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"errors"
 	"log/slog"
 
 	"encoding/base64"
@@ -239,6 +240,11 @@ func NewElasticHandler(deps ElasticDeps) http.Handler {
 				record,
 			)
 			if err != nil {
+				if errors.Is(err, &pipelines.PipelineNotFoundError{}) {
+					http.Error(w, err.Error(), http.StatusNotFound)
+					return
+				}
+
 				logger.ErrorContext(
 					r.Context(),
 					"Failed to process log entry",

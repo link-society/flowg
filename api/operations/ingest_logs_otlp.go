@@ -2,6 +2,7 @@ package operations
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 
 	"net/http"
@@ -64,6 +65,11 @@ func NewIngestLogsOTLPUsecase(deps IngestLogsOTLPDeps) usecase.Interactor {
 						logRecord,
 					)
 					if err != nil {
+						if errors.Is(err, &pipelines.PipelineNotFoundError{}) {
+							resp.Success = false
+							return status.Wrap(err, status.NotFound)
+						}
+
 						logger.DebugContext(
 							ctx,
 							"Failed to process log entry",
@@ -95,7 +101,7 @@ func NewIngestLogsOTLPUsecase(deps IngestLogsOTLPDeps) usecase.Interactor {
 	u.SetDescription("Run OpenTelemetry logs through a pipeline")
 	u.SetTags("pipelines")
 
-	u.SetExpectedErrors(status.PermissionDenied, status.Internal)
+	u.SetExpectedErrors(status.PermissionDenied, status.NotFound, status.Internal)
 
 	return u
 }

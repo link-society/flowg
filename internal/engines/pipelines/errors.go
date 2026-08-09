@@ -43,3 +43,13 @@ var _ error = (*InvalidEntrypointError)(nil)
 func (e *InvalidEntrypointError) Error() string {
 	return fmt.Sprintf("invalid entrypoint: %s", e.Entrypoint)
 }
+
+type PipelineNotFoundError struct {
+	Pipeline string
+}
+
+var _ error = (*PipelineNotFoundError)(nil)
+
+func (e *PipelineNotFoundError) Error() string {
+	return fmt.Sprintf("pipeline not found: %s", e.Pipeline)
+}

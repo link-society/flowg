@@ -2,6 +2,7 @@ package operations
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"time"
 
@@ -79,6 +80,11 @@ func NewIngestLogsTextUsecase(deps IngestLogsTextDeps) usecase.Interactor {
 						record,
 					)
 					if err != nil {
+						if errors.Is(err, &pipelines.PipelineNotFoundError{}) {
+							resp.Success = false
+							return status.Wrap(err, status.NotFound)
+						}
+
 						logger.DebugContext(
 							ctx,
 							"Failed to process log entry",
@@ -110,7 +116,7 @@ func NewIngestLogsTextUsecase(deps IngestLogsTextDeps) usecase.Interactor {
 	u.SetDescription("Run textual logs through a pipeline")
 	u.SetTags("pipelines")
 
-	u.SetExpectedErrors(status.PermissionDenied, status.Internal)
+	u.SetExpectedErrors(status.PermissionDenied, status.NotFound, status.Internal)
 
 	return u
 }

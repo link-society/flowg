@@ -68,6 +68,10 @@ func (msg logMessage) handle(ctx context.Context, w *worker) {
 			}
 		} else {
 			pipeline, err = w.getOrBuildPipeline(ctx, msg.pipelineName)
+			if pipeline == nil {
+				msg.replyTo <- &PipelineNotFoundError{Pipeline: msg.pipelineName}
+				return
+			}
 		}
 
 		if err != nil {
