@@ -26,29 +26,22 @@ rabbitmqadmin --vhost flowg declare exchange \
 
 ## Setting up the FlowG pipeline
 
-import ForwarderAmqpUrl from '@site/static/img/guides/rabbitmq/forwarder-amqp.png'
+import ForwarderForm from '@site/src/components/ForwarderForm'
 import PipelineDiagram from '@site/src/components/PipelineDiagram'
 
 
 First, let's create an "AMQP Forwarder" named `rabbitmq`, with the following
 configuration:
 
-| Property | Value | Comment |
-| --- | --- | --- |
-| URL | `amqp://user:password@1.2.3.4:5672/flowg` | Adjust the URL according to your setup, the path correspond to the Virtual Host in which we created the exchange above |
-| Exchange | `flowg.default` | This is the exchange we created above |
-| Routing Key | `a.b.c` | You can use any value you want actually |
-
-<div
-  style={{
-    textAlign: 'center',
-    border: '1px solid #CCCCCC',
-    margin: '2rem 0',
-    padding: '0.25rem',
-  }}
->
-  <img src={ForwarderAmqpUrl} alt="AMQP Forwarder Configuration" />
-</div>
+<ForwarderForm
+  forwarderType="AMQP"
+  fields={[
+    { label: 'URL', value: 'amqp://user:password@1.2.3.4:5672/flowg', tooltip: 'Adjust the URL to your setup. The path corresponds to the Virtual Host where the exchange was created.' },
+    { type: 'divider' },
+    { label: 'Exchange', value: 'flowg.default', tooltip: 'The exchange created earlier.' },
+    { label: 'Routing Key', value: 'a.b.c', tooltip: 'You can use any value you want.' },
+  ]}
+/>
 
 Then, create a pipeline that forwards logs to the `rabbitmq` forwarder:
 

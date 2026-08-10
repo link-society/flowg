@@ -23,24 +23,24 @@ docker run \
 ```
 
 ## Setting up the FlowG pipeline
-import ForwarderClickhouseUrl from '@site/static/img/guides/clickhouse/forwader-clickhouse-form.png'
+import ForwarderForm from '@site/src/components/ForwarderForm'
 import PipelineDiagram from '@site/src/components/PipelineDiagram'
 
 First, let's create a "Clickhouse Forwarder" named `clickhouse`, with the
 following configuration:
 
-| Property                      | Value            | Comment                                                          |
-| ---                           | ---              | ---                                                              |
-| Clickhouse connection address | `localhost:9000` | The Clickhouse client endpoint                                   |
-| Database name                 | `default`        | The default database created in the container                    |
-| Table name                    | `default`        | The table name to use for the logs                               |
-| Database username             | `user`           | The name of the user specified in the command                    |
-| Database password             | `pass`           | The password of the user specified in the command                |
-| Use TLS                       | unchecked        | The container doesn't set up TLS, so, for testing, we disable it |
-
-<div style={{ textAlign: 'center' }}>
-  <img src={ForwarderClickhouseUrl} alt="Clickhouse Forwarder Configuration" />
-</div>
+<ForwarderForm
+  forwarderType="Clickhouse"
+  fields={[
+    { label: 'Clickhouse Connection Address', value: 'localhost:9000', tooltip: 'The Clickhouse client endpoint.' },
+    { label: 'Database Name', value: 'default', tooltip: 'The default database created in the container.' },
+    { label: 'Table Name', value: 'default', tooltip: 'The table name to use for the logs.' },
+    { label: 'Database Username', value: 'user', tooltip: 'The name of the user specified in the command.' },
+    { type: 'password', label: 'Database Password', tooltip: 'The password of the user specified in the command.' },
+    { type: 'divider' },
+    { type: 'checkbox', label: 'Use TLS', checked: false, tooltip: "The container doesn't set up TLS, so for testing we disable it." },
+  ]}
+/>
 
 Then, create a pipeline that forwards logs to the `clickhouse` forwarder:
 

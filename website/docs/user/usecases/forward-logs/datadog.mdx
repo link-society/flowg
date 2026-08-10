@@ -41,27 +41,20 @@ All you need is to create an API Key in your Datadog account:
 
 ## Setting up the FlowG pipeline
 
-import ForwarderDatadogUrl from '@site/static/img/guides/datadog/forwarder-datadog.png'
+import ForwarderForm from '@site/src/components/ForwarderForm'
 import PipelineDiagram from '@site/src/components/PipelineDiagram'
 
 First, let's create a "Datadog Forwarder" named `dd`, with the following
 configuration:
 
-| Property | Value | Comment |
-| --- | --- | --- |
-| URL | `https://http-intake.logs.datadoghq.com/api/v2/logs` | This is the endpoint to send logs to |
-| API Key | N/A | This is an API Key you created earlier |
-
-<div
-  style={{
-    textAlign: 'center',
-    border: '1px solid #CCCCCC',
-    margin: '2rem 0',
-    padding: '0.25rem',
-  }}
->
-  <img src={ForwarderDatadogUrl} alt="Datadog Forwarder Configuration" />
-</div>
+<ForwarderForm
+  forwarderType="Datadog"
+  fields={[
+    { label: 'URL', value: 'https://http-intake.logs.datadoghq.com/api/v2/logs', tooltip: 'The HTTP intake endpoint. Must match your Datadog region.' },
+    { type: 'divider' },
+    { type: 'password', label: 'ApiKey', tooltip: 'An API Key created in your Datadog account.' },
+  ]}
+/>
 
 
 > :warning: **Important Notice**

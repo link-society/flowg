@@ -20,10 +20,15 @@ http://localhost:4318/v1/logs
 
 First, let's create an "OpenTelemetry Forwarder" named `otlp`, with the following configuration:
 
-| Property | Value | Comment |
-| --- | --- | --- |
-| Endpoint | `http://localhost:4318/v1/logs` | The OTLP HTTP endpoint for logs |
-| Headers | `{}` | Optional headers to send with the request |
+import ForwarderForm from '@site/src/components/ForwarderForm'
+
+<ForwarderForm
+  forwarderType="OpenTelemetry"
+  fields={[
+    { label: 'Endpoint', value: 'http://localhost:4318/v1/logs', tooltip: 'The OTLP HTTP endpoint for logs.' },
+    { type: 'keyvalue', keyLabel: 'Header Name', valueLabel: 'Header Value', pairs: [], tooltip: 'Optional HTTP headers to send with every request.' },
+  ]}
+/>
 
 Then, create a pipeline that forwards logs to the `otlp` forwarder:
 

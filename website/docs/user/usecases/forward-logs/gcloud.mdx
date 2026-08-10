@@ -76,32 +76,26 @@ tab, choose "Add key" > "Create new key" > "JSON".
 
 ## Setting up the FlowG pipeline
 
-import ForwarderGcloudUrl from '@site/static/img/guides/gcloud/forwarder-gcloud.png'
+import ForwarderForm from '@site/src/components/ForwarderForm'
 import PipelineDiagram from '@site/src/components/PipelineDiagram'
 
 First, let's create a "Google Cloud Logging Forwarder" named `gcloud`, with the
 following configuration:
 
-| Property | Value | Comment |
-| --- | --- | --- |
-| Endpoint host | `logging.googleapis.com` | The Cloud Logging API endpoint |
-| Endpoint port | `443` | The default port of the Cloud Logging API |
-| Project ID | N/A | The ID of your Google Cloud project |
-| Log ID | `flowg` | The name of the log the records are written to, it is created on the first write |
-| Allow Insecure Connection | unchecked | Disables TLS, only useful when targeting a local emulator |
-| Disable Authentication | unchecked | Only useful when targeting a local emulator |
-| Auth JSON | N/A | The content of the `flowg-key.json` file created earlier |
-
-<div
-  style={{
-    textAlign: 'center',
-    border: '1px solid #CCCCCC',
-    margin: '2rem 0',
-    padding: '0.25rem',
-  }}
->
-  <img src={ForwarderGcloudUrl} alt="Google Cloud Logging Forwarder Configuration" />
-</div>
+<ForwarderForm
+  forwarderType="Google Cloud Logging"
+  fields={[
+    { label: 'Endpoint host', value: 'logging.googleapis.com', tooltip: 'The Cloud Logging API endpoint.' },
+    { label: 'Endpoint port', type: 'number', value: 443, tooltip: 'The default port of the Cloud Logging API.' },
+    { label: 'Project ID', value: 'my-project', tooltip: 'The ID of your Google Cloud project.' },
+    { label: 'Log ID', value: 'flowg', tooltip: 'The name of the log the records are written to. Created on the first write.' },
+    { type: 'divider' },
+    { type: 'checkbox', label: 'Allow Insecure Connection', checked: false, tooltip: 'Disables TLS. Only useful when targeting a local emulator.' },
+    { type: 'checkbox', label: 'Disable Authentication', checked: false, tooltip: 'Only useful when targeting a local emulator.' },
+    { type: 'divider' },
+    { type: 'textarea', label: 'Auth JSON', value: '{\n  "type": "service_account",\n  ...\n}', tooltip: 'The content of the flowg-key.json file created earlier.' },
+  ]}
+/>
 
 Then, create a pipeline that forwards logs received via Syslog to the `gcloud`
 forwarder:

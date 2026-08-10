@@ -55,23 +55,24 @@ docker exec elasticsearch cat ./config/certs/http_ca.crt
 
 ## Setting up the FlowG pipeline
 
-import ForwarderElasticUrl from '@site/static/img/guides/elk/forwarder-elastic.png'
+import ForwarderForm from '@site/src/components/ForwarderForm'
 import PipelineDiagram from '@site/src/components/PipelineDiagram'
 
 First, let's create an "Elastic Forwarder" named `es`, with the following
 configuration:
 
-| Property | Value | Comment |
-| --- | --- | --- |
-| Index | `default` | In which ElasticSearch index we will be writing logs |
-| Addresses | `https://localhost:9200` | URLs pointing to your ElasticSearch cluster |
-| Username | `flowg` | The name of the user we just created |
-| Password | `...` | The password of the user we just created |
-| CA Certificate | `...` | Used to validate the ElasticSearch server certificate |
-
-<div style={{ textAlign: 'center' }}>
-  <img src={ForwarderElasticUrl} alt="ElasticSearch Forwarder Configuration" />
-</div>
+<ForwarderForm
+  forwarderType="Elastic Search"
+  fields={[
+    { label: 'Index', value: 'default', tooltip: 'The ElasticSearch index logs will be written to.' },
+    { label: 'Username', value: 'flowg', tooltip: 'The name of the user we just created.' },
+    { type: 'password', label: 'Password', tooltip: 'The password of the user we just created.' },
+    { type: 'divider' },
+    { label: 'Address', value: 'https://localhost:9200', tooltip: 'URLs pointing to your ElasticSearch cluster.' },
+    { type: 'divider' },
+    { type: 'textarea', label: 'CA Certificate', value: '-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----', tooltip: 'Used to validate the ElasticSearch server certificate.' },
+  ]}
+/>
 
 Then, create a pipeline that forwards logs to the `es` forwarder:
 

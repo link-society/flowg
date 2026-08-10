@@ -78,24 +78,23 @@ With the following credentials: `elastic` / `changeme`.
 
 ## Setting up the FlowG pipeline
 
-import ForwarderElkUrl from '@site/static/img/guides/elk/forwarder-elk.png'
+import ForwarderForm from '@site/src/components/ForwarderForm'
 import PipelineDiagram from '@site/src/components/PipelineDiagram'
 
 First, let's create a "Syslog Forwarder" named `elk`, with the following
 configuration:
 
-| Property | Value | Comment |
-| --- | --- | --- |
-| Network | `TCP` | UDP works as well, Logstash starts a listener for each protocol |
-| Server Address | `127.0.0.1:50000` | Assuming your FlowG is running on the same host as the ELK stack we started above |
-| Tag | (static) `flowg` | You can use any static value or expression you want actually |
-| Severity | (static) `INFO` | You can use any static value or expression you want |
-| Facility | (static) `LOCAL0` | You can use any static value or expression you want |
-| Message | (expression) `toJSON(log)` | The output must be a JSON because of how we configured Logstash |
-
-<div style={{ textAlign: 'center' }}>
-  <img src={ForwarderElkUrl} alt="ELK Forwarder Configuration" />
-</div>
+<ForwarderForm
+  forwarderType="Syslog Server"
+  fields={[
+    { label: 'Network', value: 'TCP', tooltip: 'UDP works as well; Logstash starts a listener for each protocol.' },
+    { label: 'Server Address', value: '127.0.0.1:50000', tooltip: 'Assuming your FlowG is running on the same host as the ELK stack.' },
+    { type: 'dynamic', label: 'Tag', value: 'flowg', tooltip: 'You can use any static value or expression.' },
+    { type: 'dynamic', label: 'Severity', value: 'INFO', tooltip: 'You can use any static value or expression.' },
+    { type: 'dynamic', label: 'Facility', value: 'LOCAL0', tooltip: 'You can use any static value or expression.' },
+    { type: 'dynamic', label: 'Message', value: '@expr:toJSON(log)', tooltip: 'The output must be a JSON because of how we configured Logstash.' },
+  ]}
+/>
 
 Then, create a pipeline that forwards logs to the `elk` forwarder:
 
