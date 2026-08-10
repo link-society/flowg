@@ -24,7 +24,7 @@ docker run \
 
 ## Setting up the FlowG pipeline
 import ForwarderClickhouseUrl from '@site/static/img/guides/clickhouse/forwader-clickhouse-form.png'
-import PipelineWithClickhouseUrl from '@site/static/img/guides/clickhouse/pipeline-with-clickhouse.png'
+import PipelineDiagram from '@site/src/components/PipelineDiagram'
 
 First, let's create a "Clickhouse Forwarder" named `clickhouse`, with the
 following configuration:
@@ -44,9 +44,16 @@ following configuration:
 
 Then, create a pipeline that forwards logs to the `clickhouse` forwarder:
 
-<div style={{ textAlign: 'center' }}>
-  <img src={PipelineWithClickhouseUrl} alt="Pipeline with Clickhouse Forwarder" />
-</div>
+<PipelineDiagram
+  alt="A FlowG pipeline routing syslog logs to the Clickhouse forwarder"
+  nodes={[
+    { id: 'source', type: 'source', x: 0, y: 0, value: 'SYSLOG' },
+    { id: 'fwd', type: 'forwarder', x: 340, y: 0, value: 'clickhouse' },
+  ]}
+  edges={[
+    { from: 'source', to: 'fwd' },
+  ]}
+/>
 
 And that's it!
 

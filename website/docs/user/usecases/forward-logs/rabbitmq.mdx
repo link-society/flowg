@@ -27,7 +27,7 @@ rabbitmqadmin --vhost flowg declare exchange \
 ## Setting up the FlowG pipeline
 
 import ForwarderAmqpUrl from '@site/static/img/guides/rabbitmq/forwarder-amqp.png'
-import PipelineWithAmqpUrl from '@site/static/img/guides/rabbitmq/pipeline-with-amqp.png'
+import PipelineDiagram from '@site/src/components/PipelineDiagram'
 
 
 First, let's create an "AMQP Forwarder" named `rabbitmq`, with the following
@@ -52,9 +52,16 @@ configuration:
 
 Then, create a pipeline that forwards logs to the `rabbitmq` forwarder:
 
-<div style={{ textAlign: 'center' }}>
-  <img src={PipelineWithAmqpUrl} alt="Pipeline with AMQP Forwarder" />
-</div>
+<PipelineDiagram
+  alt="A FlowG pipeline routing syslog logs to the RabbitMQ forwarder"
+  nodes={[
+    { id: 'source', type: 'source', x: 0, y: 0, value: 'SYSLOG' },
+    { id: 'fwd', type: 'forwarder', x: 340, y: 0, value: 'rabbitmq' },
+  ]}
+  edges={[
+    { from: 'source', to: 'fwd' },
+  ]}
+/>
 
 And that's it!
 

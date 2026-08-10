@@ -77,7 +77,7 @@ tab, choose "Add key" > "Create new key" > "JSON".
 ## Setting up the FlowG pipeline
 
 import ForwarderGcloudUrl from '@site/static/img/guides/gcloud/forwarder-gcloud.png'
-import PipelineWithGcloudUrl from '@site/static/img/guides/gcloud/pipeline-with-gcloud.png'
+import PipelineDiagram from '@site/src/components/PipelineDiagram'
 
 First, let's create a "Google Cloud Logging Forwarder" named `gcloud`, with the
 following configuration:
@@ -106,9 +106,16 @@ following configuration:
 Then, create a pipeline that forwards logs received via Syslog to the `gcloud`
 forwarder:
 
-<div style={{ textAlign: 'center' }}>
-  <img src={PipelineWithGcloudUrl} alt="Pipeline with Google Cloud Logging Forwarder" />
-</div>
+<PipelineDiagram
+  alt="A FlowG pipeline routing syslog logs to the Google Cloud Logging forwarder"
+  nodes={[
+    { id: 'source', type: 'source', x: 0, y: 0, value: 'SYSLOG' },
+    { id: 'fwd', type: 'forwarder', x: 340, y: 0, value: 'gcloud' },
+  ]}
+  edges={[
+    { from: 'source', to: 'fwd' },
+  ]}
+/>
 
 And that's it!
 

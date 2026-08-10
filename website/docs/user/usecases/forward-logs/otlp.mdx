@@ -25,7 +25,20 @@ First, let's create an "OpenTelemetry Forwarder" named `otlp`, with the followin
 | Endpoint | `http://localhost:4318/v1/logs` | The OTLP HTTP endpoint for logs |
 | Headers | `{}` | Optional headers to send with the request |
 
-Then, create a pipeline that forwards logs to the `otlp` forwarder.
+Then, create a pipeline that forwards logs to the `otlp` forwarder:
+
+import PipelineDiagram from '@site/src/components/PipelineDiagram'
+
+<PipelineDiagram
+  alt="A FlowG pipeline routing syslog logs to the OpenTelemetry forwarder"
+  nodes={[
+    { id: 'source', type: 'source', x: 0, y: 0, value: 'SYSLOG' },
+    { id: 'fwd', type: 'forwarder', x: 340, y: 0, value: 'otlp' },
+  ]}
+  edges={[
+    { from: 'source', to: 'fwd' },
+  ]}
+/>
 
 And that's it!
 

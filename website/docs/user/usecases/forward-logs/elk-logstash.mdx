@@ -79,7 +79,7 @@ With the following credentials: `elastic` / `changeme`.
 ## Setting up the FlowG pipeline
 
 import ForwarderElkUrl from '@site/static/img/guides/elk/forwarder-elk.png'
-import PipelineWithElkUrl from '@site/static/img/guides/elk/pipeline-with-elk.png'
+import PipelineDiagram from '@site/src/components/PipelineDiagram'
 
 First, let's create a "Syslog Forwarder" named `elk`, with the following
 configuration:
@@ -99,9 +99,16 @@ configuration:
 
 Then, create a pipeline that forwards logs to the `elk` forwarder:
 
-<div style={{ textAlign: 'center' }}>
-  <img src={PipelineWithElkUrl} alt="Pipeline with ELK Forwarder" />
-</div>
+<PipelineDiagram
+  alt="A FlowG pipeline routing syslog logs to the ELK forwarder"
+  nodes={[
+    { id: 'source', type: 'source', x: 0, y: 0, value: 'SYSLOG' },
+    { id: 'fwd', type: 'forwarder', x: 340, y: 0, value: 'elk' },
+  ]}
+  edges={[
+    { from: 'source', to: 'fwd' },
+  ]}
+/>
 
 And that's it!
 

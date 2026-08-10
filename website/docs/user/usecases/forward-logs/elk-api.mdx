@@ -56,7 +56,7 @@ docker exec elasticsearch cat ./config/certs/http_ca.crt
 ## Setting up the FlowG pipeline
 
 import ForwarderElasticUrl from '@site/static/img/guides/elk/forwarder-elastic.png'
-import PipelineWithElasticUrl from '@site/static/img/guides/elk/pipeline-with-elastic.png'
+import PipelineDiagram from '@site/src/components/PipelineDiagram'
 
 First, let's create an "Elastic Forwarder" named `es`, with the following
 configuration:
@@ -75,9 +75,16 @@ configuration:
 
 Then, create a pipeline that forwards logs to the `es` forwarder:
 
-<div style={{ textAlign: 'center' }}>
-  <img src={PipelineWithElasticUrl} alt="Pipeline with Elastic Forwarder" />
-</div>
+<PipelineDiagram
+  alt="A FlowG pipeline routing syslog logs to the ElasticSearch forwarder"
+  nodes={[
+    { id: 'source', type: 'source', x: 0, y: 0, value: 'SYSLOG' },
+    { id: 'fwd', type: 'forwarder', x: 340, y: 0, value: 'es' },
+  ]}
+  edges={[
+    { from: 'source', to: 'fwd' },
+  ]}
+/>
 
 And that's it!
 
