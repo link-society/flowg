@@ -9,11 +9,19 @@
   --flowg-canvas-dot: #91919a;
   --flowg-edge: #b1b1b7;
 
+  position: relative;
   width: 100%;
   margin-block: 1.5rem;
   overflow: hidden;
   border: 1px solid var(--ifm-color-emphasis-300);
   border-radius: 8px;
+  background-color: var(--flowg-canvas-bg);
+  background-image: radial-gradient(
+    circle,
+    var(--flowg-canvas-dot) 1px,
+    transparent 1px
+  );
+  background-size: 20px 20px;
 }
 
 [data-theme='dark'] .container {
@@ -27,15 +35,8 @@
 }
 
 .canvas {
-  position: relative;
+  position: absolute;
   transform-origin: top left;
-  background-color: var(--flowg-canvas-bg);
-  background-image: radial-gradient(
-    circle,
-    var(--flowg-canvas-dot) 1px,
-    transparent 1px
-  );
-  background-size: 20px 20px;
 }
 
 .edges {

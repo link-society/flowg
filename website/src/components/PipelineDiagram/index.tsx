@@ -185,12 +185,21 @@ export default function PipelineDiagram({
   alt,
 }: PipelineDiagramProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const [scale, setScale] = useState(1)
+  const [containerWidth, setContainerWidth] = useState(0)
 
   const width =
     Math.max(...nodes.map((node) => node.x)) + NODE_WIDTH + padding * 2
   const height =
     Math.max(...nodes.map((node) => node.y)) + NODE_HEIGHT + padding * 2
+
+  // Fit the canvas within the container width; never upscale.
+  const scale = containerWidth > 0 ? Math.min(1, containerWidth / width) : 1
+  // Center the scaled canvas within the container (avoids the flex overflow-clipping bug).
+  const canvasLeft = containerWidth > 0 ? (containerWidth - width * scale) / 2 : 0
+  const canvasTop =
+    containerWidth > 0
+      ? ((containerWidth * height) / width - height * scale) / 2
+      : 0
 
   useEffect(() => {
     const container = containerRef.current
@@ -199,7 +208,7 @@ export default function PipelineDiagram({
     }
 
     const observer = new ResizeObserver(([entry]) => {
-      setScale(Math.min(1, entry.contentRect.width / width))
+      setContainerWidth(entry.contentRect.width)
     })
     observer.observe(container)
     return () => observer.disconnect()
@@ -217,7 +226,7 @@ export default function PipelineDiagram({
     >
       <div
         className={styles.canvas}
-        style={{ width, height, transform: `scale(${scale})` }}
+        style={{ width, height, left: canvasLeft, top: canvasTop, transform: `scale(${scale})` }}
       >
         <svg className={styles.edges} width={width} height={height}>
           {edges.map(({ from, to }) => {
