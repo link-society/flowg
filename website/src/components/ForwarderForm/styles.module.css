@@ -1,0 +1,330 @@
+/* Mimics the FlowG forwarder configuration form (MUI outlined text fields). */
+
+.form {
+  --form-bg: #fff;
+  --form-border: var(--ifm-color-emphasis-300);
+  --field-outline: rgba(0, 0, 0, 0.23);
+  --field-label: rgba(0, 0, 0, 0.6);
+  --field-value: rgba(0, 0, 0, 0.87);
+  --field-disabled-bg: rgba(0, 0, 0, 0.04);
+  --field-disabled-value: rgba(0, 0, 0, 0.38);
+  --field-divider: rgba(0, 0, 0, 0.12);
+  --checkbox-accent: #1565c0;
+
+  background-color: var(--form-bg);
+  border: 1px solid var(--form-border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-block: 1.5rem;
+}
+
+[data-theme='dark'] .form {
+  --form-bg: #27324e;
+  --field-outline: rgba(255, 255, 255, 0.23);
+  --field-label: rgba(255, 255, 255, 0.7);
+  --field-value: #fff;
+  --field-disabled-bg: rgba(255, 255, 255, 0.06);
+  --field-disabled-value: rgba(255, 255, 255, 0.38);
+  --field-divider: rgba(255, 255, 255, 0.12);
+  --checkbox-accent: #3b82f6;
+}
+
+/* ── Field row (bordered field + optional outside tooltip) ──────────────────── */
+
+.fieldRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fieldRow > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Outlined field ─────────────────────────────────────────────────────────── */
+
+.field {
+  position: relative;
+  border: 1px solid var(--field-outline);
+  border-radius: 4px;
+  padding: 10px 14px;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+}
+
+.fieldDisabled {
+  background-color: var(--field-disabled-bg);
+}
+
+.label {
+  position: absolute;
+  top: -9px;
+  left: 8px;
+  font-size: 0.75rem;
+  line-height: 1;
+  color: var(--field-label);
+  background-color: var(--form-bg);
+  padding: 0 4px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.value {
+  font-size: 1rem;
+  color: var(--field-value);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.valueDisabled {
+  color: var(--field-disabled-value);
+}
+
+.valueTextarea {
+  align-items: flex-start;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* ── Type indicator icon ───────────────────────────────────────────────────── */
+
+.typeIcon {
+  flex-shrink: 0;
+  opacity: 0.54;
+}
+
+/* ── Dynamic field (mode toggle + vertical separator + value) ──────────────── */
+
+.dynamicField {
+  align-items: stretch;
+  padding: 0;
+}
+
+.dynamicMode {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  color: var(--field-label);
+  flex-shrink: 0;
+}
+
+.dynamicSeparator {
+  width: 1px;
+  background-color: var(--field-outline);
+  flex-shrink: 0;
+  margin: 8px 0;
+}
+
+.dynamicValue {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  font-size: 1rem;
+  color: var(--field-value);
+  font-family: var(--ifm-font-family-monospace);
+}
+
+/* ── Tooltip (? badge + hover popup) ──────────────────────────────────────── */
+
+.tooltip {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.tooltipIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--field-label);
+  color: var(--form-bg);
+  font-size: 10px;
+  font-weight: 700;
+  cursor: help;
+  line-height: 1;
+  user-select: none;
+}
+
+.tooltipPopup {
+  display: none;
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  width: 240px;
+  padding: 8px 10px;
+  /* dark surface regardless of page theme for contrast */
+  background: #1e1e2e;
+  color: #e2e8f0;
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  z-index: 100;
+  pointer-events: none;
+  white-space: normal;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.tooltip:hover .tooltipPopup,
+.tooltip:focus-within .tooltipPopup {
+  display: block;
+}
+
+/* ── Divider ────────────────────────────────────────────────────────────────── */
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--field-divider);
+  margin: 0;
+}
+/* ── Key-value field (mirrors InputKeyValue) ─────────────────────────────────── */
+
+.kvRow {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.kvCell {
+  position: relative;
+  flex: 1;
+  border: 1px solid var(--field-outline);
+  border-radius: 4px;
+  padding: 6px 10px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.kvCellLabel {
+  position: absolute;
+  top: -8px;
+  left: 8px;
+  font-size: 0.6875rem;
+  line-height: 1;
+  color: var(--field-label);
+  background: var(--form-bg);
+  padding: 0 3px;
+}
+
+.kvCellValue {
+  font-size: 0.875rem;
+  color: var(--field-value);
+  font-family: var(--ifm-font-family-monospace);
+}
+
+.kvBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  opacity: 0.5;
+}
+
+.kvBtnAdd {
+  background: #1565c0;
+  color: #fff;
+}
+
+.kvBtnDelete {
+  background: #c62828;
+  color: #fff;
+}
+
+/* ── Key-value field (mirrors InputKeyValue) ──────────────────────────────── */
+
+.kvField {
+  flex-direction: column;
+  align-items: stretch;
+  padding: 12px 14px;
+  gap: 8px;
+}
+
+.kvEmpty {
+  font-size: 0.875rem;
+  color: var(--field-label);
+  font-style: italic;
+}
+
+.kvList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.kvRow {
+  display: flex;
+  gap: 8px;
+}
+
+.kvCell {
+  position: relative;
+  flex: 1;
+  border: 1px solid var(--field-outline);
+  border-radius: 4px;
+  padding: 6px 10px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.kvCellLabel {
+  position: absolute;
+  top: -8px;
+  left: 8px;
+  font-size: 0.6875rem;
+  line-height: 1;
+  color: var(--field-label);
+  background: var(--form-bg);
+  padding: 0 3px;
+}
+
+.kvCellValue {
+  font-size: 0.875rem;
+  color: var(--field-value);
+  font-family: var(--ifm-font-family-monospace);
+}
+
+/* ── Checkbox field ─────────────────────────────────────────────────────────── */
+
+.checkboxField {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: default;
+  color: var(--field-value);
+  font-size: 1rem;
+  user-select: none;
+}
+
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 2px;
+  border: 2px solid var(--field-outline);
+  flex-shrink: 0;
+}
+
+.checkboxChecked {
+  background-color: var(--checkbox-accent);
+  border-color: var(--checkbox-accent);
+  color: #fff;
+}
