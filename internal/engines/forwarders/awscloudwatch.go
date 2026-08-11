@@ -6,7 +6,6 @@ import (
 
 	"encoding/json"
 
-	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
@@ -25,25 +24,15 @@ type awsCloudWatchRuntime struct {
 var _ Runtime = (*awsCloudWatchRuntime)(nil)
 
 func (rt *awsCloudWatchRuntime) Init(ctx context.Context) error {
-	cfg, err := config.LoadDefaultConfig(ctx,
-		config.WithCredentialsProvider(
-			credentials.NewStaticCredentialsProvider(
-				rt.config.AccessKeyID,
-				rt.config.SecretAccessKey,
-				rt.config.SessionToken,
-			),
-		),
-	)
-
-	if err != nil {
-		return fmt.Errorf("failed to acquire credentials: %w", err)
-	}
-
 	rt.client = cloudwatchlogs.New(cloudwatchlogs.Options{
 		AppID:        rt.config.AppID,
 		BaseEndpoint: &rt.config.Endpoint,
-		Credentials:  cfg.Credentials,
-		Region:       rt.config.Region,
+		Credentials: credentials.NewStaticCredentialsProvider(
+			rt.config.AccessKeyID,
+			rt.config.SecretAccessKey,
+			rt.config.SessionToken,
+		),
+		Region: rt.config.Region,
 	})
 
 	return nil
