@@ -15,14 +15,15 @@ func ListAuthProviders(txn kv.QueryTx) ([]models.AuthProvider, error) {
 	var providers []models.AuthProvider
 
 	for key := range txn.IterKeys(kv.Key{PROVIDER}, kv.KeyRange{}) {
-		var provider models.AuthProvider
-		err := json.Unmarshal([]byte(key[len(key)-1]), &provider)
-
+		name := key[len(key)-1]
+		provider, err := ReadAuthProvider(txn, name)
 		if err != nil {
-			return nil, fmt.Errorf("failed to unmarshall auth provider: %w", err)
+			return nil, fmt.Errorf("failed to list auth providers: %w", err)
 		}
 
-		providers = append(providers, provider)
+		if provider != nil {
+			providers = append(providers, *provider)
+		}
 	}
 
 	return providers, nil
@@ -37,20 +38,20 @@ func ReadAuthProvider(txn kv.QueryTx, name string) (*models.AuthProvider, error)
 		return nil, fmt.Errorf("failed to find auth provider %q: %w", name, err)
 	}
 
-	var provider *models.AuthProvider
-	err = json.Unmarshal(marshalled, provider)
+	var provider models.AuthProvider
+	err = json.Unmarshal(marshalled, &provider)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshall auth provider %q: %w", name, err)
 	}
 
-	return provider, nil
+	return &provider, nil
 }
 
 // SaveAuthProvider serializes models.AuthProvider and saves it to the database
 func SaveAuthProvider(txn kv.MutationTx, provider models.AuthProvider) error {
 	key := kv.Key{PROVIDER, provider.Name}
 
-	marshalled, err := json.Marshal(provider)
+	marshalled, err := json.Marshal(&provider)
 	if err != nil {
 		return fmt.Errorf("failed to marshall auth provider %q: %w", provider.Name, err)
 	}
