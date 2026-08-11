@@ -1,0 +1,143 @@
+---
+sidebar_position: 8
+---
+
+# AWS CloudWatch
+
+## Introduction
+
+[Amazon CloudWatch Logs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html)
+centralizes the logs of your AWS resources. FlowG can send its log records to a
+CloudWatch log stream, so they can be queried with Logs Insights, or used to
+trigger metric filters and alarms.
+
+## Setting up CloudWatch Logs
+
+FlowG writes to an existing log stream, it does not create it. Create the log
+group and the log stream first:
+
+```bash
+aws logs create-log-group --log-group-name flowg
+
+aws logs create-log-stream \
+  --log-group-name flowg \
+  --log-stream-name logs
+```
+
+Then, create an IAM user for FlowG:
+
+```bash
+aws iam create-user --user-name flowg
+```
+
+Attach a policy allowing it to write to that stream:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["logs:PutLogEvents"],
+      "Resource": "arn:aws:logs:eu-west-3:123456789012:log-group:flowg:log-stream:logs"
+    }
+  ]
+}
+```
+
+```bash
+aws iam put-user-policy \
+  --user-name flowg \
+  --policy-name flowg-cloudwatch-logs \
+  --policy-document file://flowg-cloudwatch-logs.json
+```
+
+:::note
+
+- Change `eu-west-3` to your region if different.
+- Replace `123456789012` with your AWS account ID.
+
+:::
+
+Finally, create an access key for that user:
+
+```bash
+aws iam create-access-key --user-name flowg
+```
+
+The command returns the `AccessKeyId` and the `SecretAccessKey` that FlowG will
+use to authenticate.
+
+:::note
+
+The secret access key is only displayed once, at creation time.
+
+:::
+
+## Setting up the FlowG pipeline
+
+First, let's create an "AWS CloudWatch Forwarder" named `cloudwatch`, with the
+following configuration:
+
+<ForwarderForm
+  forwarderType="AWS Cloudwatch"
+  fields={[
+    { label: 'App ID', value: 'flowg', tooltip: 'Identifier appended to the User-Agent of the AWS SDK.' },
+    { label: 'AWS endpoint', value: 'https://logs.eu-west-3.amazonaws.com', tooltip: 'The CloudWatch Logs endpoint of your region.' },
+    { label: 'Region', value: 'eu-west-3', tooltip: 'Adjust according to your setup.' },
+    { type: 'divider' },
+    { label: 'Access key ID', value: '...', tooltip: 'The access key you created earlier.' },
+    { type: 'password', label: 'Secret access key', tooltip: 'The secret of the access key you created earlier.' },
+    { label: 'Session token', value: '', tooltip: 'Only needed when using temporary credentials.' },
+    { type: 'divider' },
+    { label: 'Group', value: 'flowg', tooltip: 'The log group created earlier.' },
+    { label: 'Stream', value: 'logs', tooltip: 'The log stream created earlier.' },
+  ]}
+/>
+
+import ForwarderForm from '@site/src/components/ForwarderForm'
+import PipelineDiagram from '@site/src/components/PipelineDiagram'
+
+Then, create a pipeline that forwards logs received via Syslog to the
+`cloudwatch` forwarder:
+
+<PipelineDiagram
+  alt="A FlowG pipeline routing syslog logs to the AWS CloudWatch forwarder"
+  nodes={[
+    { id: 'source', type: 'source', x: 0, y: 0, value: 'SYSLOG' },
+    { id: 'fwd', type: 'forwarder', x: 340, y: 0, value: 'cloudwatch' },
+  ]}
+  edges={[
+    { from: 'source', to: 'fwd' },
+  ]}
+/>
+
+And that's it!
+
+## Testing
+
+You can test the setup by sending a log to the pipeline using the `logger`
+command:
+
+```bash
+logger -n localhost -P 5514 -t myapp1 'hello world'
+```
+
+You can then read the log events back with:
+
+```bash
+aws logs tail flowg --follow
+```
+
+Or find them in the
+[CloudWatch console](https://console.aws.amazon.com/cloudwatch/home#logsV2:log-groups),
+under "Log groups" > `flowg` > `logs`.
+
+import AwsCloudWatchLogsUrl from '@site/static/img/guides/aws/aws-cloudwatch-logs.png'
+
+<div style={{ textAlign: 'center' }} class="with-zoom">
+  <img src={AwsCloudWatchLogsUrl} alt="FlowG logs in the CloudWatch console" />
+</div>
+
+The fields of the log record are sent as a JSON object in the message of the log
+event, and the timestamp of the record is used as the timestamp of the event.
