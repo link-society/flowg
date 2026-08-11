@@ -106,7 +106,7 @@ const ForwarderEditorAwsCloudWatch = ({
         id="input:editor.forwarders.cloudwatch.access_key"
         label={t('components.forwarderEditorAwsCloudWatch.accessKeyLabel')}
         variant="outlined"
-        type="text"
+        type="password"
         error={!access_key.valid}
         value={access_key.value}
         onChange={(e) => {
@@ -118,7 +118,7 @@ const ForwarderEditorAwsCloudWatch = ({
         id="input:editor.forwarders.cloudwatch.token"
         label={t('components.forwarderEditorAwsCloudWatch.tokenLabel')}
         variant="outlined"
-        type="text"
+        type="password"
         error={!token.valid}
         value={token.value}
         onChange={(e) => {
