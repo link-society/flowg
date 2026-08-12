@@ -59,4 +59,14 @@ type AuthStorage interface {
 	// DeleteToken revokes the personal access token identified by tokenUUID for
 	// the named user.
 	DeleteToken(ctx context.Context, username string, tokenUUID string) error
+
+	// ListAuthProviders returns every auth provider known to the store.
+	ListAuthProviders(ctx context.Context) ([]models.AuthProvider, error)
+	// FetchAuthProvider returns the auth provider with the given name, or an
+	// error if it does not exist.
+	FetchAuthProvider(ctx context.Context, name string) (*models.AuthProvider, error)
+	// SaveAuthProvider creates or replaces an auth provider.
+	SaveAuthProvider(ctx context.Context, provider models.AuthProvider) error
+	// DeleteAuthProvider removes the auth provider with the given name.
+	DeleteAuthProvider(ctx context.Context, name string) error
 }
