@@ -111,3 +111,23 @@ func (m *MockAuthStorage) DeleteToken(ctx context.Context, username string, toke
 	args := m.Called(ctx, username, tokenUUID)
 	return args.Error(0)
 }
+
+func (m *MockAuthStorage) ListAuthProviders(ctx context.Context) ([]models.AuthProvider, error) {
+	args := m.Called(ctx)
+	return args.Get(0).([]models.AuthProvider), args.Error(1)
+}
+
+func (m *MockAuthStorage) FetchAuthProvider(ctx context.Context, name string) (*models.AuthProvider, error) {
+	args := m.Called(ctx, name)
+	return args.Get(0).(*models.AuthProvider), args.Error(1)
+}
+
+func (m *MockAuthStorage) SaveAuthProvider(ctx context.Context, provider models.AuthProvider) error {
+	args := m.Called(ctx, provider)
+	return args.Error(0)
+}
+
+func (m *MockAuthStorage) DeleteAuthProvider(ctx context.Context, name string) error {
+	args := m.Called(ctx, name)
+	return args.Error(0)
+}

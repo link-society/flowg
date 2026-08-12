@@ -227,12 +227,12 @@ func (s *Storage[QTx, MTx]) ListAuthProviders(ctx context.Context) ([]models.Aut
 }
 
 // DeleteAuthProvider implements [storage.AuthStorage].
-func (s *Storage[QTx, MTx]) FetchAuthProvider(ctx context.Context, providerType string, name string) (models.AuthProvider, error) {
-	var provider models.AuthProvider
+func (s *Storage[QTx, MTx]) FetchAuthProvider(ctx context.Context, name string) (*models.AuthProvider, error) {
+	var provider *models.AuthProvider
 
 	err := s.adapter.View(ctx, func(txn QTx) error {
 		var err error
-		provider, err = transactions.ReadAuthProvider(txn, providerType, name)
+		provider, err = transactions.ReadAuthProvider(txn, name)
 		return err
 	})
 
@@ -247,8 +247,8 @@ func (s *Storage[QTx, MTx]) SaveAuthProvider(ctx context.Context, provider model
 }
 
 // DeleteAuthProvider implements [storage.AuthStorage].
-func (s *Storage[QTx, MTx]) DeleteAuthProvider(ctx context.Context, providerType string, name string) error {
+func (s *Storage[QTx, MTx]) DeleteAuthProvider(ctx context.Context, name string) error {
 	return s.adapter.Update(ctx, func(txn MTx) error {
-		return transactions.DeleteAuthProvider(txn, providerType, name)
+		return transactions.DeleteAuthProvider(txn, name)
 	})
 }
