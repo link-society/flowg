@@ -65,6 +65,9 @@ func NewRuntime(cfg *models.ForwarderV2) (Runtime, error) {
 	case cfg.Config.AzureMonitor != nil:
 		return &azureMonitorRuntime{config: cfg.Config.AzureMonitor}, nil
 
+	case cfg.Config.JetStrean != nil:
+		return &jetstreamRuntime{config: cfg.Config.JetStrean}, nil
+
 	default:
 		return nil, ErrNotImplemented
 	}
