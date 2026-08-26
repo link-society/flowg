@@ -29,6 +29,7 @@ type ForwarderConfigV2 struct {
 	AwsCloudWatch      *ForwarderAwsCloudWatchV2      `json:"-"`
 	GoogleCloudLogging *ForwarderGoogleCloudLoggingV2 `json:"-"`
 	AzureMonitor       *ForwarderAzureMonitorV2       `json:"-"`
+	JetStream          *ForwarderJetstreamV2          `json:"-"`
 }
 
 // JSONSchemaOneOf advertises every backend variant so the generated OpenAPI
@@ -46,6 +47,7 @@ func (*ForwarderConfigV2) JSONSchemaOneOf() []any {
 		ForwarderAwsCloudWatchV2{},
 		ForwarderGoogleCloudLoggingV2{},
 		ForwarderAzureMonitorV2{},
+		ForwarderJetstreamV2{},
 	}
 }
 
@@ -85,6 +87,9 @@ func (cfg *ForwarderConfigV2) MarshalJSON() ([]byte, error) {
 	case cfg.AzureMonitor != nil:
 		return json.Marshal(&cfg.AzureMonitor)
 
+	case cfg.JetStream != nil:
+		return json.Marshal(&cfg.JetStream)
+
 	default:
 		return nil, fmt.Errorf("unsupported forwarder type")
 	}
@@ -104,6 +109,7 @@ func (cfg *ForwarderConfigV2) UnmarshalJSON(data []byte) error {
 	cfg.AwsCloudWatch = nil
 	cfg.GoogleCloudLogging = nil
 	cfg.AzureMonitor = nil
+	cfg.JetStream = nil
 
 	var typeInfo struct {
 		Type string `json:"type" required:"true"`
@@ -146,6 +152,9 @@ func (cfg *ForwarderConfigV2) UnmarshalJSON(data []byte) error {
 
 	case "azuremonitor":
 		return json.Unmarshal(data, &cfg.AzureMonitor)
+
+	case "jetstream":
+		return json.Unmarshal(data, &cfg.JetStream)
 
 	default:
 		return fmt.Errorf("unsupported forwarder type: %s", typeInfo.Type)
