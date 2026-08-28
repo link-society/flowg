@@ -73,7 +73,7 @@ func NewIngestLogsTextUsecase(deps IngestLogsTextDeps) usecase.Interactor {
 						},
 					}
 
-					err := deps.PipelineRunner.Run(
+					err := deps.PipelineRunner.Process(
 						ctx,
 						req.Pipeline,
 						pipelines.DIRECT_ENTRYPOINT,

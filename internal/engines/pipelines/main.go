@@ -2,6 +2,9 @@ package pipelines
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"sync"
 
 	"io"
 
@@ -19,17 +22,15 @@ import (
 // point of the engine: callers submit a record to a named pipeline and the
 // runner drives it through the pipeline's node graph.
 type Runner interface {
-	// Run pushes a record through pipelineName, starting at entrypoint (e.g.
+	// Run compiles and starts a pipeline
+	Run(ctx context.Context, pipelineName string) error
+	// Terminate stops a running pipeline.
+	Terminate(ctx context.Context, pipelineName string) error
+	// Process pushes a record through pipelineName, starting at entrypoint (e.g.
 	// "direct" or "syslog"), and blocks until processing completes.
-	Run(ctx context.Context, pipelineName string, entrypoint string, record *models.LogRecord) error
+	Process(ctx context.Context, pipelineName string, entrypoint string, record *models.LogRecord) error
 	// ScrapMetrics forwards a request to scrap metrics from a pipeline.
 	ScrapMetrics(ctx context.Context, pipelineName string, w io.Writer) error
-	// InvalidateCachedBuild drops the compiled build of a single pipeline so the
-	// next Run rebuilds it from storage; call it after the pipeline changes.
-	InvalidateCachedBuild(ctx context.Context, pipelineName string) error
-	// InvalidateAllCachedBuilds drops every compiled pipeline, e.g. on shutdown
-	// or after a bulk configuration import.
-	InvalidateAllCachedBuilds(ctx context.Context) error
 }
 
 type runnerImpl struct {
@@ -69,26 +70,52 @@ func NewRunner() fx.Option {
 			return mbox
 		}),
 		fx.Provide(func(lc fx.Lifecycle, d deps, mbox actor.Mailbox[message]) Runner {
-			a := actor.New(&worker{
+			w := &worker{
 				mbox:          mbox,
 				configStorage: d.ConfigStorage,
 				logStorage:    d.LogStorage,
 				logNotifier:   d.LogNotifier,
-				cache:         make(map[string]*Pipeline),
-			})
+
+				cache:   make(map[string]*Pipeline),
+				cacheMu: sync.Mutex{},
+			}
+			a := actor.New(w)
 			runner := &runnerImpl{mbox: mbox}
 
 			lc.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {
 					a.Start()
+
+					pipelines, err := d.ConfigStorage.ListPipelines(ctx)
+					if err != nil {
+						return fmt.Errorf("failed to start pipelines: %w", err)
+					}
+
+					var errs []error
+					for _, pipelineName := range pipelines {
+						if err := runner.Run(ctx, pipelineName); err != nil {
+							errs = append(errs, err)
+						}
+					}
+					if len(errs) > 0 {
+						return fmt.Errorf("failed to start pipelines: %w", errors.Join(errs...))
+					}
+
 					return nil
 				},
 				OnStop: func(ctx context.Context) error {
-					if err := runner.InvalidateAllCachedBuilds(ctx); err != nil {
-						return err
+					var errs []error
+					for pipelineName := range w.cache {
+						if err := runner.Terminate(ctx, pipelineName); err != nil {
+							errs = append(errs, err)
+						}
+					}
+					if len(errs) > 0 {
+						return fmt.Errorf("failed to close pipelines: %w", errors.Join(errs...))
 					}
 
 					a.Stop()
+
 					return nil
 				},
 			})
@@ -98,10 +125,40 @@ func NewRunner() fx.Option {
 	)
 }
 
-// Run sends a processing request to the actor and waits for the result. The
+// Run sends a request to the actor to run a pipeline.
+func (r *runnerImpl) Run(ctx context.Context, pipelineName string) error {
+	replyTo := make(chan error)
+
+	err := r.mbox.Send(ctx, runMessage{
+		replyTo:      replyTo,
+		pipelineName: pipelineName,
+	})
+	if err != nil {
+		return err
+	}
+
+	return <-replyTo
+}
+
+// Terminate sends a request to the actor to terminate a pipeline.
+func (r *runnerImpl) Terminate(ctx context.Context, pipelineName string) error {
+	replyTo := make(chan error)
+
+	err := r.mbox.Send(ctx, terminateMessage{
+		replyTo:      replyTo,
+		pipelineName: pipelineName,
+	})
+	if err != nil {
+		return err
+	}
+
+	return <-replyTo
+}
+
+// Process sends a processing request to the actor and waits for the result. The
 // active tracer (if any, set via WithTracer) is forwarded so dry runs can record
 // per-node traces.
-func (r *runnerImpl) Run(
+func (r *runnerImpl) Process(
 	ctx context.Context,
 	pipelineName string,
 	entrypoint string,
@@ -136,42 +193,6 @@ func (r *runnerImpl) ScrapMetrics(
 		replyTo:      replyTo,
 		pipelineName: pipelineName,
 		w:            w,
-	})
-	if err != nil {
-		return err
-	}
-
-	return <-replyTo
-}
-
-// InvalidateCachedBuild asks the actor to evict and close the cached build of a
-// single pipeline.
-func (r *runnerImpl) InvalidateCachedBuild(
-	ctx context.Context,
-	pipelineName string,
-) error {
-	replyTo := make(chan error)
-
-	err := r.mbox.Send(ctx, invalidateCacheMessage{
-		replyTo:      replyTo,
-		pipelineName: pipelineName,
-	})
-	if err != nil {
-		return err
-	}
-
-	return <-replyTo
-}
-
-// InvalidateAllCachedBuilds asks the actor to evict and close every cached
-// pipeline build.
-func (r *runnerImpl) InvalidateAllCachedBuilds(
-	ctx context.Context,
-) error {
-	replyTo := make(chan error)
-
-	err := r.mbox.Send(ctx, invalidateAllCacheMessage{
-		replyTo: replyTo,
 	})
 	if err != nil {
 		return err

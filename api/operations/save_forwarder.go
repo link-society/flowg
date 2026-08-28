@@ -60,17 +60,6 @@ func NewSaveForwarderUsecase(deps SaveForwarderDeps) usecase.Interactor {
 					return status.Wrap(err, status.Internal)
 				}
 
-				if err := deps.PipelineRunner.InvalidateAllCachedBuilds(ctx); err != nil {
-					logger.ErrorContext(
-						ctx,
-						"Failed to refresh pipeline cache after save",
-						slog.String("error", err.Error()),
-					)
-
-					resp.Success = false
-					return status.Wrap(err, status.Internal)
-				}
-
 				resp.Success = true
 
 				return nil

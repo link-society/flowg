@@ -54,7 +54,7 @@ func NewIngestLogsStructUsecase(deps IngestLogsStructDeps) usecase.Interactor {
 
 				for _, recordData := range req.Records {
 					record := models.NewLogRecord(recordData)
-					err := deps.PipelineRunner.Run(
+					err := deps.PipelineRunner.Process(
 						ctx,
 						req.Pipeline,
 						pipelines.DIRECT_ENTRYPOINT,

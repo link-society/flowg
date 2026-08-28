@@ -58,7 +58,7 @@ func NewIngestLogsOTLPUsecase(deps IngestLogsOTLPDeps) usecase.Interactor {
 				applog.MarkSensitive(ctx)
 
 				for _, logRecord := range req.LogRecords {
-					err := deps.PipelineRunner.Run(
+					err := deps.PipelineRunner.Process(
 						ctx,
 						req.Pipeline,
 						pipelines.DIRECT_ENTRYPOINT,
