@@ -9,6 +9,7 @@ import (
 
 	storage "link-society.com/flowg/internal/storage/interfaces"
 
+	"link-society.com/flowg/internal/engines/confignotify"
 	"link-society.com/flowg/internal/engines/lognotify"
 )
 
@@ -17,6 +18,10 @@ import (
 // access safe.
 type worker struct {
 	mbox actor.MailboxReceiver[message]
+
+	// eventsC delivers config change notifications; pipeline lifecycle follows
+	// storage mutations, wherever they were initiated.
+	eventsC <-chan confignotify.Event
 
 	configStorage storage.ConfigStorage
 	logStorage    storage.LogStorage
@@ -41,6 +46,98 @@ func (w *worker) DoWork(ctx actor.Context) actor.WorkerStatus {
 		msg.handle(ctx, w)
 
 		return actor.WorkerContinue
+
+	case event, ok := <-w.eventsC:
+		if !ok {
+			// subscription torn down at shutdown; a nil channel blocks forever
+			w.eventsC = nil
+			return actor.WorkerContinue
+		}
+
+		w.handleEvent(ctx, event)
+
+		return actor.WorkerContinue
+	}
+}
+
+// handleEvent maps a config change to the matching lifecycle action.
+func (w *worker) handleEvent(ctx actor.Context, event confignotify.Event) {
+	switch event.Kind {
+	case confignotify.PipelineChanged:
+		if err := w.buildPipeline(ctx, event.Pipeline); err != nil {
+			slog.ErrorContext(
+				ctx,
+				"failed to rebuild pipeline",
+				"channel", "pipelines",
+				"pipeline", event.Pipeline,
+				"error", err.Error(),
+			)
+		}
+
+	case confignotify.PipelineDeleted:
+		if _, err := w.closePipeline(event.Pipeline); err != nil {
+			slog.DebugContext(
+				ctx,
+				"no running build for deleted pipeline",
+				"channel", "pipelines",
+				"pipeline", event.Pipeline,
+				"error", err.Error(),
+			)
+		}
+
+	case confignotify.DependenciesChanged:
+		w.reconcile(ctx)
+	}
+}
+
+// reconcile aligns running builds with storage: every persisted pipeline is
+// rebuilt and builds whose definition disappeared are retired.
+func (w *worker) reconcile(ctx actor.Context) {
+	names, err := w.configStorage.ListPipelines(ctx)
+	if err != nil {
+		slog.ErrorContext(
+			ctx,
+			"failed to list pipelines during reconcile",
+			"channel", "pipelines",
+			"error", err.Error(),
+		)
+		return
+	}
+
+	listed := make(map[string]struct{}, len(names))
+	for _, name := range names {
+		listed[name] = struct{}{}
+
+		if err := w.buildPipeline(ctx, name); err != nil {
+			slog.ErrorContext(
+				ctx,
+				"failed to rebuild pipeline",
+				"channel", "pipelines",
+				"pipeline", name,
+				"error", err.Error(),
+			)
+		}
+	}
+
+	w.cacheMu.Lock()
+	var extras []string
+	for name := range w.cache {
+		if _, exists := listed[name]; !exists {
+			extras = append(extras, name)
+		}
+	}
+	w.cacheMu.Unlock()
+
+	for _, name := range extras {
+		if _, err := w.closePipeline(name); err != nil {
+			slog.ErrorContext(
+				ctx,
+				"failed to retire removed pipeline",
+				"channel", "pipelines",
+				"pipeline", name,
+				"error", err.Error(),
+			)
+		}
 	}
 }
 
