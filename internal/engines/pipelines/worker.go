@@ -58,9 +58,12 @@ func (w *worker) getPipeline(_ctx actor.Context, pipelineName string) (*Pipeline
 // buildPipeline compiles a new pipeline from storage and adds it to the
 // worker's cache.
 func (w *worker) buildPipeline(ctx actor.Context, pipelineName string) error {
-	pipeline, err := BuildFlow(ctx, w.configStorage, pipelineName, nil)
+	pipeline, err := BuildFromStorage(ctx, w.configStorage, pipelineName)
 	if err != nil {
 		return err
+	}
+	if pipeline == nil {
+		return &PipelineNotFoundError{Pipeline: pipelineName}
 	}
 
 	if err := pipeline.Init(ctx); err != nil {
