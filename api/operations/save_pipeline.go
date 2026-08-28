@@ -16,7 +16,6 @@ import (
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
-	"link-society.com/flowg/internal/engines/pipelines"
 	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
@@ -25,15 +24,14 @@ import (
 type SavePipelineDeps struct {
 	fx.In
 
-	AuthStorage    storage.AuthStorage
-	ConfigStorage  storage.ConfigStorage
-	PipelineRunner pipelines.Runner
+	AuthStorage   storage.AuthStorage
+	ConfigStorage storage.ConfigStorage
 }
 
 // NewSavePipelineUsecase creates or overwrites a pipeline.
 //
 // Callers must have the write-pipelines permission. Persisting a pipeline
-// invalidates its cached build so that subsequent runs use the new flow graph.
+// notifies the pipeline runner, which rebuilds and restarts it.
 func NewSavePipelineUsecase(deps SavePipelineDeps) usecase.Interactor {
 	logger := logging.Logger()
 

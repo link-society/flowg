@@ -16,7 +16,6 @@ import (
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
-	"link-society.com/flowg/internal/engines/pipelines"
 	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
@@ -25,16 +24,15 @@ import (
 type SaveForwarderDeps struct {
 	fx.In
 
-	AuthStorage    storage.AuthStorage
-	ConfigStorage  storage.ConfigStorage
-	PipelineRunner pipelines.Runner
+	AuthStorage   storage.AuthStorage
+	ConfigStorage storage.ConfigStorage
 }
 
 // NewSaveForwarderUsecase creates or overwrites a forwarder.
 //
 // Callers must have the write-forwarders permission. Persisting a forwarder
-// invalidates cached pipeline builds so that subsequent runs use the new
-// definition.
+// notifies the pipeline runner, which rebuilds every pipeline so that
+// subsequent runs use the new definition.
 func NewSaveForwarderUsecase(deps SaveForwarderDeps) usecase.Interactor {
 	logger := logging.Logger()
 

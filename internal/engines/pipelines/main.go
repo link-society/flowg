@@ -23,11 +23,11 @@ import (
 // Runner executes pipelines against incoming log records. It is the public entry
 // point of the engine: callers submit a record to a named pipeline and the
 // runner drives it through the pipeline's node graph.
+//
+// The pipeline lifecycle itself is not part of the interface: builds are
+// started eagerly at boot and follow configuration changes broadcast on the
+// confignotify bus.
 type Runner interface {
-	// Run compiles and starts a pipeline
-	Run(ctx context.Context, pipelineName string) error
-	// Terminate stops a running pipeline.
-	Terminate(ctx context.Context, pipelineName string) error
 	// Process pushes a record through pipelineName, starting at entrypoint (e.g.
 	// "direct" or "syslog"), and blocks until processing completes.
 	Process(ctx context.Context, pipelineName string, entrypoint string, record *models.LogRecord) error
@@ -105,7 +105,7 @@ func NewRunner() fx.Option {
 					// a broken pipeline must not prevent the server (and the UI needed
 					// to fix it) from starting
 					for _, pipelineName := range pipelines {
-						if err := runner.Run(ctx, pipelineName); err != nil {
+						if err := runner.run(ctx, pipelineName); err != nil {
 							slog.ErrorContext(
 								ctx,
 								"failed to start pipeline",
@@ -128,7 +128,7 @@ func NewRunner() fx.Option {
 
 					var errs []error
 					for _, pipelineName := range names {
-						if err := runner.Terminate(ctx, pipelineName); err != nil {
+						if err := runner.terminate(ctx, pipelineName); err != nil {
 							errs = append(errs, err)
 						}
 					}
@@ -147,8 +147,9 @@ func NewRunner() fx.Option {
 	)
 }
 
-// Run sends a request to the actor to run a pipeline.
-func (r *runnerImpl) Run(ctx context.Context, pipelineName string) error {
+// run sends a request to the actor to build and start a pipeline. Lifecycle is
+// internal: it is driven by the fx hooks and the confignotify events.
+func (r *runnerImpl) run(ctx context.Context, pipelineName string) error {
 	replyTo := make(chan error, 1)
 
 	err := r.mbox.Send(ctx, runMessage{
@@ -167,10 +168,10 @@ func (r *runnerImpl) Run(ctx context.Context, pipelineName string) error {
 	}
 }
 
-// Terminate sends a request to the actor to terminate a pipeline. It waits for
+// terminate sends a request to the actor to terminate a pipeline. It waits for
 // in-flight records to drain, bounded by ctx; the teardown itself always
 // completes in the background.
-func (r *runnerImpl) Terminate(ctx context.Context, pipelineName string) error {
+func (r *runnerImpl) terminate(ctx context.Context, pipelineName string) error {
 	replyTo := make(chan error, 1)
 
 	err := r.mbox.Send(ctx, terminateMessage{
