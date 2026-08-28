@@ -1,7 +1,6 @@
 package pipelines
 
 import (
-	"context"
 	"sync"
 
 	"github.com/vladopajic/go-actor/actor"
@@ -43,30 +42,49 @@ func (w *worker) DoWork(ctx actor.Context) actor.WorkerStatus {
 	}
 }
 
-// getOrBuildPipeline returns the cached build for a pipeline, compiling and
-// initialising it from storage on first use. The build is closed again if
-// initialisation fails.
-func (w *worker) getOrBuildPipeline(ctx context.Context, pipelineName string) (*Pipeline, error) {
+// getPipeline retrieves a compiled pipeline from the worker's cache by name.
+func (w *worker) getPipeline(_ctx actor.Context, pipelineName string) (*Pipeline, error) {
 	w.cacheMu.Lock()
 	defer w.cacheMu.Unlock()
 
-	if pipeline, exists := w.cache[pipelineName]; exists {
-		return pipeline, nil
+	pipeline, exists := w.cache[pipelineName]
+	if !exists {
+		return nil, &PipelineNotFoundError{Pipeline: pipelineName}
 	}
 
-	pipeline, err := BuildFromStorage(ctx, w.configStorage, pipelineName)
+	return pipeline, nil
+}
+
+// buildPipeline compiles a new pipeline from storage and adds it to the
+// worker's cache.
+func (w *worker) buildPipeline(ctx actor.Context, pipelineName string) error {
+	pipeline, err := BuildFlow(ctx, w.configStorage, pipelineName, nil)
 	if err != nil {
-		return nil, err
-	}
-	if pipeline == nil {
-		return nil, nil
+		return err
 	}
 
 	if err := pipeline.Init(ctx); err != nil {
 		_ = pipeline.Close(ctx)
-		return nil, err
+		return err
 	}
 
+	w.cacheMu.Lock()
 	w.cache[pipelineName] = pipeline
-	return pipeline, nil
+	w.cacheMu.Unlock()
+
+	return nil
+}
+
+// closePipeline removes a pipeline from the worker's cache and closes it.
+func (w *worker) closePipeline(ctx actor.Context, pipelineName string) error {
+	w.cacheMu.Lock()
+	pipeline, exists := w.cache[pipelineName]
+	if !exists {
+		w.cacheMu.Unlock()
+		return &PipelineNotFoundError{Pipeline: pipelineName}
+	}
+	delete(w.cache, pipelineName)
+	w.cacheMu.Unlock()
+
+	return pipeline.Close(ctx)
 }

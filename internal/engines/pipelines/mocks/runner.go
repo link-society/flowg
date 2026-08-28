@@ -23,22 +23,22 @@ func NewMockRunner() pipelines.Runner {
 	return &MockRunner{}
 }
 
-func (m *MockRunner) Run(ctx context.Context, pipelineName string, entrypoint string, record *models.LogRecord) error {
+func (m *MockRunner) Run(ctx context.Context, pipelineName string) error {
+	args := m.Called(ctx, pipelineName)
+	return args.Error(0)
+}
+
+func (m *MockRunner) Terminate(ctx context.Context, pipelineName string) error {
+	args := m.Called(ctx, pipelineName)
+	return args.Error(0)
+}
+
+func (m *MockRunner) Process(ctx context.Context, pipelineName string, entrypoint string, record *models.LogRecord) error {
 	args := m.Called(ctx, pipelineName, entrypoint, record)
 	return args.Error(0)
 }
 
 func (m *MockRunner) ScrapMetrics(ctx context.Context, pipelineName string, w io.Writer) error {
 	args := m.Called(ctx, pipelineName, w)
-	return args.Error(0)
-}
-
-func (m *MockRunner) InvalidateCachedBuild(ctx context.Context, pipelineName string) error {
-	args := m.Called(ctx, pipelineName)
-	return args.Error(0)
-}
-
-func (m *MockRunner) InvalidateAllCachedBuilds(ctx context.Context) error {
-	args := m.Called(ctx)
 	return args.Error(0)
 }

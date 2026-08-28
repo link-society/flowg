@@ -102,7 +102,7 @@ func (w *worker) DoWork(ctx actor.Context) actor.WorkerStatus {
 
 				record := parseLogParts(logParts)
 
-				err := w.pipelineRunner.Run(
+				err := w.pipelineRunner.Process(
 					ctx,
 					pipelineName,
 					pipelines.SYSLOG_ENTRYPOINT,

@@ -233,7 +233,7 @@ func NewElasticHandler(deps ElasticDeps) http.Handler {
 			flatten("", doc)
 
 			record := models.NewLogRecord(fields)
-			err = deps.PipelineRunner.Run(
+			err = deps.PipelineRunner.Process(
 				r.Context(),
 				index,
 				pipelines.DIRECT_ENTRYPOINT,

@@ -2,7 +2,6 @@ package pipelines
 
 import (
 	"context"
-	"errors"
 
 	"io"
 
@@ -46,15 +45,26 @@ type scrapMetricsMessage struct {
 	w            io.Writer
 }
 
-// invalidateCacheMessage requests eviction of a single pipeline's cached build.
-type invalidateCacheMessage struct {
-	replyTo      chan<- error
+// runMessage requests that a pipeline be loaded from storage, compiled and
+// initialized.
+type runMessage struct {
+	replyTo chan<- error
+
 	pipelineName string
 }
 
-// invalidateAllCacheMessage requests eviction of every cached pipeline build.
-type invalidateAllCacheMessage struct {
+var (
+	_ message = logMessage{}
+	_ message = scrapMetricsMessage{}
+	_ message = runMessage{}
+	_ message = terminateMessage{}
+)
+
+// terminateMessage requests that a pipeline be terminated and removed.
+type terminateMessage struct {
 	replyTo chan<- error
+
+	pipelineName string
 }
 
 func (msg logMessage) handle(ctx context.Context, w *worker) {
@@ -79,9 +89,9 @@ func (msg logMessage) handle(ctx context.Context, w *worker) {
 				return
 			}
 		} else {
-			pipeline, err = w.getOrBuildPipeline(ctx, msg.pipelineName)
-			if pipeline == nil {
-				msg.replyTo <- &PipelineNotFoundError{Pipeline: msg.pipelineName}
+			pipeline, err = w.getPipeline(ctx, msg.pipelineName)
+			if err != nil {
+				msg.replyTo <- err
 				return
 			}
 		}
@@ -107,13 +117,9 @@ func (msg scrapMetricsMessage) handle(ctx context.Context, w *worker) {
 		var err error
 		defer close(msg.replyTo)
 
-		pipeline, err = w.getOrBuildPipeline(ctx, msg.pipelineName)
+		pipeline, err = w.getPipeline(ctx, msg.pipelineName)
 		if err != nil {
 			msg.replyTo <- err
-			return
-		}
-		if pipeline == nil {
-			msg.replyTo <- &PipelineNotFoundError{Pipeline: msg.pipelineName}
 			return
 		}
 
@@ -136,35 +142,12 @@ func (msg scrapMetricsMessage) handle(ctx context.Context, w *worker) {
 	}()
 }
 
-func (msg invalidateCacheMessage) handle(ctx context.Context, w *worker) {
-	w.cacheMu.Lock()
-	defer w.cacheMu.Unlock()
-
-	pipeline, ok := w.cache[msg.pipelineName]
-	if ok {
-		msg.replyTo <- pipeline.Close(ctx)
-		delete(w.cache, msg.pipelineName)
-	} else {
-		msg.replyTo <- nil
-	}
+func (msg runMessage) handle(ctx context.Context, w *worker) {
+	defer close(msg.replyTo)
+	msg.replyTo <- w.buildPipeline(ctx, msg.pipelineName)
 }
 
-func (msg invalidateAllCacheMessage) handle(ctx context.Context, w *worker) {
-	w.cacheMu.Lock()
-	defer w.cacheMu.Unlock()
-
-	var errs []error
-
-	for name, pipeline := range w.cache {
-		if err := pipeline.Close(ctx); err != nil {
-			errs = append(errs, err)
-		}
-		delete(w.cache, name)
-	}
-
-	if len(errs) > 0 {
-		msg.replyTo <- errors.Join(errs...)
-	} else {
-		msg.replyTo <- nil
-	}
+func (msg terminateMessage) handle(ctx context.Context, w *worker) {
+	defer close(msg.replyTo)
+	msg.replyTo <- w.closePipeline(ctx, msg.pipelineName)
 }
