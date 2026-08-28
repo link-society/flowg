@@ -6,6 +6,8 @@ import (
 	"io"
 	"time"
 
+	"crypto/rand"
+
 	"github.com/apple/foundationdb/bindings/go/src/fdb"
 	"github.com/apple/foundationdb/bindings/go/src/fdb/subspace"
 
@@ -23,6 +25,12 @@ const FoundationApiVersion = 730
 // AdapterOptions.GCInterval is left unset.
 const defaultGCInterval = 5 * time.Minute
 
+// ChangeLogKey is the key bumped on every mutation when
+// [AdapterOptions.EnableChangeLog] is set; watching it (see
+// [FoundationAdapter.Watch]) observes every change made through the adapter,
+// from any node of the cluster.
+var ChangeLogKey = kv.Key{"meta", "changelog"}
+
 // AdapterOptions configures how a FoundationDB-backed [kv.Adapter] connects to
 // its cluster and where within the key space it stores its data.
 type AdapterOptions struct {
@@ -38,6 +46,9 @@ type AdapterOptions struct {
 	Namespace string
 	// GCInterval is how often expired keys are swept; zero uses defaultGCInterval.
 	GCInterval time.Duration
+	// EnableChangeLog makes every Update transaction also bump [ChangeLogKey],
+	// atomically with the mutation, so other nodes can watch for changes.
+	EnableChangeLog bool
 }
 
 // FoundationAdapter is a [kv.Adapter] backed by FoundationDB.
@@ -46,8 +57,9 @@ type AdapterOptions struct {
 // applied on write and stripped on read, so consumers only ever observe logical
 // [kv.Key]s.
 type FoundationAdapter struct {
-	db  fdb.Database
-	sub subspace.Subspace
+	db        fdb.Database
+	sub       subspace.Subspace
+	changeLog bool
 }
 
 var _ kv.Adapter[*FoundationQueryTx, *FoundationMutationTx] = (*FoundationAdapter)(nil)
@@ -80,8 +92,9 @@ func NewAdapter(opts AdapterOptions) fx.Option {
 		}
 
 		adapter := &FoundationAdapter{
-			db:  db,
-			sub: subspace.Sub(opts.KeySpace).Sub(opts.Namespace),
+			db:        db,
+			sub:       subspace.Sub(opts.KeySpace).Sub(opts.Namespace),
+			changeLog: opts.EnableChangeLog,
 		}
 
 		lc.Append(fx.Hook{
@@ -140,16 +153,63 @@ func (a *FoundationAdapter) View(ctx context.Context, txnFn func(txn *Foundation
 
 // Update implements [kv.Adapter.Update]. It runs inside a read-write
 // FoundationDB transaction, which is committed on success; FoundationDB retries
-// automatically on conflict.
+// automatically on conflict. When the changelog is enabled, [ChangeLogKey] is
+// set to a fresh random value in the same transaction.
 func (a *FoundationAdapter) Update(ctx context.Context, txnFn func(txn *FoundationMutationTx) error) error {
 	_, err := a.db.Transact(func(tr fdb.Transaction) (any, error) {
 		if err := applyDeadline(ctx, tr); err != nil {
 			return nil, err
 		}
 
-		return nil, txnFn(&FoundationMutationTx{concrete: tr, sub: a.sub})
+		if err := txnFn(&FoundationMutationTx{concrete: tr, sub: a.sub}); err != nil {
+			return nil, err
+		}
+
+		if a.changeLog {
+			value := make([]byte, 16)
+			rand.Read(value)
+			tr.Set(a.sub.Pack(keyToTuple(ChangeLogKey)), value)
+		}
+
+		return nil, nil
 	})
 	return err
+}
+
+// Watch arms a FoundationDB key watch and returns a channel that fires once
+// when the key's value changes. Cancelling ctx cancels the watch, which then
+// fires with the cancellation error.
+func (a *FoundationAdapter) Watch(ctx context.Context, key kv.Key) (<-chan error, error) {
+	var fut fdb.FutureNil
+	_, err := a.db.Transact(func(tr fdb.Transaction) (any, error) {
+		if err := applyDeadline(ctx, tr); err != nil {
+			return nil, err
+		}
+
+		fut = tr.Watch(a.sub.Pack(keyToTuple(key)))
+		return nil, nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to arm watch: %w", err)
+	}
+
+	firedC := make(chan error, 1)
+	resolvedC := make(chan struct{})
+
+	go func() {
+		firedC <- fut.Get()
+		close(resolvedC)
+	}()
+
+	go func() {
+		select {
+		case <-ctx.Done():
+			fut.Cancel()
+		case <-resolvedC:
+		}
+	}()
+
+	return firedC, nil
 }
 
 // Backup implements [kv.Adapter.Backup].
