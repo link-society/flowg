@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"sync"
 
 	"io"
@@ -15,6 +16,7 @@ import (
 
 	storage "link-society.com/flowg/internal/storage/interfaces"
 
+	"link-society.com/flowg/internal/engines/confignotify"
 	"link-society.com/flowg/internal/engines/lognotify"
 )
 
@@ -40,9 +42,10 @@ type runnerImpl struct {
 type deps struct {
 	fx.In
 
-	ConfigStorage storage.ConfigStorage
-	LogStorage    storage.LogStorage
-	LogNotifier   lognotify.LogNotifier
+	ConfigStorage  storage.ConfigStorage
+	LogStorage     storage.LogStorage
+	LogNotifier    lognotify.LogNotifier
+	ConfigNotifier confignotify.Notifier
 }
 
 var _ Runner = (*runnerImpl)(nil)
@@ -84,6 +87,14 @@ func NewRunner() fx.Option {
 
 			lc.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {
+					// the subscription must outlive the start phase; it is torn down
+					// with the notifier's own lifecycle
+					events, err := d.ConfigNotifier.Subscribe(context.Background())
+					if err != nil {
+						return fmt.Errorf("failed to subscribe to config changes: %w", err)
+					}
+					w.eventsC = events.ReceiveC()
+
 					a.Start()
 
 					pipelines, err := d.ConfigStorage.ListPipelines(ctx)
@@ -91,14 +102,18 @@ func NewRunner() fx.Option {
 						return fmt.Errorf("failed to start pipelines: %w", err)
 					}
 
-					var errs []error
+					// a broken pipeline must not prevent the server (and the UI needed
+					// to fix it) from starting
 					for _, pipelineName := range pipelines {
 						if err := runner.Run(ctx, pipelineName); err != nil {
-							errs = append(errs, err)
+							slog.ErrorContext(
+								ctx,
+								"failed to start pipeline",
+								"channel", "pipelines",
+								"pipeline", pipelineName,
+								"error", err.Error(),
+							)
 						}
-					}
-					if len(errs) > 0 {
-						return fmt.Errorf("failed to start pipelines: %w", errors.Join(errs...))
 					}
 
 					return nil

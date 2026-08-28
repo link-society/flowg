@@ -10,6 +10,7 @@ import (
 
 	storage "link-society.com/flowg/internal/storage/interfaces"
 
+	"link-society.com/flowg/internal/engines/confignotify"
 	"link-society.com/flowg/internal/engines/lognotify"
 	"link-society.com/flowg/internal/engines/pipelines"
 
@@ -61,6 +62,8 @@ type StorageOptions interface {
 func NewServer(opts Options) fx.Option {
 	return fx.Module(
 		"app.server",
+		// Engine Layer (confignotify first: storage modules depend on it)
+		confignotify.NewNotifier(),
 		// Storage Layer
 		opts.Storage.AuthModule(),
 		opts.Storage.ConfigModule(),
