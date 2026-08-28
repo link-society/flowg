@@ -104,8 +104,15 @@ func NewRunner() fx.Option {
 					return nil
 				},
 				OnStop: func(ctx context.Context) error {
-					var errs []error
+					w.cacheMu.Lock()
+					names := make([]string, 0, len(w.cache))
 					for pipelineName := range w.cache {
+						names = append(names, pipelineName)
+					}
+					w.cacheMu.Unlock()
+
+					var errs []error
+					for _, pipelineName := range names {
 						if err := runner.Terminate(ctx, pipelineName); err != nil {
 							errs = append(errs, err)
 						}
@@ -127,7 +134,7 @@ func NewRunner() fx.Option {
 
 // Run sends a request to the actor to run a pipeline.
 func (r *runnerImpl) Run(ctx context.Context, pipelineName string) error {
-	replyTo := make(chan error)
+	replyTo := make(chan error, 1)
 
 	err := r.mbox.Send(ctx, runMessage{
 		replyTo:      replyTo,
@@ -137,12 +144,19 @@ func (r *runnerImpl) Run(ctx context.Context, pipelineName string) error {
 		return err
 	}
 
-	return <-replyTo
+	select {
+	case err := <-replyTo:
+		return err
+	case <-ctx.Done():
+		return ctx.Err()
+	}
 }
 
-// Terminate sends a request to the actor to terminate a pipeline.
+// Terminate sends a request to the actor to terminate a pipeline. It waits for
+// in-flight records to drain, bounded by ctx; the teardown itself always
+// completes in the background.
 func (r *runnerImpl) Terminate(ctx context.Context, pipelineName string) error {
-	replyTo := make(chan error)
+	replyTo := make(chan error, 1)
 
 	err := r.mbox.Send(ctx, terminateMessage{
 		replyTo:      replyTo,
@@ -152,7 +166,12 @@ func (r *runnerImpl) Terminate(ctx context.Context, pipelineName string) error {
 		return err
 	}
 
-	return <-replyTo
+	select {
+	case err := <-replyTo:
+		return err
+	case <-ctx.Done():
+		return ctx.Err()
+	}
 }
 
 // Process sends a processing request to the actor and waits for the result. The
@@ -164,7 +183,7 @@ func (r *runnerImpl) Process(
 	entrypoint string,
 	record *models.LogRecord,
 ) error {
-	replyTo := make(chan error)
+	replyTo := make(chan error, 1)
 
 	err := r.mbox.Send(ctx, logMessage{
 		replyTo: replyTo,
@@ -178,7 +197,12 @@ func (r *runnerImpl) Process(
 		return err
 	}
 
-	return <-replyTo
+	select {
+	case err := <-replyTo:
+		return err
+	case <-ctx.Done():
+		return ctx.Err()
+	}
 }
 
 // ScrapMetrics sends a request to the actor to scrap metrics from a pipeline.
@@ -187,7 +211,7 @@ func (r *runnerImpl) ScrapMetrics(
 	pipelineName string,
 	w io.Writer,
 ) error {
-	replyTo := make(chan error)
+	replyTo := make(chan error, 1)
 
 	err := r.mbox.Send(ctx, scrapMetricsMessage{
 		replyTo:      replyTo,
@@ -198,5 +222,10 @@ func (r *runnerImpl) ScrapMetrics(
 		return err
 	}
 
-	return <-replyTo
+	select {
+	case err := <-replyTo:
+		return err
+	case <-ctx.Done():
+		return ctx.Err()
+	}
 }

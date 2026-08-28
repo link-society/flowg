@@ -1,6 +1,8 @@
 package pipelines
 
 import (
+	"context"
+	"log/slog"
 	"sync"
 
 	"github.com/vladopajic/go-actor/actor"
@@ -42,21 +44,40 @@ func (w *worker) DoWork(ctx actor.Context) actor.WorkerStatus {
 	}
 }
 
-// getPipeline retrieves a compiled pipeline from the worker's cache by name.
-func (w *worker) getPipeline(_ctx actor.Context, pipelineName string) (*Pipeline, error) {
+// acquirePipeline returns the cached build with an in-flight reservation so a
+// concurrent retire cannot close it mid-use; callers must call release.
+func (w *worker) acquirePipeline(pipelineName string) (*Pipeline, func(), error) {
 	w.cacheMu.Lock()
-	defer w.cacheMu.Unlock()
-
 	pipeline, exists := w.cache[pipelineName]
-	if !exists {
-		return nil, &PipelineNotFoundError{Pipeline: pipelineName}
+	w.cacheMu.Unlock()
+
+	if !exists || !pipeline.acquire() {
+		return nil, nil, &PipelineNotFoundError{Pipeline: pipelineName}
 	}
 
-	return pipeline, nil
+	return pipeline, pipeline.release, nil
 }
 
-// buildPipeline compiles a new pipeline from storage and adds it to the
-// worker's cache.
+// retirePipeline marks a build closed and closes it in the background once its
+// in-flight uses drained; the returned channel reports the close error.
+func (w *worker) retirePipeline(pipeline *Pipeline) <-chan error {
+	pipeline.stateMu.Lock()
+	pipeline.closed = true
+	pipeline.stateMu.Unlock()
+
+	done := make(chan error, 1)
+	go func() {
+		pipeline.inflight.Wait()
+		done <- pipeline.Close(context.Background())
+		close(done)
+	}()
+
+	return done
+}
+
+// buildPipeline compiles a new build from storage, swaps it into the worker's
+// cache and retires the previous build, if any. In-flight records finish on
+// the old build while new ones pick up the new one.
 func (w *worker) buildPipeline(ctx actor.Context, pipelineName string) error {
 	pipeline, err := BuildFromStorage(ctx, w.configStorage, pipelineName)
 	if err != nil {
@@ -72,22 +93,39 @@ func (w *worker) buildPipeline(ctx actor.Context, pipelineName string) error {
 	}
 
 	w.cacheMu.Lock()
+	previous := w.cache[pipelineName]
 	w.cache[pipelineName] = pipeline
 	w.cacheMu.Unlock()
+
+	if previous != nil {
+		done := w.retirePipeline(previous)
+		go func() {
+			if err := <-done; err != nil {
+				slog.ErrorContext(
+					ctx,
+					"failed to close previous pipeline build",
+					"channel", "pipelines",
+					"pipeline", pipelineName,
+					"error", err.Error(),
+				)
+			}
+		}()
+	}
 
 	return nil
 }
 
-// closePipeline removes a pipeline from the worker's cache and closes it.
-func (w *worker) closePipeline(ctx actor.Context, pipelineName string) error {
+// closePipeline removes a build from the worker's cache and retires it; the
+// returned channel reports the close error once in-flight work drained.
+func (w *worker) closePipeline(pipelineName string) (<-chan error, error) {
 	w.cacheMu.Lock()
 	pipeline, exists := w.cache[pipelineName]
-	if !exists {
-		w.cacheMu.Unlock()
-		return &PipelineNotFoundError{Pipeline: pipelineName}
-	}
 	delete(w.cache, pipelineName)
 	w.cacheMu.Unlock()
 
-	return pipeline.Close(ctx)
+	if !exists {
+		return nil, &PipelineNotFoundError{Pipeline: pipelineName}
+	}
+
+	return w.retirePipeline(pipeline), nil
 }

@@ -238,11 +238,12 @@ func (n *PipelineNode) Close(ctx context.Context) error {
 func (n *PipelineNode) Process(ctx context.Context, record *models.LogRecord) error {
 	w := getWorker(ctx)
 
-	pipeline, err := w.getPipeline(ctx, n.Pipeline)
+	pipeline, release, err := w.acquirePipeline(n.Pipeline)
 	traceNode(ctx, n.ID, err, record.Fields, nil)
 	if err != nil {
 		return err
 	}
+	defer release()
 
 	if isDryRun(ctx) {
 		return nil

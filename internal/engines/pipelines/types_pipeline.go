@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"link-society.com/flowg/internal/app/metrics"
@@ -23,6 +24,31 @@ type Pipeline struct {
 
 	Metrics   *prometheus.Registry
 	TotalLogs prometheus.Counter
+
+	// stateMu guards closed; inflight counts active uses of this build so that
+	// retiring it can drain them before node resources are closed.
+	stateMu  sync.Mutex
+	closed   bool
+	inflight sync.WaitGroup
+}
+
+// acquire reserves the build for one in-flight use; it fails once the build
+// has been retired. Every successful acquire must be paired with a release.
+func (p *Pipeline) acquire() bool {
+	p.stateMu.Lock()
+	defer p.stateMu.Unlock()
+
+	if p.closed {
+		return false
+	}
+
+	p.inflight.Add(1)
+	return true
+}
+
+// release ends an in-flight use started by acquire.
+func (p *Pipeline) release() {
+	p.inflight.Done()
 }
 
 // BuildFromStorage loads the persisted flow graph for name and compiles it into
