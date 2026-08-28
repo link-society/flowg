@@ -48,7 +48,7 @@ func TestElasticEndpoint(t *testing.T) {
 	mockConfigStorage.On("ListPipelines", mock.Anything).
 		Return([]string{"test"}, nil)
 
-	mockPipelineRunner.On("Run", mock.Anything, "test", pipelines.DIRECT_ENTRYPOINT, mock.Anything).
+	mockPipelineRunner.On("Process", mock.Anything, "test", pipelines.DIRECT_ENTRYPOINT, mock.Anything).
 		Return(nil)
 
 	handler := middlewares.NewElasticHandler(deps)
