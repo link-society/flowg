@@ -16,7 +16,6 @@ import (
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
-	"link-society.com/flowg/internal/engines/pipelines"
 	"link-society.com/flowg/internal/models"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
@@ -25,16 +24,15 @@ import (
 type SaveTransformerDeps struct {
 	fx.In
 
-	AuthStorage    storage.AuthStorage
-	ConfigStorage  storage.ConfigStorage
-	PipelineRunner pipelines.Runner
+	AuthStorage   storage.AuthStorage
+	ConfigStorage storage.ConfigStorage
 }
 
 // NewSaveTransformerUsecase creates or overwrites a transformer.
 //
 // Callers must have the write-transformers permission. Persisting a transformer
-// invalidates cached pipeline builds so that subsequent runs pick up the new
-// source.
+// notifies the pipeline runner, which rebuilds every pipeline so that
+// subsequent runs pick up the new source.
 func NewSaveTransformerUsecase(deps SaveTransformerDeps) usecase.Interactor {
 	logger := logging.Logger()
 
