@@ -48,7 +48,9 @@ func NewStorage(opts Options) fx.Option {
 		"storage.config",
 		foundation.NewAdapter(adapterOpts),
 		fx.Provide(func(d deps) storage.ConfigStorage {
-			return config.NewStorage(d.Adapter)
+			// no local notifier: change events come from the key watcher, so every
+			// node (including the writer) observes mutations through the same path
+			return config.NewStorage(d.Adapter, nil)
 		}),
 	)
 }

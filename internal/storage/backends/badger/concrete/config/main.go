@@ -6,6 +6,8 @@ import (
 
 	"go.uber.org/fx"
 
+	"link-society.com/flowg/internal/engines/confignotify"
+
 	"link-society.com/flowg/internal/storage/backends/badger"
 	"link-society.com/flowg/internal/storage/databases/config"
 	storage "link-society.com/flowg/internal/storage/interfaces"
@@ -22,6 +24,10 @@ type deps struct {
 	fx.In
 
 	Adapter *badger.BadgerAdapter `name:"storage.config"`
+
+	// Notifier broadcasts config mutations to the pipeline runner; it is
+	// optional so the storage can run standalone (e.g. in tests).
+	Notifier confignotify.Notifier `optional:"true"`
 }
 
 // DefaultOptions returns the default [Options] for the configuration storage.
@@ -47,7 +53,7 @@ func NewStorage(opts Options) fx.Option {
 		"storage.config",
 		badger.NewAdapter(adapterOpts),
 		fx.Provide(func(lc fx.Lifecycle, d deps) storage.ConfigStorage {
-			storage := config.NewStorage(d.Adapter)
+			storage := config.NewStorage(d.Adapter, d.Notifier)
 
 			lc.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {
