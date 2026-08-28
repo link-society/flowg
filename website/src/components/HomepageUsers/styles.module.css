@@ -1,0 +1,58 @@
+.carousel {
+  overflow: hidden;
+  padding: 2rem 0;
+}
+
+.carouselTrack {
+  display: flex;
+  width: max-content;
+  animation: carousel-scroll 30s linear infinite;
+}
+
+.carouselTrack:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carouselTrack {
+    animation: none;
+  }
+}
+
+.carouselGroup {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.userCard {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  height: 64px;
+  margin: 0 3rem;
+  text-decoration: none !important;
+}
+
+.userCard img,
+.userCard svg {
+  height: 100%;
+  width: auto;
+}
+
+.userName {
+  font-size: 1.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--ifm-font-color-base);
+}
+
+@keyframes carousel-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    /* exactly one of the four copies in the track */
+    transform: translateX(-25%);
+  }
+}

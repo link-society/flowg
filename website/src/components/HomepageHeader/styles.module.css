@@ -1,0 +1,46 @@
+.heroBanner {
+  padding: 4rem 0;
+  position: relative;
+  text-align: center;
+  overflow: hidden;
+}
+
+@media screen and (max-width: 996px) {
+  .heroBanner {
+    padding: 2rem;
+  }
+}
+
+.titleWithLogo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.news {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  padding: 1rem;
+}
+.news a {
+  background-color: oklch(95.1% 0.026 236.824);
+  border: 1px solid oklch(92.8% 0.006 264.531);
+  border-radius: 2rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
