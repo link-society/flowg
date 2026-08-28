@@ -1,0 +1,342 @@
+---
+sidebar_position: 9
+---
+
+# Azure Monitor
+
+## Introduction
+
+[Azure Monitor Logs](https://learn.microsoft.com/en-us/azure/azure-monitor/logs/data-platform-logs)
+is the log management service of Microsoft Azure. FlowG can upload its log
+records to a
+[Log Analytics workspace](https://learn.microsoft.com/en-us/azure/azure-monitor/logs/log-analytics-workspace-overview),
+so they can be queried with
+[KQL](https://learn.microsoft.com/en-us/kusto/query/), alerted on, and analyzed
+alongside the rest of your Azure telemetry.
+
+## Setting up Azure Monitor
+
+FlowG sends its records to the
+[Logs Ingestion API](https://learn.microsoft.com/en-us/azure/azure-monitor/logs/logs-ingestion-api-overview),
+which requires:
+
+ - a Log Analytics workspace, with a custom table to store the logs
+ - a Data Collection Endpoint (DCE), which FlowG uploads the records to
+ - a Data Collection Rule (DCR), which declares the schema of the records and
+   routes them to the table
+
+First, create the resource group, then the workspace and the custom table:
+
+```bash
+az group create \
+  --name testing \
+  --location northeurope
+
+az monitor log-analytics workspace create \
+  --resource-group testing \
+  --workspace-name flowg
+
+az monitor log-analytics workspace table create \
+  --resource-group testing \
+  --workspace-name flowg \
+  --name flowg_CL \
+  --columns \
+    TimeGenerated=datetime \
+    content=string \
+    hostname=string \
+    tag=string \
+    severity=string \
+    facility=string
+```
+
+:::note
+
+- The examples creates a resource group named `testing`, located in
+  `northeurope`. Adjust according to your setup.
+- The name of a custom table always ends with the `_CL` suffix.
+
+:::
+
+Then, create the Data Collection Endpoint:
+
+```bash
+az monitor data-collection endpoint create \
+  --resource-group testing \
+  --name flowg \
+  --location northeurope \
+  --public-network-access Enabled
+```
+
+The command returns the URL FlowG will upload the records to, in the
+`logsIngestion` property:
+
+```json
+{
+  "logsIngestion": {
+    "endpoint": "https://flowg-a1b2.northeurope-1.ingest.monitor.azure.com"
+  }
+}
+```
+
+:::note
+
+- The `logsIngestion` endpoint URL displayed above is an example. Your actual
+  endpoint URL will differ and should be used in the Data Collection Rule
+  configuration.
+
+:::
+
+Then, create the Data Collection Rule. It declares the fields FlowG sends in an
+input stream, and maps that stream to the table created earlier. Fetch the IDs
+of the endpoint and the workspace first:
+
+```bash
+az monitor data-collection endpoint show \
+  --resource-group testing \
+  --name flowg \
+  --query id -o tsv
+
+az monitor log-analytics workspace show \
+  --resource-group testing \
+  --workspace-name flowg \
+  --query id -o tsv
+```
+
+And write the rule definition in a `dcr.json` file:
+
+```json
+{
+  "properties": {
+    "dataCollectionEndpointId": "<ID of the Data Collection Endpoint>",
+    "streamDeclarations": {
+      "Custom-flowg_CL": {
+        "columns": [
+          { "name": "content", "type": "string" },
+          { "name": "hostname", "type": "string" },
+          { "name": "tag", "type": "string" },
+          { "name": "severity", "type": "string" },
+          { "name": "facility", "type": "string" }
+        ]
+      }
+    },
+    "destinations": {
+      "logAnalytics": [
+        {
+          "name": "workspace",
+          "workspaceResourceId": "<ID of the Log Analytics workspace>"
+        }
+      ]
+    },
+    "dataFlows": [
+      {
+        "streams": ["Custom-flowg_CL"],
+        "destinations": ["workspace"],
+        "transformKql": "source | extend TimeGenerated = now()",
+        "outputStream": "Custom-flowg_CL"
+      }
+    ]
+  }
+}
+```
+
+```bash
+az monitor data-collection rule create \
+  --resource-group testing \
+  --name flowg \
+  --location northeurope \
+  --rule-file dcr.json
+```
+
+:::note
+
+- The location **MUST** match the location of the Data Collection Endpoint.
+
+:::
+
+FlowG targets the rule by its immutable ID, which you can fetch with:
+
+```bash
+az monitor data-collection rule show \
+  --resource-group testing \
+  --name flowg \
+  --query immutableId -o tsv
+```
+
+Which returns something like `dcr-0123456789abcdef0123456789abcdef`.
+
+Finally, FlowG authenticates to the ingestion endpoint with a
+[Microsoft Entra ID](https://learn.microsoft.com/en-us/entra/identity/)
+access token.
+
+We first need to create the service principal:
+
+```bash
+APP_ID=$(
+  az ad app create --display-name flowg-azure-monitor \
+  | jq -r '.appId'
+)
+
+az ad sp create --id "$APP_ID"
+
+az ad app credential reset \
+  --id "$APP_ID" \
+  --append \
+  --display-name flowg-secret
+```
+
+Which outputs:
+
+```json
+{
+  "appId": "<APP_ID>",
+  "password": "<PASSWORD>",
+  "tenant": "<TENANT_ID>"
+}
+```
+
+Then grant the "Monitoring Metrics Publisher" role on the rule to the
+identity you will request the token with:
+
+```bash
+DCR_ID=$(az monitor data-collection rule show \
+  --resource-group testing \
+  --name flowg \
+  --query id -o tsv)
+
+az role assignment create \
+  --assignee "$APP_ID" \
+  --role "Monitoring Metrics Publisher" \
+  --scope "$DCR_ID"
+```
+
+Then, request a token for that identity:
+
+```bash
+az login --service-principal \
+  --username "$APP_ID" \
+  --password "<password>" \
+  --tenant "<tenant-id>"
+
+az account get-access-token \
+  --resource https://monitor.azure.com
+```
+
+```json
+{
+  "accessToken": "eyJ0eXAiOiJKV1QiLCJhbGci...",
+  "expiresOn": "2026-08-11 17:04:05.000000",
+  "expires_on": 1786460645,
+  "subscription": "...",
+  "tenant": "...",
+  "tokenType": "Bearer"
+}
+```
+
+FlowG expects the expiry date in RFC3339 format. The `expiresOn` property is in
+your local timezone, so convert the `expires_on` UNIX timestamp instead:
+
+```bash
+date -u -d @1786460645 +%Y-%m-%dT%H:%M:%SZ
+```
+
+Which gives `2026-08-11T15:04:05Z`.
+
+:::note
+
+Microsoft Entra ID access tokens are short-lived (about an hour by default).
+FlowG authenticates with this static token and does not renew it: once it
+expires, the forwarder configuration must be updated with a fresh one, for
+example by a scheduled job calling the [FlowG API](/docs/technical/api).
+
+:::
+
+## Setting up the FlowG pipeline
+
+import ForwarderForm from '@site/src/components/ForwarderForm'
+import PipelineDiagram from '@site/src/components/PipelineDiagram'
+
+First, let's create an "Azure Monitor Forwarder" named `azure`, with the
+following configuration:
+
+<ForwarderForm
+  forwarderType="Azure Monitor"
+  fields={[
+    { label: 'Endpoint', value: 'https://flowg-a1b2.northeurope-1.ingest.monitor.azure.com', tooltip: 'The logs ingestion endpoint of the DCE created earlier.' },
+    { label: 'Token', value: 'eyJ0eXAiOiJKV1QiLCJhbGci...', tooltip: 'The access token requested earlier.' },
+    { label: 'Expires on', value: '2026-08-11T15:04:05Z', tooltip: 'The expiry date of the token, in RFC3339 format.' },
+    { type: 'divider' },
+    { label: 'Rule ID', value: 'dcr-0123456789abcdef0123456789abcdef', tooltip: 'The immutable ID of the DCR created earlier.' },
+    { label: 'Stream name', value: 'Custom-flowg_CL', tooltip: 'The input stream declared in the DCR.' },
+    { type: 'checkbox', label: 'Allow insecure connections', checked: false, tooltip: 'Disables TLS certificate verification. Only useful when targeting a local emulator.' },
+  ]}
+/>
+
+Then, create a pipeline that forwards logs received via Syslog to the `azure`
+forwarder:
+
+<PipelineDiagram
+  alt="A FlowG pipeline routing syslog logs to the Azure Monitor forwarder"
+  nodes={[
+    { id: 'source', type: 'source', x: 0, y: 0, value: 'SYSLOG' },
+    { id: 'fwd', type: 'forwarder', x: 340, y: 0, value: 'azure' },
+  ]}
+  edges={[
+    { from: 'source', to: 'fwd' },
+  ]}
+/>
+
+And that's it!
+
+## Testing
+
+import AzureLogsUrl from '@site/static/img/guides/azure/logs.png'
+
+You can test the setup by sending a log to the pipeline using the `logger`
+command:
+
+```bash
+logger --rfc3164 -n localhost -P 5514 -t myapp1 'hello world'
+```
+
+You can then query the logs back with:
+
+```bash
+WORKSPACE_ID=$(az monitor log-analytics workspace show \
+  --resource-group testing \
+  --workspace-name flowg \
+  --query customerId -o tsv)
+
+az monitor log-analytics query \
+  --workspace "$WORKSPACE_ID" \
+  --analytics-query 'flowg_CL | take 10'
+```
+
+:::note
+
+- We assume you are logged in **NOT** with the service principal we created
+  earlier.
+
+:::
+
+Or find them in the [Azure portal](https://portal.azure.com), in the "Logs"
+tab of the Log Analytics workspace, with the following KQL query:
+
+```
+flowg_CL
+```
+
+<div style={{ textAlign: 'center' }} class="with-zoom">
+  <img src={AzureLogsUrl} alt="FlowG logs in Azure Monitor" />
+</div>
+
+:::note
+
+The first records can take a few minutes to show up after the creation of the
+table and the rule.
+
+:::
+
+The fields of the log record are sent as a JSON object to the Logs Ingestion
+API. Only the columns declared in the input stream of the DCR reach the table,
+other fields are dropped. The `TimeGenerated` column is set at ingestion time
+by the rule's transformation, FlowG does not send the record's timestamp.
