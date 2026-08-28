@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"log/slog"
+
 	"sync"
 	"sync/atomic"
 
@@ -14,6 +16,8 @@ import (
 	"net"
 
 	"link-society.com/flowg/internal/models"
+
+	"link-society.com/flowg/internal/engines/confignotify"
 
 	"link-society.com/flowg/internal/storage/generic/kv"
 	storage "link-society.com/flowg/internal/storage/interfaces"
@@ -31,8 +35,12 @@ const (
 // Storage is a backend-agnostic implementation of [storage.ConfigStorage]. It
 // runs the config transactions from the transactions subpackage on top of any
 // [kv.Adapter] and caches the decoded system configuration in memory.
+//
+// When a [confignotify.Notifier] is wired, every successful mutation is
+// broadcast on it so the pipeline runner can react to configuration changes.
 type Storage[QTx kv.QueryTx, MTx kv.MutationTx] struct {
-	adapter kv.Adapter[QTx, MTx]
+	adapter  kv.Adapter[QTx, MTx]
+	notifier confignotify.Notifier
 
 	lock                  *sync.Mutex
 	configurationInstance atomic.Pointer[models.SystemConfiguration]
@@ -41,11 +49,33 @@ type Storage[QTx kv.QueryTx, MTx kv.MutationTx] struct {
 var _ storage.ConfigStorage = (*Storage[kv.QueryTx, kv.MutationTx])(nil)
 
 // NewStorage returns a [Storage] that persists configuration data through the
-// given key-value adapter.
-func NewStorage[QTx kv.QueryTx, MTx kv.MutationTx](adapter kv.Adapter[QTx, MTx]) *Storage[QTx, MTx] {
+// given key-value adapter. notifier may be nil, in which case no change
+// notification is emitted (e.g. on backends with their own change watcher).
+func NewStorage[QTx kv.QueryTx, MTx kv.MutationTx](
+	adapter kv.Adapter[QTx, MTx],
+	notifier confignotify.Notifier,
+) *Storage[QTx, MTx] {
 	return &Storage[QTx, MTx]{
-		adapter: adapter,
-		lock:    &sync.Mutex{},
+		adapter:  adapter,
+		notifier: notifier,
+		lock:     &sync.Mutex{},
+	}
+}
+
+// notify broadcasts a config change when a notifier is wired; the mutation
+// already succeeded, so delivery errors are logged instead of returned.
+func (s *Storage[QTx, MTx]) notify(ctx context.Context, event confignotify.Event) {
+	if s.notifier == nil {
+		return
+	}
+
+	if err := s.notifier.Notify(ctx, event); err != nil {
+		slog.ErrorContext(
+			ctx,
+			"failed to notify config change",
+			"channel", "storage.config",
+			"error", err.Error(),
+		)
 	}
 }
 
@@ -56,7 +86,12 @@ func (s *Storage[QTx, MTx]) Dump(ctx context.Context, w io.Writer, version uint6
 
 // Load implements [storage.ConfigStorage].
 func (s *Storage[QTx, MTx]) Load(ctx context.Context, r io.Reader) error {
-	return s.adapter.Restore(ctx, r)
+	if err := s.adapter.Restore(ctx, r); err != nil {
+		return err
+	}
+
+	s.notify(ctx, confignotify.Event{Kind: confignotify.DependenciesChanged})
+	return nil
 }
 
 // ListTransformers implements [storage.ConfigStorage].
@@ -81,12 +116,22 @@ func (s *Storage[QTx, MTx]) ReadTransformer(ctx context.Context, name string) (*
 
 // WriteTransformer implements [storage.ConfigStorage].
 func (s *Storage[QTx, MTx]) WriteTransformer(ctx context.Context, name string, content string) error {
-	return s.writeItem(ctx, transformerItemType, name, []byte(content))
+	if err := s.writeItem(ctx, transformerItemType, name, []byte(content)); err != nil {
+		return err
+	}
+
+	s.notify(ctx, confignotify.Event{Kind: confignotify.DependenciesChanged})
+	return nil
 }
 
 // DeleteTransformer implements [storage.ConfigStorage].
 func (s *Storage[QTx, MTx]) DeleteTransformer(ctx context.Context, name string) error {
-	return s.deleteItem(ctx, transformerItemType, name)
+	if err := s.deleteItem(ctx, transformerItemType, name); err != nil {
+		return err
+	}
+
+	s.notify(ctx, confignotify.Event{Kind: confignotify.DependenciesChanged})
+	return nil
 }
 
 // ListPipelines implements [storage.ConfigStorage].
@@ -126,17 +171,32 @@ func (s *Storage[QTx, MTx]) WritePipeline(ctx context.Context, name string, flow
 		return fmt.Errorf("failed to marshal flow graph: %w", err)
 	}
 
-	return s.writeItem(ctx, pipelineItemType, name, content)
+	if err := s.writeItem(ctx, pipelineItemType, name, content); err != nil {
+		return err
+	}
+
+	s.notify(ctx, confignotify.Event{Kind: confignotify.PipelineChanged, Pipeline: name})
+	return nil
 }
 
 // WriteRawPipeline implements [storage.ConfigStorage].
 func (s *Storage[QTx, MTx]) WriteRawPipeline(ctx context.Context, name string, content string) error {
-	return s.writeItem(ctx, pipelineItemType, name, []byte(content))
+	if err := s.writeItem(ctx, pipelineItemType, name, []byte(content)); err != nil {
+		return err
+	}
+
+	s.notify(ctx, confignotify.Event{Kind: confignotify.PipelineChanged, Pipeline: name})
+	return nil
 }
 
 // DeletePipeline implements [storage.ConfigStorage].
 func (s *Storage[QTx, MTx]) DeletePipeline(ctx context.Context, name string) error {
-	return s.deleteItem(ctx, pipelineItemType, name)
+	if err := s.deleteItem(ctx, pipelineItemType, name); err != nil {
+		return err
+	}
+
+	s.notify(ctx, confignotify.Event{Kind: confignotify.PipelineDeleted, Pipeline: name})
+	return nil
 }
 
 // ListForwarders implements [storage.ConfigStorage].
@@ -177,12 +237,22 @@ func (s *Storage[QTx, MTx]) WriteForwarder(ctx context.Context, name string, for
 		return fmt.Errorf("failed to marshal forwarder: %w", err)
 	}
 
-	return s.writeItem(ctx, forwarderItemType, name, content)
+	if err := s.writeItem(ctx, forwarderItemType, name, content); err != nil {
+		return err
+	}
+
+	s.notify(ctx, confignotify.Event{Kind: confignotify.DependenciesChanged})
+	return nil
 }
 
 // DeleteForwarder implements [storage.ConfigStorage].
 func (s *Storage[QTx, MTx]) DeleteForwarder(ctx context.Context, name string) error {
-	return s.deleteItem(ctx, forwarderItemType, name)
+	if err := s.deleteItem(ctx, forwarderItemType, name); err != nil {
+		return err
+	}
+
+	s.notify(ctx, confignotify.Event{Kind: confignotify.DependenciesChanged})
+	return nil
 }
 
 // HasSystemConfig implements [storage.ConfigStorage].
