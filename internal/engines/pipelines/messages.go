@@ -69,14 +69,15 @@ type terminateMessage struct {
 
 func (msg logMessage) handle(ctx context.Context, w *worker) {
 	go func() {
-		var pipeline *Pipeline
-		var err error
 		defer close(msg.replyTo)
 
 		ctx := context.WithValue(ctx, workerKey, w)
+
+		var pipeline *Pipeline
 		if msg.tracer != nil {
 			ctx = WithTracer(ctx, msg.tracer)
 
+			var err error
 			pipeline, err = BuildFlow(ctx, w.configStorage, msg.pipelineName, &msg.tracer.Flow)
 			if err != nil {
 				msg.replyTo <- err
@@ -88,40 +89,32 @@ func (msg logMessage) handle(ctx context.Context, w *worker) {
 				msg.replyTo <- err
 				return
 			}
+			defer func() { _ = pipeline.Close(ctx) }()
 		} else {
-			pipeline, err = w.getPipeline(ctx, msg.pipelineName)
+			var release func()
+			var err error
+			pipeline, release, err = w.acquirePipeline(msg.pipelineName)
 			if err != nil {
 				msg.replyTo <- err
 				return
 			}
+			defer release()
 		}
 
-		if err != nil {
-			msg.replyTo <- err
-			return
-		}
-
-		err = pipeline.Process(ctx, msg.entrypoint, msg.record)
-
-		if msg.tracer != nil {
-			_ = pipeline.Close(ctx)
-		}
-
-		msg.replyTo <- err
+		msg.replyTo <- pipeline.Process(ctx, msg.entrypoint, msg.record)
 	}()
 }
 
 func (msg scrapMetricsMessage) handle(ctx context.Context, w *worker) {
 	go func() {
-		var pipeline *Pipeline
-		var err error
 		defer close(msg.replyTo)
 
-		pipeline, err = w.getPipeline(ctx, msg.pipelineName)
+		pipeline, release, err := w.acquirePipeline(msg.pipelineName)
 		if err != nil {
 			msg.replyTo <- err
 			return
 		}
+		defer release()
 
 		families, err := pipeline.Metrics.Gather()
 		if err != nil {
@@ -148,6 +141,16 @@ func (msg runMessage) handle(ctx context.Context, w *worker) {
 }
 
 func (msg terminateMessage) handle(ctx context.Context, w *worker) {
-	defer close(msg.replyTo)
-	msg.replyTo <- w.closePipeline(ctx, msg.pipelineName)
+	done, err := w.closePipeline(msg.pipelineName)
+	if err != nil {
+		msg.replyTo <- err
+		close(msg.replyTo)
+		return
+	}
+
+	// reply once the drain completed, without blocking the actor loop
+	go func() {
+		msg.replyTo <- <-done
+		close(msg.replyTo)
+	}()
 }
