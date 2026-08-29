@@ -68,6 +68,8 @@ tasks:
       CGO_ENABLED: "1"
       CGO_CFLAGS: "-I{{ .FDB }}/include"
       CGO_LDFLAGS: "-L{{ .FDB }}/lib/{{ .GOOS }}/{{ .GOARCH }} -Wl,-rpath,{{ .RPATH }}"
+      # test binaries run from a temp dir, so the rpath cannot resolve libfdb_c
+      LD_LIBRARY_PATH: "{{ .FDB }}/lib/{{ .GOOS }}/{{ .GOARCH }}"
 
   "test:unit:rust:vrl":
     internal: true
