@@ -47,8 +47,8 @@ taken out-of-band with the `fdbbackup` / `fdbrestore` tooling instead.
 
 ### Change log & watches
 
-When `AdapterOptions.EnableChangeLog` is set, every `Update` transaction also
-sets `ChangeLogKey` to a fresh random value, atomically with the mutation.
+Every `Update` transaction also sets `ChangeLogKey` to a fresh random value,
+atomically with the mutation.
 `Watch` arms a FoundationDB key watch and returns a channel that fires once
 when the watched key changes — from any node of the cluster. Together they let
 a storage observe every mutation made through the adapter without polling; the

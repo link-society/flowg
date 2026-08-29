@@ -25,8 +25,7 @@ const FoundationApiVersion = 730
 // AdapterOptions.GCInterval is left unset.
 const defaultGCInterval = 5 * time.Minute
 
-// ChangeLogKey is the key bumped on every mutation when
-// [AdapterOptions.EnableChangeLog] is set; watching it (see
+// ChangeLogKey is the key bumped by every Update transaction; watching it (see
 // [FoundationAdapter.Watch]) observes every change made through the adapter,
 // from any node of the cluster.
 var ChangeLogKey = kv.Key{"meta", "changelog"}
@@ -46,9 +45,6 @@ type AdapterOptions struct {
 	Namespace string
 	// GCInterval is how often expired keys are swept; zero uses defaultGCInterval.
 	GCInterval time.Duration
-	// EnableChangeLog makes every Update transaction also bump [ChangeLogKey],
-	// atomically with the mutation, so other nodes can watch for changes.
-	EnableChangeLog bool
 }
 
 // FoundationAdapter is a [kv.Adapter] backed by FoundationDB.
@@ -57,9 +53,8 @@ type AdapterOptions struct {
 // applied on write and stripped on read, so consumers only ever observe logical
 // [kv.Key]s.
 type FoundationAdapter struct {
-	db        fdb.Database
-	sub       subspace.Subspace
-	changeLog bool
+	db  fdb.Database
+	sub subspace.Subspace
 }
 
 var _ kv.Adapter[*FoundationQueryTx, *FoundationMutationTx] = (*FoundationAdapter)(nil)
@@ -92,9 +87,8 @@ func NewAdapter(opts AdapterOptions) fx.Option {
 		}
 
 		adapter := &FoundationAdapter{
-			db:        db,
-			sub:       subspace.Sub(opts.KeySpace).Sub(opts.Namespace),
-			changeLog: opts.EnableChangeLog,
+			db:  db,
+			sub: subspace.Sub(opts.KeySpace).Sub(opts.Namespace),
 		}
 
 		lc.Append(fx.Hook{
@@ -153,8 +147,8 @@ func (a *FoundationAdapter) View(ctx context.Context, txnFn func(txn *Foundation
 
 // Update implements [kv.Adapter.Update]. It runs inside a read-write
 // FoundationDB transaction, which is committed on success; FoundationDB retries
-// automatically on conflict. When the changelog is enabled, [ChangeLogKey] is
-// set to a fresh random value in the same transaction.
+// automatically on conflict. [ChangeLogKey] is set to a fresh random value in
+// the same transaction, so watchers observe every mutation.
 func (a *FoundationAdapter) Update(ctx context.Context, txnFn func(txn *FoundationMutationTx) error) error {
 	_, err := a.db.Transact(func(tr fdb.Transaction) (any, error) {
 		if err := applyDeadline(ctx, tr); err != nil {
@@ -165,11 +159,9 @@ func (a *FoundationAdapter) Update(ctx context.Context, txnFn func(txn *Foundati
 			return nil, err
 		}
 
-		if a.changeLog {
-			value := make([]byte, 16)
-			rand.Read(value)
-			tr.Set(a.sub.Pack(keyToTuple(ChangeLogKey)), value)
-		}
+		value := make([]byte, 16)
+		rand.Read(value)
+		tr.Set(a.sub.Pack(keyToTuple(ChangeLogKey)), value)
 
 		return nil, nil
 	})
