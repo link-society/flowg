@@ -90,8 +90,17 @@ func (s *Storage[QTx, MTx]) Load(ctx context.Context, r io.Reader) error {
 		return err
 	}
 
+	s.InvalidateSystemConfigCache()
 	s.notify(ctx, confignotify.Event{Kind: confignotify.DependenciesChanged})
 	return nil
+}
+
+// InvalidateSystemConfigCache drops the in-memory system configuration so the
+// next read fetches it from storage again. It is called when the stored
+// configuration changed behind the cache: on restore, or when another node of
+// a cluster wrote it.
+func (s *Storage[QTx, MTx]) InvalidateSystemConfigCache() {
+	s.configurationInstance.Store(nil)
 }
 
 // ListTransformers implements [storage.ConfigStorage].

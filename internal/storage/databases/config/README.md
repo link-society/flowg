@@ -22,6 +22,8 @@ top of any [generic/kv](../../generic/kv) adapter.
   watcher instead.
 - **System configuration** — persists and caches global settings such as the
   allowed origins used by the ingestion endpoints, validating them on write.
+  `InvalidateSystemConfigCache` drops the cache when the stored value changed
+  behind it: on restore, or when another node of a cluster wrote it.
 - **Snapshots** — satisfies `Streamable` so the configuration database can be
   backed up and restored.
 
