@@ -123,6 +123,7 @@ RUN go generate ./...
 RUN CGO_ENABLED=1 \
     CGO_CFLAGS="-I/workspace/third-party/foundationdb/7.3.77/include" \
     CGO_LDFLAGS="-L/workspace/third-party/foundationdb/7.3.77/lib/linux/$(go env GOARCH)" \
+    LD_LIBRARY_PATH="/workspace/third-party/foundationdb/7.3.77/lib/linux/$(go env GOARCH)" \
     go test -timeout 500ms -v ./...
 RUN CGO_ENABLED=1 \
     CGO_CFLAGS="-I/workspace/third-party/foundationdb/7.3.77/include" \
