@@ -54,7 +54,6 @@ func NewStorage(opts Options) fx.Option {
 		ConnectionString: opts.ConnectionString,
 		KeySpace:         opts.KeySpace,
 		Namespace:        "config",
-		EnableChangeLog:  true,
 	}
 
 	return fx.Module(
