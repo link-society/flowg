@@ -13,6 +13,9 @@ interface so the engines and API never depend on BadgerDB directly.
 
 - **Resource persistence** — stores and retrieves pipelines, transformers and
   forwarders in a dedicated [kvstore](../../kvstore).
+- **Change notifications** — wires the optional
+  [confignotify](../../../../../engines/confignotify) notifier into the store,
+  so every local mutation is broadcast to the pipeline runner.
 - **System configuration** — persists global settings such as the allowed
   origins used by the ingestion endpoints.
 - **Snapshots** — satisfies `Streamable` so the configuration database can be

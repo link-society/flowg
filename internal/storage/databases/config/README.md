@@ -14,6 +14,12 @@ top of any [generic/kv](../../generic/kv) adapter.
 - **Resource persistence** — stores and retrieves pipelines, transformers and
   forwarders through a key-value adapter, migrating them to the latest model
   version on read when needed.
+- **Change notifications** — broadcasts a
+  [confignotify](../../../engines/confignotify) event after every successful
+  mutation (when a notifier is wired), so the pipeline runner follows
+  configuration changes without the API layer driving it. Backends with their
+  own change watcher (FoundationDB) pass a nil notifier and emit from the
+  watcher instead.
 - **System configuration** — persists and caches global settings such as the
   allowed origins used by the ingestion endpoints, validating them on write.
 - **Snapshots** — satisfies `Streamable` so the configuration database can be
