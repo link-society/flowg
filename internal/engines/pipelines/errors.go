@@ -53,3 +53,8 @@ var _ error = (*PipelineNotFoundError)(nil)
 func (e *PipelineNotFoundError) Error() string {
 	return fmt.Sprintf("pipeline not found: %s", e.Pipeline)
 }
+
+func (e *PipelineNotFoundError) Is(target error) bool {
+	_, ok := target.(*PipelineNotFoundError)
+	return ok
+}
