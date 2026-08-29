@@ -3,6 +3,7 @@ package pipelines
 import (
 	"context"
 	"log/slog"
+
 	"sync"
 
 	"github.com/vladopajic/go-actor/actor"

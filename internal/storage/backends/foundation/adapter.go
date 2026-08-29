@@ -3,10 +3,11 @@ package foundation
 import (
 	"context"
 	"fmt"
+
 	"io"
-	"time"
 
 	"crypto/rand"
+	"time"
 
 	"github.com/apple/foundationdb/bindings/go/src/fdb"
 	"github.com/apple/foundationdb/bindings/go/src/fdb/subspace"

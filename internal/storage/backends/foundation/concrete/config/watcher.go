@@ -3,10 +3,11 @@ package config
 import (
 	"context"
 	"log/slog"
+
 	"maps"
-	"time"
 
 	"crypto/sha256"
+	"time"
 
 	"github.com/vladopajic/go-actor/actor"
 

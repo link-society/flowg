@@ -1,8 +1,9 @@
 package pipelines
 
 import (
-	"errors"
 	"testing"
+
+	"errors"
 	"time"
 
 	"go.uber.org/fx"

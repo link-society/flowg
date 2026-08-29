@@ -3,11 +3,12 @@ package pipelines
 import (
 	"context"
 	"errors"
+
 	"fmt"
 	"log/slog"
-	"sync"
 
 	"io"
+	"sync"
 
 	"github.com/vladopajic/go-actor/actor"
 	"go.uber.org/fx"
