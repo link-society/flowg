@@ -25,13 +25,14 @@ same path.
 ## Change watcher
 
 The watcher arms a FoundationDB watch on the adapter's change log key, hashes
-the stored pipelines, transformers and forwarders, and diffs the result against
-its previous snapshot whenever the watch fires: pipeline diffs become
-`PipelineChanged` / `PipelineDeleted` events, transformer or forwarder diffs
-collapse into a single `DependenciesChanged`. Arming the watch before scanning
-guarantees no missed window, and diffing makes FoundationDB's watch coalescing
-harmless. The first scan primes the snapshot silently, since the pipeline
-runner builds everything at boot on its own.
+the stored pipelines, transformers, forwarders and system configuration, and
+diffs the result against its previous snapshot whenever the watch fires:
+pipeline diffs become `PipelineChanged` / `PipelineDeleted` events, transformer
+or forwarder diffs collapse into a single `DependenciesChanged`, and a system
+configuration diff drops the node's cached system configuration. Arming the
+watch before scanning guarantees no missed window, and diffing makes
+FoundationDB's watch coalescing harmless. The first scan primes the snapshot
+silently, since the pipeline runner builds everything at boot on its own.
 
 ## Layout
 

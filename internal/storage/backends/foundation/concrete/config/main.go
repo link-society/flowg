@@ -60,19 +60,27 @@ func NewStorage(opts Options) fx.Option {
 	return fx.Module(
 		"storage.config",
 		foundation.NewAdapter(adapterOpts),
-		fx.Provide(func(d deps) storage.ConfigStorage {
+		fx.Provide(func(d deps) *config.Storage[*foundation.FoundationQueryTx, *foundation.FoundationMutationTx] {
 			// no local notifier: change events come from the key watcher, so every
 			// node (including the writer) observes mutations through the same path
 			return config.NewStorage(d.Adapter, nil)
 		}),
-		fx.Invoke(func(lc fx.Lifecycle, d deps) {
+		fx.Provide(func(s *config.Storage[*foundation.FoundationQueryTx, *foundation.FoundationMutationTx]) storage.ConfigStorage {
+			return s
+		}),
+		fx.Invoke(func(
+			lc fx.Lifecycle,
+			d deps,
+			s *config.Storage[*foundation.FoundationQueryTx, *foundation.FoundationMutationTx],
+		) {
 			if d.Notifier == nil {
 				return
 			}
 
 			watcher := actor.New(&watchWorker{
-				adapter:  d.Adapter,
-				notifier: d.Notifier,
+				adapter:     d.Adapter,
+				notifier:    d.Notifier,
+				systemCache: s,
 			})
 
 			lc.Append(fx.Hook{
