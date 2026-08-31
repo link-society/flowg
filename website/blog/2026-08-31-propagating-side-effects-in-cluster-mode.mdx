@@ -1,0 +1,181 @@
+---
+title: Propagating the side effects in cluster mode
+description: Saving a pipeline is more than a write, something must be compiled, started or stopped, on every node of the cluster. Here is how FlowG does it now.
+slug: propagating-side-effects-in-cluster-mode
+authors: linkdd
+tags: [pipelines, clustering, storage]
+---
+
+Since [v0.61.0](https://github.com/link-society/flowg/releases/tag/v0.61.0),
+**FlowG** can run as a cluster of nodes sharing a single FoundationDB storage.
+Storing the data is the easy part: FoundationDB replicates it for us. But
+saving a pipeline is more than a write. Something must be compiled, started,
+reloaded or stopped, and not just on the node that received the API call. On
+every node.
+
+**[FlowG v0.63.1](https://github.com/link-society/flowg/releases/tag/v0.63.1)**
+makes this work. Here's how.
+
+<!-- truncate -->
+
+## The old model
+
+A **FlowG** node is three layers. Services listen on the network. Engines
+process the records. Storages persist everything, on top of BadgerDB, or
+FoundationDB in cluster mode:
+
+<div style={{textAlign: 'center'}}>
+
+![The old model: services, engines and storages; the API saves configuration and directly invalidates the pipeline cache](/img/design/old-model-architecture.svg)
+
+</div>
+
+The part we care about here is the amber path: saving a pipeline wrote it to
+the config storage, then told the pipeline engine, directly, to drop its
+compiled version. The API layer was the one driving the engine's cache.
+
+### Lazy pipelines
+
+A compiled pipeline is expensive: its
+[VRL](https://vector.dev/docs/reference/vrl/) transformers are compiled, its
+forwarders hold live connections, its metrics are registered. So the engine
+built it the first time a record needed it, and cached the result:
+
+<div style={{textAlign: 'center'}}>
+
+![Lazy initialization: a record either finds its pipeline in the cache, or pays for the full compilation first](/img/design/pipeline-cache-lazy.svg)
+
+</div>
+
+Cheap for pipelines nobody uses, but the first record pays the bill, and a
+pipeline referencing a broken transformer saves without complaint, then
+explodes hours later in the ingestion logs, far from whoever edited it.
+
+## The problem
+
+In cluster mode, that amber "invalidate" arrow is a lie. The write reaches
+every node, because FoundationDB replicates it. The invalidation is a function
+call inside the node that handled the save:
+
+<div style={{textAlign: 'center'}}>
+
+![The write replicates to every node, the cache invalidation stays on the node that received the save](/img/design/cluster-no-propagation.svg)
+
+</div>
+
+Save a pipeline on node A, and nodes B and C keep running the old version.
+Not for a few seconds: until they restart. Same thing for transformers,
+forwarders, and the system configuration.
+
+### It was already broken on one node
+
+While redesigning this, we found out the single-node case wasn't safe either:
+deleting a pipeline removed it from storage and invalidated nothing.
+
+<div style={{textAlign: 'center'}}>
+
+![The delete bug: the pipeline is gone from storage but its compiled version keeps processing records](/img/design/deleted-pipeline-bug.svg)
+
+</div>
+
+The compiled version stayed in the cache and kept processing records, with a
+pipeline that didn't exist anymore. Nobody noticed, because the cache was an
+implementation detail driven from another layer. That's the real lesson: side
+effects managed by hand, far from the data they depend on, rot silently.
+
+## The solution
+
+We inverted the flow: instead of the API pushing invalidations into the
+engine, the engine now reacts to what the storage says. Three new pieces:
+
+ - **confignotify**, an internal event bus on each node. The pipeline engine
+   subscribes to it: "pipeline changed" reloads it, "pipeline deleted" stops
+   it, "dependencies changed" (transformer, forwarder, restore) resyncs
+   everything.
+ - a **change log key** in the FoundationDB config namespace. Every write to
+   the config storage also rewrites this key, in the same transaction. Either
+   both commit, or neither.
+ - a **watcher** on each node. It arms a
+   [FoundationDB watch](https://apple.github.io/foundationdb/developer-guide.html#watches)
+   on the change log key (think etcd or Consul watches: a doorbell, no
+   payload). When it fires, the watcher re-lists the config, fingerprints each
+   item, diffs against its previous pass, and publishes the differences on the
+   local bus.
+
+<div style={{textAlign: 'center'}}>
+
+![The new model: one transaction writes the item and the change log key, the watch fires on every node, each watcher diffs and publishes on its local bus, each engine reloads](/img/design/solution-architecture.svg)
+
+</div>
+
+Note what's *not* there: the writer doesn't notify itself. Node A hears about
+its own save the same way B and C do, through the watch. One path for local
+and remote changes, nothing to deduplicate, no way for a node to diverge from
+the shared storage.
+
+Diffing instead of trusting the doorbell is also what makes it robust.
+FoundationDB coalesces watches (three quick writes may wake the watcher once)
+and a network blip can eat one entirely. Doesn't matter: the watcher never
+acts on the event, it acts on the difference between storage and what it knew.
+Kubernetes taught us that one: react to state, not to events. Convergence can
+be delayed, never lost.
+
+On BadgerDB there's no other node to hear from, so the storage publishes on
+the bus directly, and none of the FoundationDB machinery exists.
+
+### Eager pipelines
+
+Reacting to the storage only works if the engine owns a running state to
+converge. So pipelines aren't lazy anymore: every pipeline in storage is
+compiled and started at boot, before the server accepts traffic. A save
+compiles the new version first (if it fails, the old one keeps serving, like a
+reverse proxy rejecting a bad config), then swaps:
+
+<div style={{textAlign: 'center'}}>
+
+![A reload: the new version takes new records, the old one drains before closing](/img/design/pipeline-build-lifetime.svg)
+
+</div>
+
+Records already inside finish on the version they started with; the old
+version's connections close after its last record. Deletes work the same,
+minus the new version: stop accepting records, drain, close. No record is
+ever dropped by an edit, a delete, or a shutdown.
+
+Compilation errors moved where you can see them: at boot or at save time, in
+the server logs, tagged with the pipeline name. Not hours later in the
+ingestion path.
+
+> **NB:** the counters of a pipeline's metric nodes belong to the running
+> version, so they restart from zero on reload, like on a server restart.
+> `rate()` and `increase()` don't care, but if you graph raw counter values,
+> expect a sawtooth on pipelines you edit often.
+
+### The system configuration
+
+The syslog allowed origins and the default roles are checked on every syslog
+message, so each node keeps them in memory. Same disease as the pipeline
+cache: change them on node A, node B enforced the old list until restart. The
+watcher observes the system configuration too and drops the local copy when it
+changes. Restoring a backup drops it as well, on every backend.
+
+## Conclusion
+
+What it changes when you operate **FlowG**:
+
+ - pipelines start with the server; a broken one shows up in the boot logs,
+   not hours later in the ingestion path
+ - edits are zero-downtime reloads; no record is dropped
+ - deletes actually stop the pipeline, everywhere
+ - on a cluster, changes converge on every node within milliseconds, whichever
+   node you talked to
+
+And as always, feedback is welcome, either on
+[GitHub](https://github.com/link-society/flowg) or on
+[Discord](https://discord.com/invite/zjG3mMaENg).
+
+<p style={{textAlign: "right"}}>
+
+  `\_o< {quack} >o_/`
+
+</p>

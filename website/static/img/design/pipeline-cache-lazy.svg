@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 250" role="img" aria-label="Lazy initialization: a record either finds its pipeline in the cache, or pays for the full compilation first">
+  <rect x="0" y="0" width="760" height="250" rx="10" fill="#ffffff"/>
+  <rect x="6" y="4" width="748" height="242" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="18" y="22" font-family="sans-serif" font-size="11" font-weight="bold" fill="#94a3b8">lazy initialization</text>
+
+  <rect x="30" y="70" width="190" height="44" rx="6" fill="#eff6ff" stroke="#1e40af" stroke-width="1.5"/>
+  <text x="125" y="96" text-anchor="middle" font-family="monospace" font-size="12" fill="#1e293b">record for "audit"</text>
+
+  <rect x="270" y="70" width="140" height="44" rx="6" fill="#eff6ff" stroke="#1e40af" stroke-width="1.5"/>
+  <text x="340" y="96" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#1e40af">in the cache?</text>
+
+  <rect x="610" y="70" width="110" height="44" rx="6" fill="#eff6ff" stroke="#1e40af" stroke-width="1.5"/>
+  <text x="665" y="96" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#1e40af">process</text>
+
+  <rect x="270" y="160" width="280" height="56" rx="6" fill="#fef3c7" stroke="#b45309" stroke-width="1.5"/>
+  <text x="410" y="184" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1e293b">read flow graph, compile transformers,</text>
+  <text x="410" y="202" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1e293b">connect forwarders, register metrics</text>
+
+  <path d="M220,92 L270,92" fill="none" stroke="#94a3b8" stroke-width="1.4"/>
+  <path d="M270,92 l-8,-4 v8 z" fill="#94a3b8"/>
+
+  <path d="M410,92 L610,92" fill="none" stroke="#94a3b8" stroke-width="1.4"/>
+  <path d="M610,92 l-8,-4 v8 z" fill="#94a3b8"/>
+  <text x="500" y="84" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#64748b">yes</text>
+
+  <path d="M340,114 L340,160" fill="none" stroke="#b45309" stroke-width="1.4"/>
+  <path d="M340,160 l-4,-8 h8 z" fill="#b45309"/>
+  <text x="325" y="140" text-anchor="end" font-family="sans-serif" font-size="10" fill="#b45309">no: the record waits</text>
+
+  <path d="M550,188 C620,188 665,150 665,114" fill="none" stroke="#94a3b8" stroke-width="1.4"/>
+  <path d="M665,114 l-4,8 h8 z" fill="#94a3b8"/>
+  <text x="640" y="180" font-family="sans-serif" font-size="10" fill="#64748b">cached for</text>
+  <text x="640" y="194" font-family="sans-serif" font-size="10" fill="#64748b">the next ones</text>
+</svg>

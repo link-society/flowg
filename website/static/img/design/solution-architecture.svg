@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 540" role="img" aria-label="The new model: a save writes the item and the change log key in one transaction, the watch fires on every node, each watcher diffs the config and publishes on its local confignotify bus, and each pipeline engine reloads">
+  <rect x="0" y="0" width="760" height="540" rx="10" fill="#ffffff"/>
+  <rect x="6" y="4" width="748" height="532" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="18" y="22" font-family="sans-serif" font-size="11" font-weight="bold" fill="#94a3b8">the new model, cluster-wide</text>
+
+  <!-- node A -->
+  <rect x="20" y="36" width="440" height="360" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="36" y="56" font-family="sans-serif" font-size="11" font-weight="bold" fill="#94a3b8">node A</text>
+
+  <rect x="40" y="70" width="150" height="48" rx="6" fill="#eff6ff" stroke="#1e40af" stroke-width="1.5"/>
+  <text x="115" y="98" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#1e40af">HTTP server</text>
+
+  <rect x="270" y="70" width="170" height="60" rx="6" fill="#eff6ff" stroke="#1e40af" stroke-width="1.5"/>
+  <text x="355" y="94" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#1e40af">pipeline engine</text>
+  <text x="355" y="114" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#64748b">running pipelines</text>
+
+  <rect x="40" y="200" width="150" height="54" rx="6" fill="#eff6ff" stroke="#1e40af" stroke-width="1.5"/>
+  <text x="115" y="224" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#1e40af">config storage</text>
+  <text x="115" y="242" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#64748b">reads / writes</text>
+
+  <rect x="240" y="200" width="100" height="54" rx="6" fill="#fef3c7" stroke="#b45309" stroke-width="1.5"/>
+  <text x="290" y="224" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#b45309">watcher</text>
+  <text x="290" y="242" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#64748b">list + diff</text>
+
+  <rect x="370" y="200" width="70" height="54" rx="6" fill="#fef3c7" stroke="#b45309" stroke-width="1.5"/>
+  <text x="405" y="224" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#b45309">bus</text>
+  <text x="405" y="242" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#64748b">confignotify</text>
+
+  <!-- node A arrows -->
+  <path d="M115,118 L115,200" fill="none" stroke="#94a3b8" stroke-width="1.4"/>
+  <path d="M115,200 l-4,-8 h8 z" fill="#94a3b8"/>
+  <circle cx="115" cy="155" r="9" fill="#1e40af"/>
+  <text x="115" y="159" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#ffffff">1</text>
+  <text x="130" y="159" font-family="sans-serif" font-size="10" fill="#64748b">save</text>
+
+  <path d="M340,227 L370,227" fill="none" stroke="#b45309" stroke-width="1.4"/>
+  <path d="M370,227 l-8,-4 v8 z" fill="#b45309"/>
+  <circle cx="355" cy="212" r="9" fill="#b45309"/>
+  <text x="355" y="216" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#ffffff">4</text>
+
+  <path d="M405,200 L370,130" fill="none" stroke="#b45309" stroke-width="1.4"/>
+  <path d="M370,130 l0,9 l7,-4 z" fill="#b45309"/>
+  <circle cx="392" cy="165" r="9" fill="#b45309"/>
+  <text x="392" y="169" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#ffffff">5</text>
+  <text x="406" y="169" font-family="sans-serif" font-size="10" fill="#64748b">reload / stop</text>
+
+  <!-- node B -->
+  <rect x="480" y="36" width="260" height="360" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="496" y="56" font-family="sans-serif" font-size="11" font-weight="bold" fill="#94a3b8">node B (same layout)</text>
+
+  <rect x="530" y="70" width="160" height="60" rx="6" fill="#eff6ff" stroke="#1e40af" stroke-width="1.5"/>
+  <text x="610" y="94" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#1e40af">pipeline engine</text>
+  <text x="610" y="114" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#64748b">running pipelines</text>
+
+  <rect x="500" y="200" width="100" height="54" rx="6" fill="#fef3c7" stroke="#b45309" stroke-width="1.5"/>
+  <text x="550" y="224" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#b45309">watcher</text>
+  <text x="550" y="242" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#64748b">list + diff</text>
+
+  <rect x="630" y="200" width="70" height="54" rx="6" fill="#fef3c7" stroke="#b45309" stroke-width="1.5"/>
+  <text x="665" y="224" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#b45309">bus</text>
+  <text x="665" y="242" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#64748b">confignotify</text>
+
+  <path d="M600,227 L630,227" fill="none" stroke="#b45309" stroke-width="1.4"/>
+  <path d="M630,227 l-8,-4 v8 z" fill="#b45309"/>
+  <circle cx="615" cy="212" r="9" fill="#b45309"/>
+  <text x="615" y="216" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#ffffff">4</text>
+
+  <path d="M665,200 L630,130" fill="none" stroke="#b45309" stroke-width="1.4"/>
+  <path d="M630,130 l0,9 l7,-4 z" fill="#b45309"/>
+  <circle cx="652" cy="165" r="9" fill="#b45309"/>
+  <text x="652" y="169" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#ffffff">5</text>
+  <text x="666" y="169" font-family="sans-serif" font-size="10" fill="#64748b">reload / stop</text>
+
+  <!-- FoundationDB -->
+  <rect x="20" y="416" width="720" height="108" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="36" y="436" font-family="sans-serif" font-size="10" font-weight="bold" fill="#94a3b8">FOUNDATIONDB CLUSTER</text>
+  <rect x="60" y="450" width="220" height="54" rx="6" fill="#eff6ff" stroke="#1e40af" stroke-width="1.5"/>
+  <text x="170" y="472" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#1e40af">config items</text>
+  <text x="170" y="492" text-anchor="middle" font-family="monospace" font-size="11" fill="#64748b">pipeline : ingress ...</text>
+  <rect x="330" y="450" width="200" height="54" rx="6" fill="#fef3c7" stroke="#b45309" stroke-width="1.5"/>
+  <text x="430" y="472" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#b45309">change log key</text>
+  <text x="430" y="492" text-anchor="middle" font-family="monospace" font-size="11" fill="#64748b">meta : changelog</text>
+
+  <!-- write txn -->
+  <path d="M115,254 C115,360 140,430 170,450" fill="none" stroke="#1e40af" stroke-width="1.4"/>
+  <path d="M170,450 l-9,-2 l4,-8 z" fill="#1e40af"/>
+  <circle cx="118" cy="340" r="9" fill="#1e40af"/>
+  <text x="118" y="344" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#ffffff">2</text>
+  <text x="132" y="344" font-family="sans-serif" font-size="10" fill="#64748b">one txn: item + change log</text>
+
+  <!-- watch fires -->
+  <path d="M400,450 C360,380 310,300 292,254" fill="none" stroke="#b45309" stroke-width="1.4" stroke-dasharray="5,4"/>
+  <path d="M292,254 l8,4 l-1,-9 z" fill="#b45309"/>
+  <circle cx="330" cy="330" r="9" fill="#b45309"/>
+  <text x="330" y="334" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#ffffff">3</text>
+
+  <path d="M470,450 C510,380 535,300 552,254" fill="none" stroke="#b45309" stroke-width="1.4" stroke-dasharray="5,4"/>
+  <path d="M552,254 l-8,4 l1,-9 z" fill="#b45309"/>
+  <circle cx="520" cy="330" r="9" fill="#b45309"/>
+  <text x="520" y="334" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#ffffff">3</text>
+  <text x="534" y="334" font-family="sans-serif" font-size="10" fill="#b45309">watch fires everywhere</text>
+</svg>

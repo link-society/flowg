@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" role="img" aria-label="In cluster mode the write replicates to every node through FoundationDB, but the cache invalidation stays on the node that received the save">
+  <rect x="0" y="0" width="760" height="300" rx="10" fill="#ffffff"/>
+  <rect x="6" y="4" width="748" height="292" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="18" y="22" font-family="sans-serif" font-size="11" font-weight="bold" fill="#94a3b8">the write replicates, the side effects don't</text>
+
+  <!-- nodes -->
+  <rect x="40" y="50" width="200" height="100" rx="6" fill="#eff6ff" stroke="#1e40af" stroke-width="1.5"/>
+  <text x="140" y="74" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#1e40af">node A</text>
+  <text x="140" y="100" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1e293b">saves pipeline v2</text>
+  <text x="140" y="122" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1e293b">cache refreshed ✓</text>
+
+  <rect x="280" y="50" width="200" height="100" rx="6" fill="#fef3c7" stroke="#b45309" stroke-width="1.5"/>
+  <text x="380" y="74" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#b45309">node B</text>
+  <text x="380" y="100" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1e293b">cache: still v1</text>
+  <text x="380" y="122" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#b45309">stale until restart</text>
+
+  <rect x="520" y="50" width="200" height="100" rx="6" fill="#fef3c7" stroke="#b45309" stroke-width="1.5"/>
+  <text x="620" y="74" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#b45309">node C</text>
+  <text x="620" y="100" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1e293b">cache: still v1</text>
+  <text x="620" y="122" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#b45309">stale until restart</text>
+
+  <!-- database -->
+  <rect x="180" y="210" width="400" height="60" rx="6" fill="#eff6ff" stroke="#1e40af" stroke-width="1.5"/>
+  <text x="380" y="235" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#1e40af">FoundationDB</text>
+  <text x="380" y="255" text-anchor="middle" font-family="monospace" font-size="11" fill="#64748b">pipeline : v2 (replicated everywhere)</text>
+
+  <!-- arrows -->
+  <path d="M140,150 L250,210" fill="none" stroke="#94a3b8" stroke-width="1.4"/>
+  <path d="M250,210 l-9,-1 l3,-8 z" fill="#94a3b8"/>
+  <text x="160" y="190" font-family="sans-serif" font-size="10" fill="#64748b">write v2</text>
+
+  <path d="M380,210 L380,150" fill="none" stroke="#94a3b8" stroke-width="1.4" stroke-dasharray="5,4"/>
+  <text x="380" y="185" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="#b45309">✕</text>
+
+  <path d="M510,210 L610,150" fill="none" stroke="#94a3b8" stroke-width="1.4" stroke-dasharray="5,4"/>
+  <text x="560" y="185" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="#b45309">✕</text>
+
+  <text x="470" y="288" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#64748b">nobody tells B and C that anything changed</text>
+</svg>

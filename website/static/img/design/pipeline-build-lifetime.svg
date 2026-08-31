@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 330" role="img" aria-label="Timeline of a pipeline update: the new build takes over new records while the old build drains its in-flight ones before closing">
+  <rect x="0" y="0" width="760" height="330" rx="10" fill="#ffffff"/>
+  <rect x="6" y="4" width="748" height="322" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="18" y="22" font-family="sans-serif" font-size="11" font-weight="bold" fill="#94a3b8">pipeline update timeline</text>
+
+  <!-- time axis -->
+  <line x1="60" y1="290" x2="720" y2="290" stroke="#94a3b8" stroke-width="1.4"/>
+  <path d="M720,290 l-8,-4 v8 z" fill="#94a3b8"/>
+  <text x="700" y="308" font-family="sans-serif" font-size="11" fill="#94a3b8">time</text>
+
+  <!-- save event -->
+  <line x1="380" y1="40" x2="380" y2="290" stroke="#1e40af" stroke-width="1.4" stroke-dasharray="5,4"/>
+  <text x="380" y="36" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#1e40af">pipeline saved</text>
+
+  <!-- old build lane -->
+  <text x="60" y="80" font-family="monospace" font-size="12" fill="#1e293b">old build</text>
+  <rect x="60" y="90" width="320" height="34" rx="6" fill="#eff6ff" stroke="#1e40af" stroke-width="1.5"/>
+  <text x="220" y="111" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1e40af">active</text>
+  <rect x="380" y="90" width="180" height="34" rx="6" fill="#fef3c7" stroke="#b45309" stroke-width="1.5"/>
+  <text x="470" y="111" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#b45309">retiring: no new records</text>
+  <circle cx="560" cy="107" r="5" fill="#b45309"/>
+  <text x="572" y="111" font-family="sans-serif" font-size="11" fill="#b45309">closed after drain</text>
+
+  <!-- records on old build -->
+  <line x1="120" y1="140" x2="230" y2="140" stroke="#64748b" stroke-width="3" stroke-linecap="round"/>
+  <text x="120" y="156" font-family="sans-serif" font-size="10" fill="#64748b">record</text>
+  <line x1="330" y1="140" x2="540" y2="140" stroke="#64748b" stroke-width="3" stroke-linecap="round"/>
+  <text x="410" y="156" font-family="sans-serif" font-size="10" fill="#64748b">in-flight record finishes on the old build</text>
+
+  <!-- new build lane -->
+  <text x="60" y="212" font-family="monospace" font-size="12" fill="#1e293b">new build</text>
+  <rect x="380" y="222" width="330" height="34" rx="6" fill="#eff6ff" stroke="#1e40af" stroke-width="1.5"/>
+  <text x="545" y="243" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1e40af">active</text>
+
+  <!-- records on new build -->
+  <line x1="420" y1="272" x2="530" y2="272" stroke="#64748b" stroke-width="3" stroke-linecap="round"/>
+  <line x1="560" y1="272" x2="650" y2="272" stroke="#64748b" stroke-width="3" stroke-linecap="round"/>
+  <text x="420" y="286" font-family="sans-serif" font-size="10" fill="#64748b">new records go to the new build</text>
+
+  <!-- swap annotation -->
+  <path d="M380,124 C380,160 380,190 380,222" fill="none" stroke="#1e40af" stroke-width="1.2" marker-end="none"/>
+  <circle cx="380" cy="90" r="4" fill="#1e40af"/>
+  <circle cx="380" cy="222" r="4" fill="#1e40af"/>
+  <text x="390" y="180" font-family="sans-serif" font-size="11" fill="#1e40af">swap</text>
+</svg>
