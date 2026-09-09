@@ -8,10 +8,10 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/monitor/ingestion/azlogs v1.1.0
 	github.com/ClickHouse/clickhouse-go/v2 v2.48.0
 	github.com/apple/foundationdb/bindings/go v0.0.0-20260416192139-3ea44ce1d900
-	github.com/aws/aws-sdk-go-v2/credentials v1.20.1
-	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.84.1
+	github.com/aws/aws-sdk-go-v2/credentials v1.20.3
+	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.86.0
 	github.com/dgraph-io/badger/v4 v4.9.6
-	github.com/elastic/go-elasticsearch/v9 v9.5.1
+	github.com/elastic/go-elasticsearch/v9 v9.5.2
 	github.com/expr-lang/expr v1.17.8
 	github.com/go-chi/chi/v5 v5.3.2
 	github.com/go-logfmt/logfmt v0.6.1
@@ -34,9 +34,9 @@ require (
 	github.com/vmihailenco/msgpack/v5 v5.4.1
 	go.opentelemetry.io/proto/otlp v1.11.0
 	go.uber.org/fx v1.24.0
-	golang.org/x/crypto v0.55.0
+	golang.org/x/crypto v0.56.0
 	golang.org/x/term v0.45.0
-	google.golang.org/api v0.295.0
+	google.golang.org/api v0.297.0
 	google.golang.org/grpc v1.83.2
 	google.golang.org/protobuf v1.36.12
 	gopkg.in/mcuadros/go-syslog.v2 v2.3.0
@@ -54,10 +54,10 @@ require (
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/andybalholm/brotli v1.2.2 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
-	github.com/aws/aws-sdk-go-v2 v1.45.1 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.46.0 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.20 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.5.1 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.8.1 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.5.2 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.8.2 // indirect
 	github.com/aws/smithy-go v1.28.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
@@ -84,7 +84,7 @@ require (
 	github.com/paulmach/orb v0.13.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.27 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
-	github.com/prometheus/common v0.70.1
+	github.com/prometheus/common v0.71.0
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/santhosh-tekuri/jsonschema/v3 v3.1.0 // indirect
 	github.com/segmentio/asm v1.2.1 // indirect
