@@ -8,7 +8,6 @@ import { Handle, NodeProps, Position } from '@xyflow/react'
 
 import { useProfile } from '@/lib/hooks/profile'
 
-import DialogTransformerEditor from '@/components/DialogTransformerEditor/component'
 import PipelineDeleteNodeButton from '@/components/PipelineDeleteNodeButton/component'
 import PipelineTraceNodeButton from '@/components/PipelineTraceNodeButton/component'
 import PipelineTraceNodeIndicator from '@/components/PipelineTraceNodeIndicator/component'
@@ -28,7 +27,6 @@ const PipelineNodeTransformer = ({
     <>
       {selected && permissions.can_edit_transformers && (
         <ToolbarRow>
-          <DialogTransformerEditor transformer={data.transformer} />
           <PipelineDeleteNodeButton nodeId={id} />
           {data.traces && <PipelineTraceNodeButton traces={data.traces} />}
         </ToolbarRow>

@@ -6,7 +6,6 @@ import StorageIcon from '@mui/icons-material/Storage'
 
 import { Handle, NodeProps, Position } from '@xyflow/react'
 
-import DialogStreamEditor from '@/components/DialogStreamEditor/component'
 import PipelineDeleteNodeButton from '@/components/PipelineDeleteNodeButton/component'
 import PipelineTraceNodeButton from '@/components/PipelineTraceNodeButton/component'
 import PipelineTraceNodeIndicator from '@/components/PipelineTraceNodeIndicator/component'
@@ -25,7 +24,6 @@ const PipelineNodeRouter = ({
     <>
       {selected && (
         <ToolbarRow>
-          <DialogStreamEditor stream={data.stream} />
           <PipelineDeleteNodeButton nodeId={id} />
           {data.traces && <PipelineTraceNodeButton traces={data.traces} />}
         </ToolbarRow>
