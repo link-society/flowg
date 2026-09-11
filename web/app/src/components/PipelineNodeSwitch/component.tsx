@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import TextField from '@mui/material/TextField'
@@ -6,8 +5,6 @@ import TextField from '@mui/material/TextField'
 import DeviceHubIcon from '@mui/icons-material/DeviceHub'
 
 import { Handle, NodeProps, Position } from '@xyflow/react'
-
-import { usePipelineEditorHooks } from '@/lib/hooks/pipeline-editor'
 
 import PipelineDeleteNodeButton from '@/components/PipelineDeleteNodeButton/component'
 import PipelineTraceNodeButton from '@/components/PipelineTraceNodeButton/component'
@@ -22,27 +19,6 @@ const PipelineNodeSwitch = ({
   selected,
 }: NodeProps<PipelineNodeSwitchData>) => {
   const { t } = useTranslation()
-  const { setNodes } = usePipelineEditorHooks()
-
-  const [code, setCode] = useState(data.condition)
-
-  const onChange: React.ChangeEventHandler<HTMLInputElement> = (evt) => {
-    setCode(evt.target.value)
-  }
-
-  useEffect(() => {
-    setNodes((prevNodes) => {
-      const newNodes = [...prevNodes]
-
-      for (const node of newNodes) {
-        if (node.id === id) {
-          node.data = { condition: code }
-        }
-      }
-
-      return newNodes
-    })
-  }, [id, code])
 
   return (
     <>
@@ -62,10 +38,10 @@ const PipelineNodeSwitch = ({
           <TextField
             label={t('components.pipelineNodeSwitch.label')}
             type="text"
-            value={code}
-            onChange={onChange}
+            value={data.condition}
             slotProps={{
               input: {
+                readOnly: true,
                 sx: { fontFamily: 'monospace' },
               },
             }}
