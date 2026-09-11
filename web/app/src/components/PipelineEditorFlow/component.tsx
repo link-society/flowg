@@ -10,11 +10,7 @@ import React, {
 import { flushSync } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
-import Typography from '@mui/material/Typography'
-
 import AccountTreeIcon from '@mui/icons-material/AccountTree'
-import BarChartIcon from '@mui/icons-material/BarChart'
-import DeviceHubIcon from '@mui/icons-material/DeviceHub'
 
 import {
   Background,
@@ -26,7 +22,6 @@ import {
   type OnConnect,
   type OnEdgesChange,
   type OnNodesChange,
-  Panel,
   ReactFlow,
   addEdge,
   applyEdgeChanges,
@@ -38,6 +33,7 @@ import PipelineModel from '@/lib/models/PipelineModel'
 import { PipelineTrace } from '@/lib/models/PipelineTrace.ts'
 
 import PipelineEditorHooksProvider from '@/components/PipelineEditorHooksProvider/component'
+import PipelineNodeConfigDrawer from '@/components/PipelineNodeConfigDrawer/component'
 import PipelineNodeForwarder from '@/components/PipelineNodeForwarder/component'
 import PipelineNodeMetric from '@/components/PipelineNodeMetric/component'
 import PipelineNodePipeline from '@/components/PipelineNodePipeline/component'
@@ -47,14 +43,7 @@ import PipelineNodeSwitch from '@/components/PipelineNodeSwitch/component'
 import PipelineNodeTransformer from '@/components/PipelineNodeTransformer/component'
 
 import { getLayoutedNodes } from './layout'
-import {
-  FlowPanelChips,
-  FlowPanelLabel,
-  FlowPanelPaper,
-  FlowRoot,
-  MetricNodeChip,
-  SwitchNodeChip,
-} from './styles'
+import { FlowCanvasWrap, FlowRoot } from './styles'
 
 type ShortcutMap = {
   deleteKeyCode: KeyCode
@@ -243,64 +232,34 @@ export const PipelineEditorFlow: React.FC<PipelineEditorFlowProps> = ({
   return (
     <FlowRoot>
       <PipelineEditorHooksProvider value={{ setNodes }}>
-        <ReactFlow
-          nodeTypes={nodeTypes}
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          onDrop={onDrop}
-          onDragOver={onDragOver}
-          fitView
-          snapToGrid
-          defaultEdgeOptions={{ animated: true, type: 'smoothstep' }}
-          {...shortcuts}
-        >
-          <Background />
-          <Controls>
-            <ControlButton
-              onClick={onLayout}
-              title={t('components.pipelineEditorFlow.autoLayout')}
-            >
-              <AccountTreeIcon />
-            </ControlButton>
-          </Controls>
+        <FlowCanvasWrap>
+          <ReactFlow
+            nodeTypes={nodeTypes}
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            onDrop={onDrop}
+            onDragOver={onDragOver}
+            fitView
+            snapToGrid
+            defaultEdgeOptions={{ animated: true, type: 'smoothstep' }}
+            {...shortcuts}
+          >
+            <Background />
+            <Controls>
+              <ControlButton
+                onClick={onLayout}
+                title={t('components.pipelineEditorFlow.autoLayout')}
+              >
+                <AccountTreeIcon />
+              </ControlButton>
+            </Controls>
+          </ReactFlow>
+        </FlowCanvasWrap>
 
-          <Panel position="top-left">
-            <FlowPanelPaper variant="outlined">
-              <FlowPanelLabel>
-                <Typography variant="text">
-                  {t('components.pipelineEditorFlow.otherNodes')}
-                </Typography>
-              </FlowPanelLabel>
-
-              <FlowPanelChips>
-                <SwitchNodeChip
-                  icon={<DeviceHubIcon />}
-                  label={t('components.pipelineEditorFlow.switchNodeLabel')}
-                  variant="outlined"
-                  draggable
-                  onDragStart={(evt) => {
-                    evt.dataTransfer.setData('item-type', 'switch')
-                    evt.dataTransfer.effectAllowed = 'move'
-                  }}
-                />
-
-                <MetricNodeChip
-                  icon={<BarChartIcon />}
-                  label={t('components.pipelineEditorFlow.metricNodeLabel')}
-                  variant="outlined"
-                  draggable
-                  onDragStart={(evt) => {
-                    evt.dataTransfer.setData('item-type', 'metric')
-                    evt.dataTransfer.effectAllowed = 'move'
-                  }}
-                />
-              </FlowPanelChips>
-            </FlowPanelPaper>
-          </Panel>
-        </ReactFlow>
+        <PipelineNodeConfigDrawer />
       </PipelineEditorHooksProvider>
     </FlowRoot>
   )
