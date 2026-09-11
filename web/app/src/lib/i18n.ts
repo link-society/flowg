@@ -1,7 +1,14 @@
+import dummyTranslationsUrl from '@/locales/generated/dummy/translation.json?url&no-inline'
+import enTranslationsUrl from '@/locales/generated/en/translation.json?url&no-inline'
 import i18n from 'i18next'
 import HttpBackend from 'i18next-http-backend'
 
 import { initReactI18next } from 'react-i18next'
+
+const translations: Record<string, string> = {
+  dummy: dummyTranslationsUrl,
+  en: enTranslationsUrl,
+}
 
 export type Language = {
   code: string
@@ -30,7 +37,18 @@ i18n
     supportedLngs: ['en', 'dummy'],
     load: 'languageOnly',
     returnEmptyString: false,
-    backend: { loadPath: './assets/locales/{{lng}}/{{ns}}.json' },
+    backend: {
+      loadPath: (languages: string[], namespaces: string[]) => {
+        const language = languages[0]
+        const namespace = namespaces[0]
+
+        if (namespace !== 'translation') {
+          return false
+        }
+
+        return translations[language]
+      },
+    },
     interpolation: { escapeValue: false },
     react: { useSuspense: true },
   })

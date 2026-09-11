@@ -25,4 +25,4 @@ dist-ssr
 *.tsbuildinfo
 
 # i18n generated files
-static/assets/locales/
+src/locales/generated/
