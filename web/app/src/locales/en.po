@@ -510,6 +510,9 @@ msgstr "switch"
 msgid "components.pipelineEditorNodeListForwarder.title"
 msgstr "Forwarders"
 
+msgid "components.pipelineEditorNodeListOther.title"
+msgstr "Other"
+
 msgid "components.pipelineEditorNodeListPipeline.title"
 msgstr "Pipelines"
 
@@ -518,6 +521,21 @@ msgstr "Streams"
 
 msgid "components.pipelineEditorNodeListTransformer.title"
 msgstr "Transformers"
+
+msgid "components.pipelineNodeConfigDrawer.pipelineStoredNote"
+msgstr "Stored in this pipeline — saved with the pipeline's Save button."
+
+msgid "components.pipelineNodeConfigDrawer.sharedResourceHint"
+msgstr "This is a shared resource. Opening the editor updates every pipeline that uses it."
+
+msgid "components.pipelineNodeConfigDrawer.sharedResourceNote"
+msgstr "Shared resource — changes apply to every pipeline that references it."
+
+msgid "components.pipelineNodeConfigDrawer.sourcePlaceholder"
+msgstr "Input configuration will arrive with the inputs refactor."
+
+msgid "components.pipelineNodeConfigDrawer.sourceTypeLabel"
+msgstr "Type"
 
 msgid "components.pipelineNodeForwarder.label"
 msgstr "Forwarder"
