@@ -36,6 +36,7 @@ import DialogConfirm from '@/components/DialogConfirm/component'
 import InputKeyValue from '@/components/InputKeyValue/component'
 import PipelineEditorFlow from '@/components/PipelineEditorFlow/component'
 import PipelineEditorNodeListForwarder from '@/components/PipelineEditorNodeListForwarder/component'
+import PipelineEditorNodeListOther from '@/components/PipelineEditorNodeListOther/component'
 import PipelineEditorNodeListPipeline from '@/components/PipelineEditorNodeListPipeline/component'
 import PipelineEditorNodeListStream from '@/components/PipelineEditorNodeListStream/component'
 import PipelineEditorNodeListTransformer from '@/components/PipelineEditorNodeListTransformer/component'
@@ -52,8 +53,7 @@ import {
   PipelineDetailViewHeaderRight,
   PipelineDetailViewHeaderTest,
   PipelineDetailViewLeft,
-  PipelineDetailViewRight,
-  PipelineDetailViewRightItem,
+  PipelineDetailViewLeftItem,
   PipelineDetailViewRoot,
   TestDialogHint,
 } from './styles'
@@ -279,7 +279,21 @@ const PipelineDetailView = () => {
 
         <PipelineDetailViewBody variant="page">
           <PipelineDetailViewLeft>
-            <PipelineEditorNodeListPipeline />
+            <PipelineDetailViewLeftItem>
+              <PipelineEditorNodeListPipeline />
+            </PipelineDetailViewLeftItem>
+            <PipelineDetailViewLeftItem>
+              <PipelineEditorNodeListTransformer />
+            </PipelineDetailViewLeftItem>
+            <PipelineDetailViewLeftItem>
+              <PipelineEditorNodeListForwarder />
+            </PipelineDetailViewLeftItem>
+            <PipelineDetailViewLeftItem>
+              <PipelineEditorNodeListStream />
+            </PipelineDetailViewLeftItem>
+            <PipelineDetailViewLeftItem>
+              <PipelineEditorNodeListOther />
+            </PipelineDetailViewLeftItem>
           </PipelineDetailViewLeft>
 
           <PipelineDetailViewCenter>
@@ -289,18 +303,6 @@ const PipelineDetailView = () => {
               onFlowChange={onChange}
             />
           </PipelineDetailViewCenter>
-
-          <PipelineDetailViewRight>
-            <PipelineDetailViewRightItem>
-              <PipelineEditorNodeListTransformer />
-            </PipelineDetailViewRightItem>
-            <PipelineDetailViewRightItem>
-              <PipelineEditorNodeListForwarder />
-            </PipelineDetailViewRightItem>
-            <PipelineDetailViewRightItem>
-              <PipelineEditorNodeListStream />
-            </PipelineDetailViewRightItem>
-          </PipelineDetailViewRight>
         </PipelineDetailViewBody>
       </PipelineDetailViewRoot>
 

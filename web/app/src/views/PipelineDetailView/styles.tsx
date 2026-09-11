@@ -60,38 +60,29 @@ export const PipelineDetailViewBody = styled(AppContainer)(({ theme }) => ({
 }))
 
 export const PipelineDetailViewLeft = styled('div')(({ theme }) => ({
-  flex: '0 0 16.67%',
-  height: '100%',
   width: '100%',
-  [theme.breakpoints.up('md')]: {
-    flexDirection: 'row',
-  },
-}))
-
-export const PipelineDetailViewCenter = styled('div')({
-  flex: 1,
-  height: '100%',
-})
-
-export const PipelineDetailViewRight = styled('div')(({ theme }) => ({
-  width: '100%',
-  height: '100%',
-  flexShrink: 0,
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',
   gap: theme.spacing(1),
   [theme.breakpoints.up('md')]: {
-    width: 'calc(100% / 6)',
+    flex: '0 0 240px',
+    height: '100%',
+    overflowY: 'auto',
   },
 }))
 
-export const PipelineDetailViewRightItem = styled('div')({
+export const PipelineDetailViewLeftItem = styled('div')({
   flex: '1 1 0',
-  minHeight: 0,
+  minHeight: 160,
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',
+})
+
+export const PipelineDetailViewCenter = styled('div')({
+  flex: 1,
+  height: '100%',
 })
 
 export const TestDialogHint = styled('div')({
