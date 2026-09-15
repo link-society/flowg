@@ -16,6 +16,7 @@ import ForwarderEditorDatadog from '@/components/ForwarderEditorDatadog/componen
 import ForwarderEditorElastic from '@/components/ForwarderEditorElastic/component'
 import ForwarderEditorGoogleCloudLogging from '@/components/ForwarderEditorGoogleCloudLogging/component'
 import ForwarderEditorHttp from '@/components/ForwarderEditorHttp/component'
+import ForwarderEditorJetStream from '@/components/ForwarderEditorJetStream/component.tsx'
 import ForwarderEditorOtlp from '@/components/ForwarderEditorOtlp/component'
 import ForwarderEditorSplunk from '@/components/ForwarderEditorSplunk/component'
 import ForwarderEditorSyslog from '@/components/ForwarderEditorSyslog/component'
@@ -35,6 +36,7 @@ const editors = {
   awscloudwatch: ForwarderEditorAwsloudWatch,
   googlecloudlogging: ForwarderEditorGoogleCloudLogging,
   azuremonitor: ForwarderEditorAzureMonitor,
+  jetstream: ForwarderEditorJetStream,
 }
 
 const ForwarderEditor = ({
