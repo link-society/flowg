@@ -1,131 +1,133 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata: 
-	 name: {{ include "flowg.fullname" . }}
+  name: {{ include "flowg.fullname" . }}
 spec: 
-	 serviceName: flowG
-	 replicas: 3
-	 selector: 
-		  matchLabels: 
-				{{- include "flowg.labels" . | nindent 4 }}
-	 template: 
-		  metadata: 
-				labels: 
-					{{- include "flowg.labels" . | nindent 5 }}
-		  spec: 
-		  		{{- with .Values.flowg.podSecurityContext }}
-				securityContext:
-					{{- toYaml . | nindent 5 }}
-				{{- end }}
-				{{- with .Values.flowg.image.pullSecrets }}
-				imagePullSecrets: 
-					{{- toYaml . | nindent 5 }}
-				{{- end }}
-				serviceAccountName: {{ include "flowg.flowg.serviceAccountName" . }}
-				automountServiceAccountToken: false
-				containers: 
-					 - name: flowg 
-					 	image: "{{ .Values.flowg.image.repository }}:{{ .Values.flowg.image.tag | default .Chart.AppVersion }}"
-						imagePullPolicy: "{{ .Values.flowg.image.pullPolicy }}"
-						{{- with .Values.flowg.securityContext }}
-						securityContext:
-							{{- toYaml . | nindent 7 }}
-						{{- end }}
-						env:
-						{{- if .Values.flowg.https.enabled }}
-							- name: FLOWG_HTTP_TLS_ENABLED
-								value: "true"
-							- name: FLOWG_HTTP_TLS_CERT
-								value: "/data/ssl/tls.crt"
-							- name: FLOWG_HTTP_TLS_KEY
-								value: "/data/ssl/tls.key"
-						{{- end }}
-						{{- if .Values.flowg.https.mgmt.enabled }}
-							- name: FLOWG_MGMT_TLS_ENABLED
-								value: "true" 
-							- name: FLOWG_MGMT_TLS_CERT
-								value: "/data/ssl/mgmt/tls.crt"
-							- name: FLOWG_MGMT_TLS_KEY
-								value: "/data/ssl/mgmt/tls.key"
-						{{- end }}
-						ports:
-							- containerPort: 5080
-								protocol: TCP
-							- containerPort: 9113
-								protocol: TCP
-						 	- containerPort: 5514
-								protocol: UDP
-						livenessProbe:
-							httpGet:
-								path: /health
-								port: 9113
-						readinessProbe:
-							httpGet: 
-								path: /health
-								port: 9113
-						resources:
-							{{- toYaml .Values.flowg.resources | nindent 7 }}
-						volumeMounts:
-							- name: flowg-data 
-								mountPath: /data 
-							{{- if and .Values.flowg.https.enabled (or .Values.flowg.https.certificateFrom.certmanager .Values.flowg.https.certificateFrom.secretRef) }}
-							- name: flowg-tls
-								mountPath: /data/ssl
-							{{- end }}
-							{{- if and .Values.flowg.https.mgmt.enabled (or .Values.flowg.https.mgmt.certificateFrom.certmanager .Values.flowg.https.mgmt.certificateFrom.secretRef) }}
-							- name: flowg-tls-mgmt
-								mountPath: /data/ssl/mgmt
-							{{- end }}
-				volumes:
-					{{- if and .Values.flowg.https.enabled .Values.flowg.https.certificateFrom.certmanager }}
-					- name: flowg-tls
-						secret:
-							secretName: {{ include "flowg.fullname" . }}-tls
-							items: 
-								- key: tls.crt
-									path: tls.crt
-								- key: tls.key
-									path: tls.key
-					{{- else if and .Values.flowg.https.enabled .Values.flowg.https.certificateFrom.secretRef.name }}
-					- name: flowg-tls
-						secret:
-							secretName: {{ .Values.flowg.https.certificateFrom.secretRef.name }}
-							items: 
-								- key: tls.crt
-									path: tls.crt
-								- key: tls.key
-									path: tls.key
-					{{- end }}
-					{{- if and .Values.flowg.https.mgmt.enabled .Values.flowg.https.mgmt.certificateFrom.certmanager }}
-					- name: flowg-tls-mgmt
-						secret:
-						secretName: {{ include "flowg.fullname" . }}-tls
-						items:
-						- key: tls.crt
-							path: tls.crt
-						- key: tls.key
-							path: tls.key
-      		{{- else if and .Values.flowg.https.mgmt.enabled .Values.flowg.https.mgmt.certificateFrom.secretRef }}
-					- name: flowg-tls-mgmt
-						secret:
-						secretName: {{ .Values.flowg.https.mgmt.certificateFrom.secretRef.name }}
-						items:
-						- key: tls.crt
-							path: tls.crt
-						- key: tls.key
-							path: tls.key
-      		{{- end }}
-		volumeClaimTemplates:
-			- metadata:
-					name: flowg-data
-					labels: 
-						{{- include "flowg.labels" . | nindent 5 }}
-				spec:
-					accessModes: [ "ReadWriteOnce" ]
-					{{- with .Values.flowg.storage.storageClassName }}
-					storageClassName: {{ . | quote }}
-					{{- end }}
-					resources:
-						requests: 
-							storage: {{ .Values.flowg.storage.size }}
-					
+  serviceName: {{ include "flowg.fullname" . }}
+  replicas: 1
+  selector: 
+    matchLabels: 
+      {{- include "flowg.labels" . | nindent 6 }}
+  template: 
+    metadata: 
+      labels: 
+        {{- include "flowg.labels" . | nindent 8 }}
+    spec: 
+      {{- with .Values.flowg.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.flowg.image.pullSecrets }}
+      imagePullSecrets: 
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "flowg.serviceAccountName" . }}
+      automountServiceAccountToken: false
+      containers: 
+        - name: flowg 
+          image: "{{ .Values.flowg.image.repository }}:{{ .Values.flowg.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: "{{ .Values.flowg.image.pullPolicy }}"
+          {{- with .Values.flowg.podSe }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if or .Values.flowg.https.enabled .Values.flowg.https.mgmt.enabled }}
+          env:
+            {{- if .Values.flowg.https.enabled }}
+            - name: FLOWG_HTTP_TLS_ENABLED
+              value: "true"
+            - name: FLOWG_HTTP_TLS_CERT
+              value: "/data/ssl/tls.crt"
+            - name: FLOWG_HTTP_TLS_KEY
+              value: "/data/ssl/tls.key"
+            {{- end }}
+            {{- if .Values.flowg.https.mgmt.enabled }}
+            - name: FLOWG_MGMT_TLS_ENABLED
+              value: "true"
+            - name: FLOWG_MGMT_TLS_CERT
+              value: "/data/ssl/mgmt/tls.crt"
+            - name: FLOWG_MGMT_TLS_KEY
+              value: "/data/ssl/mgmt/tls.key"
+            {{- end }}
+          {{- end }}
+          ports:
+            - containerPort: 5080
+              protocol: TCP
+            - containerPort: 9113
+              protocol: TCP
+            - containerPort: 5514
+              protocol: UDP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 9113
+          readinessProbe:
+            httpGet: 
+              path: /health
+              port: 9113
+          resources:
+            {{- toYaml .Values.flowg.resources | nindent 12 }}
+          volumeMounts:
+            - name: flowg-data 
+              mountPath: /data 
+            {{- if and .Values.flowg.https.enabled (or .Values.flowg.https.certificateFrom.certmanager .Values.flowg.https.certificateFrom.secretRef) }}
+            - name: flowg-tls
+              mountPath: /data/ssl
+            {{- end }}
+            {{- if and .Values.flowg.https.mgmt.enabled (or .Values.flowg.https.mgmt.certificateFrom.certmanager .Values.flowg.https.mgmt.certificateFrom.secretRef) }}
+            - name: flowg-tls-mgmt
+              mountPath: /data/ssl/mgmt
+            {{- end }}
+      volumes:
+        {{- if and .Values.flowg.https.enabled .Values.flowg.https.certificateFrom.certmanager }}
+        - name: flowg-tls
+          secret:
+            secretName: {{ include "flowg.fullname" . }}-tls
+            items: 
+              - key: tls.crt
+                path: tls.crt
+              - key: tls.key
+                path: tls.key
+        {{- else if and .Values.flowg.https.enabled .Values.flowg.https.certificateFrom.secretRef.name }}
+        - name: flowg-tls
+          secret:
+            secretName: {{ .Values.flowg.https.certificateFrom.secretRef.name }}
+            items: 
+              - key: tls.crt
+                path: tls.crt
+              - key: tls.key
+                path: tls.key
+        {{- end }}
+        {{- if and .Values.flowg.https.mgmt.enabled .Values.flowg.https.mgmt.certificateFrom.certmanager }}
+        - name: flowg-tls-mgmt
+          secret:
+          secretName: {{ include "flowg.fullname" . }}-tls
+          items:
+          - key: tls.crt
+            path: tls.crt
+          - key: tls.key
+            path: tls.key
+        {{- else if and .Values.flowg.https.mgmt.enabled .Values.flowg.https.mgmt.certificateFrom.secretRef }}
+        - name: flowg-tls-mgmt
+          secret:
+          secretName: {{ .Values.flowg.https.mgmt.certificateFrom.secretRef.name }}
+          items:
+          - key: tls.crt
+            path: tls.crt
+          - key: tls.key
+            path: tls.key
+        {{- end }}
+  volumeClaimTemplates:
+    - metadata:
+        name: flowg-data
+        labels: 
+          {{- include "flowg.labels" . | nindent 12 }}
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        {{- with .Values.flowg.storage.storageClassName }}
+        storageClassName: {{ . | quote }}
+        {{- end }}
+        resources:
+          requests: 
+            storage: {{ .Values.flowg.storage.size }}
+          
