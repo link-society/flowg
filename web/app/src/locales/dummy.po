@@ -198,6 +198,9 @@ msgstr "Google Log"
 msgid "components.forwarderConfigTypes.http"
 msgstr "Webhook"
 
+msgid "components.forwarderConfigTypes.jetstream"
+msgstr "JetStream"
+
 msgid "components.forwarderConfigTypes.otlp"
 msgstr "OpenTelemetry"
 
@@ -341,6 +344,60 @@ msgstr "Proxy URL"
 
 msgid "components.forwarderEditorHttp.urlLabel"
 msgstr "Webhook URL"
+
+msgid "components.forwarderEditorJetStream.PublishTimeoutLabel"
+msgstr "Publish Timeout"
+
+msgid "components.forwarderEditorJetStream.authModeLabel"
+msgstr "Authentication Mode"
+
+msgid "components.forwarderEditorJetStream.bodyLabel"
+msgstr "Body"
+
+msgid "components.forwarderEditorJetStream.credentialsLabel"
+msgstr "Credentials"
+
+msgid "components.forwarderEditorJetStream.expectedStreamLabel"
+msgstr "Expected Stream"
+
+msgid "components.forwarderEditorJetStream.headerNameLabel"
+msgstr "Header Name"
+
+msgid "components.forwarderEditorJetStream.headerValueLabel"
+msgstr "Header Value"
+
+msgid "components.forwarderEditorJetStream.messageIDLabel"
+msgstr "Message ID"
+
+msgid "components.forwarderEditorJetStream.passwordLabel"
+msgstr "Password"
+
+msgid "components.forwarderEditorJetStream.serverItemLabel"
+msgstr "Server Item"
+
+msgid "components.forwarderEditorJetStream.subjectLabel"
+msgstr "Subject"
+
+msgid "components.forwarderEditorJetStream.tlsCALabel"
+msgstr "TLS CA"
+
+msgid "components.forwarderEditorJetStream.tlsCertificateLabel"
+msgstr "TLS Certificate"
+
+msgid "components.forwarderEditorJetStream.tlsInsecureSkipVerifyLabel"
+msgstr "TLS Insecure Skip Verify"
+
+msgid "components.forwarderEditorJetStream.tlsPrivateKeyLabel"
+msgstr "TLS Private Key"
+
+msgid "components.forwarderEditorJetStream.tlsServerNameLabel"
+msgstr "TLS Server Name"
+
+msgid "components.forwarderEditorJetStream.tokenLabel"
+msgstr "Token"
+
+msgid "components.forwarderEditorJetStream.usernameLabel"
+msgstr "Username"
 
 msgid "components.forwarderEditorOtlp.endpointLabel"
 msgstr "Endpoint"

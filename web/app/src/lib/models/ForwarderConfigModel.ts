@@ -24,6 +24,9 @@ import ForwarderConfigGoogleCloudLoggingModel, {
 import ForwarderConfigHttpModel, {
   factory as ForwarderConfigHttpFactory,
 } from '@/lib/models/ForwarderConfigHttpModel'
+import ForwarderConfigJetStreamModel, {
+  factory as ForwarderConfigJetStreamFactory,
+} from '@/lib/models/ForwarderConfigJetStreamModel'
 import ForwarderConfigOtlpModel, {
   factory as ForwarderConfigOtlpFactory,
 } from '@/lib/models/ForwarderConfigOtlpModel'
@@ -42,6 +45,7 @@ import ForwarderIconDatadog from '@/components/icons/ForwarderIconDatadog/compon
 import ForwarderIconElastic from '@/components/icons/ForwarderIconElastic/component'
 import ForwarderIconGoogleLog from '@/components/icons/ForwarderIconGoogleLog/component.tsx'
 import ForwarderIconHttp from '@/components/icons/ForwarderIconHttp/component'
+import ForwarderIconJetStream from '@/components/icons/ForwarderIconJetStream/component'
 import ForwarderIconOtlp from '@/components/icons/ForwarderIconOtlp/component'
 import ForwarderIconSplunk from '@/components/icons/ForwarderIconSplunk/component'
 import ForwarderIconSyslog from '@/components/icons/ForwarderIconSyslog/component'
@@ -58,6 +62,7 @@ type ForwarderConfigModel =
   | ForwarderConfigAwsCloudWatchModel
   | ForwarderConfigGoogleCloudLoggingModel
   | ForwarderConfigAzureMonitorModel
+  | ForwarderConfigJetStreamModel
 
 export type ForwarderConfigTypes = ForwarderConfigModel['type']
 
@@ -117,6 +122,11 @@ export const ForwarderConfigTypeValues = [
     label: 'components.forwarderConfigTypes.azuremonitor',
     icon: ForwarderIconAzureMonitor,
   },
+  {
+    key: 'jetstream',
+    label: 'components.forwarderConfigTypes.jetstream',
+    icon: ForwarderIconJetStream,
+  },
 ] as const
 
 export const ForwarderConfigTypeLabelMap = ForwarderConfigTypeValues.reduce(
@@ -149,6 +159,7 @@ const factories: Record<ForwarderConfigTypes, () => ForwarderConfigModel> = {
   awscloudwatch: ForwarderConfigAwsCloudWatchFactory,
   googlecloudlogging: ForwarderConfigGoogleCloudLoggingFactory,
   azuremonitor: ForwarderConfigAzureMonitorFactory,
+  jetstream: ForwarderConfigJetStreamFactory,
 }
 
 export const factory = (type: ForwarderConfigTypes): ForwarderConfigModel => {
