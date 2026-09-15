@@ -31,14 +31,30 @@ flowg:
     enabled: false
 
     certificateFrom: {}
-      # secretRef:
-      #   name: flowg-tls
-      #
-      # certmanager:
+      # certmanager: 
+      #   privateKey:
+      #     algorithm: RSA
+      #     encoding: PKCS1
+      #     size: 2048
+
+      #   duration: 2160h # 90d
+      #   renewBefore: 360h # 15d
+
+      #   isCA: false
+      #   usages: 
+      #     - server auth
+
+      #   subject:
+      #     orgnizations:
+      #       - "FlowG"
+
       #   commonName: logs.example.com
-      #   issuerRef:
+      #   issuerRef: 
       #     name: letsencrypt-prod
       #     kind: ClusterIssuer
+      # secretRef: 
+      #   name: flowg-tls
+      
 
     mgmt:
       enabled: false
@@ -46,12 +62,25 @@ flowg:
       certificateFrom: {}
         # secretRef:
         #   name: flowg-tls
-        #
+        
         # certmanager:
-        #   commonName: logs.example.com
+        #   privateKey:
+        #     algorithm: RSA
+        #     encoding: PKCS1
+        #     size: 2048
+        #   duration: 2160h # 90d
+        #   renewBefore: 360h # 15d
+        #   isCA: false
+        #   usages: 
+        #     - server auth
+        #   subject:
+        #     orgnizations:
+        #       - "FlowG"
+        #   commonName:
         #   issuerRef:
         #     name: letsencrypt-prod
         #     kind: ClusterIssuer
+    
 
   resources: {}
     # We usually recommend not to specify default resources and to leave this as a conscious
@@ -74,3 +103,6 @@ flowg:
     # The name of the service account to use.
     # If not set and create is true, a name is generated using the fullname template
     name: ""
+
+certmanager:
+  
