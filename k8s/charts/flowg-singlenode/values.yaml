@@ -111,5 +111,15 @@ flowg:
     # If not set and create is true, a name is generated using the fullname template
     name: ""
 
-certmanager:
+  service:
+    # NodePort, LoadBalancer or ClusterIP 
+    type: LoadBalancer
+
+    # Ports inside range 30000-32767
+    nodePort:
+      httpPort: 30080
+      mgmtPort: 32113
+      syslogPort: 32514
+  
+
   
