@@ -10,11 +10,21 @@ flowg:
     pullPolicy: IfNotPresent
     pullSecrets: []
   
-  # Environment variables for FlowG. 
-  # See more at https://flowg.cloud/docs/technical/configuration
-  env: []
-    # - name: FLOWG_AUTH_INITIAL_USER
-    #   value: "root"
+  # This section allows to configure FlowG properly
+  # Read more at https://flowg.cloud/docs/technical/configuration
+  configuration:
+    demo_mode: False
+    logging: 
+      verbose: False
+      level: "info"
+
+    seed: 
+      initial_user: root 
+      initial_password: root
+      reset_user: "" 
+      reset_password: "" 
+    
+    
 
   # Customized annotations in order to enable other software layers to interact with FlowG 
   # (e.g. Prometheus scraping, Traefik directions)
@@ -77,6 +87,7 @@ flowg:
   syslog:
     port: 5514
     protocol: UDP
+    initial_allowed_origins: []
 
   https:
     enabled: false
