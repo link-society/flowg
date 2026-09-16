@@ -9,7 +9,21 @@ flowg:
     tag: ""
     pullPolicy: IfNotPresent
     pullSecrets: []
-    
+  
+  # Environment variables for FlowG. 
+  # See more at https://flowg.cloud/docs/technical/configuration
+  env: []
+    # - name: FLOWG_AUTH_INITIAL_USER
+    #   value: "root"
+
+  # Customized annotations in order to enable other software layers to interact with FlowG 
+  # (e.g. Prometheus scraping, Traefik directions)
+  # Documentation: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  podAnnotations: []
+    # prometheus.io/scrape: "true"
+  serviceAnnotations: [] 
+    # traefik.ingress.kubernetes.io/service.passhostheader: "true"
+
   podSecurityContext:
     runAsNonRoot: true
     runAsUser: 10001
@@ -26,12 +40,12 @@ flowg:
   # Allows to configure delays for probes (livenessProbe and readinessProbe specified in the templates)
   # Documentation: https://kubernetes.io/docs/concepts/workloads/pods/probes/
   probe:
-    livenessProbe: [] 
+    livenessProbe: []
       # initialDelaySeconds: 12
       # timeoutSeconds: 10 
       # failureThreshold: 3
       # periodSeconds: 5
-    readinessProbe: [] 
+    readinessProbe: []
       # initialDelaySeconds: 12
       # timeoutSeconds: 10 
       # failureThreshold: 3
