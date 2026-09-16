@@ -32,6 +32,7 @@ flowg:
   
   syslog:
     port: 5514
+    protocol: UDP
 
   https:
     enabled: false
