@@ -27,7 +27,7 @@ spec:
         - name: flowg 
           image: "{{ .Values.flowg.image.repository }}:{{ .Values.flowg.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: "{{ .Values.flowg.image.pullPolicy }}"
-          {{- with .Values.flowg.podSe }}
+          {{- with .Values.flowg.podSecurityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -100,22 +100,22 @@ spec:
         {{- end }}
         {{- if and .Values.flowg.https.mgmt.enabled .Values.flowg.https.mgmt.certificateFrom.certmanager }}
         - name: flowg-tls-mgmt
-          secret:
-          secretName: {{ include "flowg.fullname" . }}-tls
-          items:
-          - key: tls.crt
-            path: tls.crt
-          - key: tls.key
-            path: tls.key
+            secret:
+            secretName: {{ include "flowg.fullname" . }}-tls
+            items:
+              - key: tls.crt
+                path: tls.crt
+              - key: tls.key
+                path: tls.key
         {{- else if and .Values.flowg.https.mgmt.enabled .Values.flowg.https.mgmt.certificateFrom.secretRef }}
         - name: flowg-tls-mgmt
-          secret:
-          secretName: {{ .Values.flowg.https.mgmt.certificateFrom.secretRef.name }}
-          items:
-          - key: tls.crt
-            path: tls.crt
-          - key: tls.key
-            path: tls.key
+            secret:
+            secretName: {{ .Values.flowg.https.mgmt.certificateFrom.secretRef.name }}
+            items:
+              - key: tls.crt
+                path: tls.crt
+              - key: tls.key
+                path: tls.key
         {{- end }}
   volumeClaimTemplates:
     - metadata:
