@@ -78,6 +78,10 @@ spec:
             - name: flowg-tls-mgmt
               mountPath: /data/ssl/mgmt
             {{- end }}
+      {{- with .Values.flowg.nodeSelectorTolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       volumes:
         {{- if and .Values.flowg.https.enabled .Values.flowg.https.certificateFrom.certmanager }}
         - name: flowg-tls

@@ -23,6 +23,22 @@ flowg:
     #   drop:
     #     - ALL
 
+  # Allows to write Tolerations and Taints so the node gets well selected. 
+  # Integrates directly into 'tolerations:' section of the StatefulSet tempalte. 
+  # To learn more, read https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+
+  # IMPORTANT NOTE: To make sure scalar values (booleans, int), ALWAYS place them between quotation marks.
+  #                 e.g. value: "true", value: "42" instead of value: true or value: 42
+  nodeSelectorTolerations:
+    - key: "key1"
+      operator: "Equal"
+      value: "Value1"
+      effect: "NoSchedule"
+    - key: "key2"
+      operator: "Exists"
+      effect: "NoExecute"
+  
+
   storage:
     size: 10Gi
     storageClassName: ""
