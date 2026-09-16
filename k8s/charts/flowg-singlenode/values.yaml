@@ -27,6 +27,12 @@ flowg:
     size: 10Gi
     storageClassName: ""
 
+  httpPort: 5080
+  mgmtPort: 9113
+  
+  syslog:
+    port: 5514
+
   https:
     enabled: false
 

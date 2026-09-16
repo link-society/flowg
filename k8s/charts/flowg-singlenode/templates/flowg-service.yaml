@@ -10,7 +10,7 @@ spec:
     {{- include "flowg.selectorLabels" . | nindent 4 }}
   ports:
     - name: http
-      port: 5080
+      port: {{ .Values.flowg.httpPort }}
       targetPort: 5080
       protocol: TCP
       {{- if .Values.flowg.https.enabled }}
@@ -19,7 +19,7 @@ spec:
       appProtocol: http
       {{- end }}
     - name: mgmt
-      port: 9113
+      port: {{ .Values.flowg.mgmtPort }}
       targetPort: 9113
       protocol: TCP
       {{- if .Values.flowg.https.mgmt.enabled }}
@@ -28,6 +28,6 @@ spec:
       appProtocol: http
       {{- end }}
     - name: syslog
-      port: 5514
+      port: {{ .Values.flowg.syslog.port }}
       targetPort: 5514
       protocol: UDP
