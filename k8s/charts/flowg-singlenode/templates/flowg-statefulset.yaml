@@ -12,7 +12,11 @@ spec:
     metadata: 
       labels: 
         {{- include "flowg.labels" . | nindent 8 }}
-    spec: 
+      {{- with .Values.flowg.podAnnotations }}
+      annotations: 
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
       {{- with .Values.flowg.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
@@ -31,8 +35,9 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- if or .Values.flowg.https.enabled .Values.flowg.https.mgmt.enabled }}
           env:
+            - name: FLOWG_SYSLOG_PROTOCOL
+              value: {{ .Values.flowg.syslog.protocol | lower }}
             {{- if .Values.flowg.https.enabled }}
             - name: FLOWG_HTTP_TLS_ENABLED
               value: "true"
@@ -49,24 +54,27 @@ spec:
             - name: FLOWG_MGMT_TLS_KEY
               value: "/data/ssl/mgmt/tls.key"
             {{- end }}
-          {{- end }}
           ports:
             - containerPort: 5080
               protocol: TCP
             - containerPort: 9113
               protocol: TCP
             - containerPort: 5514
-              protocol: UDP
+              protocol: {{ .Values.flowg.syslog.protocol }}
           livenessProbe:
             httpGet:
               path: /health
               port: 9113
-            {{- toYaml .Values.flowg.probe.livenessProbe | nindent 12 }}
+            {{- with .Values.flowg.probe.livenessProbe }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           readinessProbe:
             httpGet: 
               path: /health
               port: 9113
-            {{- toYaml .Values.flowg.probe.readinessProbe | nindent 12 }}
+            {{- with .Values.flowg.probe.readinessProbe }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           resources:
             {{- toYaml .Values.flowg.resources | nindent 12 }}
           volumeMounts:

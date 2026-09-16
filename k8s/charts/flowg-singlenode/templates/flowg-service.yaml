@@ -4,6 +4,10 @@ metadata:
   name: {{ include "flowg.fullname" . }}
   labels:
     {{- include "flowg.labels" . | nindent 4 }}
+  {{- with .Values.flowg.serviceAnnotations }}
+  annotations: 
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .Values.flowg.service.type }}
   selector:
