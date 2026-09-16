@@ -23,6 +23,20 @@ flowg:
     #   drop:
     #     - ALL
 
+  # Allows to configure delays for probes (livenessProbe and readinessProbe specified in the templates)
+  # Documentation: https://kubernetes.io/docs/concepts/workloads/pods/probes/
+  probe:
+    livenessProbe: [] 
+      # initialDelaySeconds: 12
+      # timeoutSeconds: 10 
+      # failureThreshold: 3
+      # periodSeconds: 5
+    readinessProbe: [] 
+      # initialDelaySeconds: 12
+      # timeoutSeconds: 10 
+      # failureThreshold: 3
+      # periodSeconds: 5
+
   # Allows to write Tolerations and Taints so the node gets well selected. 
   # Integrates directly into 'tolerations:' section of the StatefulSet tempalte. 
   # To learn more, read https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/

@@ -61,10 +61,12 @@ spec:
             httpGet:
               path: /health
               port: 9113
+            {{- toYaml .Values.flowg.probe.livenessProbe | nindent 12 }}
           readinessProbe:
             httpGet: 
               path: /health
               port: 9113
+            {{- toYaml .Values.flowg.probe.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.flowg.resources | nindent 12 }}
           volumeMounts:
