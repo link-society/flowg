@@ -38,6 +38,9 @@ spec:
           env:
             - name: FLOWG_SYSLOG_PROTOCOL
               value: {{ .Values.flowg.syslog.protocol | lower }}
+            {{- with .Values.flowg.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
             {{- if .Values.flowg.https.enabled }}
             - name: FLOWG_HTTP_TLS_ENABLED
               value: "true"
