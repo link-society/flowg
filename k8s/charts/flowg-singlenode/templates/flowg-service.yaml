@@ -30,4 +30,4 @@ spec:
     - name: syslog
       port: {{ .Values.flowg.syslog.port }}
       targetPort: 5514
-      protocol: UDP
+      protocol: {{ .Values.flowg.syslog.protocol }}
