@@ -36,14 +36,22 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           env:
+            {{- with .Values.flowg.configuration.demo_mode }}
             - name: FLOWG_DEMO_MODE
-              value: {{ .Values.flowg.configuration.demo_mode }}
+              value: {{ . | toString | quote }} # Enforce string type casting 
+            {{- end }}
+            {{- with .Values.flowg.configuration.logging.verbose }}
             - name: FLOWG_VERBOSE
-              value: {{ .Values.flowg.configuration.logging.verbose }}
+              value: {{ . | toString | quote }}
+            {{- end }}
+            {{- with .Values.flowg.configuration.logging.level }}
             - name: FLOWG_LOGLEVEL
-              value: {{ .Values.flowg.configuration.logging.level }}
+              value: {{ . | toString | quote }}
+            {{- end }}
+            {{- with .Values.flowg.syslog.initial_allowed_origins }}
             - name: FLOWG_SYSLOG_INITIAL_ALLOWED_ORIGINS
-              value: {{ .Values.flowg.syslog.initial_allowed_origins }}
+              value: {{ . | toString | quote }}
+            {{- end }}
 
             # Seed configuration 
             {{- with .Values.flowg.configuration.seed }}
@@ -60,16 +68,16 @@ spec:
                   key: {{ .initialPasswordKey }}
             {{- end }}
             {{- if and (not (empty .resetUsernameKey)) (not (empty .resetPasswordKey)) }}
-            - name: FLOWG_RESET_USER
+            - name: FLOWG_AUTH_RESET_USER
               valueFrom: 
                 secretKeyRef: 
                   name: {{ .secretName }}
                   key: {{ .resetUsernameKey }}
-            - name: FLOWG_RESET_PASSWORD
+            - name: FLOWG_AUTH_RESET_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ .secretName }}
-                  key: {{ .resetUsernameKey }}
+                  key: {{ .resetPasswordKey }}
             {{- end }}
             {{- end }}
 
