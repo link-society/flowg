@@ -6,7 +6,7 @@ fullNameOverride: ""
 flowg:
   image:
     repository: linksociety/flowg
-    tag: ""
+    tag: "" # "v0.63.1-linux-arm"
     pullPolicy: IfNotPresent
     pullSecrets: []
   
@@ -15,7 +15,7 @@ flowg:
   configuration:
     # demo_mode: "False"
     logging: 
-      # verbose: "False"
+      verbose: 'True'
       level: "info"
 
     # The 'seed' functionnality creates a first user (default: root, pw: root)
@@ -26,12 +26,12 @@ flowg:
     # For your configuration to be valid, you MUST provide both username AND password for each type of value.
     # A sole username or password key will NOT be taken in account by the chart
     seed:
-      secretName: flowg-seed-test 
-      initialUsernameKey: initialUsername
-      initialPasswordKey: initialPassword
+      # secretName: flowg-seed-test 
+      # initialUsernameKey: initialUsername
+      # initialPasswordKey: initialPassword
 
-      resetUsernameKey: resetUsername
-      resetPasswordKey: resetPassword
+      # resetUsernameKey: resetUsername
+      # resetPasswordKey: resetPassword
     
     
 
