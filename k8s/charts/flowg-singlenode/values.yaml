@@ -13,16 +13,25 @@ flowg:
   # This section allows to configure FlowG properly
   # Read more at https://flowg.cloud/docs/technical/configuration
   configuration:
-    demo_mode: False
+    # demo_mode: "False"
     logging: 
-      verbose: False
+      # verbose: "False"
       level: "info"
 
-    seed: 
-      initial_user: root 
-      initial_password: root
-      reset_user: "" 
-      reset_password: "" 
+    # The 'seed' functionnality creates a first user (default: root, pw: root)
+    # And populates the database with an example dataset, then optionnally changes the credentials. 
+    # This requires you to add a secret in the same namespace as FlowG, with:
+    # - Initial Username/Password
+    # - Reset Username/Password (credentials reset after population)
+    # For your configuration to be valid, you MUST provide both username AND password for each type of value.
+    # A sole username or password key will NOT be taken in account by the chart
+    seed:
+      secretName: flowg-seed-test 
+      initialUsernameKey: initialUsername
+      initialPasswordKey: initialPassword
+
+      resetUsernameKey: resetUsername
+      resetPasswordKey: resetPassword
     
     
 
@@ -87,7 +96,7 @@ flowg:
   syslog:
     port: 5514
     protocol: UDP
-    initial_allowed_origins: []
+    # initial_allowed_origins: "[]"
 
   https:
     enabled: false

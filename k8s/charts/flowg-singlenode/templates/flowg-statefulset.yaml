@@ -44,14 +44,35 @@ spec:
               value: {{ .Values.flowg.configuration.logging.level }}
             - name: FLOWG_SYSLOG_INITIAL_ALLOWED_ORIGINS
               value: {{ .Values.flowg.syslog.initial_allowed_origins }}
+
+            # Seed configuration 
+            {{- with .Values.flowg.configuration.seed }}
+            {{- if and (not (empty .initialUsernameKey)) (not (empty .initialPasswordKey)) }}
             - name: FLOWG_AUTH_INITIAL_USER
-              value: {{ .Values.flowg.configuration.seed.initial_user }}
+              valueFrom: 
+                secretKeyRef: 
+                  name: {{ .secretName }}
+                  key: {{ .initialUsernameKey }}
             - name: FLOWG_AUTH_INITIAL_PASSWORD
-              value: {{ .Values.flowg.configuration.seed.initial_password }}
-            - name: FLOWG_AUTH_RESET_USER
-              value: {{ .Values.flowg.configuration.seed.reset_user }}
-            - name: FLOWG_AUTH_RESET_PASSWORD
-              value: {{ .Values.flowg.configuration.seed.reset_password }}
+              valueFrom:
+                secretKeyRef: 
+                  name: {{ .secretName }}
+                  key: {{ .initialPasswordKey }}
+            {{- end }}
+            {{- if and (not (empty .resetUsernameKey)) (not (empty .resetPasswordKey)) }}
+            - name: FLOWG_RESET_USER
+              valueFrom: 
+                secretKeyRef: 
+                  name: {{ .secretName }}
+                  key: {{ .resetUsernameKey }}
+            - name: FLOWG_RESET_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .secretName }}
+                  key: {{ .resetUsernameKey }}
+            {{- end }}
+            {{- end }}
+
             - name: FLOWG_SYSLOG_PROTOCOL
               value: {{ .Values.flowg.syslog.protocol | lower }}
             {{- if .Values.flowg.https.enabled }}
