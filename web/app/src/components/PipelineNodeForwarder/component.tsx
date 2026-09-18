@@ -6,7 +6,6 @@ import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox'
 
 import { Handle, NodeProps, Position } from '@xyflow/react'
 
-import DialogForwarderEditor from '@/components/DialogForwarderEditor/component'
 import PipelineDeleteNodeButton from '@/components/PipelineDeleteNodeButton/component'
 import PipelineTraceNodeButton from '@/components/PipelineTraceNodeButton/component'
 import PipelineTraceNodeIndicator from '@/components/PipelineTraceNodeIndicator/component'
@@ -25,7 +24,6 @@ const PipelineNodeForwarder = ({
     <>
       {selected && (
         <ToolbarRow>
-          <DialogForwarderEditor forwarderName={data.forwarder} />
           <PipelineDeleteNodeButton nodeId={id} />
           {data.traces && <PipelineTraceNodeButton traces={data.traces} />}
         </ToolbarRow>
