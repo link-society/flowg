@@ -1,0 +1,70 @@
+{{- if and .Values.flowg.https.enabled .Values.flowg.https.certificateFrom.certmanager -}}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "flowg.fullname" . }}-certificate
+  namespace: {{ .Release.Namespace }}
+spec:
+  secretName: {{ include "flowg.fullname" . }}-tls
+
+  privateKey:
+    algorithm: {{ .Values.flowg.https.certificateFrom.certmanager.privateKey.algorithm }}
+    encoding: {{ .Values.flowg.https.certificateFrom.certmanager.privateKey.encoding }}
+    size: {{ .Values.flowg.https.certificateFrom.certmanager.privateKey.size }}
+
+  duration: {{ .Values.flowg.https.certificateFrom.certmanager.duration }} 
+  renewBefore: {{ .Values.flowg.https.certificateFrom.certmanager.renewBefore }} 
+
+  isCA: {{ .Values.flowg.https.certificateFrom.certmanager.isCA }}
+  usages:
+    {{ toYaml  .Values.flowg.https.certificateFrom.certmanager.usages }}
+
+  subject:
+    {{- toYaml .Values.flowg.https.certificateFrom.certmanager.subject | nindent 4 }}
+
+  commonName: {{ .Values.flowg.https.certificateFrom.certmanager.commonName }}
+  dnsNames:
+    - {{ .Values.flowg.https.certificateFrom.certmanager.commonName }}
+
+  {{- with .Values.flowg.https.certificateFrom.certmanager.issuerRef }}
+  issuerRef:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
+
+{{- if and .Values.flowg.https.mgmt.enabled .Values.flowg.https.mgmt.certificateFrom.certmanager -}}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "flowg.fullname" . }}-mgmt-certificate
+  namespace: {{ .Release.Namespace }}
+spec:
+  secretName: {{ include "flowg.fullname" . }}-mgmt-tls
+
+  privateKey:
+    algorithm: {{ .Values.flowg.https.mgmt.certificateFrom.certmanager.privateKey.algorithm }}
+    encoding: {{ .Values.flowg.https.mgmt.certificateFrom.certmanager.privateKey.encoding }}
+    size: {{ .Values.flowg.https.mgmt.certificateFrom.certmanager.privateKey.size }}
+
+  duration: {{ .Values.flowg.https.mgmt.certificateFrom.certmanager.duration }} 
+  renewBefore: {{ .Values.flowg.https.mgmt.certificateFrom.certmanager.renewBefore }} 
+
+  isCA: {{ .Values.flowg.https.mgmt.certificateFrom.certmanager.isCA }}
+  usages:
+    {{ toYaml  .Values.flowg.https.mgmt.certificateFrom.certmanager.usages }}
+
+  subject:
+    {{- toYaml .Values.flowg.https.mgmt.certificateFrom.certmanager.subject | nindent 4 }}
+
+
+  commonName: {{ .Values.flowg.https.mgmt.certificateFrom.certmanager.commonName }}
+  dnsNames:
+    - {{ .Values.flowg.https.mgmt.certificateFrom.certmanager.commonName }}
+
+  {{- with .Values.flowg.https.mgmt.certificateFrom.certmanager.issuerRef }}
+  issuerRef:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}

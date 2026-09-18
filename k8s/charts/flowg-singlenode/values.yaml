@@ -1,0 +1,187 @@
+---
+
+nameOverride: ""
+fullNameOverride: ""
+
+flowg:
+  image:
+    repository: linksociety/flowg
+    tag: "" # "v0.63.1-linux-arm"
+    pullPolicy: IfNotPresent
+    pullSecrets: []
+  
+  # This section allows to configure FlowG properly
+  # Read more at https://flowg.cloud/docs/technical/configuration
+  configuration:
+    # demo_mode: "False"
+    logging: 
+      verbose: 'True'
+      level: "info"
+
+    # The 'seed' functionnality creates a first user (default: root, pw: root)
+    # And populates the database with an example dataset, then optionnally changes the credentials. 
+    # This requires you to add a secret in the same namespace as FlowG, with:
+    # - Initial Username/Password
+    # - Reset Username/Password (credentials reset after population)
+    # For your configuration to be valid, you MUST provide both username AND password for each type of value.
+    # A sole username or password key will NOT be taken in account by the chart
+    seed:
+      # secretName: flowg-seed-test 
+      # initialUsernameKey: initialUsername
+      # initialPasswordKey: initialPassword
+
+      # resetUsernameKey: resetUsername
+      # resetPasswordKey: resetPassword
+    
+    
+
+  # Customized annotations in order to enable other software layers to interact with FlowG 
+  # (e.g. Prometheus scraping, Traefik directions)
+  # Documentation: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  podAnnotations: []
+    # prometheus.io/scrape: "true"
+  serviceAnnotations: [] 
+    # traefik.ingress.kubernetes.io/service.passhostheader: "true"
+
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 10001
+    runAsGroup: 10001
+    fsGroup: 10001
+
+  securityContext: {}
+    # allowPrivilegeEscalation: false
+    # readOnlyRootFilesystem: false
+    # capabilities:
+    #   drop:
+    #     - ALL
+
+  # Allows to configure delays for probes (livenessProbe and readinessProbe specified in the templates)
+  # Documentation: https://kubernetes.io/docs/concepts/workloads/pods/probes/
+  probe:
+    livenessProbe: []
+      # initialDelaySeconds: 12
+      # timeoutSeconds: 10 
+      # failureThreshold: 3
+      # periodSeconds: 5
+    readinessProbe: []
+      # initialDelaySeconds: 12
+      # timeoutSeconds: 10 
+      # failureThreshold: 3
+      # periodSeconds: 5
+
+  # Allows to write Tolerations and Taints so the node gets well selected. 
+  # Integrates directly into 'tolerations:' section of the StatefulSet tempalte. 
+  # To learn more, read https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+
+  # IMPORTANT NOTE: To make sure scalar values (booleans, int), ALWAYS place them between quotation marks.
+  #                 e.g. value: "true", value: "42" instead of value: true or value: 42
+  nodeSelectorTolerations:
+    # - key: "key1"
+    #   operator: "Equal"
+    #   value: "Value1"
+    #   effect: "NoSchedule"
+    # - key: "key2"
+    #   operator: "Exists"
+    #   effect: "NoExecute"
+  
+
+  storage:
+    size: 10Gi
+    storageClassName: ""
+
+  httpPort: 5080
+  
+  syslog:
+    port: 5514
+    protocol: UDP
+    # initial_allowed_origins: "[]"
+
+  https:
+    enabled: false
+
+    certificateFrom: {}
+      # certmanager: 
+      #   privateKey:
+      #     algorithm: RSA
+      #     encoding: PKCS1
+      #     size: 2048
+
+      #   duration: 2160h # 90d
+      #   renewBefore: 360h # 15d
+
+      #   isCA: false
+      #   usages: 
+      #     - server auth
+
+      #   subject:
+      #     orgnizations:
+      #       - "FlowG"
+
+      #   commonName: logs.example.com
+      #   issuerRef: 
+      #     name: letsencrypt-prod
+      #     kind: ClusterIssuer
+      # secretRef: 
+      #   name: flowg-tls
+      
+
+    mgmt:
+      enabled: false
+
+      certificateFrom: {}
+        # secretRef:
+        #   name: flowg-tls
+        
+        # certmanager:
+        #   privateKey:
+        #     algorithm: RSA
+        #     encoding: PKCS1
+        #     size: 2048
+        #   duration: 2160h # 90d
+        #   renewBefore: 360h # 15d
+        #   isCA: false
+        #   usages: 
+        #     - server auth
+        #   subject:
+        #     orgnizations:
+        #       - "FlowG"
+        #   commonName:
+        #   issuerRef:
+        #     name: letsencrypt-prod
+        #     kind: ClusterIssuer
+    
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  # This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  service:
+    # NodePort, LoadBalancer or ClusterIP 
+    type: LoadBalancer
+
+    # Ports inside range 30000-32767
+    nodePort:
+      httpPort: 30080
+      syslogPort: 32514
+  
+
+  
