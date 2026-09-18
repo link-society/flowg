@@ -8,17 +8,18 @@ export const NodeListRoot = styled(Paper)({
 })
 
 export const NodeListHeader = styled('div')(({ theme }) => ({
-  padding: theme.spacing(1),
+  padding: theme.spacing(0.5, 1),
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  backgroundColor: theme.tokens.colors.cardHeaderBkg,
-  color: theme.tokens.colors.primaryContrast,
+  backgroundColor: theme.tokens.colors.codeBg,
+  color: theme.tokens.colors.labelText,
   boxShadow: theme.shadows[4],
 }))
 
 export const NodeListTitle = styled('div')({
   flex: 1,
+  fontSize: '0.8125rem',
   fontWeight: 600,
 })
 

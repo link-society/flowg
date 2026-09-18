@@ -4,4 +4,5 @@ export type StreamEditorProps = {
   streamConfig: StreamConfigModel
   storageUsage: number
   onStreamConfigChange: (config: StreamConfigModel) => void
+  stacked?: boolean
 }

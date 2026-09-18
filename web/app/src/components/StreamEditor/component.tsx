@@ -21,22 +21,23 @@ const StreamEditor = ({
   streamConfig,
   storageUsage,
   onStreamConfigChange,
+  stacked = false,
 }: StreamEditorProps) => {
   const { t } = useTranslation()
   const usageMB = storageUsage / (1024 * 1024)
   const usagePercent = (usageMB * 100) / streamConfig.size
 
   return (
-    <StreamEditorRoot>
-      <StreamEditorPanel>
-        <StreamEditorPanelHeader>
+    <StreamEditorRoot stacked={stacked}>
+      <StreamEditorPanel stacked={stacked}>
+        <StreamEditorPanelHeader stacked={stacked}>
           <Typography variant="titleSm">
             {t('components.streamEditor.retentionTitle')}
           </Typography>
         </StreamEditorPanelHeader>
         <Divider />
-        <StreamEditorPanelBody>
-          <StreamEditorUsageRow>
+        <StreamEditorPanelBody stacked={stacked}>
+          <StreamEditorUsageRow stacked={stacked}>
             <Typography variant="text">
               {t('components.streamEditor.usageLabel', {
                 usage: usageMB.toFixed(2),
@@ -86,14 +87,14 @@ const StreamEditor = ({
         </StreamEditorPanelBody>
       </StreamEditorPanel>
 
-      <StreamEditorPanel>
-        <StreamEditorPanelHeader>
+      <StreamEditorPanel stacked={stacked}>
+        <StreamEditorPanelHeader stacked={stacked}>
           <Typography variant="titleSm">
             {t('components.streamEditor.indexesTitle')}
           </Typography>
         </StreamEditorPanelHeader>
         <Divider />
-        <StreamEditorPanelBody>
+        <StreamEditorPanelBody stacked={stacked}>
           <ListEdit
             id="editor.streams.indexed-field"
             list={streamConfig.indexed_fields}
