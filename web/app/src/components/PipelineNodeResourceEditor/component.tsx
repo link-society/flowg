@@ -37,7 +37,6 @@ const Loading = () => (
   </EditorLoading>
 )
 
-/** Editor body; reports its save action up so the drawer can pin it in a fixed footer. */
 const ResourceForm = ({
   saving,
   canSave,
@@ -184,9 +183,6 @@ const ForwarderResourceEditor = ({
   )
   const dirty = useDirty(savedForwarder, forwarder)
 
-  // ForwarderEditor's sub-editors normalize their config on mount (filling
-  // in defaults for optional fields), which changes `forwarder` once before
-  // any real user edit. Treat that first change as the dirty baseline.
   const initializedRef = useRef(false)
   const handleForwarderChange = (newForwarder: ForwarderModel) => {
     setForwarder(newForwarder)
@@ -236,7 +232,6 @@ const ForwarderResourceEditor = ({
   )
 }
 
-/** Inline editor for the shared resource a pipeline node points at. */
 const PipelineNodeResourceEditor = ({
   kind,
   name,

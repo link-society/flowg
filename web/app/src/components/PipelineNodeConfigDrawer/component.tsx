@@ -206,8 +206,10 @@ const PipelineNodeConfigDrawer = () => {
           {meta.icon}
         </DrawerHeaderIcon>
         <DrawerHeaderText>
-          <DrawerHeaderKicker>{t(meta.labelKey)}</DrawerHeaderKicker>
-          <DrawerHeaderTitle title={title}>{title}</DrawerHeaderTitle>
+          <DrawerHeaderKicker variant="text">{t(meta.labelKey)}</DrawerHeaderKicker>
+          <DrawerHeaderTitle variant="titleSm" title={title}>
+            {title}
+          </DrawerHeaderTitle>
         </DrawerHeaderText>
         <IconButton
           size="small"
