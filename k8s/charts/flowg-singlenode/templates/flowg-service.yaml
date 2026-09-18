@@ -25,18 +25,6 @@ spec:
       {{- else }}
       appProtocol: http
       {{- end }}
-    - name: mgmt
-      port: {{ .Values.flowg.mgmtPort }}
-      targetPort: 9113
-      protocol: TCP
-      {{- if has .Values.flowg.service.type (list "NodePort" "LoadBalancer") }}
-      nodePort: {{ .Values.flowg.service.nodePort.mgmtPort }}
-      {{- end }}
-      {{- if .Values.flowg.https.mgmt.enabled }}
-      appProtocol: https
-      {{- else }}
-      appProtocol: http
-      {{- end }}
     - name: syslog
       port: {{ .Values.flowg.syslog.port }}
       targetPort: 5514
