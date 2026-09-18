@@ -2,8 +2,8 @@ import Box from '@mui/material/Box'
 import { styled } from '@mui/material/styles'
 
 export const DrawerRoot = styled(Box)(({ theme }) => ({
-  flex: '0 0 420px',
-  maxWidth: '420px',
+  flex: '0 0 460px',
+  maxWidth: '460px',
   height: '100%',
   display: 'flex',
   flexDirection: 'column',
@@ -74,10 +74,15 @@ export const DrawerBody = styled('div')(({ theme }) => ({
 }))
 
 export const DrawerActions = styled('div')(({ theme }) => ({
+  flex: 'none',
   display: 'flex',
   flexDirection: 'row',
   flexWrap: 'wrap',
+  justifyContent: 'flex-end',
   gap: theme.spacing(1),
+  padding: theme.spacing(1.5),
+  borderTop: `1px solid ${theme.tokens.colors.borderLight}`,
+  backgroundColor: theme.palette.background.paper,
 }))
 
 export const DrawerHint = styled('div')(({ theme }) => ({

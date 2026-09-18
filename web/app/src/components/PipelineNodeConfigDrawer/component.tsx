@@ -1,6 +1,8 @@
 import { ReactNode, useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
 import IconButton from '@mui/material/IconButton'
 import TextField from '@mui/material/TextField'
 import { useTheme } from '@mui/material/styles'
@@ -13,6 +15,7 @@ import FilterAltIcon from '@mui/icons-material/FilterAlt'
 import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import InputIcon from '@mui/icons-material/Input'
+import SaveIcon from '@mui/icons-material/Save'
 import StorageIcon from '@mui/icons-material/Storage'
 
 import { Node, useOnSelectionChange } from '@xyflow/react'
@@ -20,10 +23,9 @@ import { Node, useOnSelectionChange } from '@xyflow/react'
 import { usePipelineEditorHooks } from '@/lib/hooks/pipeline-editor'
 import { useProfile } from '@/lib/hooks/profile'
 
-import DialogForwarderEditor from '@/components/DialogForwarderEditor/component'
-import DialogStreamEditor from '@/components/DialogStreamEditor/component'
-import DialogTransformerEditor from '@/components/DialogTransformerEditor/component'
 import PipelineDeleteNodeButton from '@/components/PipelineDeleteNodeButton/component'
+import PipelineNodeResourceEditor from '@/components/PipelineNodeResourceEditor/component'
+import { PipelineNodeResourceSaveAction } from '@/components/PipelineNodeResourceEditor/types'
 
 import {
   DrawerAccent,
@@ -141,6 +143,8 @@ const PipelineNodeConfigDrawer = () => {
 
   const [selectedNode, setSelectedNode] = useState<Node | null>(null)
   const [closedNodeId, setClosedNodeId] = useState<string | null>(null)
+  const [saveAction, setSaveAction] =
+    useState<PipelineNodeResourceSaveAction | null>(null)
 
   const onSelectionChange = useCallback(({ nodes }: { nodes: Node[] }) => {
     setSelectedNode(nodes.length === 1 ? nodes[0] : null)
@@ -236,12 +240,18 @@ const PipelineNodeConfigDrawer = () => {
         {nodeType === 'transform' && (
           <>
             <DrawerHint>
-              {t('components.pipelineNodeConfigDrawer.sharedResourceHint')}
+              {t(
+                permissions.can_edit_transformers
+                  ? 'components.pipelineNodeConfigDrawer.sharedResourceHint'
+                  : 'components.pipelineNodeConfigDrawer.readOnlyHint'
+              )}
             </DrawerHint>
             {permissions.can_edit_transformers && (
-              <DrawerActions>
-                <DialogTransformerEditor transformer={str(data.transformer)} />
-              </DrawerActions>
+              <PipelineNodeResourceEditor
+                kind="transformer"
+                name={str(data.transformer)}
+                onSaveActionChange={setSaveAction}
+              />
             )}
           </>
         )}
@@ -249,12 +259,18 @@ const PipelineNodeConfigDrawer = () => {
         {nodeType === 'forwarder' && (
           <>
             <DrawerHint>
-              {t('components.pipelineNodeConfigDrawer.sharedResourceHint')}
+              {t(
+                permissions.can_edit_forwarders
+                  ? 'components.pipelineNodeConfigDrawer.sharedResourceHint'
+                  : 'components.pipelineNodeConfigDrawer.readOnlyHint'
+              )}
             </DrawerHint>
             {permissions.can_edit_forwarders && (
-              <DrawerActions>
-                <DialogForwarderEditor forwarderName={str(data.forwarder)} />
-              </DrawerActions>
+              <PipelineNodeResourceEditor
+                kind="forwarder"
+                name={str(data.forwarder)}
+                onSaveActionChange={setSaveAction}
+              />
             )}
           </>
         )}
@@ -262,12 +278,18 @@ const PipelineNodeConfigDrawer = () => {
         {nodeType === 'router' && (
           <>
             <DrawerHint>
-              {t('components.pipelineNodeConfigDrawer.sharedResourceHint')}
+              {t(
+                permissions.can_edit_streams
+                  ? 'components.pipelineNodeConfigDrawer.sharedResourceHint'
+                  : 'components.pipelineNodeConfigDrawer.readOnlyHint'
+              )}
             </DrawerHint>
             {permissions.can_edit_streams && (
-              <DrawerActions>
-                <DialogStreamEditor stream={str(data.stream)} />
-              </DrawerActions>
+              <PipelineNodeResourceEditor
+                kind="stream"
+                name={str(data.stream)}
+                onSaveActionChange={setSaveAction}
+              />
             )}
           </>
         )}
@@ -300,13 +322,29 @@ const PipelineNodeConfigDrawer = () => {
             slotProps={{ input: { readOnly: true } }}
           />
         )}
-
-        {canDelete && (
-          <DrawerActions>
-            <PipelineDeleteNodeButton nodeId={node.id} />
-          </DrawerActions>
-        )}
       </DrawerBody>
+
+      {(saveAction !== null || canDelete) && (
+        <DrawerActions>
+          {canDelete && <PipelineDeleteNodeButton nodeId={node.id} />}
+          {saveAction !== null && (
+            <Button
+              variant="contained"
+              color="secondary"
+              size="small"
+              onClick={saveAction.onSave}
+              disabled={saveAction.saving || !saveAction.canSave}
+              startIcon={!saveAction.saving && <SaveIcon />}
+            >
+              {saveAction.saving ? (
+                <CircularProgress size={20} />
+              ) : (
+                t('common.actions.save')
+              )}
+            </Button>
+          )}
+        </DrawerActions>
+      )}
 
       <DrawerFooter>
         <InfoOutlinedIcon
