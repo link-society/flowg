@@ -63,9 +63,6 @@ const DialogNewForwarder = ({
   const configDirty = useDirty(savedForwarder, forwarder)
   const dirty = name.value.trim() !== '' || type !== initialType || configDirty
 
-  // ForwarderEditor's sub-editors normalize their config on mount (filling
-  // in defaults for optional fields), which changes `forwarder` once before
-  // any real user edit. Treat that first change as the dirty baseline.
   const initializedRef = useRef(false)
   const handleForwarderChange = (newForwarder: ForwarderModel) => {
     setForwarder(newForwarder)

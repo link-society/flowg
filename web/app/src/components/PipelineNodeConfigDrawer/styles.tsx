@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 import { styled } from '@mui/material/styles'
 
 export const DrawerRoot = styled(Box)(({ theme }) => ({
@@ -46,7 +47,7 @@ export const DrawerHeaderText = styled('div')({
   lineHeight: 1.2,
 })
 
-export const DrawerHeaderKicker = styled('div')(({ theme }) => ({
+export const DrawerHeaderKicker = styled(Typography)(({ theme }) => ({
   fontSize: '0.6875rem',
   fontWeight: 600,
   letterSpacing: '0.06em',
@@ -54,7 +55,7 @@ export const DrawerHeaderKicker = styled('div')(({ theme }) => ({
   color: theme.tokens.colors.mutedText,
 }))
 
-export const DrawerHeaderTitle = styled('div')({
+export const DrawerHeaderTitle = styled(Typography)({
   fontSize: '1rem',
   fontWeight: 600,
   fontFamily: 'monospace',
