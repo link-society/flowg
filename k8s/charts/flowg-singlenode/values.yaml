@@ -77,13 +77,13 @@ flowg:
   # IMPORTANT NOTE: To make sure scalar values (booleans, int), ALWAYS place them between quotation marks.
   #                 e.g. value: "true", value: "42" instead of value: true or value: 42
   nodeSelectorTolerations:
-    - key: "key1"
-      operator: "Equal"
-      value: "Value1"
-      effect: "NoSchedule"
-    - key: "key2"
-      operator: "Exists"
-      effect: "NoExecute"
+    # - key: "key1"
+    #   operator: "Equal"
+    #   value: "Value1"
+    #   effect: "NoSchedule"
+    # - key: "key2"
+    #   operator: "Exists"
+    #   effect: "NoExecute"
   
 
   storage:
@@ -91,7 +91,6 @@ flowg:
     storageClassName: ""
 
   httpPort: 5080
-  mgmtPort: 9113
   
   syslog:
     port: 5514
@@ -182,7 +181,6 @@ flowg:
     # Ports inside range 30000-32767
     nodePort:
       httpPort: 30080
-      mgmtPort: 32113
       syslogPort: 32514
   
 
