@@ -2,9 +2,20 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import { styled } from '@mui/material/styles'
 
+export const DrawerBackdrop = styled('div')(({ theme }) => ({
+  position: 'absolute',
+  inset: 0,
+  backgroundColor: theme.tokens.colors.shadowOverlay,
+  pointerEvents: 'auto',
+  zIndex: 4,
+}))
+
 export const DrawerRoot = styled(Box)(({ theme }) => ({
-  flex: '0 0 460px',
-  maxWidth: '460px',
+  position: 'absolute',
+  top: 0,
+  right: 0,
+  width: '460px',
+  maxWidth: '100%',
   height: '100%',
   display: 'flex',
   flexDirection: 'column',

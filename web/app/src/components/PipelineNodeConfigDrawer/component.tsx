@@ -1,9 +1,12 @@
 import { ReactNode, useCallback, useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
+import Fade from '@mui/material/Fade'
 import IconButton from '@mui/material/IconButton'
+import Slide from '@mui/material/Slide'
 import TextField from '@mui/material/TextField'
 import { useTheme } from '@mui/material/styles'
 
@@ -21,6 +24,7 @@ import StorageIcon from '@mui/icons-material/Storage'
 import { Node, useOnSelectionChange } from '@xyflow/react'
 
 import { usePipelineEditorHooks } from '@/lib/hooks/pipeline-editor'
+import { usePipelineOverlayHost } from '@/lib/hooks/pipeline-overlay-host'
 import { useProfile } from '@/lib/hooks/profile'
 
 import PipelineDeleteNodeButton from '@/components/PipelineDeleteNodeButton/component'
@@ -30,6 +34,7 @@ import { PipelineNodeResourceSaveAction } from '@/components/PipelineNodeResourc
 import {
   DrawerAccent,
   DrawerActions,
+  DrawerBackdrop,
   DrawerBody,
   DrawerFooter,
   DrawerHeader,
@@ -140,9 +145,11 @@ const PipelineNodeConfigDrawer = () => {
   const { t } = useTranslation()
   const theme = useTheme()
   const { permissions } = useProfile()
+  const overlayHost = usePipelineOverlayHost()
+  const { setNodes } = usePipelineEditorHooks()
 
   const [selectedNode, setSelectedNode] = useState<Node | null>(null)
-  const [closedNodeId, setClosedNodeId] = useState<string | null>(null)
+  const [displayedNode, setDisplayedNode] = useState<Node | null>(null)
   const [saveAction, setSaveAction] =
     useState<PipelineNodeResourceSaveAction | null>(null)
 
@@ -151,11 +158,28 @@ const PipelineNodeConfigDrawer = () => {
   }, [])
   useOnSelectionChange({ onChange: onSelectionChange })
 
-  if (selectedNode === null || selectedNode.id === closedNodeId) {
+  const handleClose = useCallback(
+    (nodeId: string) => {
+      setNodes((nds) =>
+        nds.map((n) => (n.id === nodeId ? { ...n, selected: false } : n))
+      )
+    },
+    [setNodes]
+  )
+
+  const open = selectedNode !== null
+
+  useEffect(() => {
+    if (open) {
+      setDisplayedNode(selectedNode)
+    }
+  }, [open, selectedNode])
+
+  if (displayedNode === null) {
     return null
   }
 
-  const node = selectedNode
+  const node = displayedNode
   const nodeType = node.type ?? ''
   const meta = NODE_META[nodeType]
   if (meta === undefined) {
@@ -198,164 +222,179 @@ const PipelineNodeConfigDrawer = () => {
     : t('components.pipelineNodeConfigDrawer.pipelineStoredNote')
 
   return (
-    <DrawerRoot>
-      <DrawerAccent style={{ backgroundColor: accent }} />
-
-      <DrawerHeader>
-        <DrawerHeaderIcon style={{ backgroundColor: accent }}>
-          {meta.icon}
-        </DrawerHeaderIcon>
-        <DrawerHeaderText>
-          <DrawerHeaderKicker variant="text">{t(meta.labelKey)}</DrawerHeaderKicker>
-          <DrawerHeaderTitle variant="titleSm" title={title}>
-            {title}
-          </DrawerHeaderTitle>
-        </DrawerHeaderText>
-        <IconButton
-          size="small"
-          edge="end"
-          sx={{ marginLeft: 'auto' }}
-          onClick={() => setClosedNodeId(node.id)}
-          aria-label={t('common.actions.close')}
-        >
-          <CloseIcon fontSize="small" />
-        </IconButton>
-      </DrawerHeader>
-
-      <DrawerBody key={node.id}>
-        {nodeType === 'source' && (
-          <>
-            <TextField
-              label={t('components.pipelineNodeConfigDrawer.sourceTypeLabel')}
-              type="text"
-              value={str(data.type).toUpperCase()}
-              fullWidth
-              variant="outlined"
-              slotProps={{ input: { readOnly: true } }}
-            />
-            <DrawerHint>
-              {t('components.pipelineNodeConfigDrawer.sourcePlaceholder')}
-            </DrawerHint>
-          </>
+    <>
+      {overlayHost !== null &&
+        createPortal(
+          <Fade in={open} unmountOnExit>
+            <DrawerBackdrop onClick={() => handleClose(node.id)} />
+          </Fade>,
+          overlayHost
         )}
+      <Slide direction="left" in={open} onExited={() => setDisplayedNode(null)}>
+        <DrawerRoot>
+          <DrawerAccent style={{ backgroundColor: accent }} />
 
-        {nodeType === 'transform' && (
-          <>
-            <DrawerHint>
-              {t(
-                permissions.can_edit_transformers
-                  ? 'components.pipelineNodeConfigDrawer.sharedResourceHint'
-                  : 'components.pipelineNodeConfigDrawer.readOnlyHint'
-              )}
-            </DrawerHint>
-            {permissions.can_edit_transformers && (
-              <PipelineNodeResourceEditor
-                kind="transformer"
-                name={str(data.transformer)}
-                onSaveActionChange={setSaveAction}
-              />
-            )}
-          </>
-        )}
-
-        {nodeType === 'forwarder' && (
-          <>
-            <DrawerHint>
-              {t(
-                permissions.can_edit_forwarders
-                  ? 'components.pipelineNodeConfigDrawer.sharedResourceHint'
-                  : 'components.pipelineNodeConfigDrawer.readOnlyHint'
-              )}
-            </DrawerHint>
-            {permissions.can_edit_forwarders && (
-              <PipelineNodeResourceEditor
-                kind="forwarder"
-                name={str(data.forwarder)}
-                onSaveActionChange={setSaveAction}
-              />
-            )}
-          </>
-        )}
-
-        {nodeType === 'router' && (
-          <>
-            <DrawerHint>
-              {t(
-                permissions.can_edit_streams
-                  ? 'components.pipelineNodeConfigDrawer.sharedResourceHint'
-                  : 'components.pipelineNodeConfigDrawer.readOnlyHint'
-              )}
-            </DrawerHint>
-            {permissions.can_edit_streams && (
-              <PipelineNodeResourceEditor
-                kind="stream"
-                name={str(data.stream)}
-                onSaveActionChange={setSaveAction}
-              />
-            )}
-          </>
-        )}
-
-        {nodeType === 'switch' && (
-          <InlineFieldEditor
-            nodeId={node.id}
-            dataKey="condition"
-            label={t('components.pipelineNodeSwitch.label')}
-            value={str(data.condition)}
-          />
-        )}
-
-        {nodeType === 'metric' && (
-          <InlineFieldEditor
-            nodeId={node.id}
-            dataKey="name"
-            label={t('components.pipelineNodeMetric.label')}
-            value={str(data.name)}
-          />
-        )}
-
-        {nodeType === 'pipeline' && (
-          <TextField
-            label={t('components.pipelineNodePipeline.label')}
-            type="text"
-            value={str(data.pipeline)}
-            fullWidth
-            variant="outlined"
-            slotProps={{ input: { readOnly: true } }}
-          />
-        )}
-      </DrawerBody>
-
-      {(saveAction !== null || canDelete) && (
-        <DrawerActions>
-          {canDelete && <PipelineDeleteNodeButton nodeId={node.id} />}
-          {saveAction !== null && (
-            <Button
-              variant="contained"
-              color="secondary"
+          <DrawerHeader>
+            <DrawerHeaderIcon style={{ backgroundColor: accent }}>
+              {meta.icon}
+            </DrawerHeaderIcon>
+            <DrawerHeaderText>
+              <DrawerHeaderKicker variant="text">
+                {t(meta.labelKey)}
+              </DrawerHeaderKicker>
+              <DrawerHeaderTitle variant="titleSm" title={title}>
+                {title}
+              </DrawerHeaderTitle>
+            </DrawerHeaderText>
+            <IconButton
               size="small"
-              onClick={saveAction.onSave}
-              disabled={saveAction.saving || !saveAction.canSave}
-              startIcon={!saveAction.saving && <SaveIcon />}
+              edge="end"
+              sx={{ marginLeft: 'auto' }}
+              onClick={() => handleClose(node.id)}
+              aria-label={t('common.actions.close')}
             >
-              {saveAction.saving ? (
-                <CircularProgress size={20} />
-              ) : (
-                t('common.actions.save')
-              )}
-            </Button>
-          )}
-        </DrawerActions>
-      )}
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </DrawerHeader>
 
-      <DrawerFooter>
-        <InfoOutlinedIcon
-          fontSize="small"
-          sx={{ color: theme.tokens.colors.mutedText, flex: 'none' }}
-        />
-        <span>{footerNote}</span>
-      </DrawerFooter>
-    </DrawerRoot>
+          <DrawerBody key={node.id}>
+            {nodeType === 'source' && (
+              <>
+                <TextField
+                  label={t(
+                    'components.pipelineNodeConfigDrawer.sourceTypeLabel'
+                  )}
+                  type="text"
+                  value={str(data.type).toUpperCase()}
+                  fullWidth
+                  variant="outlined"
+                  slotProps={{ input: { readOnly: true } }}
+                />
+                <DrawerHint>
+                  {t('components.pipelineNodeConfigDrawer.sourcePlaceholder')}
+                </DrawerHint>
+              </>
+            )}
+
+            {nodeType === 'transform' && (
+              <>
+                <DrawerHint>
+                  {t(
+                    permissions.can_edit_transformers
+                      ? 'components.pipelineNodeConfigDrawer.sharedResourceHint'
+                      : 'components.pipelineNodeConfigDrawer.readOnlyHint'
+                  )}
+                </DrawerHint>
+                {permissions.can_edit_transformers && (
+                  <PipelineNodeResourceEditor
+                    kind="transformer"
+                    name={str(data.transformer)}
+                    onSaveActionChange={setSaveAction}
+                  />
+                )}
+              </>
+            )}
+
+            {nodeType === 'forwarder' && (
+              <>
+                <DrawerHint>
+                  {t(
+                    permissions.can_edit_forwarders
+                      ? 'components.pipelineNodeConfigDrawer.sharedResourceHint'
+                      : 'components.pipelineNodeConfigDrawer.readOnlyHint'
+                  )}
+                </DrawerHint>
+                {permissions.can_edit_forwarders && (
+                  <PipelineNodeResourceEditor
+                    kind="forwarder"
+                    name={str(data.forwarder)}
+                    onSaveActionChange={setSaveAction}
+                  />
+                )}
+              </>
+            )}
+
+            {nodeType === 'router' && (
+              <>
+                <DrawerHint>
+                  {t(
+                    permissions.can_edit_streams
+                      ? 'components.pipelineNodeConfigDrawer.sharedResourceHint'
+                      : 'components.pipelineNodeConfigDrawer.readOnlyHint'
+                  )}
+                </DrawerHint>
+                {permissions.can_edit_streams && (
+                  <PipelineNodeResourceEditor
+                    kind="stream"
+                    name={str(data.stream)}
+                    onSaveActionChange={setSaveAction}
+                  />
+                )}
+              </>
+            )}
+
+            {nodeType === 'switch' && (
+              <InlineFieldEditor
+                nodeId={node.id}
+                dataKey="condition"
+                label={t('components.pipelineNodeSwitch.label')}
+                value={str(data.condition)}
+              />
+            )}
+
+            {nodeType === 'metric' && (
+              <InlineFieldEditor
+                nodeId={node.id}
+                dataKey="name"
+                label={t('components.pipelineNodeMetric.label')}
+                value={str(data.name)}
+              />
+            )}
+
+            {nodeType === 'pipeline' && (
+              <TextField
+                label={t('components.pipelineNodePipeline.label')}
+                type="text"
+                value={str(data.pipeline)}
+                fullWidth
+                variant="outlined"
+                slotProps={{ input: { readOnly: true } }}
+              />
+            )}
+          </DrawerBody>
+
+          {(saveAction !== null || canDelete) && (
+            <DrawerActions>
+              {canDelete && <PipelineDeleteNodeButton nodeId={node.id} />}
+              {saveAction !== null && (
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  size="small"
+                  onClick={saveAction.onSave}
+                  disabled={saveAction.saving || !saveAction.canSave}
+                  startIcon={!saveAction.saving && <SaveIcon />}
+                >
+                  {saveAction.saving ? (
+                    <CircularProgress size={20} />
+                  ) : (
+                    t('common.actions.save')
+                  )}
+                </Button>
+              )}
+            </DrawerActions>
+          )}
+
+          <DrawerFooter>
+            <InfoOutlinedIcon
+              fontSize="small"
+              sx={{ color: theme.tokens.colors.mutedText, flex: 'none' }}
+            />
+            <span>{footerNote}</span>
+          </DrawerFooter>
+        </DrawerRoot>
+      </Slide>
+    </>
   )
 }
 
