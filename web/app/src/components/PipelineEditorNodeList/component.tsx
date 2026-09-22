@@ -3,13 +3,17 @@ import { useColorMode } from '@/theme'
 import { ReactElement, ReactNode, useEffect, useState } from 'react'
 
 import CircularProgress from '@mui/material/CircularProgress'
+import Collapse from '@mui/material/Collapse'
 import * as colors from '@mui/material/colors'
 
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 
 import {
   NodeChip,
+  NodeListExpandIcon,
   NodeListHeader,
+  NodeListHeaderToggle,
   NodeListItems,
   NodeListLoading,
   NodeListRoot,
@@ -27,6 +31,7 @@ type PipelineEditorNodeListProps = Readonly<{
 }>
 
 const PipelineEditorNodeList = (props: PipelineEditorNodeListProps) => {
+  const [expanded, setExpanded] = useState(true)
   const [dirty, setDirty] = useState(true)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
@@ -69,36 +74,43 @@ const PipelineEditorNodeList = (props: PipelineEditorNodeListProps) => {
   return (
     <NodeListRoot>
       <NodeListHeader>
-        <NodeListTitle>{props.title}</NodeListTitle>
+        <NodeListHeaderToggle onClick={() => setExpanded((prev) => !prev)}>
+          <NodeListExpandIcon expanded={expanded}>
+            <ExpandMoreIcon fontSize="small" />
+          </NodeListExpandIcon>
+          <NodeListTitle>{props.title}</NodeListTitle>
+        </NodeListHeaderToggle>
         {props.newButton(() => setDirty(true))}
       </NodeListHeader>
 
-      {loading ? (
-        <NodeListLoading>
-          <CircularProgress size={24} />
-        </NodeListLoading>
-      ) : (
-        <NodeListItems>
-          {items.map((item) => (
-            <NodeChip
-              key={item}
-              icon={props.itemIcon}
-              label={item}
-              onDelete={() => props.onItemOpen(item)}
-              deleteIcon={<OpenInNewIcon />}
-              variant="outlined"
-              chipBgColor={backgroundColor}
-              chipBorderColor={borderColor}
-              draggable
-              onDragStart={(evt) => {
-                evt.dataTransfer.setData('item-type', props.itemType)
-                evt.dataTransfer.setData('item', item)
-                evt.dataTransfer.effectAllowed = 'move'
-              }}
-            />
-          ))}
-        </NodeListItems>
-      )}
+      <Collapse in={expanded}>
+        {loading ? (
+          <NodeListLoading>
+            <CircularProgress size={24} />
+          </NodeListLoading>
+        ) : (
+          <NodeListItems>
+            {items.map((item) => (
+              <NodeChip
+                key={item}
+                icon={props.itemIcon}
+                label={item}
+                onDelete={() => props.onItemOpen(item)}
+                deleteIcon={<OpenInNewIcon />}
+                variant="outlined"
+                chipBgColor={backgroundColor}
+                chipBorderColor={borderColor}
+                draggable
+                onDragStart={(evt) => {
+                  evt.dataTransfer.setData('item-type', props.itemType)
+                  evt.dataTransfer.setData('item', item)
+                  evt.dataTransfer.effectAllowed = 'move'
+                }}
+              />
+            ))}
+          </NodeListItems>
+        )}
+      </Collapse>
     </NodeListRoot>
   )
 }

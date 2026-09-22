@@ -6,7 +6,6 @@ import AccountTreeIcon from '@mui/icons-material/AccountTree'
 
 import { Handle, NodeProps, Position } from '@xyflow/react'
 
-import PipelineDeleteNodeButton from '@/components/PipelineDeleteNodeButton/component'
 import PipelineTraceNodeButton from '@/components/PipelineTraceNodeButton/component'
 import PipelineTraceNodeIndicator from '@/components/PipelineTraceNodeIndicator/component'
 
@@ -14,7 +13,6 @@ import { NodeBody, NodeIcon, NodeRoot, ToolbarRow, handleStyle } from './styles'
 import { PipelineNodePipelineData } from './types'
 
 const PipelineNodePipeline = ({
-  id,
   data,
   selected,
 }: NodeProps<PipelineNodePipelineData>) => {
@@ -22,10 +20,9 @@ const PipelineNodePipeline = ({
 
   return (
     <>
-      {selected && (
+      {selected && data.traces && (
         <ToolbarRow>
-          <PipelineDeleteNodeButton nodeId={id} />
-          {data.traces && <PipelineTraceNodeButton traces={data.traces} />}
+          <PipelineTraceNodeButton traces={data.traces} />
         </ToolbarRow>
       )}
       <Handle type="target" position={Position.Left} style={handleStyle} />

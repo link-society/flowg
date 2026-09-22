@@ -6,7 +6,6 @@ import BarChartIcon from '@mui/icons-material/BarChart'
 
 import { Handle, NodeProps, Position } from '@xyflow/react'
 
-import PipelineDeleteNodeButton from '@/components/PipelineDeleteNodeButton/component'
 import PipelineTraceNodeButton from '@/components/PipelineTraceNodeButton/component'
 import PipelineTraceNodeIndicator from '@/components/PipelineTraceNodeIndicator/component'
 
@@ -14,7 +13,6 @@ import { NodeBody, NodeIcon, NodeRoot, ToolbarRow, handleStyle } from './styles'
 import { PipelineNodeMetricData } from './types'
 
 const PipelineNodeMetric = ({
-  id,
   data,
   selected,
 }: NodeProps<PipelineNodeMetricData>) => {
@@ -22,10 +20,9 @@ const PipelineNodeMetric = ({
 
   return (
     <>
-      {selected && (
+      {selected && data.traces && (
         <ToolbarRow>
-          <PipelineDeleteNodeButton nodeId={id} />
-          {data.traces && <PipelineTraceNodeButton traces={data.traces} />}
+          <PipelineTraceNodeButton traces={data.traces} />
         </ToolbarRow>
       )}
 
