@@ -48,23 +48,30 @@ export const PipelineDetailViewHeaderActions = styled('div')(({ theme }) => ({
 }))
 
 export const PipelineDetailViewBody = styled(AppContainer)(({ theme }) => ({
+  position: 'relative',
   alignItems: 'stretch',
   gap: theme.spacing(1),
   overflow: 'auto',
   flex: 1,
   flexDirection: 'column',
+  padding: '0 !important',
   [theme.breakpoints.up('md')]: {
     flexDirection: 'row',
     overflow: 'hidden',
   },
 }))
 
+export const PipelineDetailViewOverlayHost = styled('div')({
+  position: 'absolute',
+  inset: 0,
+  pointerEvents: 'none',
+})
+
 export const PipelineDetailViewLeft = styled('div')(({ theme }) => ({
   width: '100%',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',
-  gap: theme.spacing(1),
   [theme.breakpoints.up('md')]: {
     flex: '0 0 240px',
     height: '100%',
@@ -73,8 +80,7 @@ export const PipelineDetailViewLeft = styled('div')(({ theme }) => ({
 }))
 
 export const PipelineDetailViewLeftItem = styled('div')({
-  flex: '1 1 0',
-  minHeight: 160,
+  flex: 'none',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',
