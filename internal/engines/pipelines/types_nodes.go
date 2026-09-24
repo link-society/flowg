@@ -172,7 +172,9 @@ func (n *TransformNode) Init(ctx context.Context) error {
 }
 
 func (n *TransformNode) Close(ctx context.Context) error {
-	n.runner.Close()
+	if n.runner != nil {
+		n.runner.Close()
+	}
 	return nil
 }
 
@@ -316,8 +318,10 @@ func (n *MetricNode) Init(ctx context.Context) error {
 }
 
 func (n *MetricNode) Close(ctx context.Context) error {
-	pipeline := getPipeline(ctx)
-	pipeline.Metrics.Unregister(n.counter)
+	if n.counter != nil {
+		pipeline := getPipeline(ctx)
+		pipeline.Metrics.Unregister(n.counter)
+	}
 	return nil
 }
 
