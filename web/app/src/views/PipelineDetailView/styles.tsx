@@ -48,50 +48,47 @@ export const PipelineDetailViewHeaderActions = styled('div')(({ theme }) => ({
 }))
 
 export const PipelineDetailViewBody = styled(AppContainer)(({ theme }) => ({
+  position: 'relative',
   alignItems: 'stretch',
   gap: theme.spacing(1),
   overflow: 'auto',
   flex: 1,
   flexDirection: 'column',
+  padding: '0 !important',
   [theme.breakpoints.up('md')]: {
     flexDirection: 'row',
     overflow: 'hidden',
   },
 }))
 
+export const PipelineDetailViewOverlayHost = styled('div')({
+  position: 'absolute',
+  inset: 0,
+  pointerEvents: 'none',
+})
+
 export const PipelineDetailViewLeft = styled('div')(({ theme }) => ({
-  flex: '0 0 16.67%',
-  height: '100%',
   width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'stretch',
   [theme.breakpoints.up('md')]: {
-    flexDirection: 'row',
+    flex: '0 0 240px',
+    height: '100%',
+    overflowY: 'auto',
   },
 }))
+
+export const PipelineDetailViewLeftItem = styled('div')({
+  flex: 'none',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'stretch',
+})
 
 export const PipelineDetailViewCenter = styled('div')({
   flex: 1,
   height: '100%',
-})
-
-export const PipelineDetailViewRight = styled('div')(({ theme }) => ({
-  width: '100%',
-  height: '100%',
-  flexShrink: 0,
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'stretch',
-  gap: theme.spacing(1),
-  [theme.breakpoints.up('md')]: {
-    width: 'calc(100% / 6)',
-  },
-}))
-
-export const PipelineDetailViewRightItem = styled('div')({
-  flex: '1 1 0',
-  minHeight: 0,
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'stretch',
 })
 
 export const TestDialogHint = styled('div')({

@@ -21,6 +21,8 @@ import { ReactFlowProvider } from '@xyflow/react'
 
 import * as configApi from '@/lib/api/operations/config'
 
+import PipelineOverlayHostContext from '@/lib/context/pipeline-overlay-host'
+
 import { useApiOperation } from '@/lib/hooks/api'
 import { useDialogs } from '@/lib/hooks/dialogs'
 import { useDirty } from '@/lib/hooks/dirty'
@@ -36,6 +38,7 @@ import DialogConfirm from '@/components/DialogConfirm/component'
 import InputKeyValue from '@/components/InputKeyValue/component'
 import PipelineEditorFlow from '@/components/PipelineEditorFlow/component'
 import PipelineEditorNodeListForwarder from '@/components/PipelineEditorNodeListForwarder/component'
+import PipelineEditorNodeListOther from '@/components/PipelineEditorNodeListOther/component'
 import PipelineEditorNodeListPipeline from '@/components/PipelineEditorNodeListPipeline/component'
 import PipelineEditorNodeListStream from '@/components/PipelineEditorNodeListStream/component'
 import PipelineEditorNodeListTransformer from '@/components/PipelineEditorNodeListTransformer/component'
@@ -52,8 +55,8 @@ import {
   PipelineDetailViewHeaderRight,
   PipelineDetailViewHeaderTest,
   PipelineDetailViewLeft,
-  PipelineDetailViewRight,
-  PipelineDetailViewRightItem,
+  PipelineDetailViewLeftItem,
+  PipelineDetailViewOverlayHost,
   PipelineDetailViewRoot,
   TestDialogHint,
 } from './styles'
@@ -88,6 +91,8 @@ const PipelineDetailView = () => {
   const { permissions } = useProfile()
   const { currentPipeline } = useLoaderData() as LoaderData
   const navigate = useNavigate()
+
+  const [overlayHost, setOverlayHost] = useState<HTMLDivElement | null>(null)
 
   const initialFlow = currentPipeline.flow
   const [flow, setFlow] = useState(initialFlow)
@@ -189,120 +194,126 @@ const PipelineDetailView = () => {
 
   return (
     <ReactFlowProvider>
-      <PipelineDetailViewRoot>
-        <PipelineDetailViewHeader variant="toolbar">
-          <PipelineDetailViewHeaderLeft>
-            <HeaderNameInput
-              label={t('pages.pipelines.nameLabel')}
-              value={currentPipeline.name}
-              type="text"
-              variant="outlined"
-              size="small"
-              slotProps={{
-                input: {
-                  readOnly: true,
-                },
-              }}
-            />
+      <PipelineOverlayHostContext.Provider value={overlayHost}>
+        <PipelineDetailViewRoot>
+          <PipelineDetailViewHeader variant="toolbar">
+            <PipelineDetailViewHeaderLeft>
+              <HeaderNameInput
+                label={t('pages.pipelines.nameLabel')}
+                value={currentPipeline.name}
+                type="text"
+                variant="outlined"
+                size="small"
+                slotProps={{
+                  input: {
+                    readOnly: true,
+                  },
+                }}
+              />
 
-            <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              href="https://flowg.cloud/docs/"
-              target="_blank"
-              startIcon={<HelpIcon />}
-            >
-              {t('common.actions.documentation')}
-            </Button>
-
-            <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              href="https://expr-lang.org/docs/language-definition"
-              target="_blank"
-              startIcon={<HelpIcon />}
-            >
-              {t('pages.pipelines.switchExpressionDocs')}
-            </Button>
-          </PipelineDetailViewHeaderLeft>
-
-          <PipelineDetailViewHeaderRight>
-            <PipelineDetailViewHeaderTest>
               <Button
                 variant="contained"
                 color="primary"
                 size="small"
-                onClick={() => setTestOpen(true)}
-                startIcon={<ScienceIcon />}
+                href="https://flowg.cloud/docs/"
+                target="_blank"
+                startIcon={<HelpIcon />}
               >
-                {t('common.actions.test')}
+                {t('common.actions.documentation')}
               </Button>
-            </PipelineDetailViewHeaderTest>
 
-            {permissions.can_edit_pipelines && (
-              <PipelineDetailViewHeaderActions>
+              <Button
+                variant="contained"
+                color="primary"
+                size="small"
+                href="https://expr-lang.org/docs/language-definition"
+                target="_blank"
+                startIcon={<HelpIcon />}
+              >
+                {t('pages.pipelines.switchExpressionDocs')}
+              </Button>
+            </PipelineDetailViewHeaderLeft>
+
+            <PipelineDetailViewHeaderRight>
+              <PipelineDetailViewHeaderTest>
                 <Button
                   variant="contained"
-                  color="error"
+                  color="primary"
                   size="small"
-                  onClick={handleDeleteClick}
-                  disabled={deleteLoading}
-                  startIcon={!deleteLoading && <DeleteIcon />}
+                  onClick={() => setTestOpen(true)}
+                  startIcon={<ScienceIcon />}
                 >
-                  {deleteLoading ? (
-                    <CircularProgress size={24} />
-                  ) : (
-                    <>{t('common.actions.delete')}</>
-                  )}
+                  {t('common.actions.test')}
                 </Button>
+              </PipelineDetailViewHeaderTest>
 
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  size="small"
-                  onClick={onSave}
-                  disabled={saveLoading || !dirty}
-                  startIcon={!saveLoading && <SaveIcon />}
-                >
-                  {saveLoading ? (
-                    <CircularProgress size={24} />
-                  ) : (
-                    <>{t('common.actions.save')}</>
-                  )}
-                </Button>
-              </PipelineDetailViewHeaderActions>
-            )}
-          </PipelineDetailViewHeaderRight>
-        </PipelineDetailViewHeader>
+              {permissions.can_edit_pipelines && (
+                <PipelineDetailViewHeaderActions>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    size="small"
+                    onClick={handleDeleteClick}
+                    disabled={deleteLoading}
+                    startIcon={!deleteLoading && <DeleteIcon />}
+                  >
+                    {deleteLoading ? (
+                      <CircularProgress size={24} />
+                    ) : (
+                      <>{t('common.actions.delete')}</>
+                    )}
+                  </Button>
 
-        <PipelineDetailViewBody variant="page">
-          <PipelineDetailViewLeft>
-            <PipelineEditorNodeListPipeline />
-          </PipelineDetailViewLeft>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    size="small"
+                    onClick={onSave}
+                    disabled={saveLoading || !dirty}
+                    startIcon={!saveLoading && <SaveIcon />}
+                  >
+                    {saveLoading ? (
+                      <CircularProgress size={24} />
+                    ) : (
+                      <>{t('common.actions.save')}</>
+                    )}
+                  </Button>
+                </PipelineDetailViewHeaderActions>
+              )}
+            </PipelineDetailViewHeaderRight>
+          </PipelineDetailViewHeader>
 
-          <PipelineDetailViewCenter>
-            <PipelineEditorFlow
-              pipelineTrace={testResult}
-              flow={initialFlow}
-              onFlowChange={onChange}
-            />
-          </PipelineDetailViewCenter>
+          <PipelineDetailViewBody variant="compact">
+            <PipelineDetailViewLeft>
+              <PipelineDetailViewLeftItem>
+                <PipelineEditorNodeListPipeline />
+              </PipelineDetailViewLeftItem>
+              <PipelineDetailViewLeftItem>
+                <PipelineEditorNodeListTransformer />
+              </PipelineDetailViewLeftItem>
+              <PipelineDetailViewLeftItem>
+                <PipelineEditorNodeListForwarder />
+              </PipelineDetailViewLeftItem>
+              <PipelineDetailViewLeftItem>
+                <PipelineEditorNodeListStream />
+              </PipelineDetailViewLeftItem>
+              <PipelineDetailViewLeftItem>
+                <PipelineEditorNodeListOther />
+              </PipelineDetailViewLeftItem>
+            </PipelineDetailViewLeft>
 
-          <PipelineDetailViewRight>
-            <PipelineDetailViewRightItem>
-              <PipelineEditorNodeListTransformer />
-            </PipelineDetailViewRightItem>
-            <PipelineDetailViewRightItem>
-              <PipelineEditorNodeListForwarder />
-            </PipelineDetailViewRightItem>
-            <PipelineDetailViewRightItem>
-              <PipelineEditorNodeListStream />
-            </PipelineDetailViewRightItem>
-          </PipelineDetailViewRight>
-        </PipelineDetailViewBody>
-      </PipelineDetailViewRoot>
+            <PipelineDetailViewCenter>
+              <PipelineEditorFlow
+                pipelineTrace={testResult}
+                flow={initialFlow}
+                onFlowChange={onChange}
+              />
+            </PipelineDetailViewCenter>
+
+            <PipelineDetailViewOverlayHost ref={setOverlayHost} />
+          </PipelineDetailViewBody>
+        </PipelineDetailViewRoot>
+      </PipelineOverlayHostContext.Provider>
 
       <Dialog open={testOpen} scroll="paper" onClose={() => setTestOpen(false)}>
         <DialogTitle>

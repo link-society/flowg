@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import TextField from '@mui/material/TextField'
@@ -7,9 +6,6 @@ import BarChartIcon from '@mui/icons-material/BarChart'
 
 import { Handle, NodeProps, Position } from '@xyflow/react'
 
-import { usePipelineEditorHooks } from '@/lib/hooks/pipeline-editor'
-
-import PipelineDeleteNodeButton from '@/components/PipelineDeleteNodeButton/component'
 import PipelineTraceNodeButton from '@/components/PipelineTraceNodeButton/component'
 import PipelineTraceNodeIndicator from '@/components/PipelineTraceNodeIndicator/component'
 
@@ -17,39 +13,16 @@ import { NodeBody, NodeIcon, NodeRoot, ToolbarRow, handleStyle } from './styles'
 import { PipelineNodeMetricData } from './types'
 
 const PipelineNodeMetric = ({
-  id,
   data,
   selected,
 }: NodeProps<PipelineNodeMetricData>) => {
   const { t } = useTranslation()
-  const { setNodes } = usePipelineEditorHooks()
-
-  const [name, setName] = useState(data.name)
-
-  const onChange: React.ChangeEventHandler<HTMLInputElement> = (evt) => {
-    setName(evt.target.value)
-  }
-
-  useEffect(() => {
-    setNodes((prevNodes) => {
-      const newNodes = [...prevNodes]
-
-      for (const node of newNodes) {
-        if (node.id === id) {
-          node.data = { name }
-        }
-      }
-
-      return newNodes
-    })
-  }, [id, name])
 
   return (
     <>
-      {selected && (
+      {selected && data.traces && (
         <ToolbarRow>
-          <PipelineDeleteNodeButton nodeId={id} />
-          {data.traces && <PipelineTraceNodeButton traces={data.traces} />}
+          <PipelineTraceNodeButton traces={data.traces} />
         </ToolbarRow>
       )}
 
@@ -62,10 +35,10 @@ const PipelineNodeMetric = ({
           <TextField
             label={t('components.pipelineNodeMetric.label')}
             type="text"
-            value={name}
-            onChange={onChange}
+            value={data.name}
             slotProps={{
               input: {
+                readOnly: true,
                 sx: { fontFamily: 'monospace' },
               },
             }}

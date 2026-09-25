@@ -1,25 +1,48 @@
 import { Chip, Paper, styled } from '@mui/material'
 
 export const NodeListRoot = styled(Paper)({
-  height: '100%',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',
 })
 
 export const NodeListHeader = styled('div')(({ theme }) => ({
-  padding: theme.spacing(1),
+  minHeight: 38,
+  padding: theme.spacing(0.5, 1),
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  backgroundColor: theme.tokens.colors.cardHeaderBkg,
-  color: theme.tokens.colors.primaryContrast,
+  backgroundColor: theme.tokens.colors.codeBg,
+  color: theme.tokens.colors.labelText,
   boxShadow: theme.shadows[4],
+}))
+
+export const NodeListHeaderToggle = styled('div')({
+  flex: 1,
+  minWidth: 0,
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 4,
+  cursor: 'pointer',
+})
+
+export const NodeListExpandIcon = styled('div', {
+  shouldForwardProp: (prop) => prop !== 'expanded',
+})<{ expanded: boolean }>(({ expanded }) => ({
+  display: 'flex',
+  transform: expanded ? 'rotate(0deg)' : 'rotate(-90deg)',
+  transition: 'transform 0.15s ease',
 }))
 
 export const NodeListTitle = styled('div')({
   flex: 1,
+  minWidth: 0,
+  fontSize: '0.8125rem',
   fontWeight: 600,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
 })
 
 export const NodeListLoading = styled('div')({

@@ -6,10 +6,6 @@ import FilterAltIcon from '@mui/icons-material/FilterAlt'
 
 import { Handle, NodeProps, Position } from '@xyflow/react'
 
-import { useProfile } from '@/lib/hooks/profile'
-
-import DialogTransformerEditor from '@/components/DialogTransformerEditor/component'
-import PipelineDeleteNodeButton from '@/components/PipelineDeleteNodeButton/component'
 import PipelineTraceNodeButton from '@/components/PipelineTraceNodeButton/component'
 import PipelineTraceNodeIndicator from '@/components/PipelineTraceNodeIndicator/component'
 
@@ -17,20 +13,16 @@ import { NodeBody, NodeIcon, NodeRoot, ToolbarRow, handleStyle } from './styles'
 import { PipelineNodeTransformerData } from './types'
 
 const PipelineNodeTransformer = ({
-  id,
   data,
   selected,
 }: NodeProps<PipelineNodeTransformerData>) => {
   const { t } = useTranslation()
-  const { permissions } = useProfile()
 
   return (
     <>
-      {selected && permissions.can_edit_transformers && (
+      {selected && data.traces && (
         <ToolbarRow>
-          <DialogTransformerEditor transformer={data.transformer} />
-          <PipelineDeleteNodeButton nodeId={id} />
-          {data.traces && <PipelineTraceNodeButton traces={data.traces} />}
+          <PipelineTraceNodeButton traces={data.traces} />
         </ToolbarRow>
       )}
 
