@@ -54,7 +54,6 @@ export const PipelineDetailViewBody = styled(AppContainer)(({ theme }) => ({
   overflow: 'auto',
   flex: 1,
   flexDirection: 'column',
-  padding: '0 !important',
   [theme.breakpoints.up('md')]: {
     flexDirection: 'row',
     overflow: 'hidden',
