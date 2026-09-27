@@ -283,7 +283,7 @@ const PipelineDetailView = () => {
             </PipelineDetailViewHeaderRight>
           </PipelineDetailViewHeader>
 
-          <PipelineDetailViewBody variant="compact">
+          <PipelineDetailViewBody variant="page">
             <PipelineDetailViewLeft>
               <PipelineDetailViewLeftItem>
                 <PipelineEditorNodeListPipeline />
