@@ -6,6 +6,7 @@ import BarChartIcon from '@mui/icons-material/BarChart'
 
 import { Handle, NodeProps, Position } from '@xyflow/react'
 
+import PipelineNodeDragHandle from '@/components/PipelineNodeDragHandle/component'
 import PipelineTraceNodeButton from '@/components/PipelineTraceNodeButton/component'
 import PipelineTraceNodeIndicator from '@/components/PipelineTraceNodeIndicator/component'
 
@@ -28,6 +29,7 @@ const PipelineNodeMetric = ({
 
       <Handle type="target" position={Position.Left} style={handleStyle} />
       <NodeRoot>
+        <PipelineNodeDragHandle />
         <NodeIcon>
           <BarChartIcon />
         </NodeIcon>

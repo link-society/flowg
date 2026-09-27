@@ -6,6 +6,7 @@ import InputIcon from '@mui/icons-material/Input'
 
 import { Handle, NodeProps, Position } from '@xyflow/react'
 
+import PipelineNodeDragHandle from '@/components/PipelineNodeDragHandle/component'
 import PipelineTraceNodeButton from '@/components/PipelineTraceNodeButton/component'
 import PipelineTraceNodeIndicator from '@/components/PipelineTraceNodeIndicator/component'
 
@@ -27,6 +28,7 @@ const PipelineNodeSource = ({
       )}
 
       <NodeRoot>
+        <PipelineNodeDragHandle />
         <NodeIcon>
           <InputIcon />
         </NodeIcon>
