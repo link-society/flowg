@@ -1,0 +1,96 @@
+.proof {
+  padding: 34px 0;
+}
+
+.proof h2 {
+  font-size: 12px;
+  text-align: center;
+  color: var(--fg-muted);
+  font-weight: 550;
+  letter-spacing: 0;
+}
+
+.carousel {
+  overflow: hidden;
+  margin-top: 20px;
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 8%,
+    #000 92%,
+    transparent
+  );
+}
+
+.carouselTrack {
+  display: flex;
+  width: max-content;
+  animation: fg-carousel-scroll 32s linear infinite;
+}
+
+.carousel:hover .carouselTrack {
+  animation-play-state: paused;
+}
+
+.carousel:focus-within .carouselTrack {
+  animation: none;
+  transform: none;
+}
+
+.carouselGroup {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.carouselGroup a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 48px;
+  margin: 12px 50px;
+  color: var(--fg-ink);
+  font-size: 24px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.carouselGroup img,
+.carouselGroup svg {
+  height: 100%;
+  width: auto;
+  max-width: 220px;
+  object-fit: contain;
+}
+
+@keyframes fg-carousel-scroll {
+  to {
+    transform: translateX(-25%);
+  }
+}
+
+@media (max-width: 760px) {
+  .carouselGroup a {
+    height: 40px;
+    margin-inline: 27px;
+    font-size: 21px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carouselTrack {
+    width: 100%;
+  }
+  .carouselGroup {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .carouselGroup a {
+    margin: 10px;
+  }
+  .carouselGroup[aria-hidden='true'] {
+    display: none;
+  }
+}

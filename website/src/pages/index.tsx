@@ -1,35 +1,16 @@
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
-
 import Layout from '@theme/Layout'
 
-import HomepageHeader from '@site/src/components/HomepageHeader'
-import HomepageUsers from '@site/src/components/HomepageUsers'
-import HomepageFeatures from '@site/src/components/HomepageFeatures'
-import HomepageIntegrations from '@site/src/components/HomepageIntegrations'
+import Homepage from '@site/src/components/Homepage/component'
 
-export default function Home() {
-  const { siteConfig } = useDocusaurusContext()
-
+const Home = () => {
   return (
     <Layout
-      title={siteConfig.title}
-      description={siteConfig.tagline}
+      title="Stop chasing logs. Start solving problems."
+      description="When an alert fires, find the logs you need. FlowG is free, open-source log management with visual pipelines, integrated search, and connections to your existing stack."
     >
-      <HomepageHeader />
-
-      <main>
-        <hr />
-
-        <HomepageUsers />
-
-        <hr />
-
-        <HomepageFeatures />
-
-        <hr/>
-
-        <HomepageIntegrations />
-      </main>
+      <Homepage />
     </Layout>
   )
 }
+
+export default Home

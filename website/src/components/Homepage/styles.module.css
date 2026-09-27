@@ -1,0 +1,98 @@
+.page {
+  --fg-blue: var(--ifm-color-primary);
+  --fg-ink: #242526;
+  --fg-muted: #606770;
+  --fg-line: #e4e6e8;
+  --fg-soft: #f7f8fa;
+  color: var(--fg-ink);
+  background: #fff;
+}
+
+.page * {
+  box-sizing: border-box;
+}
+
+.page h1,
+.page h2,
+.page h3,
+.page p,
+.page figure {
+  margin: 0;
+}
+
+.page a {
+  text-decoration: none;
+}
+
+.page a:focus-visible {
+  outline: 3px solid var(--fg-blue);
+  outline-offset: 5px;
+}
+
+.shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.eyebrow {
+  color: var(--fg-blue);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  margin-bottom: 20px !important;
+}
+
+.page h2 {
+  font-size: clamp(29px, 3.1vw, 42px);
+  line-height: 1.18;
+  letter-spacing: -0.035em;
+}
+
+.page .emphasisBlue {
+  color: #245fc1;
+}
+
+.lead {
+  color: var(--fg-muted);
+  font-size: 17px;
+  line-height: 1.8;
+  max-width: 670px;
+  margin-top: 22px !important;
+}
+
+.section {
+  padding: 88px 0;
+}
+
+.centered {
+  text-align: center;
+}
+
+.centered .lead {
+  margin-inline: auto;
+}
+
+.motifSection {
+  --flow-art-opacity: 0.65;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+@media (max-width: 760px) {
+  .shell {
+    padding-inline: 22px;
+  }
+  .section {
+    padding: 55px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

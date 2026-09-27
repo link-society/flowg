@@ -1,0 +1,8 @@
+.workflow > .flowArt {
+  top: 220px;
+  transform: scaleY(-1);
+}
+
+.workflow {
+  padding-top: 55px;
+}

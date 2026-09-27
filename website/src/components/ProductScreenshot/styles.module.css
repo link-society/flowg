@@ -1,0 +1,82 @@
+.productShot {
+  min-width: 0;
+  position: relative;
+  isolation: isolate;
+}
+
+.productShot:before {
+  content: '';
+  position: absolute;
+  inset: -24px -20px 5px 30px;
+  background: #f1f5fd;
+  border: 1px solid #e5edfa;
+  border-radius: 20px;
+  z-index: -1;
+  transform: rotate(2deg);
+}
+
+.productShot.screenshotReverse:before {
+  inset: -24px 30px 5px -20px;
+  transform: rotate(-2deg);
+  background: #f5f6f8;
+  border-color: #e9ebef;
+}
+
+.shotHeading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 1px 2px 12px;
+  color: #677282;
+  font-size: 11px;
+}
+
+.shotHeading svg {
+  color: var(--fg-blue);
+}
+
+.shotHeading > span:last-child {
+  margin-left: auto;
+  font-size: 10px;
+  color: #7c8590;
+}
+
+.shotFrame {
+  padding: 13px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid #dae1eb;
+  box-shadow:
+    0 15px 36px -15px #253f6440,
+    0 2px 5px #253f6408;
+}
+
+.productShot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid #d6dae0;
+  border-radius: 5px;
+  box-shadow: 0 5px 14px #0000000d;
+}
+
+.productShot figcaption {
+  color: #737982;
+  font-size: 11px;
+  padding: 12px 3px 0;
+}
+
+@media (max-width: 760px) {
+  .shotFrame {
+    padding: 9px;
+  }
+  .productShot:before,
+  .productShot.screenshotReverse:before {
+    inset: -12px -6px 8px 8px;
+    transform: rotate(1deg);
+  }
+  .shotHeading {
+    font-size: 10px;
+    padding-bottom: 9px;
+  }
+}

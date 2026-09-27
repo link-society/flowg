@@ -1,0 +1,17 @@
+.integrations {
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(180deg, #fff, #f8faff);
+  border-top: 1px solid var(--fg-line);
+  overflow: hidden;
+}
+
+.integrations > .flowArt {
+  top: 150px;
+  opacity: 0.45;
+}
+
+.integrations h2.integrationsHeading {
+  text-align: center;
+  margin-bottom: 36px;
+}

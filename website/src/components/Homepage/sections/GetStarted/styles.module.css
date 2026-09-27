@@ -1,0 +1,58 @@
+.final {
+  padding: 0 0 70px;
+  text-align: center;
+}
+
+.finalPanel {
+  padding: 65px 32px;
+  border-radius: 18px;
+  border: 1px solid #d5e3f8;
+  background: radial-gradient(ellipse at 50% 0, #fff 0, #f0f5fe 85%);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.finalPanel .flowArt {
+  inset: auto 0 -90px;
+  opacity: 0.7;
+}
+
+.finalPanel > :not(.flowArt) {
+  position: relative;
+}
+
+.final h2 {
+  font-size: clamp(32px, 4vw, 49px);
+}
+
+.final .lead {
+  max-width: 590px;
+  margin-inline: auto;
+}
+
+.finalNote {
+  margin-top: 22px !important;
+  color: var(--fg-muted);
+  font-size: 12px;
+}
+
+.finalNote a {
+  color: var(--fg-blue);
+  text-decoration: underline;
+}
+
+@media (max-width: 760px) {
+  .final {
+    padding: 0 0 40px;
+  }
+  .finalPanel {
+    padding: 40px 18px;
+  }
+  .finalPanel h2 {
+    font-size: 29px;
+  }
+  .finalPanel .flowArt {
+    display: none;
+  }
+}

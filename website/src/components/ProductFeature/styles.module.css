@@ -1,0 +1,97 @@
+.feature {
+  display: grid;
+  grid-template-columns: 0.8fr 1.4fr;
+  align-items: center;
+  gap: 55px;
+}
+
+.featureCopy {
+  background: #fff;
+  box-shadow: 0 0 24px 16px #fff;
+}
+
+.feature + .feature {
+  margin-top: 105px;
+}
+
+.featureCopy .eyebrow {
+  color: var(--fg-blue);
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  margin-bottom: 20px !important;
+  display: inline-block;
+  padding: 7px 10px;
+  border-radius: 5px;
+  background: #f0f5fe;
+  font-size: 10px;
+}
+
+.featureReverse {
+  grid-template-columns: 1.4fr 0.8fr;
+}
+
+.featureReverse .featureCopy {
+  order: 2;
+}
+
+.featureReverse figure {
+  order: 1;
+}
+
+.feature h2 {
+  font-size: clamp(28px, 2.9vw, 39px);
+}
+
+.featureCopy > p:not(.eyebrow) {
+  color: var(--fg-muted);
+  font-size: 15px;
+  line-height: 1.85;
+  margin-top: 20px;
+}
+
+.feature ul {
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+
+.feature li {
+  display: flex;
+  align-items: start;
+  gap: 9px;
+  font-size: 13px;
+  color: #454950;
+}
+
+.feature li svg {
+  flex-shrink: 0;
+  color: var(--fg-blue);
+}
+
+@media (max-width: 996px) {
+  .feature,
+  .featureReverse {
+    gap: 28px;
+    grid-template-columns: 1fr 1.25fr;
+  }
+  .featureReverse {
+    grid-template-columns: 1.25fr 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .feature,
+  .featureReverse {
+    grid-template-columns: 1fr;
+  }
+  .featureReverse .featureCopy,
+  .featureReverse figure {
+    order: initial;
+  }
+  .feature + .feature {
+    margin-top: 60px;
+  }
+}

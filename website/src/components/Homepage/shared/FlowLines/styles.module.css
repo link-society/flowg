@@ -1,0 +1,10 @@
+.flowArt {
+  opacity: var(--flow-art-opacity, 1);
+  position: absolute;
+  inset: 20px 0 auto;
+  width: 100%;
+  height: auto;
+  color: #c2d6f5;
+  pointer-events: none;
+  z-index: -1;
+}

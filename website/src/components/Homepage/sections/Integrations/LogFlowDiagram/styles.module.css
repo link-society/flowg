@@ -1,0 +1,286 @@
+.offerings > .flowArt {
+  top: 55px;
+}
+
+.flowFigure {
+  min-width: 0;
+  width: 100%;
+}
+
+.flowSources {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 14px 0;
+  border: 1px solid #dce5f1;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.flowSource {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding-inline: 5px;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #56677c;
+  height: 30px;
+}
+
+.flowSource svg {
+  max-width: 100%;
+  max-height: 28px;
+  flex-shrink: 0;
+}
+
+.flowScene {
+  position: relative;
+}
+
+.eventFlow {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.eventFlowCompact,
+.flowStill {
+  display: none;
+}
+
+.flowStages {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.flowStages li {
+  --stage-accent: #3479e5;
+  --stage-tint: #dceaff;
+  position: absolute;
+  isolation: isolate;
+  left: 0;
+  top: var(--stage-y);
+  width: 36%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 20px 24px;
+  border: 1px solid transparent;
+  border-radius: 18px;
+  background:
+    linear-gradient(110deg, #fff 20%, #ffffffed 65%, #ffffff80) padding-box,
+    linear-gradient(125deg, #b6d4ff, #eef5ff 35%, #8eb7f0 72%, #78cfbc)
+      border-box;
+  box-shadow:
+    0 3px 0 #e4edf9,
+    0 7px 13px -8px #29539150,
+    0 22px 38px -23px #366fb165,
+    inset 0 1px 0 #fff;
+}
+
+.flowStages li:before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    repeating-radial-gradient(
+      circle at 110% -25%,
+      transparent 0 23px,
+      #528ad21a 24px 25px,
+      transparent 26px 45px
+    ),
+    radial-gradient(ellipse at 100% 0, var(--stage-tint), transparent 65%);
+  mask-image: linear-gradient(90deg, transparent 25%, #000);
+  pointer-events: none;
+}
+
+.flowStages li:after {
+  content: '';
+  position: absolute;
+  right: -5px;
+  top: calc(50% - 5px);
+  width: 10px;
+  height: 10px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: var(--stage-accent);
+  box-shadow:
+    0 0 0 1px #9dbfe8,
+    0 0 13px #3479e54d;
+}
+
+.flowStages li:nth-child(even) {
+  --stage-accent: #238f85;
+  --stage-tint: #d8f2eb;
+  left: auto;
+  right: 0;
+}
+
+.flowStages li:nth-child(even):after {
+  right: auto;
+  left: -5px;
+}
+
+.flowStep {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: 1px solid #ffffff70;
+  border-radius: 13px;
+  background:
+    linear-gradient(145deg, #ffffff30, transparent 65%), var(--stage-accent);
+  color: #fff;
+  box-shadow:
+    0 3px 0 #1c497526,
+    0 7px 14px #2859a32b,
+    inset 0 1px 0 #ffffff66;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.flowStages strong {
+  display: block;
+  color: #284264;
+  font-size: 17px;
+  line-height: 1.4;
+}
+
+.flowStages li div > span {
+  display: block;
+  margin-top: 6px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #40516a;
+}
+
+.flowDestinations {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: center;
+  gap: 22px 20px;
+  list-style: none;
+  margin: 0;
+  padding: 24px 20px;
+  border: 1px solid #dce5f1;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 9px 24px -16px #31588130;
+}
+
+.flowDestinations li {
+  min-width: 0;
+}
+
+.flowDestinations li > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  height: 25px;
+  font-size: 12px;
+  color: #56677c;
+  font-weight: 600;
+}
+
+.flowDestinations svg {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+@media (max-width: 900px) {
+  .flowStages li {
+    padding: 14px;
+    gap: 10px;
+  }
+  .flowStages strong {
+    font-size: 15px;
+  }
+  .flowStages li div > span {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 760px) {
+  .eventFlowWide {
+    display: none;
+  }
+  .eventFlowCompact {
+    display: block;
+  }
+  .flowStages li,
+  .flowStages li:nth-child(even) {
+    left: 0;
+    right: auto;
+    width: 58%;
+  }
+  .flowStages li:nth-child(even):after {
+    right: -5px;
+    left: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .flowSource {
+    flex-direction: column;
+    gap: 3px;
+    font-size: 10px;
+    height: 36px;
+  }
+  .flowSource > svg {
+    max-height: 23px;
+  }
+  .flowStages li {
+    display: block;
+    padding: 11px 9px;
+    border-radius: 10px;
+  }
+  .flowStages strong {
+    font-size: 15px;
+    padding-right: 23px;
+  }
+  .flowStep {
+    position: absolute;
+    right: 9px;
+    top: 9px;
+    width: 21px;
+    height: 25px;
+    border-radius: 6px;
+    font-size: 8px;
+  }
+  .flowStages li div > span {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .flowDestinations {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px 15px;
+    padding: 20px 12px;
+  }
+  .flowDestinations li > span {
+    height: 23px;
+    font-size: 10px;
+    gap: 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flowMoving {
+    display: none;
+  }
+  .flowStill {
+    display: block;
+  }
+}

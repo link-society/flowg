@@ -1,0 +1,109 @@
+.openSource .emphasisBlue {
+  color: #8ab8ff;
+}
+
+.openSource > .flowArt {
+  top: 0;
+  opacity: 0.16;
+  --fg-art-node-fill: #242526;
+}
+
+.openSource {
+  background: #242526;
+  color: #f5f6f7;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.openSource:before {
+  content: '</>';
+  position: absolute;
+  left: calc(50% - 640px);
+  bottom: -120px;
+  font-family: var(--ifm-font-family-monospace);
+  font-weight: 700;
+  font-size: 350px;
+  line-height: 1;
+  color: #ffffff03;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.openSource .eyebrow,
+.openSource .textLink {
+  color: #8ab8ff;
+}
+
+.openSource .ownership > div > p:not(.eyebrow),
+.openSource .ownershipPoints p {
+  color: #bfc3c9;
+}
+
+.openSource .ownershipPoints li {
+  border-color: #ffffff1c;
+}
+
+.openSource .ownershipPoints h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.openSource .ownershipPoints h3 svg {
+  color: #8ab8ff;
+  flex-shrink: 0;
+}
+
+.ownership {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+}
+
+.ownership > div > p:not(.eyebrow) {
+  color: var(--fg-muted);
+  line-height: 1.8;
+  font-size: 16px;
+  margin-top: 20px;
+}
+
+.ownershipPoints {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 23px;
+}
+
+.ownershipPoints li {
+  padding-bottom: 23px;
+  border-bottom: 1px solid var(--fg-line);
+}
+
+.ownershipPoints h3 {
+  font-size: 17px;
+  margin-bottom: 9px;
+}
+
+.ownershipPoints p {
+  font-size: 14px;
+  color: var(--fg-muted);
+  line-height: 1.75;
+}
+
+@media (max-width: 996px) {
+  .ownership {
+    gap: 35px;
+  }
+}
+
+@media (max-width: 760px) {
+  .ownership {
+    grid-template-columns: 1fr;
+  }
+  .ownership {
+    gap: 32px;
+  }
+}
