@@ -6,6 +6,7 @@ import FilterAltIcon from '@mui/icons-material/FilterAlt'
 
 import { Handle, NodeProps, Position } from '@xyflow/react'
 
+import PipelineNodeDragHandle from '@/components/PipelineNodeDragHandle/component'
 import PipelineTraceNodeButton from '@/components/PipelineTraceNodeButton/component'
 import PipelineTraceNodeIndicator from '@/components/PipelineTraceNodeIndicator/component'
 
@@ -28,6 +29,7 @@ const PipelineNodeTransformer = ({
 
       <Handle type="target" position={Position.Left} style={handleStyle} />
       <NodeRoot>
+        <PipelineNodeDragHandle />
         <NodeIcon>
           <FilterAltIcon />
         </NodeIcon>

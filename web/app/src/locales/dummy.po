@@ -531,6 +531,9 @@ msgstr "Input configuration will arrive with the inputs refactor."
 msgid "components.pipelineNodeConfigDrawer.sourceTypeLabel"
 msgstr "Type"
 
+msgid "components.pipelineNodeDragHandle.label"
+msgstr "Drag to move node"
+
 msgid "components.pipelineNodeForwarder.label"
 msgstr "Forwarder"
 

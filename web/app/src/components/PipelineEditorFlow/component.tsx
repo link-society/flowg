@@ -34,6 +34,7 @@ import { PipelineTrace } from '@/lib/models/PipelineTrace.ts'
 
 import PipelineEditorHooksProvider from '@/components/PipelineEditorHooksProvider/component'
 import PipelineNodeConfigDrawer from '@/components/PipelineNodeConfigDrawer/component'
+import { PIPELINE_NODE_DRAG_HANDLE_SELECTOR } from '@/components/PipelineNodeDragHandle/component'
 import PipelineNodeForwarder from '@/components/PipelineNodeForwarder/component'
 import PipelineNodeMetric from '@/components/PipelineNodeMetric/component'
 import PipelineNodePipeline from '@/components/PipelineNodePipeline/component'
@@ -93,6 +94,7 @@ export const PipelineEditorFlow: React.FC<PipelineEditorFlowProps> = ({
       if (node.type === 'source') {
         node.deletable = false
       }
+      node.dragHandle = PIPELINE_NODE_DRAG_HANDLE_SELECTOR
 
       return node
     })
@@ -122,6 +124,7 @@ export const PipelineEditorFlow: React.FC<PipelineEditorFlowProps> = ({
         if (oldNode !== undefined && oldNode.measured) {
           node.measured = oldNode.measured
         }
+        node.dragHandle = PIPELINE_NODE_DRAG_HANDLE_SELECTOR
 
         return node
       })
@@ -203,6 +206,7 @@ export const PipelineEditorFlow: React.FC<PipelineEditorFlowProps> = ({
           type,
           position,
           data: {},
+          dragHandle: PIPELINE_NODE_DRAG_HANDLE_SELECTOR,
         }
 
         switch (type) {
@@ -244,6 +248,7 @@ export const PipelineEditorFlow: React.FC<PipelineEditorFlowProps> = ({
             onDragOver={onDragOver}
             fitView
             snapToGrid
+            selectNodesOnDrag={false}
             defaultEdgeOptions={{ animated: true, type: 'smoothstep' }}
             {...shortcuts}
           >
