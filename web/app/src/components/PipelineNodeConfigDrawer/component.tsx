@@ -101,46 +101,6 @@ const NODE_META: Record<string, NodeTypeMeta> = {
 
 const SHARED_RESOURCE_TYPES = new Set(['transform', 'forwarder', 'router'])
 
-type InlineFieldEditorProps = Readonly<{
-  nodeId: string
-  dataKey: string
-  label: string
-  value: string
-}>
-
-/** Editable single-field body for `switch` / `metric` nodes. */
-const InlineFieldEditor = ({
-  nodeId,
-  dataKey,
-  label,
-  value,
-}: InlineFieldEditorProps) => {
-  const { setNodes } = usePipelineEditorHooks()
-  const [current, setCurrent] = useState(value)
-
-  useEffect(() => {
-    setNodes((prevNodes) =>
-      prevNodes.map((node) =>
-        node.id === nodeId
-          ? { ...node, data: { ...node.data, [dataKey]: current } }
-          : node
-      )
-    )
-  }, [nodeId, dataKey, current, setNodes])
-
-  return (
-    <TextField
-      label={label}
-      type="text"
-      value={current}
-      onChange={(evt) => setCurrent(evt.target.value)}
-      fullWidth
-      variant="outlined"
-      slotProps={{ input: { sx: { fontFamily: 'monospace' } } }}
-    />
-  )
-}
-
 const PipelineNodeConfigDrawer = () => {
   const { t } = useTranslation()
   const theme = useTheme()
@@ -334,20 +294,28 @@ const PipelineNodeConfigDrawer = () => {
             )}
 
             {nodeType === 'switch' && (
-              <InlineFieldEditor
-                nodeId={node.id}
-                dataKey="condition"
+              <TextField
                 label={t('components.pipelineNodeSwitch.label')}
+                type="text"
                 value={str(data.condition)}
+                fullWidth
+                variant="outlined"
+                slotProps={{
+                  input: { readOnly: true, sx: { fontFamily: 'monospace' } },
+                }}
               />
             )}
 
             {nodeType === 'metric' && (
-              <InlineFieldEditor
-                nodeId={node.id}
-                dataKey="name"
+              <TextField
                 label={t('components.pipelineNodeMetric.label')}
+                type="text"
                 value={str(data.name)}
+                fullWidth
+                variant="outlined"
+                slotProps={{
+                  input: { readOnly: true, sx: { fontFamily: 'monospace' } },
+                }}
               />
             )}
 
