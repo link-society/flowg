@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router'
 
 import AppBar from '@mui/material/AppBar'
-import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 
 import ApiIcon from '@mui/icons-material/Api'
@@ -22,6 +21,7 @@ import {
   NavBarLeftSection,
   NavBarLink,
   NavBarRightSection,
+  NavToolbar,
 } from './styles'
 
 const NavBar = () => {
@@ -34,7 +34,7 @@ const NavBar = () => {
 
   return (
     <AppBar position="static">
-      <Toolbar>
+      <NavToolbar>
         <NavBarLeftSection>
           <NavBarButtonLogo
             onClick={handleNavigate(buildUrl('/'))}
@@ -104,7 +104,7 @@ const NavBar = () => {
             </NavBarButton>
           )}
         </NavBarRightSection>
-      </Toolbar>
+      </NavToolbar>
     </AppBar>
   )
 }
