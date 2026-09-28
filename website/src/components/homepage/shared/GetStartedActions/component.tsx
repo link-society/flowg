@@ -1,6 +1,6 @@
 import { liveDemo } from '@site/src/lib/links'
 
-import CallToAction from '@site/src/components/CallToAction/component'
+import CallToAction from '@site/src/components/marketing/CallToAction/component'
 
 import styles from './styles.module.css'
 

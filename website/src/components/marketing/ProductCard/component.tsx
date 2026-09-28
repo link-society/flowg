@@ -1,4 +1,4 @@
-import CallToAction from '@site/src/components/CallToAction/component'
+import CallToAction from '@site/src/components/marketing/CallToAction/component'
 import Icon from '@site/src/components/Icon/component'
 
 import type { ProductCardProps } from './types'

@@ -2,7 +2,7 @@ import layoutStyles from '../../styles.module.css'
 
 import clsx from 'clsx'
 
-import ProductCard from '@site/src/components/ProductCard/component'
+import ProductCard from '@site/src/components/marketing/ProductCard/component'
 
 import products from './products'
 

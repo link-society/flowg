@@ -1,6 +1,6 @@
 import { contact } from '@site/src/lib/links'
 
-import type { ProductCardProps } from '@site/src/components/ProductCard/types'
+import type { ProductCardProps } from '@site/src/components/marketing/ProductCard/types'
 
 const products: ProductCardProps[] = [
   {

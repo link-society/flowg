@@ -4,7 +4,7 @@ import clsx from 'clsx'
 
 import { github } from '@site/src/lib/links'
 
-import CallToAction from '@site/src/components/CallToAction/component'
+import CallToAction from '@site/src/components/marketing/CallToAction/component'
 import Icon from '@site/src/components/Icon/component'
 
 import FlowLines from '../../shared/FlowLines/component'

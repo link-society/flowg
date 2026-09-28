@@ -7,10 +7,10 @@ import Streams from '@site/static/img/screenshots/streams.png'
 
 import { liveDemo } from '@site/src/lib/links'
 
-import CallToAction from '@site/src/components/CallToAction/component'
+import CallToAction from '@site/src/components/marketing/CallToAction/component'
 import Icon from '@site/src/components/Icon/component'
-import ProductFeature from '@site/src/components/ProductFeature/component'
-import ProductScreenshot from '@site/src/components/ProductScreenshot/component'
+import ProductFeature from '@site/src/components/marketing/ProductFeature/component'
+import ProductScreenshot from '@site/src/components/marketing/ProductScreenshot/component'
 
 import FlowLines from '../../shared/FlowLines/component'
 
