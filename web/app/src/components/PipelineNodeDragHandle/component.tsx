@@ -7,7 +7,11 @@ import { DragHandleRoot } from './styles'
 const PIPELINE_NODE_DRAG_HANDLE_CLASS = 'pipeline-node-drag-handle'
 export const PIPELINE_NODE_DRAG_HANDLE_SELECTOR = `.${PIPELINE_NODE_DRAG_HANDLE_CLASS}`
 
-const PipelineNodeDragHandle = () => {
+interface PipelineNodeDragHandleProps {
+  color: string
+}
+
+const PipelineNodeDragHandle = ({ color }: PipelineNodeDragHandleProps) => {
   const { t } = useTranslation()
 
   return (
@@ -15,6 +19,7 @@ const PipelineNodeDragHandle = () => {
       className={PIPELINE_NODE_DRAG_HANDLE_CLASS}
       onClick={(evt) => evt.stopPropagation()}
       aria-label={t('components.pipelineNodeDragHandle.label')}
+      sx={{ borderColor: color, color }}
     >
       <DragIndicatorIcon fontSize="small" />
     </DragHandleRoot>

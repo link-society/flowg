@@ -2,18 +2,23 @@ import Box from '@mui/material/Box'
 import { styled } from '@mui/material/styles'
 
 export const DragHandleRoot = styled(Box)(({ theme }) => ({
+  position: 'absolute',
+  right: 'calc(100% + 8px)',
+  top: '50%',
+  transform: 'translateY(-50%)',
+  width: 28,
+  height: 28,
   display: 'flex',
-  flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  alignSelf: 'stretch',
-  padding: theme.spacing(0, 0.25),
-  color: theme.tokens.colors.mutedText,
+  backgroundColor: theme.palette.background.paper,
+  border: '1px solid',
+  borderRadius: theme.spacing(0.75),
   cursor: 'grab',
   touchAction: 'none',
-  '&:hover': {
-    color: theme.tokens.colors.labelText,
-  },
+  opacity: 0,
+  pointerEvents: 'none',
+  transition: 'opacity 0.15s ease',
   '&:active': {
     cursor: 'grabbing',
   },
