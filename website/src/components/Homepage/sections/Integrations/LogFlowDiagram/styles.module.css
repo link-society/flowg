@@ -45,7 +45,7 @@
   height: auto;
 }
 
-.eventFlowCompact,
+.eventFlow.eventFlowCompact,
 .flowStill {
   display: none;
 }
@@ -214,10 +214,10 @@
 }
 
 @media (max-width: 760px) {
-  .eventFlowWide {
+  .eventFlow.eventFlowWide {
     display: none;
   }
-  .eventFlowCompact {
+  .eventFlow.eventFlowCompact {
     display: block;
   }
   .flowStages li,
