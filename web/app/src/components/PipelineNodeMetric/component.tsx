@@ -1,16 +1,23 @@
 import { useTranslation } from 'react-i18next'
 
 import TextField from '@mui/material/TextField'
+import { useTheme } from '@mui/material/styles'
 
 import BarChartIcon from '@mui/icons-material/BarChart'
 
 import { Handle, NodeProps, Position } from '@xyflow/react'
 
+import {
+  NodeBody,
+  NodeIcon,
+  NodeRoot,
+  ToolbarRow,
+  handleStyle,
+} from '@/components/PipelineNodeCard/styles'
 import PipelineNodeDragHandle from '@/components/PipelineNodeDragHandle/component'
 import PipelineTraceNodeButton from '@/components/PipelineTraceNodeButton/component'
 import PipelineTraceNodeIndicator from '@/components/PipelineTraceNodeIndicator/component'
 
-import { NodeBody, NodeIcon, NodeRoot, ToolbarRow, handleStyle } from './styles'
 import { PipelineNodeMetricData } from './types'
 
 const PipelineNodeMetric = ({
@@ -18,6 +25,7 @@ const PipelineNodeMetric = ({
   selected,
 }: NodeProps<PipelineNodeMetricData>) => {
   const { t } = useTranslation()
+  const theme = useTheme()
 
   return (
     <>
@@ -28,9 +36,9 @@ const PipelineNodeMetric = ({
       )}
 
       <Handle type="target" position={Position.Left} style={handleStyle} />
-      <NodeRoot>
-        <PipelineNodeDragHandle />
-        <NodeIcon>
+      <NodeRoot borderColor={theme.tokens.colors.nodeMetricBorder}>
+        <PipelineNodeDragHandle color={theme.tokens.colors.nodeMetricBg} />
+        <NodeIcon bgColor={theme.tokens.colors.nodeMetricBg}>
           <BarChartIcon />
         </NodeIcon>
         <NodeBody className="nodrag">

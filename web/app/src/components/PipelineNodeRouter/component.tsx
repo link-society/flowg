@@ -1,16 +1,23 @@
 import { useTranslation } from 'react-i18next'
 
 import TextField from '@mui/material/TextField'
+import { useTheme } from '@mui/material/styles'
 
 import StorageIcon from '@mui/icons-material/Storage'
 
 import { Handle, NodeProps, Position } from '@xyflow/react'
 
+import {
+  NodeBody,
+  NodeIcon,
+  NodeRoot,
+  ToolbarRow,
+  handleStyle,
+} from '@/components/PipelineNodeCard/styles'
 import PipelineNodeDragHandle from '@/components/PipelineNodeDragHandle/component'
 import PipelineTraceNodeButton from '@/components/PipelineTraceNodeButton/component'
 import PipelineTraceNodeIndicator from '@/components/PipelineTraceNodeIndicator/component'
 
-import { NodeBody, NodeIcon, NodeRoot, ToolbarRow, handleStyle } from './styles'
 import { PipelineNodeRouterData } from './types'
 
 const PipelineNodeRouter = ({
@@ -18,6 +25,7 @@ const PipelineNodeRouter = ({
   selected,
 }: NodeProps<PipelineNodeRouterData>) => {
   const { t } = useTranslation()
+  const theme = useTheme()
 
   return (
     <>
@@ -28,9 +36,9 @@ const PipelineNodeRouter = ({
       )}
 
       <Handle type="target" position={Position.Left} style={handleStyle} />
-      <NodeRoot>
-        <PipelineNodeDragHandle />
-        <NodeIcon>
+      <NodeRoot borderColor={theme.tokens.colors.nodeRouterBorder}>
+        <PipelineNodeDragHandle color={theme.tokens.colors.nodeRouterBg} />
+        <NodeIcon bgColor={theme.tokens.colors.nodeRouterBg}>
           <StorageIcon />
         </NodeIcon>
         <NodeBody className="nodrag">
