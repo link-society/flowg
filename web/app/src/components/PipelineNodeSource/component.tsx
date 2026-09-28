@@ -1,16 +1,23 @@
 import { useTranslation } from 'react-i18next'
 
 import TextField from '@mui/material/TextField'
+import { useTheme } from '@mui/material/styles'
 
 import InputIcon from '@mui/icons-material/Input'
 
 import { Handle, NodeProps, Position } from '@xyflow/react'
 
+import {
+  NodeBody,
+  NodeIcon,
+  NodeRoot,
+  ToolbarRow,
+  handleStyle,
+} from '@/components/PipelineNodeCard/styles'
 import PipelineNodeDragHandle from '@/components/PipelineNodeDragHandle/component'
 import PipelineTraceNodeButton from '@/components/PipelineTraceNodeButton/component'
 import PipelineTraceNodeIndicator from '@/components/PipelineTraceNodeIndicator/component'
 
-import { NodeBody, NodeIcon, NodeRoot, ToolbarRow, handleStyle } from './styles'
 import { PipelineNodeSourceData } from './types'
 
 const PipelineNodeSource = ({
@@ -18,6 +25,7 @@ const PipelineNodeSource = ({
   data,
 }: NodeProps<PipelineNodeSourceData>) => {
   const { t } = useTranslation()
+  const theme = useTheme()
 
   return (
     <>
@@ -27,9 +35,9 @@ const PipelineNodeSource = ({
         </ToolbarRow>
       )}
 
-      <NodeRoot>
-        <PipelineNodeDragHandle />
-        <NodeIcon>
+      <NodeRoot borderColor={theme.tokens.colors.nodeSourceBorder}>
+        <PipelineNodeDragHandle color={theme.tokens.colors.nodeSourceBg} />
+        <NodeIcon bgColor={theme.tokens.colors.nodeSourceBg}>
           <InputIcon />
         </NodeIcon>
         <NodeBody className="nodrag">

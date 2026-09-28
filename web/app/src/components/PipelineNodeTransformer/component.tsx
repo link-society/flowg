@@ -1,16 +1,23 @@
 import { useTranslation } from 'react-i18next'
 
 import TextField from '@mui/material/TextField'
+import { useTheme } from '@mui/material/styles'
 
 import FilterAltIcon from '@mui/icons-material/FilterAlt'
 
 import { Handle, NodeProps, Position } from '@xyflow/react'
 
+import {
+  NodeBody,
+  NodeIcon,
+  NodeRoot,
+  ToolbarRow,
+  handleStyle,
+} from '@/components/PipelineNodeCard/styles'
 import PipelineNodeDragHandle from '@/components/PipelineNodeDragHandle/component'
 import PipelineTraceNodeButton from '@/components/PipelineTraceNodeButton/component'
 import PipelineTraceNodeIndicator from '@/components/PipelineTraceNodeIndicator/component'
 
-import { NodeBody, NodeIcon, NodeRoot, ToolbarRow, handleStyle } from './styles'
 import { PipelineNodeTransformerData } from './types'
 
 const PipelineNodeTransformer = ({
@@ -18,6 +25,7 @@ const PipelineNodeTransformer = ({
   selected,
 }: NodeProps<PipelineNodeTransformerData>) => {
   const { t } = useTranslation()
+  const theme = useTheme()
 
   return (
     <>
@@ -28,9 +36,9 @@ const PipelineNodeTransformer = ({
       )}
 
       <Handle type="target" position={Position.Left} style={handleStyle} />
-      <NodeRoot>
-        <PipelineNodeDragHandle />
-        <NodeIcon>
+      <NodeRoot borderColor={theme.tokens.colors.nodeTransformerBorder}>
+        <PipelineNodeDragHandle color={theme.tokens.colors.nodeTransformerBg} />
+        <NodeIcon bgColor={theme.tokens.colors.nodeTransformerBg}>
           <FilterAltIcon />
         </NodeIcon>
         <NodeBody className="nodrag">
