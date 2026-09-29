@@ -2,12 +2,14 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata: 
   name: {{ include "flowg.fullname" . }}
+
 spec: 
   serviceName: {{ include "flowg.fullname" . }}
   replicas: 1
   selector: 
     matchLabels: 
       {{- include "flowg.labels" . | nindent 6 }}
+
   template: 
     metadata: 
       labels: 
@@ -16,7 +18,9 @@ spec:
       annotations: 
         {{- toYaml . | nindent 8 }}
       {{- end }}
+
     spec:
+
       {{- with .Values.flowg.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
@@ -25,8 +29,10 @@ spec:
       imagePullSecrets: 
         {{- toYaml . | nindent 8 }}
       {{- end }}
+
       serviceAccountName: {{ include "flowg.serviceAccountName" . }}
       automountServiceAccountToken: false
+
       containers: 
         - name: flowg 
           image: "{{ .Values.flowg.image.repository }}:{{ .Values.flowg.image.tag | default .Chart.AppVersion }}"
@@ -35,7 +41,10 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+
           env:
+
+            # Basic flowG environment variables configuration
             {{- with .Values.flowg.configuration.demoMode }}
             - name: FLOWG_DEMO_MODE
               value: {{ . | toString | quote }} # Enforce string type casting 
@@ -48,12 +57,19 @@ spec:
             - name: FLOWG_LOGLEVEL
               value: {{ . | toString | quote }}
             {{- end }}
+
+            # Syslog configuration
             {{- with .Values.flowg.syslog.initialAllowedOrigins }}
             - name: FLOWG_SYSLOG_INITIAL_ALLOWED_ORIGINS
               value: {{ . | toString | quote }}
             {{- end }}
+            - name: FLOWG_SYSLOG_PROTOCOL
+              value: {{ .Values.flowg.syslog.protocol | lower }}
+            
 
             # Seed configuration 
+            ## 'initial' and 'reset' configuration are separated, but they form a pair
+            ## there can't be only the username configuration (and not the password) and so on
             {{- with .Values.flowg.configuration.seed }}
             {{- if and (not (empty .initialUsernameKey)) (not (empty .initialPasswordKey)) }}
             - name: FLOWG_AUTH_INITIAL_USER
@@ -81,8 +97,7 @@ spec:
             {{- end }}
             {{- end }}
 
-            - name: FLOWG_SYSLOG_PROTOCOL
-              value: {{ .Values.flowg.syslog.protocol | lower }}
+            # TLS management, for web and mgmt servers
             {{- if .Values.flowg.https.enabled }}
             - name: FLOWG_HTTP_TLS_ENABLED
               value: "true"
@@ -99,6 +114,7 @@ spec:
             - name: FLOWG_MGMT_TLS_KEY
               value: "/data/ssl/mgmt/tls.key"
             {{- end }}
+
           ports:
             - containerPort: 5080
               protocol: TCP
@@ -106,6 +122,10 @@ spec:
               protocol: TCP
             - containerPort: 5514
               protocol: {{ .Values.flowg.syslog.protocol }}
+
+          # Liveness and readiness Probes
+          ## Since kubernetes is quite aggressive with its request timings, 
+          ## user is able to configure the delays
           livenessProbe:
             httpGet:
               path: /health
@@ -113,6 +133,7 @@ spec:
             {{- with .Values.flowg.probe.livenessProbe }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
+            
           readinessProbe:
             httpGet: 
               path: /health
@@ -120,6 +141,8 @@ spec:
             {{- with .Values.flowg.probe.readinessProbe }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
+
+
           resources:
             {{- toYaml .Values.flowg.resources | nindent 12 }}
           volumeMounts:
