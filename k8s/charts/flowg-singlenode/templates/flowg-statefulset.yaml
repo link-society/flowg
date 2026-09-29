@@ -43,30 +43,6 @@ spec:
           {{- end }}
 
           env:
-
-            # Basic flowG environment variables configuration
-            {{- with .Values.flowg.configuration.demoMode }}
-            - name: FLOWG_DEMO_MODE
-              value: {{ . | toString | quote }} # Enforce string type casting 
-            {{- end }}
-            {{- with .Values.flowg.configuration.logging.verbose }}
-            - name: FLOWG_VERBOSE
-              value: {{ . | toString | quote }}
-            {{- end }}
-            {{- with .Values.flowg.configuration.logging.level }}
-            - name: FLOWG_LOGLEVEL
-              value: {{ . | toString | quote }}
-            {{- end }}
-
-            # Syslog configuration
-            {{- with .Values.flowg.syslog.initialAllowedOrigins }}
-            - name: FLOWG_SYSLOG_INITIAL_ALLOWED_ORIGINS
-              value: {{ . | toString | quote }}
-            {{- end }}
-            - name: FLOWG_SYSLOG_PROTOCOL
-              value: {{ .Values.flowg.syslog.protocol | lower }}
-            
-
             # Seed configuration 
             ## 'initial' and 'reset' configuration are separated, but they form a pair
             ## there can't be only the username configuration (and not the password) and so on
@@ -96,24 +72,10 @@ spec:
                   key: {{ .resetPasswordKey }}
             {{- end }}
             {{- end }}
-
-            # TLS management, for web and mgmt servers
-            {{- if .Values.flowg.https.enabled }}
-            - name: FLOWG_HTTP_TLS_ENABLED
-              value: "true"
-            - name: FLOWG_HTTP_TLS_CERT
-              value: "/data/ssl/tls.crt"
-            - name: FLOWG_HTTP_TLS_KEY
-              value: "/data/ssl/tls.key"
-            {{- end }}
-            {{- if .Values.flowg.https.mgmt.enabled }}
-            - name: FLOWG_MGMT_TLS_ENABLED
-              value: "true"
-            - name: FLOWG_MGMT_TLS_CERT
-              value: "/data/ssl/mgmt/tls.crt"
-            - name: FLOWG_MGMT_TLS_KEY
-              value: "/data/ssl/mgmt/tls.key"
-            {{- end }}
+          
+          envFrom:
+            - configMapRef:
+                name: {{ include "flowg.fullname" . }}-configmap
 
           ports:
             - containerPort: 5080
@@ -133,7 +95,7 @@ spec:
             {{- with .Values.flowg.probe.livenessProbe }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
-            
+
           readinessProbe:
             httpGet: 
               path: /health
