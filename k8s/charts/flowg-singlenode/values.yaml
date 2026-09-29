@@ -13,7 +13,7 @@ flowg:
   # This section allows to configure FlowG properly
   # Read more at https://flowg.cloud/docs/technical/configuration
   configuration:
-    # demo_mode: "False"
+    # demoMode: "False"
     logging: 
       verbose: 'True'
       level: "info"
@@ -95,7 +95,7 @@ flowg:
   syslog:
     port: 5514
     protocol: UDP
-    # initial_allowed_origins: "[]"
+    # initialAllowedOrigins: "[]"
 
   https:
     enabled: false
