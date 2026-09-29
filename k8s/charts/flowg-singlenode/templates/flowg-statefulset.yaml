@@ -189,4 +189,3 @@ spec:
         resources:
           requests: 
             storage: {{ .Values.flowg.storage.size }}
-          
