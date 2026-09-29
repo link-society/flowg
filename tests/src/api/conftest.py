@@ -2,6 +2,7 @@ import os
 import time
 from pathlib import Path
 from shutil import rmtree
+import asyncio
 
 import pytest
 from opentelemetry.proto.collector.logs.v1.logs_service_pb2 import ExportLogsServiceRequest
@@ -16,6 +17,8 @@ from azure.mgmt.loganalytics import LogAnalyticsManagementClient
 import urllib3
 
 import boto3
+import nats
+
 from .._lib import docker_utils
 
 
@@ -35,6 +38,12 @@ def floci_gcp_image():
 def floci_az_image():
     img = os.getenv("FLOCI_AZ_TEST_DOCKER_IMAGE_NAME", "floci/floci-az:latest")
     print(f"Using floci-az Docker image: {img}")
+    return img
+
+@pytest.fixture(scope='module')
+def nats_image():
+    img = os.getenv("NATS_TEST_DOCKER_IMAGE_NAME", "nats:latest")
+    print(f"Using nats Docker image: {img}")
     return img
 
 @pytest.fixture(scope='module')
@@ -196,6 +205,42 @@ def azuremonitor_setup_dcr(floci_az_container):
     )
 
     return dcr.immutable_id
+
+@pytest.fixture(scope='module')
+def nats_container(
+        docker_client,
+        flowg_network,
+        report_dir,
+        nats_image
+):
+    name = "nats-test-server"
+
+    print(f"Creating Container: {name}")
+    container = docker_client.containers.run(
+        image=nats_image,
+        name=name,
+        network=flowg_network.name,
+        hostname=name,
+        ports={
+            "4222/tcp": 4222
+        },
+        detach=True,
+        command="-js"
+    )
+
+    yield
+
+    docker_utils.teardown_container(container, report_dir)
+
+async def nats_log_stream_create():
+    print("Creating NATS JetStream log stream")
+    nc = await nats.connect("localhost")
+    js = nc.jetstream()
+    await js.add_stream(name="logs", subjects=["logs"])
+
+@pytest.fixture(scope="module")
+def nats_log_stream(nats_container):
+    asyncio.run(nats_log_stream_create())
 
 @pytest.fixture(scope="module")
 def cache_dir():

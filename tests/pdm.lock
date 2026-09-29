@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:56a43e2c4ac58459183f74c8c6379bb4dd60d6b42b6047ebc37700c77bd509f7"
+content_hash = "sha256:c3fd3d66f51a7b63df74298a5581d5a21268df9143026e6188d90d2159564993"
 
 [[metadata.targets]]
 requires_python = "==3.13.*"
@@ -247,6 +247,7 @@ dependencies = [
     "azure-mgmt-monitor>=7.0.0",
     "boto3>=1.43.26",
     "docker>=7.1.0",
+    "nats-py>=2.16.0",
     "opentelemetry-proto>=1.32.1",
     "pytest>=8.3.5",
     "requests>=2.32.3",
@@ -312,6 +313,17 @@ groups = ["default", "dev"]
 files = [
     {file = "jmespath-1.1.0-py3-none-any.whl", hash = "sha256:a5663118de4908c91729bea0acadca56526eb2698e83de10cd116ae0f4e97c64"},
     {file = "jmespath-1.1.0.tar.gz", hash = "sha256:472c87d80f36026ae83c6ddd0f1d05d4e510134ed462851fd5f754c8c3cbb88d"},
+]
+
+[[package]]
+name = "nats-py"
+version = "2.16.0"
+requires_python = ">=3.7"
+summary = "NATS client for Python"
+groups = ["default", "dev"]
+files = [
+    {file = "nats_py-2.16.0-py3-none-any.whl", hash = "sha256:aeb1ff123966c05833d26c7df7e1d54c1c6d32b612428b21677a2e921f1fecae"},
+    {file = "nats_py-2.16.0.tar.gz", hash = "sha256:1d137ed7afc9b59033b3199324c6237df2016a5091935871344a787eba6b72fc"},
 ]
 
 [[package]]
