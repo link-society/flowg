@@ -29,7 +29,7 @@ nats stream add FLOWG --subjects "flowg" --storage file --retention limits --def
 import ForwarderForm from '@site/src/components/documentation/ForwarderForm'
 import PipelineDiagram from '@site/src/components/documentation/PipelineDiagram'
 
-First, let's create a "Google Cloud Logging Forwarder" named `gcloud`, with the
+First, let's create a "JetStream Forwarder" named `jetstream`, with the
 following configuration:
 
 <ForwarderForm
@@ -48,14 +48,14 @@ following configuration:
     ]}
 />
 
-Then, create a pipeline that forwards logs received via Syslog to the `gcloud`
+Then, create a pipeline that forwards logs received via Syslog to the `jetstream`
 forwarder:
 
 <PipelineDiagram
     alt="A FlowG pipeline routing syslog logs to the JetStream forwarder"
     nodes={[
         { id: 'source', type: 'source', x: 0, y: 0, value: 'SYSLOG' },
-        { id: 'fwd', type: 'forwarder', x: 340, y: 0, value: 'JetStream' },
+        { id: 'fwd', type: 'forwarder', x: 340, y: 0, value: 'jetstream' },
     ]}
     edges={[
         { from: 'source', to: 'fwd' },
