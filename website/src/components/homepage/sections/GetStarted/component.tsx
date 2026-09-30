@@ -1,11 +1,11 @@
-import layoutStyles from '../../styles.module.css'
+import layoutStyles from '@site/src/components/homepage/styles.module.css'
 
 import clsx from 'clsx'
 
 import { contact } from '@site/src/lib/links'
 
-import FlowLines from '../../shared/FlowLines/component'
-import GetStartedActions from '../../shared/GetStartedActions/component'
+import FlowLines from '@site/src/components/homepage/shared/FlowLines/component'
+import GetStartedActions from '@site/src/components/homepage/shared/GetStartedActions/component'
 
 import styles from './styles.module.css'
 

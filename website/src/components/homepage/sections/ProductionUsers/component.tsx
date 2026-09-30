@@ -1,4 +1,4 @@
-import layoutStyles from '../../styles.module.css'
+import layoutStyles from '@site/src/components/homepage/styles.module.css'
 
 import users from './users'
 

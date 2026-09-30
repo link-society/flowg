@@ -1,10 +1,10 @@
-import layoutStyles from '../../styles.module.css'
+import layoutStyles from '@site/src/components/homepage/styles.module.css'
 
 import clsx from 'clsx'
 
-import LogFlowDiagram from './LogFlowDiagram/component'
+import LogFlowDiagram from '@site/src/components/homepage/sections/Integrations/LogFlowDiagram/component'
 
-import FlowLines from '../../shared/FlowLines/component'
+import FlowLines from '@site/src/components/homepage/shared/FlowLines/component'
 
 import styles from './styles.module.css'
 

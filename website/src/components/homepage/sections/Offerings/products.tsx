@@ -1,5 +1,3 @@
-import { contact } from '@site/src/lib/links'
-
 import type { ProductCardProps } from '@site/src/components/marketing/ProductCard/types'
 
 const products: ProductCardProps[] = [
@@ -7,7 +5,7 @@ const products: ProductCardProps[] = [
     id: 'on-premise',
     name: 'FlowG On Premise',
     icon: 'terminal',
-    label: 'ON YOUR INFRASTRUCTURE',
+    label: 'CONSULTANCY ON YOUR INFRASTRUCTURE',
     headline: (
       <>
         Your infrastructure.
@@ -15,7 +13,8 @@ const products: ProductCardProps[] = [
         Our <span>team</span>.
       </>
     ),
-    description: 'Keep control of your logs, with experts alongside your team.',
+    description:
+      'Hire us to audit, advise, install, manage, and maintain FlowG in your environment.',
     benefits: [
       {
         icon: 'key',
@@ -31,12 +30,12 @@ const products: ProductCardProps[] = [
       },
     ],
     servicesLabel: 'How we help',
-    services: ['Audits', 'Installation', 'Maintenance', 'Support'],
+    services: ['Audits', 'Advice', 'Installation', 'Maintenance', 'Support'],
     action: {
-      href: contact('Help me plan my FlowG deployment'),
-      label: 'Plan my deployment',
+      href: '/products/on-premise',
+      label: 'Explore On Premise',
     },
-    note: 'Commercial services for open-source FlowG.',
+    note: 'Start with a pilot. Scope and pricing agreed with you.',
   },
   {
     id: 'saas',
@@ -59,23 +58,23 @@ const products: ProductCardProps[] = [
       },
       {
         icon: 'upgrade',
-        text: 'Stay up to date without paying extra for upgrades.',
+        text: 'Hand off upgrades and platform monitoring.',
       },
       { icon: 'support', text: 'Get expert help when you’re stuck.' },
     ],
     servicesLabel: 'What’s planned',
-    services: ['Hosting', 'Free upgrades', 'Support'],
+    services: ['Hosting', 'Upgrades', 'Monitoring', 'Support'],
     action: {
-      href: contact('Please notify me when FlowG SaaS launches'),
-      label: 'Notify me at launch',
+      href: '/products/saas',
+      label: 'Discover FlowG SaaS',
     },
-    note: 'Request updates by email. Not open source.',
+    note: 'Planned managed service based on open-source FlowG.',
   },
   {
     id: 'mcp',
     name: 'FlowG MCP',
     icon: 'spark',
-    label: 'FOR YOUR LLM WORKFLOW',
+    label: 'AVAILABLE · COMMERCIAL MCP SERVER',
     headline: (
       <>
         Your LLM.
@@ -84,12 +83,12 @@ const products: ProductCardProps[] = [
       </>
     ),
     description:
-      'Give your LLM the context it needs to help investigate your logs.',
+      'Let approved AI assistants search your FlowG log streams, read-only.',
     benefits: [
       { icon: 'file', text: 'Stop copying log snippets into chats.' },
       {
         icon: 'search',
-        text: 'Investigate errors with context beyond a pasted event.',
+        text: 'Answers grounded in your actual logs.',
       },
       {
         icon: 'route',
@@ -105,10 +104,10 @@ const products: ProductCardProps[] = [
       'Support',
     ],
     action: {
-      href: contact('Help me connect my LLM to FlowG'),
-      label: 'Connect my LLM',
+      href: '/products/mcp',
+      label: 'Explore FlowG MCP',
     },
-    note: 'Commercial licenses and services. Not open source.',
+    note: 'Proprietary MCP server. Licensing and services scoped with you.',
   },
 ]
 

@@ -1,12 +1,14 @@
-import layoutStyles from '../../styles.module.css'
+import layoutStyles from '@site/src/components/homepage/styles.module.css'
 
 import clsx from 'clsx'
+
+import CallToAction from '@site/src/components/marketing/CallToAction/component'
 
 import ProductCard from '@site/src/components/marketing/ProductCard/component'
 
 import products from './products'
 
-import FlowLines from '../../shared/FlowLines/component'
+import FlowLines from '@site/src/components/homepage/shared/FlowLines/component'
 
 import styles from './styles.module.css'
 
@@ -37,6 +39,11 @@ const Offerings = () => {
           {products.map((product) => (
             <ProductCard key={product.id} {...product} />
           ))}
+        </div>
+        <div className={layoutStyles.centered}>
+          <CallToAction href="/products" variant="text">
+            Compare all FlowG products
+          </CallToAction>
         </div>
       </div>
     </section>

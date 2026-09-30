@@ -1,4 +1,4 @@
-import layoutStyles from '../../styles.module.css'
+import layoutStyles from '@site/src/components/homepage/styles.module.css'
 
 import clsx from 'clsx'
 
@@ -12,7 +12,7 @@ import Icon from '@site/src/components/Icon/component'
 import ProductFeature from '@site/src/components/marketing/ProductFeature/component'
 import ProductScreenshot from '@site/src/components/marketing/ProductScreenshot/component'
 
-import FlowLines from '../../shared/FlowLines/component'
+import FlowLines from '@site/src/components/homepage/shared/FlowLines/component'
 
 import styles from './styles.module.css'
 
