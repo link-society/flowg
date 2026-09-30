@@ -1,0 +1,59 @@
+{{- if and .Values.flowg.https.enabled .Values.flowg.https.certificateFrom.certmanager -}}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "flowg.fullname" . }}-certificate
+  namespace: {{ .Release.Namespace }}
+spec:
+  secretName: {{ include "flowg.fullname" . }}-tls
+
+  privateKey:
+    algorithm: {{ .Values.flowg.https.certificateFrom.certmanager.privateKey.algorithm }}
+    encoding: {{ .Values.flowg.https.certificateFrom.certmanager.privateKey.encoding }}
+    size: {{ .Values.flowg.https.certificateFrom.certmanager.privateKey.size }}
+
+  {{- with .Values.flowg.https.certificateFrom.certmanager.dnsNames }}
+  dnsNames:
+    - {{- toYamlPretty . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.flowg.https.certificateFrom.certmanager.ipAddresses }}
+  ipAddresses:
+    {{- toYamlPretty . | nindent 4 }}
+  {{- end }}
+
+  {{- with .Values.flowg.https.certificateFrom.certmanager.issuerRef }}
+  issuerRef:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
+
+{{- if and .Values.flowg.https.mgmt.enabled .Values.flowg.https.mgmt.certificateFrom.certmanager -}}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "flowg.fullname" . }}-mgmt-certificate
+  namespace: {{ .Release.Namespace }}
+spec:
+  secretName: {{ include "flowg.fullname" . }}-tls
+
+  privateKey:
+    algorithm: {{ .Values.flowg.https.mgmt.certificateFrom.certmanager.privateKey.algorithm }}
+    encoding: {{ .Values.flowg.https.mgmt.certificateFrom.certmanager.privateKey.encoding }}
+    size: {{ .Values.flowg.https.mgmt.certificateFrom.certmanager.privateKey.size }}
+
+  {{- with .Values.flowg.https.mgmt.certificateFrom.certmanager.dnsNames }}
+  dnsNames:
+    - {{- toYamlPretty . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.flowg.https.mgmt.certificateFrom.certmanager.ipAddresses }}
+  ipAddresses:
+    {{- toYamlPretty . | nindent 4 }}
+  {{- end }}
+
+  {{- with .Values.flowg.https.mgmt.certificateFrom.certmanager.issuerRef }}
+  issuerRef:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
