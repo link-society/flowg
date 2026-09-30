@@ -11,6 +11,23 @@ foundationdb:
 
   version: 7.3.69
 
+  # Provide at least resource requests (limits are optional)
+  foundationdbResourceRequests:
+    cpu: 1
+    memory: 128Mi
+  sidecarResourceRequests:
+    cpu: 1
+    memory: 128mi
+
+  foundationdbResourceLimits: 
+    # cpu: 1
+    # memory: 128Mi
+  sidecarResourceLimits: {}
+    # cpu: 1
+    # memory: 128Mi
+
+  storageRequest: 16Gi
+
 flowg:
   replicas: 4
   image:
