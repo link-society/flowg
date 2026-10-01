@@ -4,7 +4,6 @@ metadata:
   name: {{ include "flowg.fullname" . }}
 
 spec: 
-  serviceName: {{ include "flowg.fullname" . }}
   replicas: {{ .Values.flowg.replicas }}
   selector: 
     matchLabels: 
@@ -43,6 +42,12 @@ spec:
           {{- end }}
 
           env:
+            # Use FoundationDB as the storage backend
+            - name: FLOWG_STORAGE_BACKEND
+              value: "foundationdb"
+            - name: FLOWG_FOUNDATIONDB_CLUSTER_FILE
+              value: "/var/run/foundationdb/fdb.cluster"
+
             # Seed configuration 
             ## 'initial' and 'reset' configuration are separated, but they form a pair
             ## there can't be only the username configuration (and not the password) and so on
@@ -108,8 +113,8 @@ spec:
           resources:
             {{- toYaml .Values.flowg.resources | nindent 12 }}
           volumeMounts:
-            - name: flowg-data 
-              mountPath: /data 
+            - name: fdb-cluster-volume
+              mountPath: /var/run/foundationdb/
             {{- if and .Values.flowg.https.enabled (or .Values.flowg.https.certificateFrom.certmanager .Values.flowg.https.certificateFrom.secretRef) }}
             - name: flowg-tls
               mountPath: /data/ssl
@@ -118,6 +123,50 @@ spec:
             - name: flowg-tls-mgmt
               mountPath: /data/ssl/mgmt
             {{- end }}
+      
+      initContainers:
+        - name: wait-for-fdb
+          image: debian:stable
+          securityContext:
+            runAsUser: 0      # Force l'utilisateur root
+            runAsGroup: 0     # Force le groupe root
+            runAsNonRoot: false
+          command: 
+            - /bin/bash
+            - -c 
+            - |
+              set -e
+
+              echo "1. Installing dependencies"
+              apt-get update
+              apt-get install -y wget 
+
+              echo 
+              echo 2. "Downloading & installing fdbclient"
+              wget https://github.com/apple/foundationdb/releases/download/7.4.8/foundationdb-clients_7.4.8-1_amd64.deb
+              apt-get install -y ./foundationdb-clients_7.4.8-1_amd64.deb
+
+              echo
+              echo "Prerequisites satisfied!"
+
+              while [ -z "$UP" ]; do
+                echo "Testing connection to FoundationDB.."
+                fdbcli && UP="yes"
+                
+                if [ -n "$UP" ]; then
+                  echo "FoundationDB is up! Done initializing."
+                else
+                  sleep 2
+                fi
+              done
+          env:
+            - name: FDB_CLUSTER_FILE
+              value: "/var/run/foundationdb/fdb.cluster"
+          volumeMounts:
+            - name: fdb-cluster-volume
+              mountPath: /var/run/foundationdb/
+        
+
       {{- with .Values.flowg.nodeSelectorTolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
@@ -162,17 +211,10 @@ spec:
                 path: tls.key
         {{- end }}
 
-        
-  volumeClaimTemplates:
-    - metadata:
-        name: flowg-data
-        labels: 
-          {{- include "flowg.labels" . | nindent 12 }}
-      spec:
-        accessModes: [ "ReadWriteOnce" ]
-        {{- with .Values.flowg.storage.storageClassName }}
-        storageClassName: {{ . | quote }}
-        {{- end }}
-        resources:
-          requests: 
-            storage: {{ .Values.flowg.storage.size }}
+        - name: fdb-cluster-volume
+          configMap:
+            name: {{ include "flowg.fullname" . }}-fdb-config
+            items: 
+              - key: cluster-file
+                path: fdb.cluster
+    
