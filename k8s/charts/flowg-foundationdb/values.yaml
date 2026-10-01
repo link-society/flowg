@@ -3,10 +3,14 @@ nameOverride: ""
 fullNameOverride: ""
 
 foundationdb:
-  storageProcesses: 4
-  logProcesses: 4
-  statelessProcesses: -1
-  clusterControllerProcesses: 1
+  # '-1' is none 
+  # '0' lets FoundationDB decide how many processes he wants
+  processCounts:
+    storage: 0
+    log: -1
+    stateless: -1
+
+  redundancyMode: single
 
   version: 7.3.69
 
@@ -16,7 +20,7 @@ foundationdb:
     memory: 128Mi
   sidecarResourceRequests:
     cpu: 1
-    memory: 128mi
+    memory: 128Mi
 
   foundationdbResourceLimits: 
     # cpu: 1
@@ -28,7 +32,7 @@ foundationdb:
   storageRequest: 16Gi
 
 flowg:
-  replicas: 4
+  replicas: 1
   image:
     repository: linksociety/flowg
     tag: "" # "v0.63.1-linux-arm"
