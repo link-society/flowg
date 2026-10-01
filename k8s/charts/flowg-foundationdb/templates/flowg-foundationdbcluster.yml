@@ -50,9 +50,12 @@ spec:
     processGroupIDLabels:
     - foundationdb.org/fdb-process-group-id
   minimumUptimeSecondsForBounce: 60
+
+  databaseConfiguration:
+    redundancy_mode: {{ .Values.foundationdb.redundancyMode }} 
   processCounts:
-    cluster_controller: 1
-    stateless: -1
+    {{- toYamlPretty .Values.foundationdb.processCounts | nindent 4 }}
+
   processes:
     general:
       customParameters:
