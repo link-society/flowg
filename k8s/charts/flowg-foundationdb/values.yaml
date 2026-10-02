@@ -32,8 +32,18 @@ foundationdb:
   storageRequest: 16Gi
 
 flowg:
+
+  # FLOWG_SECRET_KEY is VITAL if you use more than 1 replicas. 
+  # Learn more at https://flowg.cloud/docs/user/advanced/cluster
+  secretKey:
+    # useExistingSecret allows you to put your own secret for FLOWG_SECRET_KEY.
+    # ensure the secret's name and key qre given to 'secretRef'
+    useExistingSecret: false
+
+    # secret's name and key are the same for simplicity concerns
+    secretRef: flowg-shared-key
+
   replicas: 4
-  sharedKeySecretRef: flowg-shared-key
   image:
     repository: linksociety/flowg
     tag: "" # "v0.63.1-linux-arm"
