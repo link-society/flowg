@@ -53,8 +53,8 @@ spec:
               valueFrom:
                 secretKeyRef:
                   # secret name and key are the same to simplify things 
-                  name: {{ .Values.flowg.sharedKeySecretRef }}
-                  key: {{ .Values.flowg.sharedKeySecretRef }}
+                  name: {{ .Values.flowg.secretKey.secretRef }}
+                  key: {{ .Values.flowg.secretKey.secretRef }}
 
             # Seed configuration 
             ## 'initial' and 'reset' configuration are separated, but they form a pair
