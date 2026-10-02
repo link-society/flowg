@@ -9,13 +9,13 @@ description: "Flowg is a low-code log processing platform."
 home: "https://github.com/link-society/flowg"
 sources:
   - "https://github.com/link-society/flowg"
-maintainers: 
+maintainers:
   - name: Link Society
     email: contact@link-society.com
     url: https://link-society.com
 keywords:
-  - monitoring 
-  - logging 
+  - monitoring
+  - logging
   - observability
 annotations:
   artifacthub.io/category: monitoring-logging
