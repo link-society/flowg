@@ -3,7 +3,7 @@ fullNameOverride: ""
 flowg:
   image:
     repository: linksociety/flowg
-    tag: "" # "v0.63.1-linux-arm"
+    tag: ""                             # "v0.63.1-linux-arm"
     pullPolicy: IfNotPresent
     pullSecrets: []
   # This section allows to configure FlowG properly
@@ -14,8 +14,8 @@ flowg:
       verbose: "True"
       level: "info"
     # The 'seed' functionnality creates a first user (default: root, pw: root)
-    # And populates the database with an example dataset, then optionnally changes the credentials.
-    # This requires you to add a secret in the same namespace as FlowG, with:
+    # And populates the database with an example dataset, then optionnally changes the credentials.
+    # This requires you to add a secret in the same namespace as FlowG, with:
     # - Initial Username/Password
     # - Reset Username/Password (credentials reset after population)
     # For your configuration to be valid, you MUST provide both username AND password for each type of value.
