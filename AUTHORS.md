@@ -19,3 +19,4 @@
  - [@devnoct](https://github.com/devnoct)
  - [@nightcityblade](https://github.com/nightcityblade)
  - [@ShivanshKansal19](https://github.com/ShivanshKansal19)
+ - [@x86ethan](https://github.com/x86ethan)
