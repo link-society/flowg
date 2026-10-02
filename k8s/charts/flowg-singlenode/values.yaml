@@ -11,23 +11,23 @@ flowg:
   configuration:
     # demoMode: "False"
     logging:
-      verbose: 'True'
+      verbose: "True"
       level: "info"
     # The 'seed' functionnality creates a first user (default: root, pw: root)
-    # And populates the database with an example dataset, then optionnally changes the credentials. 
+    # And populates the database with an example dataset, then optionnally changes the credentials.
     # This requires you to add a secret in the same namespace as FlowG, with:
     # - Initial Username/Password
     # - Reset Username/Password (credentials reset after population)
     # For your configuration to be valid, you MUST provide both username AND password for each type of value.
     # A sole username or password key will NOT be taken in account by the chart
     seed:
-    # secretName: flowg-seed-test 
+    # secretName: flowg-seed-test
     # initialUsernameKey: initialUsername
     # initialPasswordKey: initialPassword
 
     # resetUsernameKey: resetUsername
     # resetPasswordKey: resetPassword
-  # Customized annotations in order to enable other software layers to interact with FlowG 
+  # Customized annotations in order to enable other software layers to interact with FlowG
   # (e.g. Prometheus scraping, Traefik directions)
   # Documentation: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
   podAnnotations: []
@@ -52,16 +52,16 @@ flowg:
   probe:
     livenessProbe: []
     # initialDelaySeconds: 12
-    # timeoutSeconds: 10 
+    # timeoutSeconds: 10
     # failureThreshold: 3
     # periodSeconds: 5
     readinessProbe: []
     # initialDelaySeconds: 12
-    # timeoutSeconds: 10 
+    # timeoutSeconds: 10
     # failureThreshold: 3
     # periodSeconds: 5
-  # Allows to write Tolerations and Taints so the node gets well selected. 
-  # Integrates directly into 'tolerations:' section of the StatefulSet tempalte. 
+  # Allows to write Tolerations and Taints so the node gets well selected.
+  # Integrates directly into 'tolerations:' section of the StatefulSet tempalte.
   # To learn more, read https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
 
   # IMPORTANT NOTE: To make sure scalar values (booleans, int), ALWAYS place them between quotation marks.
@@ -85,7 +85,7 @@ flowg:
   https:
     enabled: false
     # certificateFrom:
-    #   certmanager: 
+    #   certmanager:
     #     privateKey:
     #       algorithm: RSA
     #       encoding: PKCS1
@@ -94,16 +94,16 @@ flowg:
     #     # SAN ; either dnsNames or ipAddresses (mandatory)
     #     # dnsNames: ["logs.example.com"]
     #     ipAddresses: ["127.0.0.1"]
-    #     issuerRef: 
+    #     issuerRef:
     #       name: selfsigned-issuer
     #       kind: Issuer
 
-    #   # secretRef: 
+    #   # secretRef:
     #   #   name: flowg-tls
     mgmt:
       enabled: false
       #   certificateFrom:
-      #     certmanager: 
+      #     certmanager:
       #       privateKey:
       #         algorithm: RSA
       #         encoding: PKCS1
@@ -112,11 +112,11 @@ flowg:
       #       # SAN ; either dnsNames or ipAddresses (mandatory)
       #       # dnsNames: ["logs.example.com"]
       #       ipAddresses: ["127.0.0.1"]
-      #       issuerRef: 
+      #       issuerRef:
       #         name: selfsigned-issuer
       #         kind: Issuer
 
-      #     # secretRef: 
+      #     # secretRef:
       #     #   name: flowg-tls
   resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -140,7 +140,7 @@ flowg:
     # If not set and create is true, a name is generated using the fullname template
     name: ""
   service:
-    # NodePort, LoadBalancer or ClusterIP 
+    # NodePort, LoadBalancer or ClusterIP
     type: LoadBalancer
     # Ports inside range 30000-32767
     nodePort:
