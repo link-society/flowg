@@ -25,7 +25,8 @@
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "redocusaurus": "^2.5.2",
-    "serialize-javascript": "^7.0.3"
+    "serialize-javascript": "^7.0.3",
+    "qs": "^6.16.0"
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "3.10.2",
@@ -50,7 +51,8 @@
   },
   "overrides": {
     "@docusaurus/core": {
-      "serialize-javascript": "$serialize-javascript"
+      "serialize-javascript": "$serialize-javascript",
+      "qs": "$qs"
     }
   }
 }
