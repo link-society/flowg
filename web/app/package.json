@@ -25,6 +25,7 @@
     "ag-grid-react": "^36.2.0",
     "dagre": "^0.8.5",
     "dayjs": "^1.11.23",
+    "dompurify": "^3.4.16",
     "event-source-plus": "^0.1.15",
     "i18next": "^26.4.2",
     "i18next-http-backend": "^4.0.2",
@@ -53,7 +54,9 @@
     "vite-plugin-compression2": "^2.5.3"
   },
   "overrides": {
-    "dompurify": "3.4.10",
+    "monaco-editor": {
+      "dompurify": "$dompurify"
+    },
     "i18next": {
       "typescript": "$typescript"
     }
