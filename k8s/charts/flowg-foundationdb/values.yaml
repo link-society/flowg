@@ -32,7 +32,8 @@ foundationdb:
   storageRequest: 16Gi
 
 flowg:
-  replicas: 1
+  replicas: 4
+  sharedKeySecretRef: flowg-shared-key
   image:
     repository: linksociety/flowg
     tag: "" # "v0.63.1-linux-arm"

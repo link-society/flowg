@@ -48,6 +48,14 @@ spec:
             - name: FLOWG_FOUNDATIONDB_CLUSTER_FILE
               value: "/var/run/foundationdb/fdb.cluster"
 
+            # Shared key (for instances mutualization)
+            - name: FLOWG_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  # secret name and key are the same to simplify things 
+                  name: {{ .Values.flowg.sharedKeySecretRef }}
+                  key: {{ .Values.flowg.sharedKeySecretRef }}
+
             # Seed configuration 
             ## 'initial' and 'reset' configuration are separated, but they form a pair
             ## there can't be only the username configuration (and not the password) and so on
