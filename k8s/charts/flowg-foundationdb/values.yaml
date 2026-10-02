@@ -14,20 +14,26 @@ foundationdb:
 
   version: 7.3.69
 
-  # Provide at least resource requests (limits are optional)
-  foundationdbResourceRequests:
-    cpu: 1
-    memory: 128Mi
-  sidecarResourceRequests:
-    cpu: 1
-    memory: 128Mi
+  resourceRequests:
+    worker:
+      cpu: 1
+      memory: 128Mi
+    sidecar:
+      cpu: 1
+      memory: 128Mi
+    
+  resourceLimits:
+    worker:
+      cpu: 1
+      memory: 128Mi
+    sidecar:
+      cpu: 1 
+      memory: 128Mi
+  
+  sidecarContainer: 
+    livenessProbe: true
+    readinessProbe: false 
 
-  foundationdbResourceLimits: 
-    # cpu: 1
-    # memory: 128Mi
-  sidecarResourceLimits: {}
-    # cpu: 1
-    # memory: 128Mi
 
   storageRequest: 16Gi
 

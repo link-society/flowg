@@ -65,16 +65,46 @@ spec:
           containers:
           - name: foundationdb
             resources:
+              {{- if .Values.foundationdb.resourceRequests.worker }}
               requests:
-                cpu: {{ .Values.foundationdb.foundationdbResourceRequests.cpu }}
-                memory: {{ .Values.foundationdb.foundationdbResourceRequests.memory }}
+                {{- with .Values.foundationdb.resourceRequests.worker.cpu }} 
+                cpu: {{ . }}
+                {{- end }}
+                {{- with .Values.foundationdb.resourceRequests.worker.memory }}
+                memory: {{ . | quote }}
+                {{- end }}
+              {{- end }}
+              {{- if .Values.foundationdb.resourceLimits.worker }}
+              limits:
+                {{- with .Values.foundationdb.resourceLimits.worker.cpu }}
+                cpu: {{ . }}
+                {{- end }}
+                {{- with .Values.foundationdb.resourceLimits.worker.memory }}
+                memory: {{ . | quote }}
+                {{- end }}
+              {{- end }}
             securityContext:
               runAsUser: 0
           - name: foundationdb-kubernetes-sidecar
             resources:
+              {{- if .Values.foundationdb.resourceRequests.sidecar }}
               requests:
-                cpu: {{ .Values.foundationdb.sidecarResourceRequests.cpu }}
-                memory: {{ .Values.foundationdb.sidecarResourceRequests.memory }}
+                {{- with .Values.foundationdb.resourceRequests.sidecar.cpu }}
+                cpu: {{ . }}
+                {{- end }}
+                {{- with .Values.foundationdb.resourceRequests.sidecar.memory }}
+                memory: {{ . | quote }}
+                {{- end }}
+              {{- end }}
+              {{- if .Values.foundationdb.resourceLimits.sidecar }}
+              limits:
+                {{- with .Values.foundationdb.resourceLimits.sidecar.cpu }}
+                cpu: {{ . }}
+                {{- end }}
+                {{- with .Values.foundationdb.resourceLimits.sidecar.memory }}
+                memory: {{ . | quote }}
+                {{- end }}
+              {{- end }}
             securityContext:
               runAsUser: 0
           serviceAccountName: {{ include "flowg.fullname" . }}-fdb
@@ -86,7 +116,7 @@ spec:
   routing:
     defineDNSLocalityFields: true
   sidecarContainer:
-    enableLivenessProbe: true
-    enableReadinessProbe: false
+    enableLivenessProbe: {{ .Values.foundationdb.sidecarContainer.livenessProbe }}
+    enableReadinessProbe: {{ .Values.foundationdb.sidecarContainer.readinessProbe }}
   useExplicitListenAddress: true
   version: {{ .Values.foundationdb.version }}
