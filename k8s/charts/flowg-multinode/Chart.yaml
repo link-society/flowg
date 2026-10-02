@@ -1,6 +1,6 @@
 ---
 apiVersion: v2
-name: flowg-foundationdb
+name: flowg-multinode
 version: "v0.63.1"
 type: application
 appVersion: "v0.63.1"
