@@ -1,36 +1,43 @@
 import { useTranslation } from 'react-i18next'
 
 import TextField from '@mui/material/TextField'
+import { useTheme } from '@mui/material/styles'
 
 import AccountTreeIcon from '@mui/icons-material/AccountTree'
 
 import { Handle, NodeProps, Position } from '@xyflow/react'
 
-import PipelineDeleteNodeButton from '@/components/PipelineDeleteNodeButton/component'
+import {
+  NodeBody,
+  NodeIcon,
+  NodeRoot,
+  ToolbarRow,
+  handleStyle,
+} from '@/components/PipelineNodeCard/styles'
+import PipelineNodeDragHandle from '@/components/PipelineNodeDragHandle/component'
 import PipelineTraceNodeButton from '@/components/PipelineTraceNodeButton/component'
 import PipelineTraceNodeIndicator from '@/components/PipelineTraceNodeIndicator/component'
 
-import { NodeBody, NodeIcon, NodeRoot, ToolbarRow, handleStyle } from './styles'
 import { PipelineNodePipelineData } from './types'
 
 const PipelineNodePipeline = ({
-  id,
   data,
   selected,
 }: NodeProps<PipelineNodePipelineData>) => {
   const { t } = useTranslation()
+  const theme = useTheme()
 
   return (
     <>
-      {selected && (
+      {selected && data.traces && (
         <ToolbarRow>
-          <PipelineDeleteNodeButton nodeId={id} />
-          {data.traces && <PipelineTraceNodeButton traces={data.traces} />}
+          <PipelineTraceNodeButton traces={data.traces} />
         </ToolbarRow>
       )}
       <Handle type="target" position={Position.Left} style={handleStyle} />
-      <NodeRoot>
-        <NodeIcon>
+      <NodeRoot borderColor={theme.tokens.colors.nodePipelineBorder}>
+        <PipelineNodeDragHandle color={theme.tokens.colors.nodePipelineBg} />
+        <NodeIcon bgColor={theme.tokens.colors.nodePipelineBg}>
           <AccountTreeIcon />
         </NodeIcon>
         <NodeBody className="nodrag">

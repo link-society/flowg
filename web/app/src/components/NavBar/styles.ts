@@ -1,12 +1,15 @@
 import { Button, IconButton, Link, styled } from '@mui/material'
 
 export const NavToolbar = styled('div')`
-  background-color: ${({ theme }) => theme.tokens.colors.black};
   display: flex;
   align-items: center;
-  padding: 0 ${({ theme }) => theme.spacing(2)};
+  padding: 0 ${({ theme }) => theme.spacing(1)};
   min-height: 64px;
   width: 100%;
+
+  ${({ theme }) => theme.breakpoints.up('md')} {
+    padding: 0 ${({ theme }) => theme.spacing(1.5)};
+  }
 `
 
 export const NavBarLeftSection = styled('section')`

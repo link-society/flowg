@@ -21,21 +21,21 @@ export const AppContainer = forwardRef<HTMLDivElement, AppContainerProps>(
       switch (variant) {
         case 'section':
           return {
-            px: disableX ? 0 : { xs: 2, md: 3 },
+            px: disableX ? 0 : { xs: 1, md: 1.5 },
             py: 0,
           }
         case 'toolbar':
           return {
-            px: disableX ? 0 : { xs: 1, md: 3 },
-            py: disableX ? 0 : { xs: 1, md: 1 },
+            px: disableX ? 0 : { xs: 1, md: 1.5 },
+            py: disableX ? 0 : { xs: 0.5, md: 0.5 },
           }
         case 'compact':
           return { px: 0, py: 0 }
         case 'page':
         default:
           return {
-            px: disableX ? 0 : { xs: 2, md: 3 },
-            py: disableY ? 0 : { xs: 2, md: 3 },
+            px: disableX ? 0 : { xs: 1, md: 1.5 },
+            py: disableY ? 0 : { xs: 1, md: 1.5 },
           }
       }
     }
