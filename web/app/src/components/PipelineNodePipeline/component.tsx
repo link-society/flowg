@@ -14,7 +14,6 @@ import {
   ToolbarRow,
   handleStyle,
 } from '@/components/PipelineNodeCard/styles'
-import PipelineNodeDragHandle from '@/components/PipelineNodeDragHandle/component'
 import PipelineTraceNodeButton from '@/components/PipelineTraceNodeButton/component'
 import PipelineTraceNodeIndicator from '@/components/PipelineTraceNodeIndicator/component'
 
@@ -36,7 +35,6 @@ const PipelineNodePipeline = ({
       )}
       <Handle type="target" position={Position.Left} style={handleStyle} />
       <NodeRoot borderColor={theme.tokens.colors.nodePipelineBorder}>
-        <PipelineNodeDragHandle color={theme.tokens.colors.nodePipelineBg} />
         <NodeIcon bgColor={theme.tokens.colors.nodePipelineBg}>
           <AccountTreeIcon />
         </NodeIcon>
