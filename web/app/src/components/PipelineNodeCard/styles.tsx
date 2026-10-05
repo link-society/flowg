@@ -1,3 +1,5 @@
+import { ComponentProps } from 'react'
+
 import Box from '@mui/material/Box'
 import { styled } from '@mui/material/styles'
 
@@ -27,10 +29,6 @@ export const NodeRoot = styled(Box, {
   '&:hover': {
     boxShadow: theme.tokens.shadows.nodeElevatedHover,
   },
-  '&:hover .pipeline-node-drag-handle': {
-    opacity: 1,
-    pointerEvents: 'auto',
-  },
   '&::before': {
     content: '""',
     position: 'absolute',
@@ -41,9 +39,16 @@ export const NodeRoot = styled(Box, {
   },
 }))
 
-export const NodeIcon = styled(Box, {
+const PIPELINE_NODE_DRAG_HANDLE_CLASS = 'pipeline-node-drag-handle'
+export const PIPELINE_NODE_DRAG_HANDLE_SELECTOR = `.${PIPELINE_NODE_DRAG_HANDLE_CLASS}`
+
+const NodeIconRoot = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'bgColor',
 })<{ bgColor: string }>(({ theme, bgColor }) => ({
+  cursor: 'grab',
+  '&:active': {
+    cursor: 'grabbing',
+  },
   backgroundColor: bgColor,
   color: theme.tokens.colors.primaryContrast,
   padding: theme.spacing(1.5),
@@ -52,6 +57,10 @@ export const NodeIcon = styled(Box, {
   alignItems: 'center',
   marginRight: theme.spacing(1),
 }))
+
+export const NodeIcon = (props: ComponentProps<typeof NodeIconRoot>) => (
+  <NodeIconRoot className={PIPELINE_NODE_DRAG_HANDLE_CLASS} {...props} />
+)
 
 export const NodeBody = styled(Box)(({ theme }) => ({
   padding: theme.spacing(1.5),

@@ -14,7 +14,6 @@ import {
   ToolbarRow,
   handleStyle,
 } from '@/components/PipelineNodeCard/styles'
-import PipelineNodeDragHandle from '@/components/PipelineNodeDragHandle/component'
 import PipelineTraceNodeButton from '@/components/PipelineTraceNodeButton/component'
 import PipelineTraceNodeIndicator from '@/components/PipelineTraceNodeIndicator/component'
 
@@ -37,7 +36,6 @@ const PipelineNodeForwarder = ({
 
       <Handle type="target" position={Position.Left} style={handleStyle} />
       <NodeRoot borderColor={theme.tokens.colors.nodeForwarderBorder}>
-        <PipelineNodeDragHandle color={theme.tokens.colors.nodeForwarderBg} />
         <NodeIcon bgColor={theme.tokens.colors.nodeForwarderBg}>
           <ForwardToInboxIcon />
         </NodeIcon>
