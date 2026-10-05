@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useEffect, useState } from 'react'
+import { ChangeEventHandler, ReactNode, useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
@@ -100,6 +100,47 @@ const NODE_META: Record<string, NodeTypeMeta> = {
 }
 
 const SHARED_RESOURCE_TYPES = new Set(['transform', 'forwarder', 'router'])
+
+const NodeDataField = ({
+  nodeId,
+  field,
+  label,
+  initialValue,
+  monospace,
+}: {
+  nodeId: string
+  field: string
+  label: string
+  initialValue: string
+  monospace?: boolean
+}) => {
+  const { setNodes } = usePipelineEditorHooks()
+  const [value, setValue] = useState(initialValue)
+
+  const onChange: ChangeEventHandler<HTMLInputElement> = (evt) => {
+    const newValue = evt.target.value
+    setValue(newValue)
+    setNodes((nds) =>
+      nds.map((n) =>
+        n.id === nodeId ? { ...n, data: { ...n.data, [field]: newValue } } : n
+      )
+    )
+  }
+
+  return (
+    <TextField
+      label={label}
+      type="text"
+      value={value}
+      onChange={onChange}
+      fullWidth
+      variant="outlined"
+      slotProps={{
+        input: { sx: monospace ? { fontFamily: 'monospace' } : undefined },
+      }}
+    />
+  )
+}
 
 const PipelineNodeConfigDrawer = () => {
   const { t } = useTranslation()
@@ -294,28 +335,22 @@ const PipelineNodeConfigDrawer = () => {
             )}
 
             {nodeType === 'switch' && (
-              <TextField
+              <NodeDataField
+                nodeId={node.id}
+                field="condition"
                 label={t('components.pipelineNodeSwitch.label')}
-                type="text"
-                value={str(data.condition)}
-                fullWidth
-                variant="outlined"
-                slotProps={{
-                  input: { readOnly: true, sx: { fontFamily: 'monospace' } },
-                }}
+                initialValue={str(data.condition)}
+                monospace
               />
             )}
 
             {nodeType === 'metric' && (
-              <TextField
+              <NodeDataField
+                nodeId={node.id}
+                field="name"
                 label={t('components.pipelineNodeMetric.label')}
-                type="text"
-                value={str(data.name)}
-                fullWidth
-                variant="outlined"
-                slotProps={{
-                  input: { readOnly: true, sx: { fontFamily: 'monospace' } },
-                }}
+                initialValue={str(data.name)}
+                monospace
               />
             )}
 
