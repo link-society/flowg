@@ -142,6 +142,12 @@ docker run \
 helm install flowg ./k8s/charts/flowg-singlenode -n flowg-system --create-namespace
 ```
 
+- **Multi-node version**: *FoundationDB, Deployment with $n$ replicas*, for larger and clusters on multiple nodes
+
+```bash 
+helm install flowg ./k8s/charts/flowg-multinode -n flowg-system --create-namespace 
+``` 
+
 ## :memo: License
 
 This software is released under the terms of the [MIT License](./LICENSE.txt)
