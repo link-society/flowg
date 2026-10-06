@@ -24,16 +24,30 @@ runs:
 
     - name: lint@helm
       shell: bash
-      run: ct lint --chart-dirs ./k8s/charts --charts ./k8s/charts/flowg --validate-maintainers=false
+      run: ct lint --chart-dirs ./k8s/charts --charts ./k8s/charts/flowg-singlenode --validate-maintainers=false
 
-    - name: test@helm
+    - name: test-singlenode@helm
       shell: bash
       run: |
         set -ex
         kubectl get ns flowg-system || kubectl create ns flowg-system
         ct install \
           --chart-dirs ./k8s/charts \
-          --charts ./k8s/charts/flowg \
+          --charts ./k8s/charts/flowg-singlenode \
+          --namespace flowg-system \
+          --helm-extra-set-args "--set=flowg.image.repository=${DOCKER_IMAGE_REPOSITORY} --set=flowg.image.tag=${DOCKER_IMAGE_TAG} --set=flowg.image.pullPolicy=Never --wait"
+      env:
+        DOCKER_IMAGE_REPOSITORY: ghcr.io/link-society/flowg/ci-artifacts/docker
+        DOCKER_IMAGE_TAG: ${{ inputs.ref }}-linux-amd64
+
+    - name: test-observability@helm
+      shell: bash
+      run: |
+        set -ex
+        kubectl get ns flowg-system || kubectl create ns flowg-system
+        ct install \
+          --chart-dirs ./k8s/charts \
+          --charts ./k8s/charts/flowg-observability \
           --namespace flowg-system \
           --helm-extra-set-args "--set=flowg.image.repository=${DOCKER_IMAGE_REPOSITORY} --set=flowg.image.tag=${DOCKER_IMAGE_TAG} --set=flowg.image.pullPolicy=Never --wait"
       env:

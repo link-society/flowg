@@ -1,6 +1,6 @@
 import Layout from '@theme/Layout'
 
-import Homepage from '@site/src/components/Homepage/component'
+import Homepage from '@site/src/components/homepage/component'
 
 const Home = () => {
   return (

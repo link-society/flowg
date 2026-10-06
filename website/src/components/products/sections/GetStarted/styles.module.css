@@ -1,0 +1,98 @@
+.closing {
+  padding: 88px 0 70px;
+  text-align: center;
+}
+.panel {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 65px 32px;
+  border: 1px solid #d5e3f8;
+  border-radius: 18px;
+  background: radial-gradient(ellipse at 50% 0, #fff 0, #f0f5fe 85%);
+}
+.flowArt {
+  inset: auto 0 -90px;
+  opacity: 0.7;
+}
+.panel h2 {
+  max-width: 760px;
+  margin-inline: auto !important;
+  font-size: clamp(32px, 4vw, 49px) !important;
+}
+.lead {
+  max-width: 590px;
+  margin-inline: auto !important;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 32px;
+}
+.others {
+  margin-top: 56px;
+}
+.others > p {
+  margin-bottom: 18px !important;
+  color: var(--fg-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+.others > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  max-width: 860px;
+  margin-inline: auto;
+}
+.other {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 22px;
+  border: 1px solid #e2e7ef;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 12px 30px -22px #254e8a40;
+  color: var(--fg-muted);
+  font-size: 13px;
+  text-align: left;
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
+}
+.other:hover {
+  transform: translateY(-3px);
+  border-color: #b9cde9;
+  color: var(--fg-muted);
+}
+.other strong {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--fg-ink);
+  font-size: 16px;
+}
+.other > svg {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--fg-blue);
+}
+
+@media (max-width: 760px) {
+  .closing {
+    padding: 55px 0 40px;
+  }
+  .panel {
+    padding: 40px 18px;
+  }
+  .flowArt {
+    display: none;
+  }
+  .others > div {
+    grid-template-columns: 1fr;
+  }
+}

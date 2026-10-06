@@ -48,6 +48,7 @@ const paths = {
     </>
   ),
   check: <path d="m5 12 4 4L19 6" />,
+  close: <path d="M6 6l12 12M18 6 6 18" />,
   terminal: (
     <>
       <rect x="3" y="4" width="18" height="16" rx="3" />

@@ -136,8 +136,10 @@ docker run \
 
 **:warning: EXPERIMENTAL :warning:** Using Kubernetes (and Helm):
 
+- **Single-node version**: *BeaverDB, StatefulSet with 1 replicas*, ideal for homelabs and small clusters 
+
 ```bash
-helm install flowg ./k8s/charts/flowg -n flowg-system --create-namespace
+helm install flowg ./k8s/charts/flowg-singlenode -n flowg-system --create-namespace
 ```
 
 ## :memo: License

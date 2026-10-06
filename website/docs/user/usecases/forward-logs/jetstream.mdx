@@ -1,0 +1,80 @@
+---
+sidebar_position: 10
+---
+
+# NATS JetStream
+
+## Introduction
+
+Core NATS delivers messages only to subscribers connected at the moment of
+publication. [NATS JetStream](https://docs.nats.io/concepts/jetstream) adds a
+persistence layer on top, giving you at-least-once delivery.
+
+## Setting up JetStream
+
+First, connect to NATS server, for this example we'll use localhost connection:
+
+```bash
+nats context add localhost --description "Localhost"
+```
+
+Then, create a log stream for FlowG:
+
+```bash
+nats stream add FLOWG --subjects "flowg" --storage file --retention limits --defaults
+```
+
+## Setting up the FlowG pipeline
+
+import ForwarderForm from '@site/src/components/documentation/ForwarderForm'
+import PipelineDiagram from '@site/src/components/documentation/PipelineDiagram'
+
+First, let's create a "JetStream Forwarder" named `jetstream`, with the
+following configuration:
+
+<ForwarderForm
+    forwarderType="JetStream"
+    fields={[
+        { label: 'Servers', value: 'http://localhost:4222' },
+        { label: 'Subject', value: 'flowg' },
+        { label: 'Body', value: 'toJSON(log)' },
+        { label: 'Message ID', value: '' },
+        { label: 'Expected Stream', value: 'FLOWG' },
+        { label: 'Publish Timeout', value: '0' },
+        { type: 'divider' },
+        { label: 'Auth mode', value: "NONE" },
+        { type: 'divider' },
+        { type: 'checkbox', label: 'TLS Insecure Skip Verify', checked: true },
+    ]}
+/>
+
+Then, create a pipeline that forwards logs received via Syslog to the `jetstream`
+forwarder:
+
+<PipelineDiagram
+    alt="A FlowG pipeline routing syslog logs to the JetStream forwarder"
+    nodes={[
+        { id: 'source', type: 'source', x: 0, y: 0, value: 'SYSLOG' },
+        { id: 'fwd', type: 'forwarder', x: 340, y: 0, value: 'jetstream' },
+    ]}
+    edges={[
+        { from: 'source', to: 'fwd' },
+    ]}
+/>
+
+And that's it!
+
+## Testing
+
+You can test the setup by sending a log to the pipeline using the `logger`
+command:
+
+```bash
+logger -n localhost -P 5514 -t myapp1 'hello world'
+```
+
+You can then find your logs using `nats` CLI interface, with command:
+
+```bash
+nats stream get FLOWG 1
+```

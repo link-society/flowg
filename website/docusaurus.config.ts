@@ -79,6 +79,11 @@ const config: Config = {
       style: 'primary',
       items: [
         {
+          to: '/products',
+          label: 'Products',
+          position: 'left',
+        },
+        {
           type: 'docSidebar',
           sidebarId: 'docSidebar',
           position: 'left',

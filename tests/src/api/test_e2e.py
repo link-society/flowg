@@ -14,11 +14,10 @@ def test_hurl(
     mockserver_container,
     flowg_admin_token,
     flowg_guest_token,
-    floci_aws_container,
     cloudwatch_log_stream,
     floci_gcp_container,
-    floci_az_container,
     azuremonitor_setup_dcr,
+    nats_log_stream,
     otlp_pb,
 ):
     print("Running Hurl test suite:\n")
