@@ -24,7 +24,9 @@ runs:
 
     - name: lint@helm
       shell: bash
-      run: ct lint --chart-dirs ./k8s/charts --charts ./k8s/charts/flowg-singlenode --validate-maintainers=false
+      run: |
+        ct lint --chart-dirs ./k8s/charts --charts ./k8s/charts/flowg-singlenode --validate-maintainers=false
+        ct lint --charts-dir ./k8s/charts --charts ./k8s/charts/flowg-multinode --validate-maintainers=false
 
     - name: test-singlenode@helm
       shell: bash
@@ -40,6 +42,20 @@ runs:
         DOCKER_IMAGE_REPOSITORY: ghcr.io/link-society/flowg/ci-artifacts/docker
         DOCKER_IMAGE_TAG: ${{ inputs.ref }}-linux-amd64
 
+    - name: test-multinode@helm
+      shell: bash
+      run: |
+        set -ex
+        kubectl get ns flowg-system || kubectl create ns flowg-system
+        ct install \
+          --charts-dir ./k8s/charts \
+          --charts ./k8s/charts/flowg-multinode \
+          --namespace flowg-system \
+          --helm-extra-set-args "--set=flowg.image.repository=${DOCKER_IMAGE_REPOSITORY} --set=flowg.image.tag=${DOCKER_IMAGE_TAG} --set=flowg.image.pullPolicy=Never --wait"
+      env:
+        DOCKER_IMAGE_REPOSITORY: ghcr.io/link-society/flowg/ci-artifacts/docker
+        DOCKER_IMAGE_TAG: ${{ inputs.ref }}-linux-amd64
+        
     - name: test-observability@helm
       shell: bash
       run: |
