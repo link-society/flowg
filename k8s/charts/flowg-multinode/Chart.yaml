@@ -5,7 +5,7 @@ version: "v0.63.2"
 type: application
 appVersion: "v0.63.2"
 kubeVersion: ">=1.30.0-0"
-description: "Flk8s/charts/flowg-singlenode/Chart.yamlm/link-society/flowg"
+description: "Flowg is a low-code log processing platform."
 sources:
   - "https://github.com/link-society/flowg"
 maintainers:
