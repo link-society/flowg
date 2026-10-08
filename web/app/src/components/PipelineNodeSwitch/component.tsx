@@ -45,6 +45,7 @@ const PipelineNodeSwitch = ({
             type="text"
             value={data.condition}
             slotProps={{
+              inputLabel: { shrink: true },
               input: {
                 readOnly: true,
                 sx: { fontFamily: 'monospace' },

@@ -69,4 +69,4 @@ export const NodeBody = styled(Box)(({ theme }) => ({
   alignItems: 'center',
 }))
 
-export const handleStyle = { width: 12, height: 12 }
+export const handleStyle = { width: 12, height: 12, zIndex: 1 }

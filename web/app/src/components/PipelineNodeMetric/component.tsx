@@ -45,6 +45,7 @@ const PipelineNodeMetric = ({
             type="text"
             value={data.name}
             slotProps={{
+              inputLabel: { shrink: true },
               input: {
                 readOnly: true,
                 sx: { fontFamily: 'monospace' },
