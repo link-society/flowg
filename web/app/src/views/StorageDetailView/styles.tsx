@@ -18,6 +18,8 @@ export const StorageDetailViewHeader = styled(AppContainer)(({ theme }) => ({
   boxShadow: theme.shadows[4],
   zIndex: 10,
   flex: 0,
+  paddingTop: '12px !important',
+  paddingBottom: '12px !important',
 }))
 
 export const StorageDetailViewHeaderLeft = styled('div')(({ theme }) => ({
