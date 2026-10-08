@@ -118,5 +118,5 @@ spec:
   sidecarContainer:
     enableLivenessProbe: {{ .Values.foundationdb.sidecarContainer.livenessProbe }}
     enableReadinessProbe: {{ .Values.foundationdb.sidecarContainer.readinessProbe }}
-  useExplicitListenAddress: true
-  version: {{ .Values.foundationdb.version }}
+  useExplicitListenAddress: true 
+  version: 7.3.69
