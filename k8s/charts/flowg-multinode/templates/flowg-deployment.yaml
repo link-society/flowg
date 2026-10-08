@@ -134,7 +134,7 @@ spec:
       
       initContainers:
         - name: wait-for-fdb
-          image: debian:stable
+          image: bitnami/kubectl:latest
           securityContext:
             runAsUser: 0      # Force l'utilisateur root
             runAsGroup: 0     # Force le groupe root
@@ -143,36 +143,25 @@ spec:
             - /bin/bash
             - -c 
             - |
-              set -e
-
-              echo "1. Installing dependencies"
-              apt-get update
-              apt-get install -y wget 
-
-              echo 
-              echo 2. "Downloading & installing fdbclient"
-              wget https://github.com/apple/foundationdb/releases/download/7.4.8/foundationdb-clients_7.4.8-1_amd64.deb
-              apt-get install -y ./foundationdb-clients_7.4.8-1_amd64.deb
-
-              echo
-              echo "Prerequisites satisfied!"
-
+              
+              echo "Waiting for FDB cluster to be available"
               while [ -z "$UP" ]; do
-                echo "Testing connection to FoundationDB.."
-                fdbcli && UP="yes"
-                
-                if [ -n "$UP" ]; then
-                  echo "FoundationDB is up! Done initializing."
-                else
-                  sleep 2
-                fi
+                echo "Refreshing state"
+                [[ "$(kubectl --token="$(cat /service-account/serviceaccount-token)" \
+                    --server="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}" \
+                    --certificate-authority=/service-account/ca.crt \
+                    get fdb {{ include "flowg.fullname" . }}-fdb -n {{ .Release.Namespace }} -o yaml | yq .status.health.available)" == "true" ]] && UP="true"
+                      
+                sleep 2
               done
-          env:
-            - name: FDB_CLUSTER_FILE
-              value: "/var/run/foundationdb/fdb.cluster"
+              echo "FDB cluster is up. Going on."
+
           volumeMounts:
-            - name: fdb-cluster-volume
-              mountPath: /var/run/foundationdb/
+            - name: init-perms
+              mountPath: "/service-account"
+              readOnly: true
+
+          
         
 
       {{- with .Values.flowg.nodeSelectorTolerations }}
@@ -180,6 +169,18 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
+        # ServiceAccount permissions (for init container)
+        - name: init-perms
+          projected:
+            sources:
+              - serviceAccountToken:
+                  path: serviceaccount-token
+              - configMap:
+                  name: kube-root-ca.crt
+                  items:
+                    - key: ca.crt
+                      path: ca.crt
+                
         {{- if and .Values.flowg.https.enabled .Values.flowg.https.certificateFrom.certmanager }}
         - name: flowg-tls
           secret:
