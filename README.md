@@ -145,8 +145,9 @@ helm install flowg ./k8s/charts/flowg-singlenode -n flowg-system --create-namesp
 - **Multi-node version**: *FoundationDB, Deployment with $n$ replicas*, for larger and clusters on multiple nodes
 
 ```bash 
-helm install flowg ./k8s/charts/flowg-multinode -n flowg-system --create-namespace 
+helm install flowg ./k8s/charts/flowg-multinode -n flowg-system --create-namespace --set flowg.replicas=2
 ``` 
+
 
 ## :memo: License
 
