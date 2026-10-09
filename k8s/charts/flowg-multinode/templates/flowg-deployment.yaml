@@ -1,0 +1,224 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: {{ include "flowg.fullname" . }}
+
+spec: 
+  replicas: {{ .Values.flowg.replicas }}
+  selector: 
+    matchLabels: 
+      {{- include "flowg.labels" . | nindent 6 }}
+
+  template: 
+    metadata: 
+      labels: 
+        {{- include "flowg.labels" . | nindent 8 }}
+      {{- with .Values.flowg.podAnnotations }}
+      annotations: 
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+    spec:
+
+      {{- with .Values.flowg.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.flowg.image.pullSecrets }}
+      imagePullSecrets: 
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      serviceAccountName: {{ include "flowg.serviceAccountName" . }}
+      automountServiceAccountToken: false
+
+      containers: 
+        - name: flowg 
+          image: "{{ .Values.flowg.image.repository }}:{{ .Values.flowg.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: "{{ .Values.flowg.image.pullPolicy }}"
+          {{- with .Values.flowg.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          env:
+            # Use FoundationDB as the storage backend
+            - name: FLOWG_STORAGE_BACKEND
+              value: "foundationdb"
+            - name: FLOWG_FOUNDATIONDB_CLUSTER_FILE
+              value: "/var/run/foundationdb/fdb.cluster"
+
+            # Shared key (for instances mutualization)
+            - name: FLOWG_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  # secret name and key are the same to simplify things 
+                  name: {{ .Values.flowg.secretKey.secretRef }}
+                  key: {{ .Values.flowg.secretKey.secretRef }}
+
+            # Seed configuration 
+            ## 'initial' and 'reset' configuration are separated, but they form a pair
+            ## there can't be only the username configuration (and not the password) and so on
+            {{- with .Values.flowg.configuration.seed }}
+            {{- if and (not (empty .initialUsernameKey)) (not (empty .initialPasswordKey)) }}
+            - name: FLOWG_AUTH_INITIAL_USER
+              valueFrom: 
+                secretKeyRef: 
+                  name: {{ .secretName }}
+                  key: {{ .initialUsernameKey }}
+            - name: FLOWG_AUTH_INITIAL_PASSWORD
+              valueFrom:
+                secretKeyRef: 
+                  name: {{ .secretName }}
+                  key: {{ .initialPasswordKey }}
+            {{- end }}
+            {{- if and (not (empty .resetUsernameKey)) (not (empty .resetPasswordKey)) }}
+            - name: FLOWG_AUTH_RESET_USER
+              valueFrom: 
+                secretKeyRef: 
+                  name: {{ .secretName }}
+                  key: {{ .resetUsernameKey }}
+            - name: FLOWG_AUTH_RESET_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .secretName }}
+                  key: {{ .resetPasswordKey }}
+            {{- end }}
+            {{- end }}
+          
+          envFrom:
+            - configMapRef:
+                name: {{ include "flowg.fullname" . }}-configmap
+
+          ports:
+            - containerPort: 5080
+              protocol: TCP
+            - containerPort: 9113
+              protocol: TCP
+            - containerPort: 5514
+              protocol: {{ .Values.flowg.syslog.protocol }}
+
+          # Liveness and readiness Probes
+          ## Since kubernetes is quite aggressive with its request timings, 
+          ## user is able to configure the delays
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 9113
+            {{- with .Values.flowg.probe.livenessProbe }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+
+          readinessProbe:
+            httpGet: 
+              path: /health
+              port: 9113
+            {{- with .Values.flowg.probe.readinessProbe }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+
+
+          resources:
+            {{- toYaml .Values.flowg.resources | nindent 12 }}
+          volumeMounts:
+            - name: fdb-cluster-volume
+              mountPath: /var/run/foundationdb/
+            {{- if and .Values.flowg.https.enabled (or .Values.flowg.https.certificateFrom.certmanager .Values.flowg.https.certificateFrom.secretRef) }}
+            - name: flowg-tls
+              mountPath: /data/ssl
+            {{- end }}
+            {{- if and .Values.flowg.https.mgmt.enabled (or .Values.flowg.https.mgmt.certificateFrom.certmanager .Values.flowg.https.mgmt.certificateFrom.secretRef) }}
+            - name: flowg-tls-mgmt
+              mountPath: /data/ssl/mgmt
+            {{- end }}
+      
+      initContainers:
+        - name: wait-for-fdb
+          image: bitnami/kubectl:latest
+          securityContext:
+            runAsUser: 0      # Force l'utilisateur root
+            runAsGroup: 0     # Force le groupe root
+            runAsNonRoot: false
+          command: 
+            - /bin/bash
+            - -c 
+            - |
+              echo "Waiting for FDB cluster to be available"
+              kubectl --token="$(cat /service-account/serviceaccount-token)" \
+                    --server="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}" \
+                    --certificate-authority=/service-account/ca.crt \
+                    --namespace {{ .Release.Namespace }} \
+                    wait --for=jsonpath='{.status.health.available}'=true fdb/{{ include "flowg.fullname" . }}-fdb --timeout 300s
+              echo "FDB cluster is up. Going on."
+
+          volumeMounts:
+            - name: init-perms
+              mountPath: "/service-account"
+              readOnly: true
+
+          
+        
+
+      {{- with .Values.flowg.nodeSelectorTolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        # ServiceAccount permissions (for init container)
+        - name: init-perms
+          projected:
+            sources:
+              - serviceAccountToken:
+                  path: serviceaccount-token
+              - configMap:
+                  name: kube-root-ca.crt
+                  items:
+                    - key: ca.crt
+                      path: ca.crt
+                
+        {{- if and .Values.flowg.https.enabled .Values.flowg.https.certificateFrom.certmanager }}
+        - name: flowg-tls
+          secret:
+            secretName: {{ include "flowg.fullname" . }}-tls
+            items: 
+              - key: tls.crt
+                path: tls.crt
+              - key: tls.key
+                path: tls.key
+        {{- else if and .Values.flowg.https.enabled .Values.flowg.https.certificateFrom.secretRef.name }}
+        - name: flowg-tls
+          secret:
+            secretName: {{ .Values.flowg.https.certificateFrom.secretRef.name }}
+            items: 
+              - key: tls.crt
+                path: tls.crt
+              - key: tls.key
+                path: tls.key
+        {{- end }}
+        {{- if and .Values.flowg.https.mgmt.enabled .Values.flowg.https.mgmt.certificateFrom.certmanager }}
+        - name: flowg-tls-mgmt
+            secret:
+            secretName: {{ include "flowg.fullname" . }}-tls
+            items:
+              - key: tls.crt
+                path: tls.crt
+              - key: tls.key
+                path: tls.key
+        {{- else if and .Values.flowg.https.mgmt.enabled .Values.flowg.https.mgmt.certificateFrom.secretRef }}
+        - name: flowg-tls-mgmt
+            secret:
+            secretName: {{ .Values.flowg.https.mgmt.certificateFrom.secretRef.name }}
+            items:
+              - key: tls.crt
+                path: tls.crt
+              - key: tls.key
+                path: tls.key
+        {{- end }}
+
+        - name: fdb-cluster-volume
+          configMap:
+            name: {{ include "flowg.fullname" . }}-fdb-config
+            items: 
+              - key: cluster-file
+                path: fdb.cluster
+    

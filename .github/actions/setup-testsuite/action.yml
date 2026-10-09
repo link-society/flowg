@@ -11,12 +11,12 @@ runs:
     - name: setup@pdm
       uses: pdm-project/setup-pdm@94a823180e06fcde4ad29308721954a521c96ed0
       with:
-        python-version: '3.13'
+        python-version: "3.13"
 
     - name: setup@sys-deps
       uses: gacts/install-hurl@ab6d0234456944b022ef7d1f594845af9561357d # v1.3.4
       with:
-        version: '7.1.0'
+        version: "7.1.0"
         github-token: ${{ github.token }}
 
     - name: setup@env
