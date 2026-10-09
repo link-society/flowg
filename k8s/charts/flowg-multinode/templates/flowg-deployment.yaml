@@ -143,17 +143,12 @@ spec:
             - /bin/bash
             - -c 
             - |
-              
               echo "Waiting for FDB cluster to be available"
-              while [ -z "$UP" ]; do
-                echo "Refreshing state"
-                [[ "$(kubectl --token="$(cat /service-account/serviceaccount-token)" \
+              kubectl --token="$(cat /service-account/serviceaccount-token)" \
                     --server="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}" \
                     --certificate-authority=/service-account/ca.crt \
-                    get fdb {{ include "flowg.fullname" . }}-fdb -n {{ .Release.Namespace }} -o yaml | yq .status.health.available)" == "true" ]] && UP="true"
-                      
-                sleep 2
-              done
+                    --namespace {{ .Release.Namespace }} \
+                    wait --for=jsonpath='{.status.health.available}'=true fdb/{{ include "flowg.fullname" . }}-fdb --timeout 300s
               echo "FDB cluster is up. Going on."
 
           volumeMounts:
