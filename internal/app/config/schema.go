@@ -139,35 +139,35 @@ type StorageSeedAuthConfig struct {
 }
 
 // Returns a default configuration for the server, which is inherited from
-// environment variables.
+// environment variables. The environment is read on each call.
 func DefaultConfig() *RootConfig {
-	var defaultHttpTlsConfig *HttpTlsConfig
-	if defaultHttpTlsEnabled {
-		defaultHttpTlsConfig = &HttpTlsConfig{
-			Cert: defaultHttpTlsCert,
-			Key:  defaultHttpTlsCertKey,
+	var httpTlsConfig *HttpTlsConfig
+	if getEnvBool("FLOWG_HTTP_TLS_ENABLED", false) {
+		httpTlsConfig = &HttpTlsConfig{
+			Cert: getEnvString("FLOWG_HTTP_TLS_CERT", ""),
+			Key:  getEnvString("FLOWG_HTTP_TLS_KEY", ""),
 		}
 	}
 
-	var defaultMgmtTlsConfig *HttpTlsConfig
-	if defaultMgmtTlsEnabled {
-		defaultMgmtTlsConfig = &HttpTlsConfig{
-			Cert: defaultMgmtTlsCert,
-			Key:  defaultMgmtTlsCertKey,
+	var mgmtTlsConfig *HttpTlsConfig
+	if getEnvBool("FLOWG_MGMT_TLS_ENABLED", false) {
+		mgmtTlsConfig = &HttpTlsConfig{
+			Cert: getEnvString("FLOWG_MGMT_TLS_CERT", ""),
+			Key:  getEnvString("FLOWG_MGMT_TLS_KEY", ""),
 		}
 	}
 
-	var defaultSyslogTlsConfig *SyslogTlsConfig
-	if defaultSyslogTlsEnabled {
-		defaultSyslogTlsConfig = &SyslogTlsConfig{
-			Cert:        defaultSyslogTlsCert,
-			Key:         defaultSyslogTlsCertKey,
-			AuthEnabled: defaultSyslogTlsAuthEnabled,
+	var syslogTlsConfig *SyslogTlsConfig
+	if getEnvBool("FLOWG_SYSLOG_TLS_ENABLED", false) {
+		syslogTlsConfig = &SyslogTlsConfig{
+			Cert:        getEnvString("FLOWG_SYSLOG_TLS_CERT", ""),
+			Key:         getEnvString("FLOWG_SYSLOG_TLS_KEY", ""),
+			AuthEnabled: getEnvBool("FLOWG_SYSLOG_TLS_AUTH", false),
 		}
 	}
 
 	storageBackendConfig := &StorageBackendConfig{
-		Backend: defaultStorageBackend,
+		Backend: getEnvString("FLOWG_STORAGE_BACKEND", StorageBackendBadgerDb),
 	}
 
 	switch storageBackendConfig.Backend {
@@ -175,44 +175,40 @@ func DefaultConfig() *RootConfig {
 		storageBackendConfig.BadgerDB = DefaultStorageBackendBadgerDbConfig()
 
 	case StorageBackendFoundationDb:
-		storageBackendConfig.FoundationDB = &StorageBackendFoundationDbConfig{
-			ClusterFile:      defaultFoundationDbClusterFile,
-			ConnectionString: defaultFoundationConnectionString,
-			KeySpace:         defaultFoundationDbKeySpace,
-		}
+		storageBackendConfig.FoundationDB = DefaultStorageBackendFoundationDbConfig()
 	}
 
 	return &RootConfig{
-		DemoMode: defaultDemoMode,
+		DemoMode: getEnvBool("FLOWG_DEMO_MODE", false),
 		Logging: &LoggingConfig{
-			Level:   defaultLogLevel,
-			Verbose: defaultVerbose,
+			Level:   getEnvString("FLOWG_LOGLEVEL", "info"),
+			Verbose: getEnvBool("FLOWG_VERBOSE", false),
 		},
 		Services: &ServicesConfig{
 			Http: &HttpConfig{
-				BindAddress: defaultHttpBindAddress,
-				MountPath:   defaultHttpMountPath,
-				Tls:         defaultHttpTlsConfig,
+				BindAddress: getEnvString("FLOWG_HTTP_BIND_ADDRESS", ":5080"),
+				MountPath:   getEnvString("FLOWG_HTTP_MOUNT_PATH", "/"),
+				Tls:         httpTlsConfig,
 			},
 			Management: &ManagementConfig{
-				BindAddress: defaultMgmtBindAddress,
-				Tls:         defaultMgmtTlsConfig,
+				BindAddress: getEnvString("FLOWG_MGMT_BIND_ADDRESS", ":9113"),
+				Tls:         mgmtTlsConfig,
 			},
 			Syslog: &SyslogConfig{
-				Bind:                  defaultSyslogBindAddr,
-				Protocol:              defaultSyslogProtocol,
-				Tls:                   defaultSyslogTlsConfig,
-				InitialAllowedOrigins: defaultSyslogInitialAllowedOrigins,
+				Bind:                  getEnvString("FLOWG_SYSLOG_BIND_ADDRESS", ":5514"),
+				Protocol:              getEnvString("FLOWG_SYSLOG_PROTOCOL", "udp"),
+				Tls:                   syslogTlsConfig,
+				InitialAllowedOrigins: getEnvListString("FLOWG_SYSLOG_INITIAL_ALLOWED_ORIGINS", []string{}),
 			},
 		},
 		Storage: &StorageConfig{
 			Backend: storageBackendConfig,
 			Seed: &StorageSeedConfig{
 				Auth: &StorageSeedAuthConfig{
-					InitialUser:     defaultAuthInitialUser,
-					InitialPassword: defaultAuthInitialPassword,
-					ResetUser:       defaultAuthResetUser,
-					ResetPassword:   defaultAuthResetPassword,
+					InitialUser:     getEnvString("FLOWG_AUTH_INITIAL_USER", "root"),
+					InitialPassword: getEnvString("FLOWG_AUTH_INITIAL_PASSWORD", "root"),
+					ResetUser:       getEnvString("FLOWG_AUTH_RESET_USER", ""),
+					ResetPassword:   getEnvString("FLOWG_AUTH_RESET_PASSWORD", ""),
 				},
 			},
 		},
@@ -220,22 +216,23 @@ func DefaultConfig() *RootConfig {
 }
 
 // Returns a default configuration for the BadgerDB storage backend, which is
-// inherited from environment variables.
+// inherited from environment variables. The environment is read on each call.
 func DefaultStorageBackendBadgerDbConfig() *StorageBackendBadgerDbConfig {
 	return &StorageBackendBadgerDbConfig{
-		AuthDir:   defaultBadgerAuthDir,
-		LogDir:    defaultBadgerLogDir,
-		ConfigDir: defaultBadgerConfigDir,
+		AuthDir:   getEnvString("FLOWG_BADGER_AUTH_DIR", "./data/auth"),
+		LogDir:    getEnvString("FLOWG_BADGER_LOG_DIR", "./data/logs"),
+		ConfigDir: getEnvString("FLOWG_BADGER_CONFIG_DIR", "./data/config"),
 	}
 }
 
 // Returns a default configuration for the FoundationDB storage backend, which
-// is inherited from environment variables.
+// is inherited from environment variables. The environment is read on each
+// call.
 func DefaultStorageBackendFoundationDbConfig() *StorageBackendFoundationDbConfig {
 	return &StorageBackendFoundationDbConfig{
-		ClusterFile:      defaultFoundationDbClusterFile,
-		ConnectionString: defaultFoundationConnectionString,
-		KeySpace:         defaultFoundationDbKeySpace,
+		ClusterFile:      getEnvString("FLOWG_FOUNDATIONDB_CLUSTER_FILE", "/etc/foundationdb/fdb.cluster"),
+		ConnectionString: getEnvString("FLOWG_FOUNDATIONDB_CONNECTION_STRING", ""),
+		KeySpace:         getEnvString("FLOWG_FOUNDATIONDB_KEY_SPACE", "flowg"),
 	}
 }
 
