@@ -19,6 +19,7 @@ options of each component is the job of the caller.
   (`string`, `bool`, comma-separated `[]string`; blocks tagged `default:"{}"`
   are allocated and filled recursively, untagged blocks stay nil).
 - **`env.go`** — the environment overlay applied by `Load` after the
-  configuration file (environment variables take precedence), and the `getEnv*`
-  helpers reading a typed value from an environment variable, with a fallback
-  when it is unset or empty.
+  configuration file (environment variables take precedence). Variables are
+  declared by the `env` struct tags; an `env` tag on a block is a boolean
+  enabling or disabling it. The storage backend (`FLOWG_STORAGE_BACKEND`) is
+  selected explicitly before the overlay.
