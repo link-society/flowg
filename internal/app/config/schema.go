@@ -138,101 +138,59 @@ type StorageSeedAuthConfig struct {
 	ResetPassword string `hcl:"reset_password,optional"`
 }
 
-// Returns a default configuration for the server, which is inherited from
-// environment variables. The environment is read on each call.
+// Returns the built-in default configuration for the server. It does not read
+// the environment: environment variables are applied by [RootConfig.Load].
 func DefaultConfig() *RootConfig {
-	var httpTlsConfig *HttpTlsConfig
-	if getEnvBool("FLOWG_HTTP_TLS_ENABLED", false) {
-		httpTlsConfig = &HttpTlsConfig{
-			Cert: getEnvString("FLOWG_HTTP_TLS_CERT", ""),
-			Key:  getEnvString("FLOWG_HTTP_TLS_KEY", ""),
-		}
-	}
-
-	var mgmtTlsConfig *HttpTlsConfig
-	if getEnvBool("FLOWG_MGMT_TLS_ENABLED", false) {
-		mgmtTlsConfig = &HttpTlsConfig{
-			Cert: getEnvString("FLOWG_MGMT_TLS_CERT", ""),
-			Key:  getEnvString("FLOWG_MGMT_TLS_KEY", ""),
-		}
-	}
-
-	var syslogTlsConfig *SyslogTlsConfig
-	if getEnvBool("FLOWG_SYSLOG_TLS_ENABLED", false) {
-		syslogTlsConfig = &SyslogTlsConfig{
-			Cert:        getEnvString("FLOWG_SYSLOG_TLS_CERT", ""),
-			Key:         getEnvString("FLOWG_SYSLOG_TLS_KEY", ""),
-			AuthEnabled: getEnvBool("FLOWG_SYSLOG_TLS_AUTH", false),
-		}
-	}
-
-	storageBackendConfig := &StorageBackendConfig{
-		Backend: getEnvString("FLOWG_STORAGE_BACKEND", StorageBackendBadgerDb),
-	}
-
-	switch storageBackendConfig.Backend {
-	case StorageBackendBadgerDb:
-		storageBackendConfig.BadgerDB = DefaultStorageBackendBadgerDbConfig()
-
-	case StorageBackendFoundationDb:
-		storageBackendConfig.FoundationDB = DefaultStorageBackendFoundationDbConfig()
-	}
-
 	return &RootConfig{
-		DemoMode: getEnvBool("FLOWG_DEMO_MODE", false),
+		DemoMode: false,
 		Logging: &LoggingConfig{
-			Level:   getEnvString("FLOWG_LOGLEVEL", "info"),
-			Verbose: getEnvBool("FLOWG_VERBOSE", false),
+			Level:   "info",
+			Verbose: false,
 		},
 		Services: &ServicesConfig{
 			Http: &HttpConfig{
-				BindAddress: getEnvString("FLOWG_HTTP_BIND_ADDRESS", ":5080"),
-				MountPath:   getEnvString("FLOWG_HTTP_MOUNT_PATH", "/"),
-				Tls:         httpTlsConfig,
+				BindAddress: ":5080",
+				MountPath:   "/",
 			},
 			Management: &ManagementConfig{
-				BindAddress: getEnvString("FLOWG_MGMT_BIND_ADDRESS", ":9113"),
-				Tls:         mgmtTlsConfig,
+				BindAddress: ":9113",
 			},
 			Syslog: &SyslogConfig{
-				Bind:                  getEnvString("FLOWG_SYSLOG_BIND_ADDRESS", ":5514"),
-				Protocol:              getEnvString("FLOWG_SYSLOG_PROTOCOL", "udp"),
-				Tls:                   syslogTlsConfig,
-				InitialAllowedOrigins: getEnvListString("FLOWG_SYSLOG_INITIAL_ALLOWED_ORIGINS", []string{}),
+				Bind:                  ":5514",
+				Protocol:              "udp",
+				InitialAllowedOrigins: []string{},
 			},
 		},
 		Storage: &StorageConfig{
-			Backend: storageBackendConfig,
+			Backend: &StorageBackendConfig{
+				Backend:  StorageBackendBadgerDb,
+				BadgerDB: DefaultStorageBackendBadgerDbConfig(),
+			},
 			Seed: &StorageSeedConfig{
 				Auth: &StorageSeedAuthConfig{
-					InitialUser:     getEnvString("FLOWG_AUTH_INITIAL_USER", "root"),
-					InitialPassword: getEnvString("FLOWG_AUTH_INITIAL_PASSWORD", "root"),
-					ResetUser:       getEnvString("FLOWG_AUTH_RESET_USER", ""),
-					ResetPassword:   getEnvString("FLOWG_AUTH_RESET_PASSWORD", ""),
+					InitialUser:     "root",
+					InitialPassword: "root",
 				},
 			},
 		},
 	}
 }
 
-// Returns a default configuration for the BadgerDB storage backend, which is
-// inherited from environment variables. The environment is read on each call.
+// Returns the built-in default configuration for the BadgerDB storage backend.
 func DefaultStorageBackendBadgerDbConfig() *StorageBackendBadgerDbConfig {
 	return &StorageBackendBadgerDbConfig{
-		AuthDir:   getEnvString("FLOWG_BADGER_AUTH_DIR", "./data/auth"),
-		LogDir:    getEnvString("FLOWG_BADGER_LOG_DIR", "./data/logs"),
-		ConfigDir: getEnvString("FLOWG_BADGER_CONFIG_DIR", "./data/config"),
+		AuthDir:   "./data/auth",
+		LogDir:    "./data/logs",
+		ConfigDir: "./data/config",
 	}
 }
 
-// Returns a default configuration for the FoundationDB storage backend, which
-// is inherited from environment variables. The environment is read on each
-// call.
+// Returns the built-in default configuration for the FoundationDB storage
+// backend.
 func DefaultStorageBackendFoundationDbConfig() *StorageBackendFoundationDbConfig {
 	return &StorageBackendFoundationDbConfig{
-		ClusterFile:      getEnvString("FLOWG_FOUNDATIONDB_CLUSTER_FILE", "/etc/foundationdb/fdb.cluster"),
-		ConnectionString: getEnvString("FLOWG_FOUNDATIONDB_CONNECTION_STRING", ""),
-		KeySpace:         getEnvString("FLOWG_FOUNDATIONDB_KEY_SPACE", "flowg"),
+		ClusterFile: "/etc/foundationdb/fdb.cluster",
+		KeySpace:    "flowg",
 	}
 }
 
@@ -325,10 +283,27 @@ func (c *StorageBackendConfig) Validate() error {
 	return nil
 }
 
-// Load reads the configuration file at the given path, parses it, and
-// decodes it into a RootConfig struct. It returns an error if parsing or
-// decoding fails, or if the configuration is invalid.
+// Load completes the configuration with, by order of precedence, the
+// environment variables that are set and the configuration file at the given
+// path (skipped when the path is empty), the current values acting as
+// defaults. It returns an error if parsing or decoding the file fails, or if
+// the resulting configuration is invalid.
 func (cfg *RootConfig) Load(path string) error {
+	if path != "" {
+		if err := cfg.loadFile(path); err != nil {
+			return err
+		}
+	}
+
+	cfg.applyEnv()
+
+	return cfg.Validate()
+}
+
+// loadFile reads the configuration file at the given path, parses it, and
+// decodes it over the current values. It returns an error if parsing or
+// decoding fails.
+func (cfg *RootConfig) loadFile(path string) error {
 	parser := hclparse.NewParser()
 
 	file, diags := parser.ParseHCLFile(path)
@@ -350,10 +325,6 @@ func (cfg *RootConfig) Load(path string) error {
 		if diags.HasErrors() {
 			return diags
 		}
-	}
-
-	if err := cfg.Validate(); err != nil {
-		return err
 	}
 
 	return nil

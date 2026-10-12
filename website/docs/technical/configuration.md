@@ -127,9 +127,16 @@ storage {
 
 ## Priority
 
-Settings specified in the configuration file have the highest priority. If
-missing, their value is read from environment variables. If unset, a default
-value is provided.
+Settings specified in environment variables have the highest priority. If
+unset (or empty), their value is read from the configuration file. If missing,
+a default value is provided.
+
+Setting `FLOWG_STORAGE_BACKEND` to a backend other than the one configured in
+the file discards the settings of the file's backend: the selected backend
+starts from its default values, overridden by its own environment variables.
+
+Setting a `FLOWG_*_TLS_ENABLED` variable to `false` disables TLS for the
+service, even if the configuration file has a `tls` block.
 
 ## Security
 

@@ -106,18 +106,18 @@ storage {
 	)
 }
 
-func TestDefaultConfig_ReadsEnvAtCallTime(t *testing.T) {
+func TestDefaultConfig_IgnoresEnv(t *testing.T) {
 	clearEnv(t)
 	t.Setenv("FLOWG_HTTP_BIND_ADDRESS", ":1234")
 	t.Setenv("FLOWG_BADGER_LOG_DIR", "/tmp/flowg/logs")
 
 	cfg := config.DefaultConfig()
 
-	require.Equal(t, ":1234", cfg.Services.Http.BindAddress)
-	require.Equal(t, "/tmp/flowg/logs", cfg.Storage.Backend.BadgerDB.LogDir)
+	require.Equal(t, ":5080", cfg.Services.Http.BindAddress)
+	require.Equal(t, "./data/logs", cfg.Storage.Backend.BadgerDB.LogDir)
 }
 
-func TestValidate_EnvOnlyConfig(t *testing.T) {
+func TestLoad_EnvOnlyConfigValidation(t *testing.T) {
 	testCases := []struct {
 		name string
 		key  string
@@ -144,7 +144,7 @@ func TestValidate_EnvOnlyConfig(t *testing.T) {
 			t.Setenv(tc.key, tc.val)
 
 			cfg := config.DefaultConfig()
-			require.EqualError(t, cfg.Validate(), tc.want)
+			require.EqualError(t, cfg.Load(""), tc.want)
 		})
 	}
 }
