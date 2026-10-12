@@ -58,6 +58,14 @@ def floci_aws_container(
         detach=True,
     )
 
+    try:
+        print(f"Waiting for readiness: {name}")
+        docker_utils.wait_for_http(container, "http://localhost:4566/")
+
+    except RuntimeError as err:
+        docker_utils.teardown_container(container, report_dir)
+        pytest.fail(f"{err}", pytrace=False)
+
     yield
 
     docker_utils.teardown_container(container, report_dir)
@@ -111,6 +119,18 @@ def floci_az_container(
         },
         detach=True,
     )
+
+    try:
+        print(f"Waiting for readiness: {name}")
+        docker_utils.wait_for_http(
+            container,
+            "https://localhost:4577/",
+            verify=False,
+        )
+
+    except RuntimeError as err:
+        docker_utils.teardown_container(container, report_dir)
+        pytest.fail(f"{err}", pytrace=False)
 
     yield
 
