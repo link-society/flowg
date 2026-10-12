@@ -37,7 +37,7 @@ var staticfiles embed.FS
 // All assets are stored and served gzip-compressed, so clients must advertise
 // gzip support through the Accept-Encoding header; requests that do not are
 // rejected with http.StatusNotAcceptable.
-func NewHandler(mountPath string) http.Handler {
+func NewHandler(mountPath string, flags featureflags.Flags) http.Handler {
 	return http.StripPrefix(
 		"/web/",
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -86,7 +86,7 @@ func NewHandler(mountPath string) http.Handler {
 
 				data := map[string]any{
 					"FeatureFlags": map[string]bool{
-						"DemoMode": featureflags.GetDemoMode(),
+						"DemoMode": flags.DemoMode,
 					},
 					"MountPath": mountPath,
 				}

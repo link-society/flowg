@@ -19,5 +19,5 @@ out of its subpackages.
   handler shared by the API and the server process.
 - **[metrics](metrics)** — the Prometheus counters and helpers exposed on the
   management server's `/metrics` endpoint.
-- **[featureflags](featureflags)** — process-wide feature toggles (e.g. demo
-  mode).
+- **[featureflags](featureflags)** — the feature toggles (e.g. demo mode),
+  provided to the dependency graph from the configuration.

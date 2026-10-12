@@ -16,14 +16,21 @@ import (
 // "entry:<stream>:..." key with the stream's retention TTL, registers each of
 // its fields in the stream's field set ("stream:field:<stream>:<field>"), and,
 // for every field the stream is configured to index, adds an inverted-index key
-// pointing back at the record.
-func Ingest(txn kv.MutationTx, stream string, logRecord *models.LogRecord, key kv.Key) error {
+// pointing back at the record. When override is not nil, it is used as the
+// stream's configuration (see [GetOrCreateStreamConfig]).
+func Ingest(
+	txn kv.MutationTx,
+	stream string,
+	logRecord *models.LogRecord,
+	key kv.Key,
+	override *models.StreamConfig,
+) error {
 	val, err := json.Marshal(logRecord)
 	if err != nil {
 		return fmt.Errorf("could not marshal log entry: %w", err)
 	}
 
-	streamConfig, err := GetOrCreateStreamConfig(txn, stream)
+	streamConfig, err := GetOrCreateStreamConfig(txn, stream, override)
 	if err != nil {
 		return err
 	}

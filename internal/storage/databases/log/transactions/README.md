@@ -22,7 +22,8 @@ its name.
 
 - `stream:config:<stream>` — the JSON-encoded stream configuration; an empty
   value is treated as the default (zero-value) config, and its mere existence
-  marks the stream.
+  marks the stream. The transactions reading it accept an override, used
+  instead of the stored value when not nil.
 - `stream:field:<stream>:<field>` — one existence marker per field name ever seen
   in the stream, used to enumerate a stream's fields.
 

@@ -9,6 +9,9 @@ import (
 	"go.uber.org/fx"
 
 	"link-society.com/flowg/internal/app/config"
+	"link-society.com/flowg/internal/app/featureflags"
+
+	"link-society.com/flowg/internal/models"
 
 	badgerauth "link-society.com/flowg/internal/storage/backends/badger/concrete/auth"
 	badgerconfig "link-society.com/flowg/internal/storage/backends/badger/concrete/config"
@@ -32,6 +35,7 @@ func configModule(cfg *config.RootConfig) fx.Option {
 		"app.server.config",
 		fx.Supply(cfg),
 		fx.Provide(
+			provideFeatureFlags,
 			provideHttpOptions,
 			provideMgmtOptions,
 			provideSyslogOptions,
@@ -91,9 +95,10 @@ func provideBadgerConfigOptions(cfg *config.RootConfig) badgerconfig.Options {
 
 // provideBadgerLogOptions configures the BadgerDB log storage, stored in its
 // own directory.
-func provideBadgerLogOptions(cfg *config.RootConfig) badgerlog.Options {
+func provideBadgerLogOptions(cfg *config.RootConfig, flags featureflags.Flags) badgerlog.Options {
 	opts := badgerlog.DefaultOptions()
 	opts.Directory = cfg.Storage.Backend.BadgerDB.LogDir
+	opts.StreamConfigOverride = streamConfigOverride(flags)
 	return opts
 }
 
@@ -142,7 +147,7 @@ func provideFoundationDbConfigOptions(cfg *config.RootConfig) fdbconfig.Options 
 }
 
 // provideFoundationDbLogOptions configures the FoundationDB log storage.
-func provideFoundationDbLogOptions(cfg *config.RootConfig) fdblog.Options {
+func provideFoundationDbLogOptions(cfg *config.RootConfig, flags featureflags.Flags) fdblog.Options {
 	fdbCfg := cfg.Storage.Backend.FoundationDB
 
 	opts := fdblog.DefaultOptions()
@@ -151,8 +156,32 @@ func provideFoundationDbLogOptions(cfg *config.RootConfig) fdblog.Options {
 	if fdbCfg.KeySpace != "" {
 		opts.KeySpace = fdbCfg.KeySpace
 	}
+	opts.StreamConfigOverride = streamConfigOverride(flags)
 
 	return opts
+}
+
+// streamConfigOverride returns the configuration enforced on every stream, or
+// nil to use the stored ones. In demo mode, streams keep their logs for 15
+// minutes and up to 10MB, without any index, so a public instance stays small.
+func streamConfigOverride(flags featureflags.Flags) *models.StreamConfig {
+	if !flags.DemoMode {
+		return nil
+	}
+
+	return &models.StreamConfig{
+		RetentionTime: 15 * 60, // 15 minutes
+		RetentionSize: 10,
+		IndexedFields: []string{},
+	}
+}
+
+// provideFeatureFlags extracts the feature toggles enabled by the
+// configuration.
+func provideFeatureFlags(cfg *config.RootConfig) featureflags.Flags {
+	return featureflags.Flags{
+		DemoMode: cfg.DemoMode,
+	}
 }
 
 // provideHttpOptions converts the configuration of the HTTP service into its
@@ -230,13 +259,16 @@ func provideWebOptions(cfg *config.RootConfig) web.Options {
 }
 
 // provideBootstrapOptions extracts the settings applied when seeding the
-// storage: the initial syslog origins and the initial/reset credentials.
-func provideBootstrapOptions(cfg *config.RootConfig) bootstrapOptions {
+// storage: the initial syslog origins, the initial/reset credentials, and
+// whether to seed the demo role and user.
+func provideBootstrapOptions(cfg *config.RootConfig, flags featureflags.Flags) bootstrapOptions {
 	return bootstrapOptions{
 		InitialSyslogAllowedOrigins: cfg.Services.Syslog.InitialAllowedOrigins,
 
 		InitialUser:     cfg.Storage.Seed.Auth.InitialUser,
 		InitialPassword: cfg.Storage.Seed.Auth.InitialPassword,
+
+		DemoMode: flags.DemoMode,
 
 		ResetUser:     cfg.Storage.Seed.Auth.ResetUser,
 		ResetPassword: cfg.Storage.Seed.Auth.ResetPassword,

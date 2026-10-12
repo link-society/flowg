@@ -25,23 +25,32 @@ const defaultBatchSize = 1000
 // the log transactions from the transactions subpackage on top of any
 // [kv.Adapter].
 type Storage[QTx kv.QueryTx, MTx kv.MutationTx] struct {
-	adapter   kv.Adapter[QTx, MTx]
-	batchSize int
+	adapter              kv.Adapter[QTx, MTx]
+	batchSize            int
+	streamConfigOverride *models.StreamConfig
 }
 
 var _ storage.LogStorage = (*Storage[kv.QueryTx, kv.MutationTx])(nil)
 
 // NewStorage returns a [Storage] that persists log data through the given
 // key-value adapter. batchSize bounds how many keys whole-stream operations
-// touch per transaction; a value of zero or less uses [defaultBatchSize].
-func NewStorage[QTx kv.QueryTx, MTx kv.MutationTx](adapter kv.Adapter[QTx, MTx], batchSize int) *Storage[QTx, MTx] {
+// touch per transaction; a value of zero or less uses [defaultBatchSize]. When
+// streamConfigOverride is not nil, it is used as the configuration of every
+// stream instead of the stored one (e.g. to enforce a short retention in demo
+// mode).
+func NewStorage[QTx kv.QueryTx, MTx kv.MutationTx](
+	adapter kv.Adapter[QTx, MTx],
+	batchSize int,
+	streamConfigOverride *models.StreamConfig,
+) *Storage[QTx, MTx] {
 	if batchSize <= 0 {
 		batchSize = defaultBatchSize
 	}
 
 	return &Storage[QTx, MTx]{
-		adapter:   adapter,
-		batchSize: batchSize,
+		adapter:              adapter,
+		batchSize:            batchSize,
+		streamConfigOverride: streamConfigOverride,
 	}
 }
 
@@ -61,7 +70,7 @@ func (s *Storage[QTx, MTx]) ListStreamConfigs(ctx context.Context) (map[string]m
 
 	err := s.adapter.View(ctx, func(txn QTx) error {
 		var err error
-		streams, err = transactions.FetchStreamConfigs(txn)
+		streams, err = transactions.FetchStreamConfigs(txn, s.streamConfigOverride)
 		return err
 	})
 	if err != nil {
@@ -92,7 +101,7 @@ func (s *Storage[QTx, MTx]) GetOrCreateStreamConfig(ctx context.Context, stream 
 
 	err := s.adapter.Update(ctx, func(txn MTx) error {
 		var err error
-		streamConfig, err = transactions.GetOrCreateStreamConfig(txn, stream)
+		streamConfig, err = transactions.GetOrCreateStreamConfig(txn, stream, s.streamConfigOverride)
 		return err
 	})
 
@@ -109,7 +118,7 @@ func (s *Storage[QTx, MTx]) ConfigureStream(ctx context.Context, stream string, 
 
 	err := s.adapter.Update(ctx, func(txn MTx) error {
 		var err error
-		toIndex, toUnindex, err = transactions.SaveStreamConfig(txn, stream, config)
+		toIndex, toUnindex, err = transactions.SaveStreamConfig(txn, stream, config, s.streamConfigOverride)
 		return err
 	})
 	if err != nil {
@@ -240,7 +249,7 @@ func (s *Storage[QTx, MTx]) CollectGarbage(ctx context.Context) error {
 
 	err := s.adapter.View(ctx, func(txn QTx) error {
 		var err error
-		configs, err = transactions.FetchStreamConfigs(txn)
+		configs, err = transactions.FetchStreamConfigs(txn, s.streamConfigOverride)
 		return err
 	})
 	if err != nil {
@@ -311,7 +320,7 @@ func (s *Storage[QTx, MTx]) Distinct(ctx context.Context, stream string) (map[st
 func (s *Storage[QTx, MTx]) Ingest(ctx context.Context, stream string, logRecord *models.LogRecord) (kv.Key, error) {
 	key := newDbKey(stream, logRecord)
 	err := s.adapter.Update(ctx, func(txn MTx) error {
-		return transactions.Ingest(txn, stream, logRecord, key)
+		return transactions.Ingest(txn, stream, logRecord, key, s.streamConfigOverride)
 	})
 	if err != nil {
 		return nil, err

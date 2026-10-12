@@ -5,22 +5,13 @@ import (
 
 	"encoding/json"
 
-	"link-society.com/flowg/internal/app/featureflags"
-
 	"link-society.com/flowg/internal/models"
 	"link-society.com/flowg/internal/storage/generic/kv"
 )
 
-var demoStreamConfig = models.StreamConfig{
-	RetentionTime: 15 * 60, // 15 minutes
-	RetentionSize: 10,
-	IndexedFields: []string{},
-}
-
 // FetchStreamConfigs returns the configuration of every stream, keyed by stream
-// name. In demo mode the fixed demo configuration is substituted for all of
-// them.
-func FetchStreamConfigs(txn kv.QueryTx) (map[string]models.StreamConfig, error) {
+// name. When override is not nil, it is substituted for all of them.
+func FetchStreamConfigs(txn kv.QueryTx, override *models.StreamConfig) (map[string]models.StreamConfig, error) {
 	streams := map[string]models.StreamConfig{}
 
 	for pair := range txn.IterPairs(kv.Key{"stream", "config"}, kv.KeyRange{}) {
@@ -29,8 +20,8 @@ func FetchStreamConfigs(txn kv.QueryTx) (map[string]models.StreamConfig, error) 
 		stream := key[len(key)-1]
 
 		var streamConfig models.StreamConfig
-		if featureflags.GetDemoMode() {
-			streamConfig = demoStreamConfig
+		if override != nil {
+			streamConfig = *override
 		} else {
 			val := pair.Value()
 			// If the value is empty, we treat it as a default config (the zero-value
@@ -67,10 +58,10 @@ func FetchStreamFields(txn kv.QueryTx, stream string) []string {
 
 // GetOrCreateStreamConfig returns a stream's configuration, lazily creating an
 // empty (default) config the first time a stream is referenced so later writes
-// have something to update. Demo mode short-circuits to the fixed config.
-func GetOrCreateStreamConfig(txn kv.MutationTx, stream string) (models.StreamConfig, error) {
-	if featureflags.GetDemoMode() {
-		return demoStreamConfig, nil
+// have something to update. A non-nil override short-circuits to that config.
+func GetOrCreateStreamConfig(txn kv.MutationTx, stream string, override *models.StreamConfig) (models.StreamConfig, error) {
+	if override != nil {
+		return *override, nil
 	}
 
 	var streamConfig models.StreamConfig
@@ -120,16 +111,20 @@ func GetOrCreateStreamConfig(txn kv.MutationTx, stream string) (models.StreamCon
 // The actual back-fill and index removal are performed separately, in their own
 // batched transactions, because on a large stream they can exceed a single
 // transaction's size and time limits.
+//
+// When override is not nil, the previous configuration is taken to be override
+// (see [GetOrCreateStreamConfig]).
 func SaveStreamConfig(
 	txn kv.MutationTx,
 	stream string,
 	config models.StreamConfig,
+	override *models.StreamConfig,
 ) (toIndex []string, toUnindex []string, err error) {
 	if config.IndexedFields == nil {
 		config.IndexedFields = []string{}
 	}
 
-	oldConfig, err := GetOrCreateStreamConfig(txn, stream)
+	oldConfig, err := GetOrCreateStreamConfig(txn, stream, override)
 	if err != nil {
 		return nil, nil, fmt.Errorf("could not fetch old stream config '%s': %w", stream, err)
 	}

@@ -8,7 +8,10 @@ import (
 	"github.com/vladopajic/go-actor/actor"
 	"go.uber.org/fx"
 
+	"link-society.com/flowg/internal/models"
+
 	"link-society.com/flowg/internal/storage/backends/badger"
+
 	"link-society.com/flowg/internal/storage/databases/log"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
@@ -20,6 +23,9 @@ type Options struct {
 	ReadOnly   bool
 	GCInterval time.Duration
 	BatchSize  int
+	// StreamConfigOverride, when not nil, is used as the configuration of every
+	// stream instead of the stored one.
+	StreamConfigOverride *models.StreamConfig
 }
 
 type deps struct {
@@ -56,7 +62,7 @@ func Module() fx.Option {
 		"storage.log",
 		badger.NewAdapter("storage.log", Options.adapterOptions),
 		fx.Provide(func(lc fx.Lifecycle, d deps) storage.LogStorage {
-			storage := log.NewStorage(d.Adapter, d.Options.BatchSize)
+			storage := log.NewStorage(d.Adapter, d.Options.BatchSize, d.Options.StreamConfigOverride)
 
 			gc := actor.New(log.NewGarbageCollector(storage, d.Options.GCInterval))
 
