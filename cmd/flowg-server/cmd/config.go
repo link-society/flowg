@@ -245,7 +245,9 @@ func DefaultStorageBackendFoundationDbConfig() *StorageBackendFoundationDbConfig
 // and that the storage backend is properly configured. Returns an error if the
 // configuration is invalid.
 func (c *RootConfig) Validate() error {
-	c.Storage.Backend.Validate()
+	if err := c.Storage.Backend.Validate(); err != nil {
+		return err
+	}
 
 	if c.Services.Syslog.Protocol != "tcp" && c.Services.Syslog.Protocol != "udp" {
 		return fmt.Errorf("invalid syslog protocol: %s", c.Services.Syslog.Protocol)
@@ -269,6 +271,7 @@ func (c *StorageBackendConfig) Resolve() hcl.Diagnostics {
 		diags := gohcl.DecodeBody(c.Body, nil, config)
 		if !diags.HasErrors() {
 			c.BadgerDB = config
+			c.FoundationDB = nil
 		}
 
 		return diags
@@ -279,6 +282,7 @@ func (c *StorageBackendConfig) Resolve() hcl.Diagnostics {
 		diags := gohcl.DecodeBody(c.Body, nil, config)
 		if !diags.HasErrors() {
 			c.FoundationDB = config
+			c.BadgerDB = nil
 		}
 
 		return diags

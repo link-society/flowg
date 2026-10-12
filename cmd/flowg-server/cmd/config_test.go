@@ -71,3 +71,22 @@ storage {
 		opts.Storage,
 	)
 }
+
+func TestLoad_StorageBackendValidationError(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "config.hcl")
+	require.NoError(t, os.WriteFile(path, []byte(`
+storage {
+  backend "foundationdb" {
+    cluster_file      = ""
+    connection_string = ""
+  }
+}
+`), 0600))
+
+	config := cmd.DefaultConfig()
+	require.ErrorContains(
+		t,
+		config.Load(path),
+		"FoundationDB backend requires either a cluster file or a connection string",
+	)
+}
