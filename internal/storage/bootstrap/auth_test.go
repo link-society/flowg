@@ -95,3 +95,69 @@ func TestDefaultRolesAndUsers(t *testing.T) {
 		}
 	}
 }
+
+func TestDefaultRolesAndUsers_DemoMode(t *testing.T) {
+	logging.Discard()
+
+	ctx := t.Context()
+
+	authOpts := auth.DefaultOptions()
+	authOpts.InMemory = true
+
+	var authStorage storage.AuthStorage
+
+	app := fxtest.New(
+		t,
+		fx.Supply(authOpts),
+		auth.Module(),
+		fx.Populate(&authStorage),
+		fx.NopLogger,
+	)
+	app.RequireStart()
+	defer app.RequireStop()
+
+	err := bootstrap.DefaultRolesAndUsers(ctx, authStorage, bootstrap.BootstrapAuthOptions{
+		InitialUser:     "root",
+		InitialPassword: "root",
+		DemoMode:        true,
+	})
+	if err != nil {
+		t.Fatalf("failed to bootstrap roles and users: %v", err)
+	}
+
+	roles, err := authStorage.ListRoles(ctx)
+	if err != nil {
+		t.Fatalf("failed to list roles: %v", err)
+	}
+
+	var demoRole *models.Role
+	for i := range roles {
+		if roles[i].Name == "demo" {
+			demoRole = &roles[i]
+		}
+	}
+
+	if demoRole == nil {
+		t.Fatal("expected demo role to exist")
+	}
+
+	if demoRole.HasScope(models.SCOPE_WRITE_ACLS) {
+		t.Fatal("expected demo role to NOT have scope write_acls")
+	}
+
+	users, err := authStorage.ListUsers(ctx)
+	if err != nil {
+		t.Fatalf("failed to list users: %v", err)
+	}
+
+	var demoUser *models.User
+	for i := range users {
+		if users[i].Name == "demo" {
+			demoUser = &users[i]
+		}
+	}
+
+	if demoUser == nil {
+		t.Fatal("expected demo user to exist")
+	}
+}

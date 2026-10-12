@@ -13,13 +13,15 @@ import (
 )
 
 // bootstrapOptions configures the bootstrap handler: the syslog origins allowed
-// on a fresh instance, the initial admin credentials, and the optional
-// credential reset.
+// on a fresh instance, the initial admin credentials, whether to seed the demo
+// role and user, and the optional credential reset.
 type bootstrapOptions struct {
 	InitialSyslogAllowedOrigins []string
 
 	InitialUser     string
 	InitialPassword string
+
+	DemoMode bool
 
 	ResetUser     string
 	ResetPassword string
@@ -71,6 +73,7 @@ func (h *bootstrapHandler) Run(ctx context.Context) error {
 	err := bootstrap.DefaultRolesAndUsers(ctx, h.authStorage, bootstrap.BootstrapAuthOptions{
 		InitialUser:     h.opts.InitialUser,
 		InitialPassword: h.opts.InitialPassword,
+		DemoMode:        h.opts.DemoMode,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to bootstrap default roles and users: %w", err)

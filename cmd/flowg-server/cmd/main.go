@@ -10,7 +10,6 @@ import (
 	"go.uber.org/fx"
 
 	"link-society.com/flowg/internal/app/config"
-	"link-society.com/flowg/internal/app/featureflags"
 	"link-society.com/flowg/internal/app/metrics"
 	"link-society.com/flowg/internal/app/server"
 
@@ -21,10 +20,9 @@ import (
 // or configuration fails.
 var ExitCode int = 0
 
-// NewRootCommand builds the root flowg-server command. Its pre-run hook sets the
-// umask, configures logging, applies the demo-mode flag and registers the
-// Prometheus metrics; its run hook loads the configuration and starts the fx
-// application built from it.
+// NewRootCommand builds the root flowg-server command. Its run hook loads the
+// configuration, sets the umask, configures logging, registers the Prometheus
+// metrics, and starts the fx application built from the configuration.
 func NewRootCommand() *cobra.Command {
 	var configPath string
 
@@ -41,7 +39,6 @@ func NewRootCommand() *cobra.Command {
 
 			syscall.Umask(0077)
 			logging.Setup(cfg.Logging.Verbose, cfg.Logging.Level)
-			featureflags.SetDemoMode(cfg.DemoMode)
 			metrics.Setup()
 
 			app := fx.New(fx.NopLogger, server.NewServer(cfg))

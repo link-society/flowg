@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log/slog"
 
-	"link-society.com/flowg/internal/app/featureflags"
 	"link-society.com/flowg/internal/models"
 
 	storage "link-society.com/flowg/internal/storage/interfaces"
@@ -14,6 +13,10 @@ import (
 type BootstrapAuthOptions struct {
 	InitialUser     string
 	InitialPassword string
+
+	// DemoMode seeds the "demo" role and user, which are not suitable for
+	// production use.
+	DemoMode bool
 }
 
 type ResetUserOptions struct {
@@ -76,7 +79,7 @@ func DefaultRolesAndUsers(ctx context.Context, authStorage storage.AuthStorage, 
 		}
 	}
 
-	if featureflags.GetDemoMode() {
+	if opts.DemoMode {
 		demoRole := models.Role{
 			Name: "demo",
 			Scopes: []models.Scope{

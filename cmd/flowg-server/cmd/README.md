@@ -12,5 +12,5 @@ built from it.
 ## Layout
 
 - **`main.go`** — `NewRootCommand`, which assembles the root command, loads and
-  validates the configuration, runs the startup hooks (umask, logging, demo
-  mode, metrics) and starts the fx application.
+  validates the configuration, runs the startup hooks (umask, logging,
+  metrics) and starts the fx application.

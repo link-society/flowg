@@ -26,6 +26,9 @@ database. The implementation is backend-agnostic: it runs on top of any
   collector in addition to the per-record TTLs.
 - **Snapshots** — satisfies `Streamable` so the log database can be backed up and
   restored.
+- **Configuration override** — when `NewStorage` is given a stream configuration
+  override (e.g. in demo mode), it is used for every stream instead of the
+  stored configuration.
 
 ## Layout
 
