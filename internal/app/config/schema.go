@@ -1,6 +1,7 @@
 // Package config defines the user-facing configuration of flowg-server: the
 // schema of the HCL configuration file, its defaults (declared by the `default`
-// struct tags), its environment overlay, and its validation.
+// struct tags), its environment overlay (declared by the `env` struct tags),
+// and its validation.
 package config
 
 import (
@@ -17,7 +18,7 @@ import (
 type RootConfig struct {
 	// DemoMode enables the demo role and user account which is not suitable for
 	// production use. It is intended for demonstration and testing purposes only.
-	DemoMode bool `hcl:"demo,optional" default:"false"`
+	DemoMode bool `hcl:"demo,optional" default:"false" env:"FLOWG_DEMO_MODE"`
 
 	Logging  *LoggingConfig  `hcl:"logging,block" default:"{}"`
 	Services *ServicesConfig `hcl:"services,block" default:"{}"`
@@ -26,8 +27,8 @@ type RootConfig struct {
 
 // Define logging settings
 type LoggingConfig struct {
-	Level   string `hcl:"level,optional" default:"info"`
-	Verbose bool   `hcl:"verbose,optional" default:"false"`
+	Level   string `hcl:"level,optional" default:"info" env:"FLOWG_LOGLEVEL"`
+	Verbose bool   `hcl:"verbose,optional" default:"false" env:"FLOWG_VERBOSE"`
 }
 
 // Group together the configuration for the services provided by the server.
@@ -41,39 +42,45 @@ type ServicesConfig struct {
 
 // Configuration for the "HTTP" service, which provides the REST API and web UI.
 type HttpConfig struct {
-	BindAddress string         `hcl:"bind,optional" default:":5080"`
-	MountPath   string         `hcl:"mount,optional" default:"/"`
-	Tls         *HttpTlsConfig `hcl:"tls,block"`
+	BindAddress string         `hcl:"bind,optional" default:":5080" env:"FLOWG_HTTP_BIND_ADDRESS"`
+	MountPath   string         `hcl:"mount,optional" default:"/" env:"FLOWG_HTTP_MOUNT_PATH"`
+	Tls         *HttpTlsConfig `hcl:"tls,block" env:"FLOWG_HTTP_TLS_ENABLED"`
 }
 
 // Configuration for the "Management" service, which provides the health check
 // and metrics endpoints.
 type ManagementConfig struct {
-	BindAddress string         `hcl:"bind,optional" default:":9113"`
-	Tls         *HttpTlsConfig `hcl:"tls,block"`
+	BindAddress string               `hcl:"bind,optional" default:":9113" env:"FLOWG_MGMT_BIND_ADDRESS"`
+	Tls         *ManagementTlsConfig `hcl:"tls,block" env:"FLOWG_MGMT_TLS_ENABLED"`
 }
 
-// Configuration for TLS settings for HTTP services.
+// Configuration for TLS settings for the "HTTP" service.
 type HttpTlsConfig struct {
-	Cert string `hcl:"cert"`
-	Key  string `hcl:"key"`
+	Cert string `hcl:"cert" env:"FLOWG_HTTP_TLS_CERT"`
+	Key  string `hcl:"key" env:"FLOWG_HTTP_TLS_KEY"`
+}
+
+// Configuration for TLS settings for the "Management" service.
+type ManagementTlsConfig struct {
+	Cert string `hcl:"cert" env:"FLOWG_MGMT_TLS_CERT"`
+	Key  string `hcl:"key" env:"FLOWG_MGMT_TLS_KEY"`
 }
 
 // Configuration for the "Syslog" service, which provides a syslog server for
 // receiving log messages from other services. It supports both TCP and UDP
 // protocols, and can optionally use TLS for secure communication.
 type SyslogConfig struct {
-	Bind                  string           `hcl:"bind,optional" default:":5514"`
-	Protocol              string           `hcl:"protocol,optional" default:"udp"`
-	InitialAllowedOrigins []string         `hcl:"initial_allowed_origins,optional" default:""`
-	Tls                   *SyslogTlsConfig `hcl:"tls,block"`
+	Bind                  string           `hcl:"bind,optional" default:":5514" env:"FLOWG_SYSLOG_BIND_ADDRESS"`
+	Protocol              string           `hcl:"protocol,optional" default:"udp" env:"FLOWG_SYSLOG_PROTOCOL"`
+	InitialAllowedOrigins []string         `hcl:"initial_allowed_origins,optional" default:"" env:"FLOWG_SYSLOG_INITIAL_ALLOWED_ORIGINS"`
+	Tls                   *SyslogTlsConfig `hcl:"tls,block" env:"FLOWG_SYSLOG_TLS_ENABLED"`
 }
 
 // Configuration for TLS settings for the Syslog service.
 type SyslogTlsConfig struct {
-	Cert        string `hcl:"cert"`
-	Key         string `hcl:"key"`
-	AuthEnabled bool   `hcl:"auth,optional" default:"false"`
+	Cert        string `hcl:"cert" env:"FLOWG_SYSLOG_TLS_CERT"`
+	Key         string `hcl:"key" env:"FLOWG_SYSLOG_TLS_KEY"`
+	AuthEnabled bool   `hcl:"auth,optional" default:"false" env:"FLOWG_SYSLOG_TLS_AUTH"`
 }
 
 // StorageConfig groups together settings related to storage.
@@ -86,6 +93,8 @@ type StorageConfig struct {
 // multiple backends, but only one can be configured at a time: the settings of
 // the selected backend are held by the matching field, the others being nil.
 type StorageBackendConfig struct {
+	// Selected from FLOWG_STORAGE_BACKEND by [RootConfig.applyEnv], before the
+	// other environment variables are applied.
 	Backend string   `hcl:"backend,label" default:"badgerdb"`
 	Body    hcl.Body `hcl:",remain"`
 
@@ -108,17 +117,17 @@ var (
 // Configuration for the BadgerDB storage backend, which is an embedded
 // key-value store.
 type StorageBackendBadgerDbConfig struct {
-	AuthDir   string `hcl:"auth_dir,optional" default:"./data/auth"`
-	LogDir    string `hcl:"log_dir,optional" default:"./data/logs"`
-	ConfigDir string `hcl:"config_dir,optional" default:"./data/config"`
+	AuthDir   string `hcl:"auth_dir,optional" default:"./data/auth" env:"FLOWG_BADGER_AUTH_DIR"`
+	LogDir    string `hcl:"log_dir,optional" default:"./data/logs" env:"FLOWG_BADGER_LOG_DIR"`
+	ConfigDir string `hcl:"config_dir,optional" default:"./data/config" env:"FLOWG_BADGER_CONFIG_DIR"`
 }
 
 // Configuration for the FoundationDB storage backend, which is a distributed
 // key-value store.
 type StorageBackendFoundationDbConfig struct {
-	ClusterFile      string `hcl:"cluster_file,optional" default:"/etc/foundationdb/fdb.cluster"`
-	ConnectionString string `hcl:"connection_string,optional" default:""`
-	KeySpace         string `hcl:"key_space,optional" default:"flowg"`
+	ClusterFile      string `hcl:"cluster_file,optional" default:"/etc/foundationdb/fdb.cluster" env:"FLOWG_FOUNDATIONDB_CLUSTER_FILE"`
+	ConnectionString string `hcl:"connection_string,optional" default:"" env:"FLOWG_FOUNDATIONDB_CONNECTION_STRING"`
+	KeySpace         string `hcl:"key_space,optional" default:"flowg" env:"FLOWG_FOUNDATIONDB_KEY_SPACE"`
 }
 
 // Configuration for seeding the storage backend with initial data. This is
@@ -132,11 +141,11 @@ type StorageSeedConfig struct {
 // and password. This is useful for bootstrapping the server with a default
 // admin account.
 type StorageSeedAuthConfig struct {
-	InitialUser     string `hcl:"initial_user" default:"root"`
-	InitialPassword string `hcl:"initial_password" default:"root"`
+	InitialUser     string `hcl:"initial_user" default:"root" env:"FLOWG_AUTH_INITIAL_USER"`
+	InitialPassword string `hcl:"initial_password" default:"root" env:"FLOWG_AUTH_INITIAL_PASSWORD"`
 
-	ResetUser     string `hcl:"reset_user,optional" default:""`
-	ResetPassword string `hcl:"reset_password,optional" default:""`
+	ResetUser     string `hcl:"reset_user,optional" default:"" env:"FLOWG_AUTH_RESET_USER"`
+	ResetPassword string `hcl:"reset_password,optional" default:"" env:"FLOWG_AUTH_RESET_PASSWORD"`
 }
 
 // Returns the built-in default configuration for the server, as declared by
