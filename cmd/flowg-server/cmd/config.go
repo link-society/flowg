@@ -267,7 +267,7 @@ func (c *StorageBackendConfig) Resolve() hcl.Diagnostics {
 		config := DefaultStorageBackendBadgerDbConfig()
 
 		diags := gohcl.DecodeBody(c.Body, nil, config)
-		if diags.HasErrors() {
+		if !diags.HasErrors() {
 			c.BadgerDB = config
 		}
 
@@ -277,7 +277,7 @@ func (c *StorageBackendConfig) Resolve() hcl.Diagnostics {
 		config := DefaultStorageBackendFoundationDbConfig()
 
 		diags := gohcl.DecodeBody(c.Body, nil, config)
-		if diags.HasErrors() {
+		if !diags.HasErrors() {
 			c.FoundationDB = config
 		}
 
