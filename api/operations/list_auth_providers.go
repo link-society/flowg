@@ -22,12 +22,14 @@ import (
 type ListAuthProvidersDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage storage.AuthStorage
 }
 
 // NewListAuthProvidersUsecase enumerates all available auth providers.
 func NewListAuthProvidersUsecase(deps ListAuthProvidersDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		func(

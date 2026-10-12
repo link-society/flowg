@@ -24,6 +24,8 @@ import (
 type PurgeStreamDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage storage.AuthStorage
 	LogStorage  storage.LogStorage
 }
@@ -33,10 +35,11 @@ type PurgeStreamDeps struct {
 // Callers must have the write-streams permission. This is a destructive
 // operation: the stored logs cannot be recovered afterwards.
 func NewPurgeStreamUsecase(deps PurgeStreamDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_STREAMS,
 			func(

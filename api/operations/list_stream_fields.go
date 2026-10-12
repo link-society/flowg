@@ -24,6 +24,8 @@ import (
 type ListStreamFieldsDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage storage.AuthStorage
 	LogStorage  storage.LogStorage
 }
@@ -34,10 +36,11 @@ type ListStreamFieldsDeps struct {
 // It backs query builders that suggest available fields. Callers must have the
 // read-streams permission.
 func NewListStreamFieldsUsecase(deps ListStreamFieldsDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_STREAMS,
 			func(

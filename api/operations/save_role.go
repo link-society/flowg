@@ -24,6 +24,8 @@ import (
 type SaveRoleDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage storage.AuthStorage
 }
 
@@ -32,10 +34,11 @@ type SaveRoleDeps struct {
 // Callers must have the write-ACLs permission. An unknown permission name in
 // the request is reported as an invalid-argument error.
 func NewSaveRoleUsecase(deps SaveRoleDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_ACLS,
 			func(

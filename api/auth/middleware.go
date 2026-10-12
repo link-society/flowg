@@ -27,28 +27,27 @@ import (
 // the next handler is invoked. Any failure — missing, malformed, or invalid
 // credential — stops the chain and produces a [status.Unauthenticated] error
 // response, so downstream handlers can assume a valid identity is always
-// present.
-func ApiMiddleware(authStorage storage.AuthStorage) func(http.Handler) http.Handler {
+// present. Authentications and response encoding failures are logged through
+// logger.
+func ApiMiddleware(logger *slog.Logger, authStorage storage.AuthStorage) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		serveError := func(w http.ResponseWriter, r *http.Request, err error) {
 			code, payload := rest.Err(status.Wrap(err, status.Unauthenticated))
 			w.WriteHeader(code)
 			err = json.NewEncoder(w).Encode(payload)
 			if err != nil {
-				slog.ErrorContext(
+				logger.ErrorContext(
 					r.Context(),
 					"Failed to encode error response",
-					slog.String("channel", "api"),
 					slog.String("error", err.Error()),
 				)
 			}
 		}
 
 		serveNext := func(w http.ResponseWriter, r *http.Request, user *models.User) {
-			slog.DebugContext(
+			logger.DebugContext(
 				r.Context(),
 				"Authenticated user",
-				slog.String("channel", "api"),
 				slog.String("user", user.Name),
 			)
 

@@ -38,10 +38,10 @@ func NewRootCommand() *cobra.Command {
 			}
 
 			syscall.Umask(0077)
-			logging.Setup(cfg.Logging.Verbose, cfg.Logging.Level)
+			logger := logging.Setup(cfg.Logging.Verbose, cfg.Logging.Level)
 			metrics.Setup()
 
-			app := fx.New(fx.NopLogger, server.NewServer(cfg))
+			app := fx.New(fx.NopLogger, server.NewServer(cfg, logger))
 			if err := app.Err(); err != nil {
 				fmt.Printf("ERROR: %v\n", dig.RootCause(err))
 				ExitCode = 1

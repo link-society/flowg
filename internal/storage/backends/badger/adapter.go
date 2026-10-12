@@ -3,6 +3,7 @@ package badger
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"io"
 
@@ -47,9 +48,9 @@ var _ kv.Adapter[*BadgerTx, *BadgerTx] = (*BadgerAdapter)(nil)
 //
 // The database is opened with the [AdapterOptions] computed by adapterOptions
 // from the options O of the storage owning the adapter, injected from the
-// graph.
+// graph, and logs through the root logger injected from the graph.
 func NewAdapter[O any](logChannel string, adapterOptions func(O) AdapterOptions) fx.Option {
-	makeDB := func(lc fx.Lifecycle, storageOpts O) (*badger.DB, error) {
+	makeDB := func(lc fx.Lifecycle, storageOpts O, rootLogger *slog.Logger) (*badger.DB, error) {
 		opts := adapterOptions(storageOpts)
 
 		var dbDir string
@@ -59,7 +60,9 @@ func NewAdapter[O any](logChannel string, adapterOptions func(O) AdapterOptions)
 
 		dbOpts := badger.
 			DefaultOptions(dbDir).
-			WithLogger(&badgerLogger{Channel: logChannel}).
+			WithLogger(&badgerLogger{
+				logger: rootLogger.With(slog.String("channel", logChannel)),
+			}).
 			WithCompression(badgerOptions.ZSTD).
 			WithInMemory(opts.InMemory).
 			WithReadOnly(opts.ReadOnly)

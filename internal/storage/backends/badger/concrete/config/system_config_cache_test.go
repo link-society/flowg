@@ -3,6 +3,8 @@ package config_test
 import (
 	"testing"
 
+	"log/slog"
+
 	"bytes"
 	"reflect"
 
@@ -43,6 +45,7 @@ func TestSystemConfigCacheInvalidation(t *testing.T) {
 
 	app := fxtest.New(
 		t,
+		fx.Supply(slog.New(slog.DiscardHandler)),
 		fx.Supply(opts),
 		badgerconfig.Module(),
 		fx.Populate(&nodeA),
@@ -52,7 +55,7 @@ func TestSystemConfigCacheInvalidation(t *testing.T) {
 	app.RequireStart()
 	defer app.RequireStop()
 
-	nodeB := config.NewStorage(d.Adapter, nil)
+	nodeB := config.NewStorage(slog.New(slog.DiscardHandler), d.Adapter, nil)
 
 	v1 := &models.SystemConfiguration{SyslogAllowedOrigins: []string{"10.0.0.1"}}
 	v2 := &models.SystemConfiguration{SyslogAllowedOrigins: []string{"10.0.0.2"}}
@@ -113,6 +116,7 @@ func TestSystemConfigCacheInvalidatedOnRestore(t *testing.T) {
 
 		app := fxtest.New(
 			t,
+			fx.Supply(slog.New(slog.DiscardHandler)),
 			fx.Supply(opts),
 			badgerconfig.Module(),
 			fx.Populate(&configStorage),
@@ -138,6 +142,7 @@ func TestSystemConfigCacheInvalidatedOnRestore(t *testing.T) {
 
 	app := fxtest.New(
 		t,
+		fx.Supply(slog.New(slog.DiscardHandler)),
 		fx.Supply(opts),
 		badgerconfig.Module(),
 		fx.Populate(&configStorage),

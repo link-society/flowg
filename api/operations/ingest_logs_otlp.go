@@ -30,6 +30,8 @@ import (
 type IngestLogsOTLPDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage    storage.AuthStorage
 	PipelineRunner pipelines.Runner
 }
@@ -44,10 +46,11 @@ var _ request.Loader = (*schemas.IngestLogsOTLPRequest)(nil)
 // record that fails. The request is marked sensitive so the payload stays out
 // of FlowG's own logs.
 func NewIngestLogsOTLPUsecase(deps IngestLogsOTLPDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_SEND_LOGS,
 			func(
@@ -56,6 +59,13 @@ func NewIngestLogsOTLPUsecase(deps IngestLogsOTLPDeps) usecase.Interactor {
 				resp *schemas.IngestLogsOTLPResponse,
 			) error {
 				applog.MarkSensitive(ctx)
+
+				logger.InfoContext(
+					ctx,
+					"Parsed OpenTelemetry message",
+					slog.String("otlp.content-type", req.ContentType()),
+					slog.String("otlp.content-encoding", req.ContentEncoding),
+				)
 
 				for _, logRecord := range req.LogRecords {
 					err := deps.PipelineRunner.Process(

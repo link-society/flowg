@@ -109,12 +109,17 @@ func DefaultRolesAndUsers(ctx context.Context, authStorage storage.AuthStorage, 
 	return nil
 }
 
-func ResetUser(ctx context.Context, authStorage storage.AuthStorage, opts ResetUserOptions) error {
+func ResetUser(
+	ctx context.Context,
+	logger *slog.Logger,
+	authStorage storage.AuthStorage,
+	opts ResetUserOptions,
+) error {
 	if opts.User == "" || opts.Password == "" {
 		return nil
 	}
 
-	slog.InfoContext(
+	logger.InfoContext(
 		ctx,
 		"Resetting user password",
 		slog.String("user", opts.User),

@@ -28,6 +28,8 @@ import (
 type IngestLogsStructDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage    storage.AuthStorage
 	PipelineRunner pipelines.Runner
 }
@@ -39,10 +41,11 @@ type IngestLogsStructDeps struct {
 // stops at the first record that fails. The request is marked sensitive so the
 // payload stays out of FlowG's own logs.
 func NewIngestLogsStructUsecase(deps IngestLogsStructDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_SEND_LOGS,
 			func(

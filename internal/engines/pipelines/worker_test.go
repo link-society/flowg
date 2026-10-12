@@ -3,6 +3,8 @@ package pipelines
 import (
 	"testing"
 
+	"log/slog"
+
 	"github.com/stretchr/testify/mock"
 
 	"context"
@@ -69,6 +71,7 @@ func routedFlowGraph() *models.FlowGraphV2 {
 
 func newTestWorker(configStorage *mocks.MockConfigStorage) *worker {
 	return &worker{
+		logger:        slog.New(slog.DiscardHandler),
 		configStorage: configStorage,
 		cache:         make(map[string]*Pipeline),
 	}

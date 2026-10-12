@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"testing"
 
+	"log/slog"
+
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 	"link-society.com/flowg/internal/models"
@@ -16,6 +18,7 @@ func TestLogNotifier(t *testing.T) {
 
 	app := fxtest.New(
 		t,
+		fx.Supply(slog.New(slog.DiscardHandler)),
 		lognotify.NewLogNotifier(),
 		fx.Populate(&notifier),
 		fx.NopLogger,

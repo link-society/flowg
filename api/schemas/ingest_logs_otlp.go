@@ -2,7 +2,6 @@ package schemas
 
 import (
 	"fmt"
-	"log/slog"
 
 	"compress/gzip"
 	"io"
@@ -29,6 +28,14 @@ type IngestLogsOTLPRequest struct {
 	LogRecords []*models.LogRecord
 
 	collectlogs.ExportLogsServiceRequest
+
+	contentType string
+}
+
+// ContentType returns the payload's media type, as sent in the Content-Type
+// header.
+func (ior *IngestLogsOTLPRequest) ContentType() string {
+	return ior.contentType
 }
 
 // LoadFromHTTPRequest decodes the OTLP payload from the raw HTTP request,
@@ -43,12 +50,7 @@ func (ior *IngestLogsOTLPRequest) LoadFromHTTPRequest(r *http.Request) error {
 	}
 	defer r.Body.Close()
 
-	slog.InfoContext(
-		r.Context(),
-		"Parsing OpenTelemetry message",
-		slog.String("otlp.content-type", r.Header.Get("Content-Type")),
-		slog.String("otlp.content-encoding", r.Header.Get("Content-Encoding")),
-	)
+	ior.contentType = r.Header.Get("Content-Type")
 
 	var body []byte
 

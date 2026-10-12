@@ -9,14 +9,15 @@ import (
 	applog "link-society.com/flowg/internal/app/logging"
 )
 
-// Setup configures the process-wide default slog logger to write to stdout
-// using the correlation-id aware handler from the internal/app/logging package.
+// Setup builds the root slog logger, writing to stdout using the
+// correlation-id aware handler from the internal/app/logging package, and makes
+// it the process-wide default. The returned logger is the one injected into the
+// application.
 //
-// When verbose is true, the log level is forced to debug and the access-log
-// middleware is told to dump response bodies for failed requests. Otherwise the
-// level is derived from levelName ("debug", "info", "warn" or "error",
-// defaulting to "info").
-func Setup(verbose bool, levelName string) {
+// When verbose is true, the log level is forced to debug. Otherwise the level is
+// derived from levelName ("debug", "info", "warn" or "error", defaulting to
+// "info").
+func Setup(verbose bool, levelName string) *slog.Logger {
 	var level slog.Level
 	if verbose {
 		level = slog.LevelDebug
@@ -35,9 +36,11 @@ func Setup(verbose bool, levelName string) {
 		}
 	}
 
-	applog.VERBOSE_LOGGING = verbose
 	opts := &slog.HandlerOptions{Level: level}
-	slog.SetDefault(slog.New(applog.NewHandler(os.Stdout, opts)))
+	logger := slog.New(applog.NewHandler(os.Stdout, opts))
+	slog.SetDefault(logger)
+
+	return logger
 }
 
 // Discard configures the process-wide default slog logger to drop every record.

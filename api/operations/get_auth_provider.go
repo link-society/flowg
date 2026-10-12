@@ -24,6 +24,8 @@ import (
 type GetAuthProviderDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage storage.AuthStorage
 }
 
@@ -32,10 +34,11 @@ type GetAuthProviderDeps struct {
 // Callers must have the read-auth-providers permission. Requesting an unknown auth provider yields
 // a not-found error.
 func NewGetAuthProviderUsecase(deps GetAuthProviderDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_AUTH_PROVIDERS,
 			func(

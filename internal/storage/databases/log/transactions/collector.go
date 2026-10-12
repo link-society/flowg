@@ -2,6 +2,7 @@ package transactions
 
 import (
 	"fmt"
+	"log/slog"
 
 	"encoding/json"
 	"time"
@@ -17,8 +18,10 @@ import (
 // its fields in the stream's field set ("stream:field:<stream>:<field>"), and,
 // for every field the stream is configured to index, adds an inverted-index key
 // pointing back at the record. When override is not nil, it is used as the
-// stream's configuration (see [GetOrCreateStreamConfig]).
+// stream's configuration (see [GetOrCreateStreamConfig]). Field values too
+// large to be indexed are skipped, with a warning logged through logger.
 func Ingest(
+	logger *slog.Logger,
 	txn kv.MutationTx,
 	stream string,
 	logRecord *models.LogRecord,
@@ -58,7 +61,7 @@ func Ingest(
 		}
 
 		if streamConfig.IsFieldIndexed(field) {
-			fieldIndex := newFieldIndex(txn, stream, field, value)
+			fieldIndex := newFieldIndex(logger, txn, stream, field, value)
 			if err := fieldIndex.AddKey(key, streamConfig.RetentionTime); err != nil {
 				return fmt.Errorf(
 					"could not add field index '%s' of log entry '%s' to stream '%s': %w",

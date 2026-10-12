@@ -14,8 +14,8 @@ whole application together and runs it until interrupted.
 - **[cmd](./cmd)** — the root `flowg-server` command: flag definitions,
   environment-variable defaults, and the translation from CLI options into the
   application's configuration.
-- **[logging](./logging)** — process-wide `slog` logger setup, sharing the
-  correlation-id handler with the API.
+- **[logging](./logging)** — the root `slog` logger, injected into the
+  application, sharing the correlation-id handler with the API.
 
 ## Configuration
 

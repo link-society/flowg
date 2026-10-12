@@ -185,11 +185,13 @@ func provideFeatureFlags(cfg *config.RootConfig) featureflags.Flags {
 }
 
 // provideHttpOptions converts the configuration of the HTTP service into its
-// options, loading its TLS certificate when TLS is enabled.
+// options, loading its TLS certificate when TLS is enabled. Verbose logging
+// also dumps the response bodies of failed requests.
 func provideHttpOptions(cfg *config.RootConfig) (http.Options, error) {
 	opts := http.Options{
-		BindAddress: cfg.Services.Http.BindAddress,
-		MountPath:   mountPath(cfg),
+		BindAddress:     cfg.Services.Http.BindAddress,
+		MountPath:       mountPath(cfg),
+		DumpErrorBodies: cfg.Logging.Verbose,
 	}
 
 	if tlsCfg := cfg.Services.Http.Tls; tlsCfg != nil {

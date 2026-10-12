@@ -23,6 +23,8 @@ import (
 type CreateTokenDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage storage.AuthStorage
 }
 
@@ -32,7 +34,7 @@ type CreateTokenDeps struct {
 // later; only its UUID is persisted for management. It requires authentication
 // but no particular permission.
 func NewCreateTokenUsecase(deps CreateTokenDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		func(

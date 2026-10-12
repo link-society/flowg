@@ -13,6 +13,7 @@ type subscriberSet map[actor.MailboxSender[LogMessage]]struct{}
 // mutations on one goroutine means the per-stream subscriber sets need no
 // locking.
 type worker struct {
+	logger      *slog.Logger
 	subscribers map[string]subscriberSet
 	subMbox     actor.MailboxReceiver[SubscribeMessage]
 	logMbox     actor.MailboxReceiver[LogMessage]
@@ -68,10 +69,9 @@ func (w *worker) DoWork(ctx actor.Context) actor.WorkerStatus {
 
 		for sub := range w.subscribers[msg.Stream] {
 			if err := sub.Send(ctx, msg); err != nil {
-				slog.ErrorContext(
+				w.logger.ErrorContext(
 					ctx,
 					"failed to send log message",
-					"channel", "lognotify",
 					"stream", msg.Stream,
 					"error", err.Error(),
 				)

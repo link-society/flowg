@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/vladopajic/go-actor/actor"
 	"go.uber.org/fx"
@@ -26,6 +27,7 @@ type Options struct {
 type deps struct {
 	fx.In
 
+	Logger  *slog.Logger
 	Adapter *foundation.FoundationAdapter `name:"storage.config"`
 
 	// Notifier receives the events emitted by the changelog watcher; it is
@@ -64,7 +66,7 @@ func Module() fx.Option {
 		fx.Provide(func(d deps) *config.Storage[*foundation.FoundationQueryTx, *foundation.FoundationMutationTx] {
 			// no local notifier: change events come from the key watcher, so every
 			// node (including the writer) observes mutations through the same path
-			return config.NewStorage(d.Adapter, nil)
+			return config.NewStorage(d.Logger, d.Adapter, nil)
 		}),
 		fx.Provide(func(s *config.Storage[*foundation.FoundationQueryTx, *foundation.FoundationMutationTx]) storage.ConfigStorage {
 			return s
@@ -79,6 +81,7 @@ func Module() fx.Option {
 			}
 
 			watcher := actor.New(&watchWorker{
+				logger:      d.Logger.With(slog.String("channel", "storage.config")),
 				adapter:     d.Adapter,
 				notifier:    d.Notifier,
 				systemCache: s,

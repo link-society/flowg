@@ -24,6 +24,8 @@ import (
 type SaveAuthProviderDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage storage.AuthStorage
 }
 
@@ -31,10 +33,11 @@ type SaveAuthProviderDeps struct {
 //
 // Callers must have the write-auth-providers permission.
 func NewSaveAuthProviderUsecase(deps SaveAuthProviderDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_AUTH_PROVIDERS,
 			func(

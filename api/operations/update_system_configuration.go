@@ -24,6 +24,8 @@ import (
 type UpdateSystemConfigurationDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage   storage.AuthStorage
 	ConfigStorage storage.ConfigStorage
 }
@@ -32,10 +34,11 @@ type UpdateSystemConfigurationDeps struct {
 //
 // Callers must have the write-system-configuration permission.
 func NewUpdateSystemConfigurationUsecase(deps UpdateSystemConfigurationDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_SYSTEM_CONFIGURATION,
 			func(

@@ -24,6 +24,8 @@ import (
 type ListStreamsDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage storage.AuthStorage
 	LogStorage  storage.LogStorage
 }
@@ -32,10 +34,11 @@ type ListStreamsDeps struct {
 //
 // Callers must have the read-streams permission.
 func NewListStreamsUsecase(deps ListStreamsDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_STREAMS,
 			func(

@@ -24,6 +24,8 @@ import (
 type ListRolesDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage storage.AuthStorage
 }
 
@@ -31,10 +33,11 @@ type ListRolesDeps struct {
 //
 // Callers must have the read-ACLs permission.
 func NewListRolesUsecase(deps ListRolesDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_ACLS,
 			func(

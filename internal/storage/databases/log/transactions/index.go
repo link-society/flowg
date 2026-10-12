@@ -15,6 +15,7 @@ import (
 )
 
 type fieldIndex struct {
+	logger    *slog.Logger
 	txn       kv.MutationTx
 	stream    string
 	field     string
@@ -30,8 +31,10 @@ type fieldIndex struct {
 // It returns the last entry key it processed — to be passed as cursor on the
 // next call — and how many entries it processed. A processed count below limit
 // means the stream has been fully back-filled. Splitting the work this way keeps
-// each transaction within the backend's size and time limits.
+// each transaction within the backend's size and time limits. Values too large
+// to be indexed are skipped, with a warning logged through logger.
 func IndexFieldBatch(
+	logger *slog.Logger,
 	txn kv.MutationTx,
 	stream string,
 	field string,
@@ -65,7 +68,7 @@ func IndexFieldBatch(
 			retentionTime = int64(ts) - time.Now().Unix()
 		}
 
-		index := newFieldIndex(txn, stream, field, entry.Fields[field])
+		index := newFieldIndex(logger, txn, stream, field, entry.Fields[field])
 		if err := index.AddKey(key, retentionTime); err != nil {
 			return last, processed, fmt.Errorf(
 				"could not index field '%s' for entry '%s': %w",
@@ -143,9 +146,17 @@ func Distinct(txn kv.QueryTx, stream string) (map[string][]string, error) {
 }
 
 // newFieldIndex builds the index key prefix for one (stream, field, value)
-// triple, base64-encoding the value as it appears in the stored keys.
-func newFieldIndex(txn kv.MutationTx, stream string, field string, value string) *fieldIndex {
+// triple, base64-encoding the value as it appears in the stored keys. Values
+// too large to be indexed are skipped, with a warning logged through logger.
+func newFieldIndex(
+	logger *slog.Logger,
+	txn kv.MutationTx,
+	stream string,
+	field string,
+	value string,
+) *fieldIndex {
 	return &fieldIndex{
+		logger:    logger,
 		txn:       txn,
 		stream:    stream,
 		field:     field,
@@ -193,9 +204,8 @@ func (index *fieldIndex) AddKey(entryKey kv.Key, retentionTime int64) error {
 		// entry is still stored and queryable by time, it just won't be found by
 		// an exact-match filter on this oversized value.
 		if errors.Is(err, kv.ErrKeyTooLarge) {
-			slog.Warn(
+			index.logger.Warn(
 				"skipping oversized field index value",
-				slog.String("channel", "logstorage"),
 				slog.String("stream", index.stream),
 				slog.String("field", index.field),
 			)

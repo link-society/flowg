@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"log/slog"
+
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 
@@ -25,6 +27,7 @@ func newAuthStorage(t *testing.T) (context.Context, storage.AuthStorage) {
 
 	app := fxtest.New(
 		t,
+		fx.Supply(slog.New(slog.DiscardHandler)),
 		fx.Supply(opts),
 		badgerauth.Module(),
 		fx.Populate(&authStorage),

@@ -18,6 +18,8 @@ import (
 // the storage handles every node needs; serialising message handling keeps cache
 // access safe.
 type worker struct {
+	logger *slog.Logger
+
 	mbox actor.MailboxReceiver[message]
 
 	// eventsC delivers config change notifications; pipeline lifecycle follows
@@ -66,10 +68,9 @@ func (w *worker) handleEvent(ctx actor.Context, event confignotify.Event) {
 	switch event.Kind {
 	case confignotify.PipelineChanged:
 		if err := w.buildPipeline(ctx, event.Pipeline); err != nil {
-			slog.ErrorContext(
+			w.logger.ErrorContext(
 				ctx,
 				"failed to rebuild pipeline",
-				"channel", "pipelines",
 				"pipeline", event.Pipeline,
 				"error", err.Error(),
 			)
@@ -77,10 +78,9 @@ func (w *worker) handleEvent(ctx actor.Context, event confignotify.Event) {
 
 	case confignotify.PipelineDeleted:
 		if _, err := w.closePipeline(event.Pipeline); err != nil {
-			slog.DebugContext(
+			w.logger.DebugContext(
 				ctx,
 				"no running build for deleted pipeline",
-				"channel", "pipelines",
 				"pipeline", event.Pipeline,
 				"error", err.Error(),
 			)
@@ -96,10 +96,9 @@ func (w *worker) handleEvent(ctx actor.Context, event confignotify.Event) {
 func (w *worker) reconcile(ctx actor.Context) {
 	names, err := w.configStorage.ListPipelines(ctx)
 	if err != nil {
-		slog.ErrorContext(
+		w.logger.ErrorContext(
 			ctx,
 			"failed to list pipelines during reconcile",
-			"channel", "pipelines",
 			"error", err.Error(),
 		)
 		return
@@ -110,10 +109,9 @@ func (w *worker) reconcile(ctx actor.Context) {
 		listed[name] = struct{}{}
 
 		if err := w.buildPipeline(ctx, name); err != nil {
-			slog.ErrorContext(
+			w.logger.ErrorContext(
 				ctx,
 				"failed to rebuild pipeline",
-				"channel", "pipelines",
 				"pipeline", name,
 				"error", err.Error(),
 			)
@@ -131,10 +129,9 @@ func (w *worker) reconcile(ctx actor.Context) {
 
 	for _, name := range extras {
 		if _, err := w.closePipeline(name); err != nil {
-			slog.ErrorContext(
+			w.logger.ErrorContext(
 				ctx,
 				"failed to retire removed pipeline",
-				"channel", "pipelines",
 				"pipeline", name,
 				"error", err.Error(),
 			)
@@ -199,10 +196,9 @@ func (w *worker) buildPipeline(ctx actor.Context, pipelineName string) error {
 		done := w.retirePipeline(previous)
 		go func() {
 			if err := <-done; err != nil {
-				slog.ErrorContext(
+				w.logger.ErrorContext(
 					ctx,
 					"failed to close previous pipeline build",
-					"channel", "pipelines",
 					"pipeline", pipelineName,
 					"error", err.Error(),
 				)

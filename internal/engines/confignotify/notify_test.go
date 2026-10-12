@@ -3,6 +3,8 @@ package confignotify_test
 import (
 	"testing"
 
+	"log/slog"
+
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 
@@ -14,6 +16,7 @@ func TestNotifier(t *testing.T) {
 
 	app := fxtest.New(
 		t,
+		fx.Supply(slog.New(slog.DiscardHandler)),
 		confignotify.NewNotifier(),
 		fx.Populate(&notifier),
 		fx.NopLogger,
@@ -50,6 +53,7 @@ func TestNotifier_MultipleSubscribers(t *testing.T) {
 
 	app := fxtest.New(
 		t,
+		fx.Supply(slog.New(slog.DiscardHandler)),
 		confignotify.NewNotifier(),
 		fx.Populate(&notifier),
 		fx.NopLogger,

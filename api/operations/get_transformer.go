@@ -25,6 +25,8 @@ import (
 type GetTransformerDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage   storage.AuthStorage
 	ConfigStorage storage.ConfigStorage
 }
@@ -34,10 +36,11 @@ type GetTransformerDeps struct {
 // Callers must have the read-transformers permission. Requesting an unknown
 // transformer yields a not-found error.
 func NewGetTransformerUsecase(deps GetTransformerDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_TRANSFORMERS,
 			func(

@@ -3,6 +3,8 @@ package pipelines
 import (
 	"testing"
 
+	"log/slog"
+
 	"errors"
 	"time"
 
@@ -73,6 +75,7 @@ func TestRunner_StorageDrivenLifecycle(t *testing.T) {
 
 	app := fxtest.New(
 		t,
+		fx.Supply(slog.New(slog.DiscardHandler)),
 		fx.Options(testRunnerModules(configOpts, logOpts)...),
 		fx.Populate(&runner, &configStorage),
 	)
@@ -120,6 +123,7 @@ func TestRunner_StartsPersistedPipelinesOnBoot(t *testing.T) {
 
 		app := fxtest.New(
 			t,
+			fx.Supply(slog.New(slog.DiscardHandler)),
 			fx.Options(testRunnerModules(configOpts, logOpts)...),
 			fx.Populate(&configStorage),
 		)
@@ -137,6 +141,7 @@ func TestRunner_StartsPersistedPipelinesOnBoot(t *testing.T) {
 
 	app := fxtest.New(
 		t,
+		fx.Supply(slog.New(slog.DiscardHandler)),
 		fx.Options(testRunnerModules(configOpts, logOpts)...),
 		fx.Populate(&runner),
 	)

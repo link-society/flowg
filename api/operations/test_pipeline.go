@@ -27,6 +27,8 @@ import (
 type TestPipelineDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage    storage.AuthStorage
 	PipelineRunner pipelines.Runner
 }
@@ -38,10 +40,11 @@ type TestPipelineDeps struct {
 // pipeline. Callers must have the send-logs permission. The run is marked sensitive
 // so its records are excluded from FlowG's own logs.
 func NewTestPipelineUsecase(deps TestPipelineDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_SEND_LOGS,
 			func(

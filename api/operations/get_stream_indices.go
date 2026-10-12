@@ -24,6 +24,8 @@ import (
 type GetStreamIndicesDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage storage.AuthStorage
 	LogStorage  storage.LogStorage
 }
@@ -34,10 +36,11 @@ type GetStreamIndicesDeps struct {
 // It backs query builders that offer the known values of an index. Callers must
 // have the read-streams permission.
 func NewGetStreamIndicesUsecase(deps GetStreamIndicesDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_STREAMS,
 			func(

@@ -24,6 +24,8 @@ import (
 type PatchUserRolesDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage storage.AuthStorage
 }
 
@@ -34,10 +36,11 @@ type PatchUserRolesDeps struct {
 // when the caller does not know or want to reset the password. Callers must
 // have the write-ACLs permission.
 func NewPatchUserRolesUsecase(deps PatchUserRolesDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_ACLS,
 			func(

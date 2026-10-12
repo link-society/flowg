@@ -25,6 +25,8 @@ import (
 type TestForwarderDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage   storage.AuthStorage
 	ConfigStorage storage.ConfigStorage
 }
@@ -36,10 +38,11 @@ type TestForwarderDeps struct {
 // confirms end-to-end connectivity. Callers must have the write-forwarders
 // permission.
 func NewTestForwarderUsecase(deps TestForwarderDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_FORWARDERS,
 			func(

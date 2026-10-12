@@ -25,6 +25,8 @@ import (
 type TestTransformerDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage storage.AuthStorage
 }
 
@@ -35,12 +37,13 @@ type TestTransformerDeps struct {
 // read-transformers permission. Source that fails to compile or run is reported as
 // an unprocessable-entity error rather than a server fault.
 func NewTestTransformerUsecase(deps TestTransformerDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	const UnprocessableEntityCode = 422
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_TRANSFORMERS,
 			func(

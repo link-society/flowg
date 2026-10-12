@@ -26,6 +26,8 @@ import (
 type RestoreConfigDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage   storage.AuthStorage
 	ConfigStorage storage.ConfigStorage
 }
@@ -36,10 +38,11 @@ type RestoreConfigDeps struct {
 // It is the import counterpart to [NewBackupConfigUsecase]. Callers
 // must have write access to pipelines, transformers and forwarders.
 func NewRestoreConfigUsecase(deps RestoreConfigDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopesApiDecorator(
+			logger,
 			deps.AuthStorage,
 			[]models.Scope{
 				models.SCOPE_WRITE_PIPELINES,

@@ -2,6 +2,7 @@ package confignotify
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/vladopajic/go-actor/actor"
 	"go.uber.org/fx"
@@ -32,8 +33,9 @@ type notifierImpl struct {
 var _ Notifier = (*notifierImpl)(nil)
 
 // NewNotifier returns an fx module providing a Notifier backed by a single
-// actor. The actor and its two mailboxes (subscriptions and event broadcasts)
-// are started and stopped with the application lifecycle.
+// actor, logging through the root logger provided to the graph. The actor and
+// its two mailboxes (subscriptions and event broadcasts) are started and
+// stopped with the application lifecycle.
 func NewNotifier() fx.Option {
 	return fx.Module(
 		"confignotifier",
@@ -71,11 +73,13 @@ func NewNotifier() fx.Option {
 		}),
 		fx.Provide(func(
 			lc fx.Lifecycle,
+			rootLogger *slog.Logger,
 			subMbox actor.Mailbox[SubscribeMessage],
 			eventMbox actor.Mailbox[Event],
 		) Notifier {
 			notifier := &notifierImpl{
 				Actor: actor.New(&worker{
+					logger:      rootLogger.With(slog.String("channel", "confignotify")),
 					subscribers: make(map[actor.Mailbox[Event]]<-chan struct{}),
 					subMbox:     subMbox,
 					eventMbox:   eventMbox,

@@ -27,6 +27,8 @@ import (
 type BackupLogsDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage storage.AuthStorage
 	LogStorage  storage.LogStorage
 }
@@ -38,10 +40,11 @@ type BackupLogsDeps struct {
 // reloaded with [NewRestoreLogsUsecase]. Callers must have the
 // read-streams permission.
 func NewBackupLogsUsecase(deps BackupLogsDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_STREAMS,
 			func(

@@ -24,6 +24,8 @@ import (
 type WhoamiDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage storage.AuthStorage
 }
 
@@ -33,7 +35,7 @@ type WhoamiDeps struct {
 // to do, typically to drive UI affordances. It requires authentication but no
 // particular permission.
 func NewWhoamiUsecase(deps WhoamiDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		func(

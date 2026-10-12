@@ -24,6 +24,8 @@ import (
 type ListPipelinesDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage   storage.AuthStorage
 	ConfigStorage storage.ConfigStorage
 }
@@ -32,10 +34,11 @@ type ListPipelinesDeps struct {
 //
 // Callers must have the read-pipelines permission.
 func NewListPipelinesUsecase(deps ListPipelinesDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_PIPELINES,
 			func(

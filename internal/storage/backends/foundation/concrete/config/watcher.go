@@ -38,6 +38,7 @@ type systemConfigCache interface {
 // confignotify events, so every node of the cluster (including the one that
 // made the change) reacts to configuration changes through the same path.
 type watchWorker struct {
+	logger      *slog.Logger
 	adapter     *foundation.FoundationAdapter
 	notifier    confignotify.Notifier
 	systemCache systemConfigCache
@@ -170,10 +171,9 @@ func (w *watchWorker) backoff(ctx actor.Context) actor.WorkerStatus {
 }
 
 func (w *watchWorker) logError(ctx context.Context, message string, err error) {
-	slog.ErrorContext(
+	w.logger.ErrorContext(
 		ctx,
 		message,
-		"channel", "storage.config",
 		"error", err.Error(),
 	)
 }

@@ -25,6 +25,8 @@ import (
 type ChangePasswordDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage storage.AuthStorage
 }
 
@@ -36,7 +38,7 @@ type ChangePasswordDeps struct {
 // permission-denied. The request is marked sensitive so the passwords are kept
 // out of FlowG's own logs.
 func NewChangePasswordUsecase(deps ChangePasswordDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		func(

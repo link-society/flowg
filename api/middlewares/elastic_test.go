@@ -9,6 +9,7 @@ import (
 
 	"bytes"
 	"fmt"
+	"log/slog"
 
 	"github.com/elastic/go-elasticsearch/v9"
 
@@ -27,6 +28,7 @@ func TestElasticEndpoint(t *testing.T) {
 	mockPipelineRunner := pipelinesMocks.NewMockRunner().(*pipelinesMocks.MockRunner)
 
 	deps := middlewares.ElasticDeps{
+		Logger:         slog.New(slog.DiscardHandler),
 		AuthStorage:    mockAuthStorage,
 		ConfigStorage:  mockConfigStorage,
 		PipelineRunner: mockPipelineRunner,

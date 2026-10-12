@@ -43,6 +43,7 @@ type runnerImpl struct {
 type deps struct {
 	fx.In
 
+	Logger         *slog.Logger
 	ConfigStorage  storage.ConfigStorage
 	LogStorage     storage.LogStorage
 	LogNotifier    lognotify.LogNotifier
@@ -75,6 +76,7 @@ func NewRunner() fx.Option {
 		}),
 		fx.Provide(func(lc fx.Lifecycle, d deps, mbox actor.Mailbox[message]) Runner {
 			w := &worker{
+				logger:        d.Logger.With(slog.String("channel", "pipelines")),
 				mbox:          mbox,
 				configStorage: d.ConfigStorage,
 				logStorage:    d.LogStorage,
@@ -107,10 +109,9 @@ func NewRunner() fx.Option {
 					// to fix it) from starting
 					for _, pipelineName := range pipelines {
 						if err := runner.run(ctx, pipelineName); err != nil {
-							slog.ErrorContext(
+							w.logger.ErrorContext(
 								ctx,
 								"failed to start pipeline",
-								"channel", "pipelines",
 								"pipeline", pipelineName,
 								"error", err.Error(),
 							)

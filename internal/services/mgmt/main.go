@@ -29,12 +29,13 @@ type Server struct {
 // Module returns an fx module exposing the operational endpoints on a separate
 // port: "/health" for liveness, "/metrics" for Prometheus, and (in debug builds)
 // the pprof profiler. It is configured by the [Options] provided to the graph,
-// and bound to the application lifecycle.
+// logs through the root [slog.Logger] provided to the graph, and is bound to
+// the application lifecycle.
 func Module() fx.Option {
 	return fx.Module(
 		"services.mgmt",
-		fx.Provide(func(lc fx.Lifecycle, opts Options) *Server {
-			logger := slog.Default().With(
+		fx.Provide(func(lc fx.Lifecycle, opts Options, rootLogger *slog.Logger) *Server {
+			logger := rootLogger.With(
 				slog.String("channel", "mgmt"),
 				slog.Group("mgmt",
 					slog.String("bind", opts.BindAddress),

@@ -24,6 +24,8 @@ import (
 type GetUserDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage storage.AuthStorage
 }
 
@@ -32,10 +34,11 @@ type GetUserDeps struct {
 // Callers must have the read-ACLs permission. Requesting an unknown user yields
 // a not-found error.
 func NewGetUserUsecase(deps GetUserDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_ACLS,
 			func(

@@ -24,6 +24,8 @@ import (
 type ListTransformersDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage   storage.AuthStorage
 	ConfigStorage storage.ConfigStorage
 }
@@ -32,10 +34,11 @@ type ListTransformersDeps struct {
 //
 // Callers must have the read-transformers permission.
 func NewListTransformersUsecase(deps ListTransformersDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_TRANSFORMERS,
 			func(

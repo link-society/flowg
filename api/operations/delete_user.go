@@ -24,6 +24,8 @@ import (
 type DeleteUserDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage storage.AuthStorage
 }
 
@@ -32,10 +34,11 @@ type DeleteUserDeps struct {
 // Callers must have the write-ACLs permission. Deleting an absent user is
 // treated as a success.
 func NewDeleteUserUsecase(deps DeleteUserDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_ACLS,
 			func(

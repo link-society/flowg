@@ -24,6 +24,8 @@ import (
 type DeleteAuthProviderDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage storage.AuthStorage
 }
 
@@ -32,10 +34,11 @@ type DeleteAuthProviderDeps struct {
 // Callers must have the write-auth-providers permission. Deleting an absent auth provider is
 // treated as a success.
 func NewDeleteAuthProviderUsecase(deps DeleteAuthProviderDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_AUTH_PROVIDERS,
 			func(

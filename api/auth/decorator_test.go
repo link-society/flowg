@@ -3,6 +3,7 @@ package auth_test
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -17,6 +18,8 @@ import (
 
 type req struct{}
 type resp struct{}
+
+var discardLogger = slog.New(slog.DiscardHandler)
 
 func authorizedContext() context.Context {
 	user := &models.User{Name: "alice", Roles: []string{"admin"}}
@@ -40,7 +43,7 @@ func TestRequireScopeAllowsAuthorizedCaller(t *testing.T) {
 	}
 
 	decorated := auth.RequireScopeApiDecorator(
-		mockStorage, models.SCOPE_READ_PIPELINES, next,
+		discardLogger, mockStorage, models.SCOPE_READ_PIPELINES, next,
 	)
 	err := decorated(authorizedContext(), req{}, &resp{})
 
@@ -65,7 +68,7 @@ func TestRequireScopeRejectsUnauthorizedCaller(t *testing.T) {
 	}
 
 	decorated := auth.RequireScopeApiDecorator(
-		mockStorage, models.SCOPE_READ_PIPELINES, next,
+		discardLogger, mockStorage, models.SCOPE_READ_PIPELINES, next,
 	)
 	err := decorated(authorizedContext(), req{}, &resp{})
 
@@ -89,7 +92,7 @@ func TestRequireScopeForwardsLookupFailure(t *testing.T) {
 	}
 
 	decorated := auth.RequireScopeApiDecorator(
-		mockStorage, models.SCOPE_READ_PIPELINES, next,
+		discardLogger, mockStorage, models.SCOPE_READ_PIPELINES, next,
 	)
 	err := decorated(authorizedContext(), req{}, &resp{})
 
@@ -109,7 +112,7 @@ func TestRequireScopesWithoutScopesRunsNextUnchanged(t *testing.T) {
 	}
 
 	decorated := auth.RequireScopesApiDecorator(
-		mockStorage, nil, next,
+		discardLogger, mockStorage, nil, next,
 	)
 	err := decorated(authorizedContext(), req{}, &resp{})
 
@@ -138,7 +141,7 @@ func TestRequireScopesRequiresEveryScope(t *testing.T) {
 	}
 
 	decorated := auth.RequireScopesApiDecorator(
-		mockStorage,
+		discardLogger, mockStorage,
 		[]models.Scope{models.SCOPE_READ_PIPELINES, models.SCOPE_WRITE_PIPELINES},
 		next,
 	)
@@ -171,7 +174,7 @@ func TestRequireScopesRejectsWhenOneScopeMissing(t *testing.T) {
 	}
 
 	decorated := auth.RequireScopesApiDecorator(
-		mockStorage,
+		discardLogger, mockStorage,
 		[]models.Scope{models.SCOPE_READ_PIPELINES, models.SCOPE_WRITE_PIPELINES},
 		next,
 	)

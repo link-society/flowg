@@ -3,6 +3,8 @@ package config_test
 import (
 	"testing"
 
+	"log/slog"
+
 	"github.com/stretchr/testify/mock"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
@@ -44,6 +46,7 @@ func TestNotifyOnMutations(t *testing.T) {
 
 	app := fxtest.New(
 		t,
+		fx.Supply(slog.New(slog.DiscardHandler)),
 		fx.Supply(opts),
 		badgerconfig.Module(),
 		fx.Provide(func() confignotify.Notifier { return notifier }),

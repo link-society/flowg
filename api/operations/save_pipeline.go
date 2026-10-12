@@ -24,6 +24,8 @@ import (
 type SavePipelineDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage   storage.AuthStorage
 	ConfigStorage storage.ConfigStorage
 }
@@ -33,10 +35,11 @@ type SavePipelineDeps struct {
 // Callers must have the write-pipelines permission. Persisting a pipeline
 // notifies the pipeline runner, which rebuilds and restarts it.
 func NewSavePipelineUsecase(deps SavePipelineDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_PIPELINES,
 			func(

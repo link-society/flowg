@@ -3,6 +3,8 @@ package bootstrap_test
 import (
 	"testing"
 
+	"log/slog"
+
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 
@@ -22,6 +24,7 @@ func TestDefaultPipeline(t *testing.T) {
 
 	app := fxtest.New(
 		t,
+		fx.Supply(slog.New(slog.DiscardHandler)),
 		fx.Supply(configOpts),
 		config.Module(),
 		fx.Populate(&configStorage),
