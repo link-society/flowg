@@ -22,7 +22,8 @@ func TestDefaultPipeline(t *testing.T) {
 
 	app := fxtest.New(
 		t,
-		config.NewStorage(configOpts),
+		fx.Supply(configOpts),
+		config.Module(),
 		fx.Populate(&configStorage),
 		fx.NopLogger,
 	)

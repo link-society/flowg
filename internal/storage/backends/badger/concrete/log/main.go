@@ -25,6 +25,7 @@ type Options struct {
 type deps struct {
 	fx.In
 
+	Options Options
 	Adapter *badger.BadgerAdapter `name:"storage.log"`
 }
 
@@ -38,24 +39,26 @@ func DefaultOptions() Options {
 	}
 }
 
-// NewStorage returns an fx module providing a badger-backed [storage.LogStorage]
-// configured with the given options. It also starts a background worker that
-// periodically runs the value-log garbage collector.
-func NewStorage(opts Options) fx.Option {
-	adapterOpts := badger.AdapterOptions{
-		LogChannel: "storage.log",
-		Directory:  opts.Directory,
-		InMemory:   opts.InMemory,
-		ReadOnly:   opts.ReadOnly,
+// adapterOptions returns the options of the underlying badger adapter.
+func (o Options) adapterOptions() badger.AdapterOptions {
+	return badger.AdapterOptions{
+		Directory: o.Directory,
+		InMemory:  o.InMemory,
+		ReadOnly:  o.ReadOnly,
 	}
+}
 
+// Module returns an fx module providing a badger-backed [storage.LogStorage]
+// configured by the [Options] provided to the graph. It also starts a
+// background worker that periodically runs the value-log garbage collector.
+func Module() fx.Option {
 	return fx.Module(
 		"storage.log",
-		badger.NewAdapter(adapterOpts),
+		badger.NewAdapter("storage.log", Options.adapterOptions),
 		fx.Provide(func(lc fx.Lifecycle, d deps) storage.LogStorage {
-			storage := log.NewStorage(d.Adapter, opts.BatchSize)
+			storage := log.NewStorage(d.Adapter, d.Options.BatchSize)
 
-			gc := actor.New(log.NewGarbageCollector(storage, opts.GCInterval))
+			gc := actor.New(log.NewGarbageCollector(storage, d.Options.GCInterval))
 
 			lc.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {

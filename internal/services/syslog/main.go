@@ -17,9 +17,9 @@ import (
 	"link-society.com/flowg/internal/engines/pipelines"
 )
 
-// ServerOptions configures the syslog server: UDP (default) or TCP, where to
-// bind, and an optional TLS configuration (TCP only).
-type ServerOptions struct {
+// Options configures the syslog server: UDP (default) or TCP, where to bind,
+// and an optional TLS configuration (TCP only).
+type Options struct {
 	TcpMode     bool
 	BindAddress string
 	TlsConfig   *tls.Config
@@ -31,16 +31,14 @@ type Server struct {
 	actor.Actor
 }
 
-// NewServer returns an fx module that listens for syslog messages (auto-detecting
-// the format) and feeds each one, through the worker actor, into every pipeline's
-// syslog entrypoint. Listener and actor are bound to the application lifecycle.
-func NewServer(opts ServerOptions) fx.Option {
+// newLogger returns the logger of the syslog server, scoped to its options.
+func newLogger(opts Options) *slog.Logger {
 	proto := "udp"
 	if opts.TcpMode {
 		proto = "tcp"
 	}
 
-	logger := slog.Default().With(
+	return slog.Default().With(
 		slog.String("channel", "syslog"),
 		slog.Group("syslog",
 			slog.String("proto", proto),
@@ -48,7 +46,13 @@ func NewServer(opts ServerOptions) fx.Option {
 			slog.Bool("tls", opts.TlsConfig != nil),
 		),
 	)
+}
 
+// Module returns an fx module that listens for syslog messages (auto-detecting
+// the format) and feeds each one, through the worker actor, into every
+// pipeline's syslog entrypoint. It is configured by the [Options] provided to
+// the graph. Listener and actor are bound to the application lifecycle.
+func Module() fx.Option {
 	return fx.Module(
 		"services.syslog",
 		fx.Provide(func() gosyslog.LogPartsChannel {
@@ -57,7 +61,9 @@ func NewServer(opts ServerOptions) fx.Option {
 		fx.Provide(func(channel gosyslog.LogPartsChannel) *gosyslog.ChannelHandler {
 			return gosyslog.NewChannelHandler(channel)
 		}),
-		fx.Provide(func(lc fx.Lifecycle, handler *gosyslog.ChannelHandler) *gosyslog.Server {
+		fx.Provide(func(lc fx.Lifecycle, opts Options, handler *gosyslog.ChannelHandler) *gosyslog.Server {
+			logger := newLogger(opts)
+
 			server := gosyslog.NewServer()
 			server.SetFormat(gosyslog.Automatic)
 			server.SetHandler(handler)
@@ -99,13 +105,14 @@ func NewServer(opts ServerOptions) fx.Option {
 		}),
 		fx.Provide(func(
 			lc fx.Lifecycle,
+			opts Options,
 			channel gosyslog.LogPartsChannel,
 			configStorage storage.ConfigStorage,
 			pipelineRunner pipelines.Runner,
 		) *Server {
 			srv := &Server{
 				Actor: actor.New(&worker{
-					logger:         logger,
+					logger:         newLogger(opts),
 					channel:        channel,
 					configStorage:  configStorage,
 					pipelineRunner: pipelineRunner,

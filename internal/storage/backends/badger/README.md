@@ -13,7 +13,8 @@ store into ready-to-use `fx` modules.
 ## Design
 
 `NewAdapter` returns an `fx` module that provides a `BadgerAdapter`, a
-`kv.Adapter` implementation. All database access is serialized through an actor
+`kv.Adapter` implementation, under the given name. Its `AdapterOptions` are
+derived from the options of the storage owning it, injected from the graph. All database access is serialized through an actor
 mailbox: `View`, `Update`, `Backup` and `Restore` each enqueue an operation that
 a single worker goroutine applies to the BadgerDB handle, and write transactions
 are transparently retried on conflict. Composite `kv.Key`s are joined into

@@ -33,20 +33,22 @@ func DefaultOptions() Options {
 	}
 }
 
-// NewStorage returns an fx module providing a FoundationDB-backed
-// [storage.AuthStorage] configured with the given options.
-func NewStorage(opts Options) fx.Option {
-	adapterOpts := foundation.AdapterOptions{
-		LogChannel:       "storage.auth",
-		ClusterFile:      opts.ClusterFile,
-		ConnectionString: opts.ConnectionString,
-		KeySpace:         opts.KeySpace,
+// adapterOptions returns the options of the underlying FoundationDB adapter.
+func (o Options) adapterOptions() foundation.AdapterOptions {
+	return foundation.AdapterOptions{
+		ClusterFile:      o.ClusterFile,
+		ConnectionString: o.ConnectionString,
+		KeySpace:         o.KeySpace,
 		Namespace:        "auth",
 	}
+}
 
+// Module returns an fx module providing a FoundationDB-backed
+// [storage.AuthStorage] configured by the [Options] provided to the graph.
+func Module() fx.Option {
 	return fx.Module(
 		"storage.auth",
-		foundation.NewAdapter(adapterOpts),
+		foundation.NewAdapter("storage.auth", Options.adapterOptions),
 		fx.Provide(func(d deps) storage.AuthStorage {
 			return auth.NewStorage(d.Adapter)
 		}),

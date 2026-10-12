@@ -11,10 +11,10 @@ It assembles the FoundationDB adapter (scoped to the `auth` subspace) with the
 
 ## Wiring
 
-`NewStorage` returns an `fx` module that provides an `AuthStorage`. `Options`
-carries the FoundationDB cluster file and the shared key space, and
-`DefaultOptions` supplies their defaults.
+`Module` returns an `fx` module that provides an `AuthStorage`, configured by
+the `Options` provided to the graph. `Options` carries the FoundationDB cluster
+file and the shared key space, and `DefaultOptions` supplies their defaults.
 
 ## Layout
 
-- **main.go** — the `Options`, `DefaultOptions` and `NewStorage` `fx` wiring.
+- **main.go** — the `Options`, `DefaultOptions` and `Module` `fx` wiring.

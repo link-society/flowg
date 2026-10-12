@@ -16,7 +16,8 @@ adapter and the matching domain store into ready-to-use `fx` modules.
 ## Design
 
 `NewAdapter` returns an `fx` module that provides a `FoundationAdapter`, a
-`kv.Adapter` implementation. `View` runs inside a read-only transaction
+`kv.Adapter` implementation, under the given name. Its `AdapterOptions` are
+derived from the options of the storage owning it, injected from the graph. `View` runs inside a read-only transaction
 (`db.ReadTransact`, never committed) and `Update` inside a read-write
 transaction (`db.Transact`, committed on success); FoundationDB retries both
 automatically on retryable errors and conflicts.

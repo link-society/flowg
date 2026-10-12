@@ -16,9 +16,9 @@ import (
 	"link-society.com/flowg/web"
 )
 
-// ServerOptions configures the HTTP server: where to bind, the path everything
-// is mounted under, and an optional TLS configuration (nil serves plain HTTP).
-type ServerOptions struct {
+// Options configures the HTTP server: where to bind, the path everything is
+// mounted under, and an optional TLS configuration (nil serves plain HTTP).
+type Options struct {
 	BindAddress string
 	MountPath   string
 	TlsConfig   *tls.Config
@@ -40,16 +40,17 @@ type handlers struct {
 	WebHandler http.Handler `name:"service-http-web"`
 }
 
-// NewServer returns an fx module that mounts the API under "<mount>/api/" and
-// the web UI under "<mount>/web/" (with the root redirecting to the UI), wraps
+// Module returns an fx module that mounts the API under "<mount>/api/" and the
+// web UI under "<mount>/web/" (with the root redirecting to the UI), wraps
 // everything in the access-log middleware, and binds the server to the
-// application lifecycle.
-func NewServer(opts ServerOptions) fx.Option {
+// application lifecycle. It is configured by the [Options] provided to the
+// graph.
+func Module() fx.Option {
 	return fx.Module(
 		"services.http",
 		api.Module("service-http-api"),
-		web.Module("service-http-web", opts.MountPath),
-		fx.Provide(func(lc fx.Lifecycle, h handlers) *Server {
+		web.Module("service-http-web"),
+		fx.Provide(func(lc fx.Lifecycle, opts Options, h handlers) *Server {
 			rootHandler := http.NewServeMux()
 			rootHandler.Handle(opts.MountPath+"/api/", http.StripPrefix(opts.MountPath, h.ApiHandler))
 			rootHandler.Handle(opts.MountPath+"/web/", http.StripPrefix(opts.MountPath, h.WebHandler))

@@ -25,7 +25,8 @@ func TestDefaultSystemConfig(t *testing.T) {
 
 	app := fxtest.New(
 		t,
-		config.NewStorage(confOpts),
+		fx.Supply(confOpts),
+		config.Module(),
 		fx.Populate(&confStorage),
 		fx.NopLogger,
 	)

@@ -17,7 +17,8 @@ external file dependencies, and the rest of the application only ever sees an
   only known at runtime — the enabled feature flags and the mount path the UI
   is served from — can be injected into the page on each request.
 - **Wiring** — `Module` provides the handler to the application's `fx`
-  dependency graph under a named tag so the HTTP server can mount it.
+  dependency graph under a named tag so the HTTP server can mount it. It is
+  configured by the `Options` (mount path) provided to the graph.
 
 ## Compression
 

@@ -11,12 +11,13 @@ be firewalled independently of user traffic.
 - **Metrics** — exposes the Prometheus registry at `/metrics`.
 - **Profiling** — mounts the `net/http/pprof` endpoints under `/debug/pprof/`,
   but only in builds compiled with the `debug` build tag.
-- **Wiring** — `NewServer` returns an fx module binding the listener to the
-  application lifecycle, optionally over TLS.
+- **Wiring** — `Module` returns an fx module binding the listener to the
+  application lifecycle, optionally over TLS. It is configured by the `Options`
+  provided to the graph.
 
 ## Layout
 
-- **main.go** — `ServerOptions`, the `Server`, and the `NewServer` fx module.
+- **main.go** — `Options`, the `Server`, and the `Module` fx module.
 - **profiler_debug.go** — registers the pprof endpoints (build tag `debug`).
 - **profiler_nodebug.go** — a no-op profiler registration for normal builds
   (build tag `!debug`).

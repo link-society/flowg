@@ -43,7 +43,8 @@ func TestSystemConfigCacheInvalidation(t *testing.T) {
 
 	app := fxtest.New(
 		t,
-		badgerconfig.NewStorage(opts),
+		fx.Supply(opts),
+		badgerconfig.Module(),
 		fx.Populate(&nodeA),
 		fx.Populate(&d),
 		fx.NopLogger,
@@ -112,7 +113,8 @@ func TestSystemConfigCacheInvalidatedOnRestore(t *testing.T) {
 
 		app := fxtest.New(
 			t,
-			badgerconfig.NewStorage(opts),
+			fx.Supply(opts),
+			badgerconfig.Module(),
 			fx.Populate(&configStorage),
 			fx.NopLogger,
 		)
@@ -136,7 +138,8 @@ func TestSystemConfigCacheInvalidatedOnRestore(t *testing.T) {
 
 	app := fxtest.New(
 		t,
-		badgerconfig.NewStorage(opts),
+		fx.Supply(opts),
+		badgerconfig.Module(),
 		fx.Populate(&configStorage),
 		fx.NopLogger,
 	)

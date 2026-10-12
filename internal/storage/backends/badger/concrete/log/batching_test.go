@@ -34,7 +34,8 @@ func newBatchedStorage(t *testing.T, batchSize int) (context.Context, storage.Lo
 
 	app := fxtest.New(
 		t,
-		badgerlog.NewStorage(opts),
+		fx.Supply(opts),
+		badgerlog.Module(),
 		fx.Populate(&logStorage),
 		fx.NopLogger,
 	)

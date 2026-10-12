@@ -30,6 +30,7 @@ type Options struct {
 type deps struct {
 	fx.In
 
+	Options Options
 	Adapter *foundation.FoundationAdapter `name:"storage.log"`
 }
 
@@ -43,26 +44,29 @@ func DefaultOptions() Options {
 	}
 }
 
-// NewStorage returns an fx module providing a FoundationDB-backed
-// [storage.LogStorage] configured with the given options. It also starts a
-// background worker that periodically enforces each stream's retention budget.
-func NewStorage(opts Options) fx.Option {
-	adapterOpts := foundation.AdapterOptions{
-		LogChannel:       "storage.log",
-		ClusterFile:      opts.ClusterFile,
-		ConnectionString: opts.ConnectionString,
-		KeySpace:         opts.KeySpace,
+// adapterOptions returns the options of the underlying FoundationDB adapter.
+func (o Options) adapterOptions() foundation.AdapterOptions {
+	return foundation.AdapterOptions{
+		ClusterFile:      o.ClusterFile,
+		ConnectionString: o.ConnectionString,
+		KeySpace:         o.KeySpace,
 		Namespace:        "log",
-		GCInterval:       opts.GCInterval,
+		GCInterval:       o.GCInterval,
 	}
+}
 
+// Module returns an fx module providing a FoundationDB-backed
+// [storage.LogStorage] configured by the [Options] provided to the graph. It
+// also starts a background worker that periodically enforces each stream's
+// retention budget.
+func Module() fx.Option {
 	return fx.Module(
 		"storage.log",
-		foundation.NewAdapter(adapterOpts),
+		foundation.NewAdapter("storage.log", Options.adapterOptions),
 		fx.Provide(func(lc fx.Lifecycle, d deps) storage.LogStorage {
-			storage := log.NewStorage(d.Adapter, opts.BatchSize)
+			storage := log.NewStorage(d.Adapter, d.Options.BatchSize)
 
-			gc := actor.New(log.NewGarbageCollector(storage, opts.GCInterval))
+			gc := actor.New(log.NewGarbageCollector(storage, d.Options.GCInterval))
 
 			lc.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {

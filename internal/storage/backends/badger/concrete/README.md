@@ -12,7 +12,8 @@ shared BadgerDB primitives that sit alongside them (the adapter, the transaction
 adapter, and the `slog` logger).
 
 Every package exposes the same shape: an `Options` struct, a `DefaultOptions`
-constructor and a `NewStorage` function returning the `fx` module.
+constructor and a `Module` function returning the `fx` module, configured by
+the `Options` provided to the graph.
 
 ## Layout
 
