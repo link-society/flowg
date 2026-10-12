@@ -33,14 +33,7 @@ func NewRootCommand() *cobra.Command {
 		Short: "Low-Code log management solution",
 		Run: func(cmd *cobra.Command, args []string) {
 			cfg := config.DefaultConfig()
-
-			var err error
-			if configPath != "" {
-				err = cfg.Load(configPath)
-			} else {
-				err = cfg.Validate()
-			}
-			if err != nil {
+			if err := cfg.Load(configPath); err != nil {
 				fmt.Printf("ERROR: %v\n", err)
 				ExitCode = 1
 				return
