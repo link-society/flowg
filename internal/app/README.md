@@ -13,6 +13,8 @@ out of its subpackages.
 - **[server](server)** — the `NewServer` fx module that wires the whole server
   together (storage, engines, services) and the bootstrap handler that seeds a
   fresh instance on start.
+- **[config](config)** — the configuration file schema, its environment-based
+  defaults and its validation.
 - **[logging](logging)** — request-scoped correlation helpers and the `slog`
   handler shared by the API and the server process.
 - **[metrics](metrics)** — the Prometheus counters and helpers exposed on the

@@ -9,6 +9,7 @@ import (
 	"go.uber.org/dig"
 	"go.uber.org/fx"
 
+	"link-society.com/flowg/internal/app/config"
 	"link-society.com/flowg/internal/app/featureflags"
 	"link-society.com/flowg/internal/app/metrics"
 	"link-society.com/flowg/internal/app/server"
@@ -31,13 +32,13 @@ func NewRootCommand() *cobra.Command {
 		Use:   "flowg-server",
 		Short: "Low-Code log management solution",
 		Run: func(cmd *cobra.Command, args []string) {
-			config := DefaultConfig()
+			cfg := config.DefaultConfig()
 
 			var err error
 			if configPath != "" {
-				err = config.Load(configPath)
+				err = cfg.Load(configPath)
 			} else {
-				err = config.Validate()
+				err = cfg.Validate()
 			}
 			if err != nil {
 				fmt.Printf("ERROR: %v\n", err)
@@ -45,7 +46,7 @@ func NewRootCommand() *cobra.Command {
 				return
 			}
 
-			opts, err := config.AsServerOptions()
+			opts, err := asServerOptions(cfg)
 			if err != nil {
 				fmt.Printf("ERROR: %v\n", err)
 				ExitCode = 1
@@ -53,8 +54,8 @@ func NewRootCommand() *cobra.Command {
 			}
 
 			syscall.Umask(0077)
-			logging.Setup(config.Logging.Verbose, config.Logging.Level)
-			featureflags.SetDemoMode(config.DemoMode)
+			logging.Setup(cfg.Logging.Verbose, cfg.Logging.Level)
+			featureflags.SetDemoMode(cfg.DemoMode)
 			metrics.Setup()
 
 			app := fx.New(fx.NopLogger, server.NewServer(opts))
