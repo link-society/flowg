@@ -11,10 +11,13 @@ options of each component is the job of the caller.
 
 ## Layout
 
-- **`schema.go`** — the schema (`RootConfig` and its sections), the built-in
-  defaults (`DefaultConfig`), and the `Load` / `Validate` methods that complete
-  the configuration from the configuration file and the environment, then check
-  it.
+- **`schema.go`** — the schema (`RootConfig` and its sections), whose `default`
+  struct tags declare the built-in defaults (`DefaultConfig`), and the `Load` /
+  `Validate` methods that complete the configuration from the configuration
+  file and the environment, then check it.
+- **`defaults.go`** — `applyDefaults`, filling a struct from its `default` tags
+  (`string`, `bool`, comma-separated `[]string`; blocks tagged `default:"{}"`
+  are allocated and filled recursively, untagged blocks stay nil).
 - **`env.go`** — the environment overlay applied by `Load` after the
   configuration file (environment variables take precedence), and the `getEnv*`
   helpers reading a typed value from an environment variable, with a fallback

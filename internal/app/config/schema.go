@@ -1,6 +1,6 @@
 // Package config defines the user-facing configuration of flowg-server: the
-// schema of the HCL configuration file, its defaults (resolved from environment
-// variables), and its validation.
+// schema of the HCL configuration file, its defaults (declared by the `default`
+// struct tags), its environment overlay, and its validation.
 package config
 
 import (
@@ -17,39 +17,39 @@ import (
 type RootConfig struct {
 	// DemoMode enables the demo role and user account which is not suitable for
 	// production use. It is intended for demonstration and testing purposes only.
-	DemoMode bool `hcl:"demo,optional"`
+	DemoMode bool `hcl:"demo,optional" default:"false"`
 
-	Logging  *LoggingConfig  `hcl:"logging,block"`
-	Services *ServicesConfig `hcl:"services,block"`
-	Storage  *StorageConfig  `hcl:"storage,block"`
+	Logging  *LoggingConfig  `hcl:"logging,block" default:"{}"`
+	Services *ServicesConfig `hcl:"services,block" default:"{}"`
+	Storage  *StorageConfig  `hcl:"storage,block" default:"{}"`
 }
 
 // Define logging settings
 type LoggingConfig struct {
-	Level   string `hcl:"level,optional"`
-	Verbose bool   `hcl:"verbose,optional"`
+	Level   string `hcl:"level,optional" default:"info"`
+	Verbose bool   `hcl:"verbose,optional" default:"false"`
 }
 
 // Group together the configuration for the services provided by the server.
 // Each service needs to bind to a specific address and port, and may have TLS
 // support.
 type ServicesConfig struct {
-	Http       *HttpConfig       `hcl:"http,block"`
-	Management *ManagementConfig `hcl:"management,block"`
-	Syslog     *SyslogConfig     `hcl:"syslog,block"`
+	Http       *HttpConfig       `hcl:"http,block" default:"{}"`
+	Management *ManagementConfig `hcl:"management,block" default:"{}"`
+	Syslog     *SyslogConfig     `hcl:"syslog,block" default:"{}"`
 }
 
 // Configuration for the "HTTP" service, which provides the REST API and web UI.
 type HttpConfig struct {
-	BindAddress string         `hcl:"bind,optional"`
-	MountPath   string         `hcl:"mount,optional"`
+	BindAddress string         `hcl:"bind,optional" default:":5080"`
+	MountPath   string         `hcl:"mount,optional" default:"/"`
 	Tls         *HttpTlsConfig `hcl:"tls,block"`
 }
 
 // Configuration for the "Management" service, which provides the health check
 // and metrics endpoints.
 type ManagementConfig struct {
-	BindAddress string         `hcl:"bind,optional"`
+	BindAddress string         `hcl:"bind,optional" default:":9113"`
 	Tls         *HttpTlsConfig `hcl:"tls,block"`
 }
 
@@ -63,9 +63,9 @@ type HttpTlsConfig struct {
 // receiving log messages from other services. It supports both TCP and UDP
 // protocols, and can optionally use TLS for secure communication.
 type SyslogConfig struct {
-	Bind                  string           `hcl:"bind,optional"`
-	Protocol              string           `hcl:"protocol,optional"`
-	InitialAllowedOrigins []string         `hcl:"initial_allowed_origins,optional"`
+	Bind                  string           `hcl:"bind,optional" default:":5514"`
+	Protocol              string           `hcl:"protocol,optional" default:"udp"`
+	InitialAllowedOrigins []string         `hcl:"initial_allowed_origins,optional" default:""`
 	Tls                   *SyslogTlsConfig `hcl:"tls,block"`
 }
 
@@ -73,19 +73,20 @@ type SyslogConfig struct {
 type SyslogTlsConfig struct {
 	Cert        string `hcl:"cert"`
 	Key         string `hcl:"key"`
-	AuthEnabled bool   `hcl:"auth,optional"`
+	AuthEnabled bool   `hcl:"auth,optional" default:"false"`
 }
 
 // StorageConfig groups together settings related to storage.
 type StorageConfig struct {
-	Backend *StorageBackendConfig `hcl:"backend,block"`
-	Seed    *StorageSeedConfig    `hcl:"seed,block"`
+	Backend *StorageBackendConfig `hcl:"backend,block" default:"{}"`
+	Seed    *StorageSeedConfig    `hcl:"seed,block" default:"{}"`
 }
 
 // Configuration for the storage backend used by the server. It supports
-// multiple backends, but only one can be configured at a time.
+// multiple backends, but only one can be configured at a time: the settings of
+// the selected backend are held by the matching field, the others being nil.
 type StorageBackendConfig struct {
-	Backend string   `hcl:"backend,label"`
+	Backend string   `hcl:"backend,label" default:"badgerdb"`
 	Body    hcl.Body `hcl:",remain"`
 
 	BadgerDB     *StorageBackendBadgerDbConfig
@@ -107,90 +108,71 @@ var (
 // Configuration for the BadgerDB storage backend, which is an embedded
 // key-value store.
 type StorageBackendBadgerDbConfig struct {
-	AuthDir   string `hcl:"auth_dir,optional"`
-	LogDir    string `hcl:"log_dir,optional"`
-	ConfigDir string `hcl:"config_dir,optional"`
+	AuthDir   string `hcl:"auth_dir,optional" default:"./data/auth"`
+	LogDir    string `hcl:"log_dir,optional" default:"./data/logs"`
+	ConfigDir string `hcl:"config_dir,optional" default:"./data/config"`
 }
 
 // Configuration for the FoundationDB storage backend, which is a distributed
 // key-value store.
 type StorageBackendFoundationDbConfig struct {
-	ClusterFile      string `hcl:"cluster_file,optional"`
-	ConnectionString string `hcl:"connection_string,optional"`
-	KeySpace         string `hcl:"key_space,optional"`
+	ClusterFile      string `hcl:"cluster_file,optional" default:"/etc/foundationdb/fdb.cluster"`
+	ConnectionString string `hcl:"connection_string,optional" default:""`
+	KeySpace         string `hcl:"key_space,optional" default:"flowg"`
 }
 
 // Configuration for seeding the storage backend with initial data. This is
 // useful for setting up default users, roles, and other necessary data during
 // the first run of the server.
 type StorageSeedConfig struct {
-	Auth *StorageSeedAuthConfig `hcl:"auth,block"`
+	Auth *StorageSeedAuthConfig `hcl:"auth,block" default:"{}"`
 }
 
 // Configuration for seeding the authentication storage with an initial user
 // and password. This is useful for bootstrapping the server with a default
 // admin account.
 type StorageSeedAuthConfig struct {
-	InitialUser     string `hcl:"initial_user"`
-	InitialPassword string `hcl:"initial_password"`
+	InitialUser     string `hcl:"initial_user" default:"root"`
+	InitialPassword string `hcl:"initial_password" default:"root"`
 
-	ResetUser     string `hcl:"reset_user,optional"`
-	ResetPassword string `hcl:"reset_password,optional"`
+	ResetUser     string `hcl:"reset_user,optional" default:""`
+	ResetPassword string `hcl:"reset_password,optional" default:""`
 }
 
-// Returns the built-in default configuration for the server. It does not read
-// the environment: environment variables are applied by [RootConfig.Load].
+// Returns the built-in default configuration for the server, as declared by
+// the `default` struct tags of the schema. It does not read the environment:
+// environment variables are applied by [RootConfig.Load].
 func DefaultConfig() *RootConfig {
-	return &RootConfig{
-		DemoMode: false,
-		Logging: &LoggingConfig{
-			Level:   "info",
-			Verbose: false,
-		},
-		Services: &ServicesConfig{
-			Http: &HttpConfig{
-				BindAddress: ":5080",
-				MountPath:   "/",
-			},
-			Management: &ManagementConfig{
-				BindAddress: ":9113",
-			},
-			Syslog: &SyslogConfig{
-				Bind:                  ":5514",
-				Protocol:              "udp",
-				InitialAllowedOrigins: []string{},
-			},
-		},
-		Storage: &StorageConfig{
-			Backend: &StorageBackendConfig{
-				Backend:  StorageBackendBadgerDb,
-				BadgerDB: DefaultStorageBackendBadgerDbConfig(),
-			},
-			Seed: &StorageSeedConfig{
-				Auth: &StorageSeedAuthConfig{
-					InitialUser:     "root",
-					InitialPassword: "root",
-				},
-			},
-		},
-	}
+	cfg := newWithDefaults[RootConfig]()
+	cfg.Storage.Backend.selectBackend(cfg.Storage.Backend.Backend)
+	return cfg
 }
 
 // Returns the built-in default configuration for the BadgerDB storage backend.
 func DefaultStorageBackendBadgerDbConfig() *StorageBackendBadgerDbConfig {
-	return &StorageBackendBadgerDbConfig{
-		AuthDir:   "./data/auth",
-		LogDir:    "./data/logs",
-		ConfigDir: "./data/config",
-	}
+	return newWithDefaults[StorageBackendBadgerDbConfig]()
 }
 
 // Returns the built-in default configuration for the FoundationDB storage
 // backend.
 func DefaultStorageBackendFoundationDbConfig() *StorageBackendFoundationDbConfig {
-	return &StorageBackendFoundationDbConfig{
-		ClusterFile: "/etc/foundationdb/fdb.cluster",
-		KeySpace:    "flowg",
+	return newWithDefaults[StorageBackendFoundationDbConfig]()
+}
+
+// selectBackend selects the named backend, with its default settings, and
+// drops the settings of any other backend. An unsupported name leaves no
+// backend settings, which [StorageBackendConfig.Validate] reports.
+func (c *StorageBackendConfig) selectBackend(name string) {
+	c.Backend = name
+	c.BadgerDB = nil
+	c.FoundationDB = nil
+
+	switch name {
+	case StorageBackendBadgerDb:
+		c.BadgerDB = DefaultStorageBackendBadgerDbConfig()
+
+	case StorageBackendFoundationDb:
+		c.FoundationDB = DefaultStorageBackendFoundationDbConfig()
 	}
 }
 

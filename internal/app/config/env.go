@@ -64,17 +64,7 @@ func (c *SyslogConfig) applyEnv() {
 func (c *StorageBackendConfig) applyEnv() {
 	backend := getEnvString("FLOWG_STORAGE_BACKEND", c.Backend)
 	if backend != c.Backend {
-		c.Backend = backend
-		c.BadgerDB = nil
-		c.FoundationDB = nil
-
-		switch backend {
-		case StorageBackendBadgerDb:
-			c.BadgerDB = DefaultStorageBackendBadgerDbConfig()
-
-		case StorageBackendFoundationDb:
-			c.FoundationDB = DefaultStorageBackendFoundationDbConfig()
-		}
+		c.selectBackend(backend)
 	}
 
 	if c.BadgerDB != nil {
@@ -98,15 +88,16 @@ func (c *StorageSeedAuthConfig) applyEnv() {
 }
 
 // applyEnvToggle enables or disables an optional block according to the boolean
-// environment variable key: the block is allocated when enabled and missing,
-// removed when disabled, and left untouched when the variable is unset.
+// environment variable key: the block is allocated with its defaults when
+// enabled and missing, removed when disabled, and left untouched when the
+// variable is unset.
 func applyEnvToggle[T any](key string, block *T) *T {
 	if !getEnvBool(key, block != nil) {
 		return nil
 	}
 
 	if block == nil {
-		block = new(T)
+		block = newWithDefaults[T]()
 	}
 
 	return block
