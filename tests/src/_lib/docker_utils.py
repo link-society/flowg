@@ -1,4 +1,6 @@
-from time import sleep
+from time import monotonic, sleep
+
+import requests
 
 
 def cleanup(docker_client):
@@ -29,6 +31,36 @@ def wait_for_healthcheck(container):
             raise RuntimeError(f"Node {container.name} was not healthy")
 
         sleep(1)
+
+
+def wait_for_http(container, url, *, timeout=60, verify=True):
+    """
+    Wait until the service in the container answers HTTP requests.
+    Any HTTP response (whatever its status code) means the server is up.
+    """
+
+    deadline = monotonic() + timeout
+
+    while True:
+        try:
+            requests.get(url, timeout=1, verify=verify)
+
+        except requests.RequestException as err:
+            container.reload()
+            if container.status != "running":
+                raise RuntimeError(
+                    f"Container {container.name} is not running ({container.status})"
+                ) from err
+
+            if monotonic() >= deadline:
+                raise RuntimeError(
+                    f"Container {container.name} not ready after {timeout}s: {err}"
+                ) from err
+
+            sleep(1)
+
+        else:
+            break
 
 
 def teardown_container(container, report_dir):
