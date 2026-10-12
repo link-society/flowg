@@ -8,10 +8,13 @@ import (
 
 	"go.uber.org/fx"
 
+	"link-society.com/flowg/api/auth"
+
 	"link-society.com/flowg/internal/app/config"
 	"link-society.com/flowg/internal/app/featureflags"
 
 	"link-society.com/flowg/internal/models"
+	"link-society.com/flowg/internal/utils/secret"
 
 	badgerauth "link-society.com/flowg/internal/storage/backends/badger/concrete/auth"
 	badgerconfig "link-society.com/flowg/internal/storage/backends/badger/concrete/config"
@@ -35,6 +38,7 @@ func configModule(cfg *config.RootConfig) fx.Option {
 		"app.server.config",
 		fx.Supply(cfg),
 		fx.Provide(
+			provideAuthKeys,
 			provideFeatureFlags,
 			provideHttpOptions,
 			provideMgmtOptions,
@@ -174,6 +178,25 @@ func streamConfigOverride(flags featureflags.Flags) *models.StreamConfig {
 		RetentionSize: 10,
 		IndexedFields: []string{},
 	}
+}
+
+// provideAuthKeys provides the keys signing the JWTs issued on login, from the
+// configured secret key. When no secret key is configured, a random one is
+// generated, so issued tokens do not survive a restart.
+func provideAuthKeys(cfg *config.RootConfig) (auth.Keys, error) {
+	secretKey := cfg.Security.SecretKey
+	if secretKey == "" {
+		var err error
+		secretKey, err = secret.NewSecret("jwt", 32)
+		if err != nil {
+			return auth.Keys{}, fmt.Errorf("failed to generate JWT secret key: %w", err)
+		}
+	}
+
+	return auth.Keys{
+		SigningKey: []byte(secretKey),
+		TokenTTL:   auth.DefaultTokenTTL,
+	}, nil
 }
 
 // provideFeatureFlags extracts the feature toggles enabled by the

@@ -25,13 +25,14 @@ import (
 
 // handlerParams gathers everything [NewHandler] needs from the
 // dependency-injection container: the root logger, the authentication backend
-// it guards the routes with, the protocol-compatibility middlewares it mounts, and the full
+// and JWT keys it guards the routes with, the protocol-compatibility middlewares it mounts, and the full
 // set of operations contributed to the routing group.
 type handlerParams struct {
 	fx.In
 
 	Logger      *slog.Logger
 	AuthStorage storage.AuthStorage
+	Keys        auth.Keys
 
 	Operations  []routing.Operation  `group:"operations"`
 	Middlewares []routing.Middleware `group:"middlewares"`
@@ -93,7 +94,7 @@ func NewHandler(params handlerParams) http.Handler {
 			"Authentication using JSON Web Token",
 			"JWT",
 		),
-		auth.ApiMiddleware(logging.Logger(params.Logger), params.AuthStorage),
+		auth.ApiMiddleware(logging.Logger(params.Logger), params.AuthStorage, params.Keys),
 	).Group(func(router chi.Router) {
 		for _, op := range ops {
 			if !op.Public {

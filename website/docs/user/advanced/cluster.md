@@ -14,7 +14,8 @@ reads/writes the same shared FoundationDB cluster, so any node can ingest and
 query logs.
 
 :::note
-All nodes in the cluster **must** share the same `FLOWG_SECRET_KEY`. This key
+All nodes in the cluster **must** share the same `FLOWG_SECRET_KEY` (or
+`security.secret_key` in the configuration file). This key
 is used to sign the JSON Web Tokens handed out on login. If the nodes use
 different keys, a token issued by one node will be rejected by the others.
 :::

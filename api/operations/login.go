@@ -27,6 +27,7 @@ type LoginDeps struct {
 	Logger *slog.Logger
 
 	AuthStorage storage.AuthStorage
+	Keys        auth.Keys
 }
 
 // NewLoginUsecase authenticates a user by password and issues a session token.
@@ -60,7 +61,7 @@ func NewLoginUsecase(deps LoginDeps) usecase.Interactor {
 				return status.Wrap(errors.New("invalid credentials"), status.Unauthenticated)
 
 			case valid:
-				token, err := auth.NewJWT(req.Username)
+				token, err := deps.Keys.NewJWT(req.Username)
 				if err != nil {
 					logger.ErrorContext(
 						ctx,

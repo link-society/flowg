@@ -123,6 +123,11 @@ storage {
     }
   }
 }
+
+security {
+  # env: FLOWG_SECRET_KEY (default: "", a random key is generated)
+  secret_key = "a-long-random-secret"
+}
 ```
 
 ## Priority
@@ -141,7 +146,9 @@ service, even if the configuration file has a `tls` block.
 ## Security
 
 JSON Web Tokens, one of the mechanisms used for authentication against the API,
-are signed using the key provided by the environment variable
-`FLOWG_SECRET_KEY`.
+are signed using the key provided by `security.secret_key` (or the environment
+variable `FLOWG_SECRET_KEY`).
 
-If the environment variable is unset, a random key will be used.
+If unset, a random key is generated at startup: issued tokens are then
+invalidated whenever the server restarts. In a cluster, every node must share
+the same key.
