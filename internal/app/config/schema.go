@@ -23,6 +23,15 @@ type RootConfig struct {
 	Logging  *LoggingConfig  `hcl:"logging,block" default:"{}"`
 	Services *ServicesConfig `hcl:"services,block" default:"{}"`
 	Storage  *StorageConfig  `hcl:"storage,block" default:"{}"`
+	Security *SecurityConfig `hcl:"security,block" default:"{}"`
+}
+
+// SecurityConfig groups together the secrets used by the server.
+type SecurityConfig struct {
+	// SecretKey signs the JSON Web Tokens issued on login. When empty, a random
+	// key is generated at startup, so issued tokens do not survive a restart.
+	// Every node of a cluster must share the same key.
+	SecretKey string `hcl:"secret_key,optional" default:"" env:"FLOWG_SECRET_KEY"`
 }
 
 // Define logging settings

@@ -27,9 +27,13 @@ import (
 // the next handler is invoked. Any failure — missing, malformed, or invalid
 // credential — stops the chain and produces a [status.Unauthenticated] error
 // response, so downstream handlers can assume a valid identity is always
-// present. Authentications and response encoding failures are logged through
-// logger.
-func ApiMiddleware(logger *slog.Logger, authStorage storage.AuthStorage) func(http.Handler) http.Handler {
+// present. JWTs are verified with keys. Authentications and response encoding
+// failures are logged through logger.
+func ApiMiddleware(
+	logger *slog.Logger,
+	authStorage storage.AuthStorage,
+	keys Keys,
+) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		serveError := func(w http.ResponseWriter, r *http.Request, err error) {
 			code, payload := rest.Err(status.Wrap(err, status.Unauthenticated))
@@ -77,7 +81,7 @@ func ApiMiddleware(logger *slog.Logger, authStorage storage.AuthStorage) func(ht
 			case strings.HasPrefix(strings.ToLower(authHeader), "bearer jwt_"):
 				token := authHeader[len("bearer "):]
 
-				username, err := VerifyJWT(token)
+				username, err := keys.VerifyJWT(token)
 				if err != nil {
 					serveError(w, r, err)
 					return

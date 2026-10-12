@@ -3,6 +3,7 @@ package auth_test
 import (
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -10,12 +11,17 @@ import (
 	"link-society.com/flowg/api/auth"
 )
 
+var testKeys = auth.Keys{
+	SigningKey: []byte("test-signing-key"),
+	TokenTTL:   auth.DefaultTokenTTL,
+}
+
 func TestNewJWTRoundTrip(t *testing.T) {
-	// Contract: a token issued by NewJWT verifies back to the same subject.
-	token, err := auth.NewJWT("alice")
+	// Contract: a token issued by Keys.NewJWT verifies back to the same subject.
+	token, err := testKeys.NewJWT("alice")
 	require.NoError(t, err)
 
-	username, err := auth.VerifyJWT(token)
+	username, err := testKeys.VerifyJWT(token)
 	require.NoError(t, err)
 	assert.Equal(t, "alice", username)
 }
@@ -23,7 +29,7 @@ func TestNewJWTRoundTrip(t *testing.T) {
 func TestNewJWTCarriesPrefix(t *testing.T) {
 	// Contract: issued tokens are prefixed so the middleware can tell them
 	// apart from other bearer credentials.
-	token, err := auth.NewJWT("alice")
+	token, err := testKeys.NewJWT("alice")
 	require.NoError(t, err)
 
 	assert.True(t, strings.HasPrefix(token, "jwt_"), "token must carry the jwt_ prefix")
@@ -32,14 +38,14 @@ func TestNewJWTCarriesPrefix(t *testing.T) {
 func TestVerifyJWTRejectsMissingPrefix(t *testing.T) {
 	// Contract: a token without the expected prefix is not a JWT and must be
 	// rejected.
-	_, err := auth.VerifyJWT("alice")
+	_, err := testKeys.VerifyJWT("alice")
 	require.Error(t, err)
 }
 
 func TestVerifyJWTRejectsTamperedToken(t *testing.T) {
 	// Contract: a token whose signature does not match the signing key is
 	// rejected rather than yielding a best-effort identity.
-	token, err := auth.NewJWT("alice")
+	token, err := testKeys.NewJWT("alice")
 	require.NoError(t, err)
 
 	// Break the signature by mutating the first character of its segment.
@@ -58,7 +64,7 @@ func TestVerifyJWTRejectsTamperedToken(t *testing.T) {
 	}
 	tampered := "jwt_" + strings.Join(parts, ".")
 
-	_, err = auth.VerifyJWT(tampered)
+	_, err = testKeys.VerifyJWT(tampered)
 	require.Error(t, err)
 }
 
@@ -69,6 +75,35 @@ func TestVerifyJWTRejectsForeignSignature(t *testing.T) {
 		"eyJpc3MiOiJmbG93ZyIsInN1YiI6ImFsaWNlIn0." +
 		"3Vd3X8mO0p1q2r3s4t5u6v7w8x9y0zAbCdEfGhIjKlM"
 
-	_, err := auth.VerifyJWT(foreign)
+	_, err := testKeys.VerifyJWT(foreign)
+	require.Error(t, err)
+}
+
+func TestVerifyJWTRejectsTokenSignedWithOtherKeys(t *testing.T) {
+	// Contract: a token issued with other keys (e.g. by a node configured with
+	// another secret key) is rejected.
+	otherKeys := auth.Keys{
+		SigningKey: []byte("other-signing-key"),
+		TokenTTL:   auth.DefaultTokenTTL,
+	}
+
+	token, err := otherKeys.NewJWT("alice")
+	require.NoError(t, err)
+
+	_, err = testKeys.VerifyJWT(token)
+	require.Error(t, err)
+}
+
+func TestVerifyJWTRejectsExpiredToken(t *testing.T) {
+	// Contract: a token is only valid for the keys' token TTL.
+	expiringKeys := auth.Keys{
+		SigningKey: testKeys.SigningKey,
+		TokenTTL:   -time.Minute,
+	}
+
+	token, err := expiringKeys.NewJWT("alice")
+	require.NoError(t, err)
+
+	_, err = testKeys.VerifyJWT(token)
 	require.Error(t, err)
 }

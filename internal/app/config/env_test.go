@@ -260,6 +260,16 @@ func TestLoad_Precedence(t *testing.T) {
 			fromFile:  "file",
 			fromEnv:   "env",
 		},
+		{
+			name:      "security.secret_key",
+			file:      block("security", `secret_key = "file"`),
+			env:       "FLOWG_SECRET_KEY",
+			envValue:  "env",
+			get:       func(c *config.RootConfig) any { return c.Security.SecretKey },
+			byDefault: "",
+			fromFile:  "file",
+			fromEnv:   "env",
+		},
 	}
 
 	for _, s := range settings {
