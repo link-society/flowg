@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -33,8 +32,6 @@ type DeleteTokenDeps struct {
 // A user may only delete their own tokens. It requires authentication but no
 // particular permission.
 func NewDeleteTokenUsecase(deps DeleteTokenDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		func(
 			ctx context.Context,
@@ -45,7 +42,7 @@ func NewDeleteTokenUsecase(deps DeleteTokenDeps) usecase.Interactor {
 
 			err := deps.AuthStorage.DeleteToken(ctx, user.Name, req.TokenUUID)
 			if err != nil {
-				logger.ErrorContext(
+				deps.Logger.ErrorContext(
 					ctx,
 					"Failed to delete token",
 					slog.String("user", user.Name),

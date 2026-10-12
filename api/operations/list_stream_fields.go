@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -36,11 +35,9 @@ type ListStreamFieldsDeps struct {
 // It backs query builders that suggest available fields. Callers must have the
 // read-streams permission.
 func NewListStreamFieldsUsecase(deps ListStreamFieldsDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_STREAMS,
 			func(
@@ -50,7 +47,7 @@ func NewListStreamFieldsUsecase(deps ListStreamFieldsDeps) usecase.Interactor {
 			) error {
 				fields, err := deps.LogStorage.ListStreamFields(ctx, req.Stream)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to list stream fields",
 						slog.String("stream", req.Stream),

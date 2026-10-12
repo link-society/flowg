@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -35,11 +34,9 @@ type DeleteTransformerDeps struct {
 // Callers must have the write-transformers permission. Deleting an absent
 // transformer is treated as a success.
 func NewDeleteTransformerUsecase(deps DeleteTransformerDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_TRANSFORMERS,
 			func(
@@ -49,7 +46,7 @@ func NewDeleteTransformerUsecase(deps DeleteTransformerDeps) usecase.Interactor 
 			) error {
 				err := deps.ConfigStorage.DeleteTransformer(ctx, req.Transformer)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to delete transformer",
 						slog.String("transformer", req.Transformer),

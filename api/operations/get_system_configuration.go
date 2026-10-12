@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -34,11 +33,9 @@ type GetSystemConfigurationDeps struct {
 //
 // Callers must have the read-system-configuration permission.
 func NewGetSystemConfigurationUsecase(deps GetSystemConfigurationDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_SYSTEM_CONFIGURATION,
 			func(
@@ -48,7 +45,7 @@ func NewGetSystemConfigurationUsecase(deps GetSystemConfigurationDeps) usecase.I
 			) error {
 				conf, err := deps.ConfigStorage.ReadSystemConfig(ctx)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to read system configuration",
 						slog.String("error", err.Error()),

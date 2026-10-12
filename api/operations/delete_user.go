@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -34,11 +33,9 @@ type DeleteUserDeps struct {
 // Callers must have the write-ACLs permission. Deleting an absent user is
 // treated as a success.
 func NewDeleteUserUsecase(deps DeleteUserDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_ACLS,
 			func(
@@ -48,7 +45,7 @@ func NewDeleteUserUsecase(deps DeleteUserDeps) usecase.Interactor {
 			) error {
 				err := deps.AuthStorage.DeleteUser(ctx, req.User)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to delete user",
 						slog.String("user", req.User),

@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -38,11 +37,9 @@ type TestForwarderDeps struct {
 // confirms end-to-end connectivity. Callers must have the write-forwarders
 // permission.
 func NewTestForwarderUsecase(deps TestForwarderDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_FORWARDERS,
 			func(
@@ -52,7 +49,7 @@ func NewTestForwarderUsecase(deps TestForwarderDeps) usecase.Interactor {
 			) error {
 				forwarder, err := deps.ConfigStorage.ReadForwarder(ctx, req.Forwarder)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to get forwarder",
 						slog.String("forwarder", req.Forwarder),
@@ -69,7 +66,7 @@ func NewTestForwarderUsecase(deps TestForwarderDeps) usecase.Interactor {
 
 				runtime, err := forwarders.NewRuntime(forwarder)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to create forwarder runtime",
 						slog.String("forwarder", req.Forwarder),
@@ -81,7 +78,7 @@ func NewTestForwarderUsecase(deps TestForwarderDeps) usecase.Interactor {
 				}
 
 				if err := runtime.Init(ctx); err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to initialize forwarder",
 						slog.String("forwarder", req.Forwarder),
@@ -94,7 +91,7 @@ func NewTestForwarderUsecase(deps TestForwarderDeps) usecase.Interactor {
 
 				defer func() {
 					if err := runtime.Close(ctx); err != nil {
-						logger.WarnContext(
+						deps.Logger.WarnContext(
 							ctx,
 							"Failed to shutdown forwarder",
 							slog.String("forwarder", req.Forwarder),
@@ -105,7 +102,7 @@ func NewTestForwarderUsecase(deps TestForwarderDeps) usecase.Interactor {
 
 				logRecord := models.NewLogRecord(req.Record)
 				if err := runtime.Call(ctx, logRecord); err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to call forwarder",
 						slog.String("forwarder", req.Forwarder),

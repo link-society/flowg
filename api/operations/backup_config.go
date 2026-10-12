@@ -14,7 +14,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -40,11 +39,9 @@ type BackupConfigDeps struct {
 // later be reloaded with [NewRestoreConfigUsecase]. Callers must have
 // read access to pipelines, transformers and forwarders.
 func NewBackupConfigUsecase(deps BackupConfigDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopesApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			[]models.Scope{
 				models.SCOPE_READ_PIPELINES,
@@ -66,7 +63,7 @@ func NewBackupConfigUsecase(deps BackupConfigDeps) usecase.Interactor {
 						return status.Wrap(err, status.Unimplemented)
 					}
 
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to backup configuration database",
 						slog.String("error", err.Error()),

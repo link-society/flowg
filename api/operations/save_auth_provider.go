@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -33,11 +32,9 @@ type SaveAuthProviderDeps struct {
 //
 // Callers must have the write-auth-providers permission.
 func NewSaveAuthProviderUsecase(deps SaveAuthProviderDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_AUTH_PROVIDERS,
 			func(
@@ -48,7 +45,7 @@ func NewSaveAuthProviderUsecase(deps SaveAuthProviderDeps) usecase.Interactor {
 				req.Config.Name = req.AuthProvider
 				err := deps.AuthStorage.SaveAuthProvider(ctx, req.Config)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to save auth provider",
 						slog.String("auth_provider", req.AuthProvider),

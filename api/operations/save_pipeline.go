@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -35,11 +34,9 @@ type SavePipelineDeps struct {
 // Callers must have the write-pipelines permission. Persisting a pipeline
 // notifies the pipeline runner, which rebuilds and restarts it.
 func NewSavePipelineUsecase(deps SavePipelineDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_PIPELINES,
 			func(
@@ -48,7 +45,7 @@ func NewSavePipelineUsecase(deps SavePipelineDeps) usecase.Interactor {
 				resp *schemas.SavePipelineResponse,
 			) error {
 				if err := deps.ConfigStorage.WritePipeline(ctx, req.Pipeline, &req.Flow); err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to save pipeline",
 						slog.String("pipeline", req.Pipeline),

@@ -13,7 +13,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -38,11 +37,9 @@ type RestoreConfigDeps struct {
 // It is the import counterpart to [NewBackupConfigUsecase]. Callers
 // must have write access to pipelines, transformers and forwarders.
 func NewRestoreConfigUsecase(deps RestoreConfigDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopesApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			[]models.Scope{
 				models.SCOPE_WRITE_PIPELINES,
@@ -62,7 +59,7 @@ func NewRestoreConfigUsecase(deps RestoreConfigDeps) usecase.Interactor {
 						return status.Wrap(err, status.Unimplemented)
 					}
 
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to restore configuration database",
 						slog.String("error", err.Error()),

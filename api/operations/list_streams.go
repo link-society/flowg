@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -34,11 +33,9 @@ type ListStreamsDeps struct {
 //
 // Callers must have the read-streams permission.
 func NewListStreamsUsecase(deps ListStreamsDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_STREAMS,
 			func(
@@ -48,7 +45,7 @@ func NewListStreamsUsecase(deps ListStreamsDeps) usecase.Interactor {
 			) error {
 				streams, err := deps.LogStorage.ListStreamConfigs(ctx)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to list streams",
 						slog.String("error", err.Error()),

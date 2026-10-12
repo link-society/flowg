@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -37,13 +36,11 @@ type TestTransformerDeps struct {
 // read-transformers permission. Source that fails to compile or run is reported as
 // an unprocessable-entity error rather than a server fault.
 func NewTestTransformerUsecase(deps TestTransformerDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	const UnprocessableEntityCode = 422
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_TRANSFORMERS,
 			func(
@@ -53,7 +50,7 @@ func NewTestTransformerUsecase(deps TestTransformerDeps) usecase.Interactor {
 			) error {
 				runner, err := vrl.NewScriptRunner(req.Code)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to compile transformer",
 						slog.String("error", err.Error()),
@@ -70,7 +67,7 @@ func NewTestTransformerUsecase(deps TestTransformerDeps) usecase.Interactor {
 
 				output, err := runner.TransformLog(req.Record)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to execute transformer",
 						slog.String("error", err.Error()),

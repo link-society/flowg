@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -34,8 +33,6 @@ type ListTokensDeps struct {
 // Only the UUIDs are returned; the secret values are never recoverable after
 // creation. It requires authentication but no particular permission.
 func NewListTokensUsecase(deps ListTokensDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		func(
 			ctx context.Context,
@@ -46,7 +43,7 @@ func NewListTokensUsecase(deps ListTokensDeps) usecase.Interactor {
 
 			tokenUUIDs, err := deps.AuthStorage.ListTokens(ctx, user.Name)
 			if err != nil {
-				logger.ErrorContext(
+				deps.Logger.ErrorContext(
 					ctx,
 					"Failed to list tokens",
 					slog.String("user", user.Name),

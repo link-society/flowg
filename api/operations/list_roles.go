@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -33,11 +32,9 @@ type ListRolesDeps struct {
 //
 // Callers must have the read-ACLs permission.
 func NewListRolesUsecase(deps ListRolesDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_ACLS,
 			func(
@@ -47,7 +44,7 @@ func NewListRolesUsecase(deps ListRolesDeps) usecase.Interactor {
 			) error {
 				roles, err := deps.AuthStorage.ListRoles(ctx)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to list roles",
 						slog.String("error", err.Error()),

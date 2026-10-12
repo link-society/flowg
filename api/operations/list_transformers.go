@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -34,11 +33,9 @@ type ListTransformersDeps struct {
 //
 // Callers must have the read-transformers permission.
 func NewListTransformersUsecase(deps ListTransformersDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_TRANSFORMERS,
 			func(
@@ -48,7 +45,7 @@ func NewListTransformersUsecase(deps ListTransformersDeps) usecase.Interactor {
 			) error {
 				transformers, err := deps.ConfigStorage.ListTransformers(ctx)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to list transformers",
 						slog.String("error", err.Error()),

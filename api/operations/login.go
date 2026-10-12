@@ -13,7 +13,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -36,8 +35,6 @@ type LoginDeps struct {
 // credentials are reported as an unauthenticated error, never revealing whether
 // the username exists.
 func NewLoginUsecase(deps LoginDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		func(
 			ctx context.Context,
@@ -46,7 +43,7 @@ func NewLoginUsecase(deps LoginDeps) usecase.Interactor {
 		) error {
 			switch valid, err := deps.AuthStorage.VerifyUserPassword(ctx, req.Username, req.Password); {
 			case err != nil:
-				logger.ErrorContext(
+				deps.Logger.ErrorContext(
 					ctx,
 					"Failed to verify user password",
 					slog.String("username", req.Username),
@@ -63,7 +60,7 @@ func NewLoginUsecase(deps LoginDeps) usecase.Interactor {
 			case valid:
 				token, err := deps.Keys.NewJWT(req.Username)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to create JWT",
 						slog.String("username", req.Username),

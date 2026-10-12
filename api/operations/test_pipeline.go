@@ -13,7 +13,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -40,11 +39,9 @@ type TestPipelineDeps struct {
 // pipeline. Callers must have the send-logs permission. The run is marked sensitive
 // so its records are excluded from FlowG's own logs.
 func NewTestPipelineUsecase(deps TestPipelineDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_SEND_LOGS,
 			func(
@@ -72,7 +69,7 @@ func NewTestPipelineUsecase(deps TestPipelineDeps) usecase.Interactor {
 						resp.Error = &errMsg
 					}
 
-					logger.DebugContext(
+					deps.Logger.DebugContext(
 						ctx,
 						"Ran test for",
 						slog.String("pipeline", req.Pipeline),

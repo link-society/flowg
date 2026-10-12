@@ -4,8 +4,9 @@ The package at `internal/app/logging` holds the logging building blocks shared
 between FlowG's REST API and the `flowg-server` process.
 
 It exists so the request-scoped correlation handling and the `slog` handler that
-both layers rely on live in one place: the API ([`api/logging`](../../../api/logging))
-builds its access-log middleware on top of these helpers, while the server
+both layers rely on live in one place: the API marks sensitive requests with
+these helpers, the [HTTP service](../../services/http) builds its access-log
+middleware on top of them, while the server
 ([`cmd/flowg-server/logging`](../../../cmd/flowg-server/logging)) uses them to
 build the root logger injected into the application.
 

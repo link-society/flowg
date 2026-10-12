@@ -14,7 +14,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -40,11 +39,9 @@ type BackupLogsDeps struct {
 // reloaded with [NewRestoreLogsUsecase]. Callers must have the
 // read-streams permission.
 func NewBackupLogsUsecase(deps BackupLogsDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_STREAMS,
 			func(
@@ -62,7 +59,7 @@ func NewBackupLogsUsecase(deps BackupLogsDeps) usecase.Interactor {
 						return status.Wrap(err, status.Unimplemented)
 					}
 
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to backup logs database",
 						slog.String("error", err.Error()),

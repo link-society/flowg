@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -34,11 +33,9 @@ type ListForwardersDeps struct {
 //
 // Callers must have the read-forwarders permission.
 func NewListForwardersUsecase(deps ListForwardersDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_FORWARDERS,
 			func(
@@ -48,7 +45,7 @@ func NewListForwardersUsecase(deps ListForwardersDeps) usecase.Interactor {
 			) error {
 				forwarders, err := deps.ConfigStorage.ListForwarders(ctx)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to list forwarders",
 						slog.String("error", err.Error()),

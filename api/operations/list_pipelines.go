@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -34,11 +33,9 @@ type ListPipelinesDeps struct {
 //
 // Callers must have the read-pipelines permission.
 func NewListPipelinesUsecase(deps ListPipelinesDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_PIPELINES,
 			func(
@@ -48,7 +45,7 @@ func NewListPipelinesUsecase(deps ListPipelinesDeps) usecase.Interactor {
 			) error {
 				pipelines, err := deps.ConfigStorage.ListPipelines(ctx)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to list pipelines",
 						slog.String("error", err.Error()),

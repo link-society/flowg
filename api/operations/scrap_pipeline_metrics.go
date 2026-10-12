@@ -14,7 +14,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -38,11 +37,9 @@ type ScrapPipelineMetricsDeps struct {
 // Callers must have the read-pipelines permission. Requesting an unknown pipeline
 // yields a not-found error.
 func NewScrapPipelineMetricsUsecase(deps ScrapPipelineMetricsDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_PIPELINES,
 			func(
@@ -56,7 +53,7 @@ func NewScrapPipelineMetricsUsecase(deps ScrapPipelineMetricsDeps) usecase.Inter
 						return status.Wrap(err, status.NotFound)
 					}
 
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to scrap pipeline metrics",
 						slog.String("pipeline", req.Pipeline),

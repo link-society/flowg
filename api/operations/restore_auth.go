@@ -13,7 +13,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -37,11 +36,9 @@ type RestoreAuthDeps struct {
 // It is the import counterpart to [NewBackupAuthUsecase]. Callers must
 // have the write-ACLs permission.
 func NewRestoreAuthUsecase(deps RestoreAuthDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_ACLS,
 			func(
@@ -57,7 +54,7 @@ func NewRestoreAuthUsecase(deps RestoreAuthDeps) usecase.Interactor {
 						return status.Wrap(err, status.Unimplemented)
 					}
 
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to restore authentication database",
 						slog.String("error", err.Error()),
