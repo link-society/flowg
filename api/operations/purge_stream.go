@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -35,11 +34,9 @@ type PurgeStreamDeps struct {
 // Callers must have the write-streams permission. This is a destructive
 // operation: the stored logs cannot be recovered afterwards.
 func NewPurgeStreamUsecase(deps PurgeStreamDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_STREAMS,
 			func(
@@ -49,7 +46,7 @@ func NewPurgeStreamUsecase(deps PurgeStreamDeps) usecase.Interactor {
 			) error {
 				err := deps.LogStorage.DeleteStream(ctx, req.Stream)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to purge stream",
 						slog.String("stream", req.Stream),
@@ -60,7 +57,7 @@ func NewPurgeStreamUsecase(deps PurgeStreamDeps) usecase.Interactor {
 					return status.Wrap(err, status.Internal)
 				}
 
-				logger.InfoContext(
+				deps.Logger.InfoContext(
 					ctx,
 					"Log stream purged",
 					slog.String("stream", req.Stream),

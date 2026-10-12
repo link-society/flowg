@@ -13,7 +13,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -38,8 +37,6 @@ type ChangePasswordDeps struct {
 // permission-denied. The request is marked sensitive so the passwords are kept
 // out of FlowG's own logs.
 func NewChangePasswordUsecase(deps ChangePasswordDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		func(
 			ctx context.Context,
@@ -52,7 +49,7 @@ func NewChangePasswordUsecase(deps ChangePasswordDeps) usecase.Interactor {
 
 			switch valid, err := deps.AuthStorage.VerifyUserPassword(ctx, user.Name, req.OldPassword); {
 			case err != nil:
-				logger.ErrorContext(
+				deps.Logger.ErrorContext(
 					ctx,
 					"Failed to verify user password",
 					slog.String("username", user.Name),
@@ -68,7 +65,7 @@ func NewChangePasswordUsecase(deps ChangePasswordDeps) usecase.Interactor {
 			}
 
 			if err := deps.AuthStorage.SaveUser(ctx, *user, req.NewPassword); err != nil {
-				logger.ErrorContext(
+				deps.Logger.ErrorContext(
 					ctx,
 					"Failed to update user password",
 					slog.String("username", user.Name),

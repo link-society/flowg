@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -35,11 +34,9 @@ type GetStreamDeps struct {
 //
 // Callers must have the read-streams permission.
 func NewGetStreamUsecase(deps GetStreamDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_STREAMS,
 			func(
@@ -49,7 +46,7 @@ func NewGetStreamUsecase(deps GetStreamDeps) usecase.Interactor {
 			) error {
 				config, err := deps.LogStorage.GetOrCreateStreamConfig(ctx, req.Stream)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to get stream config",
 						slog.String("stream", req.Stream),

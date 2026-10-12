@@ -21,7 +21,6 @@ being scattered across endpoints.
   themselves, collected here into the route table.
 - **[auth](auth)** — the authentication middleware guarding every non-public
   route, and the authorization decorators endpoints apply.
-- **[logging](logging)** — the shared logger every endpoint emits through.
 
 Operations are mounted in a deterministic order so the generated OpenAPI
 document is reproducible: the collector derives each shared component schema

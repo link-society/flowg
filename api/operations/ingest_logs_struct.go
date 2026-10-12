@@ -13,7 +13,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -41,11 +40,9 @@ type IngestLogsStructDeps struct {
 // stops at the first record that fails. The request is marked sensitive so the
 // payload stays out of FlowG's own logs.
 func NewIngestLogsStructUsecase(deps IngestLogsStructDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_SEND_LOGS,
 			func(
@@ -69,7 +66,7 @@ func NewIngestLogsStructUsecase(deps IngestLogsStructDeps) usecase.Interactor {
 							return status.Wrap(err, status.NotFound)
 						}
 
-						logger.DebugContext(
+						deps.Logger.DebugContext(
 							ctx,
 							"Failed to process log entry",
 							slog.String("pipeline", req.Pipeline),
@@ -80,7 +77,7 @@ func NewIngestLogsStructUsecase(deps IngestLogsStructDeps) usecase.Interactor {
 						return status.Wrap(err, status.Internal)
 					}
 
-					logger.DebugContext(
+					deps.Logger.DebugContext(
 						ctx,
 						"Log entry processed",
 						slog.String("pipeline", req.Pipeline),

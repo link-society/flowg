@@ -14,7 +14,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -39,11 +38,9 @@ type BackupAuthDeps struct {
 // reloaded with [NewRestoreAuthUsecase]. Callers must have the
 // read-ACLs permission.
 func NewBackupAuthUsecase(deps BackupAuthDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_ACLS,
 			func(
@@ -61,7 +58,7 @@ func NewBackupAuthUsecase(deps BackupAuthDeps) usecase.Interactor {
 						return status.Wrap(err, status.Unimplemented)
 					}
 
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to backup authentication database",
 						slog.String("error", err.Error()),

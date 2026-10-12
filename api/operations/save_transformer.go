@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -36,11 +35,9 @@ type SaveTransformerDeps struct {
 // notifies the pipeline runner, which rebuilds every pipeline so that
 // subsequent runs pick up the new source.
 func NewSaveTransformerUsecase(deps SaveTransformerDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_TRANSFORMERS,
 			func(
@@ -49,7 +46,7 @@ func NewSaveTransformerUsecase(deps SaveTransformerDeps) usecase.Interactor {
 				resp *schemas.SaveTransformerResponse,
 			) error {
 				if err := deps.ConfigStorage.WriteTransformer(ctx, req.Transformer, req.Script); err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to save transformer",
 						slog.String("transformer", req.Transformer),

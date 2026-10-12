@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -37,11 +36,9 @@ type QueryStreamDeps struct {
 // Callers must have the read-streams permission. A filter that fails to compile
 // is reported as an invalid-argument error.
 func NewQueryStreamUsecase(deps QueryStreamDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_STREAMS,
 			func(
@@ -55,7 +52,7 @@ func NewQueryStreamUsecase(deps QueryStreamDeps) usecase.Interactor {
 					var err error
 					filter, err = filtering.Compile(*req.Filter)
 					if err != nil {
-						logger.ErrorContext(
+						deps.Logger.ErrorContext(
 							ctx,
 							"Failed to compile filter",
 							slog.String("stream", req.Stream),
@@ -72,7 +69,7 @@ func NewQueryStreamUsecase(deps QueryStreamDeps) usecase.Interactor {
 
 				records, err := deps.LogStorage.FetchLogs(ctx, req.Stream, req.From, req.To, filter, req.Indexing)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to query logs",
 						slog.String("stream", req.Stream),

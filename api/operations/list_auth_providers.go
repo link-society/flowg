@@ -11,7 +11,6 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -29,8 +28,6 @@ type ListAuthProvidersDeps struct {
 
 // NewListAuthProvidersUsecase enumerates all available auth providers.
 func NewListAuthProvidersUsecase(deps ListAuthProvidersDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		func(
 			ctx context.Context,
@@ -39,7 +36,7 @@ func NewListAuthProvidersUsecase(deps ListAuthProvidersDeps) usecase.Interactor 
 		) error {
 			authProviders, err := deps.AuthStorage.ListAuthProviders(ctx)
 			if err != nil {
-				logger.ErrorContext(
+				deps.Logger.ErrorContext(
 					ctx,
 					"Failed to list auth providers",
 					slog.String("error", err.Error()),

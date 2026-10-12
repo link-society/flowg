@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -36,11 +35,9 @@ type SaveForwarderDeps struct {
 // notifies the pipeline runner, which rebuilds every pipeline so that
 // subsequent runs use the new definition.
 func NewSaveForwarderUsecase(deps SaveForwarderDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_FORWARDERS,
 			func(
@@ -50,7 +47,7 @@ func NewSaveForwarderUsecase(deps SaveForwarderDeps) usecase.Interactor {
 			) error {
 				err := deps.ConfigStorage.WriteForwarder(ctx, req.Forwarder, &req.Config)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to save forwarder",
 						slog.String("forwarder", req.Forwarder),

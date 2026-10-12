@@ -15,7 +15,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -46,11 +45,9 @@ var _ request.Loader = (*schemas.IngestLogsOTLPRequest)(nil)
 // record that fails. The request is marked sensitive so the payload stays out
 // of FlowG's own logs.
 func NewIngestLogsOTLPUsecase(deps IngestLogsOTLPDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_SEND_LOGS,
 			func(
@@ -60,7 +57,7 @@ func NewIngestLogsOTLPUsecase(deps IngestLogsOTLPDeps) usecase.Interactor {
 			) error {
 				applog.MarkSensitive(ctx)
 
-				logger.InfoContext(
+				deps.Logger.InfoContext(
 					ctx,
 					"Parsed OpenTelemetry message",
 					slog.String("otlp.content-type", req.ContentType()),
@@ -80,7 +77,7 @@ func NewIngestLogsOTLPUsecase(deps IngestLogsOTLPDeps) usecase.Interactor {
 							return status.Wrap(err, status.NotFound)
 						}
 
-						logger.DebugContext(
+						deps.Logger.DebugContext(
 							ctx,
 							"Failed to process log entry",
 							slog.String("pipeline", req.Pipeline),
@@ -90,7 +87,7 @@ func NewIngestLogsOTLPUsecase(deps IngestLogsOTLPDeps) usecase.Interactor {
 						resp.Success = false
 						return status.Wrap(err, status.Internal)
 					}
-					logger.DebugContext(
+					deps.Logger.DebugContext(
 						ctx,
 						"Log entry processed",
 						slog.String("pipeline", req.Pipeline),

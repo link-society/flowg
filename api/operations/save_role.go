@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -34,11 +33,9 @@ type SaveRoleDeps struct {
 // Callers must have the write-ACLs permission. An unknown permission name in
 // the request is reported as an invalid-argument error.
 func NewSaveRoleUsecase(deps SaveRoleDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_ACLS,
 			func(
@@ -51,7 +48,7 @@ func NewSaveRoleUsecase(deps SaveRoleDeps) usecase.Interactor {
 				for i, scopeName := range req.Scopes {
 					scope, err := models.ParseScope(scopeName)
 					if err != nil {
-						logger.ErrorContext(
+						deps.Logger.ErrorContext(
 							ctx,
 							"Failed to parse scope",
 							slog.String("scope", scopeName),
@@ -72,7 +69,7 @@ func NewSaveRoleUsecase(deps SaveRoleDeps) usecase.Interactor {
 
 				err := deps.AuthStorage.SaveRole(ctx, role)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to save role",
 						slog.String("role", req.Role),

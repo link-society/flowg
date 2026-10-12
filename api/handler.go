@@ -16,7 +16,6 @@ import (
 	"github.com/swaggest/swgui/v5emb"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/internal/app"
 
@@ -24,7 +23,7 @@ import (
 )
 
 // handlerParams gathers everything [NewHandler] needs from the
-// dependency-injection container: the root logger, the authentication backend
+// dependency-injection container: the API logger, the authentication backend
 // and JWT keys it guards the routes with, the protocol-compatibility middlewares it mounts, and the full
 // set of operations contributed to the routing group.
 type handlerParams struct {
@@ -94,7 +93,7 @@ func NewHandler(params handlerParams) http.Handler {
 			"Authentication using JSON Web Token",
 			"JWT",
 		),
-		auth.ApiMiddleware(logging.Logger(params.Logger), params.AuthStorage, params.Keys),
+		auth.ApiMiddleware(params.Logger, params.AuthStorage, params.Keys),
 	).Group(func(router chi.Router) {
 		for _, op := range ops {
 			if !op.Public {

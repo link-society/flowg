@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -35,8 +34,6 @@ type WhoamiDeps struct {
 // to do, typically to drive UI affordances. It requires authentication but no
 // particular permission.
 func NewWhoamiUsecase(deps WhoamiDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		func(
 			ctx context.Context,
@@ -47,7 +44,7 @@ func NewWhoamiUsecase(deps WhoamiDeps) usecase.Interactor {
 
 			scopes, err := deps.AuthStorage.ListUserScopes(ctx, resp.User.Name)
 			if err != nil {
-				logger.ErrorContext(
+				deps.Logger.ErrorContext(
 					ctx,
 					"Failed to fetch user scopes",
 					slog.String("channel", "api"),

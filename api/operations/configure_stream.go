@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -35,11 +34,9 @@ type ConfigureStreamDeps struct {
 //
 // Callers must have the write-streams permission.
 func NewConfigureStreamUsecase(deps ConfigureStreamDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_STREAMS,
 			func(
@@ -49,7 +46,7 @@ func NewConfigureStreamUsecase(deps ConfigureStreamDeps) usecase.Interactor {
 			) error {
 				err := deps.LogStorage.ConfigureStream(ctx, req.Stream, req.Config)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to configure stream",
 						slog.String("stream", req.Stream),

@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -34,8 +33,6 @@ type CreateTokenDeps struct {
 // later; only its UUID is persisted for management. It requires authentication
 // but no particular permission.
 func NewCreateTokenUsecase(deps CreateTokenDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		func(
 			ctx context.Context,
@@ -46,7 +43,7 @@ func NewCreateTokenUsecase(deps CreateTokenDeps) usecase.Interactor {
 
 			token, tokenUuid, err := deps.AuthStorage.CreateToken(ctx, user.Name)
 			if err != nil {
-				logger.ErrorContext(
+				deps.Logger.ErrorContext(
 					ctx,
 					"Failed to create token",
 					slog.String("user", user.Name),

@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -34,11 +33,9 @@ type UpdateSystemConfigurationDeps struct {
 //
 // Callers must have the write-system-configuration permission.
 func NewUpdateSystemConfigurationUsecase(deps UpdateSystemConfigurationDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_SYSTEM_CONFIGURATION,
 			func(
@@ -48,7 +45,7 @@ func NewUpdateSystemConfigurationUsecase(deps UpdateSystemConfigurationDeps) use
 			) error {
 				err := deps.ConfigStorage.WriteSystemConfig(ctx, &req)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to write system configuration",
 						slog.String("error", err.Error()),

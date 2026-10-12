@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -34,11 +33,9 @@ type GetUserDeps struct {
 // Callers must have the read-ACLs permission. Requesting an unknown user yields
 // a not-found error.
 func NewGetUserUsecase(deps GetUserDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_ACLS,
 			func(
@@ -48,7 +45,7 @@ func NewGetUserUsecase(deps GetUserDeps) usecase.Interactor {
 			) error {
 				user, err := deps.AuthStorage.FetchUser(ctx, req.Username)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to get user",
 						slog.String("user", req.Username),

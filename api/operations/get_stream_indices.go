@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -36,11 +35,9 @@ type GetStreamIndicesDeps struct {
 // It backs query builders that offer the known values of an index. Callers must
 // have the read-streams permission.
 func NewGetStreamIndicesUsecase(deps GetStreamIndicesDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_STREAMS,
 			func(
@@ -50,7 +47,7 @@ func NewGetStreamIndicesUsecase(deps GetStreamIndicesDeps) usecase.Interactor {
 			) error {
 				indices, err := deps.LogStorage.Distinct(ctx, req.Stream)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to get stream indices",
 						slog.String("stream", req.Stream),

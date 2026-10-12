@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -36,11 +35,9 @@ type PatchUserRolesDeps struct {
 // when the caller does not know or want to reset the password. Callers must
 // have the write-ACLs permission.
 func NewPatchUserRolesUsecase(deps PatchUserRolesDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_ACLS,
 			func(
@@ -55,7 +52,7 @@ func NewPatchUserRolesUsecase(deps PatchUserRolesDeps) usecase.Interactor {
 
 				err := deps.AuthStorage.PatchUserRoles(ctx, user)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to patch user roles",
 						slog.String("user", req.User),

@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -35,11 +34,9 @@ type DeletePipelineDeps struct {
 // Callers must have the write-pipelines permission. Deleting an absent pipeline is
 // treated as a success.
 func NewDeletePipelineUsecase(deps DeletePipelineDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_PIPELINES,
 			func(
@@ -49,7 +46,7 @@ func NewDeletePipelineUsecase(deps DeletePipelineDeps) usecase.Interactor {
 			) error {
 				err := deps.ConfigStorage.DeletePipeline(ctx, req.Pipeline)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to delete pipeline",
 						slog.String("pipeline", req.Pipeline),

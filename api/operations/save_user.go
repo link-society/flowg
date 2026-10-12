@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -34,11 +33,9 @@ type SaveUserDeps struct {
 // Callers must have the write-ACLs permission. To change roles without
 // resetting the password, use [NewPatchUserRolesUsecase] instead.
 func NewSaveUserUsecase(deps SaveUserDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_ACLS,
 			func(
@@ -53,7 +50,7 @@ func NewSaveUserUsecase(deps SaveUserDeps) usecase.Interactor {
 
 				err := deps.AuthStorage.SaveUser(ctx, user, req.Password)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to save user",
 						slog.String("user", req.User),

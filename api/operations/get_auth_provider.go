@@ -12,7 +12,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -34,11 +33,9 @@ type GetAuthProviderDeps struct {
 // Callers must have the read-auth-providers permission. Requesting an unknown auth provider yields
 // a not-found error.
 func NewGetAuthProviderUsecase(deps GetAuthProviderDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_AUTH_PROVIDERS,
 			func(
@@ -48,7 +45,7 @@ func NewGetAuthProviderUsecase(deps GetAuthProviderDeps) usecase.Interactor {
 			) error {
 				authProvider, err := deps.AuthStorage.FetchAuthProvider(ctx, req.AuthProvider)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to get auth provider",
 						slog.String("auth_provider", req.AuthProvider),

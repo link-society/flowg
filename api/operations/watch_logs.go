@@ -16,7 +16,6 @@ import (
 	"github.com/swaggest/usecase/status"
 
 	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/logging"
 	"link-society.com/flowg/api/routing"
 	"link-society.com/flowg/api/schemas"
 
@@ -43,11 +42,9 @@ type WatchLogsDeps struct {
 // until the client disconnects. Callers must have the read-streams permission.
 // A filter that fails to compile is reported as an invalid-argument error.
 func NewWatchLogsUsecase(deps WatchLogsDeps) usecase.Interactor {
-	logger := logging.Logger(deps.Logger)
-
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
-			logger,
+			deps.Logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_STREAMS,
 			func(
@@ -62,7 +59,7 @@ func NewWatchLogsUsecase(deps WatchLogsDeps) usecase.Interactor {
 
 					filter, err = filtering.Compile(*req.Filter)
 					if err != nil {
-						logger.ErrorContext(
+						deps.Logger.ErrorContext(
 							ctx,
 							"Failed to compile filter",
 							slog.String("error", err.Error()),
@@ -76,7 +73,7 @@ func NewWatchLogsUsecase(deps WatchLogsDeps) usecase.Interactor {
 
 				logM, err := deps.LogNotifier.Subscribe(ctx, req.Stream)
 				if err != nil {
-					logger.ErrorContext(
+					deps.Logger.ErrorContext(
 						ctx,
 						"Failed to subscribe to logs",
 						slog.String("error", err.Error()),
@@ -93,12 +90,12 @@ func NewWatchLogsUsecase(deps WatchLogsDeps) usecase.Interactor {
 				resp.Writer.(http.ResponseWriter).Header().Set("Cache-Control", "no-cache")
 				resp.Writer.(http.ResponseWriter).Header().Set("Connection", "keep-alive")
 
-				logger.InfoContext(
+				deps.Logger.InfoContext(
 					ctx,
 					"watch logs",
 					slog.String("stream", req.Stream),
 				)
-				defer logger.InfoContext(
+				defer deps.Logger.InfoContext(
 					ctx,
 					"done watching logs",
 					slog.String("stream", req.Stream),
