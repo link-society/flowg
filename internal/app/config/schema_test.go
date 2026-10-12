@@ -1,4 +1,4 @@
-package cmd_test
+package config_test
 
 import (
 	"testing"
@@ -8,24 +8,23 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"link-society.com/flowg/cmd/flowg-server/cmd"
-	"link-society.com/flowg/internal/app/server"
+	"link-society.com/flowg/internal/app/config"
 )
 
-func loadConfig(t *testing.T, source string) *cmd.RootConfig {
+func loadConfig(t *testing.T, source string) *config.RootConfig {
 	t.Helper()
 
 	path := filepath.Join(t.TempDir(), "config.hcl")
 	require.NoError(t, os.WriteFile(path, []byte(source), 0600))
 
-	config := cmd.DefaultConfig()
-	require.NoError(t, config.Load(path))
+	cfg := config.DefaultConfig()
+	require.NoError(t, cfg.Load(path))
 
-	return config
+	return cfg
 }
 
 func TestLoad_StorageBackendBadgerDbFromFile(t *testing.T) {
-	config := loadConfig(t, `
+	cfg := loadConfig(t, `
 storage {
   backend "badgerdb" {
     auth_dir   = "/tmp/flowg/auth"
@@ -35,21 +34,20 @@ storage {
 }
 `)
 
-	opts, err := config.AsServerOptions()
-	require.NoError(t, err)
 	require.Equal(
 		t,
-		&server.BadgerDbStorageOptions{
+		&config.StorageBackendBadgerDbConfig{
 			AuthDir:   "/tmp/flowg/auth",
 			ConfigDir: "/tmp/flowg/config",
 			LogDir:    "/tmp/flowg/logs",
 		},
-		opts.Storage,
+		cfg.Storage.Backend.BadgerDB,
 	)
+	require.Nil(t, cfg.Storage.Backend.FoundationDB)
 }
 
 func TestLoad_StorageBackendFoundationDbFromFile(t *testing.T) {
-	config := loadConfig(t, `
+	cfg := loadConfig(t, `
 storage {
   backend "foundationdb" {
     cluster_file      = "/tmp/flowg/fdb.cluster"
@@ -59,17 +57,16 @@ storage {
 }
 `)
 
-	opts, err := config.AsServerOptions()
-	require.NoError(t, err)
 	require.Equal(
 		t,
-		&server.FoundationDbStorageOptions{
+		&config.StorageBackendFoundationDbConfig{
 			ClusterFile:      "/tmp/flowg/fdb.cluster",
 			ConnectionString: "flowg:test@127.0.0.1:4500",
 			KeySpace:         "flowg-test",
 		},
-		opts.Storage,
+		cfg.Storage.Backend.FoundationDB,
 	)
+	require.Nil(t, cfg.Storage.Backend.BadgerDB)
 }
 
 func TestLoad_StorageBackendValidationError(t *testing.T) {
@@ -83,10 +80,10 @@ storage {
 }
 `), 0600))
 
-	config := cmd.DefaultConfig()
+	cfg := config.DefaultConfig()
 	require.ErrorContains(
 		t,
-		config.Load(path),
+		cfg.Load(path),
 		"FoundationDB backend requires either a cluster file or a connection string",
 	)
 }
