@@ -3,6 +3,7 @@ package log
 import (
 	"context"
 	"io"
+	"log/slog"
 
 	"time"
 
@@ -25,6 +26,7 @@ const defaultBatchSize = 1000
 // the log transactions from the transactions subpackage on top of any
 // [kv.Adapter].
 type Storage[QTx kv.QueryTx, MTx kv.MutationTx] struct {
+	logger               *slog.Logger
 	adapter              kv.Adapter[QTx, MTx]
 	batchSize            int
 	streamConfigOverride *models.StreamConfig
@@ -37,8 +39,9 @@ var _ storage.LogStorage = (*Storage[kv.QueryTx, kv.MutationTx])(nil)
 // touch per transaction; a value of zero or less uses [defaultBatchSize]. When
 // streamConfigOverride is not nil, it is used as the configuration of every
 // stream instead of the stored one (e.g. to enforce a short retention in demo
-// mode).
+// mode). It logs through a logger derived from rootLogger.
 func NewStorage[QTx kv.QueryTx, MTx kv.MutationTx](
+	rootLogger *slog.Logger,
 	adapter kv.Adapter[QTx, MTx],
 	batchSize int,
 	streamConfigOverride *models.StreamConfig,
@@ -48,6 +51,7 @@ func NewStorage[QTx kv.QueryTx, MTx kv.MutationTx](
 	}
 
 	return &Storage[QTx, MTx]{
+		logger:               rootLogger.With(slog.String("channel", "logstorage")),
 		adapter:              adapter,
 		batchSize:            batchSize,
 		streamConfigOverride: streamConfigOverride,
@@ -204,7 +208,7 @@ func (s *Storage[QTx, MTx]) indexField(ctx context.Context, stream, field string
 
 		err := s.adapter.Update(ctx, func(txn MTx) error {
 			var err error
-			next, processed, err = transactions.IndexFieldBatch(txn, stream, field, cursor, s.batchSize)
+			next, processed, err = transactions.IndexFieldBatch(s.logger, txn, stream, field, cursor, s.batchSize)
 			return err
 		})
 		if err != nil {
@@ -320,7 +324,7 @@ func (s *Storage[QTx, MTx]) Distinct(ctx context.Context, stream string) (map[st
 func (s *Storage[QTx, MTx]) Ingest(ctx context.Context, stream string, logRecord *models.LogRecord) (kv.Key, error) {
 	key := newDbKey(stream, logRecord)
 	err := s.adapter.Update(ctx, func(txn MTx) error {
-		return transactions.Ingest(txn, stream, logRecord, key, s.streamConfigOverride)
+		return transactions.Ingest(s.logger, txn, stream, logRecord, key, s.streamConfigOverride)
 	})
 	if err != nil {
 		return nil, err

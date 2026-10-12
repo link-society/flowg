@@ -1,6 +1,8 @@
 package server
 
 import (
+	"log/slog"
+
 	"go.uber.org/fx"
 
 	"link-society.com/flowg/internal/app/config"
@@ -17,15 +19,16 @@ import (
 )
 
 // NewServer assembles the complete FlowG server as a single fx module. It
-// supplies the configuration to the graph, wires the three storage backends,
+// supplies the configuration and the root logger to the graph, wires the three storage backends,
 // the engine layer (log notifier and pipeline runner) and the network services
 // (HTTP, management, syslog) together, and registers a bootstrap handler that
 // seeds the default configuration on start.
-func NewServer(cfg *config.RootConfig) fx.Option {
+func NewServer(cfg *config.RootConfig, logger *slog.Logger) fx.Option {
 	return fx.Module(
 		"app.server",
 		// Configuration
 		configModule(cfg),
+		fx.Supply(logger),
 		// Engine Layer (confignotify first: storage modules depend on it)
 		confignotify.NewNotifier(),
 		// Storage Layer

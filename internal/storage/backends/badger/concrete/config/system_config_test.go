@@ -3,6 +3,8 @@ package config_test
 import (
 	"testing"
 
+	"log/slog"
+
 	"sync"
 
 	"go.uber.org/fx"
@@ -30,6 +32,7 @@ func TestReadSystemConfigConcurrent(t *testing.T) {
 
 	app := fxtest.New(
 		t,
+		fx.Supply(slog.New(slog.DiscardHandler)),
 		fx.Supply(opts),
 		badgerconfig.Module(),
 		fx.Populate(&configStorage),

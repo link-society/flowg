@@ -30,6 +30,8 @@ import (
 type WatchLogsDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage storage.AuthStorage
 	LogNotifier lognotify.LogNotifier
 }
@@ -41,10 +43,11 @@ type WatchLogsDeps struct {
 // until the client disconnects. Callers must have the read-streams permission.
 // A filter that fails to compile is reported as an invalid-argument error.
 func NewWatchLogsUsecase(deps WatchLogsDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_STREAMS,
 			func(

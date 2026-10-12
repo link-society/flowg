@@ -24,6 +24,8 @@ import (
 type LoginDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage storage.AuthStorage
 }
 
@@ -33,7 +35,7 @@ type LoginDeps struct {
 // credentials are reported as an unauthenticated error, never revealing whether
 // the username exists.
 func NewLoginUsecase(deps LoginDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		func(

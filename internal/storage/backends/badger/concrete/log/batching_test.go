@@ -3,6 +3,8 @@ package log_test
 import (
 	"testing"
 
+	"log/slog"
+
 	"context"
 	"fmt"
 
@@ -34,6 +36,7 @@ func newBatchedStorage(t *testing.T, batchSize int) (context.Context, storage.Lo
 
 	app := fxtest.New(
 		t,
+		fx.Supply(slog.New(slog.DiscardHandler)),
 		fx.Supply(opts),
 		badgerlog.Module(),
 		fx.Populate(&logStorage),

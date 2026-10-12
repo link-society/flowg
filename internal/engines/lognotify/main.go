@@ -2,6 +2,7 @@ package lognotify
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/vladopajic/go-actor/actor"
 	"go.uber.org/fx"
@@ -32,8 +33,9 @@ type logNotifierImpl struct {
 var _ LogNotifier = (*logNotifierImpl)(nil)
 
 // NewLogNotifier returns an fx module providing a LogNotifier backed by a single
-// actor. The actor and its two mailboxes (subscriptions and log broadcasts) are
-// started and stopped with the application lifecycle.
+// actor, logging through the root logger provided to the graph. The actor and
+// its two mailboxes (subscriptions and log broadcasts) are started and stopped
+// with the application lifecycle.
 func NewLogNotifier() fx.Option {
 	return fx.Module(
 		"lognotifier",
@@ -71,11 +73,13 @@ func NewLogNotifier() fx.Option {
 		}),
 		fx.Provide(func(
 			lc fx.Lifecycle,
+			rootLogger *slog.Logger,
 			subMbox actor.Mailbox[SubscribeMessage],
 			logMbox actor.Mailbox[LogMessage],
 		) LogNotifier {
 			logNotifier := &logNotifierImpl{
 				Actor: actor.New(&worker{
+					logger:      rootLogger.With(slog.String("channel", "lognotify")),
 					subscribers: make(map[string]subscriberSet),
 					subMbox:     subMbox,
 					logMbox:     logMbox,

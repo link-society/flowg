@@ -24,6 +24,8 @@ import (
 type DeleteTransformerDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage   storage.AuthStorage
 	ConfigStorage storage.ConfigStorage
 }
@@ -33,10 +35,11 @@ type DeleteTransformerDeps struct {
 // Callers must have the write-transformers permission. Deleting an absent
 // transformer is treated as a success.
 func NewDeleteTransformerUsecase(deps DeleteTransformerDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_TRANSFORMERS,
 			func(

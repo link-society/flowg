@@ -24,6 +24,8 @@ import (
 type ConfigureStreamDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage storage.AuthStorage
 	LogStorage  storage.LogStorage
 }
@@ -33,10 +35,11 @@ type ConfigureStreamDeps struct {
 //
 // Callers must have the write-streams permission.
 func NewConfigureStreamUsecase(deps ConfigureStreamDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_STREAMS,
 			func(

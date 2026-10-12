@@ -38,6 +38,7 @@ const (
 // When a [confignotify.Notifier] is wired, every successful mutation is
 // broadcast on it so the pipeline runner can react to configuration changes.
 type Storage[QTx kv.QueryTx, MTx kv.MutationTx] struct {
+	logger   *slog.Logger
 	adapter  kv.Adapter[QTx, MTx]
 	notifier confignotify.Notifier
 
@@ -49,12 +50,15 @@ var _ storage.ConfigStorage = (*Storage[kv.QueryTx, kv.MutationTx])(nil)
 
 // NewStorage returns a [Storage] that persists configuration data through the
 // given key-value adapter. notifier may be nil, in which case no change
-// notification is emitted (e.g. on backends with their own change watcher).
+// notification is emitted (e.g. on backends with their own change watcher). It
+// logs through a logger derived from rootLogger.
 func NewStorage[QTx kv.QueryTx, MTx kv.MutationTx](
+	rootLogger *slog.Logger,
 	adapter kv.Adapter[QTx, MTx],
 	notifier confignotify.Notifier,
 ) *Storage[QTx, MTx] {
 	return &Storage[QTx, MTx]{
+		logger:   rootLogger.With(slog.String("channel", "storage.config")),
 		adapter:  adapter,
 		notifier: notifier,
 		lock:     &sync.Mutex{},
@@ -69,10 +73,9 @@ func (s *Storage[QTx, MTx]) notify(ctx context.Context, event confignotify.Event
 	}
 
 	if err := s.notifier.Notify(ctx, event); err != nil {
-		slog.ErrorContext(
+		s.logger.ErrorContext(
 			ctx,
 			"failed to notify config change",
-			"channel", "storage.config",
 			"error", err.Error(),
 		)
 	}

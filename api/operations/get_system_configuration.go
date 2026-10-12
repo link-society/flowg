@@ -24,6 +24,8 @@ import (
 type GetSystemConfigurationDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage   storage.AuthStorage
 	ConfigStorage storage.ConfigStorage
 }
@@ -32,10 +34,11 @@ type GetSystemConfigurationDeps struct {
 //
 // Callers must have the read-system-configuration permission.
 func NewGetSystemConfigurationUsecase(deps GetSystemConfigurationDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_SYSTEM_CONFIGURATION,
 			func(

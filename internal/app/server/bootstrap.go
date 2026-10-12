@@ -40,18 +40,20 @@ type bootstrapHandler struct {
 }
 
 // newBootstrapHandler builds the bootstrap handler configured by the
-// [bootstrapOptions] provided to the graph, and runs it from the OnStart hook.
+// [bootstrapOptions] provided to the graph, logging through the root logger,
+// and runs it from the OnStart hook.
 // It depends on the log storage too, so that every storage is started before
 // the handler runs.
 func newBootstrapHandler(
 	lc fx.Lifecycle,
 	opts bootstrapOptions,
+	rootLogger *slog.Logger,
 	authStorage storage.AuthStorage,
 	configStorage storage.ConfigStorage,
 	_ storage.LogStorage,
 ) *bootstrapHandler {
 	h := &bootstrapHandler{
-		logger:        slog.Default().With(slog.String("channel", "bootstrap")),
+		logger:        rootLogger.With(slog.String("channel", "bootstrap")),
 		authStorage:   authStorage,
 		configStorage: configStorage,
 		opts:          opts,
@@ -91,7 +93,7 @@ func (h *bootstrapHandler) Run(ctx context.Context) error {
 		return fmt.Errorf("failed to bootstrap default pipeline: %w", err)
 	}
 
-	err = bootstrap.ResetUser(ctx, h.authStorage, bootstrap.ResetUserOptions{
+	err = bootstrap.ResetUser(ctx, h.logger, h.authStorage, bootstrap.ResetUserOptions{
 		User:     h.opts.ResetUser,
 		Password: h.opts.ResetPassword,
 	})

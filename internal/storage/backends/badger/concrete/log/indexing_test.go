@@ -3,6 +3,8 @@ package log_test
 import (
 	"testing"
 
+	"log/slog"
+
 	"strings"
 	"time"
 
@@ -32,6 +34,7 @@ func TestFetchLogsIndexingFilter(t *testing.T) {
 
 	app := fxtest.New(
 		t,
+		fx.Supply(slog.New(slog.DiscardHandler)),
 		fx.Supply(opts),
 		badgerlog.Module(),
 		fx.Populate(&logStorage),
@@ -112,6 +115,7 @@ func TestStreamIndicesDistinct(t *testing.T) {
 
 	app := fxtest.New(
 		t,
+		fx.Supply(slog.New(slog.DiscardHandler)),
 		fx.Supply(opts),
 		badgerlog.Module(),
 		fx.Populate(&logStorage),
@@ -174,6 +178,7 @@ func TestIngestOversizedIndexedValue(t *testing.T) {
 
 	app := fxtest.New(
 		t,
+		fx.Supply(slog.New(slog.DiscardHandler)),
 		fx.Supply(opts),
 		badgerlog.Module(),
 		fx.Populate(&logStorage),

@@ -23,6 +23,8 @@ import (
 type ListTokensDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage storage.AuthStorage
 }
 
@@ -32,7 +34,7 @@ type ListTokensDeps struct {
 // Only the UUIDs are returned; the secret values are never recoverable after
 // creation. It requires authentication but no particular permission.
 func NewListTokensUsecase(deps ListTokensDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		func(

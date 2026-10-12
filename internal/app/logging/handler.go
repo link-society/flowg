@@ -12,11 +12,6 @@ type handler struct {
 
 var _ slog.Handler = (*handler)(nil)
 
-// VERBOSE_LOGGING controls whether the access-log middleware buffers response
-// bodies and dumps them to stderr for failed requests. It is toggled by the
-// server's logging setup and read by the API access-log middleware.
-var VERBOSE_LOGGING = false
-
 // NewHandler builds a slog.Handler that writes text-formatted records to w and
 // enriches each record with the correlation id carried by the context (see
 // CORRELATION_ID).

@@ -31,14 +31,15 @@ type Server struct {
 	actor.Actor
 }
 
-// newLogger returns the logger of the syslog server, scoped to its options.
-func newLogger(opts Options) *slog.Logger {
+// newLogger returns the logger of the syslog server, derived from the root
+// logger and scoped to its options.
+func newLogger(rootLogger *slog.Logger, opts Options) *slog.Logger {
 	proto := "udp"
 	if opts.TcpMode {
 		proto = "tcp"
 	}
 
-	return slog.Default().With(
+	return rootLogger.With(
 		slog.String("channel", "syslog"),
 		slog.Group("syslog",
 			slog.String("proto", proto),
@@ -51,7 +52,8 @@ func newLogger(opts Options) *slog.Logger {
 // Module returns an fx module that listens for syslog messages (auto-detecting
 // the format) and feeds each one, through the worker actor, into every
 // pipeline's syslog entrypoint. It is configured by the [Options] provided to
-// the graph. Listener and actor are bound to the application lifecycle.
+// the graph and logs through the root [slog.Logger] provided to the graph.
+// Listener and actor are bound to the application lifecycle.
 func Module() fx.Option {
 	return fx.Module(
 		"services.syslog",
@@ -61,8 +63,13 @@ func Module() fx.Option {
 		fx.Provide(func(channel gosyslog.LogPartsChannel) *gosyslog.ChannelHandler {
 			return gosyslog.NewChannelHandler(channel)
 		}),
-		fx.Provide(func(lc fx.Lifecycle, opts Options, handler *gosyslog.ChannelHandler) *gosyslog.Server {
-			logger := newLogger(opts)
+		fx.Provide(func(
+			lc fx.Lifecycle,
+			opts Options,
+			rootLogger *slog.Logger,
+			handler *gosyslog.ChannelHandler,
+		) *gosyslog.Server {
+			logger := newLogger(rootLogger, opts)
 
 			server := gosyslog.NewServer()
 			server.SetFormat(gosyslog.Automatic)
@@ -106,13 +113,14 @@ func Module() fx.Option {
 		fx.Provide(func(
 			lc fx.Lifecycle,
 			opts Options,
+			rootLogger *slog.Logger,
 			channel gosyslog.LogPartsChannel,
 			configStorage storage.ConfigStorage,
 			pipelineRunner pipelines.Runner,
 		) *Server {
 			srv := &Server{
 				Actor: actor.New(&worker{
-					logger:         newLogger(opts),
+					logger:         newLogger(rootLogger, opts),
 					channel:        channel,
 					configStorage:  configStorage,
 					pipelineRunner: pipelineRunner,

@@ -17,11 +17,15 @@ import (
 )
 
 // Options configures the HTTP server: where to bind, the path everything is
-// mounted under, and an optional TLS configuration (nil serves plain HTTP).
+// mounted under, an optional TLS configuration (nil serves plain HTTP), and
+// whether to dump the response bodies of failed requests.
 type Options struct {
 	BindAddress string
 	MountPath   string
 	TlsConfig   *tls.Config
+	// DumpErrorBodies makes the access-log middleware buffer response bodies and
+	// dump them to standard error for failed requests (status >= 400).
+	DumpErrorBodies bool
 }
 
 // Server is the running HTTP service: the standard library server plus its
@@ -44,13 +48,13 @@ type handlers struct {
 // web UI under "<mount>/web/" (with the root redirecting to the UI), wraps
 // everything in the access-log middleware, and binds the server to the
 // application lifecycle. It is configured by the [Options] provided to the
-// graph.
+// graph, and logs through the root [slog.Logger] provided to the graph.
 func Module() fx.Option {
 	return fx.Module(
 		"services.http",
 		api.Module("service-http-api"),
 		web.Module("service-http-web"),
-		fx.Provide(func(lc fx.Lifecycle, opts Options, h handlers) *Server {
+		fx.Provide(func(lc fx.Lifecycle, opts Options, rootLogger *slog.Logger, h handlers) *Server {
 			rootHandler := http.NewServeMux()
 			rootHandler.Handle(opts.MountPath+"/api/", http.StripPrefix(opts.MountPath, h.ApiHandler))
 			rootHandler.Handle(opts.MountPath+"/web/", http.StripPrefix(opts.MountPath, h.WebHandler))
@@ -63,7 +67,7 @@ func Module() fx.Option {
 			)
 
 			srv := &Server{
-				logger: slog.Default().With(
+				logger: rootLogger.With(
 					slog.String("channel", "http"),
 					slog.Group("http",
 						slog.String("bind", opts.BindAddress),
@@ -71,7 +75,7 @@ func Module() fx.Option {
 				),
 				httpServer: &http.Server{
 					Addr:      opts.BindAddress,
-					Handler:   newLoggingMiddleware(rootHandler),
+					Handler:   newLoggingMiddleware(rootLogger, opts.DumpErrorBodies, rootHandler),
 					TLSConfig: opts.TlsConfig,
 				},
 			}

@@ -2,6 +2,7 @@ package log
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
 	"github.com/vladopajic/go-actor/actor"
@@ -36,6 +37,7 @@ type Options struct {
 type deps struct {
 	fx.In
 
+	Logger  *slog.Logger
 	Options Options
 	Adapter *foundation.FoundationAdapter `name:"storage.log"`
 }
@@ -70,7 +72,7 @@ func Module() fx.Option {
 		"storage.log",
 		foundation.NewAdapter("storage.log", Options.adapterOptions),
 		fx.Provide(func(lc fx.Lifecycle, d deps) storage.LogStorage {
-			storage := log.NewStorage(d.Adapter, d.Options.BatchSize, d.Options.StreamConfigOverride)
+			storage := log.NewStorage(d.Logger, d.Adapter, d.Options.BatchSize, d.Options.StreamConfigOverride)
 
 			gc := actor.New(log.NewGarbageCollector(storage, d.Options.GCInterval))
 

@@ -30,6 +30,8 @@ import (
 type IngestLogsTextDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage    storage.AuthStorage
 	PipelineRunner pipelines.Runner
 }
@@ -42,10 +44,11 @@ type IngestLogsTextDeps struct {
 // send-logs permission. Ingestion stops at the first line that fails. The
 // request is marked sensitive so the payload stays out of FlowG's own logs.
 func NewIngestLogsTextUsecase(deps IngestLogsTextDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_SEND_LOGS,
 			func(

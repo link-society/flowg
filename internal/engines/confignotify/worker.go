@@ -9,6 +9,7 @@ import (
 // worker is the single actor that owns the subscriber registry. All mutations
 // happen on the actor goroutine, so the registry needs no locking.
 type worker struct {
+	logger      *slog.Logger
 	subscribers map[actor.Mailbox[Event]]<-chan struct{}
 	subMbox     actor.MailboxReceiver[SubscribeMessage]
 	eventMbox   actor.MailboxReceiver[Event]
@@ -48,10 +49,9 @@ func (w *worker) DoWork(ctx actor.Context) actor.WorkerStatus {
 
 		for sub := range w.subscribers {
 			if err := sub.Send(ctx, event); err != nil {
-				slog.ErrorContext(
+				w.logger.ErrorContext(
 					ctx,
 					"failed to deliver config change event",
-					"channel", "confignotify",
 					"error", err.Error(),
 				)
 			}

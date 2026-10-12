@@ -32,7 +32,7 @@ func TestApiMiddlewareRejectsMissingCredential(t *testing.T) {
 		nextCalled = true
 	})
 
-	handler := auth.ApiMiddleware(mockStorage)(next)
+	handler := auth.ApiMiddleware(discardLogger, mockStorage)(next)
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
@@ -51,7 +51,7 @@ func TestApiMiddlewareAuthenticatesPersonalAccessToken(t *testing.T) {
 		Return(user, nil)
 
 	var captured *models.User
-	handler := auth.ApiMiddleware(mockStorage)(newCapturingHandler(&captured))
+	handler := auth.ApiMiddleware(discardLogger, mockStorage)(newCapturingHandler(&captured))
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
@@ -75,7 +75,7 @@ func TestApiMiddlewareRejectsUnknownPersonalAccessToken(t *testing.T) {
 	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		nextCalled = true
 	})
-	handler := auth.ApiMiddleware(mockStorage)(next)
+	handler := auth.ApiMiddleware(discardLogger, mockStorage)(next)
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
@@ -98,7 +98,7 @@ func TestApiMiddlewareAuthenticatesJWT(t *testing.T) {
 	require.NoError(t, err)
 
 	var captured *models.User
-	handler := auth.ApiMiddleware(mockStorage)(newCapturingHandler(&captured))
+	handler := auth.ApiMiddleware(discardLogger, mockStorage)(newCapturingHandler(&captured))
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
@@ -119,7 +119,7 @@ func TestApiMiddlewareRejectsUnknownScheme(t *testing.T) {
 	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		nextCalled = true
 	})
-	handler := auth.ApiMiddleware(mockStorage)(next)
+	handler := auth.ApiMiddleware(discardLogger, mockStorage)(next)
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/", nil)

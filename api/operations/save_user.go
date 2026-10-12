@@ -24,6 +24,8 @@ import (
 type SaveUserDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage storage.AuthStorage
 }
 
@@ -32,10 +34,11 @@ type SaveUserDeps struct {
 // Callers must have the write-ACLs permission. To change roles without
 // resetting the password, use [NewPatchUserRolesUsecase] instead.
 func NewSaveUserUsecase(deps SaveUserDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_ACLS,
 			func(

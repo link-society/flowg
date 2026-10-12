@@ -24,6 +24,8 @@ import (
 type ListForwardersDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage   storage.AuthStorage
 	ConfigStorage storage.ConfigStorage
 }
@@ -32,10 +34,11 @@ type ListForwardersDeps struct {
 //
 // Callers must have the read-forwarders permission.
 func NewListForwardersUsecase(deps ListForwardersDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_FORWARDERS,
 			func(

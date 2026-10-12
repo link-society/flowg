@@ -27,7 +27,8 @@ identity from the incoming request and enforcing the declared permissions.
 
 A typical endpoint is composed by chaining these pieces: the middleware
 authenticates the request and binds the user to the context, then a scope
-decorator wraps the interactor so it only runs for authorized callers.
+decorator wraps the interactor so it only runs for authorized callers. Both
+are given the logger they log through (the operation's API logger).
 
 ```text
 request ──▶ ApiMiddleware ──▶ RequireScope(s)ApiDecorator ──▶ use-case

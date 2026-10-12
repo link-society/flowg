@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"go.uber.org/fx"
 
@@ -23,6 +24,7 @@ type Options struct {
 type deps struct {
 	fx.In
 
+	Logger  *slog.Logger
 	Options Options
 	Adapter *badger.BadgerAdapter `name:"storage.config"`
 
@@ -56,7 +58,7 @@ func Module() fx.Option {
 		"storage.config",
 		badger.NewAdapter("storage.config", Options.adapterOptions),
 		fx.Provide(func(lc fx.Lifecycle, d deps) storage.ConfigStorage {
-			storage := config.NewStorage(d.Adapter, d.Notifier)
+			storage := config.NewStorage(d.Logger, d.Adapter, d.Notifier)
 
 			lc.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {

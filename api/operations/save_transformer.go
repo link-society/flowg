@@ -24,6 +24,8 @@ import (
 type SaveTransformerDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage   storage.AuthStorage
 	ConfigStorage storage.ConfigStorage
 }
@@ -34,10 +36,11 @@ type SaveTransformerDeps struct {
 // notifies the pipeline runner, which rebuilds every pipeline so that
 // subsequent runs pick up the new source.
 func NewSaveTransformerUsecase(deps SaveTransformerDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_TRANSFORMERS,
 			func(

@@ -20,6 +20,7 @@ const gcBatchSize = 1000
 // lazily on read (see [FoundationQueryTx.Get] and the iterators); this worker
 // reclaims their storage.
 type gcWorker struct {
+	logger     *slog.Logger
 	adapter    *FoundationAdapter
 	gcInterval time.Duration
 }
@@ -27,10 +28,15 @@ type gcWorker struct {
 var _ actor.Worker = (*gcWorker)(nil)
 
 // NewGarbageCollector returns an [actor.Worker] that scans the adapter's
-// subspace every gcInterval and removes expired keys. Errors are logged and do
-// not stop the worker.
-func NewGarbageCollector(adapter *FoundationAdapter, gcInterval time.Duration) actor.Worker {
+// subspace every gcInterval and removes expired keys. Errors are logged through
+// a logger derived from rootLogger, and do not stop the worker.
+func NewGarbageCollector(
+	rootLogger *slog.Logger,
+	adapter *FoundationAdapter,
+	gcInterval time.Duration,
+) actor.Worker {
 	return &gcWorker{
+		logger:     rootLogger.With(slog.String("channel", "storage.foundation")),
 		adapter:    adapter,
 		gcInterval: gcInterval,
 	}
@@ -43,10 +49,9 @@ func (w *gcWorker) DoWork(ctx actor.Context) actor.WorkerStatus {
 
 	case <-time.After(w.gcInterval):
 		if err := collectExpired(ctx, w.adapter.db, w.adapter.sub); err != nil && ctx.Err() == nil {
-			slog.ErrorContext(
+			w.logger.ErrorContext(
 				ctx,
 				"failed to collect expired keys",
-				slog.String("channel", "storage.foundation"),
 				slog.String("error", err.Error()),
 			)
 		}

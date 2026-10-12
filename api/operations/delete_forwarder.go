@@ -24,6 +24,8 @@ import (
 type DeleteForwarderDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage   storage.AuthStorage
 	ConfigStorage storage.ConfigStorage
 }
@@ -33,10 +35,11 @@ type DeleteForwarderDeps struct {
 // Callers must have the write-forwarders permission. Deleting an absent
 // forwarder is treated as a success.
 func NewDeleteForwarderUsecase(deps DeleteForwarderDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_WRITE_FORWARDERS,
 			func(

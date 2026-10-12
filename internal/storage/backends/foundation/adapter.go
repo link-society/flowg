@@ -3,6 +3,7 @@ package foundation
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"io"
 
@@ -66,9 +67,10 @@ var _ kv.Adapter[*FoundationQueryTx, *FoundationMutationTx] = (*FoundationAdapte
 //
 // The database is opened with the [AdapterOptions] computed by adapterOptions
 // from the options O of the storage owning the adapter, injected from the
+// graph. Its garbage collector logs through the root logger injected from the
 // graph.
 func NewAdapter[O any](logChannel string, adapterOptions func(O) AdapterOptions) fx.Option {
-	makeAdapter := func(lc fx.Lifecycle, storageOpts O) (*FoundationAdapter, error) {
+	makeAdapter := func(lc fx.Lifecycle, storageOpts O, rootLogger *slog.Logger) (*FoundationAdapter, error) {
 		opts := adapterOptions(storageOpts)
 
 		if err := fdb.APIVersion(FoundationApiVersion); err != nil {
@@ -107,7 +109,7 @@ func NewAdapter[O any](logChannel string, adapterOptions func(O) AdapterOptions)
 			gcInterval = defaultGCInterval
 		}
 
-		gc := actor.New(NewGarbageCollector(adapter, gcInterval))
+		gc := actor.New(NewGarbageCollector(rootLogger, adapter, gcInterval))
 		lc.Append(fx.Hook{
 			OnStart: func(ctx context.Context) error {
 				gc.Start()

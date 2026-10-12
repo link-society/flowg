@@ -3,6 +3,8 @@ package config
 import (
 	"testing"
 
+	"log/slog"
+
 	"crypto/sha256"
 
 	"github.com/stretchr/testify/mock"
@@ -39,6 +41,7 @@ func newTestWatcher() (*watchWorker, *confignotifyMocks.MockNotifier, *fakeSyste
 	cache := &fakeSystemCache{}
 
 	return &watchWorker{
+		logger:      slog.New(slog.DiscardHandler),
 		notifier:    notifier,
 		systemCache: cache,
 	}, notifier, cache

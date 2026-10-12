@@ -23,6 +23,8 @@ import (
 type DeleteTokenDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage storage.AuthStorage
 }
 
@@ -31,7 +33,7 @@ type DeleteTokenDeps struct {
 // A user may only delete their own tokens. It requires authentication but no
 // particular permission.
 func NewDeleteTokenUsecase(deps DeleteTokenDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		func(

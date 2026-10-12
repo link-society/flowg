@@ -8,8 +8,10 @@ import (
 	"github.com/dgraph-io/badger/v4"
 )
 
+// badgerLogger forwards BadgerDB's log output to a slog logger, one record per
+// line. Info messages are logged at debug level.
 type badgerLogger struct {
-	Channel string
+	logger *slog.Logger
 }
 
 var _ badger.Logger = (*badgerLogger)(nil)
@@ -18,7 +20,7 @@ func (l *badgerLogger) Errorf(format string, v ...interface{}) {
 	content := fmt.Sprintf(format, v...)
 	lines := strings.FieldsFunc(content, func(c rune) bool { return c == '\n' || c == '\r' })
 	for _, line := range lines {
-		slog.Error(line, "channel", l.Channel)
+		l.logger.Error(line)
 	}
 }
 
@@ -26,7 +28,7 @@ func (l *badgerLogger) Warningf(format string, v ...interface{}) {
 	content := fmt.Sprintf(format, v...)
 	lines := strings.FieldsFunc(content, func(c rune) bool { return c == '\n' || c == '\r' })
 	for _, line := range lines {
-		slog.Warn(line, "channel", l.Channel)
+		l.logger.Warn(line)
 	}
 }
 
@@ -38,6 +40,6 @@ func (l *badgerLogger) Debugf(format string, v ...interface{}) {
 	content := fmt.Sprintf(format, v...)
 	lines := strings.FieldsFunc(content, func(c rune) bool { return c == '\n' || c == '\r' })
 	for _, line := range lines {
-		slog.Debug(line, "channel", l.Channel)
+		l.logger.Debug(line)
 	}
 }

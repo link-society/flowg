@@ -25,7 +25,10 @@ import (
 //     is not invoked;
 //   - the user holds the scope: next is invoked and its result is returned
 //     unchanged.
+//
+// Permission lookup failures and authorizations are logged through logger.
 func RequireScopeApiDecorator[Req any, Resp any](
+	logger *slog.Logger,
 	authStorage storage.AuthStorage,
 	scope models.Scope,
 	next func(context.Context, Req, *Resp) error,
@@ -38,10 +41,9 @@ func RequireScopeApiDecorator[Req any, Resp any](
 			scope,
 		)
 		if err != nil {
-			slog.ErrorContext(
+			logger.ErrorContext(
 				ctx,
 				"Failed to verify user permission",
-				slog.String("channel", "api"),
 				slog.String("error", err.Error()),
 			)
 			return status.Wrap(err, status.PermissionDenied)
@@ -51,10 +53,9 @@ func RequireScopeApiDecorator[Req any, Resp any](
 			return status.PermissionDenied
 		}
 
-		slog.DebugContext(
+		logger.DebugContext(
 			ctx,
 			"Authorized user",
-			slog.String("channel", "api"),
 			slog.String("user", user.Name),
 			slog.String("scope", string(scope)),
 		)
@@ -72,6 +73,7 @@ func RequireScopeApiDecorator[Req any, Resp any](
 // unresolvable scope short-circuits with [status.PermissionDenied]. An empty
 // scope list imposes no requirement and yields next unchanged.
 func RequireScopesApiDecorator[Req any, Resp any](
+	logger *slog.Logger,
 	authStorage storage.AuthStorage,
 	scopes []models.Scope,
 	next func(context.Context, Req, *Resp) error,
@@ -79,12 +81,13 @@ func RequireScopesApiDecorator[Req any, Resp any](
 	if len(scopes) == 0 {
 		return next
 	} else if len(scopes) == 1 {
-		return RequireScopeApiDecorator(authStorage, scopes[0], next)
+		return RequireScopeApiDecorator(logger, authStorage, scopes[0], next)
 	} else {
 		return RequireScopesApiDecorator(
+			logger,
 			authStorage,
 			scopes[1:],
-			RequireScopeApiDecorator(authStorage, scopes[0], next),
+			RequireScopeApiDecorator(logger, authStorage, scopes[0], next),
 		)
 	}
 }

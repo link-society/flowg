@@ -24,11 +24,13 @@ import (
 	storage "link-society.com/flowg/internal/storage/interfaces"
 )
 
-// ElasticDeps lists the dependencies of [newElasticHandler]: the backends it
-// uses to authenticate callers and turn the documents they index into pipeline
-// runs.
+// ElasticDeps lists the dependencies of [newElasticHandler]: the root logger,
+// and the backends it uses to authenticate callers and turn the documents they
+// index into pipeline runs.
 type ElasticDeps struct {
 	fx.In
+
+	Logger *slog.Logger
 
 	AuthStorage    storage.AuthStorage
 	ConfigStorage  storage.ConfigStorage
@@ -101,7 +103,7 @@ func elasticAuth(deps ElasticDeps, next http.Handler) http.Handler {
 // shippers exercise: checking that an index (a FlowG pipeline) exists, and
 // indexing a document (running a log record through that pipeline).
 func NewElasticHandler(deps ElasticDeps) http.Handler {
-	logger := slog.Default().With(slog.String("channel", "input.middleware.elastic"))
+	logger := deps.Logger.With(slog.String("channel", "input.middleware.elastic"))
 	mux := http.NewServeMux()
 
 	mux.HandleFunc(

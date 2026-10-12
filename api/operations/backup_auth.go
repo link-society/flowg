@@ -27,6 +27,8 @@ import (
 type BackupAuthDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage storage.AuthStorage
 }
 
@@ -37,10 +39,11 @@ type BackupAuthDeps struct {
 // reloaded with [NewRestoreAuthUsecase]. Callers must have the
 // read-ACLs permission.
 func NewBackupAuthUsecase(deps BackupAuthDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_ACLS,
 			func(

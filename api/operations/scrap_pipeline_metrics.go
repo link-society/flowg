@@ -27,6 +27,8 @@ import (
 type ScrapPipelineMetricsDeps struct {
 	fx.In
 
+	Logger *slog.Logger
+
 	AuthStorage    storage.AuthStorage
 	PipelineRunner pipelines.Runner
 }
@@ -36,10 +38,11 @@ type ScrapPipelineMetricsDeps struct {
 // Callers must have the read-pipelines permission. Requesting an unknown pipeline
 // yields a not-found error.
 func NewScrapPipelineMetricsUsecase(deps ScrapPipelineMetricsDeps) usecase.Interactor {
-	logger := logging.Logger()
+	logger := logging.Logger(deps.Logger)
 
 	u := usecase.NewInteractor(
 		auth.RequireScopeApiDecorator(
+			logger,
 			deps.AuthStorage,
 			models.SCOPE_READ_PIPELINES,
 			func(

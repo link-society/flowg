@@ -34,10 +34,9 @@ func (w *gcWorker[QTx, MTx]) DoWork(ctx actor.Context) actor.WorkerStatus {
 
 	case <-time.After(w.gcInterval):
 		if err := w.storage.CollectGarbage(ctx); err != nil && ctx.Err() == nil {
-			slog.ErrorContext(
+			w.storage.logger.ErrorContext(
 				ctx,
 				"failed to collect garbage",
-				slog.String("channel", "logstorage"),
 				slog.String("error", err.Error()),
 			)
 		}
