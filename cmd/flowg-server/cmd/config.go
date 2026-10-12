@@ -298,10 +298,15 @@ func (c *StorageBackendConfig) Resolve() hcl.Diagnostics {
 	}
 }
 
-// Validates the storage configuration, ensuring that exactly one backend is
-// configured. Returns an error if no backend is configured or if multiple
-// backends are configured.
+// Validates the storage configuration, ensuring that the backend is supported
+// and that exactly one backend is configured. Returns an error if the backend is
+// unsupported, if no backend is configured or if multiple backends are
+// configured.
 func (c *StorageBackendConfig) Validate() error {
+	if c.Backend != StorageBackendBadgerDb && c.Backend != StorageBackendFoundationDb {
+		return fmt.Errorf("unsupported storage backend: %q", c.Backend)
+	}
+
 	count := 0
 
 	if c.BadgerDB != nil {

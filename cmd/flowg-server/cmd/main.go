@@ -33,12 +33,16 @@ func NewRootCommand() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			config := DefaultConfig()
 
+			var err error
 			if configPath != "" {
-				if err := config.Load(configPath); err != nil {
-					fmt.Printf("ERROR: %v\n", err)
-					ExitCode = 1
-					return
-				}
+				err = config.Load(configPath)
+			} else {
+				err = config.Validate()
+			}
+			if err != nil {
+				fmt.Printf("ERROR: %v\n", err)
+				ExitCode = 1
+				return
 			}
 
 			opts, err := config.AsServerOptions()
