@@ -16,7 +16,7 @@ requiring predefined schemas and relies on
 [BadgerDB](https://github.com/dgraph-io/badger) as its storage backend.
 
 For more information, consult the
-[documentation](https://docs.flowg.cloud).
+[documentation](https://flowg.cloud/docs).
 
 You wish to contribute? Please read our [guidelines](./CONTRIBUTING.md) first.
 
@@ -136,7 +136,7 @@ docker run \
 
 **:warning: EXPERIMENTAL :warning:** Using Kubernetes (and Helm):
 
-- **Single-node version**: *BeaverDB, StatefulSet with 1 replicas*, ideal for homelabs and small clusters 
+- **Single-node version**: *BeaverDB, StatefulSet with 1 replicas*, ideal for homelabs and small clusters
 
 ```bash
 helm install flowg ./k8s/charts/flowg-singlenode -n flowg-system --create-namespace
