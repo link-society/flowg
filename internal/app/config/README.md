@@ -11,7 +11,9 @@ options of each component is the job of the caller.
 
 ## Layout
 
-- **`schema.go`** — the schema (`RootConfig` and its sections), `DefaultConfig`,
-  and the `Load` / `Validate` methods that parse and check a configuration file.
-- **`env.go`** — default settings, each resolved from an environment variable
-  via the `getEnv*` helpers.
+- **`schema.go`** — the schema (`RootConfig` and its sections), `DefaultConfig`
+  (which resolves each default from its environment variable, read on each
+  call), and the `Load` / `Validate` methods that parse and check a
+  configuration file.
+- **`env.go`** — the `getEnv*` helpers reading a typed value from an
+  environment variable, with a fallback when it is unset or empty.
