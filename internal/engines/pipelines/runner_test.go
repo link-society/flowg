@@ -36,8 +36,10 @@ const rawTestPipeline = `{
 func testRunnerModules(configOpts badgerconfig.Options, logOpts badgerlog.Options) []fx.Option {
 	return []fx.Option{
 		confignotify.NewNotifier(),
-		badgerconfig.NewStorage(configOpts),
-		badgerlog.NewStorage(logOpts),
+		fx.Supply(configOpts),
+		badgerconfig.Module(),
+		fx.Supply(logOpts),
+		badgerlog.Module(),
 		lognotify.NewLogNotifier(),
 		NewRunner(),
 		fx.NopLogger,

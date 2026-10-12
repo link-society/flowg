@@ -11,8 +11,9 @@ starts the retention garbage collector.
 
 ## Wiring
 
-`NewStorage` returns an `fx` module that provides a `LogStorage` and starts a
-background worker enforcing each stream's retention budget. `Options` carries
+`Module` returns an `fx` module that provides a `LogStorage` and starts a
+background worker enforcing each stream's retention budget. It is configured by
+the `Options` provided to the graph. `Options` carries
 the FoundationDB cluster file, the shared key space and the garbage-collection
 interval, and `DefaultOptions` supplies their defaults.
 
@@ -22,4 +23,4 @@ the configured `GCInterval`.
 
 ## Layout
 
-- **main.go** — the `Options`, `DefaultOptions` and `NewStorage` `fx` wiring.
+- **main.go** — the `Options`, `DefaultOptions` and `Module` `fx` wiring.

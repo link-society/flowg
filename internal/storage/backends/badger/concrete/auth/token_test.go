@@ -25,7 +25,8 @@ func newAuthStorage(t *testing.T) (context.Context, storage.AuthStorage) {
 
 	app := fxtest.New(
 		t,
-		badgerauth.NewStorage(opts),
+		fx.Supply(opts),
+		badgerauth.Module(),
 		fx.Populate(&authStorage),
 		fx.NopLogger,
 	)

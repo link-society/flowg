@@ -5,10 +5,25 @@ import (
 	"fmt"
 	"log/slog"
 
+	"go.uber.org/fx"
+
 	storage "link-society.com/flowg/internal/storage/interfaces"
 
 	"link-society.com/flowg/internal/storage/bootstrap"
 )
+
+// bootstrapOptions configures the bootstrap handler: the syslog origins allowed
+// on a fresh instance, the initial admin credentials, and the optional
+// credential reset.
+type bootstrapOptions struct {
+	InitialSyslogAllowedOrigins []string
+
+	InitialUser     string
+	InitialPassword string
+
+	ResetUser     string
+	ResetPassword string
+}
 
 // bootstrapHandler seeds a fresh (or upgraded) instance on startup: it applies
 // the default system configuration, roles and users, and pipeline, and performs
@@ -19,13 +34,34 @@ type bootstrapHandler struct {
 	authStorage   storage.AuthStorage
 	configStorage storage.ConfigStorage
 
-	initialSyslogAllowedOrigins []string
+	opts bootstrapOptions
+}
 
-	initialUser     string
-	initialPassword string
+// newBootstrapHandler builds the bootstrap handler configured by the
+// [bootstrapOptions] provided to the graph, and runs it from the OnStart hook.
+// It depends on the log storage too, so that every storage is started before
+// the handler runs.
+func newBootstrapHandler(
+	lc fx.Lifecycle,
+	opts bootstrapOptions,
+	authStorage storage.AuthStorage,
+	configStorage storage.ConfigStorage,
+	_ storage.LogStorage,
+) *bootstrapHandler {
+	h := &bootstrapHandler{
+		logger:        slog.Default().With(slog.String("channel", "bootstrap")),
+		authStorage:   authStorage,
+		configStorage: configStorage,
+		opts:          opts,
+	}
 
-	resetUser     string
-	resetPassword string
+	lc.Append(fx.Hook{
+		OnStart: func(ctx context.Context) error {
+			return h.Run(ctx)
+		},
+	})
+
+	return h
 }
 
 // Run applies all bootstrap steps in order: default roles and users,
@@ -33,15 +69,15 @@ type bootstrapHandler struct {
 // user-password reset. It is invoked from the module's OnStart lifecycle hook.
 func (h *bootstrapHandler) Run(ctx context.Context) error {
 	err := bootstrap.DefaultRolesAndUsers(ctx, h.authStorage, bootstrap.BootstrapAuthOptions{
-		InitialUser:     h.initialUser,
-		InitialPassword: h.initialPassword,
+		InitialUser:     h.opts.InitialUser,
+		InitialPassword: h.opts.InitialPassword,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to bootstrap default roles and users: %w", err)
 	}
 
 	err = bootstrap.DefaultSystemConfig(ctx, h.configStorage, bootstrap.BootstrapSystemOptions{
-		InitialSyslogAllowedOrigins: h.initialSyslogAllowedOrigins,
+		InitialSyslogAllowedOrigins: h.opts.InitialSyslogAllowedOrigins,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to bootstrap default system config: %w", err)
@@ -53,8 +89,8 @@ func (h *bootstrapHandler) Run(ctx context.Context) error {
 	}
 
 	err = bootstrap.ResetUser(ctx, h.authStorage, bootstrap.ResetUserOptions{
-		User:     h.resetUser,
-		Password: h.resetPassword,
+		User:     h.opts.ResetUser,
+		Password: h.opts.ResetPassword,
 	})
 
 	return nil

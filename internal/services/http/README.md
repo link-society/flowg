@@ -16,8 +16,9 @@ access-log middleware.
 
 ## Layout
 
-- **main.go** — `ServerOptions`, the `Server`, and the `NewServer` fx module that
-  assembles the routes and lifecycle hooks.
+- **main.go** — `Options`, the `Server`, and the `Module` fx module that
+  assembles the routes and lifecycle hooks, configured by the `Options`
+  provided to the graph.
 - **logging.go** — the access-log middleware.
 
 ## Access logging

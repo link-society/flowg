@@ -44,7 +44,8 @@ func TestNotifyOnMutations(t *testing.T) {
 
 	app := fxtest.New(
 		t,
-		badgerconfig.NewStorage(opts),
+		fx.Supply(opts),
+		badgerconfig.Module(),
 		fx.Provide(func() confignotify.Notifier { return notifier }),
 		fx.Populate(&configStorage),
 		fx.NopLogger,

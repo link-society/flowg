@@ -33,19 +33,21 @@ func DefaultOptions() Options {
 	}
 }
 
-// NewStorage returns an fx module providing a badger-backed
-// [storage.AuthStorage] configured with the given options.
-func NewStorage(opts Options) fx.Option {
-	adapterOpts := badger.AdapterOptions{
-		LogChannel: "storage.auth",
-		Directory:  opts.Directory,
-		InMemory:   opts.InMemory,
-		ReadOnly:   opts.ReadOnly,
+// adapterOptions returns the options of the underlying badger adapter.
+func (o Options) adapterOptions() badger.AdapterOptions {
+	return badger.AdapterOptions{
+		Directory: o.Directory,
+		InMemory:  o.InMemory,
+		ReadOnly:  o.ReadOnly,
 	}
+}
 
+// Module returns an fx module providing a badger-backed [storage.AuthStorage]
+// configured by the [Options] provided to the graph.
+func Module() fx.Option {
 	return fx.Module(
 		"storage.auth",
-		badger.NewAdapter(adapterOpts),
+		badger.NewAdapter("storage.auth", Options.adapterOptions),
 		fx.Provide(func(lc fx.Lifecycle, d deps) storage.AuthStorage {
 			storage := auth.NewStorage(d.Adapter)
 

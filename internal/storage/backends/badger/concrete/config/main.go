@@ -23,6 +23,7 @@ type Options struct {
 type deps struct {
 	fx.In
 
+	Options Options
 	Adapter *badger.BadgerAdapter `name:"storage.config"`
 
 	// Notifier broadcasts config mutations to the pipeline runner; it is
@@ -39,29 +40,31 @@ func DefaultOptions() Options {
 	}
 }
 
-// NewStorage returns an fx module providing a badger-backed
-// [storage.ConfigStorage] configured with the given options.
-func NewStorage(opts Options) fx.Option {
-	adapterOpts := badger.AdapterOptions{
-		LogChannel: "storage.config",
-		Directory:  opts.Directory,
-		InMemory:   opts.InMemory,
-		ReadOnly:   opts.ReadOnly,
+// adapterOptions returns the options of the underlying badger adapter.
+func (o Options) adapterOptions() badger.AdapterOptions {
+	return badger.AdapterOptions{
+		Directory: o.Directory,
+		InMemory:  o.InMemory,
+		ReadOnly:  o.ReadOnly,
 	}
+}
 
+// Module returns an fx module providing a badger-backed [storage.ConfigStorage]
+// configured by the [Options] provided to the graph.
+func Module() fx.Option {
 	return fx.Module(
 		"storage.config",
-		badger.NewAdapter(adapterOpts),
+		badger.NewAdapter("storage.config", Options.adapterOptions),
 		fx.Provide(func(lc fx.Lifecycle, d deps) storage.ConfigStorage {
 			storage := config.NewStorage(d.Adapter, d.Notifier)
 
 			lc.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {
-					if err := migrateAlerts(opts.Directory); err != nil {
+					if err := migrateAlerts(d.Options.Directory); err != nil {
 						return fmt.Errorf("failed to migrate alerts: %w", err)
 					}
 
-					if err := migrateToBadger(ctx, opts.Directory, storage); err != nil {
+					if err := migrateToBadger(ctx, d.Options.Directory, storage); err != nil {
 						return fmt.Errorf("failed to migrate to badger: %w", err)
 					}
 

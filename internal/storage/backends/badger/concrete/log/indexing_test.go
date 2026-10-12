@@ -32,7 +32,8 @@ func TestFetchLogsIndexingFilter(t *testing.T) {
 
 	app := fxtest.New(
 		t,
-		badgerlog.NewStorage(opts),
+		fx.Supply(opts),
+		badgerlog.Module(),
 		fx.Populate(&logStorage),
 		fx.NopLogger,
 	)
@@ -111,7 +112,8 @@ func TestStreamIndicesDistinct(t *testing.T) {
 
 	app := fxtest.New(
 		t,
-		badgerlog.NewStorage(opts),
+		fx.Supply(opts),
+		badgerlog.Module(),
 		fx.Populate(&logStorage),
 		fx.NopLogger,
 	)
@@ -172,7 +174,8 @@ func TestIngestOversizedIndexedValue(t *testing.T) {
 
 	app := fxtest.New(
 		t,
-		badgerlog.NewStorage(opts),
+		fx.Supply(opts),
+		badgerlog.Module(),
 		fx.Populate(&logStorage),
 		fx.NopLogger,
 	)

@@ -27,7 +27,8 @@ func TestDefaultRolesAndUsers(t *testing.T) {
 
 	app := fxtest.New(
 		t,
-		auth.NewStorage(authOpts),
+		fx.Supply(authOpts),
+		auth.Module(),
 		fx.Populate(&authStorage),
 		fx.NopLogger,
 	)

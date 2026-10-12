@@ -16,12 +16,13 @@ drains the messages parsed by the underlying syslog library.
   range.
 - **Dispatch** — normalises each message into a `LogRecord` and runs it through
   every pipeline's `syslog` entrypoint concurrently.
-- **Wiring** — `NewServer` returns an fx module binding the listener and actor to
-  the application lifecycle.
+- **Wiring** — `Module` returns an fx module binding the listener and actor to
+  the application lifecycle. It is configured by the `Options` provided to the
+  graph.
 
 ## Layout
 
-- **main.go** — `ServerOptions`, the `Server`, and the `NewServer` fx module that
-  wires the listener, the message channel and the worker actor.
+- **main.go** — `Options`, the `Server`, and the `Module` fx module that wires
+  the listener, the message channel and the worker actor.
 - **worker.go** — the actor body: origin filtering and per-pipeline dispatch.
 - **parse.go** — converts the library's loosely-typed fields into a `LogRecord`.

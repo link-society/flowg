@@ -19,8 +19,9 @@ ingestion pipeline and query API never depend on BadgerDB directly.
   collection routine.
 - **Snapshots** — satisfies `Streamable` so the log database can be backed up
   and restored.
-- **Wiring** — `NewStorage` returns an `fx` module providing a `LogStorage`;
-  `Options` and `DefaultOptions` configure where and how the database is opened.
+- **Wiring** — `Module` returns an `fx` module providing a `LogStorage`;
+  `Options` (provided to the graph) and `DefaultOptions` configure where and how
+  the database is opened.
 
 ## Layout
 

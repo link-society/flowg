@@ -34,8 +34,6 @@ var ChangeLogKey = kv.Key{"meta", "changelog"}
 // AdapterOptions configures how a FoundationDB-backed [kv.Adapter] connects to
 // its cluster and where within the key space it stores its data.
 type AdapterOptions struct {
-	// LogChannel names the logging channel and the fx module the store lives in.
-	LogChannel string
 	// ClusterFile is the path to the fdb.cluster file; empty uses the default.
 	ClusterFile string
 	// ConnectionString is the FoundationDB connection string; empty uses the default.
@@ -63,11 +61,16 @@ var _ kv.Adapter[*FoundationQueryTx, *FoundationMutationTx] = (*FoundationAdapte
 // NewAdapter builds an fx module that provides a [kv.Adapter] backed by
 // FoundationDB.
 //
-// The resulting [kv.Adapter] is published under the name given by
-// AdapterOptions.LogChannel so several adapters can coexist in the same
-// container.
-func NewAdapter(opts AdapterOptions) fx.Option {
-	makeAdapter := func(lc fx.Lifecycle) (*FoundationAdapter, error) {
+// The resulting [kv.Adapter] is published under the name logChannel so several
+// adapters can coexist in the same container.
+//
+// The database is opened with the [AdapterOptions] computed by adapterOptions
+// from the options O of the storage owning the adapter, injected from the
+// graph.
+func NewAdapter[O any](logChannel string, adapterOptions func(O) AdapterOptions) fx.Option {
+	makeAdapter := func(lc fx.Lifecycle, storageOpts O) (*FoundationAdapter, error) {
+		opts := adapterOptions(storageOpts)
+
 		if err := fdb.APIVersion(FoundationApiVersion); err != nil {
 			return nil, fmt.Errorf("failed to select FoundationDB API version: %w", err)
 		}
@@ -119,14 +122,14 @@ func NewAdapter(opts AdapterOptions) fx.Option {
 		return adapter, nil
 	}
 
-	module := fmt.Sprintf("kv.adapter.%s", opts.LogChannel)
+	module := fmt.Sprintf("kv.adapter.%s", logChannel)
 
 	return fx.Module(
 		module,
 		fx.Provide(
 			fx.Annotate(
 				makeAdapter,
-				fx.ResultTags(fmt.Sprintf(`name:"%s"`, opts.LogChannel)),
+				fx.ResultTags(fmt.Sprintf(`name:"%s"`, logChannel)),
 			),
 		),
 	)

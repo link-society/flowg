@@ -20,8 +20,9 @@ identity purely through the `AuthStorage` interface.
   its roles.
 - **Snapshots** — satisfies `Streamable` so the auth database can be backed up
   and restored.
-- **Wiring** — `NewStorage` returns an `fx` module providing an `AuthStorage`;
-  `Options` and `DefaultOptions` configure where and how the database is opened.
+- **Wiring** — `Module` returns an `fx` module providing an `AuthStorage`;
+  `Options` (provided to the graph) and `DefaultOptions` configure where and how
+  the database is opened.
 
 ## Layout
 

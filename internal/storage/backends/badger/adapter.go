@@ -17,8 +17,6 @@ import (
 
 // Configures how the underlying BadgerDB database is opened.
 type AdapterOptions struct {
-	// LogChannel names the logging channel and the fx module the store lives in.
-	LogChannel string
 	// Directory is the on-disk location of the database; ignored when InMemory.
 	Directory string
 	// InMemory keeps the whole database in memory, useful for tests.
@@ -43,11 +41,17 @@ var _ kv.Adapter[*BadgerTx, *BadgerTx] = (*BadgerAdapter)(nil)
 //
 // The module wires together the database handle, the actor mailbox and the
 // worker that drains it, binding their lifecycles to the fx application. The
-// resulting [kv.Adapter] is published under the name given by
-// AdapterOptions.LogChannel so several adapters can coexist in the same
+// resulting [kv.Adapter] is published under the name logChannel, which also
+// names its logging channel, so several adapters can coexist in the same
 // container.
-func NewAdapter(opts AdapterOptions) fx.Option {
-	makeDB := func(lc fx.Lifecycle) (*badger.DB, error) {
+//
+// The database is opened with the [AdapterOptions] computed by adapterOptions
+// from the options O of the storage owning the adapter, injected from the
+// graph.
+func NewAdapter[O any](logChannel string, adapterOptions func(O) AdapterOptions) fx.Option {
+	makeDB := func(lc fx.Lifecycle, storageOpts O) (*badger.DB, error) {
+		opts := adapterOptions(storageOpts)
+
 		var dbDir string
 		if !opts.InMemory {
 			dbDir = opts.Directory
@@ -55,7 +59,7 @@ func NewAdapter(opts AdapterOptions) fx.Option {
 
 		dbOpts := badger.
 			DefaultOptions(dbDir).
-			WithLogger(&badgerLogger{Channel: opts.LogChannel}).
+			WithLogger(&badgerLogger{Channel: logChannel}).
 			WithCompression(badgerOptions.ZSTD).
 			WithInMemory(opts.InMemory).
 			WithReadOnly(opts.ReadOnly)
@@ -142,7 +146,7 @@ func NewAdapter(opts AdapterOptions) fx.Option {
 		return adapter
 	}
 
-	module := fmt.Sprintf("kv.adapter.%s", opts.LogChannel)
+	module := fmt.Sprintf("kv.adapter.%s", logChannel)
 	tag := func(s string) string { return fmt.Sprintf(`name:"%s.%s"`, module, s) }
 
 	return fx.Module(
@@ -153,7 +157,7 @@ func NewAdapter(opts AdapterOptions) fx.Option {
 			fx.Annotate(
 				makeActor,
 				fx.ParamTags("", tag("db"), tag("mbox")),
-				fx.ResultTags(fmt.Sprintf(`name:"%s"`, opts.LogChannel)),
+				fx.ResultTags(fmt.Sprintf(`name:"%s"`, logChannel)),
 			),
 		),
 	)

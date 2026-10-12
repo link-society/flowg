@@ -12,7 +12,8 @@ them (the adapter, the transaction adapters and the garbage collector).
 
 Every package exposes the same shape: an `Options` struct carrying the
 FoundationDB cluster file and the shared key space, a `DefaultOptions`
-constructor and a `NewStorage` function returning the `fx` module. Each storage
+constructor and a `Module` function returning the `fx` module, configured by
+the `Options` provided to the graph. Each storage
 is scoped to its own subspace (`auth`, `config` or `log`) beneath the key space.
 
 ## Layout

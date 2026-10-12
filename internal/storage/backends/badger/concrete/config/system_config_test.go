@@ -30,7 +30,8 @@ func TestReadSystemConfigConcurrent(t *testing.T) {
 
 	app := fxtest.New(
 		t,
-		badgerconfig.NewStorage(opts),
+		fx.Supply(opts),
+		badgerconfig.Module(),
 		fx.Populate(&configStorage),
 		fx.NopLogger,
 	)

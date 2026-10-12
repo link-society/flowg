@@ -23,8 +23,8 @@ var ExitCode int = 0
 
 // NewRootCommand builds the root flowg-server command. Its pre-run hook sets the
 // umask, configures logging, applies the demo-mode flag and registers the
-// Prometheus metrics; its run hook turns the CLI options into a server
-// configuration and starts the fx application.
+// Prometheus metrics; its run hook loads the configuration and starts the fx
+// application built from it.
 func NewRootCommand() *cobra.Command {
 	var configPath string
 
@@ -39,19 +39,12 @@ func NewRootCommand() *cobra.Command {
 				return
 			}
 
-			opts, err := asServerOptions(cfg)
-			if err != nil {
-				fmt.Printf("ERROR: %v\n", err)
-				ExitCode = 1
-				return
-			}
-
 			syscall.Umask(0077)
 			logging.Setup(cfg.Logging.Verbose, cfg.Logging.Level)
 			featureflags.SetDemoMode(cfg.DemoMode)
 			metrics.Setup()
 
-			app := fx.New(fx.NopLogger, server.NewServer(opts))
+			app := fx.New(fx.NopLogger, server.NewServer(cfg))
 			if err := app.Err(); err != nil {
 				fmt.Printf("ERROR: %v\n", dig.RootCause(err))
 				ExitCode = 1

@@ -20,8 +20,9 @@ interface so the engines and API never depend on BadgerDB directly.
   origins used by the ingestion endpoints.
 - **Snapshots** — satisfies `Streamable` so the configuration database can be
   backed up and restored.
-- **Wiring** — `NewStorage` returns an `fx` module providing a `ConfigStorage`;
-  `Options` and `DefaultOptions` configure where and how the database is opened.
+- **Wiring** — `Module` returns an `fx` module providing a `ConfigStorage`;
+  `Options` (provided to the graph) and `DefaultOptions` configure where and how
+  the database is opened.
 
 ## Layout
 

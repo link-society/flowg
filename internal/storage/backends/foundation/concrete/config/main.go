@@ -42,23 +42,25 @@ func DefaultOptions() Options {
 	}
 }
 
-// NewStorage returns an fx module providing a FoundationDB-backed
-// [storage.ConfigStorage] configured with the given options.
+// adapterOptions returns the options of the underlying FoundationDB adapter.
+func (o Options) adapterOptions() foundation.AdapterOptions {
+	return foundation.AdapterOptions{
+		ClusterFile:      o.ClusterFile,
+		ConnectionString: o.ConnectionString,
+		KeySpace:         o.KeySpace,
+		Namespace:        "config",
+	}
+}
+
+// Module returns an fx module providing a FoundationDB-backed
+// [storage.ConfigStorage] configured by the [Options] provided to the graph.
 //
 // The module also starts a changelog watcher that translates config mutations
 // (local or from other nodes) into confignotify events.
-func NewStorage(opts Options) fx.Option {
-	adapterOpts := foundation.AdapterOptions{
-		LogChannel:       "storage.config",
-		ClusterFile:      opts.ClusterFile,
-		ConnectionString: opts.ConnectionString,
-		KeySpace:         opts.KeySpace,
-		Namespace:        "config",
-	}
-
+func Module() fx.Option {
 	return fx.Module(
 		"storage.config",
-		foundation.NewAdapter(adapterOpts),
+		foundation.NewAdapter("storage.config", Options.adapterOptions),
 		fx.Provide(func(d deps) *config.Storage[*foundation.FoundationQueryTx, *foundation.FoundationMutationTx] {
 			// no local notifier: change events come from the key watcher, so every
 			// node (including the writer) observes mutations through the same path
