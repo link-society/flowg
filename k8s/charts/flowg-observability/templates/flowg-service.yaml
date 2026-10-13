@@ -28,7 +28,7 @@ spec:
     - name: syslog
       port: {{ .Values.flowg.syslog.port }}
       targetPort: 5514
-      protocol: {{ .Values.flowg.syslog.protocol }}
+      protocol: UDP
       {{- if has .Values.flowg.service.type (list "NodePort" "LoadBalancer") }}
       nodePort: {{ .Values.flowg.service.nodePort.syslogPort }}
       {{- end }}

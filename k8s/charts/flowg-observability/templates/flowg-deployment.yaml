@@ -96,7 +96,7 @@ spec:
             - containerPort: 9113
               protocol: TCP
             - containerPort: 5514
-              protocol: {{ .Values.flowg.syslog.protocol }}
+              protocol: UDP
 
           # Liveness and readiness Probes
           ## Since kubernetes is quite aggressive with its request timings, 

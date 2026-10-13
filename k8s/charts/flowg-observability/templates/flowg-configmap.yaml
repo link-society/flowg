@@ -19,7 +19,7 @@ data:
     {{- with .Values.flowg.syslog.initialAllowedOrigins }}
     FLOWG_SYSLOG_INITIAL_ALLOWED_ORIGINS: {{ . | toString | quote }}
     {{- end }}
-    FLOWG_SYSLOG_PROTOCOL: {{ .Values.flowg.syslog.protocol | lower }}
+    FLOWG_SYSLOG_PROTOCOL: udp
 
     # TLS management, for web and mgmt servers
     {{- if .Values.flowg.https.enabled }}
