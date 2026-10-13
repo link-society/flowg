@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "fluentd.fullname" . }}
+  labels:
+    {{- include "fluentd.labels" . | nindent 4 }}
+data:
+  fluent.conf: |
+    <source>
+      @type tail
+      path /var/log/containers/*
+      exclude_path ["/var/log/containers/fluentd*"]
+      pos_file /var/log/fluent/log.pos
+      tag logs
+
+      <parse>
+        @type cri
+      </parse>
+    </source>
+
+    <match logs>
+      @type copy
+      <store>
+        @type stdout
+      </store>
+      <store>
+        @type remote_syslog
+        host {{ include "flowg.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+        port {{ .Values.flowg.syslog.port  }}
+        severity debug
+        program fluentd
+        hostname ${tag[1]}
+
+        <buffer tag>
+        </buffer>
+
+        <format>
+          @type json
+        </format>
+      </store>
+    </match>
