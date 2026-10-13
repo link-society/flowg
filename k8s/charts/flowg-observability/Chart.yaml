@@ -1,14 +1,13 @@
 ---
 apiVersion: v2
-name: flowg
+name: flowg-observability
 version: "v0.63.2"
 type: application
 appVersion: "v0.63.2"
 kubeVersion: ">=1.30.0-0"
-description: Flowg is a low-code log processing platform.
-home: https://github.com/link-society/flowg
+description: "Flowg is a low-code log processing platform."
 sources:
-  - https://github.com/link-society/flowg
+  - "https://github.com/link-society/flowg"
 maintainers:
   - name: Link Society
     email: contact@link-society.com

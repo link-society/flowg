@@ -65,33 +65,3 @@ Create the name of the service account to use for FlowG
 {{- default "default" .Values.flowg.serviceAccount.name }}
 {{- end }}
 {{- end }}
-
-{{/*
-Fluentd component variables
-*/}}
-{{- define "fluentd.name" -}}
-{{- printf "%s-fluentd" (include "flowg.name" .) -}}
-{{- end -}}
-
-{{- define "fluentd.fullname" -}}
-{{- printf "%s-fluentd" (include "flowg.fullname" .) -}}
-{{- end -}}
-
-{{- define "fluentd.labels" -}}
-helm.sh/chart: {{ include "flowg.chart" . }}
-{{ include "fluentd.selectorLabels" . }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- end }}
-
-{{- define "fluentd.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "fluentd.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end -}}
-
-{{- define "fluentd.serviceAccountName" -}}
-{{- if .Values.fluentd.serviceAccount.create }}
-{{- default (include "fluentd.fullname" .) .Values.fluentd.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.fluentd.serviceAccount.name }}
-{{- end }}
-{{- end -}}

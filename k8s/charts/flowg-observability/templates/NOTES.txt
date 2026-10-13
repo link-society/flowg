@@ -1,1 +1,0 @@
-FlowG {{ .Chart.AppVersion }} has been deployed! 🚀
