@@ -47,11 +47,11 @@ func (rt *jetstreamRuntime) Init(ctx context.Context) error {
 				ServerName:         rt.config.TlsServerName,
 				InsecureSkipVerify: rt.config.TlsInsecureSkipVerify,
 			}),
-			Token:   rt.config.Token,
+			Token: rt.config.Token,
 		}
 
 		if rt.config.PublishTimeout > 0 {
-			opts.Timeout = time.Duration(rt.config.PublishTimeout)*time.Second
+			opts.Timeout = time.Duration(rt.config.PublishTimeout) * time.Second
 		}
 
 		switch rt.config.AuthMode {

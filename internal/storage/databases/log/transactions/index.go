@@ -184,7 +184,6 @@ func keysEqual(a, b kv.Key) bool {
 	return true
 }
 
-
 // AddKey records that entryKey carries this (stream, field, value), giving the
 // index key the entry's remaining TTL so the two expire together.
 func (index *fieldIndex) AddKey(entryKey kv.Key, retentionTime int64) error {

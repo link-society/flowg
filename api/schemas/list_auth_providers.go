@@ -2,7 +2,7 @@ package schemas
 
 // AuthProviderInfo carries the name and display name of an auth provider.
 type AuthProviderInfo struct {
-	Name string `json:"name" required:"true"`
+	Name        string `json:"name" required:"true"`
 	DisplayName string `json:"display_name" required:"true"`
 }
 
@@ -16,4 +16,3 @@ type ListAuthProvidersResponse struct {
 	// AuthProviders holds the name and display name of every configured auth provider.
 	AuthProviders []AuthProviderInfo `json:"auth_providers"`
 }
-

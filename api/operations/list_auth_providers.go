@@ -46,7 +46,7 @@ func NewListAuthProvidersUsecase(deps ListAuthProvidersDeps) usecase.Interactor 
 				return status.Wrap(err, status.Internal)
 			}
 
-			authProviderInfos := make([]schemas.AuthProviderInfo, len(authProviders))	
+			authProviderInfos := make([]schemas.AuthProviderInfo, len(authProviders))
 			for i, ap := range authProviders {
 				authProviderInfos[i] = schemas.AuthProviderInfo{
 					Name:        ap.Name,
