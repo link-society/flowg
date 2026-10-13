@@ -148,6 +148,12 @@ helm install flowg ./k8s/charts/flowg-singlenode -n flowg-system --create-namesp
 helm install flowg ./k8s/charts/flowg-multinode -n flowg-system --create-namespace --set flowg.replicas=2
 ``` 
 
+- **Multi-node + Observability stack**, *FoundationDB, Deployment, Fluentd Daemonset*
+
+```bash
+helm install flowg ./k8s/charts/flowg-observability -n flowg-system --create-namespace --set flowg.replicas=2
+``` 
+
 
 ## :memo: License
 
