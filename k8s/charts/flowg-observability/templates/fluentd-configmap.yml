@@ -9,7 +9,7 @@ data:
     <source>
       @type tail
       path /var/log/containers/*
-      exclude_path ["/var/log/containers/fluentd*"]
+      exclude_path ["/var/log/containers/*fluentd*"]
       pos_file /var/log/fluent/log.pos
       tag logs
 
