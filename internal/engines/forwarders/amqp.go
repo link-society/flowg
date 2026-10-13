@@ -30,54 +30,43 @@ type amqpRuntime struct {
 
 var _ Runtime = (*amqpRuntime)(nil)
 
-func (rt *amqpRuntime) Init(ctx context.Context) error {
-	reply := make(chan error, 1)
-	defer close(reply)
+func (rt *amqpRuntime) Init(context.Context) error {
+	var err error
 
-	go func() {
-		conn, err := amqp.Dial(rt.config.Url)
-		if err != nil {
-			reply <- fmt.Errorf("failed to connect to AMQP server: %w", err)
-		}
-
-		ch, err := conn.Channel()
-		if err != nil {
-			_ = conn.Close()
-			reply <- fmt.Errorf("failed to open an AMQP channel: %w", err)
-		}
-
-		rt.conn = conn
-		rt.channel = ch
-
-		rt.exchange, err = CompileDynamicField(string(rt.config.Exchange))
-		if err != nil {
-			reply <- fmt.Errorf("failed to compile exchange field: %w", err)
-		}
-
-		rt.routingKey, err = CompileDynamicField(string(rt.config.RoutingKey))
-		if err != nil {
-			reply <- fmt.Errorf("failed to compile routingKey field: %w", err)
-		}
-
-		body := rt.config.Body
-		if body == "" {
-			body = "@expr:toJSON(log)"
-		}
-		rt.body, err = CompileDynamicField(string(body))
-		if err != nil {
-			reply <- fmt.Errorf("failed to compile body field: %w", err)
-		}
-
-		reply <- nil
-	}()
-
-	select {
-	case <-ctx.Done():
-		return nil
-
-	case err := <-reply:
-		return err
+	rt.exchange, err = CompileDynamicField(string(rt.config.Exchange))
+	if err != nil {
+		return fmt.Errorf("failed to compile exchange field: %w", err)
 	}
+
+	rt.routingKey, err = CompileDynamicField(string(rt.config.RoutingKey))
+	if err != nil {
+		return fmt.Errorf("failed to compile routingKey field: %w", err)
+	}
+
+	body := rt.config.Body
+	if body == "" {
+		body = "@expr:toJSON(log)"
+	}
+	rt.body, err = CompileDynamicField(string(body))
+	if err != nil {
+		return fmt.Errorf("failed to compile body field: %w", err)
+	}
+
+	conn, err := amqp.Dial(rt.config.Url)
+	if err != nil {
+		return fmt.Errorf("failed to connect to AMQP server: %w", err)
+	}
+
+	ch, err := conn.Channel()
+	if err != nil {
+		_ = conn.Close()
+		return fmt.Errorf("failed to open an AMQP channel: %w", err)
+	}
+
+	rt.conn = conn
+	rt.channel = ch
+
+	return nil
 }
 
 func (rt *amqpRuntime) Close(context.Context) error {
