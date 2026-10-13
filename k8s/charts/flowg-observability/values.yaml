@@ -133,7 +133,6 @@ flowg:
 
   syslog:
     port: 5514
-    protocol: UDP
     # initialAllowedOrigins: "[]"
 
   https:
@@ -227,13 +226,3 @@ fluentd:
     # requests:
     #   cpu: 100m
     #   memory: 128Mi
-
-  # This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
-  serviceAccount:
-    # Specifies whether a service account should be created
-    create: true
-    # Annotations to add to the service account
-    annotations: {}
-    # The name of the service account to use.
-    # If not set and create is true, a name is generated using the fullname template
-    name: ""

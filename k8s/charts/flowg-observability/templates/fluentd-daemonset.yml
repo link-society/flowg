@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "fluentd.fullname" . }}
+  labels:
+    k8s-app: fluentd-logging
+    version: v1
+    {{- include "fluentd.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      k8s-app: fluentd-logging
+      version: v1
+  template:
+    metadata:
+      labels:
+        k8s-app: fluentd-logging
+        version: v1
+    spec:
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          effect: NoSchedule
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
+      serviceAccountName: {{ include "fluentd.serviceAccountName" . }}
+      {{- with .Values.fluentd.image.pullSecrets }}
+      imagePullSecrets: 
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: fluentd
+          image: {{ .Values.fluentd.image.repository }}:{{ .Values.fluentd.image.tag }}
+          imagePullPolicy: {{ .Values.fluentd.image.pullPolicy }}
+          env:
+            - name: K8S_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          resources:
+            {{- with .Values.fluentd.resources.limits }}
+              limits:
+                memory: {{ .memory }}
+                cpu: {{ .cpu }}
+            {{- end }}
+            {{- with .Values.fluentd.resources.requests }}
+            requests:
+              cpu: {{ .cpu }}
+              memory: {{ .memory }}
+            {{- end }}
+          volumeMounts:
+            - name: varlog
+              mountPath: /var/log
+            - name: logdir
+              mountPath: {{ .Values.fluentd.logdir }}
+            - name: fluentd-config
+              mountPath: /fluentd/etc/fluent.conf
+              subPath: fluent.conf
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: fluentd-config
+          configMap:
+            name: {{ include "fluentd.fullname" . }}
+        - name: varlog
+          hostPath:
+            path: /var/log
+        - name: logdir
+          hostPath:
+            path: {{ .Values.fluentd.logdir }}
