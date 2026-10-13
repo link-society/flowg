@@ -76,7 +76,9 @@ func TestNotifier_MultipleSubscribers(t *testing.T) {
 		t.Fatalf("unexpected error while notifying: %v", err)
 	}
 
-	for _, sub := range []interface{ ReceiveC() <-chan confignotify.Event }{first, second} {
+	for _, sub := range []interface {
+		ReceiveC() <-chan confignotify.Event
+	}{first, second} {
 		result, ok := <-sub.ReceiveC()
 		if !ok {
 			t.Fatalf("unexpected closed channel")
