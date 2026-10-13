@@ -89,9 +89,5 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
 {{- define "fluentd.serviceAccountName" -}}
-{{- if .Values.fluentd.serviceAccount.create }}
-{{- default (include "fluentd.fullname" .) .Values.fluentd.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.fluentd.serviceAccount.name }}
+{{- default (include "fluentd.fullname" .) }}
 {{- end }}
-{{- end -}}
