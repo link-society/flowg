@@ -174,7 +174,7 @@ func (rt *jetstreamRuntime) Call(ctx context.Context, record *models.LogRecord) 
 		return fmt.Errorf("failed to evaluate `message_id` record: %w", err)
 	}
 
-	streamName, err := rt.client.StreamNameBySubject(ctx, string(rt.config.Subject))
+	streamName, err := rt.client.StreamNameBySubject(ctx, subject)
 	if err != nil {
 		return err
 	}
