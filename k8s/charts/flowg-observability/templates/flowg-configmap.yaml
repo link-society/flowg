@@ -1,0 +1,35 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: {{ include "flowg.fullname" . }}-configmap
+data:
+    # Basic flowG environment variables configuration
+    {{- with .Values.flowg.configuration.demoMode }}
+    FLOWG_DEMO_MODE: {{ . | toString | quote }}
+    {{- end }}
+    {{- with .Values.flowg.configuration.logging.verbose }}
+    FLOWG_VERBOSE: {{ . | toString | quote }}
+    {{- end }}
+    {{- with .Values.flowg.configuration.logging.level }}
+    FLOWG_LOGLEVEL: {{ . | toString | quote }}
+    {{- end }}
+
+    # Syslog configuration
+    {{- with .Values.flowg.syslog.initialAllowedOrigins }}
+    FLOWG_SYSLOG_INITIAL_ALLOWED_ORIGINS: {{ . | toString | quote }}
+    {{- end }}
+    FLOWG_SYSLOG_PROTOCOL: {{ .Values.flowg.syslog.protocol | lower }}
+
+    # TLS management, for web and mgmt servers
+    {{- if .Values.flowg.https.enabled }}
+    FLOWG_HTTP_TLS_ENABLED: "true"
+    FLOWG_HTTP_TLS_CERT: "/data/ssl/tls.crt"
+    FLOWG_HTTP_TLS_KEY: "/data/ssl/tls.key"
+    {{- end }}
+    {{- if .Values.flowg.https.mgmt.enabled }}
+    FLOWG_MGMT_TLS_ENABLED: "true"
+    FLOWG_MGMT_TLS_CERT: "/data/ssl/mgmt/tls.crt"
+    FLOWG_MGMT_TLS_KEY: "/data/ssl/mgmt/tls.key"
+    {{- end }}
+    
