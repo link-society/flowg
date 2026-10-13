@@ -33,131 +33,110 @@ type jetstreamRuntime struct {
 
 var _ Runtime = (*jetstreamRuntime)(nil)
 
-func (rt *jetstreamRuntime) Init(ctx context.Context) error {
-	reply := make(chan error, 1)
-	defer close(reply)
+func (rt *jetstreamRuntime) Init(context.Context) error {
+	var err error
 
-	go func() {
-		var err error
-
-		opts := nats.Options{
-			Servers: rt.config.Servers,
-			Secure:  !rt.config.TlsInsecureSkipVerify,
-			TLSConfig: new(tls.Config{
-				ServerName:         rt.config.TlsServerName,
-				InsecureSkipVerify: rt.config.TlsInsecureSkipVerify,
-			}),
-			Token: rt.config.Token,
-		}
-
-		if rt.config.PublishTimeout > 0 {
-			opts.Timeout = time.Duration(rt.config.PublishTimeout) * time.Second
-		}
-
-		switch rt.config.AuthMode {
-		case "none":
-		case "user_password":
-			opts.User = rt.config.Username
-			opts.Password = rt.config.Password
-		case "token":
-			opts.Token = rt.config.Token
-		case "credentials":
-			userJWT, err := jwt.ParseDecoratedJWT([]byte(rt.config.Credentials))
-			if err != nil {
-				reply <- fmt.Errorf("can't parse JWT credentials: %w", err)
-				return
-			}
-
-			keyPair, err := nkeys.ParseDecoratedNKey([]byte(rt.config.Credentials))
-			if err != nil {
-				reply <- fmt.Errorf("can't parse JWT key pair: %w", err)
-				return
-			}
-
-			opts.UserJWT = func() (string, error) {
-				return userJWT, nil
-			}
-
-			opts.SignatureCB = func(nonce []byte) ([]byte, error) {
-				return keyPair.Sign(nonce)
-			}
-		default:
-			reply <- fmt.Errorf("unknown auth_mode: %s", rt.config.AuthMode)
-			return
-		}
-
-		if len(rt.config.TlsCertificate) > 0 {
-			clientCAs := x509.NewCertPool()
-			if !clientCAs.AppendCertsFromPEM([]byte(rt.config.TlsCertificate)) {
-				reply <- fmt.Errorf("couldn't parse client certificate")
-				return
-			}
-
-			opts.TLSConfig.ClientAuth = tls.RequireAndVerifyClientCert
-			opts.TLSConfig.ClientCAs = clientCAs
-		}
-
-		if len(rt.config.TlsCA) > 0 {
-			clientCert, err := tls.X509KeyPair(
-				[]byte(rt.config.TlsCA),
-				[]byte(rt.config.TlsPrivateKey),
-			)
-			if err != nil {
-				reply <- fmt.Errorf("couldn't parse PEM CA certificate: %w", err)
-				return
-			}
-			opts.TLSConfig.Certificates = append(opts.TLSConfig.Certificates, clientCert)
-		}
-
-		rt.connection, err = opts.Connect()
-		if err != nil {
-			reply <- fmt.Errorf("failed to connect to nats server: %w", err)
-			return
-		}
-
-		rt.client, err = jetstream.New(rt.connection)
-		if err != nil {
-			reply <- fmt.Errorf("failed to establish jetstream connection: %w", err)
-			return
-		}
-
-		body := rt.config.Body
-		if body == "" {
-			body = "@expr:toJSON(log)"
-		}
-
-		rt.body, err = CompileDynamicField(string(body))
-		if err != nil {
-			reply <- fmt.Errorf("failed to compile body field: %w", err)
-			return
-		}
-
-		rt.subject, err = CompileDynamicField(string(rt.config.Subject))
-		if err != nil {
-			reply <- fmt.Errorf("failed to compile subject field: %w", err)
-			return
-		}
-
-		rt.messageID, err = CompileDynamicField(string(rt.config.MessageID))
-		if err != nil {
-			reply <- fmt.Errorf("failed to compile message_id field: %w", err)
-			return
-		}
-
-		reply <- nil
-	}()
-
-	select {
-	case <-ctx.Done():
-		return nil
-
-	case err := <-reply:
-		return err
+	opts := nats.Options{
+		Servers: rt.config.Servers,
+		Secure:  !rt.config.TlsInsecureSkipVerify,
+		TLSConfig: new(tls.Config{
+			ServerName:         rt.config.TlsServerName,
+			InsecureSkipVerify: rt.config.TlsInsecureSkipVerify,
+		}),
+		Token: rt.config.Token,
 	}
+
+	if rt.config.PublishTimeout > 0 {
+		opts.Timeout = time.Duration(rt.config.PublishTimeout) * time.Second
+	}
+
+	switch rt.config.AuthMode {
+	case "none":
+	case "user_password":
+		opts.User = rt.config.Username
+		opts.Password = rt.config.Password
+	case "token":
+		opts.Token = rt.config.Token
+	case "credentials":
+		userJWT, err := jwt.ParseDecoratedJWT([]byte(rt.config.Credentials))
+		if err != nil {
+			return fmt.Errorf("can't parse JWT credentials: %w", err)
+		}
+
+		keyPair, err := nkeys.ParseDecoratedNKey([]byte(rt.config.Credentials))
+		if err != nil {
+			return fmt.Errorf("can't parse JWT key pair: %w", err)
+		}
+
+		opts.UserJWT = func() (string, error) {
+			return userJWT, nil
+		}
+
+		opts.SignatureCB = func(nonce []byte) ([]byte, error) {
+			return keyPair.Sign(nonce)
+		}
+	default:
+		return fmt.Errorf("unknown auth_mode: %s", rt.config.AuthMode)
+	}
+
+	if len(rt.config.TlsCertificate) > 0 {
+		clientCAs := x509.NewCertPool()
+		if !clientCAs.AppendCertsFromPEM([]byte(rt.config.TlsCertificate)) {
+			return fmt.Errorf("couldn't parse client certificate")
+		}
+
+		opts.TLSConfig.ClientAuth = tls.RequireAndVerifyClientCert
+		opts.TLSConfig.ClientCAs = clientCAs
+	}
+
+	if len(rt.config.TlsCA) > 0 {
+		clientCert, err := tls.X509KeyPair(
+			[]byte(rt.config.TlsCA),
+			[]byte(rt.config.TlsPrivateKey),
+		)
+		if err != nil {
+			return fmt.Errorf("couldn't parse PEM CA certificate: %w", err)
+		}
+		opts.TLSConfig.Certificates = append(opts.TLSConfig.Certificates, clientCert)
+	}
+
+	rt.connection, err = opts.Connect()
+	if err != nil {
+		return fmt.Errorf("failed to connect to nats server: %w", err)
+	}
+
+	rt.client, err = jetstream.New(rt.connection)
+	if err != nil {
+		return fmt.Errorf("failed to establish jetstream connection: %w", err)
+	}
+
+	body := rt.config.Body
+	if body == "" {
+		body = "@expr:toJSON(log)"
+	}
+
+	rt.body, err = CompileDynamicField(string(body))
+	if err != nil {
+		return fmt.Errorf("failed to compile body field: %w", err)
+	}
+
+	rt.subject, err = CompileDynamicField(string(rt.config.Subject))
+	if err != nil {
+		return fmt.Errorf("failed to compile subject field: %w", err)
+	}
+
+	rt.messageID, err = CompileDynamicField(string(rt.config.MessageID))
+	if err != nil {
+		return fmt.Errorf("failed to compile message_id field: %w", err)
+	}
+
+	return nil
 }
 
 func (rt *jetstreamRuntime) Close(context.Context) error {
-	rt.connection.Close()
+	if rt.connection != nil {
+		rt.connection.Close()
+	}
 
 	return nil
 }
