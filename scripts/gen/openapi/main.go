@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 
 	"go.uber.org/fx"
@@ -12,6 +13,7 @@ import (
 	"github.com/swaggest/rest/web"
 
 	"link-society.com/flowg/api"
+	"link-society.com/flowg/api/auth"
 
 	storage "link-society.com/flowg/internal/storage/interfaces"
 
@@ -25,8 +27,10 @@ func main() {
 	app := fx.New(
 		fx.NopLogger,
 
-		// The schema generation only inspects the route table, so nil backends
-		// are enough to build the handler.
+		// The schema generation only inspects the route table, so nil backends,
+		// a discarding logger and empty keys are enough to build the handler.
+		fx.Supply(slog.New(slog.DiscardHandler)),
+		fx.Supply(auth.Keys{}),
 		fx.Provide(func() storage.AuthStorage { return nil }),
 		fx.Provide(func() storage.ConfigStorage { return nil }),
 		fx.Provide(func() storage.LogStorage { return nil }),
