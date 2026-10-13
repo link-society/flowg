@@ -97,6 +97,9 @@ func (h *bootstrapHandler) Run(ctx context.Context) error {
 		User:     h.opts.ResetUser,
 		Password: h.opts.ResetPassword,
 	})
+	if err != nil {
+		return fmt.Errorf("failed to reset user credentials: %w", err)
+	}
 
 	return nil
 }
