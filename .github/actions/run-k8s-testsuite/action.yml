@@ -51,7 +51,7 @@ runs:
           --chart-dirs ./k8s/charts \
           --charts ./k8s/charts/flowg-multinode \
           --namespace flowg-system \
-          --timeout 10m \
+          --helm-extra-args='--timeout 10m' \
           --helm-extra-set-args "--set=flowg.image.repository=${DOCKER_IMAGE_REPOSITORY} --set=flowg.image.tag=${DOCKER_IMAGE_TAG} --set=flowg.image.pullPolicy=Never --wait"
       env:
         DOCKER_IMAGE_REPOSITORY: ghcr.io/link-society/flowg/ci-artifacts/docker
@@ -66,7 +66,7 @@ runs:
           --chart-dirs ./k8s/charts \
           --charts ./k8s/charts/flowg-observability \
           --namespace flowg-system \
-          --timeout 10m \
+          --helm-extra-args='--timeout 10m' \
           --helm-extra-set-args "--set=flowg.image.repository=${DOCKER_IMAGE_REPOSITORY} --set=flowg.image.tag=${DOCKER_IMAGE_TAG} --set=flowg.image.pullPolicy=Never --wait"
       env:
         DOCKER_IMAGE_REPOSITORY: ghcr.io/link-society/flowg/ci-artifacts/docker
