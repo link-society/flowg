@@ -48,7 +48,7 @@ runs:
         set -ex
         kubectl get ns flowg-system || kubectl create ns flowg-system
         ct install \
-          --chart-dir ./k8s/charts \
+          --chart-dirs ./k8s/charts \
           --charts ./k8s/charts/flowg-multinode \
           --namespace flowg-system \
           --helm-extra-set-args "--set=flowg.image.repository=${DOCKER_IMAGE_REPOSITORY} --set=flowg.image.tag=${DOCKER_IMAGE_TAG} --set=flowg.image.pullPolicy=Never --wait"
