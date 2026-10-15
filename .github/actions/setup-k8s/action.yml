@@ -23,3 +23,11 @@ runs:
       with:
         version: v0.24.0
         cluster_name: flowg
+
+    - name: setup@foundationdb
+      shell: bash
+      run: |
+        # Clone foundationdb git repo
+        git clone https://github.com/FoundationDB/fdb-kubernetes-operator.git fdb
+        helm upgrade --install fdb fdb/charts/fdb-operator
+        rm -rf fdb
