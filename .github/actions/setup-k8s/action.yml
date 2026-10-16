@@ -29,5 +29,5 @@ runs:
       run: |
         # Clone foundationdb git repo
         git clone https://github.com/FoundationDB/fdb-kubernetes-operator.git fdb
-        helm upgrade --install fdb fdb/charts/fdb-operator
+        helm upgrade --install fdb fdb/charts/fdb-operator --namespace flowg-system --create-namespace
         rm -rf fdb
