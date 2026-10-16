@@ -4,30 +4,31 @@ metadata:
   name: {{ include "flowg.fullname" . }}
   labels:
     {{- include "flowg.labels" . | nindent 4 }}
+  {{- with .Values.flowg.serviceAnnotations }}
+  annotations: 
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
-  type: ClusterIP
+  type: {{ .Values.flowg.service.type }}
   selector:
     {{- include "flowg.selectorLabels" . | nindent 4 }}
   ports:
     - name: http
-      port: 5080
+      port: {{ .Values.flowg.httpPort }}
       targetPort: 5080
+      {{- if has .Values.flowg.service.type (list "NodePort" "LoadBalancer") }}
+      nodePort: {{ .Values.flowg.service.nodePort.httpPort }}
+      {{- end }}
       protocol: TCP
       {{- if .Values.flowg.https.enabled }}
       appProtocol: https
       {{- else }}
       appProtocol: http
       {{- end }}
-    - name: mgmt
-      port: 9113
-      targetPort: 9113
-      protocol: TCP
-      {{- if .Values.flowg.https.mgmt.enabled }}
-      appProtocol: https
-      {{- else }}
-      appProtocol: http
-      {{- end }}
     - name: syslog
-      port: 5514
+      port: {{ .Values.flowg.syslog.port }}
       targetPort: 5514
       protocol: UDP
+      {{- if has .Values.flowg.service.type (list "NodePort" "LoadBalancer") }}
+      nodePort: {{ .Values.flowg.service.nodePort.syslogPort }}
+      {{- end }}

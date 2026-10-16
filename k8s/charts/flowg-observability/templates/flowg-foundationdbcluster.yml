@@ -1,0 +1,122 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "flowg.fullname" . }}-fdb
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "flowg.fullname" . }}-fdb
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - watch
+  - update
+  - patch
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "flowg.fullname" . }}-fdb
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "flowg.fullname" . }}-fdb
+subjects:
+- kind: ServiceAccount
+  name: {{ include "flowg.fullname" . }}-fdb
+---
+apiVersion: apps.foundationdb.org/v1beta2
+kind: FoundationDBCluster
+metadata:
+  name: {{ include "flowg.fullname" . }}-fdb
+spec:
+  automationOptions:
+    replacements:
+      enabled: true
+  faultDomain:
+    key: foundationdb.org/none
+  labels:
+    filterOnOwnerReference: false
+    matchLabels:
+      foundationdb.org/fdb-cluster-name: {{ include "flowg.fullname" . }}-fdb
+    processClassLabels:
+    - foundationdb.org/fdb-process-class
+    processGroupIDLabels:
+    - foundationdb.org/fdb-process-group-id
+  minimumUptimeSecondsForBounce: 60
+
+  databaseConfiguration:
+    redundancy_mode: {{ .Values.foundationdb.redundancyMode }} 
+  processCounts:
+    {{- toYamlPretty .Values.foundationdb.processCounts | nindent 4 }}
+
+  processes:
+    general:
+      customParameters:
+      - knob_disable_posix_kernel_aio=1
+      podTemplate:
+        spec:
+          containers:
+          - name: foundationdb
+            resources:
+              {{- if .Values.foundationdb.resourceRequests.worker }}
+              requests:
+                {{- with .Values.foundationdb.resourceRequests.worker.cpu }} 
+                cpu: {{ . }}
+                {{- end }}
+                {{- with .Values.foundationdb.resourceRequests.worker.memory }}
+                memory: {{ . | quote }}
+                {{- end }}
+              {{- end }}
+              {{- if .Values.foundationdb.resourceLimits.worker }}
+              limits:
+                {{- with .Values.foundationdb.resourceLimits.worker.cpu }}
+                cpu: {{ . }}
+                {{- end }}
+                {{- with .Values.foundationdb.resourceLimits.worker.memory }}
+                memory: {{ . | quote }}
+                {{- end }}
+              {{- end }}
+            securityContext:
+              runAsUser: 0
+          - name: foundationdb-kubernetes-sidecar
+            resources:
+              {{- if .Values.foundationdb.resourceRequests.sidecar }}
+              requests:
+                {{- with .Values.foundationdb.resourceRequests.sidecar.cpu }}
+                cpu: {{ . }}
+                {{- end }}
+                {{- with .Values.foundationdb.resourceRequests.sidecar.memory }}
+                memory: {{ . | quote }}
+                {{- end }}
+              {{- end }}
+              {{- if .Values.foundationdb.resourceLimits.sidecar }}
+              limits:
+                {{- with .Values.foundationdb.resourceLimits.sidecar.cpu }}
+                cpu: {{ . }}
+                {{- end }}
+                {{- with .Values.foundationdb.resourceLimits.sidecar.memory }}
+                memory: {{ . | quote }}
+                {{- end }}
+              {{- end }}
+            securityContext:
+              runAsUser: 0
+          serviceAccountName: {{ include "flowg.fullname" . }}-fdb
+      volumeClaimTemplate:
+        spec:
+          resources:
+            requests:
+              storage: {{ .Values.foundationdb.storageRequest }}
+  routing:
+    defineDNSLocalityFields: true
+  sidecarContainer:
+    enableLivenessProbe: {{ .Values.foundationdb.sidecarContainer.livenessProbe }}
+    enableReadinessProbe: {{ .Values.foundationdb.sidecarContainer.readinessProbe }}
+  useExplicitListenAddress: true 
+  version: 7.3.69
