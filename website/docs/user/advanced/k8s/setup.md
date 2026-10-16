@@ -8,8 +8,8 @@ This guide helps you setup a flowG Kubernetes cluster using our **Helm charts**.
 
 This guide splits into 3 different branches, following the needs of your cluster.
 
-1. [Single-node flowg instance with BadgerDB as a backend](), if you only need a small installation. 
-2. [Multi-node cluster using foundationDB]() (and optionnally an observability stack), if you need multiple instances running 
+1. [Single-node flowg instance with BadgerDB as a backend](#1-single-node-flowg-instance), if you only need a small installation. 
+2. [Multi-node cluster using foundationDB](#2-multi-node-cluster-without-fluentd) (and optionnally an observability stack), if you need multiple instances running 
 
 ## Prerequisites 
 
