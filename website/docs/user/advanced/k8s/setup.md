@@ -9,8 +9,7 @@ This guide helps you setup a flowG Kubernetes cluster using our **Helm charts**.
 This guide splits into 3 different branches, following the needs of your cluster.
 
 1. [Single-node flowg instance with BadgerDB as a backend](), if you only need a small installation. 
-2. [Multi-node cluster using foundationDB](), if you need multiple instances running on different nodes.
-3. [Multi-node cluster with fluentD](), if you dont want to bring your own log routing system. 
+2. [Multi-node cluster using foundationDB]() (and optionnally an observability stack), if you need multiple instances running 
 
 ## Prerequisites 
 
@@ -43,7 +42,7 @@ This will create these resources into the chosen namespace:
 - A `ServiceAccount` for flowG
 - A `StatefulSet` with flowG's pod and 1 PVC for its storage
 
-## 2. Multi-node cluster
+## 2. Multi-node cluster, with/out Fluentd 
 
 ### Installing FoundationDB CRD
 
@@ -72,10 +71,21 @@ cd flowg
 > **Configuration**  
 > The configuration can be found inside `values.yaml`. The default configuration normally applies to all needs, but you can still customize it if you want. See [configuration](configuration.md)
 
-And then install the chart:
+And then install the chart following your needs:
+
+- **If you don't need fluentD**: 
 ```bash
-helm install flowg flowg-singlenode -n flowg-system --create-namespace
+helm install flowg flowg-multinode -n flowg-system --create-namespace
 ```
+
+- **If you want an observability stack based on fluentd**: 
+```bash
+helm install flowg flowg-observability -n flowg-system --create-namespace
+``` 
+
+> **Fluentd**  
+> Fluentd manages all the log routing to flowG by gathering ALL the logfiles specified in the `logdir` in `values.yaml`, except fluentd's own logs, and sends it to flowG's syslog server. You can learn more [here]() about how to configure it.
+
 
 > **Important note**  
 > The cluster will take some time to get brought up. This is normal. FoundationDB takes time reconciling their cluster and creating the cluster file. An init container waiting for it will be waiting for it to exist before running flowG (to avoid it crashing on startup).
