@@ -84,7 +84,9 @@ helm install flowg flowg-observability -n flowg-system --create-namespace
 ``` 
 
 > **Fluentd**  
-> Fluentd manages all the log routing to flowG by gathering ALL the logfiles specified in the `logdir` in `values.yaml`, except fluentd's own logs, and sends it to flowG's syslog server. You can learn more [here]() about how to configure it.
+> Fluentd manages all the log routing to flowG by gathering ALL the logfiles specified in the `logdir` in `values.yaml`, except fluentd's own logs, and sends it to flowG's syslog server.  
+> The applied configuration is minimal and only parse the entries following the CRI (Kubernetes) format to send it under Json format to flowG.  
+> You can learn more [here]() about how to configure it.
 
 
 > **Important note**  
@@ -99,3 +101,9 @@ This chart will set these resources up inside your namespace:
 - A `Deployment` with flowG's pods
 - A `FoundationDBCluster` for flowG's storage, with its own RBAC setup
 - A `Secret` containing a random-generated key in order for flowG instances to share the same JWT secret key.
+- If you chose the fluentd chart:
+    - A `ServiceAccount` for fluentd
+    - The fluentd `DaemonSet`
+    - A `ConfigMap` containing fluentd's configuration
+
+
