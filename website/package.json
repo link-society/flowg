@@ -22,11 +22,11 @@
     "clsx": "^2.0.0",
     "plugin-image-zoom": "github:flexanalytics/plugin-image-zoom",
     "prism-react-renderer": "^2.4.1",
-    "react": "^19.3.0",
-    "react-dom": "^19.3.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "redocusaurus": "^2.5.2",
     "serialize-javascript": "^7.0.3",
-    "qs": "^6.16.0",
+    "qs": "^6.16.1",
     "uuid": "^14.0.3"
   },
   "devDependencies": {
