@@ -144,41 +144,8 @@ Certificates will be stored in `/etc/letsencrypt/live/logs.example.com/`.
 
 ## Using Cert-Manager (on Kubernetes)
 
-If you deployed **FlowG** on Kubernetes, using the Helm Chart, you can rely on
-[Cert-Manager](https://cert-manager.io) to issue and renew the certificate.
+If you deployed **FlowG** on Kubernetes, using the Helm Chart, you can either rely on
+[Cert-Manager](https://cert-manager.io) to issue and renew the certificate, or do it yourself by providing a custom secret to flowg. 
 
-You will need to redeploy the Helm Chart with the following values:
+Refer to [Advanced Configuration / Kubernetes / Setting up HTTPS](/docs/user/advanced/k8s/https) to see instructions. 
 
-```yaml
----
-
-# ...
-
-flowg:
-  # ...
-
-  https:
-    enabled: true
-
-    certificateFrom:
-      ## Manually issued certificate stored in a `Secret`:
-      # secretRef:
-      #   ## Expected keys: `tls.crt` & `tls.key`
-      #   name: logs-example-com-tls
-
-      ## Automatically issued with Cert-Manager
-      certmanager:
-        commonName: logs.example.com
-        issuerRef:
-          name: ca-issuer      # adjust to your setup
-          kind: ClusterIssuer  # adjust to your setup
-
-# ...
-```
-
-:::note
-
-The Helm Chart will not deploy an `Issuer` or `ClusterIssuer`
-resource, it must exist prior to the Helm Chart's deployment.
-
-:::
