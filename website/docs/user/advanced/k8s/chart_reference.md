@@ -1,12 +1,19 @@
 ---
 sidebar_position: 3
+toc_min_heading_level: 2
+toc_max_heading_level: 2
 ---
 
-# Helm Chart reference
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Charts configuration reference
 
 This page references every available `values.yaml` option, their utility, default value(s) and behavior. 
 
-## Base options
+<Tabs>
+  <TabItem value="base" label="Base options" default>
+
 
 ### `flowg`
 
@@ -510,7 +517,8 @@ flowg:
 
 </details>
 
-## HTTPS
+  </TabItem>
+  <TabItem value="https" label="HTTPS">
 
 The main `https` key enables TLS encryption on the web endpoint (port 5080 by default), while `https.mgmt` enables it on the MGMT endpoint (port 9113).
 
@@ -666,7 +674,9 @@ flowg:
 
 </details>
 
-## FoundationDB
+  </TabItem>
+  <TabItem value="foundationdb" label="FoundationDB">
+
 
 These options configure the FoundationDB cluster used by the multi-node FlowG deployment.
 
@@ -873,7 +883,8 @@ foundationdb:
 
 </details>
 
-## Fluentd
+  </TabItem>
+  <TabItem value="fluentd" label="Fluentd">
 
 These options configure the Fluentd daemonset used in the observability stack chart (`flowg-observability`).
 
@@ -993,3 +1004,6 @@ fluentd:
 ```
 
 </details>
+
+  </TabItem>
+</Tabs>
