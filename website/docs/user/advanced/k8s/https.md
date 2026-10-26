@@ -1,14 +1,14 @@
 ---
-sidebar_position: 4
+sidebar_position: 2
 ---
 
 # Setting up HTTPS
 
 There are two main ways of setting up HTTPS in flowg. The first lets you use any provider you want, and only needs you to store the certificate and private key inside a Kubernetes secret. The second uses [cert-manager](https://cert-manager.io/docs) to auto generate and manage the TLS certificate.
 
-> **Note**  
-> These exact instructions will only work for the web enpoint (port 5080 by default). If you need to setup TLS encryption for the MGMT endpoint (port 9113), just replace `https` by `https.mgmt` in the `values.yaml` setup. You can have both enabled.
-
+:::note  
+These exact instructions will only work for the web enpoint (port 5080 by default). If you need to setup TLS encryption for the MGMT endpoint (port 9113), just replace `https` by `https.mgmt` in the `values.yaml` setup. You can have both enabled.
+:::
 ## 1. Using cert-manager
 
 You will first need to create an `Issuer` and `ClusterIssuer` resource. To setup cert-manager and create these resources, see [the official Cert-Manager documentation](https://cert-manager.io/docs/getting-started/)
