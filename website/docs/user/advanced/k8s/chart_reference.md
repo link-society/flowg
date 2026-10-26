@@ -12,15 +12,16 @@ import TabItem from '@theme/TabItem';
 This page references every available `values.yaml` option, their utility, default value(s) and behavior. 
 
 <Tabs>
-  <TabItem value="base" label="Base options" default>
+  <TabItem value="base" label="Flowg" default>
 
 
-### `flowg`
 
-#### `image`
+#### Docker image sourcing configuration
+
+Settings related to flowg's docker image sourcing.
 
 <details>
-<summary><code>repository</code> — <code>string</code> (Default: <code>linksociety/flowg</code>)</summary>
+<summary>**<code>flowg.image.repository</code>** — <code>string</code> (Default: <code>linksociety/flowg</code>)</summary>
 
 Repository where flowg image is sourced from. 
 
@@ -33,7 +34,7 @@ flowg:
 </details>
 
 <details>
-<summary><code>tag</code> - <code>string</code> (Default: <code>latest</code>)</summary>
+<summary>**<code>flowg.image.tag</code>** - <code>string</code> (Default: <code>latest</code>)</summary>
 
 Image tag used by Docker.
 
@@ -46,7 +47,7 @@ flowg:
 </details>
 
 <details>
-<summary><code>pullPolicy</code> - <code>string</code> (Default: <code>IfNotPresent</code>)</summary>
+<summary>**<code>flowg.image.pullPolicy</code>** - <code>string</code> (Default: <code>IfNotPresent</code>)</summary>
 
 Image pull policy given to Kubernetes. 
 
@@ -59,22 +60,27 @@ flowg:
 </details>
 
 <details>
-<summary><code>pullSecrets</code> - <code>array</code> (Default: <code>[]</code>)</summary>
+<summary>**<code>flowg.image.pullSecrets</code>** - <code>array</code> (Default: <code>[]</code>)</summary>
 
 Image pull secrets for private registries.
 
 ```yaml
 flowg:
   image:
-    pullSecrets: []
+    pullSecrets: 
+    - name: my-secret-registry
 ```
 
 </details>
 
-#### `configuration`
+#### Flowg configuration
+
+Settings related to flowg's configuration. Will use environment variables. Please read the [advanced configuration documentation](/docs/technical/configuration).
+
+##### Logging configuration
 
 <details>
-<summary><code>logging.verbose</code> - <code>string</code> (Default: <code>"True"</code>)</summary>
+<summary>**<code>flowg.configuration.logging.verbose</code>** - <code>string</code> (Default: <code>"True"</code>)</summary>
 
 Enable or disable verbose logging.
 
@@ -88,7 +94,7 @@ flowg:
 </details>
 
 <details>
-<summary><code>logging.level</code> - <code>string</code> (Default: <code>info</code>)</summary>
+<summary>**<code>flowg.configuration.logging.level</code>** - <code>string</code> (Default: <code>info</code>)</summary>
 
 Log level (e.g. debug, info, warn, error).
 
@@ -101,8 +107,13 @@ flowg:
 
 </details>
 
+##### Seeding credentials configuration
+
+Seeding is a flowg feature that creates a user and sample data during the first setup phase.  
+The helm chart is designed to source this user's initial (pre-seed) and reset (post-seed) credentials from a secret that you will need to create.
+
 <details>
-<summary><code>seed.secretName</code> - <code>string</code> (Default: <code>""</code>)</summary>
+<summary>**<code>flowg.configuration.seed.secretName</code>** - <code>string</code> (Default: <code>""</code>)</summary>
 
 Kubernetes secret name containing initial/reset credentials for database seeding.
 
@@ -116,7 +127,7 @@ flowg:
 </details>
 
 <details>
-<summary><code>seed.initialUsernameKey</code> - <code>string</code> (Default: <code>""</code>)</summary>
+<summary>**<code>flowg.configuration.seed.initialUsernameKey</code>** - <code>string</code> (Default: <code>""</code>)</summary>
 
 Key in the secret for the initial user's username.
 
@@ -130,7 +141,7 @@ flowg:
 </details>
 
 <details>
-<summary><code>seed.initialPasswordKey</code> - <code>string</code> (Default: <code>""</code>)</summary>
+<summary>**<code>flowg.configuration.seed.initialPasswordKey</code>** - <code>string</code> (Default: <code>""</code>)</summary>
 
 Key in the secret for the initial user's password.
 
@@ -144,7 +155,7 @@ flowg:
 </details>
 
 <details>
-<summary><code>seed.resetUsernameKey</code> - <code>string</code> (Default: <code>""</code>)</summary>
+<summary>**<code>flowg.configuration.seed.resetUsernameKey</code>** - <code>string</code> (Default: <code>""</code>)</summary>
 
 Key in the secret for the reset user's username (applied after initial population).
 
@@ -158,7 +169,7 @@ flowg:
 </details>
 
 <details>
-<summary><code>seed.resetPasswordKey</code> - <code>string</code> (Default: <code>""</code>)</summary>
+<summary>**<code>flowg.configuration.seed.resetPasswordKey</code>** - <code>string</code> (Default: <code>""</code>)</summary>
 
 Key in the secret for the reset user's password (applied after initial population).
 
@@ -171,38 +182,47 @@ flowg:
 
 </details>
 
-#### `podAnnotations`
+---
+
+#### Base kubernetes pod/service configuration
 
 <details>
-<summary><code>podAnnotations</code> - <code>array</code> (Default: <code>[]</code>)</summary>
+<summary>**<code>flowg.podAnnotations</code>** - <code>object</code> (Default: <code>\{\}</code>)</summary>
 
 Custom annotations to add to the FlowG pods.
 
 ```yaml
 flowg:
-  podAnnotations: []
+  podAnnotations: 
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
 ```
 
 </details>
 
-#### `serviceAnnotations`
 
 <details>
-<summary><code>serviceAnnotations</code> - <code>array</code> (Default: <code>[]</code>)</summary>
+<summary>**<code>flowg.serviceAnnotations</code>** - <code>object</code> (Default: <code>\{\}</code>)</summary>
 
 Custom annotations to add to the FlowG services.
 
 ```yaml
 flowg:
-  serviceAnnotations: []
+  serviceAnnotations: 
+    kubernetes.io/description: "flowG load balancer"
+    service.beta.kubernetes.io/aws-load-balancer-internal: "true"
 ```
 
 </details>
 
-#### `podSecurityContext`
+##### Flowg pod security context
+
+Security Context configuration for flowg's pod.  
+You can also add other Kubernetes option as the entire `flowg.podSecurityContext` objsect is injected into the manifest. 
+See more [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
 
 <details>
-<summary><code>runAsNonRoot</code> - <code>boolean</code> (Default: <code>true</code>)</summary>
+<summary>**<code>flowg.podSecurityContext.runAsNonRoot</code>** - <code>boolean</code> (Default: <code>true</code>)</summary>
 
 Requires the pod to run as a non-root user.
 
@@ -215,7 +235,7 @@ flowg:
 </details>
 
 <details>
-<summary><code>runAsUser</code> - <code>integer</code> (Default: <code>10001</code>)</summary>
+<summary>**<code>flowg.podSecurityContext.runAsUser</code>** - <code>integer</code> (Default: <code>10001</code>)</summary>
 
 The UID to run the container process as.
 
@@ -228,7 +248,7 @@ flowg:
 </details>
 
 <details>
-<summary><code>runAsGroup</code> - <code>integer</code> (Default: <code>10001</code>)</summary>
+<summary>**<code>flowg.podSecurityContext.runAsGroup</code>** -<code>integer</code>** (Default: <code>10001</code>)</summary>
 
 The GID to run the container process as.
 
@@ -241,7 +261,7 @@ flowg:
 </details>
 
 <details>
-<summary><code>fsGroup</code> - <code>integer</code> (Default: <code>10001</code>)</summary>
+<summary>**<code>flowg.podSecurityContext.fsGroup</code>** - <code>integer</code> (Default: <code>10001</code>)</summary>
 
 The filesystem group ID for volumes.
 
@@ -253,66 +273,108 @@ flowg:
 
 </details>
 
-#### `securityContext`
+
+
+##### Container-level security context
+
 
 <details>
-<summary><code>securityContext</code> - <code>object</code> (Default: <code>{}</code>)</summary>
+<summary>**<code>flowg.securityContext</code>** - <code>object</code> (Default: <code>\{\}</code>)</summary>
 
 Container-level security context (e.g. allowPrivilegeEscalation, capabilities).
 
 ```yaml
 flowg:
-  securityContext: {}
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+        - ALL
 ```
 
 </details>
 
-#### `probe`
+##### Liveness/readiness probes configuration
+
+Kubernetes liveness/readiness [probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration.
 
 <details>
-<summary><code>livenessProbe</code> - <code>array</code> (Default: <code>[]</code>)</summary>
+<summary>**<code>flowg.livenessProbe</code>** - <code>object</code> (Default: <code>\{\}</code>)</summary>
 
 Custom configuration for liveness probe settings (initialDelaySeconds, timeoutSeconds, etc.).
 
 ```yaml
 flowg:
   probe:
-    livenessProbe: []
+    livenessProbe: 
+      initialDelaySeconds: 3
+      timeoutSeconds: 5
 ```
 
 </details>
 
 <details>
-<summary><code>readinessProbe</code> - <code>array</code> (Default: <code>[]</code>)</summary>
+<summary>**<code>flowg.readinessProbe</code>** - <code>object</code> (Default: <code>\{\}</code>)</summary>
 
 Custom configuration for readiness probe settings (initialDelaySeconds, timeoutSeconds, etc.).
 
 ```yaml
 flowg:
   probe:
-    readinessProbe: []
+    readinessProbe: 
+      initialDelaySeconds: 3
+      timeoutSeconds: 5
 ```
 
 </details>
 
-#### `nodeSelectorTolerations`
+##### Node selector tolerations and taints
+
+Kubernetes [node selector toleration/taints](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) configuration.  
 
 <details>
-<summary><code>nodeSelectorTolerations</code> - <code>array</code> (Default: <code>null</code>)</summary>
+<summary>**<code>flowg.nodeSelectorTolerations</code>** - <code>array</code> (Default: <code>null</code>)</summary>
 
 Tolerations for pod scheduling on tainted nodes.
 
 ```yaml
 flowg:
-  nodeSelectorTolerations: []
+  nodeSelectorTolerations:
+  - key: "dedicated"
+    operator: "Equal"
+    value: "gpu"
+    effect: "NoSchedule"
 ```
 
 </details>
 
-#### `storage`
+##### Resources limitations and requests
 
 <details>
-<summary><code>size</code> - <code>string</code> (Default: <code>10Gi</code>)</summary>
+<summary>**<code>flowg.resources</code>** - <code>object</code> (Default: <code>\{\}</code>)</summary>
+
+CPU and memory resource requests and limits for the FlowG container.
+
+```yaml
+flowg:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+```
+
+</details>
+
+---
+
+#### Requested storage configuration
+
+<details>
+<summary>**<code>flowg.storage.size</code>** - <code>string</code> (Default: <code>10Gi</code>)</summary>
 
 Storage size requested for the data volume PVC.
 
@@ -325,22 +387,25 @@ flowg:
 </details>
 
 <details>
-<summary><code>storageClassName</code> - <code>string</code> (Default: <code>""</code>)</summary>
+<summary>**<code>flowg.storageClassName</code>** - <code>string</code> (Default: <code>""</code>)</summary>
 
 Storage class name for provisioning the PVC.
 
 ```yaml
 flowg:
   storage:
-    storageClassName: ""
+    storageClassName: "standard"
 ```
 
 </details>
 
-#### `httpPort`
+---
+
+#### Network exposure configuration
+
 
 <details>
-<summary><code>httpPort</code> - <code>integer</code> (Default: <code>5080</code>)</summary>
+<summary>**<code>flowg.httpPort</code>** - <code>integer</code> (Default: <code>5080</code>)</summary>
 
 Port on which the HTTP server listens inside the container.
 
@@ -351,10 +416,10 @@ flowg:
 
 </details>
 
-#### `syslog`
+##### Syslog server configuration
 
 <details>
-<summary><code>port</code> - <code>integer</code> (Default: <code>5514</code>)</summary>
+<summary>**<code>flowg.syslog.port</code>** - <code>integer</code> (Default: <code>5514</code>)</summary>
 
 Port on which the syslog server listens.
 
@@ -367,9 +432,10 @@ flowg:
 </details>
 
 <details>
-<summary><code>protocol</code> - <code>string</code> (Default: <code>UDP</code>)</summary>
+<summary>**<code>flowg.syslog.protocol</code>** - <code>string</code> (Default: <code>UDP</code>)</summary>
 
-Protocol used by the syslog server (e.g. UDP, TCP).
+Protocol used by the syslog server (e.g. UDP, TCP).  
+On **fluentd** helm chart, UDP is enforced.
 
 ```yaml
 flowg:
@@ -379,24 +445,12 @@ flowg:
 
 </details>
 
-#### `resources`
+---
+
+#### Flowg service account configuration
 
 <details>
-<summary><code>resources</code> - <code>object</code> (Default: <code>{}</code>)</summary>
-
-CPU and memory resource requests and limits for the FlowG container.
-
-```yaml
-flowg:
-  resources: {}
-```
-
-</details>
-
-#### `serviceAccount`
-
-<details>
-<summary><code>create</code> - <code>boolean</code> (Default: <code>true</code>)</summary>
+<summary>**<code>flowg.serviceAccount.create</code>** - <code>boolean</code> (Default: <code>true</code>)</summary>
 
 Specifies whether a service account should be created.
 
@@ -409,20 +463,21 @@ flowg:
 </details>
 
 <details>
-<summary><code>annotations</code> - <code>object</code> (Default: <code>{}</code>)</summary>
+<summary>**<code>flowg.serviceAccount.annotations</code>** - <code>object</code> (Default: <code>\{\}</code>)</summary>
 
 Annotations to add to the service account.
 
 ```yaml
 flowg:
   serviceAccount:
-    annotations: {}
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/my-role
 ```
 
 </details>
 
 <details>
-<summary><code>name</code> - <code>string</code> (Default: <code>""</code>)</summary>
+<summary>**<code>flowg.serviceAccount.name</code>** - <code>string</code> (Default: <code>""</code>)</summary>
 
 The name of the service account to use.
 
@@ -434,10 +489,12 @@ flowg:
 
 </details>
 
-#### `service`
+---
+
+#### Flowg service configuration
 
 <details>
-<summary><code>type</code> - <code>string</code> (Default: <code>LoadBalancer</code>)</summary>
+<summary>**<code>flowg.service.type</code>** - <code>string</code> (Default: <code>LoadBalancer</code>)</summary>
 
 Kubernetes service type (e.g. LoadBalancer, NodePort, ClusterIP).
 
@@ -450,7 +507,7 @@ flowg:
 </details>
 
 <details>
-<summary><code>nodePort.httpPort</code> - <code>integer</code> (Default: <code>30080</code>)</summary>
+<summary>**<code>flowg.service.nodePort.httpPort</code>** - <code>integer</code> (Default: <code>30080</code>)</summary>
 
 NodePort assigned for HTTP traffic when service type is NodePort/LoadBalancer.
 
@@ -464,7 +521,7 @@ flowg:
 </details>
 
 <details>
-<summary><code>nodePort.syslogPort</code> - <code>integer</code> (Default: <code>32514</code>)</summary>
+<summary>**<code>flowg.service.nodePort.syslogPort</code>** - <code>integer</code> (Default: <code>32514</code>)</summary>
 
 NodePort assigned for syslog traffic when service type is NodePort/LoadBalancer.
 
@@ -480,7 +537,7 @@ flowg:
 #### Multi-node flowg options
 
 <details>
-<summary><code>replicas</code> - <code>integer</code> (Default: <code>4</code>)</summary>
+<summary>**<code>flowg.replicas</code>** - <code>integer</code> (Default: <code>4</code>)</summary>
 
 Number of FlowG replicas in the multi-node deployment.
 
@@ -492,7 +549,7 @@ flowg:
 </details>
 
 <details>
-<summary><code>secretKey.useExistingSecret</code> - <code>boolean</code> (Default: <code>false</code>)</summary>
+<summary>**<code>flowg.secretKey.useExistingSecret</code>** - <code>boolean</code> (Default: <code>false</code>)</summary>
 
 Whether to use an existing Kubernetes secret for `FLOWG_SECRET_KEY`.
 
@@ -505,7 +562,7 @@ flowg:
 </details>
 
 <details>
-<summary><code>secretKey.secretRef</code> - <code>string</code> (Default: <code>flowg-shared-key</code>)</summary>
+<summary>**<code>flowg.secretKey.secretRef</code>** - <code>string</code> (Default: <code>flowg-shared-key</code>)</summary>
 
 Name of the secret/key used for shared session encryption across replicas.
 
@@ -522,10 +579,13 @@ flowg:
 
 The main `https` key enables TLS encryption on the web endpoint (port 5080 by default), while `https.mgmt` enables it on the MGMT endpoint (port 9113).
 
-### `https` / `https.mgmt`
+:::note
+For simplicity reasons, below reference will only mention `flowg.https`, but the **same** configuration can be applied to `flowg.https.mgmt` as well.
+:::
+
 
 <details>
-<summary><code>enabled</code> - <code>boolean</code> (Default: <code>false</code>)</summary>
+<summary>**<code>flowg.https.enabled</code>** - <code>boolean</code> (Default: <code>false</code>)</summary>
 
 Enables HTTPS encryption on the web endpoint (`https`) or management endpoint (`https.mgmt`).
 
@@ -537,8 +597,12 @@ flowg:
 
 </details>
 
+#### Custom secret configuration
+
+In case your TLS certificate is already set up and you only want to inject it into flowg. See more [here](/docs/user/advanced/k8s/https#2-using-a-custom-secret)
+
 <details>
-<summary><code>certificateFrom.secretRef.name</code> - <code>string</code> (Default: <code>""</code>)</summary>
+<summary>**<code>flowg.https.certificateFrom.secretRef.name</code>** - <code>string</code> (Default: <code>""</code>)</summary>
 
 Name of an existing Kubernetes Secret containing `tls.crt` and `tls.key` for custom certificate management.
 
@@ -553,59 +617,14 @@ flowg:
 
 </details>
 
-<details>
-<summary><code>certificateFrom.certmanager.privateKey.algorithm</code> - <code>string</code> (Default: <code>RSA</code>)</summary>
+---
 
-Private key algorithm generated by Cert-Manager (e.g. RSA, ECDSA).
+#### Cert-manager configuration
 
-```yaml
-flowg:
-  https:
-    enabled: true
-    certificateFrom:
-      certmanager:
-        privateKey:
-          algorithm: RSA
-```
-
-</details>
+Alternatively, cert-manager automatically manages your HTTPS secret. 
 
 <details>
-<summary><code>certificateFrom.certmanager.privateKey.encoding</code> - <code>string</code> (Default: <code>PKCS1</code>)</summary>
-
-Private key encoding generated by Cert-Manager.
-
-```yaml
-flowg:
-  https:
-    enabled: true
-    certificateFrom:
-      certmanager:
-        privateKey:
-          encoding: PKCS1
-```
-
-</details>
-
-<details>
-<summary><code>certificateFrom.certmanager.privateKey.size</code> - <code>integer</code> (Default: <code>2048</code>)</summary>
-
-Private key size in bits generated by Cert-Manager.
-
-```yaml
-flowg:
-  https:
-    enabled: true
-    certificateFrom:
-      certmanager:
-        privateKey:
-          size: 2048
-```
-
-</details>
-
-<details>
-<summary><code>certificateFrom.certmanager.dnsNames</code> - <code>array</code> (Default: <code>[]</code>)</summary>
+<summary>**<code>flowg.https.certificateFrom.certmanager.dnsNames</code>** - <code>array</code> (Default: <code>[]</code>)</summary>
 
 DNS SANs for the automatically generated certificate.
 
@@ -622,7 +641,7 @@ flowg:
 </details>
 
 <details>
-<summary><code>certificateFrom.certmanager.ipAddresses</code> - <code>array</code> (Default: <code>["127.0.0.1"]</code>)</summary>
+<summary>**<code>flowg.https.certificateFrom.certmanager.ipAddresses</code>** - <code>array</code> (Default: <code>["127.0.0.1"]</code>)</summary>
 
 IP SANs for the automatically generated certificate.
 
@@ -639,7 +658,7 @@ flowg:
 </details>
 
 <details>
-<summary><code>certificateFrom.certmanager.issuerRef.name</code> - <code>string</code> (Default: <code>selfsigned-issuer</code>)</summary>
+<summary>**<code>flowg.https.certificateFrom.certmanager.issuerRef.name</code>** - <code>string</code> (Default: <code>selfsigned-issuer</code>)</summary>
 
 Name of the Cert-Manager Issuer or ClusterIssuer.
 
@@ -657,7 +676,7 @@ flowg:
 </details>
 
 <details>
-<summary><code>certificateFrom.certmanager.issuerRef.kind</code> - <code>string</code> (Default: <code>Issuer</code>)</summary>
+<summary>**<code>flowg.https.certificateFrom.certmanager.issuerRef.kind</code>** - <code>string</code> (Default: <code>Issuer</code>)</summary>
 
 Kind of the Cert-Manager issuer (`Issuer` or `ClusterIssuer`).
 
@@ -674,16 +693,73 @@ flowg:
 
 </details>
 
+##### Secret key generator configuration 
+
+<details>
+<summary>**<code>flowg.https.certificateFrom.certmanager.privateKey.algorithm</code>** - <code>string</code> (Default: <code>RSA</code>)</summary>
+
+Private key algorithm generated by Cert-Manager (e.g. RSA, ECDSA).
+
+```yaml
+flowg:
+  https:
+    enabled: true
+    certificateFrom:
+      certmanager:
+        privateKey:
+          algorithm: RSA
+```
+
+</details>
+
+<details>
+<summary>**<code>flowg.https.certificateFrom.certmanager.privateKey.encoding</code>** - <code>string</code> (Default: <code>PKCS1</code>)</summary>
+
+Private key encoding generated by Cert-Manager.
+
+```yaml
+flowg:
+  https:
+    enabled: true
+    certificateFrom:
+      certmanager:
+        privateKey:
+          encoding: PKCS1
+```
+
+</details>
+
+<details>
+<summary>**<code>flowg.https.certificateFrom.certmanager.privateKey.size</code>** - <code>integer</code> (Default: <code>2048</code>)</summary>
+
+Private key size in bits generated by Cert-Manager.
+
+```yaml
+flowg:
+  https:
+    enabled: true
+    certificateFrom:
+      certmanager:
+        privateKey:
+          size: 2048
+```
+
+</details>
+
+
+
   </TabItem>
   <TabItem value="foundationdb" label="FoundationDB">
 
 
 These options configure the FoundationDB cluster used by the multi-node FlowG deployment.
 
-### `foundationdb`
+#### Processcounts configuration
+
+FoundationDB allows you to configure the exact number of processes you want in each FoundationDB worker process. Learn more by reading the [Official foundationdb documentation](https://github.com/FoundationDB/fdb-kubernetes-operator/blob/main/docs/manual/resources.md).
 
 <details>
-<summary><code>processCounts.storage</code> - <code>integer</code> (Default: <code>0</code>)</summary>
+<summary>**<code>foundationdb.processCounts.storage</code>** - <code>integer</code> (Default: <code>0</code>)</summary>
 
 Number of FoundationDB storage processes per FDB process group (`-1` is none, `0` lets FDB decide).
 
@@ -696,7 +772,7 @@ foundationdb:
 </details>
 
 <details>
-<summary><code>processCounts.log</code> - <code>integer</code> (Default: <code>-1</code>)</summary>
+<summary>**<code>foundationdb.processCounts.log</code>** - <code>integer</code> (Default: <code>-1</code>)</summary>
 
 Number of FoundationDB log processes per FDB process group.
 
@@ -709,7 +785,7 @@ foundationdb:
 </details>
 
 <details>
-<summary><code>processCounts.stateless</code> - <code>integer</code> (Default: <code>-1</code>)</summary>
+<summary>**<code>foundationdb.processCounts.stateless</code>** - <code>integer</code> (Default: <code>-1</code>)</summary>
 
 Number of FoundationDB stateless processes per FDB process group.
 
@@ -722,7 +798,7 @@ foundationdb:
 </details>
 
 <details>
-<summary><code>redundancyMode</code> - <code>string</code> (Default: <code>single</code>)</summary>
+<summary>**<code>foundationdb.redundancyMode</code>** - <code>string</code> (Default: <code>single</code>)</summary>
 
 FDB redundancy mode (e.g. single, double, triple).
 
@@ -733,8 +809,12 @@ foundationdb:
 
 </details>
 
+---
+
+#### Resource limitations
+
 <details>
-<summary><code>resourceRequests.worker.cpu</code> - <code>string/number</code> (Default: <code>1</code>)</summary>
+<summary>**<code>founationdb.resourceRequests.worker.cpu</code>** - <code>string/number</code> (Default: <code>1</code>)</summary>
 
 CPU resource request for FDB worker processes.
 
@@ -748,7 +828,7 @@ foundationdb:
 </details>
 
 <details>
-<summary><code>resourceRequests.worker.memory</code> - <code>string</code> (Default: <code>128Mi</code>)</summary>
+<summary>**<code>foundationdb.resourceRequests.worker.memory</code>** - <code>string</code> (Default: <code>128Mi</code>)</summary>
 
 Memory resource request for FDB worker processes.
 
@@ -762,7 +842,7 @@ foundationdb:
 </details>
 
 <details>
-<summary><code>resourceRequests.sidecar.cpu</code> - <code>string/number</code> (Default: <code>1</code>)</summary>
+<summary>**<code>foundationdb.resourceRequests.sidecar.cpu</code>** - <code>string/number</code> (Default: <code>1</code>)</summary>
 
 CPU resource request for FDB sidecar container.
 
@@ -776,7 +856,7 @@ foundationdb:
 </details>
 
 <details>
-<summary><code>resourceRequests.sidecar.memory</code> - <code>string</code> (Default: <code>128Mi</code>)</summary>
+<summary>**<code>foundationdb.resourceRequests.sidecar.memory</code>** - <code>string</code> (Default: <code>128Mi</code>)</summary>
 
 Memory resource request for FDB sidecar container.
 
@@ -790,7 +870,7 @@ foundationdb:
 </details>
 
 <details>
-<summary><code>resourceLimits.worker.cpu</code> - <code>string/number</code> (Default: <code>1</code>)</summary>
+<summary>**<code>foundationdb.resourceLimits.worker.cpu</code>** - <code>string/number</code> (Default: <code>1</code>)</summary>
 
 CPU resource limit for FDB worker processes.
 
@@ -804,7 +884,7 @@ foundationdb:
 </details>
 
 <details>
-<summary><code>resourceLimits.worker.memory</code> - <code>string</code> (Default: <code>128Mi</code>)</summary>
+<summary>**<code>foundationdb.resourceLimits.worker.memory</code>** - <code>string</code> (Default: <code>128Mi</code>)</summary>
 
 Memory resource limit for FDB worker processes.
 
@@ -818,7 +898,7 @@ foundationdb:
 </details>
 
 <details>
-<summary><code>resourceLimits.sidecar.cpu</code> - <code>string/number</code> (Default: <code>1</code>)</summary>
+<summary>**<code>foundationdb.resourceLimits.sidecar.cpu</code>** - <code>string/number</code> (Default: <code>1</code>)</summary>
 
 CPU resource limit for FDB sidecar container.
 
@@ -832,7 +912,7 @@ foundationdb:
 </details>
 
 <details>
-<summary><code>resourceLimits.sidecar.memory</code> - <code>string</code> (Default: <code>128Mi</code>)</summary>
+<summary>**<code>foundationdb.resourceLimits.sidecar.memory</code>** - <code>string</code> (Default: <code>128Mi</code>)</summary>
 
 Memory resource limit for FDB sidecar container.
 
@@ -845,8 +925,12 @@ foundationdb:
 
 </details>
 
+---
+
+#### Liveness and readiness probes
+
 <details>
-<summary><code>sidecarContainer.livenessProbe</code> - <code>boolean</code> (Default: <code>true</code>)</summary>
+<summary>**<code>foundationdb.sidecarContainer.livenessProbe</code>** - <code>boolean</code> (Default: <code>true</code>)</summary>
 
 Enable or disable liveness probe for the FDB sidecar container.
 
@@ -859,7 +943,7 @@ foundationdb:
 </details>
 
 <details>
-<summary><code>sidecarContainer.readinessProbe</code> - <code>boolean</code> (Default: <code>false</code>)</summary>
+<summary>**<code>foundationdb.sidecarContainer.readinessProbe</code>** - <code>boolean</code> (Default: <code>false</code>)</summary>
 
 Enable or disable readiness probe for the FDB sidecar container.
 
@@ -871,8 +955,12 @@ foundationdb:
 
 </details>
 
+---
+
+#### Other FoundationDB configuration
+
 <details>
-<summary><code>storageRequest</code> - <code>string</code> (Default: <code>16Gi</code>)</summary>
+<summary>**<code>foundationdb.storageRequest</code>** - <code>string</code> (Default: <code>16Gi</code>)</summary>
 
 Storage size requested for each FoundationDB PV.
 
@@ -888,10 +976,11 @@ foundationdb:
 
 These options configure the Fluentd daemonset used in the observability stack chart (`flowg-observability`).
 
-### `fluentd`
+
+#### Docker image configuration
 
 <details>
-<summary><code>image.repository</code> - <code>string</code> (Default: <code>fluent/fluentd-kubernetes-daemonset</code>)</summary>
+<summary>**<code>fluentd.image.repository</code>** - <code>string</code> (Default: <code>fluent/fluentd-kubernetes-daemonset</code>)</summary>
 
 Repository for the Fluentd image.
 
@@ -904,9 +993,9 @@ fluentd:
 </details>
 
 <details>
-<summary><code>image.tag</code> - <code>string</code> (Default: <code>v1-debian-syslog</code>)</summary>
+<summary>**<code>fluentd.image.tag</code>** -<code>string</code> (Default: <code>v1-debian-syslog</code>)</summary>
 
-Image tag for Fluentd.
+Image tag for Fluentd. Syslog version is highly recommended in order to work with flowg (which is a Syslog server).
 
 ```yaml
 fluentd:
@@ -917,7 +1006,7 @@ fluentd:
 </details>
 
 <details>
-<summary><code>image.pullPolicy</code> - <code>string</code> (Default: <code>IfNotPresent</code>)</summary>
+<summary>**<code>fluentd.image.pullPolicy</code>** -<code>string</code> (Default: <code>IfNotPresent</code>)</summary>
 
 Image pull policy for Fluentd.
 
@@ -930,20 +1019,25 @@ fluentd:
 </details>
 
 <details>
-<summary><code>image.pullSecrets</code> - <code>array</code> (Default: <code>[]</code>)</summary>
+<summary>**<code>fluentd.image.pullSecrets</code>** -<code>array</code> (Default: <code>[]</code>)</summary>
 
 Image pull secrets for private container registries.
 
 ```yaml
 fluentd:
   image:
-    pullSecrets: []
+    pullSecrets:
+    - name: my-secret-registry
 ```
 
 </details>
 
+---
+
+#### Fluentd parser configuration
+
 <details>
-<summary><code>logdir</code> - <code>string</code> (Default: <code>/var/log/pods</code>)</summary>
+<summary>**<code>fluentd.logdir</code>** -<code>string</code> (Default: <code>/var/log/pods</code>)</summary>
 
 Directory on nodes where pod logs are gathered from.
 
@@ -954,20 +1048,12 @@ fluentd:
 
 </details>
 
-<details>
-<summary><code>resources</code> - <code>object</code> (Default: <code>{}</code>)</summary>
+---
 
-Resource requests and limits for Fluentd pods.
-
-```yaml
-fluentd:
-  resources: {}
-```
-
-</details>
+#### ServiceAccount configuration
 
 <details>
-<summary><code>serviceAccount.create</code> - <code>boolean</code> (Default: <code>true</code>)</summary>
+<summary>**<code>fluentd.serviceAccount.create</code>** -<code>boolean</code> (Default: <code>true</code>)</summary>
 
 Specifies whether a service account should be created for Fluentd.
 
@@ -980,20 +1066,7 @@ fluentd:
 </details>
 
 <details>
-<summary><code>serviceAccount.annotations</code> - <code>object</code> (Default: <code>{}</code>)</summary>
-
-Annotations to add to Fluentd's service account.
-
-```yaml
-fluentd:
-  serviceAccount:
-    annotations: {}
-```
-
-</details>
-
-<details>
-<summary><code>serviceAccount.name</code> - <code>string</code> (Default: <code>""</code>)</summary>
+<summary>**<code>fluentd.serviceAccount.name</code>** -<code>string</code> (Default: <code>""</code>)</summary>
 
 Name of the Fluentd service account.
 
@@ -1004,6 +1077,47 @@ fluentd:
 ```
 
 </details>
+
+<details>
+<summary>**<code>fluentd.serviceAccount.annotations</code>** -<code>object</code> (Default: <code>\{\}</code>)</summary>
+
+Annotations to add to Fluentd's service account.
+
+```yaml
+fluentd:
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/my-role
+```
+
+</details>
+
+---
+
+#### Standard kubernetes configuration
+
+<details>
+<summary>**<code>fluentd.resources</code>** -<code>object</code> (Default: <code>\{\}</code>)</summary>
+
+Resource requests and limits for Fluentd pods.
+
+```yaml
+fluentd:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+```
+
+</details>
+
+
+
+
+
 
   </TabItem>
 </Tabs>
