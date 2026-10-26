@@ -9,6 +9,7 @@ import Services from '@site/src/components/products/sections/Services/component'
 import Offer from '@site/src/components/products/sections/Offer/component'
 import Questions from '@site/src/components/products/sections/Questions/component'
 import GetStarted from '@site/src/components/products/sections/GetStarted/component'
+import Support from '@site/src/components/products/shared/Support/component'
 
 import type { ProductDetailProps } from './types'
 
@@ -21,6 +22,7 @@ const ProductDetail = ({ product }: ProductDetailProps) => {
       <Services product={product} />
       <Offer product={product} />
       <Questions product={product} />
+      <Support />
       <GetStarted product={product} />
     </main>
   )
