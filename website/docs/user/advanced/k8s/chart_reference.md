@@ -752,7 +752,7 @@ flowg:
   <TabItem value="foundationdb" label="FoundationDB">
 
 
-These options configure the FoundationDB cluster used by the multi-node FlowG deployment.
+These options configure the FoundationDB cluster used by the multi-node FlowG deployment. It is only present in `flowg-multinode` and `flowg-observability` helm charts.
 
 #### Processcounts configuration
 
