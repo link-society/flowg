@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Setting up a Kubernetes cluster
 
-This guide helps you setup a flowG Kubernetes cluster using our **Helm charts**. 
+This guide helps you setup a FlowG Kubernetes cluster using our **Helm charts**. 
 
 This guide splits into 3 different branches, following the needs of your cluster.
 
@@ -73,7 +73,7 @@ flowchart LR
 
 ### Installing FoundationDB CRD
 
-In order to make flowG work with FoundationDB, you first need to intall the [FoundationDB Kubernetes Operator](https://github.com/foundationdb/fdb-kubernetes-operator). 
+In order to make FlowG work with FoundationDB, you first need to intall the [FoundationDB Kubernetes Operator](https://github.com/foundationdb/fdb-kubernetes-operator). 
 
 To do so, a simple way is to use the Helm chart they provide.
 
@@ -83,11 +83,11 @@ git clone https://github.com/foundationdb/fdb-kubernetes-operator
 cd fdb-kubernetes-operator
 
 # Install FoundationDB CRD
-# We install it in the same namespace as flowG 
+# We install it in the same namespace as FlowG 
 helm install foundationdb charts/fdb-opeator -n flowg-system --create-namespace
 ``` 
 
-### Setting up flowG
+### Setting up FlowG
 
 The instructions are close to the ones for the other charts. First, you need to clone the repository:
 ```bash
@@ -111,12 +111,12 @@ helm install flowg flowg-observability -n flowg-system --create-namespace
 ``` 
 
 > **Fluentd**  
-> Fluentd manages all the log routing to flowG by gathering ALL the logfiles specified in the `logdir` in `values.yaml`, except fluentd's own logs, and sends it to flowG's syslog server.  
-> The applied configuration is minimal and only parse the entries following the CRI (Kubernetes) format to send it under Json format to flowG.  
+> Fluentd manages all the log routing to FlowG by gathering ALL the logfiles specified in the `logdir` in `values.yaml`, except fluentd's own logs, and sends it to FlowG's syslog server.  
+> The applied configuration is minimal and only parse the entries following the CRI (Kubernetes) format to send it under Json format to FlowG.  
 
 
 > **Important note**  
-> The cluster will take some time to get brought up. This is normal. FoundationDB takes time reconciling their cluster and creating the cluster file. An init container waiting for it will be waiting for it to exist before running flowG (to avoid it crashing on startup).
+> The cluster will take some time to get brought up. This is normal. FoundationDB takes time reconciling their cluster and creating the cluster file. An init container waiting for it will be waiting for it to exist before running FlowG (to avoid it crashing on startup).
 
 ```mermaid
 
