@@ -18,12 +18,12 @@ This page references every available `values.yaml` option, their utility, defaul
 
 #### Docker image sourcing configuration
 
-Settings related to flowg's docker image sourcing.
+Settings related to FlowG's docker image sourcing.
 
 <details>
-<summary>**<code>flowg.image.repository</code>** — <code>string</code> (Default: <code>linksociety/flowg</code>)</summary>
+<summary>**<code>FlowG.image.repository</code>** — <code>string</code> (Default: <code>linksociety/flowg</code>)</summary>
 
-Repository where flowg image is sourced from. 
+Repository where FlowG image is sourced from. 
 
 ```yaml
 flowg:
@@ -75,7 +75,7 @@ flowg:
 
 #### Flowg configuration
 
-Settings related to flowg's configuration. Will use environment variables. Please read the [advanced configuration documentation](/docs/technical/configuration).
+Settings related to FlowG's configuration. Will use environment variables. Please read the [advanced configuration documentation](/docs/technical/configuration).
 
 ##### Logging configuration
 
@@ -109,7 +109,7 @@ flowg:
 
 ##### Seeding credentials configuration
 
-Seeding is a flowg feature that creates a user and sample data during the first setup phase.  
+Seeding is a FlowG feature that creates a user and sample data during the first setup phase.  
 The helm chart is designed to source this user's initial (pre-seed) and reset (post-seed) credentials from a secret that you will need to create.
 
 <details>
@@ -217,7 +217,7 @@ flowg:
 
 ##### Flowg pod security context
 
-Security Context configuration for flowg's pod.  
+Security Context configuration for FlowG's pod.  
 You can also add other Kubernetes option as the entire `flowg.podSecurityContext` objsect is injected into the manifest. 
 See more [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
 
@@ -599,7 +599,7 @@ flowg:
 
 #### Custom secret configuration
 
-In case your TLS certificate is already set up and you only want to inject it into flowg. See more [here](/docs/user/advanced/k8s/https#2-using-a-custom-secret)
+In case your TLS certificate is already set up and you only want to inject it into FlowG. See more [here](/docs/user/advanced/k8s/https#2-using-a-custom-secret)
 
 <details>
 <summary>**<code>flowg.https.certificateFrom.secretRef.name</code>** - <code>string</code> (Default: <code>""</code>)</summary>
@@ -995,7 +995,7 @@ fluentd:
 <details>
 <summary>**<code>fluentd.image.tag</code>** -<code>string</code> (Default: <code>v1-debian-syslog</code>)</summary>
 
-Image tag for Fluentd. Syslog version is highly recommended in order to work with flowg (which is a Syslog server).
+Image tag for Fluentd. Syslog version is highly recommended in order to work with FlowG (which is a Syslog server).
 
 ```yaml
 fluentd:
