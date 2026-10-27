@@ -195,7 +195,7 @@ Custom annotations to add to the FlowG pods.
 flowg:
   podAnnotations: 
     prometheus.io/scrape: "true"
-    prometheus.io/port: "8080"
+    prometheus.io/port: "9113"
 ```
 
 </details>
