@@ -7,6 +7,15 @@ linkdd:
   socials:
     github: linkdd
 
+x86ethan:
+  name: Ethan Robert
+  title: One of the FlowG team members
+  url: https://github.com/x86ethan
+  image_url: https://github.com/x86ethan.png
+  email: ethan.robert@ik.me
+  socials:
+    github: x86ethan
+
 gloopsies:
   name: Gloopsies
   title: One of the FlowG developers
