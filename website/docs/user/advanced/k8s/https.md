@@ -35,7 +35,7 @@ https:
           kind: ClusterIssuer  # adjust to your setup
 ```
 
-## 2. Using a custom secret
+## 2. Using a custom certificate
 
 If you want instead to use an external certificate management system, or even manage them manually, the Helm chart allows you to connect it to a secret.
 
