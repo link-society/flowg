@@ -12,7 +12,7 @@ import TabItem from '@theme/TabItem';
 This page references every available `values.yaml` option, their utility, default value(s) and behavior. 
 
 <Tabs>
-  <TabItem value="base" label="Flowg" default>
+  <TabItem value="base" label="FlowG" default>
 
 
 
@@ -73,7 +73,7 @@ flowg:
 
 </details>
 
-#### Flowg configuration
+#### FlowG configuration
 
 Settings related to FlowG's configuration. Will use environment variables. Please read the [advanced configuration documentation](/docs/technical/configuration).
 
@@ -215,7 +215,7 @@ flowg:
 
 </details>
 
-##### Flowg pod security context
+##### FlowG pod security context
 
 Security Context configuration for FlowG's pod.  
 You can also add other Kubernetes option as the entire `flowg.podSecurityContext` objsect is injected into the manifest. 
@@ -447,7 +447,7 @@ flowg:
 
 ---
 
-#### Flowg service account configuration
+#### FlowG service account configuration
 
 <details>
 <summary>**<code>flowg.serviceAccount.create</code>** - <code>boolean</code> (Default: <code>true</code>)</summary>
@@ -491,7 +491,7 @@ flowg:
 
 ---
 
-#### Flowg service configuration
+#### FlowG service configuration
 
 <details>
 <summary>**<code>flowg.service.type</code>** - <code>string</code> (Default: <code>LoadBalancer</code>)</summary>
