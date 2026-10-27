@@ -26,7 +26,7 @@ cd flowg/k8s/charts
 ```
 
 > **Configuration**  
-> The configuration can be found inside `values.yaml`. The default configuration normally applies to all needs, but you can still customize it if you want. See [configuration](configuration.md)
+> The configuration can be found inside `values.yaml`. The default configuration normally applies to all needs, but you can still customize it if you want. See the [configuration reference](chart_reference.md).
 
 
 To install the chart, simply run:
@@ -69,7 +69,7 @@ cd flowg
 ```
 
 > **Configuration**  
-> The configuration can be found inside `values.yaml`. The default configuration normally applies to all needs, but you can still customize it if you want. See [configuration](configuration.md)
+> The configuration can be found inside `values.yaml`. The default configuration normally applies to all needs, but you can still customize it if you want. See the [configuration reference](chart_reference.md).
 
 And then install the chart following your needs:
 
@@ -86,7 +86,6 @@ helm install flowg flowg-observability -n flowg-system --create-namespace
 > **Fluentd**  
 > Fluentd manages all the log routing to flowG by gathering ALL the logfiles specified in the `logdir` in `values.yaml`, except fluentd's own logs, and sends it to flowG's syslog server.  
 > The applied configuration is minimal and only parse the entries following the CRI (Kubernetes) format to send it under Json format to flowG.  
-> You can learn more [here]() about how to configure it.
 
 
 > **Important note**  
