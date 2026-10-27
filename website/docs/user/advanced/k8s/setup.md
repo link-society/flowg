@@ -35,12 +35,39 @@ helm install flowg flowg-singlenode -n flowg-system --create-namespace
 ```
 
 This will create these resources into the chosen namespace:
-- (If HTTPS is enabled on web or MGMT endpoint) 1 or 2 cert-manager certificates
-- A `Service` used to access flowg's web interface
-- A `Service` used to perform healthchecks on flowg's mgmt endpoint
-- A `ConfigMap` containing the applied configuration as environment variables, sourced from `values.yaml` 
-- A `ServiceAccount` for flowG
-- A `StatefulSet` with flowG's pod and 1 PVC for its storage
+
+```mermaid
+
+flowchart LR
+    subgraph NS["fa:fa-tag Namespace"]
+        direction LR
+
+        %% Config & Access
+        CM["fa:fa-gear ConfigMap"]
+        SA["fa:fa-address-card ServiceAccount"]
+        Cert["fa:fa-award Cert-manager Certificate"]
+
+        %% Services
+        SvcWeb["fa:fa-globe Service (Web UI)"]
+        SvcMgmt["fa:fa-globe Service (Management)"]
+
+        %% Core Workload & Storage
+        subgraph STS["fa:fa-window-restore StatefulSet"]
+            Pod["fa:fa-cube FlowG Pod"]
+        end
+        
+        PVC["fa:fa-hard-drive PVC"]
+
+        %% Liaison des composants au Pod
+        CM -. "fa:fa-code Environment<br>Variables" .-> Pod
+        SA --> Pod
+        SvcWeb --> Pod
+        SvcMgmt --> Pod
+        Cert -. "TLS" .-> SvcWeb
+        Pod <--> PVC
+    end
+
+```
 
 ## 2. Multi-node cluster, with/out Fluentd 
 
@@ -91,18 +118,70 @@ helm install flowg flowg-observability -n flowg-system --create-namespace
 > **Important note**  
 > The cluster will take some time to get brought up. This is normal. FoundationDB takes time reconciling their cluster and creating the cluster file. An init container waiting for it will be waiting for it to exist before running flowG (to avoid it crashing on startup).
 
-This chart will set these resources up inside your namespace:
-- (If HTTPS is enabled on web or MGMT endpoint) 1 or 2 cert-manager certificates
-- A `Service` used to access flowg's web interface
-- A `Service` used to perform healthchecks on flowg's mgmt endpoint
-- A `ConfigMap` containing the applied configuration as environment variables, sourced from `values.yaml` 
-- A `ServiceAccount` for flowG
-- A `Deployment` with flowG's pods
-- A `FoundationDBCluster` for flowG's storage, with its own RBAC setup
-- A `Secret` containing a random-generated key in order for flowG instances to share the same JWT secret key.
-- If you chose the fluentd chart:
-    - A `ServiceAccount` for fluentd
-    - The fluentd `DaemonSet`
-    - A `ConfigMap` containing fluentd's configuration
+```mermaid
+
+flowchart LR
+    subgraph NS["fa:fa-tag Namespace"]
+        direction LR
+
+        CM["fa:fa-gear ConfigMap"]
+        SA["fa:fa-address-card ServiceAccount"]
+        Cert["fa:fa-award Cert-manager Certificate"]
+
+        SvcWeb["fa:fa-globe Service (Web UI)"]
+        SvcMgmt["fa:fa-globe Service (Management)"]
+
+        Secret["JWT Secret Key"]
+
+        subgraph Deployment["fa:fa-window-restore Deployment"]
+            direction LR
+
+            Pod1["FlowG Pod"]
+            Pod2["FlowG Pod"]
+            Pod3["FlowG Pod"]
+            Pod4["FlowG Pod"]
+        end
+        
+        subgraph FDB["FoundationDB"]
+
+            direction LR
+
+            FDB1["FoundationDB Pod"]
+            FDB2["FoundationDB Pod"]
+            FDB3["FoundationDB Pod"]
+
+        end 
+
+        FDBSA["FoundationDB RBAC"]
+
+        subgraph FD["Fluentd Daemonset (Optional)"]
+
+            direction LR
+
+            FD1["Fluentd Pod"]
+            FDSA["Fluentd ServiceAccount"]
+            FDCM["Fluentd ConfigMap"]
+
+            FDSA --> FD1
+            FDCM --> FD1
+
+        end
+
+        style FD stroke-dasharray: 5 5, fill:none, stroke:#64748b, stroke-width:1px
+        FD1 -- "Syslog" --> SvcWeb
+
+        CM -. "Environment Variables" .-> Deployment
+        SA --> Deployment
+        SvcWeb --> Deployment
+        SvcMgmt --> Deployment
+        Cert -. "TLS" .-> SvcWeb
+        Deployment --> FDB
+        Secret --> Deployment
+
+        FDBSA --> FDB
+    end
+
+```
+
 
 
