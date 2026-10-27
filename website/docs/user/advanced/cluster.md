@@ -26,6 +26,15 @@ the release archives and in the Docker image). Make sure your FoundationDB
 **server** uses a compatible **7.3.x** version.
 :::
 
+## Using Kubernetes
+
+If you need to setup a flowg cluster, the easiest way to do so is to use one of our Helm Charts. They provide 3 different configuration that could match your needs:
+- Single-node installation with BadgerDB as a back-end, persistent volume attached, easiest for small clusters and homelabs.
+- Multi-node setup with a configurable FoundationDB cluster, that fits the needs of larger environments.
+- Multi-node setup, with an additional Fluentd layer if you want to setup log routing from inside your nodes.
+
+You can refer to the [Kubernetes setup instructions](/docs/user/advanced/k8s/setup.md). 
+
 ## Without Docker
 
 ### 1. Set up a FoundationDB cluster
