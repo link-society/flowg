@@ -1,9 +1,9 @@
 ---
 apiVersion: v2
 name: flowg-observability
-version: "v0.63.2"
+version: "v0.64.0"
 type: application
-appVersion: "v0.63.2"
+appVersion: "v0.64.0"
 kubeVersion: ">=1.30.0-0"
 description: "Flowg is a low-code log processing platform."
 sources:
