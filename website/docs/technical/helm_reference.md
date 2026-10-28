@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 10
 toc_min_heading_level: 2
 toc_max_heading_level: 2
 ---
@@ -7,7 +7,7 @@ toc_max_heading_level: 2
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Charts configuration reference
+# Helm Charts configuration reference
 
 This page references every available `values.yaml` option, their utility, default value(s) and behavior. 
 
