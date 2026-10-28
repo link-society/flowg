@@ -2,13 +2,13 @@
 sidebar_position: 1
 ---
 
-# Setting up a Kubernetes cluster
+# Deploying using Helm
 
 This guide helps you setup a FlowG Kubernetes cluster using our **Helm charts**. 
 
 This guide splits into 3 different branches, following the needs of your cluster.
 
-1. [Single-node flowg instance with BadgerDB as a backend](#1-single-node-flowg-instance), if you only need a small installation. 
+1. [Single-node FlowG instance with BadgerDB as a backend](#1-single-node-flowg-instance), if you only need a small installation. 
 2. [Multi-node cluster using foundationDB](#2-multi-node-cluster-without-fluentd) (and optionnally an observability stack), if you need multiple instances running 
 
 ## Prerequisites 
@@ -16,7 +16,7 @@ This guide splits into 3 different branches, following the needs of your cluster
 - A working **Kubernetes cluster** 
 - Helm 
 
-## 1. Single-node flowg instance 
+## 1. Single-node FlowG instance 
 
 First, clone the repository containing our helm charts:
 
