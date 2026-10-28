@@ -183,5 +183,8 @@ flowchart LR
 
 ```
 
+:::info 
 
+To get a list of every available features in each chart, please refer to the full configuration reference : [Technical Documentation / Helm](/docs/technical/helm.md)
 
+:::
