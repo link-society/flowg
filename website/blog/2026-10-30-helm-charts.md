@@ -248,7 +248,7 @@ git clone https://github.com/link-society/flowg
 helm upgrade --install flowg flowg/k8s/charts/flowg-observability --namespace flowg
 ```
 
-And that's it for the installation. Changing configuration? You can read our [documentation reference](/docs/user/advanced/k8s/chart_reference.md). We also provide tutorials to help you setup key features, like [TLS encryption](/docs/user/advanced/k8s/https.md).
+And that's it for the installation. Changing configuration? You can read our [documentation reference](/docs/technical/helm_reference.md). We also provide tutorials to help you setup key features, like [TLS encryption](/docs/user/advanced/k8s/https.md).
 
 ## Now, why Fluentd?
 
