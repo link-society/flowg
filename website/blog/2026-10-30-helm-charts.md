@@ -9,7 +9,7 @@ tags: [helm, k8s]
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-As [0.64.0](https://github.com/link-society/flowg/releases/tag/0.64.0) has just been released, we are happy to introduce you to 3 Helm Charts to enable you to deploy FlowG faster and in an easier way in your own cluster.
+Alongside the recent release of [0.64.0](https://github.com/link-society/flowg/releases/tag/0.64.0), we are happy to introduce you to 3 Helm Charts to enable you to deploy FlowG faster and smoother in your own cluster.
 
 <!-- truncate -->
 
