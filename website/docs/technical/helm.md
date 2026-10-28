@@ -21,7 +21,7 @@ This page references every available `values.yaml` option, their utility, defaul
 Settings related to FlowG's docker image sourcing.
 
 <details>
-<summary>**<code>FlowG.image.repository</code>** — <code>string</code> (Default: <code>linksociety/flowg</code>)</summary>
+<summary>**<code>flowg.image.repository</code>** — <code>string</code> (Default: <code>linksociety/flowg</code>)</summary>
 
 Repository where FlowG image is sourced from. 
 
