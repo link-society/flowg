@@ -26,7 +26,7 @@ cd flowg/k8s/charts
 ```
 
 > **Configuration**  
-> The configuration can be found inside `values.yaml`. The default configuration normally applies to all needs, but you can still customize it if you want. See the [configuration reference](/docs/technical/helm_reference.md).
+> The configuration can be found inside `values.yaml`. The default configuration normally applies to all needs, but you can still customize it if you want. See the [configuration reference](/docs/technical/helm.md).
 
 
 To install the chart, simply run:
@@ -96,7 +96,7 @@ cd flowg
 ```
 
 > **Configuration**  
-> The configuration can be found inside `values.yaml`. The default configuration normally applies to all needs, but you can still customize it if you want. See the [configuration reference](/docs/technical/helm_reference.md).
+> The configuration can be found inside `values.yaml`. The default configuration normally applies to all needs, but you can still customize it if you want. See the [configuration reference](/docs/technical/helm.md).
 
 And then install the chart following your needs:
 
