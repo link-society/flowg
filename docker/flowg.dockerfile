@@ -18,6 +18,7 @@ ADD third-party /src/third-party
 ADD VERSION.txt /src/VERSION.txt
 ADD api /src/api
 ADD cmd /src/cmd
+ADD pkg /src/pkg
 
 ADD \
   --exclude=internal/utils/langs/vrl/rust-crate \
