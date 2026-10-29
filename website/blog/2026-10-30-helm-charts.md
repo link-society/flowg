@@ -34,7 +34,8 @@ However, Helm isn't a magic wand. From an operator perspective, running complex 
 - Helm can sometimes behave weirdly in case a deployment fails mid-way, getting stuck in a `pending-upgrade` state, leaving you to clean the cat's litter box on your own as it watches you with a mocking expression.
 - Stateful workload migrations are... complicated. Running `helm upgrade` on stateless microservices is easy; doing it on a distributed storage engine like FoundationDB requires strict lifecycle hooks and ordering to avoid data locks or downtime. 
 
-So, why did we choose Helm? Because despite all its flaws, it remains a great solution to easily distribute mid-size services on Kubernetes. Since FlowG is almost never a primary application within a cluster, it is much simpler from a user perspective to have it automatically managed by a program and a simple and understandable configuration file (instead of a complex CRD or a fixed manifest that are heavy and can cause manual interventions and/or downtime).
+So, why did we choose Helm? Because despite all its flaws, it remains a great solution to easily distribute mid-size services on Kubernetes. Sice FlowG is almost never a primary application within a cluster, it is much simpler from a user perspective to have it automatically managed by a program and configured by a simple and understable YAML file. 
+
 
 ## What does it look like? 
 
