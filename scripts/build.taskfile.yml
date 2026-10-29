@@ -11,7 +11,7 @@ tasks:
     desc: "Build frontend"
     dir: ./web/app
     cmds:
-      - NODE_ENV=dev npm i
+      - NODE_ENV=dev npm ci
       - rm -rf ../public ./dist
       - NODE_ENV=dev npm run build:dev
       - mkdir -p ../public
