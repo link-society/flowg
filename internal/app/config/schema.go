@@ -119,7 +119,8 @@ const (
 
 // Errors related to storage backend configuration.
 var (
-	ErrNoStorageBackend = errors.New("no storage backend configured")
+	ErrNoStorageBackend         = errors.New("no storage backend configured")
+	ErrFoundationConnectionInfo = errors.New("FoundationDB backend requires either a cluster file or a connection string")
 )
 
 // Configuration for the BadgerDB storage backend, which is an embedded
@@ -259,11 +260,19 @@ func (c *StorageBackendConfig) Validate() error {
 		return fmt.Errorf("unsupported storage backend: %q", c.Backend)
 	}
 
-	if c.BadgerDB == nil && c.FoundationDB == nil {
+	switch {
+	case c.BadgerDB != nil:
+		return nil
+
+	case c.FoundationDB != nil:
+		if c.FoundationDB.ClusterFile == "" && c.FoundationDB.ConnectionString == "" {
+			return ErrFoundationConnectionInfo
+		}
+		return nil
+
+	default:
 		return ErrNoStorageBackend
 	}
-
-	return nil
 }
 
 // Load completes the configuration with, by order of precedence, the
