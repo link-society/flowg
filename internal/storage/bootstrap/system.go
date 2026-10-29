@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"go.link-society.com/flowg/internal/models"
 	storage "go.link-society.com/flowg/internal/storage/interfaces"
+	"go.link-society.com/flowg/pkg/models"
 )
 
 type BootstrapSystemOptions struct {

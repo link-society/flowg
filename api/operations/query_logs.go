@@ -15,9 +15,9 @@ import (
 	"go.link-society.com/flowg/api/routing"
 	"go.link-society.com/flowg/api/schemas"
 
-	"go.link-society.com/flowg/internal/models"
 	storage "go.link-society.com/flowg/internal/storage/interfaces"
 	"go.link-society.com/flowg/internal/utils/langs/filtering"
+	"go.link-society.com/flowg/pkg/models"
 )
 
 // QueryStreamDeps lists the dependencies of [NewQueryStreamUsecase].

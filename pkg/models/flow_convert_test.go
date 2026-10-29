@@ -3,7 +3,7 @@ package models_test
 import (
 	"testing"
 
-	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/pkg/models"
 )
 
 func TestConvert_FilterDSL_to_ExprLang(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"go.link-society.com/flowg/internal/engines/forwarders"
-	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/pkg/models"
 )
 
 func TestForwarderHttp_Call(t *testing.T) {

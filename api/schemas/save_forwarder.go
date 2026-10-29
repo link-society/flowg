@@ -1,6 +1,6 @@
 package schemas
 
-import "go.link-society.com/flowg/internal/models"
+import "go.link-society.com/flowg/pkg/models"
 
 // SaveForwarderRequest carries the forwarder name and its new definition.
 type SaveForwarderRequest struct {

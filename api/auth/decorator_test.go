@@ -10,8 +10,8 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"go.link-society.com/flowg/internal/models"
 	"go.link-society.com/flowg/internal/storage/mocks"
+	"go.link-society.com/flowg/pkg/models"
 
 	"go.link-society.com/flowg/api/auth"
 )

@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"go.link-society.com/flowg/internal/models"
 	"go.link-society.com/flowg/internal/storage/generic/kv"
+	"go.link-society.com/flowg/pkg/models"
 )
 
 const PROVIDER = "provider"

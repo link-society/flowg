@@ -9,7 +9,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 
-	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/pkg/models"
 
 	"go.link-society.com/flowg/internal/engines/confignotify"
 	confignotifyMocks "go.link-society.com/flowg/internal/engines/confignotify/mocks"

@@ -1,6 +1,6 @@
 package schemas
 
-import "go.link-society.com/flowg/internal/models"
+import "go.link-society.com/flowg/pkg/models"
 
 // GetForwarderRequest identifies the forwarder to retrieve.
 type GetForwarderRequest struct {

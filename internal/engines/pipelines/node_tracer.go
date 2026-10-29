@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/pkg/models"
 )
 
 const TRACER_KEY = "tracer_key"

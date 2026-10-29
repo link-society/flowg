@@ -1,6 +1,6 @@
 package schemas
 
-import "go.link-society.com/flowg/internal/models"
+import "go.link-society.com/flowg/pkg/models"
 
 // GetPipelineRequest identifies the pipeline to retrieve.
 type GetPipelineRequest struct {

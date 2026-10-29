@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 
-	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/pkg/models"
 
 	storage "go.link-society.com/flowg/internal/storage/interfaces"
 )

@@ -16,8 +16,8 @@ import (
 	"go.link-society.com/flowg/api/schemas"
 
 	"go.link-society.com/flowg/internal/engines/forwarders"
-	"go.link-society.com/flowg/internal/models"
 	storage "go.link-society.com/flowg/internal/storage/interfaces"
+	"go.link-society.com/flowg/pkg/models"
 )
 
 // TestForwarderDeps lists the dependencies of [NewTestForwarderUsecase].

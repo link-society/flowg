@@ -13,7 +13,7 @@ import (
 	"github.com/expr-lang/expr"
 	"github.com/expr-lang/expr/vm"
 
-	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/pkg/models"
 )
 
 // httpRuntime delivers records to an arbitrary HTTP endpoint via POST, with

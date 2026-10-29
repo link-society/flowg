@@ -24,7 +24,7 @@ The struct tags double as OpenAPI metadata: the API layer generates the JSON
 schema of every endpoint from these definitions, so the documentation always
 matches what the server actually decodes. Domain objects embedded in the
 payloads (users, roles, flow graphs, forwarders, ...) come from
-`internal/models`.
+`pkg/models`.
 
 ## Special cases
 

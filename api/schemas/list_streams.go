@@ -1,6 +1,6 @@
 package schemas
 
-import "go.link-society.com/flowg/internal/models"
+import "go.link-society.com/flowg/pkg/models"
 
 // ListStreamsRequest is empty: listing streams takes no parameters.
 type ListStreamsRequest struct{}

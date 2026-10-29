@@ -9,8 +9,8 @@ import (
 
 	collectlogs "go.opentelemetry.io/proto/otlp/collector/logs/v1"
 
-	"go.link-society.com/flowg/internal/models"
 	"go.link-society.com/flowg/internal/utils/otlp"
+	"go.link-society.com/flowg/pkg/models"
 )
 
 // IngestLogsOTLPRequest carries an OpenTelemetry logs export to push through a

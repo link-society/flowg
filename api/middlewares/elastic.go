@@ -19,7 +19,7 @@ import (
 	"go.link-society.com/flowg/api/auth"
 	"go.link-society.com/flowg/api/routing"
 	"go.link-society.com/flowg/internal/engines/pipelines"
-	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/pkg/models"
 
 	storage "go.link-society.com/flowg/internal/storage/interfaces"
 )

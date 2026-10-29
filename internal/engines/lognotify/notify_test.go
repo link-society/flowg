@@ -6,7 +6,7 @@ import (
 
 	"log/slog"
 
-	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/pkg/models"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 

@@ -1,6 +1,6 @@
 package schemas
 
-import "go.link-society.com/flowg/internal/models"
+import "go.link-society.com/flowg/pkg/models"
 
 // ListRolesRequest is empty: listing roles takes no parameters.
 type ListRolesRequest struct{}

@@ -1,7 +1,7 @@
 package schemas
 
 import (
-	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/pkg/models"
 )
 
 // GetStreamRequest identifies the stream whose configuration is requested.

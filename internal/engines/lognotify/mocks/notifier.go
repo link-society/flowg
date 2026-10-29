@@ -8,7 +8,7 @@ import (
 	"github.com/vladopajic/go-actor/actor"
 
 	"go.link-society.com/flowg/internal/engines/lognotify"
-	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/pkg/models"
 )
 
 // MockNotifier is a testify mock implementation of LogNotifier for use in tests.

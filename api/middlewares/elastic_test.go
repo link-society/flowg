@@ -14,7 +14,7 @@ import (
 	"github.com/elastic/go-elasticsearch/v9"
 
 	"go.link-society.com/flowg/internal/engines/pipelines"
-	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/pkg/models"
 
 	pipelinesMocks "go.link-society.com/flowg/internal/engines/pipelines/mocks"
 	storageMocks "go.link-society.com/flowg/internal/storage/mocks"

@@ -4,7 +4,7 @@ The package at `internal/engines/forwarders` executes FlowG's forwarders: it
 turns a stored forwarder configuration (`models.ForwarderV2`) into a `Runtime`
 that delivers log records to the configured external destination.
 
-It exists to keep behaviour out of the data model. The `internal/models`
+It exists to keep behaviour out of the data model. The `pkg/models`
 package describes _what_ a forwarder is (its JSON shape, validation and schema
 hints); this package owns _how_ each backend is contacted, along with the
 backend SDKs that entails. Consumers that only need the shapes — the API

@@ -154,7 +154,7 @@ flowg/
 
 ### Versioning conventions in models
 
-The `internal/models` package versions some on-disk/serialized structures with
+The `pkg/models` package versions some on-disk/serialized structures with
 explicit `_v1` / `_v2` suffixes (e.g. `flow_v1.go`, `flow_v2.go`,
 `forwarder_v1.go`, `forwarder_v2.go`) and provides `_convert.go` helpers to
 migrate between versions. New work should target the latest version and add a

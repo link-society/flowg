@@ -3,7 +3,7 @@ package otlp
 import (
 	collectlogs "go.opentelemetry.io/proto/otlp/collector/logs/v1"
 
-	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/pkg/models"
 )
 
 func convertToLogRecords(message *collectlogs.ExportLogsServiceRequest) []*models.LogRecord {

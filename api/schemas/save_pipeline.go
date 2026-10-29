@@ -1,6 +1,6 @@
 package schemas
 
-import "go.link-society.com/flowg/internal/models"
+import "go.link-society.com/flowg/pkg/models"
 
 // SavePipelineRequest carries the pipeline name and its new flow graph.
 type SavePipelineRequest struct {

@@ -12,7 +12,7 @@ import (
 	"github.com/swaggest/rest"
 	"github.com/swaggest/usecase/status"
 
-	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/pkg/models"
 
 	storage "go.link-society.com/flowg/internal/storage/interfaces"
 )

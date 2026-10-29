@@ -14,7 +14,7 @@ import (
 
 	"github.com/vladopajic/go-actor/actor"
 
-	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/pkg/models"
 
 	lognotifyMocks "go.link-society.com/flowg/internal/engines/lognotify/mocks"
 	"go.link-society.com/flowg/internal/storage/generic/kv"

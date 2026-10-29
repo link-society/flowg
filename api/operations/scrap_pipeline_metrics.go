@@ -18,8 +18,8 @@ import (
 	"go.link-society.com/flowg/api/schemas"
 
 	"go.link-society.com/flowg/internal/engines/pipelines"
-	"go.link-society.com/flowg/internal/models"
 	storage "go.link-society.com/flowg/internal/storage/interfaces"
+	"go.link-society.com/flowg/pkg/models"
 )
 
 // ScrapPipelineMetricsDeps lists the dependencies of [NewScrapPipelineMetricsUsecase].

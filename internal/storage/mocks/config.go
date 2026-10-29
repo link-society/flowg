@@ -6,8 +6,8 @@ import (
 	"context"
 	"io"
 
-	"go.link-society.com/flowg/internal/models"
 	storage "go.link-society.com/flowg/internal/storage/interfaces"
+	"go.link-society.com/flowg/pkg/models"
 )
 
 // MockConfigStorage is a testify-based mock implementation of [ConfigStorage].

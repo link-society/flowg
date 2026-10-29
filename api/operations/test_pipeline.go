@@ -18,8 +18,8 @@ import (
 
 	applog "go.link-society.com/flowg/internal/app/logging"
 	"go.link-society.com/flowg/internal/engines/pipelines"
-	"go.link-society.com/flowg/internal/models"
 	storage "go.link-society.com/flowg/internal/storage/interfaces"
+	"go.link-society.com/flowg/pkg/models"
 )
 
 // TestPipelineDeps lists the dependencies of [NewTestPipelineUsecase].

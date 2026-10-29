@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/pkg/models"
 )
 
 func TestAwsCloudWatchTimestamp(t *testing.T) {

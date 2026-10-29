@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"go.link-society.com/flowg/internal/models"
 	"go.link-society.com/flowg/internal/storage/generic/kv"
 	"go.link-society.com/flowg/internal/utils/langs/filtering"
+	"go.link-society.com/flowg/pkg/models"
 )
 
 // LogStorage is the contract for persisting and querying FlowG's log records,

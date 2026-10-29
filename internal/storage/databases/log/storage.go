@@ -7,7 +7,7 @@ import (
 
 	"time"
 
-	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/pkg/models"
 
 	"go.link-society.com/flowg/internal/storage/generic/kv"
 	storage "go.link-society.com/flowg/internal/storage/interfaces"

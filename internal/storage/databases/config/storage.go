@@ -14,7 +14,7 @@ import (
 	"io"
 	"net"
 
-	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/pkg/models"
 
 	"go.link-society.com/flowg/internal/engines/confignotify"
 

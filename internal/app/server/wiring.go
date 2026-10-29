@@ -13,8 +13,8 @@ import (
 	"go.link-society.com/flowg/internal/app/config"
 	"go.link-society.com/flowg/internal/app/featureflags"
 
-	"go.link-society.com/flowg/internal/models"
 	"go.link-society.com/flowg/internal/utils/secret"
+	"go.link-society.com/flowg/pkg/models"
 
 	badgerauth "go.link-society.com/flowg/internal/storage/backends/badger/concrete/auth"
 	badgerconfig "go.link-society.com/flowg/internal/storage/backends/badger/concrete/config"

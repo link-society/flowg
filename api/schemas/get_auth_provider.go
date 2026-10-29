@@ -1,7 +1,7 @@
 package schemas
 
 import (
-	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/pkg/models"
 )
 
 // GetAuthProvidersRequest identifies the auth provider to retrieve.

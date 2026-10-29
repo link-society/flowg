@@ -3,7 +3,7 @@ package auth
 import (
 	"context"
 
-	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/pkg/models"
 )
 
 type authContextKey string

@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"go.link-society.com/flowg/internal/engines/forwarders"
-	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/pkg/models"
 )
 
 func TestForwarderSplunk_Call(t *testing.T) {

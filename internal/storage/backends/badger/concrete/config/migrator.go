@@ -9,8 +9,8 @@ import (
 	"encoding/base64"
 	"strings"
 
-	"go.link-society.com/flowg/internal/models"
 	storage "go.link-society.com/flowg/internal/storage/interfaces"
+	"go.link-society.com/flowg/pkg/models"
 )
 
 // migrateAlerts is the on-disk counterpart of the auth "alerts" -> "forwarders"

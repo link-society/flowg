@@ -20,9 +20,9 @@ import (
 	"go.link-society.com/flowg/api/schemas"
 
 	"go.link-society.com/flowg/internal/engines/lognotify"
-	"go.link-society.com/flowg/internal/models"
 	storage "go.link-society.com/flowg/internal/storage/interfaces"
 	"go.link-society.com/flowg/internal/utils/langs/filtering"
+	"go.link-society.com/flowg/pkg/models"
 )
 
 // WatchLogsDeps lists the dependencies of [NewWatchLogsUsecase].

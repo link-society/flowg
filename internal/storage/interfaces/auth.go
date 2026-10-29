@@ -3,7 +3,7 @@ package interfaces
 import (
 	"context"
 
-	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/pkg/models"
 )
 
 // AuthStorage is the contract for persisting FlowG's authentication and

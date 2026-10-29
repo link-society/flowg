@@ -11,7 +11,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 
-	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/pkg/models"
 
 	badgerlog "go.link-society.com/flowg/internal/storage/backends/badger/concrete/log"
 	"go.link-society.com/flowg/internal/storage/generic/kv"

@@ -11,7 +11,7 @@ import (
 	"github.com/swaggest/jsonschema-go"
 
 	"go.link-society.com/flowg/internal/engines/forwarders"
-	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/pkg/models"
 )
 
 func TestDynamicField_JSONSchemaShape(t *testing.T) {

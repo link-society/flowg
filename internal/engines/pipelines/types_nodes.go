@@ -12,7 +12,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"go.link-society.com/flowg/internal/app/metrics"
 
-	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/pkg/models"
 
 	"go.link-society.com/flowg/internal/engines/forwarders"
 

@@ -1,6 +1,6 @@
 package schemas
 
-import "go.link-society.com/flowg/internal/models"
+import "go.link-society.com/flowg/pkg/models"
 
 // SaveAuthProviderRequest carries the auth provider name and its new definition.
 type SaveAuthProviderRequest struct {
