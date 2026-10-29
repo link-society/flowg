@@ -10,7 +10,6 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 
-	"link-society.com/flowg/cmd/flowg-server/logging"
 	"link-society.com/flowg/internal/models"
 
 	badgerconfig "link-society.com/flowg/internal/storage/backends/badger/concrete/config"
@@ -21,8 +20,6 @@ import (
 // writer. Under `go test -race` it flags the unsynchronized read of the cached
 // system configuration unless the double-checked lock is made race-safe.
 func TestReadSystemConfigConcurrent(t *testing.T) {
-	logging.Discard()
-
 	ctx := t.Context()
 
 	opts := badgerconfig.DefaultOptions()

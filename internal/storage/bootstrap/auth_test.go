@@ -13,13 +13,10 @@ import (
 	"link-society.com/flowg/internal/storage/backends/badger/concrete/auth"
 	storage "link-society.com/flowg/internal/storage/interfaces"
 
-	"link-society.com/flowg/cmd/flowg-server/logging"
 	"link-society.com/flowg/internal/storage/bootstrap"
 )
 
 func TestDefaultRolesAndUsers(t *testing.T) {
-	logging.Discard()
-
 	ctx := t.Context()
 
 	authOpts := auth.DefaultOptions()
@@ -100,8 +97,6 @@ func TestDefaultRolesAndUsers(t *testing.T) {
 }
 
 func TestDefaultRolesAndUsers_DemoMode(t *testing.T) {
-	logging.Discard()
-
 	ctx := t.Context()
 
 	authOpts := auth.DefaultOptions()

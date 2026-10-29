@@ -9,7 +9,6 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 
-	"link-society.com/flowg/cmd/flowg-server/logging"
 	"link-society.com/flowg/internal/models"
 
 	badgerauth "link-society.com/flowg/internal/storage/backends/badger/concrete/auth"
@@ -18,7 +17,6 @@ import (
 
 func newAuthStorage(t *testing.T) (context.Context, storage.AuthStorage) {
 	t.Helper()
-	logging.Discard()
 
 	opts := badgerauth.DefaultOptions()
 	opts.InMemory = true

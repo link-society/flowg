@@ -8,7 +8,6 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 
-	"link-society.com/flowg/cmd/flowg-server/logging"
 	"link-society.com/flowg/internal/storage/bootstrap"
 
 	"link-society.com/flowg/internal/storage/backends/badger/concrete/config"
@@ -16,8 +15,6 @@ import (
 )
 
 func TestDefaultSystemConfig(t *testing.T) {
-	logging.Discard()
-
 	ctx := t.Context()
 
 	confOpts := config.DefaultOptions()

@@ -11,7 +11,6 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 
-	"link-society.com/flowg/cmd/flowg-server/logging"
 	"link-society.com/flowg/internal/models"
 
 	badgerlog "link-society.com/flowg/internal/storage/backends/badger/concrete/log"
@@ -23,8 +22,6 @@ import (
 // every record (which happens when the "missing key" case is not distinguished
 // from the "present, empty value" case on the kv.QueryTx.Get contract).
 func TestFetchLogsIndexingFilter(t *testing.T) {
-	logging.Discard()
-
 	ctx := t.Context()
 
 	opts := badgerlog.DefaultOptions()
@@ -104,8 +101,6 @@ func TestFetchLogsIndexingFilter(t *testing.T) {
 // key (which happens when the segment-count guard is wrong), returning an empty
 // map and breaking the stream-indices autocomplete endpoint.
 func TestStreamIndicesDistinct(t *testing.T) {
-	logging.Discard()
-
 	ctx := t.Context()
 
 	opts := badgerlog.DefaultOptions()
@@ -167,8 +162,6 @@ func TestStreamIndicesDistinct(t *testing.T) {
 // unindexed, so an exact-match filter on it degrades to "no match" instead of
 // erroring.
 func TestIngestOversizedIndexedValue(t *testing.T) {
-	logging.Discard()
-
 	ctx := t.Context()
 
 	opts := badgerlog.DefaultOptions()

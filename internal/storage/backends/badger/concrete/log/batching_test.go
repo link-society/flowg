@@ -14,7 +14,6 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 
-	"link-society.com/flowg/cmd/flowg-server/logging"
 	"link-society.com/flowg/internal/models"
 
 	badgerlog "link-society.com/flowg/internal/storage/backends/badger/concrete/log"
@@ -26,7 +25,6 @@ import (
 // multi-transaction paths with only a handful of records.
 func newBatchedStorage(t *testing.T, batchSize int) (context.Context, storage.LogStorage) {
 	t.Helper()
-	logging.Discard()
 
 	opts := badgerlog.DefaultOptions()
 	opts.InMemory = true

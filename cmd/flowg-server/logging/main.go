@@ -1,7 +1,6 @@
 package logging
 
 import (
-	"io"
 	"log/slog"
 	"os"
 	"strings"
@@ -41,11 +40,4 @@ func Setup(verbose bool, levelName string) *slog.Logger {
 	slog.SetDefault(logger)
 
 	return logger
-}
-
-// Discard configures the process-wide default slog logger to drop every record.
-// It is primarily used to silence logging output during tests.
-func Discard() {
-	opts := &slog.HandlerOptions{Level: slog.LevelInfo}
-	slog.SetDefault(slog.New(applog.NewHandler(io.Discard, opts)))
 }

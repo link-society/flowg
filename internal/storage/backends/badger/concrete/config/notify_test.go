@@ -9,7 +9,6 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 
-	"link-society.com/flowg/cmd/flowg-server/logging"
 	"link-society.com/flowg/internal/models"
 
 	"link-society.com/flowg/internal/engines/confignotify"
@@ -22,8 +21,6 @@ import (
 // TestNotifyOnMutations verifies that every config mutation broadcasts the
 // matching confignotify event.
 func TestNotifyOnMutations(t *testing.T) {
-	logging.Discard()
-
 	ctx := t.Context()
 
 	notifier := confignotifyMocks.NewMockNotifier().(*confignotifyMocks.MockNotifier)
