@@ -5,7 +5,7 @@ import (
 
 	"go.uber.org/fx"
 
-	"link-society.com/flowg/internal/app/featureflags"
+	"go.link-society.com/flowg/internal/app/featureflags"
 )
 
 // Options configures the web UI handler.

@@ -10,7 +10,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/cmd/flowg-client/utils"
+	"go.link-society.com/flowg/cmd/flowg-client/utils"
 )
 
 // NewAclUserAddCommand builds the "add" command, which adds a new user.

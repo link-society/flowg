@@ -6,9 +6,9 @@ import (
 
 	"go.uber.org/fx"
 
-	"link-society.com/flowg/internal/storage/backends/badger"
-	"link-society.com/flowg/internal/storage/databases/auth"
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	"go.link-society.com/flowg/internal/storage/backends/badger"
+	"go.link-society.com/flowg/internal/storage/databases/auth"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 )
 
 // Options configures the badger-backed authentication storage.

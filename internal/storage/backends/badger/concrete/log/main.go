@@ -9,12 +9,12 @@ import (
 	"github.com/vladopajic/go-actor/actor"
 	"go.uber.org/fx"
 
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/internal/storage/backends/badger"
+	"go.link-society.com/flowg/internal/storage/backends/badger"
 
-	"link-society.com/flowg/internal/storage/databases/log"
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	"go.link-society.com/flowg/internal/storage/databases/log"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 )
 
 // Options configures the badger-backed log storage.

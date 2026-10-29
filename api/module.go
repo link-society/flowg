@@ -5,9 +5,9 @@ import (
 
 	"go.uber.org/fx"
 
-	_ "link-society.com/flowg/api/middlewares"
-	_ "link-society.com/flowg/api/operations"
-	"link-society.com/flowg/api/routing"
+	_ "go.link-society.com/flowg/api/middlewares"
+	_ "go.link-society.com/flowg/api/operations"
+	"go.link-society.com/flowg/api/routing"
 )
 
 // Module bundles everything needed to serve FlowG's REST API into a single

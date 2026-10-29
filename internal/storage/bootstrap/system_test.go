@@ -8,10 +8,10 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 
-	"link-society.com/flowg/internal/storage/bootstrap"
+	"go.link-society.com/flowg/internal/storage/bootstrap"
 
-	"link-society.com/flowg/internal/storage/backends/badger/concrete/config"
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	"go.link-society.com/flowg/internal/storage/backends/badger/concrete/config"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 )
 
 func TestDefaultSystemConfig(t *testing.T) {

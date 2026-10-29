@@ -12,8 +12,8 @@ import (
 
 	"go.uber.org/fx"
 
-	"link-society.com/flowg/api"
-	"link-society.com/flowg/web"
+	"go.link-society.com/flowg/api"
+	"go.link-society.com/flowg/web"
 )
 
 // Options configures the HTTP server: where to bind, the path everything is

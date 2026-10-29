@@ -12,12 +12,12 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/api/schemas"
+	"go.link-society.com/flowg/api/auth"
+	"go.link-society.com/flowg/api/routing"
+	"go.link-society.com/flowg/api/schemas"
 
-	applog "link-society.com/flowg/internal/app/logging"
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	applog "go.link-society.com/flowg/internal/app/logging"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 )
 
 // ChangePasswordDeps lists the dependencies of [NewChangePasswordUsecase].

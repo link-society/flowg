@@ -11,8 +11,8 @@ import (
 
 	"github.com/google/uuid"
 
-	"link-society.com/flowg/internal/app"
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/app"
+	"go.link-society.com/flowg/internal/models"
 )
 
 // clickhouseRuntime inserts records into a ClickHouse table, created at Init

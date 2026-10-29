@@ -8,7 +8,7 @@ import (
 	otlpcommonmodels "go.opentelemetry.io/proto/otlp/common/v1"
 	otlplogmodels "go.opentelemetry.io/proto/otlp/logs/v1"
 
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 )
 
 // newLogRecord flattens an OpenTelemetry log record into a LogRecord, promoting

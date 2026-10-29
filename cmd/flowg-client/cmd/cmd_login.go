@@ -15,8 +15,8 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 
-	"link-society.com/flowg/api/schemas"
-	"link-society.com/flowg/cmd/flowg-client/utils"
+	"go.link-society.com/flowg/api/schemas"
+	"go.link-society.com/flowg/cmd/flowg-client/utils"
 )
 
 // NewLoginCommand builds the "login" command, which gets a temporary JSON Web Token for authentication.

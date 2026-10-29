@@ -11,9 +11,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/cmd/flowg-client/utils"
+	"go.link-society.com/flowg/cmd/flowg-client/utils"
 )
 
 // NewForwarderImportCommand builds the "import" command, which imports a forwarder.

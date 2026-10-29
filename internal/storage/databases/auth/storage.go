@@ -5,12 +5,12 @@ import (
 
 	"io"
 
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/internal/storage/generic/kv"
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	"go.link-society.com/flowg/internal/storage/generic/kv"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 
-	"link-society.com/flowg/internal/storage/databases/auth/transactions"
+	"go.link-society.com/flowg/internal/storage/databases/auth/transactions"
 )
 
 // Storage is a backend-agnostic implementation of [storage.AuthStorage]. It

@@ -15,7 +15,7 @@ import (
 	"io"
 	"net/http"
 
-	"link-society.com/flowg/internal/app/featureflags"
+	"go.link-society.com/flowg/internal/app/featureflags"
 )
 
 // staticfiles holds the pre-built, gzip-compressed assets of the web UI,

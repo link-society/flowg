@@ -1,7 +1,7 @@
 package schemas
 
 import (
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 )
 
 // GetSystemConfigurationRequest is empty: the system configuration is global.

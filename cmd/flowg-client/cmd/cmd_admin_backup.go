@@ -11,7 +11,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/cmd/flowg-client/utils"
+	"go.link-society.com/flowg/cmd/flowg-client/utils"
 )
 
 // NewAdminBackupCommand builds the "backup" command, which backs up FlowG data.

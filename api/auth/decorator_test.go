@@ -10,10 +10,10 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/mocks"
+	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/storage/mocks"
 
-	"link-society.com/flowg/api/auth"
+	"go.link-society.com/flowg/api/auth"
 )
 
 type req struct{}

@@ -3,7 +3,7 @@ package schemas
 import (
 	"time"
 
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 )
 
 // QueryStreamRequest describes a bounded search over a stream's logs.

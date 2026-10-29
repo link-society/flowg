@@ -8,12 +8,12 @@ import (
 	"github.com/vladopajic/go-actor/actor"
 	"go.uber.org/fx"
 
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/internal/storage/backends/foundation"
+	"go.link-society.com/flowg/internal/storage/backends/foundation"
 
-	"link-society.com/flowg/internal/storage/databases/log"
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	"go.link-society.com/flowg/internal/storage/databases/log"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 )
 
 // Options configures the FoundationDB-backed log storage.

@@ -14,10 +14,10 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 
-	badgerlog "link-society.com/flowg/internal/storage/backends/badger/concrete/log"
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	badgerlog "go.link-society.com/flowg/internal/storage/backends/badger/concrete/log"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 )
 
 // newBatchedStorage builds an in-memory log storage whose whole-stream

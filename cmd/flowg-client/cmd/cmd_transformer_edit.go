@@ -13,8 +13,8 @@ import (
 	"github.com/google/shlex"
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/api/schemas"
-	"link-society.com/flowg/cmd/flowg-client/utils"
+	"go.link-society.com/flowg/api/schemas"
+	"go.link-society.com/flowg/cmd/flowg-client/utils"
 )
 
 // NewTransformerEditCommand builds the "edit" command, which edits a transformer's code.

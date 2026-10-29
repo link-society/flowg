@@ -13,12 +13,12 @@ import (
 	"github.com/vladopajic/go-actor/actor"
 	"go.uber.org/fx"
 
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 
-	"link-society.com/flowg/internal/engines/confignotify"
-	"link-society.com/flowg/internal/engines/lognotify"
+	"go.link-society.com/flowg/internal/engines/confignotify"
+	"go.link-society.com/flowg/internal/engines/lognotify"
 )
 
 // Runner executes pipelines against incoming log records. It is the public entry

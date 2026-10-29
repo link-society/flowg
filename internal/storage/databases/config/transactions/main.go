@@ -3,7 +3,7 @@ package transactions
 import (
 	"fmt"
 
-	"link-society.com/flowg/internal/storage/generic/kv"
+	"go.link-society.com/flowg/internal/storage/generic/kv"
 )
 
 // ListItems returns the names of every item of the given type by scanning the

@@ -16,12 +16,12 @@ import (
 
 	"go.uber.org/fx"
 
-	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/engines/pipelines"
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/api/auth"
+	"go.link-society.com/flowg/api/routing"
+	"go.link-society.com/flowg/internal/engines/pipelines"
+	"go.link-society.com/flowg/internal/models"
 
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 )
 
 // ElasticDeps lists the dependencies of [newElasticHandler]: the API logger,

@@ -5,7 +5,7 @@ import (
 
 	gosyslogformat "gopkg.in/mcuadros/go-syslog.v2/format"
 
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 )
 
 // parseLogParts converts the loosely-typed fields parsed by the syslog library

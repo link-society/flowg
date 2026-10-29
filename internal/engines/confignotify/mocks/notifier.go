@@ -7,7 +7,7 @@ import (
 
 	"github.com/vladopajic/go-actor/actor"
 
-	"link-society.com/flowg/internal/engines/confignotify"
+	"go.link-society.com/flowg/internal/engines/confignotify"
 )
 
 // MockNotifier is a testify mock implementation of Notifier for use in tests.

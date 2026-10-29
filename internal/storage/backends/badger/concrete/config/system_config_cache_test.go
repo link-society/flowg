@@ -11,12 +11,12 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/internal/storage/backends/badger"
-	badgerconfig "link-society.com/flowg/internal/storage/backends/badger/concrete/config"
-	"link-society.com/flowg/internal/storage/databases/config"
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	"go.link-society.com/flowg/internal/storage/backends/badger"
+	badgerconfig "go.link-society.com/flowg/internal/storage/backends/badger/concrete/config"
+	"go.link-society.com/flowg/internal/storage/databases/config"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 )
 
 type adapterDeps struct {

@@ -9,7 +9,7 @@ import (
 	"bytes"
 	gohttp "net/http"
 
-	applog "link-society.com/flowg/internal/app/logging"
+	applog "go.link-society.com/flowg/internal/app/logging"
 )
 
 // loggingMiddleware is the access-log middleware wrapping the root handler.

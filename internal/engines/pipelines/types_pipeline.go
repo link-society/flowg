@@ -8,12 +8,12 @@ import (
 	"sync"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"link-society.com/flowg/internal/app/metrics"
+	"go.link-society.com/flowg/internal/app/metrics"
 
-	"link-society.com/flowg/internal/engines/forwarders"
+	"go.link-society.com/flowg/internal/engines/forwarders"
 
-	"link-society.com/flowg/internal/models"
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	"go.link-society.com/flowg/internal/models"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 )
 
 // Pipeline is a compiled, ready-to-run flow: a graph of Nodes indexed by ID,

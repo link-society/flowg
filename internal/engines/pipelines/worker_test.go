@@ -14,13 +14,13 @@ import (
 
 	"github.com/vladopajic/go-actor/actor"
 
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 
-	lognotifyMocks "link-society.com/flowg/internal/engines/lognotify/mocks"
-	"link-society.com/flowg/internal/storage/generic/kv"
-	"link-society.com/flowg/internal/storage/mocks"
+	lognotifyMocks "go.link-society.com/flowg/internal/engines/lognotify/mocks"
+	"go.link-society.com/flowg/internal/storage/generic/kv"
+	"go.link-society.com/flowg/internal/storage/mocks"
 
-	appMetrics "link-society.com/flowg/internal/app/metrics"
+	appMetrics "go.link-society.com/flowg/internal/app/metrics"
 )
 
 func TestMain(m *testing.M) {

@@ -7,8 +7,8 @@ import (
 
 	"github.com/stretchr/testify/mock"
 
-	"link-society.com/flowg/internal/engines/pipelines"
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/engines/pipelines"
+	"go.link-society.com/flowg/internal/models"
 )
 
 // MockRunner is a testify mock implementation of Runner for use in tests.

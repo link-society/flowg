@@ -9,7 +9,7 @@ import (
 
 	"github.com/elastic/go-elasticsearch/v9"
 
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 )
 
 // elasticRuntime indexes records into an Elasticsearch index, creating the

@@ -5,11 +5,11 @@ import (
 
 	"github.com/google/uuid"
 
-	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/generic/kv"
+	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/storage/generic/kv"
 
-	"link-society.com/flowg/internal/utils/hash"
-	"link-society.com/flowg/internal/utils/secret"
+	"go.link-society.com/flowg/internal/utils/hash"
+	"go.link-society.com/flowg/internal/utils/secret"
 )
 
 // CreateToken issues a fresh PAT for an existing user. It confirms the user

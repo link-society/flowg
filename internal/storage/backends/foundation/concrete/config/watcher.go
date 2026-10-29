@@ -11,10 +11,10 @@ import (
 
 	"github.com/vladopajic/go-actor/actor"
 
-	"link-society.com/flowg/internal/engines/confignotify"
+	"go.link-society.com/flowg/internal/engines/confignotify"
 
-	"link-society.com/flowg/internal/storage/backends/foundation"
-	"link-society.com/flowg/internal/storage/generic/kv"
+	"go.link-society.com/flowg/internal/storage/backends/foundation"
+	"go.link-society.com/flowg/internal/storage/generic/kv"
 )
 
 // watchedItemTypes are the config item prefixes the watcher observes:

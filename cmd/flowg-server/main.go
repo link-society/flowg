@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"link-society.com/flowg/cmd/flowg-server/cmd"
+	"go.link-society.com/flowg/cmd/flowg-server/cmd"
 )
 
 func main() {

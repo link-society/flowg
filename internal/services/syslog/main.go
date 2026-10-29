@@ -12,9 +12,9 @@ import (
 
 	gosyslog "gopkg.in/mcuadros/go-syslog.v2"
 
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 
-	"link-society.com/flowg/internal/engines/pipelines"
+	"go.link-society.com/flowg/internal/engines/pipelines"
 )
 
 // Options configures the syslog server: UDP (default) or TCP, where to bind,

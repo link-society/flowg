@@ -9,10 +9,10 @@ import (
 	"encoding/json"
 	"strings"
 
-	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/generic/kv"
+	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/storage/generic/kv"
 
-	"link-society.com/flowg/internal/utils/langs/filtering"
+	"go.link-society.com/flowg/internal/utils/langs/filtering"
 )
 
 // FetchLogs returns the records of a stream between two timestamps, newest

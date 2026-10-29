@@ -11,7 +11,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/cmd/flowg-client/utils"
+	"go.link-society.com/flowg/cmd/flowg-client/utils"
 )
 
 // NewAdminRestoreCommand builds the "restore" command, which restores FlowG data.

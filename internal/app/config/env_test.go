@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"link-society.com/flowg/internal/app/config"
+	"go.link-society.com/flowg/internal/app/config"
 )
 
 // block formats an HCL block with the given header and body.

@@ -8,7 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/cmd/flowg-client/utils"
+	"go.link-society.com/flowg/cmd/flowg-client/utils"
 )
 
 // NewTokenRevokeCommand builds the "revoke" command, which revokes a Personal Access Token.

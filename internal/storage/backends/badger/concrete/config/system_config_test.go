@@ -10,10 +10,10 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 
-	badgerconfig "link-society.com/flowg/internal/storage/backends/badger/concrete/config"
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	badgerconfig "go.link-society.com/flowg/internal/storage/backends/badger/concrete/config"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 )
 
 // TestReadSystemConfigConcurrent runs ReadSystemConfig against a concurrent

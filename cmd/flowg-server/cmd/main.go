@@ -9,11 +9,11 @@ import (
 	"go.uber.org/dig"
 	"go.uber.org/fx"
 
-	"link-society.com/flowg/internal/app/config"
-	"link-society.com/flowg/internal/app/metrics"
-	"link-society.com/flowg/internal/app/server"
+	"go.link-society.com/flowg/internal/app/config"
+	"go.link-society.com/flowg/internal/app/metrics"
+	"go.link-society.com/flowg/internal/app/server"
 
-	"link-society.com/flowg/cmd/flowg-server/logging"
+	"go.link-society.com/flowg/cmd/flowg-server/logging"
 )
 
 // ExitCode is the process exit code; the root command sets it to 1 when startup

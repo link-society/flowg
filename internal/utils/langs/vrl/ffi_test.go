@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"link-society.com/flowg/internal/utils/langs/vrl"
+	"go.link-society.com/flowg/internal/utils/langs/vrl"
 )
 
 func TestTransformLog(t *testing.T) {

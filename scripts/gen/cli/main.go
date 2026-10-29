@@ -10,9 +10,9 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/cobra/doc"
 
-	client "link-society.com/flowg/cmd/flowg-client/cmd"
-	health "link-society.com/flowg/cmd/flowg-health/cmd"
-	server "link-society.com/flowg/cmd/flowg-server/cmd"
+	client "go.link-society.com/flowg/cmd/flowg-client/cmd"
+	health "go.link-society.com/flowg/cmd/flowg-health/cmd"
+	server "go.link-society.com/flowg/cmd/flowg-server/cmd"
 )
 
 func main() {

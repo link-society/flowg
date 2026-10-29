@@ -1,4 +1,4 @@
-module link-society.com/flowg
+module go.link-society.com/flowg
 
 go 1.26.0
 

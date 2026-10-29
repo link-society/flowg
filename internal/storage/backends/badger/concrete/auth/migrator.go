@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"link-society.com/flowg/internal/storage/backends/badger"
-	"link-society.com/flowg/internal/storage/generic/kv"
+	"go.link-society.com/flowg/internal/storage/backends/badger"
+	"go.link-society.com/flowg/internal/storage/generic/kv"
 )
 
 // migrateAlertScopes renames the legacy "alerts" permission to "forwarders".

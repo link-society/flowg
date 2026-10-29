@@ -5,8 +5,8 @@ import (
 
 	"encoding/json"
 
-	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/generic/kv"
+	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/storage/generic/kv"
 )
 
 // FetchStreamConfigs returns the configuration of every stream, keyed by stream

@@ -12,13 +12,13 @@ import (
 	"github.com/swaggest/openapi-go/openapi31"
 	"github.com/swaggest/rest/web"
 
-	"link-society.com/flowg/api"
-	"link-society.com/flowg/api/auth"
+	"go.link-society.com/flowg/api"
+	"go.link-society.com/flowg/api/auth"
 
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 
-	"link-society.com/flowg/internal/engines/lognotify"
-	"link-society.com/flowg/internal/engines/pipelines"
+	"go.link-society.com/flowg/internal/engines/lognotify"
+	"go.link-society.com/flowg/internal/engines/pipelines"
 )
 
 func main() {

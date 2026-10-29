@@ -7,7 +7,7 @@ import (
 
 	"github.com/vladopajic/go-actor/actor"
 
-	"link-society.com/flowg/internal/storage/generic/kv"
+	"go.link-society.com/flowg/internal/storage/generic/kv"
 )
 
 type gcWorker[QTx kv.QueryTx, MTx kv.MutationTx] struct {

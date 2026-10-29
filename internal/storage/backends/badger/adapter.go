@@ -13,7 +13,7 @@ import (
 	"github.com/dgraph-io/badger/v4"
 	badgerOptions "github.com/dgraph-io/badger/v4/options"
 
-	"link-society.com/flowg/internal/storage/generic/kv"
+	"go.link-society.com/flowg/internal/storage/generic/kv"
 )
 
 // Configures how the underlying BadgerDB database is opened.

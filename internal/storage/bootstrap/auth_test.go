@@ -8,12 +8,12 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/internal/storage/backends/badger/concrete/auth"
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	"go.link-society.com/flowg/internal/storage/backends/badger/concrete/auth"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 
-	"link-society.com/flowg/internal/storage/bootstrap"
+	"go.link-society.com/flowg/internal/storage/bootstrap"
 )
 
 func TestDefaultRolesAndUsers(t *testing.T) {

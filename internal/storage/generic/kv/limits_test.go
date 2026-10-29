@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"link-society.com/flowg/internal/storage/generic/kv"
+	"go.link-society.com/flowg/internal/storage/generic/kv"
 )
 
 func TestCheckKeySize(t *testing.T) {

@@ -8,11 +8,11 @@ import (
 	"io"
 	"time"
 
-	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/utils/langs/filtering"
+	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/utils/langs/filtering"
 
-	"link-society.com/flowg/internal/storage/generic/kv"
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	"go.link-society.com/flowg/internal/storage/generic/kv"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 )
 
 // MockLogStorage is a testify-based mock implementation of [LogStorage].

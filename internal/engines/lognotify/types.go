@@ -3,7 +3,7 @@ package lognotify
 import (
 	"github.com/vladopajic/go-actor/actor"
 
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 )
 
 // LogMessage is a single record delivered to subscribers, carrying both the

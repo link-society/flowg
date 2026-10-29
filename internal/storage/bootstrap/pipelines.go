@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 )
 
 func DefaultPipeline(ctx context.Context, configStorage storage.ConfigStorage) error {

@@ -11,11 +11,11 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 
-	badgerlog "link-society.com/flowg/internal/storage/backends/badger/concrete/log"
-	"link-society.com/flowg/internal/storage/generic/kv"
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	badgerlog "go.link-society.com/flowg/internal/storage/backends/badger/concrete/log"
+	"go.link-society.com/flowg/internal/storage/generic/kv"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 )
 
 // TestFetchLogsIndexingFilter guards against the indexed-field filter matching

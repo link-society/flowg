@@ -13,13 +13,13 @@ import (
 
 	"github.com/elastic/go-elasticsearch/v9"
 
-	"link-society.com/flowg/internal/engines/pipelines"
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/engines/pipelines"
+	"go.link-society.com/flowg/internal/models"
 
-	pipelinesMocks "link-society.com/flowg/internal/engines/pipelines/mocks"
-	storageMocks "link-society.com/flowg/internal/storage/mocks"
+	pipelinesMocks "go.link-society.com/flowg/internal/engines/pipelines/mocks"
+	storageMocks "go.link-society.com/flowg/internal/storage/mocks"
 
-	"link-society.com/flowg/api/middlewares"
+	"go.link-society.com/flowg/api/middlewares"
 )
 
 func TestElasticEndpoint(t *testing.T) {

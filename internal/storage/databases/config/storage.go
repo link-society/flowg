@@ -14,14 +14,14 @@ import (
 	"io"
 	"net"
 
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/internal/engines/confignotify"
+	"go.link-society.com/flowg/internal/engines/confignotify"
 
-	"link-society.com/flowg/internal/storage/generic/kv"
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	"go.link-society.com/flowg/internal/storage/generic/kv"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 
-	"link-society.com/flowg/internal/storage/databases/config/transactions"
+	"go.link-society.com/flowg/internal/storage/databases/config/transactions"
 )
 
 const (

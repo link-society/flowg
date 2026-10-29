@@ -7,14 +7,14 @@ import (
 
 	"time"
 
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/internal/storage/generic/kv"
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	"go.link-society.com/flowg/internal/storage/generic/kv"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 
-	"link-society.com/flowg/internal/storage/databases/log/transactions"
+	"go.link-society.com/flowg/internal/storage/databases/log/transactions"
 
-	"link-society.com/flowg/internal/utils/langs/filtering"
+	"go.link-society.com/flowg/internal/utils/langs/filtering"
 )
 
 // defaultBatchSize bounds how many keys a whole-stream maintenance operation

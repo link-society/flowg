@@ -8,7 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/cmd/flowg-client/utils"
+	"go.link-society.com/flowg/cmd/flowg-client/utils"
 )
 
 // NewTransformerDeleteCommand builds the "rm" command, which deletes a transformer.

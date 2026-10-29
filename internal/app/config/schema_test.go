@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"link-society.com/flowg/internal/app/config"
+	"go.link-society.com/flowg/internal/app/config"
 )
 
 // clearEnv blanks the FLOWG_* environment variables inherited from the shell,

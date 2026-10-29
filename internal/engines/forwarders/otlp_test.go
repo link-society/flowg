@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"link-society.com/flowg/internal/engines/forwarders"
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/engines/forwarders"
+	"go.link-society.com/flowg/internal/models"
 )
 
 func TestForwarderOtlpV2_Call_Success(t *testing.T) {

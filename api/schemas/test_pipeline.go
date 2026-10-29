@@ -1,6 +1,6 @@
 package schemas
 
-import "link-society.com/flowg/internal/models"
+import "go.link-society.com/flowg/internal/models"
 
 // TestPipelineRequest carries a pipeline definition and sample records to run
 // through it.

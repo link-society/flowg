@@ -3,9 +3,9 @@ package auth
 import (
 	"go.uber.org/fx"
 
-	"link-society.com/flowg/internal/storage/backends/foundation"
-	"link-society.com/flowg/internal/storage/databases/auth"
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	"go.link-society.com/flowg/internal/storage/backends/foundation"
+	"go.link-society.com/flowg/internal/storage/databases/auth"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 )
 
 // Options configures the FoundationDB-backed authentication storage.

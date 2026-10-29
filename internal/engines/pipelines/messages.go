@@ -7,7 +7,7 @@ import (
 
 	"github.com/prometheus/common/expfmt"
 
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 )
 
 const (

@@ -1,6 +1,6 @@
 package schemas
 
-import "link-society.com/flowg/internal/models"
+import "go.link-society.com/flowg/internal/models"
 
 // ConfigureStreamRequest carries the stream name and its new configuration.
 type ConfigureStreamRequest struct {

@@ -11,7 +11,7 @@ import (
 	"github.com/expr-lang/expr"
 	"github.com/expr-lang/expr/vm"
 
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 )
 
 // splunkRuntime pushes records to a Splunk HTTP Event Collector, evaluating

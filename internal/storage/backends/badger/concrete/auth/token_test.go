@@ -9,10 +9,10 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 
-	badgerauth "link-society.com/flowg/internal/storage/backends/badger/concrete/auth"
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	badgerauth "go.link-society.com/flowg/internal/storage/backends/badger/concrete/auth"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 )
 
 func newAuthStorage(t *testing.T) (context.Context, storage.AuthStorage) {

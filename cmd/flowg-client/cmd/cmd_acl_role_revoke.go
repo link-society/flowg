@@ -10,9 +10,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/api/schemas"
-	"link-society.com/flowg/cmd/flowg-client/utils"
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/api/schemas"
+	"go.link-society.com/flowg/cmd/flowg-client/utils"
+	"go.link-society.com/flowg/internal/models"
 )
 
 // NewAclRoleRevokeCommand builds the "revoke" command, which revokes a permission from a role.

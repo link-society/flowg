@@ -9,8 +9,8 @@ import (
 
 	"github.com/stretchr/testify/mock"
 
-	"link-society.com/flowg/internal/engines/confignotify"
-	confignotifyMocks "link-society.com/flowg/internal/engines/confignotify/mocks"
+	"go.link-society.com/flowg/internal/engines/confignotify"
+	confignotifyMocks "go.link-society.com/flowg/internal/engines/confignotify/mocks"
 )
 
 type fakeSystemCache struct {

@@ -10,10 +10,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/cmd/flowg-client/utils"
-	"link-society.com/flowg/cmd/flowg-client/utils/sse"
+	"go.link-society.com/flowg/cmd/flowg-client/utils"
+	"go.link-society.com/flowg/cmd/flowg-client/utils/sse"
 )
 
 // NewStreamWatchCommand builds the "watch" command, which watches logs in real-time.

@@ -11,14 +11,14 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 
-	"link-society.com/flowg/internal/models"
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	"go.link-society.com/flowg/internal/models"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 
-	"link-society.com/flowg/internal/engines/confignotify"
-	"link-society.com/flowg/internal/engines/lognotify"
+	"go.link-society.com/flowg/internal/engines/confignotify"
+	"go.link-society.com/flowg/internal/engines/lognotify"
 
-	badgerconfig "link-society.com/flowg/internal/storage/backends/badger/concrete/config"
-	badgerlog "link-society.com/flowg/internal/storage/backends/badger/concrete/log"
+	badgerconfig "go.link-society.com/flowg/internal/storage/backends/badger/concrete/config"
+	badgerlog "go.link-society.com/flowg/internal/storage/backends/badger/concrete/log"
 )
 
 const rawTestPipeline = `{

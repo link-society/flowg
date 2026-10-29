@@ -6,11 +6,11 @@ import (
 
 	"log/slog"
 
+	"go.link-society.com/flowg/internal/models"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
-	"link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/internal/engines/lognotify"
+	"go.link-society.com/flowg/internal/engines/lognotify"
 )
 
 func TestLogNotifier(t *testing.T) {

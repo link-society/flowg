@@ -13,7 +13,7 @@ import (
 	otlplogs "go.opentelemetry.io/proto/otlp/logs/v1"
 	proto "google.golang.org/protobuf/proto"
 
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 )
 
 // otlpRuntime exports records to an OpenTelemetry collector as OTLP/HTTP logs

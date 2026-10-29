@@ -11,12 +11,12 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/api/schemas"
+	"go.link-society.com/flowg/api/auth"
+	"go.link-society.com/flowg/api/routing"
+	"go.link-society.com/flowg/api/schemas"
 
-	"link-society.com/flowg/internal/models"
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	"go.link-society.com/flowg/internal/models"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 )
 
 // SaveTransformerDeps lists the dependencies of [NewSaveTransformerUsecase].

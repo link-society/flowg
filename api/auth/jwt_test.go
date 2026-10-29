@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"link-society.com/flowg/api/auth"
+	"go.link-society.com/flowg/api/auth"
 )
 
 var testKeys = auth.Keys{

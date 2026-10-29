@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-logfmt/logfmt"
 
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 )
 
 // Printer renders log records to standard output as logfmt lines.

@@ -8,26 +8,26 @@ import (
 
 	"go.uber.org/fx"
 
-	"link-society.com/flowg/api/auth"
+	"go.link-society.com/flowg/api/auth"
 
-	"link-society.com/flowg/internal/app/config"
-	"link-society.com/flowg/internal/app/featureflags"
+	"go.link-society.com/flowg/internal/app/config"
+	"go.link-society.com/flowg/internal/app/featureflags"
 
-	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/utils/secret"
+	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/utils/secret"
 
-	badgerauth "link-society.com/flowg/internal/storage/backends/badger/concrete/auth"
-	badgerconfig "link-society.com/flowg/internal/storage/backends/badger/concrete/config"
-	badgerlog "link-society.com/flowg/internal/storage/backends/badger/concrete/log"
-	fdbauth "link-society.com/flowg/internal/storage/backends/foundation/concrete/auth"
-	fdbconfig "link-society.com/flowg/internal/storage/backends/foundation/concrete/config"
-	fdblog "link-society.com/flowg/internal/storage/backends/foundation/concrete/log"
+	badgerauth "go.link-society.com/flowg/internal/storage/backends/badger/concrete/auth"
+	badgerconfig "go.link-society.com/flowg/internal/storage/backends/badger/concrete/config"
+	badgerlog "go.link-society.com/flowg/internal/storage/backends/badger/concrete/log"
+	fdbauth "go.link-society.com/flowg/internal/storage/backends/foundation/concrete/auth"
+	fdbconfig "go.link-society.com/flowg/internal/storage/backends/foundation/concrete/config"
+	fdblog "go.link-society.com/flowg/internal/storage/backends/foundation/concrete/log"
 
-	"link-society.com/flowg/internal/services/http"
-	"link-society.com/flowg/internal/services/mgmt"
-	"link-society.com/flowg/internal/services/syslog"
+	"go.link-society.com/flowg/internal/services/http"
+	"go.link-society.com/flowg/internal/services/mgmt"
+	"go.link-society.com/flowg/internal/services/syslog"
 
-	"link-society.com/flowg/web"
+	"go.link-society.com/flowg/web"
 )
 
 // configModule supplies the configuration to the graph, along with the

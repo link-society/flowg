@@ -8,7 +8,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 
-	"link-society.com/flowg/internal/engines/confignotify"
+	"go.link-society.com/flowg/internal/engines/confignotify"
 )
 
 func TestNotifier(t *testing.T) {

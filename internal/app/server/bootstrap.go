@@ -7,9 +7,9 @@ import (
 
 	"go.uber.org/fx"
 
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 
-	"link-society.com/flowg/internal/storage/bootstrap"
+	"go.link-society.com/flowg/internal/storage/bootstrap"
 )
 
 // bootstrapOptions configures the bootstrap handler: the syslog origins allowed

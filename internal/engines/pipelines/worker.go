@@ -8,10 +8,10 @@ import (
 
 	"github.com/vladopajic/go-actor/actor"
 
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 
-	"link-society.com/flowg/internal/engines/confignotify"
-	"link-society.com/flowg/internal/engines/lognotify"
+	"go.link-society.com/flowg/internal/engines/confignotify"
+	"go.link-society.com/flowg/internal/engines/lognotify"
 )
 
 // worker is the runner's actor body. It owns the cache of compiled pipelines and

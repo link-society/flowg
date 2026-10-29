@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"log/slog"
 
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 )
 
 type BootstrapAuthOptions struct {

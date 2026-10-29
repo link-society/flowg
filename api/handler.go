@@ -15,11 +15,11 @@ import (
 	"github.com/swaggest/rest/web"
 	"github.com/swaggest/swgui/v5emb"
 
-	"link-society.com/flowg/api/auth"
-	"link-society.com/flowg/api/routing"
-	"link-society.com/flowg/internal/app"
+	"go.link-society.com/flowg/api/auth"
+	"go.link-society.com/flowg/api/routing"
+	"go.link-society.com/flowg/internal/app"
 
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 )
 
 // handlerParams gathers everything [NewHandler] needs from the

@@ -10,14 +10,14 @@ import (
 	"sync"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"link-society.com/flowg/internal/app/metrics"
+	"go.link-society.com/flowg/internal/app/metrics"
 
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/models"
 
-	"link-society.com/flowg/internal/engines/forwarders"
+	"go.link-society.com/flowg/internal/engines/forwarders"
 
-	"link-society.com/flowg/internal/utils/langs/filtering"
-	"link-society.com/flowg/internal/utils/langs/vrl"
+	"go.link-society.com/flowg/internal/utils/langs/filtering"
+	"go.link-society.com/flowg/internal/utils/langs/vrl"
 )
 
 // Node is one vertex of a compiled pipeline. Records flow through nodes from a

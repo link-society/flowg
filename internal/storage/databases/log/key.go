@@ -5,8 +5,8 @@ import (
 
 	"github.com/google/uuid"
 
-	"link-society.com/flowg/internal/models"
-	"link-society.com/flowg/internal/storage/generic/kv"
+	"go.link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/internal/storage/generic/kv"
 )
 
 // newDbKey builds the time-ordered storage key for the record in a stream:

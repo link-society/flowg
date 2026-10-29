@@ -11,7 +11,7 @@ import (
 
 	"github.com/dgraph-io/badger/v4"
 
-	"link-society.com/flowg/internal/storage/generic/kv"
+	"go.link-society.com/flowg/internal/storage/generic/kv"
 )
 
 func newTestTx(t *testing.T) *BadgerTx {

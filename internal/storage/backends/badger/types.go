@@ -5,7 +5,7 @@ import (
 
 	"github.com/dgraph-io/badger/v4"
 
-	"link-society.com/flowg/internal/storage/generic/kv"
+	"go.link-society.com/flowg/internal/storage/generic/kv"
 )
 
 // keySeparator delimits the segments of a composite [kv.Key] in BadgerDB's flat

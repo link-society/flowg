@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	applog "link-society.com/flowg/internal/app/logging"
+	applog "go.link-society.com/flowg/internal/app/logging"
 )
 
 // Setup builds the root slog logger, writing to stdout using the

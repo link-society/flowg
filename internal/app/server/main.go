@@ -5,17 +5,17 @@ import (
 
 	"go.uber.org/fx"
 
-	"link-society.com/flowg/internal/app/config"
+	"go.link-society.com/flowg/internal/app/config"
 
-	storage "link-society.com/flowg/internal/storage/interfaces"
+	storage "go.link-society.com/flowg/internal/storage/interfaces"
 
-	"link-society.com/flowg/internal/engines/confignotify"
-	"link-society.com/flowg/internal/engines/lognotify"
-	"link-society.com/flowg/internal/engines/pipelines"
+	"go.link-society.com/flowg/internal/engines/confignotify"
+	"go.link-society.com/flowg/internal/engines/lognotify"
+	"go.link-society.com/flowg/internal/engines/pipelines"
 
-	"link-society.com/flowg/internal/services/http"
-	"link-society.com/flowg/internal/services/mgmt"
-	"link-society.com/flowg/internal/services/syslog"
+	"go.link-society.com/flowg/internal/services/http"
+	"go.link-society.com/flowg/internal/services/mgmt"
+	"go.link-society.com/flowg/internal/services/syslog"
 )
 
 // NewServer assembles the complete FlowG server as a single fx module. It

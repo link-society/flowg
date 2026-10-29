@@ -12,9 +12,9 @@ import (
 
 	"slices"
 
-	"link-society.com/flowg/api/schemas"
-	"link-society.com/flowg/cmd/flowg-client/utils"
-	"link-society.com/flowg/internal/models"
+	"go.link-society.com/flowg/api/schemas"
+	"go.link-society.com/flowg/cmd/flowg-client/utils"
+	"go.link-society.com/flowg/internal/models"
 )
 
 // NewStreamIndexCommand builds the "index" command, which creates or removes indexed fields for a stream.
