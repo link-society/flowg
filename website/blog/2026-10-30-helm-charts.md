@@ -17,9 +17,9 @@ Alongside the recent release of [0.64.0](https://github.com/link-society/flowg/r
 
 Since [0.61.0](https://github.com/link-society/flowg/releases/tag/0.61.0) FlowG can run in a cluster using FoundationDB as a backend (instead of BadgerDB). But up until now, clusterizing it was a bit complicated:
 - A bare-metal cluster relies on complex, hard to automate and maintain mechanisms (Pacemaker, Corosync, Keepalived). And orchestrating VMs on the global level quickly becomes a mess when you add Ansible/Chef in the equation and start thinking about global resources and processes management.
-- The Docker compose approach is limited to a single-host environment. Service dependencies are still lacking — especially with FoundationDB, which is as lazy as my roommate. Compose also struggles to handle environment variables, volumes and secrets replication, and updating images inevitably causes downtime.
+- The Docker compose approach is limited to a single-host environment. Service dependencies are still lacking (especially with FoundationDB, which is as lazy as my roommate). Compose also struggles to handle environment variables, volumes and secrets replication, and updating images inevitably causes downtime.
 
-That is why we came up with the idea of offering an easy way to do so using Kubernetes. Since FlowG has always been available as a Docker image, it was possible even before, but writing — on your own, which implies knowing FlowG — and maintaining manifests in a multi-stage environment is still... tedious. 
+That is why we came up with the idea of offering an easy way to do so using Kubernetes. Since FlowG has always been available as a Docker image, it was possible even before, but writing (on your own, which implies knowing FlowG) and maintaining manifests in a multi-stage environment is still... tedious. 
 
 ## Charting the cluster 
 
@@ -34,7 +34,7 @@ However, Helm isn't a magic wand. From an operator perspective, running complex 
 - Helm can sometimes behave weirdly in case a deployment fails mid-way, getting stuck in a `pending-upgrade` state, leaving you to clean the cat's litter box on your own as it watches you with a mocking expression.
 - Stateful workload migrations are... complicated. Running `helm upgrade` on stateless microservices is easy; doing it on a distributed storage engine like FoundationDB requires strict lifecycle hooks and ordering to avoid data locks or downtime. 
 
-So, why did we choose Helm? Because despite all its flaws, it remains a great solution to easily distribute mid-size services on Kubernetes. Since FlowG is almost never a primary application within a cluster, it is much simpler from a user perspective to have it automatically managed by a program and a simple and understandable configuration file — instead of a complex CRD or a fixed manifest that are heavy and can cause manual interventions and/or downtime.
+So, why did we choose Helm? Because despite all its flaws, it remains a great solution to easily distribute mid-size services on Kubernetes. Since FlowG is almost never a primary application within a cluster, it is much simpler from a user perspective to have it automatically managed by a program and a simple and understandable configuration file (instead of a complex CRD or a fixed manifest that are heavy and can cause manual interventions and/or downtime).
 
 ## What does it look like? 
 
