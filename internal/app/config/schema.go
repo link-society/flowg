@@ -119,8 +119,7 @@ const (
 
 // Errors related to storage backend configuration.
 var (
-	ErrNoStorageBackend        = errors.New("no storage backend configured")
-	ErrMultipleStorageBackends = errors.New("multiple storage backends configured")
+	ErrNoStorageBackend = errors.New("no storage backend configured")
 )
 
 // Configuration for the BadgerDB storage backend, which is an embedded
@@ -252,32 +251,16 @@ func (c *StorageBackendConfig) Resolve() hcl.Diagnostics {
 }
 
 // Validates the storage configuration, ensuring that the backend is supported
-// and that exactly one backend is configured. Returns an error if the backend is
-// unsupported, if no backend is configured or if multiple backends are
-// configured.
+// and that one backend is configured. Returns an error if the backend is
+// unsupported, if no backend is configured.
+// `Resolve()` guarantees that exactly one backend at most is configured.
 func (c *StorageBackendConfig) Validate() error {
 	if c.Backend != StorageBackendBadgerDb && c.Backend != StorageBackendFoundationDb {
 		return fmt.Errorf("unsupported storage backend: %q", c.Backend)
 	}
 
-	count := 0
-
-	if c.BadgerDB != nil {
-		count++
-	}
-
-	if c.FoundationDB != nil {
-		if c.FoundationDB.ClusterFile == "" && c.FoundationDB.ConnectionString == "" {
-			return fmt.Errorf("FoundationDB backend requires either a cluster file or a connection string")
-		}
-
-		count++
-	}
-
-	if count == 0 {
+	if c.BadgerDB == nil && c.FoundationDB == nil {
 		return ErrNoStorageBackend
-	} else if count > 1 {
-		return ErrMultipleStorageBackends
 	}
 
 	return nil
