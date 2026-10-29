@@ -34,7 +34,7 @@ However, Helm isn't a magic wand. From an operator perspective, running complex 
 - Helm can sometimes behave weirdly in case a deployment fails mid-way, getting stuck in a `pending-upgrade` state, leaving you to clean the cat's litter box on your own as it watches you with a mocking expression.
 - Stateful workload migrations are... complicated. Running `helm upgrade` on stateless microservices is easy; doing it on a distributed storage engine like FoundationDB requires strict lifecycle hooks and ordering to avoid data locks or downtime. 
 
-So, why did we choose Helm? Because despite all its flaws, it remains a great solution to easily distribute mid-size services on Kubernetes. Sice FlowG is almost never a primary application within a cluster, it is much simpler from a user perspective to have it automatically managed by a program and configured by a simple and understable YAML file. 
+So, why did we choose Helm? Because despite all its flaws, it remains a great solution to easily distribute mid-size services on Kubernetes. Since FlowG is almost never a primary application within a cluster, it is much simpler from a user perspective to have it automatically managed by a program and configured by a simple and understandable YAML file. 
 
 
 ## What does it look like? 
@@ -44,7 +44,7 @@ As I said earlier, there are 3 different charts, each providing a different arch
 <Tabs defaultValue="singlenode">
 
 <TabItem value="singlenode" label="Single-node">
-This one provides a **single-node** approach, with only 1 FlowG process, attached to a persisten volume *(PVC)*, which relies on [BadgerDB](https://github.com/dgraph-io/badger) as a back-end.
+This one provides a **single-node** approach, with only 1 FlowG process, attached to a persistent volume *(PVC)*, which relies on [BadgerDB](https://github.com/dgraph-io/badger) as a back-end.
 
 ```mermaid
 
@@ -84,7 +84,7 @@ This one is perfect for small clusters (homelabs, for example) or environments w
 </TabItem>
 
 <TabItem value="multinode" label="Multi-node">
-Another allows for a **multi-node** setup, this time using [FoundationDB](https://www.foundationdb.org/). Though letting you manage the FoundationDB CRDs setup, it comes with its own FoundationDBCluster, which can be configured according to your needs (redundancy modes, processes counts, etc.). 
+Another allows for a **multi-node** setup, this time using [FoundationDB](https://www.foundationdb.org/). While letting you manage the FoundationDB CRDs setup, it comes with its own FoundationDBCluster, which can be configured according to your needs (redundancy modes, processes counts, etc.). 
 
 ```mermaid
 
@@ -233,7 +233,7 @@ cd flowg/k8s/charts
 helm upgrade --install flowg flowg-singlenode --namespace flowg --create-namespace
 ```
 
-Curious on how it can expand to complex shenanigans with more complex architectures?
+Curious about how it can expand to complex shenanigans with more complex architectures?
 
 **Installing multi-node + Fluentd version**: 
 ```bash
@@ -264,7 +264,7 @@ First of all, why a `DaemonSet` precisely? A `DaemonSet` runs exactly one pod pe
 A sidecar (a container that executes on every pod that would be tracked) could also be considered, but it is way too complex to deploy in a Helm Chart context, and consumes too many resources (basically, it just doubles the number of processes that are executed by the nodes). A DaemonSet is easy to set up by a Chart (just one manifest file, in addition to its RBAC setup), and costs almost nothing. 
 
 Now, why **Fluentd** precisely?  
-First, because it is stable, mature and well documented (CNCF Graduated). It means API, configuration format and execution standards won't break over time, which means almost no dependency management or maintenance for the Fluentd-side of the chart. And also, it has solid support for the Syslog protocol, which is essential when sending logs to Flowg.
+First, because it is stable, mature and well documented (CNCF Graduated). It means API, configuration format and execution standards won't break over time, which means almost no dependency management or maintenance for the Fluentd-side of the chart. And also, it has solid support for the Syslog protocol, which is essential when sending logs to FlowG.
 
 ### An important word about our collection philosophy
 
