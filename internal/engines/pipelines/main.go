@@ -44,12 +44,21 @@ type runnerImpl struct {
 	logMbox actor.MailboxSender[logMessage]
 }
 
-// logWorkerCount bounds the number of records processed concurrently.
-const logWorkerCount = 64
+// Options configures the pipeline runner.
+type Options struct {
+	// WorkerCount bounds the number of records processed concurrently.
+	WorkerCount int
+}
+
+// DefaultOptions returns the default [Options] of the pipeline runner.
+func DefaultOptions() Options {
+	return Options{WorkerCount: 64}
+}
 
 type deps struct {
 	fx.In
 
+	Options        Options
 	Logger         *slog.Logger
 	ConfigStorage  storage.ConfigStorage
 	LogStorage     storage.LogStorage
@@ -112,7 +121,7 @@ func NewRunner() fx.Option {
 			})
 
 			actors := []actor.Actor{actor.New(w)}
-			for range logWorkerCount {
+			for range d.Options.WorkerCount {
 				actors = append(actors, actor.New(logWorker))
 			}
 			all := actor.Combine(actors...).Build()

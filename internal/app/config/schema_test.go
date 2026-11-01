@@ -136,6 +136,34 @@ func TestLoad_BadgerDbMemTablesCountTooSmall(t *testing.T) {
 	require.ErrorContains(t, cfg.Load(""), "log memtables count must be at least 1, got 0")
 }
 
+func TestLoad_Workers(t *testing.T) {
+	clearEnv(t)
+	t.Setenv("FLOWG_WORKERS_SYSLOG", "8")
+
+	path := filepath.Join(t.TempDir(), "config.hcl")
+	require.NoError(t, os.WriteFile(path, []byte(`
+workers {
+  pipelines = 16
+}
+`), 0600))
+
+	cfg := config.DefaultConfig()
+	require.NoError(t, cfg.Load(path))
+	require.Equal(
+		t,
+		&config.WorkersConfig{Pipelines: 16, Syslog: 8, BadgerDB: 64},
+		cfg.Workers,
+	)
+}
+
+func TestLoad_WorkersCountTooSmall(t *testing.T) {
+	clearEnv(t)
+	t.Setenv("FLOWG_WORKERS_PIPELINES", "0")
+
+	cfg := config.DefaultConfig()
+	require.ErrorContains(t, cfg.Load(""), "pipelines workers count must be at least 1, got 0")
+}
+
 func TestDefaultConfig_IgnoresEnv(t *testing.T) {
 	clearEnv(t)
 	t.Setenv("FLOWG_HTTP_BIND_ADDRESS", ":1234")

@@ -2,12 +2,12 @@ demo = false
 
 logging {
   verbose = false
-  level = "info"
+  level   = "info"
 }
 
 services {
   http {
-    bind = ":5080"
+    bind  = ":5080"
     mount = "/"
 
     tls {
@@ -26,8 +26,9 @@ services {
   }
 
   syslog {
-    bind = ":5514"
+    bind     = ":5514"
     protocol = "tcp"
+
     initial_allowed_origins = []
 
     tls {
@@ -39,26 +40,32 @@ services {
 
 storage {
   backend "badgerdb" {
-    auth_dir = "./data/auth"
-    log_dir = "./data/logs"
+    auth_dir   = "./data/auth"
+    log_dir    = "./data/logs"
     config_dir = "./data/config"
 
-    auth_memtable_size = 64
-    log_memtable_size = 64
+    auth_memtable_size   = 64
+    log_memtable_size    = 64
     config_memtable_size = 64
 
-    auth_memtables_count = 5
-    log_memtables_count = 5
+    auth_memtables_count   = 5
+    log_memtables_count    = 5
     config_memtables_count = 5
   }
 
   seed {
     auth {
-      initial_user = "root"
+      initial_user     = "root"
       initial_password = "root"
 
-      reset_user = ""
+      reset_user     = ""
       reset_password = ""
     }
   }
+}
+
+workers {
+  pipelines = 64
+  syslog    = 64
+  badgerdb  = 64
 }

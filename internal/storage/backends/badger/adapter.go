@@ -30,6 +30,9 @@ type AdapterOptions struct {
 	// NumMemtables is the number of memtables kept in memory; 0 keeps
 	// BadgerDB's default (5).
 	NumMemtables int
+	// WorkerCount bounds the number of concurrent database operations; 0 keeps
+	// the default (64).
+	WorkerCount int
 }
 
 // BadgerAdapter is a [kv.Adapter] backed by BadgerDB. All database access goes
@@ -40,8 +43,9 @@ type BadgerAdapter struct {
 	mbox actor.Mailbox[message]
 }
 
-// workerCount bounds the number of concurrent database operations.
-const workerCount = 64
+// defaultWorkerCount is the number of workers when [AdapterOptions.WorkerCount]
+// is not set.
+const defaultWorkerCount = 64
 
 var _ kv.Adapter[*BadgerTx, *BadgerTx] = (*BadgerAdapter)(nil)
 
@@ -123,6 +127,7 @@ func NewAdapter[O any](logChannel string, adapterOptions func(O) AdapterOptions)
 
 	makeActor := func(
 		lc fx.Lifecycle,
+		storageOpts O,
 		db *badger.DB,
 		mbox actor.Mailbox[message],
 	) *BadgerAdapter {
@@ -142,6 +147,11 @@ func NewAdapter[O any](logChannel string, adapterOptions func(O) AdapterOptions)
 				return actor.WorkerContinue
 			}
 		})
+
+		workerCount := adapterOptions(storageOpts).WorkerCount
+		if workerCount <= 0 {
+			workerCount = defaultWorkerCount
+		}
 
 		workers := make([]actor.Actor, workerCount)
 		for i := range workers {
@@ -177,7 +187,7 @@ func NewAdapter[O any](logChannel string, adapterOptions func(O) AdapterOptions)
 			fx.Annotate(makeMailbox, fx.ResultTags(tag("mbox"))),
 			fx.Annotate(
 				makeActor,
-				fx.ParamTags("", tag("db"), tag("mbox")),
+				fx.ParamTags("", "", tag("db"), tag("mbox")),
 				fx.ResultTags(fmt.Sprintf(`name:"%s"`, logChannel)),
 			),
 		),

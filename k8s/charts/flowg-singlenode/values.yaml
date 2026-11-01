@@ -13,6 +13,12 @@ flowg:
     logging:
       verbose: "True"
       level: "info"
+    # Number of workers processing data concurrently (default: 64, minimum: 1)
+    # badgerdb is per database
+    workers:
+    # pipelines: "64"
+    # syslog: "64"
+    # badgerdb: "64"
     # BadgerDB memtable sizes, in MB (default: 64, minimum: 7), and number of
     # memtables kept in memory (default: 5, minimum: 1), per database.
     # Lower them for small memory limits

@@ -148,6 +148,21 @@ security {
   # env: FLOWG_SECRET_KEY (default: "", a random key is generated)
   secret_key = "a-long-random-secret"
 }
+
+# Number of workers processing data concurrently (minimum: 1)
+workers {
+  # Records processed by the pipelines
+  # env: FLOWG_WORKERS_PIPELINES (default: 64)
+  pipelines = 64
+
+  # Syslog messages received
+  # env: FLOWG_WORKERS_SYSLOG (default: 64)
+  syslog = 64
+
+  # Operations per BadgerDB database, ignored by the other backends
+  # env: FLOWG_WORKERS_BADGERDB (default: 64)
+  badgerdb = 64
+}
 ```
 
 ## Priority

@@ -15,6 +15,16 @@ data:
     FLOWG_LOGLEVEL: {{ . | toString | quote }}
     {{- end }}
 
+    # Workers configuration
+    {{- with .Values.flowg.configuration.workers }}
+    {{- with .pipelines }}
+    FLOWG_WORKERS_PIPELINES: {{ . | toString | quote }}
+    {{- end }}
+    {{- with .syslog }}
+    FLOWG_WORKERS_SYSLOG: {{ . | toString | quote }}
+    {{- end }}
+    {{- end }}
+
     # Syslog configuration
     {{- with .Values.flowg.syslog.initialAllowedOrigins }}
     FLOWG_SYSLOG_INITIAL_ALLOWED_ORIGINS: {{ . | toString | quote }}

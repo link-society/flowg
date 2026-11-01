@@ -18,11 +18,13 @@ import (
 )
 
 // Options configures the syslog server: UDP (default) or TCP, where to bind,
-// and an optional TLS configuration (TCP only).
+// an optional TLS configuration (TCP only), and the number of messages
+// processed concurrently.
 type Options struct {
 	TcpMode     bool
 	BindAddress string
 	TlsConfig   *tls.Config
+	WorkerCount int
 }
 
 // Server is the running syslog service: a pool of actors that drain received
@@ -30,9 +32,6 @@ type Options struct {
 type Server struct {
 	actor.Actor
 }
-
-// workerCount bounds the number of syslog messages processed concurrently.
-const workerCount = 64
 
 // newLogger returns the logger of the syslog server, derived from the root
 // logger and scoped to its options.
@@ -128,7 +127,7 @@ func Module() fx.Option {
 				pipelineRunner: pipelineRunner,
 			}
 
-			workers := make([]actor.Actor, workerCount)
+			workers := make([]actor.Actor, opts.WorkerCount)
 			for i := range workers {
 				workers[i] = actor.New(w)
 			}

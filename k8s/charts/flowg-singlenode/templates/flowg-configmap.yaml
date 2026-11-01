@@ -15,6 +15,19 @@ data:
     FLOWG_LOGLEVEL: {{ . | toString | quote }}
     {{- end }}
 
+    # Workers configuration
+    {{- with .Values.flowg.configuration.workers }}
+    {{- with .pipelines }}
+    FLOWG_WORKERS_PIPELINES: {{ . | toString | quote }}
+    {{- end }}
+    {{- with .syslog }}
+    FLOWG_WORKERS_SYSLOG: {{ . | toString | quote }}
+    {{- end }}
+    {{- with .badgerdb }}
+    FLOWG_WORKERS_BADGERDB: {{ . | toString | quote }}
+    {{- end }}
+    {{- end }}
+
     # BadgerDB configuration
     {{- with .Values.flowg.configuration.badger }}
     {{- with .authMemtableSize }}
