@@ -2,6 +2,8 @@ package syslog
 
 import (
 	"fmt"
+	"strconv"
+	"time"
 
 	gosyslogformat "gopkg.in/mcuadros/go-syslog.v2/format"
 
@@ -20,6 +22,12 @@ func parseLogParts(logParts gosyslogformat.LogParts) *models.LogRecord {
 
 		case []byte:
 			fields[key] = string(value)
+
+		case int:
+			fields[key] = strconv.Itoa(value)
+
+		case time.Time:
+			fields[key] = value.String()
 
 		default:
 			fields[key] = fmt.Sprintf("%v", value)
