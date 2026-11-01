@@ -12,6 +12,7 @@ import (
 
 	"bytes"
 	"fmt"
+	"sync"
 
 	"github.com/vmihailenco/msgpack/v5"
 )
@@ -20,9 +21,12 @@ import (
 // transform log events.
 //
 // It wraps a handle to the Rust implementation through cgo, so it owns native
-// resources: call [ScriptRunner.Close] when done to release them. A runner is
-// not safe for concurrent use; serialize calls or use one runner per goroutine.
+// resources: call [ScriptRunner.Close] when done to release them. It is safe
+// for concurrent use, calls are serialized.
 type ScriptRunner struct {
+	// mu guards the encoder buffer and the output buffer owned by the native
+	// runner, which is only valid until the next call.
+	mu        sync.Mutex
 	ffiObject C.script_runner
 	buffer    bytes.Buffer
 	encoder   *msgpack.Encoder
@@ -53,6 +57,9 @@ func NewScriptRunner(source string) (*ScriptRunner, error) {
 // Close releases the native resources held by the runner. It is safe to call
 // more than once.
 func (sr *ScriptRunner) Close() {
+	sr.mu.Lock()
+	defer sr.mu.Unlock()
+
 	if sr.ffiObject != nil {
 		C.drop_script_runner(sr.ffiObject)
 		sr.ffiObject = nil
@@ -67,6 +74,9 @@ func (sr *ScriptRunner) Close() {
 // dotted field names. It returns a [*EvalError] if the program fails at
 // runtime.
 func (sr *ScriptRunner) TransformLog(logEvent map[string]string) ([]map[string]string, error) {
+	sr.mu.Lock()
+	defer sr.mu.Unlock()
+
 	sr.buffer.Reset()
 
 	if err := sr.encoder.Encode(logEvent); err != nil {
