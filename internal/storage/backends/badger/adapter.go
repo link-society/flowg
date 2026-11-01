@@ -29,14 +29,16 @@ type AdapterOptions struct {
 	MemTableSize int64
 }
 
-// BadgerAdapter is a [kv.Adapter] backed by BadgerDB. All database access is
-// serialized through an actor mailbox so a single goroutine touches the handle
-// at a time.
+// BadgerAdapter is a [kv.Adapter] backed by BadgerDB. All database access goes
+// through an actor mailbox, drained by a fixed pool of workers.
 type BadgerAdapter struct {
 	actor.Actor
 
 	mbox actor.Mailbox[message]
 }
+
+// workerCount bounds the number of concurrent database operations.
+const workerCount = 64
 
 var _ kv.Adapter[*BadgerTx, *BadgerTx] = (*BadgerAdapter)(nil)
 
@@ -44,7 +46,7 @@ var _ kv.Adapter[*BadgerTx, *BadgerTx] = (*BadgerAdapter)(nil)
 // BadgerDB.
 //
 // The module wires together the database handle, the actor mailbox and the
-// worker that drains it, binding their lifecycles to the fx application. The
+// workers that drain it, binding their lifecycles to the fx application. The
 // resulting [kv.Adapter] is published under the name logChannel, which also
 // names its logging channel, so several adapters can coexist in the same
 // container.
@@ -127,18 +129,20 @@ func NewAdapter[O any](logChannel string, adapterOptions func(O) AdapterOptions)
 					return actor.WorkerEnd
 				}
 
-				go func() {
-					err := msg.operation.Handle(db)
-					msg.replyTo <- err
-					close(msg.replyTo)
-				}()
+				msg.replyTo <- msg.operation.Handle(db)
+				close(msg.replyTo)
 
 				return actor.WorkerContinue
 			}
 		})
 
+		workers := make([]actor.Actor, workerCount)
+		for i := range workers {
+			workers[i] = actor.New(worker)
+		}
+
 		adapter := &BadgerAdapter{
-			Actor: actor.New(worker),
+			Actor: actor.Combine(workers...).Build(),
 			mbox:  mbox,
 		}
 
