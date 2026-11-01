@@ -23,14 +23,15 @@ class Limits:
     name: str
     nano_cpus: int
     memory: str
+    memtable_size: int
 
 
 # Container sizes, the smallest being the single-node target on Kubernetes
 LIMITS = [
-    Limits("128m-256MB", 128_000_000, "256m"),
-    Limits("256m-512MB", 256_000_000, "512m"),
-    Limits("512m-1024MB", 512_000_000, "1024m"),
-    Limits("1000m-2048MB", 1_000_000_000, "2048m"),
+    Limits("128m-256MB", 128_000_000, "256m", 8),
+    Limits("256m-512MB", 256_000_000, "512m", 16),
+    Limits("512m-1024MB", 512_000_000, "1024m", 32),
+    Limits("1000m-2048MB", 1_000_000_000, "2048m", 64),
 ]
 
 RECORD = {
@@ -96,6 +97,7 @@ def test_stress(limits, flowg_stress_container, flowg_stress_token, flowg_stress
         if write_header:
             writer.writerow([
                 "limits",
+                "memtable_size_mb",
                 "target_records_per_s",
                 "achieved_records_per_s",
                 "fits",
@@ -103,7 +105,7 @@ def test_stress(limits, flowg_stress_container, flowg_stress_token, flowg_stress
                 "failed_requests",
             ])
 
-        writer.writerow([limits.name, TARGET_RECORDS_PER_SECOND, round(achieved), fits, state["OOMKilled"], failed])
+        writer.writerow([limits.name, limits.memtable_size, TARGET_RECORDS_PER_SECOND, round(achieved), fits, state["OOMKilled"], failed])
 
 
 def save_profile(query, path):

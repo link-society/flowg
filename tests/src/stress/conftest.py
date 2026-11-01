@@ -18,7 +18,11 @@ def flowg_stress_container(limits, docker_client, flowg_network, flowg_image, re
             network=flowg_network,
             volume=volume,
             image=flowg_image,
-            environment={},
+            environment={
+                "FLOWG_BADGER_AUTH_MEMTABLE_SIZE": str(limits.memtable_size),
+                "FLOWG_BADGER_LOG_MEMTABLE_SIZE": str(limits.memtable_size),
+                "FLOWG_BADGER_CONFIG_MEMTABLE_SIZE": str(limits.memtable_size),
+            },
             ports={
                 "5080/tcp": 5080,
                 "9113/tcp": 9113,
