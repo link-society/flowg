@@ -9,7 +9,7 @@ import TabItem from '@theme/TabItem';
 
 # Helm Charts configuration reference
 
-This page references every available `values.yaml` option, their utility, default value(s) and behavior. 
+This page references every available `values.yaml` option, their utility, default value(s) and behavior.
 
 <Tabs>
   <TabItem value="base" label="FlowG" default>
@@ -23,7 +23,7 @@ Settings related to FlowG's docker image sourcing.
 <details>
 <summary>**<code>flowg.image.repository</code>** — <code>string</code> (Default: <code>linksociety/flowg</code>)</summary>
 
-Repository where FlowG image is sourced from. 
+Repository where FlowG image is sourced from.
 
 ```yaml
 flowg:
@@ -42,20 +42,20 @@ Image tag used by Docker.
 flowg:
   image:
     tag: latest
-``` 
+```
 
 </details>
 
 <details>
 <summary>**<code>flowg.image.pullPolicy</code>** - <code>string</code> (Default: <code>IfNotPresent</code>)</summary>
 
-Image pull policy given to Kubernetes. 
+Image pull policy given to Kubernetes.
 
 ```yaml
 flowg:
   image:
     pullPolicy: IfNotPresent
-``` 
+```
 
 </details>
 
@@ -67,7 +67,7 @@ Image pull secrets for private registries.
 ```yaml
 flowg:
   image:
-    pullSecrets: 
+    pullSecrets:
     - name: my-secret-registry
 ```
 
@@ -109,7 +109,7 @@ flowg:
 
 ##### Seeding credentials configuration
 
-Seeding is a FlowG feature that creates a user and sample data during the first setup phase.  
+Seeding is a FlowG feature that creates a user and sample data during the first setup phase.
 The helm chart is designed to source this user's initial (pre-seed) and reset (post-seed) credentials from a secret that you will need to create.
 
 <details>
@@ -182,6 +182,54 @@ flowg:
 
 </details>
 
+##### BadgerDB configuration
+
+Only available in the single-node chart, the multi-node charts use FoundationDB.
+
+Memtable sizes, in MB (minimum: 7). BadgerDB keeps up to 5 memtables per database, so these settings drive most of FlowG's memory usage. Lower them when running with a small memory limit.
+
+<details>
+<summary>**<code>flowg.configuration.badger.authMemtableSize</code>** - <code>string</code> (Default: <code>"64"</code>)</summary>
+
+Memtable size of the database holding users, roles and tokens.
+
+```yaml
+flowg:
+  configuration:
+    badger:
+      authMemtableSize: "64"
+```
+
+</details>
+
+<details>
+<summary>**<code>flowg.configuration.badger.logMemtableSize</code>** - <code>string</code> (Default: <code>"64"</code>)</summary>
+
+Memtable size of the database holding the logs.
+
+```yaml
+flowg:
+  configuration:
+    badger:
+      logMemtableSize: "64"
+```
+
+</details>
+
+<details>
+<summary>**<code>flowg.configuration.badger.configMemtableSize</code>** - <code>string</code> (Default: <code>"64"</code>)</summary>
+
+Memtable size of the database holding pipelines, transformers and forwarders.
+
+```yaml
+flowg:
+  configuration:
+    badger:
+      configMemtableSize: "64"
+```
+
+</details>
+
 ---
 
 #### Base kubernetes pod/service configuration
@@ -193,7 +241,7 @@ Custom annotations to add to the FlowG pods.
 
 ```yaml
 flowg:
-  podAnnotations: 
+  podAnnotations:
     prometheus.io/scrape: "true"
     prometheus.io/port: "9113"
 ```
@@ -208,7 +256,7 @@ Custom annotations to add to the FlowG services.
 
 ```yaml
 flowg:
-  serviceAnnotations: 
+  serviceAnnotations:
     kubernetes.io/description: "flowG load balancer"
     service.beta.kubernetes.io/aws-load-balancer-internal: "true"
 ```
@@ -217,8 +265,8 @@ flowg:
 
 ##### FlowG pod security context
 
-Security Context configuration for FlowG's pod.  
-You can also add other Kubernetes option as the entire `flowg.podSecurityContext` objsect is injected into the manifest. 
+Security Context configuration for FlowG's pod.
+You can also add other Kubernetes option as the entire `flowg.podSecurityContext` objsect is injected into the manifest.
 See more [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
 
 <details>
@@ -307,7 +355,7 @@ Custom configuration for liveness probe settings (initialDelaySeconds, timeoutSe
 ```yaml
 flowg:
   probe:
-    livenessProbe: 
+    livenessProbe:
       initialDelaySeconds: 3
       timeoutSeconds: 5
 ```
@@ -322,7 +370,7 @@ Custom configuration for readiness probe settings (initialDelaySeconds, timeoutS
 ```yaml
 flowg:
   probe:
-    readinessProbe: 
+    readinessProbe:
       initialDelaySeconds: 3
       timeoutSeconds: 5
 ```
@@ -331,7 +379,7 @@ flowg:
 
 ##### Node selector tolerations and taints
 
-Kubernetes [node selector toleration/taints](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) configuration.  
+Kubernetes [node selector toleration/taints](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) configuration.
 
 <details>
 <summary>**<code>flowg.nodeSelectorTolerations</code>** - <code>array</code> (Default: <code>null</code>)</summary>
@@ -434,7 +482,7 @@ flowg:
 <details>
 <summary>**<code>flowg.syslog.protocol</code>** - <code>string</code> (Default: <code>UDP</code>)</summary>
 
-Protocol used by the syslog server (e.g. UDP, TCP).  
+Protocol used by the syslog server (e.g. UDP, TCP).
 On **fluentd** helm chart, UDP is enforced.
 
 ```yaml
@@ -621,7 +669,7 @@ flowg:
 
 #### Cert-manager configuration
 
-Alternatively, cert-manager automatically manages your HTTPS secret. 
+Alternatively, cert-manager automatically manages your HTTPS secret.
 
 <details>
 <summary>**<code>flowg.https.certificateFrom.certmanager.dnsNames</code>** - <code>array</code> (Default: <code>[]</code>)</summary>
@@ -693,7 +741,7 @@ flowg:
 
 </details>
 
-##### Secret key generator configuration 
+##### Secret key generator configuration
 
 <details>
 <summary>**<code>flowg.https.certificateFrom.certmanager.privateKey.algorithm</code>** - <code>string</code> (Default: <code>RSA</code>)</summary>

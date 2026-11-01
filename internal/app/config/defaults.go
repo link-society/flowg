@@ -64,8 +64,9 @@ func applyDefaultsToStruct(s reflect.Value) {
 	}
 }
 
-// setFromString parses raw into v, which must be a `string`, a `bool` or a
-// `[]string` (comma-separated items, trimmed; empty when raw is empty).
+// setFromString parses raw into v, which must be a `string`, a `bool`, an
+// `int64` or a `[]string` (comma-separated items, trimmed; empty when raw is
+// empty).
 func setFromString(v reflect.Value, raw string) error {
 	switch {
 	case v.Kind() == reflect.String:
@@ -77,6 +78,13 @@ func setFromString(v reflect.Value, raw string) error {
 			return err
 		}
 		v.SetBool(b)
+
+	case v.Kind() == reflect.Int64:
+		i, err := strconv.ParseInt(raw, 10, 64)
+		if err != nil {
+			return err
+		}
+		v.SetInt(i)
 
 	case v.Kind() == reflect.Slice && v.Type().Elem().Kind() == reflect.String:
 		items := []string{}

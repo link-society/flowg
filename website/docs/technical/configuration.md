@@ -90,6 +90,16 @@ storage {
 
     # env: FLOWG_BADGER_CONFIG_DIR (default: "./data/config")
     config_dir = "./data/config"
+
+    # Memtable sizes, in MB (minimum: 7)
+    # env: FLOWG_BADGER_AUTH_MEMTABLE_SIZE (default: 64)
+    auth_memtable_size = 64
+
+    # env: FLOWG_BADGER_LOG_MEMTABLE_SIZE (default: 64)
+    log_memtable_size = 64
+
+    # env: FLOWG_BADGER_CONFIG_MEMTABLE_SIZE (default: 64)
+    config_memtable_size = 64
   }
 
   # env: FLOWG_STORAGE_BACKEND

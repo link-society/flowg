@@ -129,6 +129,11 @@ type StorageBackendBadgerDbConfig struct {
 	AuthDir   string `hcl:"auth_dir,optional" default:"./data/auth" env:"FLOWG_BADGER_AUTH_DIR"`
 	LogDir    string `hcl:"log_dir,optional" default:"./data/logs" env:"FLOWG_BADGER_LOG_DIR"`
 	ConfigDir string `hcl:"config_dir,optional" default:"./data/config" env:"FLOWG_BADGER_CONFIG_DIR"`
+
+	// Memtable sizes, in MB; BadgerDB keeps up to 5 memtables per database.
+	AuthMemTableSize   int64 `hcl:"auth_memtable_size,optional" default:"64" env:"FLOWG_BADGER_AUTH_MEMTABLE_SIZE"`
+	LogMemTableSize    int64 `hcl:"log_memtable_size,optional" default:"64" env:"FLOWG_BADGER_LOG_MEMTABLE_SIZE"`
+	ConfigMemTableSize int64 `hcl:"config_memtable_size,optional" default:"64" env:"FLOWG_BADGER_CONFIG_MEMTABLE_SIZE"`
 }
 
 // Configuration for the FoundationDB storage backend, which is a distributed

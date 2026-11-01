@@ -42,6 +42,10 @@ storage {
     auth_dir = "./data/auth"
     log_dir = "./data/logs"
     config_dir = "./data/config"
+
+    auth_memtable_size = 64
+    log_memtable_size = 64
+    config_memtable_size = 64
   }
 
   seed {

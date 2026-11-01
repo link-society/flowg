@@ -24,6 +24,9 @@ type AdapterOptions struct {
 	InMemory bool
 	// ReadOnly opens the database without allowing writes.
 	ReadOnly bool
+	// MemTableSize is the size in bytes of each memtable; 0 keeps BadgerDB's
+	// default (64MB).
+	MemTableSize int64
 }
 
 // BadgerAdapter is a [kv.Adapter] backed by BadgerDB. All database access is
@@ -66,6 +69,10 @@ func NewAdapter[O any](logChannel string, adapterOptions func(O) AdapterOptions)
 			WithCompression(badgerOptions.ZSTD).
 			WithInMemory(opts.InMemory).
 			WithReadOnly(opts.ReadOnly)
+
+		if opts.MemTableSize > 0 {
+			dbOpts = dbOpts.WithMemTableSize(opts.MemTableSize)
+		}
 
 		db, err := badger.Open(dbOpts)
 		if err != nil {

@@ -15,6 +15,19 @@ data:
     FLOWG_LOGLEVEL: {{ . | toString | quote }}
     {{- end }}
 
+    # BadgerDB configuration
+    {{- with .Values.flowg.configuration.badger }}
+    {{- with .authMemtableSize }}
+    FLOWG_BADGER_AUTH_MEMTABLE_SIZE: {{ . | toString | quote }}
+    {{- end }}
+    {{- with .logMemtableSize }}
+    FLOWG_BADGER_LOG_MEMTABLE_SIZE: {{ . | toString | quote }}
+    {{- end }}
+    {{- with .configMemtableSize }}
+    FLOWG_BADGER_CONFIG_MEMTABLE_SIZE: {{ . | toString | quote }}
+    {{- end }}
+    {{- end }}
+
     # Syslog configuration
     {{- with .Values.flowg.syslog.initialAllowedOrigins }}
     FLOWG_SYSLOG_INITIAL_ALLOWED_ORIGINS: {{ . | toString | quote }}
@@ -32,4 +45,3 @@ data:
     FLOWG_MGMT_TLS_CERT: "/data/ssl/mgmt/tls.crt"
     FLOWG_MGMT_TLS_KEY: "/data/ssl/mgmt/tls.key"
     {{- end }}
-    
