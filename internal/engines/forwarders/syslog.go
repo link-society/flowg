@@ -96,8 +96,8 @@ func (rt *syslogRuntime) Close(context.Context) error {
 }
 
 func (rt *syslogRuntime) Call(ctx context.Context, record *models.LogRecord) error {
+	// buffered and never closed: the goroutine may still reply after a timeout
 	replyC := make(chan error, 1)
-	defer close(replyC)
 
 	go func() {
 		env := map[string]any{

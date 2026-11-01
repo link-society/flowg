@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"sync"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.link-society.com/flowg/internal/app/metrics"
@@ -267,11 +268,18 @@ func (n *ForwardNode) Close(ctx context.Context) error {
 	return n.Runtime.Close(ctx)
 }
 
+// forwardTimeout bounds a forwarder call, so that an unresponsive target cannot
+// hold a pipeline worker forever.
+const forwardTimeout = 30 * time.Second
+
 func (n *ForwardNode) Process(ctx context.Context, record *models.LogRecord) error {
 	traceNode(ctx, n.ID, nil, record.Fields, nil)
 	if isDryRun(ctx) {
 		return nil
 	}
+
+	ctx, cancel := context.WithTimeout(ctx, forwardTimeout)
+	defer cancel()
 
 	return n.Runtime.Call(ctx, record)
 }
