@@ -46,7 +46,7 @@ RECORD = {
 
 @pytest.mark.skipif(not has_test_suite("stress"), reason="Stress test suite excluded")
 @pytest.mark.parametrize("limits", LIMITS, ids=lambda limits: limits.name)
-def test_stress(limits, flowg_stress_container, flowg_stress_token, flowg_stress_config, report_dir):
+def test_stress(limits, flowg_stress_container, flowg_stress_token, flowg_stress_config, docker_client, report_dir):
     profile_dir = report_dir / limits.name
     profile_dir.mkdir()
 
@@ -87,6 +87,7 @@ def test_stress(limits, flowg_stress_container, flowg_stress_token, flowg_stress
     # oha's total duration includes the wait for in-flight requests, allow 1% for it
     reached = achieved >= TARGET_RECORDS_PER_SECOND * 0.99
     fits = state["Running"] and not state["OOMKilled"] and failed == 0 and reached
+    memory_peak = read_memory_peak(docker_client, flowg_stress_container) if state["Running"] else None
 
     print(f"{limits.name}: {achieved:.0f} records/s, fits={fits}")
 
@@ -105,9 +106,31 @@ def test_stress(limits, flowg_stress_container, flowg_stress_token, flowg_stress
                 "fits",
                 "oom_killed",
                 "failed_requests",
+                "memory_peak_mb",
             ])
 
-        writer.writerow([limits.name, limits.memtable_size, TARGET_RECORDS_PER_SECOND, round(achieved), fits, state["OOMKilled"], failed])
+        writer.writerow([
+            limits.name,
+            limits.memtable_size,
+            TARGET_RECORDS_PER_SECOND,
+            round(achieved),
+            fits,
+            state["OOMKilled"],
+            failed,
+            memory_peak,
+        ])
+
+
+def read_memory_peak(docker_client, container):
+    # the flowg image has no shell, read its cgroup from a sidecar sharing its PID namespace
+    out = docker_client.containers.run(
+        "busybox",
+        ["cat", "/proc/1/root/sys/fs/cgroup/memory.peak"],
+        pid_mode=f"container:{container.id}",
+        cap_add=["SYS_PTRACE"],
+        remove=True,
+    )
+    return int(out) // 2**20
 
 
 def save_profile(query, path):
