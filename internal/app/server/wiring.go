@@ -23,6 +23,8 @@ import (
 	fdbconfig "go.link-society.com/flowg/internal/storage/backends/foundation/concrete/config"
 	fdblog "go.link-society.com/flowg/internal/storage/backends/foundation/concrete/log"
 
+	"go.link-society.com/flowg/internal/engines/pipelines"
+
 	"go.link-society.com/flowg/internal/services/http"
 	"go.link-society.com/flowg/internal/services/mgmt"
 	"go.link-society.com/flowg/internal/services/syslog"
@@ -43,6 +45,7 @@ func configModule(cfg *config.RootConfig) fx.Option {
 			provideHttpOptions,
 			provideMgmtOptions,
 			provideSyslogOptions,
+			providePipelinesOptions,
 			provideBootstrapOptions,
 			provideWebOptions,
 		),
@@ -88,6 +91,7 @@ func provideBadgerAuthOptions(cfg *config.RootConfig) badgerauth.Options {
 	opts.Directory = cfg.Storage.Backend.BadgerDB.AuthDir
 	opts.MemTableSize = cfg.Storage.Backend.BadgerDB.AuthMemTableSize << 20
 	opts.NumMemtables = int(cfg.Storage.Backend.BadgerDB.AuthMemTablesCount)
+	opts.WorkerCount = int(cfg.Workers.BadgerDB)
 	return opts
 }
 
@@ -98,6 +102,7 @@ func provideBadgerConfigOptions(cfg *config.RootConfig) badgerconfig.Options {
 	opts.Directory = cfg.Storage.Backend.BadgerDB.ConfigDir
 	opts.MemTableSize = cfg.Storage.Backend.BadgerDB.ConfigMemTableSize << 20
 	opts.NumMemtables = int(cfg.Storage.Backend.BadgerDB.ConfigMemTablesCount)
+	opts.WorkerCount = int(cfg.Workers.BadgerDB)
 	return opts
 }
 
@@ -108,6 +113,7 @@ func provideBadgerLogOptions(cfg *config.RootConfig, flags featureflags.Flags) b
 	opts.Directory = cfg.Storage.Backend.BadgerDB.LogDir
 	opts.MemTableSize = cfg.Storage.Backend.BadgerDB.LogMemTableSize << 20
 	opts.NumMemtables = int(cfg.Storage.Backend.BadgerDB.LogMemTablesCount)
+	opts.WorkerCount = int(cfg.Workers.BadgerDB)
 	opts.StreamConfigOverride = streamConfigOverride(flags)
 	return opts
 }
@@ -254,6 +260,13 @@ func provideMgmtOptions(cfg *config.RootConfig) (mgmt.Options, error) {
 	return opts, nil
 }
 
+// providePipelinesOptions configures the pipeline runner.
+func providePipelinesOptions(cfg *config.RootConfig) pipelines.Options {
+	opts := pipelines.DefaultOptions()
+	opts.WorkerCount = int(cfg.Workers.Pipelines)
+	return opts
+}
+
 // provideSyslogOptions converts the configuration of the syslog service into
 // its options, loading its TLS certificate when TLS is enabled. Client
 // certificates are verified when given, and required when TLS authentication is
@@ -262,6 +275,7 @@ func provideSyslogOptions(cfg *config.RootConfig) (syslog.Options, error) {
 	opts := syslog.Options{
 		TcpMode:     cfg.Services.Syslog.Protocol == "tcp",
 		BindAddress: cfg.Services.Syslog.Bind,
+		WorkerCount: int(cfg.Workers.Syslog),
 	}
 
 	if tlsCfg := cfg.Services.Syslog.Tls; tlsCfg != nil {

@@ -107,6 +107,54 @@ flowg:
 
 </details>
 
+##### Workers configuration
+
+Number of workers processing data concurrently (minimum: 1).
+
+<details>
+<summary>**<code>flowg.configuration.workers.pipelines</code>** - <code>string</code> (Default: <code>"64"</code>)</summary>
+
+Number of records processed by the pipelines at the same time.
+
+```yaml
+flowg:
+  configuration:
+    workers:
+      pipelines: "64"
+```
+
+</details>
+
+<details>
+<summary>**<code>flowg.configuration.workers.syslog</code>** - <code>string</code> (Default: <code>"64"</code>)</summary>
+
+Number of received syslog messages processed at the same time.
+
+```yaml
+flowg:
+  configuration:
+    workers:
+      syslog: "64"
+```
+
+</details>
+
+<details>
+<summary>**<code>flowg.configuration.workers.badgerdb</code>** - <code>string</code> (Default: <code>"64"</code>)</summary>
+
+Only available in the single-node chart, the multi-node charts use FoundationDB.
+
+Number of concurrent operations per BadgerDB database.
+
+```yaml
+flowg:
+  configuration:
+    workers:
+      badgerdb: "64"
+```
+
+</details>
+
 ##### Seeding credentials configuration
 
 Seeding is a FlowG feature that creates a user and sample data during the first setup phase.

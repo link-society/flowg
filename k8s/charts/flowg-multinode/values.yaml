@@ -59,6 +59,10 @@ flowg:
     logging:
       verbose: "True"
       level: "info"
+    # Number of workers processing data concurrently (default: 64, minimum: 1)
+    workers:
+    # pipelines: "64"
+    # syslog: "64"
 
     # The 'seed' functionnality creates a first user (default: root, pw: root)
     # And populates the database with an example dataset, then optionnally changes the credentials.

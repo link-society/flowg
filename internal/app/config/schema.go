@@ -24,6 +24,35 @@ type RootConfig struct {
 	Services *ServicesConfig `hcl:"services,block" default:"{}"`
 	Storage  *StorageConfig  `hcl:"storage,block" default:"{}"`
 	Security *SecurityConfig `hcl:"security,block" default:"{}"`
+	Workers  *WorkersConfig  `hcl:"workers,block" default:"{}"`
+}
+
+// WorkersConfig sets the number of workers of the components processing data
+// concurrently.
+type WorkersConfig struct {
+	Pipelines int64 `hcl:"pipelines,optional" default:"64" env:"FLOWG_WORKERS_PIPELINES"`
+	Syslog    int64 `hcl:"syslog,optional" default:"64" env:"FLOWG_WORKERS_SYSLOG"`
+	// Per database, only used by the BadgerDB storage backend.
+	BadgerDB int64 `hcl:"badgerdb,optional" default:"64" env:"FLOWG_WORKERS_BADGERDB"`
+}
+
+// Validates the workers configuration, ensuring that every component has at
+// least one worker.
+func (c *WorkersConfig) Validate() error {
+	for _, component := range []struct {
+		name  string
+		count int64
+	}{
+		{"pipelines", c.Pipelines},
+		{"syslog", c.Syslog},
+		{"badgerdb", c.BadgerDB},
+	} {
+		if component.count < 1 {
+			return fmt.Errorf("%s workers count must be at least 1, got %d", component.name, component.count)
+		}
+	}
+
+	return nil
 }
 
 // SecurityConfig groups together the secrets used by the server.
@@ -249,6 +278,10 @@ func (c *RootConfig) Validate() error {
 
 	if c.Services.Syslog.Tls != nil && c.Services.Syslog.Protocol == "udp" {
 		return fmt.Errorf("TLS is not supported for Syslog UDP protocol")
+	}
+
+	if err := c.Workers.Validate(); err != nil {
+		return err
 	}
 
 	return nil

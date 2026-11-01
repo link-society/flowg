@@ -18,6 +18,7 @@ type Options struct {
 	ReadOnly     bool
 	MemTableSize int64
 	NumMemtables int
+	WorkerCount  int
 }
 
 type deps struct {
@@ -43,6 +44,7 @@ func (o Options) adapterOptions() badger.AdapterOptions {
 		ReadOnly:     o.ReadOnly,
 		MemTableSize: o.MemTableSize,
 		NumMemtables: o.NumMemtables,
+		WorkerCount:  o.WorkerCount,
 	}
 }
 

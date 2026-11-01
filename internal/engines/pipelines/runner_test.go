@@ -44,6 +44,7 @@ func testRunnerModules(configOpts badgerconfig.Options, logOpts badgerlog.Option
 		fx.Supply(logOpts),
 		badgerlog.Module(),
 		lognotify.NewLogNotifier(),
+		fx.Supply(DefaultOptions()),
 		NewRunner(),
 		fx.NopLogger,
 	}
