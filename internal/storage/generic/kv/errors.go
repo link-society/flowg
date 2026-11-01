@@ -14,4 +14,8 @@ var (
 	// ErrValueTooLarge is returned by a mutation when an encoded value exceeds
 	// [MaxValueSize].
 	ErrValueTooLarge = errors.New("value too large")
+
+	// ErrTxnTooLarge is returned by [Adapter.Update] when the transaction
+	// exceeds the backend's size limits.
+	ErrTxnTooLarge = errors.New("transaction too large")
 )

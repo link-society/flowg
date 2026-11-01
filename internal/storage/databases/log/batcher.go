@@ -2,6 +2,7 @@ package log
 
 import (
 	"context"
+	"errors"
 
 	"github.com/vladopajic/go-actor/actor"
 
@@ -81,8 +82,14 @@ func (s *Storage[QTx, MTx]) ingestBatch(ctx context.Context, batch []ingestReque
 		return
 	}
 
+	s.storeBatch(ctx, pending)
+}
+
+// storeBatch stores batch in one transaction, or in two halves, recursively,
+// when it is too large for one.
+func (s *Storage[QTx, MTx]) storeBatch(ctx context.Context, batch []ingestRequest) {
 	err := s.adapter.Update(ctx, func(txn MTx) error {
-		for _, req := range pending {
+		for _, req := range batch {
 			err := transactions.Ingest(s.logger, txn, req.stream, req.record, req.key, req.val, s.streamConfigOverride)
 			if err != nil {
 				return err
@@ -91,7 +98,14 @@ func (s *Storage[QTx, MTx]) ingestBatch(ctx context.Context, batch []ingestReque
 		return nil
 	})
 
-	for _, req := range pending {
+	if errors.Is(err, kv.ErrTxnTooLarge) && len(batch) > 1 {
+		half := len(batch) / 2
+		s.storeBatch(ctx, batch[:half])
+		s.storeBatch(ctx, batch[half:])
+		return
+	}
+
+	for _, req := range batch {
 		req.replyTo <- err
 	}
 }

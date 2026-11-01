@@ -1,6 +1,9 @@
 package badger
 
 import (
+	"errors"
+	"fmt"
+
 	"iter"
 	"strings"
 	"time"
@@ -150,7 +153,7 @@ func (txn *BadgerTx) Set(key kv.Key, value kv.Value) error {
 	if err := kv.CheckValueSize(len(value)); err != nil {
 		return err
 	}
-	return txn.concrete.Set(bkey, value)
+	return mutationError(txn.concrete.Set(bkey, value))
 }
 
 // SetWithTTL implements [kv.MutationTx].
@@ -163,7 +166,7 @@ func (txn *BadgerTx) SetWithTTL(key kv.Key, value kv.Value, ttl time.Duration) e
 		return err
 	}
 	entry := badger.NewEntry(bkey, value).WithTTL(ttl)
-	return txn.concrete.SetEntry(entry)
+	return mutationError(txn.concrete.SetEntry(entry))
 }
 
 // Clear implements [kv.MutationTx].
@@ -172,5 +175,13 @@ func (txn *BadgerTx) Clear(key kv.Key) error {
 	if err := kv.CheckKeySize(len(bkey)); err != nil {
 		return err
 	}
-	return txn.concrete.Delete(bkey)
+	return mutationError(txn.concrete.Delete(bkey))
+}
+
+// mutationError reports BadgerDB's transaction size limit as [kv.ErrTxnTooLarge].
+func mutationError(err error) error {
+	if errors.Is(err, badger.ErrTxnTooBig) {
+		return fmt.Errorf("%w: %w", kv.ErrTxnTooLarge, err)
+	}
+	return err
 }
