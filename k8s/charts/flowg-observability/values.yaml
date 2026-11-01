@@ -186,6 +186,8 @@ flowg:
     # requests:
     #   cpu: 100m
     #   memory: 128Mi
+  # Go memory limit (GOMEMLIMIT), about 80% of the memory limit
+  # goMemLimit: "200MiB"
 
   # This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
   serviceAccount:

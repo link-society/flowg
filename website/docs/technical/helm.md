@@ -459,6 +459,21 @@ flowg:
 
 </details>
 
+<details>
+<summary>**<code>flowg.goMemLimit</code>** - <code>string</code> (Default: none)</summary>
+
+Go memory limit, passed as the `GOMEMLIMIT` environment variable. Without it, the Go garbage collector ignores the container memory limit and FlowG can be killed under load. Set it to about 80% of `flowg.resources.limits.memory`, leaving room for memory outside the Go runtime.
+
+```yaml
+flowg:
+  resources:
+    limits:
+      memory: 256Mi
+  goMemLimit: "200MiB"
+```
+
+</details>
+
 ---
 
 #### Requested storage configuration
