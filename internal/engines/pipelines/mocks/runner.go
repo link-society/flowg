@@ -28,6 +28,12 @@ func (m *MockRunner) Process(ctx context.Context, pipelineName string, entrypoin
 	return args.Error(0)
 }
 
+func (m *MockRunner) RunningPipelines() []string {
+	args := m.Called()
+	names, _ := args.Get(0).([]string)
+	return names
+}
+
 func (m *MockRunner) ScrapMetrics(ctx context.Context, pipelineName string, w io.Writer) error {
 	args := m.Called(ctx, pipelineName, w)
 	return args.Error(0)
