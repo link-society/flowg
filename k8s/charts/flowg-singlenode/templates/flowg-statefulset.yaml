@@ -72,6 +72,10 @@ spec:
                   key: {{ .resetPasswordKey }}
             {{- end }}
             {{- end }}
+            {{- with .Values.flowg.goMemLimit }}
+            - name: GOMEMLIMIT
+              value: {{ . | quote }}
+            {{- end }}
           
           envFrom:
             - configMapRef:
