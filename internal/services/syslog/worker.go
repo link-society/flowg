@@ -3,8 +3,6 @@ package syslog
 import (
 	"log/slog"
 
-	"sync"
-
 	"net"
 
 	gosyslog "gopkg.in/mcuadros/go-syslog.v2"
@@ -15,8 +13,9 @@ import (
 	storage "go.link-society.com/flowg/internal/storage/interfaces"
 )
 
-// worker is the syslog service's actor body. It drains the message channel and
-// drives each message through the pipeline engine.
+// worker is the body of the syslog service's actors. Several of them drain the
+// message channel, each driving one message at a time through the pipeline
+// engine.
 type worker struct {
 	logger         *slog.Logger
 	channel        gosyslog.LogPartsChannel
@@ -28,8 +27,8 @@ var _ actor.Worker = (*worker)(nil)
 
 // DoWork handles one received syslog message: it enforces the configured
 // allowed-origin list (exact IPs or CIDR ranges), then runs the message through
-// every pipeline's syslog entrypoint concurrently, logging but not aborting on
-// per-pipeline errors.
+// every pipeline's syslog entrypoint, one after the other, logging but not
+// aborting on per-pipeline errors.
 func (w *worker) DoWork(ctx actor.Context) actor.WorkerStatus {
 	select {
 	case <-ctx.Done():
@@ -93,33 +92,24 @@ func (w *worker) DoWork(ctx actor.Context) actor.WorkerStatus {
 			return actor.WorkerContinue
 		}
 
-		wg := sync.WaitGroup{}
-
 		for _, pipelineName := range pipelineNames {
-			wg.Add(1)
-			go func(pipelineName string) {
-				defer wg.Done()
+			record := parseLogParts(logParts)
 
-				record := parseLogParts(logParts)
-
-				err := w.pipelineRunner.Process(
+			err := w.pipelineRunner.Process(
+				ctx,
+				pipelineName,
+				pipelines.SYSLOG_ENTRYPOINT,
+				record,
+			)
+			if err != nil {
+				w.logger.ErrorContext(
 					ctx,
-					pipelineName,
-					pipelines.SYSLOG_ENTRYPOINT,
-					record,
+					"Failed to process log entry",
+					slog.String("pipeline", pipelineName),
+					slog.String("error", err.Error()),
 				)
-				if err != nil {
-					w.logger.ErrorContext(
-						ctx,
-						"Failed to process log entry",
-						slog.String("pipeline", pipelineName),
-						slog.String("error", err.Error()),
-					)
-				}
-			}(pipelineName)
+			}
 		}
-
-		wg.Wait()
 
 		return actor.WorkerContinue
 	}

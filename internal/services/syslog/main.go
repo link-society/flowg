@@ -25,11 +25,14 @@ type Options struct {
 	TlsConfig   *tls.Config
 }
 
-// Server is the running syslog service: an actor that drains received messages
-// into the pipeline engine.
+// Server is the running syslog service: a pool of actors that drain received
+// messages into the pipeline engine.
 type Server struct {
 	actor.Actor
 }
+
+// workerCount bounds the number of syslog messages processed concurrently.
+const workerCount = 64
 
 // newLogger returns the logger of the syslog server, derived from the root
 // logger and scoped to its options.
@@ -50,7 +53,7 @@ func newLogger(rootLogger *slog.Logger, opts Options) *slog.Logger {
 }
 
 // Module returns an fx module that listens for syslog messages (auto-detecting
-// the format) and feeds each one, through the worker actor, into every
+// the format) and feeds each one, through a pool of worker actors, into every
 // pipeline's syslog entrypoint. It is configured by the [Options] provided to
 // the graph and logs through the root [slog.Logger] provided to the graph.
 // Listener and actor are bound to the application lifecycle.
@@ -118,13 +121,20 @@ func Module() fx.Option {
 			configStorage storage.ConfigStorage,
 			pipelineRunner pipelines.Runner,
 		) *Server {
+			w := &worker{
+				logger:         newLogger(rootLogger, opts),
+				channel:        channel,
+				configStorage:  configStorage,
+				pipelineRunner: pipelineRunner,
+			}
+
+			workers := make([]actor.Actor, workerCount)
+			for i := range workers {
+				workers[i] = actor.New(w)
+			}
+
 			srv := &Server{
-				Actor: actor.New(&worker{
-					logger:         newLogger(rootLogger, opts),
-					channel:        channel,
-					configStorage:  configStorage,
-					pipelineRunner: pipelineRunner,
-				}),
+				Actor: actor.Combine(workers...).Build(),
 			}
 
 			lc.Append(fx.Hook{
