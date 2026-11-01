@@ -35,6 +35,8 @@ def badgerdb_container(
     environment,
     ports,
     report_dir,
+    nano_cpus=None,
+    mem_limit=None,
 ):
     env = {
         "FLOWG_SECRET_KEY": "s3cr3!",
@@ -55,6 +57,10 @@ def badgerdb_container(
         volumes={
             volume.name: {"bind": "/data", "mode": "rw"}
         },
+        nano_cpus=nano_cpus,
+        mem_limit=mem_limit,
+        # no swap, so that exceeding the memory limit gets the container OOM-killed
+        memswap_limit=mem_limit,
         detach=True,
     )
     print(f"Starting container: {name}")

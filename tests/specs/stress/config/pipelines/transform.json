@@ -1,0 +1,42 @@
+{
+  "nodes": [
+    {
+      "id": "__builtin__source_direct",
+      "type": "source",
+      "position": { "x": 0, "y": 0 },
+      "data": { "type": "direct" }
+    },
+    {
+      "id": "__builtin__source_syslog",
+      "type": "source",
+      "position": { "x": 0, "y": 150 },
+      "data": { "type": "syslog" }
+    },
+    {
+      "id": "transform",
+      "type": "transform",
+      "position": { "x": 300, "y": 0 },
+      "data": { "transformer": "json" }
+    },
+    {
+      "id": "router",
+      "type": "router",
+      "position": { "x": 600, "y": 0 },
+      "data": { "stream": "stress" }
+    }
+  ],
+  "edges": [
+    {
+      "id": "direct-transform",
+      "source": "__builtin__source_direct",
+      "sourceHandle": "",
+      "target": "transform"
+    },
+    {
+      "id": "transform-router",
+      "source": "transform",
+      "sourceHandle": "",
+      "target": "router"
+    }
+  ]
+}
