@@ -102,7 +102,7 @@ func NewRunner() fx.Option {
 						return actor.WorkerEnd
 					}
 
-					msg.process(ctx, w)
+					msg.process(w)
 
 					return actor.WorkerContinue
 				}
@@ -235,6 +235,7 @@ func (r *runnerImpl) Process(
 
 	err := r.logMbox.Send(ctx, logMessage{
 		replyTo: replyTo,
+		ctx:     ctx,
 
 		pipelineName: pipelineName,
 		entrypoint:   entrypoint,
