@@ -186,7 +186,7 @@ flowg:
 
 Only available in the single-node chart, the multi-node charts use FoundationDB.
 
-Memtable sizes, in MB (minimum: 7). BadgerDB keeps up to 5 memtables per database, so these settings drive most of FlowG's memory usage. Lower them when running with a small memory limit.
+Memtable sizes, in MB (minimum: 7), and number of memtables kept in memory (minimum: 1), per database. Memory used by memtables is about their size times their number, so these settings drive most of FlowG's memory usage. Lower them when running with a small memory limit.
 
 <details>
 <summary>**<code>flowg.configuration.badger.authMemtableSize</code>** - <code>string</code> (Default: <code>"64"</code>)</summary>
@@ -226,6 +226,48 @@ flowg:
   configuration:
     badger:
       configMemtableSize: "64"
+```
+
+</details>
+
+<details>
+<summary>**<code>flowg.configuration.badger.authMemtablesCount</code>** - <code>string</code> (Default: <code>"5"</code>)</summary>
+
+Number of memtables of the database holding users, roles and tokens.
+
+```yaml
+flowg:
+  configuration:
+    badger:
+      authMemtablesCount: "5"
+```
+
+</details>
+
+<details>
+<summary>**<code>flowg.configuration.badger.logMemtablesCount</code>** - <code>string</code> (Default: <code>"5"</code>)</summary>
+
+Number of memtables of the database holding the logs.
+
+```yaml
+flowg:
+  configuration:
+    badger:
+      logMemtablesCount: "5"
+```
+
+</details>
+
+<details>
+<summary>**<code>flowg.configuration.badger.configMemtablesCount</code>** - <code>string</code> (Default: <code>"5"</code>)</summary>
+
+Number of memtables of the database holding pipelines, transformers and forwarders.
+
+```yaml
+flowg:
+  configuration:
+    badger:
+      configMemtablesCount: "5"
 ```
 
 </details>

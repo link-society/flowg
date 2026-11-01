@@ -46,6 +46,10 @@ storage {
     auth_memtable_size = 64
     log_memtable_size = 64
     config_memtable_size = 64
+
+    auth_memtables_count = 5
+    log_memtables_count = 5
+    config_memtables_count = 5
   }
 
   seed {

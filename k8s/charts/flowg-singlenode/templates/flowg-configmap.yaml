@@ -26,6 +26,15 @@ data:
     {{- with .configMemtableSize }}
     FLOWG_BADGER_CONFIG_MEMTABLE_SIZE: {{ . | toString | quote }}
     {{- end }}
+    {{- with .authMemtablesCount }}
+    FLOWG_BADGER_AUTH_MEMTABLES_COUNT: {{ . | toString | quote }}
+    {{- end }}
+    {{- with .logMemtablesCount }}
+    FLOWG_BADGER_LOG_MEMTABLES_COUNT: {{ . | toString | quote }}
+    {{- end }}
+    {{- with .configMemtablesCount }}
+    FLOWG_BADGER_CONFIG_MEMTABLES_COUNT: {{ . | toString | quote }}
+    {{- end }}
     {{- end }}
 
     # Syslog configuration

@@ -100,6 +100,16 @@ storage {
 
     # env: FLOWG_BADGER_CONFIG_MEMTABLE_SIZE (default: 64)
     config_memtable_size = 64
+
+    # Number of memtables kept in memory (minimum: 1)
+    # env: FLOWG_BADGER_AUTH_MEMTABLES_COUNT (default: 5)
+    auth_memtables_count = 5
+
+    # env: FLOWG_BADGER_LOG_MEMTABLES_COUNT (default: 5)
+    log_memtables_count = 5
+
+    # env: FLOWG_BADGER_CONFIG_MEMTABLES_COUNT (default: 5)
+    config_memtables_count = 5
   }
 
   # env: FLOWG_STORAGE_BACKEND

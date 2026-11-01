@@ -20,6 +20,7 @@ type Options struct {
 	InMemory     bool
 	ReadOnly     bool
 	MemTableSize int64
+	NumMemtables int
 }
 
 type deps struct {
@@ -50,6 +51,7 @@ func (o Options) adapterOptions() badger.AdapterOptions {
 		InMemory:     o.InMemory,
 		ReadOnly:     o.ReadOnly,
 		MemTableSize: o.MemTableSize,
+		NumMemtables: o.NumMemtables,
 	}
 }
 
