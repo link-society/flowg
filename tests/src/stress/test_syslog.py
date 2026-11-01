@@ -3,8 +3,6 @@ import pytest
 import threading
 import time
 
-import requests
-
 from ..settings import has_test_suite
 from .._lib.stress_utils import (
     LIMITS,
@@ -15,6 +13,7 @@ from .._lib.stress_utils import (
     read_cpu_usage,
     read_from_sidecar,
     read_memory_peak,
+    read_stream_log_total,
     save_profile,
 )
 
@@ -95,7 +94,7 @@ def test_stress_syslog(limits, flowg_stress_container, flowg_stress_config, flow
 
     print(f"{limits.name} (syslog): {achieved:.0f} records/s, fits={fits}")
 
-    append_result(report_dir / "results-syslog.csv", {
+    append_result(report_dir / "syslog-udp.csv", {
         "limits": limits.name,
         "memtable_size_mb": limits.memtable_size,
         "target_records_per_s": TARGET_RECORDS_PER_SECOND,
@@ -107,17 +106,6 @@ def test_stress_syslog(limits, flowg_stress_container, flowg_stress_config, flow
         "memory_peak_mb": memory_peak,
         "cpu_seconds": cpu_seconds,
     })
-
-
-def read_stream_log_total():
-    resp = requests.get("http://localhost:9113/metrics", timeout=10)
-    resp.raise_for_status()
-
-    for line in resp.text.splitlines():
-        if line.startswith('flowg_stream_log_total{stream="stress"}'):
-            return float(line.split()[-1])
-
-    return 0
 
 
 def read_udp_receive_buffer_errors(docker_client, container):

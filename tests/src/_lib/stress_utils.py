@@ -51,6 +51,17 @@ def append_result(path, row):
         writer.writerow(row)
 
 
+def read_stream_log_total():
+    resp = requests.get("http://localhost:9113/metrics", timeout=10)
+    resp.raise_for_status()
+
+    for line in resp.text.splitlines():
+        if line.startswith('flowg_stream_log_total{stream="stress"}'):
+            return float(line.split()[-1])
+
+    return 0
+
+
 def read_cpu_usage(container):
     stats = container.stats(stream=False, one_shot=True)
     return stats["cpu_stats"]["cpu_usage"]["total_usage"]

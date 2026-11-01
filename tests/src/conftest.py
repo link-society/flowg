@@ -29,11 +29,21 @@ def spec_dir(request):
     yield spec_dir
 
 
+@pytest.fixture(scope="session")
+def cleared_report_dirs():
+    return set()
+
+
 @pytest.fixture(scope="module")
-def report_dir(request):
+def report_dir(request, cleared_report_dirs):
     report_dir = Path.cwd() / "reports" / request.node.parent.name
-    rmtree(report_dir, ignore_errors=True)
-    report_dir.mkdir(parents=True)
+
+    # cleared once per session, so modules of the same suite keep each other's reports
+    if report_dir not in cleared_report_dirs:
+        rmtree(report_dir, ignore_errors=True)
+        cleared_report_dirs.add(report_dir)
+
+    report_dir.mkdir(parents=True, exist_ok=True)
     yield report_dir
 
 

@@ -75,7 +75,7 @@ def test_stress(limits, flowg_stress_container, flowg_stress_token, flowg_stress
 
     print(f"{limits.name}: {achieved:.0f} records/s, fits={fits}")
 
-    append_result(report_dir / "results.csv", {
+    append_result(report_dir / "http.csv", {
         "limits": limits.name,
         "memtable_size_mb": limits.memtable_size,
         "target_records_per_s": TARGET_RECORDS_PER_SECOND,
