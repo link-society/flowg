@@ -2,6 +2,7 @@ package foundation
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 
@@ -171,6 +172,13 @@ func (a *FoundationAdapter) Update(ctx context.Context, txnFn func(txn *Foundati
 
 		return nil, nil
 	})
+
+	// 2101 is transaction_too_large
+	var fdbErr fdb.Error
+	if errors.As(err, &fdbErr) && fdbErr.Code == 2101 {
+		return fmt.Errorf("%w: %w", kv.ErrTxnTooLarge, err)
+	}
+
 	return err
 }
 
