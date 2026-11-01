@@ -6,6 +6,11 @@ tasks:
     cmds:
       - docker build -t linksociety/flowg:localdev -f docker/flowg.dockerfile .
 
+  "build:debug":
+    desc: "Build the docker image with the debug profile (pprof enabled)"
+    cmds:
+      - docker build --build-arg BUILD_PROFILE=debug -t linksociety/flowg:localdev-debug -f docker/flowg.dockerfile .
+
   run:
     vars:
       UID:
