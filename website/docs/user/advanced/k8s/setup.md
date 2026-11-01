@@ -16,6 +16,8 @@ This guide splits into 3 different branches, following the needs of your cluster
 - A working **Kubernetes cluster** 
 - Helm 
 
+To size the pods (`flowg.resources`, `flowg.goMemLimit`) for your log throughput, see [Tuning](/docs/technical/tuning).
+
 ## 1. Single-node FlowG instance 
 
 First, clone the repository containing our helm charts:
