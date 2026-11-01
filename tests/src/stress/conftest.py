@@ -25,6 +25,7 @@ def flowg_stress_container(limits, docker_client, flowg_network, flowg_image, re
             },
             ports={
                 "5080/tcp": 5080,
+                "5514/udp": 5514,
                 "9113/tcp": 9113,
             },
             report_dir=report_dir,

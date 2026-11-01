@@ -33,6 +33,12 @@
       "target": "transform"
     },
     {
+      "id": "syslog-transform",
+      "source": "__builtin__source_syslog",
+      "sourceHandle": "",
+      "target": "transform"
+    },
+    {
       "id": "transform-router",
       "source": "transform",
       "sourceHandle": "",
