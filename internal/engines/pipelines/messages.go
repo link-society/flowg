@@ -54,7 +54,6 @@ type runMessage struct {
 }
 
 var (
-	_ message = logMessage{}
 	_ message = scrapMetricsMessage{}
 	_ message = runMessage{}
 	_ message = terminateMessage{}
@@ -67,42 +66,42 @@ type terminateMessage struct {
 	pipelineName string
 }
 
-func (msg logMessage) handle(ctx context.Context, w *worker) {
-	go func() {
-		defer close(msg.replyTo)
+// process runs on a log worker, outside the actor loop, so that slow records
+// do not delay pipeline lifecycle messages.
+func (msg logMessage) process(ctx context.Context, w *worker) {
+	defer close(msg.replyTo)
 
-		ctx := context.WithValue(ctx, workerKey, w)
+	ctx = context.WithValue(ctx, workerKey, w)
 
-		var pipeline *Pipeline
-		if msg.tracer != nil {
-			ctx = WithTracer(ctx, msg.tracer)
+	var pipeline *Pipeline
+	if msg.tracer != nil {
+		ctx = WithTracer(ctx, msg.tracer)
 
-			var err error
-			pipeline, err = BuildFlow(ctx, w.configStorage, msg.pipelineName, &msg.tracer.Flow)
-			if err != nil {
-				msg.replyTo <- err
-				return
-			}
-
-			if err := pipeline.Init(ctx); err != nil {
-				_ = pipeline.Close(ctx)
-				msg.replyTo <- err
-				return
-			}
-			defer func() { _ = pipeline.Close(ctx) }()
-		} else {
-			var release func()
-			var err error
-			pipeline, release, err = w.acquirePipeline(msg.pipelineName)
-			if err != nil {
-				msg.replyTo <- err
-				return
-			}
-			defer release()
+		var err error
+		pipeline, err = BuildFlow(ctx, w.configStorage, msg.pipelineName, &msg.tracer.Flow)
+		if err != nil {
+			msg.replyTo <- err
+			return
 		}
 
-		msg.replyTo <- pipeline.Process(ctx, msg.entrypoint, msg.record)
-	}()
+		if err := pipeline.Init(ctx); err != nil {
+			_ = pipeline.Close(ctx)
+			msg.replyTo <- err
+			return
+		}
+		defer func() { _ = pipeline.Close(ctx) }()
+	} else {
+		var release func()
+		var err error
+		pipeline, release, err = w.acquirePipeline(msg.pipelineName)
+		if err != nil {
+			msg.replyTo <- err
+			return
+		}
+		defer release()
+	}
+
+	msg.replyTo <- pipeline.Process(ctx, msg.entrypoint, msg.record)
 }
 
 func (msg scrapMetricsMessage) handle(ctx context.Context, w *worker) {
