@@ -6,6 +6,9 @@ ARG DISTROLESS_RELEASE="debian13"
 ARG UPX_VERSION="4.2.4"
 ARG UPX_OS="linux"
 
+# release or debug (adds the pprof endpoints on the management port)
+ARG BUILD_PROFILE="release"
+
 ##############################
 ## SOURCES FILES
 ##############################
@@ -93,6 +96,7 @@ FROM golang:1.26-${DEBIAN_RELEASE} AS builder-go
 ARG TARGETARCH
 ARG UPX_VERSION
 ARG UPX_OS
+ARG BUILD_PROFILE
 
 RUN set -ex && \
     apt update && \
@@ -126,10 +130,15 @@ RUN CGO_ENABLED=1 \
     CGO_LDFLAGS="-L/workspace/third-party/foundationdb/7.3.77/lib/linux/$(go env GOARCH)" \
     LD_LIBRARY_PATH="/workspace/third-party/foundationdb/7.3.77/lib/linux/$(go env GOARCH)" \
     go test -timeout 500ms -v ./...
-RUN CGO_ENABLED=1 \
+RUN case "${BUILD_PROFILE}" in \
+      release) tags="" ;; \
+      debug) tags="debug" ;; \
+      *) echo "unknown BUILD_PROFILE: ${BUILD_PROFILE}" >&2 && exit 1 ;; \
+    esac && \
+    CGO_ENABLED=1 \
     CGO_CFLAGS="-I/workspace/third-party/foundationdb/7.3.77/include" \
     CGO_LDFLAGS="-L/workspace/third-party/foundationdb/7.3.77/lib/linux/$(go env GOARCH)" \
-    go build -ldflags="-s -w" -o bin/ ./cmd/...
+    go build -tags "${tags}" -ldflags="-s -w" -o bin/ ./cmd/...
 RUN upx bin/*
 
 ##############################
