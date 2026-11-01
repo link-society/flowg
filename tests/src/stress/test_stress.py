@@ -32,6 +32,8 @@ LIMITS = [
     Limits("256m-512MB", 256_000_000, "512m", 16),
     Limits("512m-1024MB", 512_000_000, "1024m", 32),
     Limits("1000m-2048MB", 1_000_000_000, "2048m", 64),
+    # default memtable size, to compare with the tuned one above
+    Limits("512m-1024MB-memtable64", 512_000_000, "1024m", 64),
 ]
 
 RECORD = {
