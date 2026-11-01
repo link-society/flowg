@@ -92,7 +92,7 @@ RUN NODE_ENV="production" npm run build
 ## BUILD GO CODE
 ##############################
 
-FROM golang:1.26-${DEBIAN_RELEASE} AS builder-go
+FROM golang:1.27-${DEBIAN_RELEASE} AS builder-go
 ARG TARGETARCH
 ARG UPX_VERSION
 ARG UPX_OS
