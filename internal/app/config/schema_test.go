@@ -109,6 +109,22 @@ storage {
 	)
 }
 
+func TestLoad_BadgerDbMemTableSizeTooSmall(t *testing.T) {
+	clearEnv(t)
+
+	path := filepath.Join(t.TempDir(), "config.hcl")
+	require.NoError(t, os.WriteFile(path, []byte(`
+storage {
+  backend "badgerdb" {
+    log_memtable_size = 6
+  }
+}
+`), 0600))
+
+	cfg := config.DefaultConfig()
+	require.ErrorContains(t, cfg.Load(path), "log memtable size must be at least 7 MB, got 6")
+}
+
 func TestDefaultConfig_IgnoresEnv(t *testing.T) {
 	clearEnv(t)
 	t.Setenv("FLOWG_HTTP_BIND_ADDRESS", ":1234")

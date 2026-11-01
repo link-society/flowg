@@ -136,6 +136,32 @@ type StorageBackendBadgerDbConfig struct {
 	ConfigMemTableSize int64 `hcl:"config_memtable_size,optional" default:"64" env:"FLOWG_BADGER_CONFIG_MEMTABLE_SIZE"`
 }
 
+// MinMemTableSize is the smallest memtable size, in MB, BadgerDB accepts: its
+// 1MB value threshold must be at most 15% of the memtable.
+const MinMemTableSize = 7
+
+// Validates the BadgerDB configuration, ensuring that every memtable size is at
+// least [MinMemTableSize].
+func (c *StorageBackendBadgerDbConfig) Validate() error {
+	for _, memtable := range []struct {
+		name string
+		size int64
+	}{
+		{"auth", c.AuthMemTableSize},
+		{"log", c.LogMemTableSize},
+		{"config", c.ConfigMemTableSize},
+	} {
+		if memtable.size < MinMemTableSize {
+			return fmt.Errorf(
+				"%s memtable size must be at least %d MB, got %d",
+				memtable.name, MinMemTableSize, memtable.size,
+			)
+		}
+	}
+
+	return nil
+}
+
 // Configuration for the FoundationDB storage backend, which is a distributed
 // key-value store.
 type StorageBackendFoundationDbConfig struct {
@@ -267,7 +293,7 @@ func (c *StorageBackendConfig) Validate() error {
 
 	switch {
 	case c.BadgerDB != nil:
-		return nil
+		return c.BadgerDB.Validate()
 
 	case c.FoundationDB != nil:
 		if c.FoundationDB.ClusterFile == "" && c.FoundationDB.ConnectionString == "" {
