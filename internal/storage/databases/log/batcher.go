@@ -86,26 +86,40 @@ func (s *Storage[QTx, MTx]) ingestBatch(ctx context.Context, batch []ingestReque
 }
 
 // storeBatch stores batch in one transaction, or in two halves, recursively,
-// when it is too large for one.
+// when it is too large for one. A record that fails is reported to its caller
+// alone, and the others are stored without it.
 func (s *Storage[QTx, MTx]) storeBatch(ctx context.Context, batch []ingestRequest) {
+	failed := -1
 	err := s.adapter.Update(ctx, func(txn MTx) error {
-		for _, req := range batch {
+		// reset, the adapter may run this function again on conflict
+		failed = -1
+		for i, req := range batch {
 			err := transactions.Ingest(s.logger, txn, req.stream, req.record, req.key, req.val, s.streamConfigOverride)
 			if err != nil {
+				failed = i
 				return err
 			}
 		}
 		return nil
 	})
 
-	if errors.Is(err, kv.ErrTxnTooLarge) && len(batch) > 1 {
+	switch {
+	case errors.Is(err, kv.ErrTxnTooLarge) && len(batch) > 1:
 		half := len(batch) / 2
 		s.storeBatch(ctx, batch[:half])
 		s.storeBatch(ctx, batch[half:])
-		return
-	}
 
-	for _, req := range batch {
-		req.replyTo <- err
+	case err != nil && failed >= 0 && len(batch) > 1:
+		batch[failed].replyTo <- err
+
+		rest := make([]ingestRequest, 0, len(batch)-1)
+		rest = append(rest, batch[:failed]...)
+		rest = append(rest, batch[failed+1:]...)
+		s.storeBatch(ctx, rest)
+
+	default:
+		for _, req := range batch {
+			req.replyTo <- err
+		}
 	}
 }
