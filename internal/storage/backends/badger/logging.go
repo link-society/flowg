@@ -1,6 +1,7 @@
 package badger
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"strings"
@@ -37,6 +38,11 @@ func (l *badgerLogger) Infof(format string, v ...interface{}) {
 }
 
 func (l *badgerLogger) Debugf(format string, v ...interface{}) {
+	// BadgerDB logs at debug level on every write, skip formatting when disabled
+	if !l.logger.Enabled(context.Background(), slog.LevelDebug) {
+		return
+	}
+
 	content := fmt.Sprintf(format, v...)
 	lines := strings.FieldsFunc(content, func(c rune) bool { return c == '\n' || c == '\r' })
 	for _, line := range lines {
