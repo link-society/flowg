@@ -84,7 +84,9 @@ def test_stress(limits, flowg_stress_container, flowg_stress_token, flowg_stress
     accepted = statuses.get("200", 0)
     failed = sum(statuses.values()) - accepted + sum(report["errorDistribution"].values())
     achieved = accepted * RECORDS_PER_REQUEST / report["summary"]["total"]
-    fits = state["Running"] and not state["OOMKilled"] and failed == 0
+    # oha's total duration includes the wait for in-flight requests, allow 1% for it
+    reached = achieved >= TARGET_RECORDS_PER_SECOND * 0.99
+    fits = state["Running"] and not state["OOMKilled"] and failed == 0 and reached
 
     print(f"{limits.name}: {achieved:.0f} records/s, fits={fits}")
 
