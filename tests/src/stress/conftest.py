@@ -8,7 +8,12 @@ from .._lib import flowg_utils
 
 
 @pytest.fixture()
-def flowg_stress_container(limits, docker_client, flowg_network, flowg_image, report_dir):
+def flowg_stress_environment():
+    return {}
+
+
+@pytest.fixture()
+def flowg_stress_container(limits, docker_client, flowg_network, flowg_image, report_dir, flowg_stress_environment):
     name = "test-flowg-stress"
 
     with flowg_utils.volume(docker_client, name=name) as volume:
@@ -23,6 +28,7 @@ def flowg_stress_container(limits, docker_client, flowg_network, flowg_image, re
                 "FLOWG_BADGER_LOG_MEMTABLE_SIZE": str(limits.memtable_size),
                 "FLOWG_BADGER_CONFIG_MEMTABLE_SIZE": str(limits.memtable_size),
                 "GOMEMLIMIT": limits.go_mem_limit,
+                **flowg_stress_environment,
             },
             ports={
                 "5080/tcp": 5080,
