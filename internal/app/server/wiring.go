@@ -86,6 +86,7 @@ func badgerDbModules() fx.Option {
 func provideBadgerAuthOptions(cfg *config.RootConfig) badgerauth.Options {
 	opts := badgerauth.DefaultOptions()
 	opts.Directory = cfg.Storage.Backend.BadgerDB.AuthDir
+	opts.MemTableSize = cfg.Storage.Backend.BadgerDB.AuthMemTableSize << 20
 	return opts
 }
 
@@ -94,6 +95,7 @@ func provideBadgerAuthOptions(cfg *config.RootConfig) badgerauth.Options {
 func provideBadgerConfigOptions(cfg *config.RootConfig) badgerconfig.Options {
 	opts := badgerconfig.DefaultOptions()
 	opts.Directory = cfg.Storage.Backend.BadgerDB.ConfigDir
+	opts.MemTableSize = cfg.Storage.Backend.BadgerDB.ConfigMemTableSize << 20
 	return opts
 }
 
@@ -102,6 +104,7 @@ func provideBadgerConfigOptions(cfg *config.RootConfig) badgerconfig.Options {
 func provideBadgerLogOptions(cfg *config.RootConfig, flags featureflags.Flags) badgerlog.Options {
 	opts := badgerlog.DefaultOptions()
 	opts.Directory = cfg.Storage.Backend.BadgerDB.LogDir
+	opts.MemTableSize = cfg.Storage.Backend.BadgerDB.LogMemTableSize << 20
 	opts.StreamConfigOverride = streamConfigOverride(flags)
 	return opts
 }

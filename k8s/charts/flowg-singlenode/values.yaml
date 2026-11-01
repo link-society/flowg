@@ -13,6 +13,12 @@ flowg:
     logging:
       verbose: "True"
       level: "info"
+    # BadgerDB memtable sizes, in MB (default: 64, minimum: 7)
+    # BadgerDB keeps up to 5 memtables per database, lower them for small memory limits
+    badger:
+    # authMemtableSize: "64"
+    # logMemtableSize: "64"
+    # configMemtableSize: "64"
     # The 'seed' functionnality creates a first user (default: root, pw: root)
     # And populates the database with an example dataset, then optionnally changes the credentials.
     # This requires you to add a secret in the same namespace as FlowG, with:

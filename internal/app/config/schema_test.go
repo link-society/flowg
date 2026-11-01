@@ -53,9 +53,12 @@ storage {
 	require.Equal(
 		t,
 		&config.StorageBackendBadgerDbConfig{
-			AuthDir:   "/tmp/flowg/auth",
-			ConfigDir: "/tmp/flowg/config",
-			LogDir:    "/tmp/flowg/logs",
+			AuthDir:            "/tmp/flowg/auth",
+			ConfigDir:          "/tmp/flowg/config",
+			LogDir:             "/tmp/flowg/logs",
+			AuthMemTableSize:   64,
+			LogMemTableSize:    64,
+			ConfigMemTableSize: 64,
 		},
 		cfg.Storage.Backend.BadgerDB,
 	)

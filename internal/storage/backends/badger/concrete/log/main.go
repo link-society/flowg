@@ -19,11 +19,12 @@ import (
 
 // Options configures the badger-backed log storage.
 type Options struct {
-	Directory  string
-	InMemory   bool
-	ReadOnly   bool
-	GCInterval time.Duration
-	BatchSize  int
+	Directory    string
+	InMemory     bool
+	ReadOnly     bool
+	MemTableSize int64
+	GCInterval   time.Duration
+	BatchSize    int
 	// StreamConfigOverride, when not nil, is used as the configuration of every
 	// stream instead of the stored one.
 	StreamConfigOverride *models.StreamConfig
@@ -50,9 +51,10 @@ func DefaultOptions() Options {
 // adapterOptions returns the options of the underlying badger adapter.
 func (o Options) adapterOptions() badger.AdapterOptions {
 	return badger.AdapterOptions{
-		Directory: o.Directory,
-		InMemory:  o.InMemory,
-		ReadOnly:  o.ReadOnly,
+		Directory:    o.Directory,
+		InMemory:     o.InMemory,
+		ReadOnly:     o.ReadOnly,
+		MemTableSize: o.MemTableSize,
 	}
 }
 

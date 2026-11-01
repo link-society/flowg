@@ -13,9 +13,10 @@ import (
 
 // Options configures the badger-backed authentication storage.
 type Options struct {
-	Directory string
-	InMemory  bool
-	ReadOnly  bool
+	Directory    string
+	InMemory     bool
+	ReadOnly     bool
+	MemTableSize int64
 }
 
 type deps struct {
@@ -36,9 +37,10 @@ func DefaultOptions() Options {
 // adapterOptions returns the options of the underlying badger adapter.
 func (o Options) adapterOptions() badger.AdapterOptions {
 	return badger.AdapterOptions{
-		Directory: o.Directory,
-		InMemory:  o.InMemory,
-		ReadOnly:  o.ReadOnly,
+		Directory:    o.Directory,
+		InMemory:     o.InMemory,
+		ReadOnly:     o.ReadOnly,
+		MemTableSize: o.MemTableSize,
 	}
 }
 
