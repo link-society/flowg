@@ -27,6 +27,9 @@ type AdapterOptions struct {
 	// MemTableSize is the size in bytes of each memtable; 0 keeps BadgerDB's
 	// default (64MB).
 	MemTableSize int64
+	// NumMemtables is the number of memtables kept in memory; 0 keeps
+	// BadgerDB's default (5).
+	NumMemtables int
 }
 
 // BadgerAdapter is a [kv.Adapter] backed by BadgerDB. All database access goes
@@ -74,6 +77,10 @@ func NewAdapter[O any](logChannel string, adapterOptions func(O) AdapterOptions)
 
 		if opts.MemTableSize > 0 {
 			dbOpts = dbOpts.WithMemTableSize(opts.MemTableSize)
+		}
+
+		if opts.NumMemtables > 0 {
+			dbOpts = dbOpts.WithNumMemtables(opts.NumMemtables)
 		}
 
 		db, err := badger.Open(dbOpts)

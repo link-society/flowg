@@ -130,10 +130,15 @@ type StorageBackendBadgerDbConfig struct {
 	LogDir    string `hcl:"log_dir,optional" default:"./data/logs" env:"FLOWG_BADGER_LOG_DIR"`
 	ConfigDir string `hcl:"config_dir,optional" default:"./data/config" env:"FLOWG_BADGER_CONFIG_DIR"`
 
-	// Memtable sizes, in MB; BadgerDB keeps up to 5 memtables per database.
+	// Memtable sizes, in MB, and number of memtables kept in memory, per
+	// database.
 	AuthMemTableSize   int64 `hcl:"auth_memtable_size,optional" default:"64" env:"FLOWG_BADGER_AUTH_MEMTABLE_SIZE"`
 	LogMemTableSize    int64 `hcl:"log_memtable_size,optional" default:"64" env:"FLOWG_BADGER_LOG_MEMTABLE_SIZE"`
 	ConfigMemTableSize int64 `hcl:"config_memtable_size,optional" default:"64" env:"FLOWG_BADGER_CONFIG_MEMTABLE_SIZE"`
+
+	AuthMemTablesCount   int64 `hcl:"auth_memtables_count,optional" default:"5" env:"FLOWG_BADGER_AUTH_MEMTABLES_COUNT"`
+	LogMemTablesCount    int64 `hcl:"log_memtables_count,optional" default:"5" env:"FLOWG_BADGER_LOG_MEMTABLES_COUNT"`
+	ConfigMemTablesCount int64 `hcl:"config_memtables_count,optional" default:"5" env:"FLOWG_BADGER_CONFIG_MEMTABLES_COUNT"`
 }
 
 // MinMemTableSize is the smallest memtable size, in MB, BadgerDB accepts: its
@@ -141,21 +146,26 @@ type StorageBackendBadgerDbConfig struct {
 const MinMemTableSize = 7
 
 // Validates the BadgerDB configuration, ensuring that every memtable size is at
-// least [MinMemTableSize].
+// least [MinMemTableSize] and that every database has at least one memtable.
 func (c *StorageBackendBadgerDbConfig) Validate() error {
-	for _, memtable := range []struct {
-		name string
-		size int64
+	for _, db := range []struct {
+		name  string
+		size  int64
+		count int64
 	}{
-		{"auth", c.AuthMemTableSize},
-		{"log", c.LogMemTableSize},
-		{"config", c.ConfigMemTableSize},
+		{"auth", c.AuthMemTableSize, c.AuthMemTablesCount},
+		{"log", c.LogMemTableSize, c.LogMemTablesCount},
+		{"config", c.ConfigMemTableSize, c.ConfigMemTablesCount},
 	} {
-		if memtable.size < MinMemTableSize {
+		if db.size < MinMemTableSize {
 			return fmt.Errorf(
 				"%s memtable size must be at least %d MB, got %d",
-				memtable.name, MinMemTableSize, memtable.size,
+				db.name, MinMemTableSize, db.size,
 			)
+		}
+
+		if db.count < 1 {
+			return fmt.Errorf("%s memtables count must be at least 1, got %d", db.name, db.count)
 		}
 	}
 

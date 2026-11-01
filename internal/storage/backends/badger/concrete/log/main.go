@@ -23,6 +23,7 @@ type Options struct {
 	InMemory     bool
 	ReadOnly     bool
 	MemTableSize int64
+	NumMemtables int
 	GCInterval   time.Duration
 	BatchSize    int
 	// StreamConfigOverride, when not nil, is used as the configuration of every
@@ -55,6 +56,7 @@ func (o Options) adapterOptions() badger.AdapterOptions {
 		InMemory:     o.InMemory,
 		ReadOnly:     o.ReadOnly,
 		MemTableSize: o.MemTableSize,
+		NumMemtables: o.NumMemtables,
 	}
 }
 

@@ -439,12 +439,15 @@ func TestLoad_StorageBackendPrecedence(t *testing.T) {
 		require.Equal(
 			t,
 			&config.StorageBackendBadgerDbConfig{
-				AuthDir:            "./data/auth",
-				LogDir:             "/env/logs",
-				ConfigDir:          "./data/config",
-				AuthMemTableSize:   64,
-				LogMemTableSize:    64,
-				ConfigMemTableSize: 64,
+				AuthDir:              "./data/auth",
+				LogDir:               "/env/logs",
+				ConfigDir:            "./data/config",
+				AuthMemTableSize:     64,
+				LogMemTableSize:      64,
+				ConfigMemTableSize:   64,
+				AuthMemTablesCount:   5,
+				LogMemTablesCount:    5,
+				ConfigMemTablesCount: 5,
 			},
 			cfg.Storage.Backend.BadgerDB,
 		)

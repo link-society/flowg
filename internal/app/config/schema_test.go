@@ -53,12 +53,15 @@ storage {
 	require.Equal(
 		t,
 		&config.StorageBackendBadgerDbConfig{
-			AuthDir:            "/tmp/flowg/auth",
-			ConfigDir:          "/tmp/flowg/config",
-			LogDir:             "/tmp/flowg/logs",
-			AuthMemTableSize:   64,
-			LogMemTableSize:    64,
-			ConfigMemTableSize: 64,
+			AuthDir:              "/tmp/flowg/auth",
+			ConfigDir:            "/tmp/flowg/config",
+			LogDir:               "/tmp/flowg/logs",
+			AuthMemTableSize:     64,
+			LogMemTableSize:      64,
+			ConfigMemTableSize:   64,
+			AuthMemTablesCount:   5,
+			LogMemTablesCount:    5,
+			ConfigMemTablesCount: 5,
 		},
 		cfg.Storage.Backend.BadgerDB,
 	)
@@ -123,6 +126,14 @@ storage {
 
 	cfg := config.DefaultConfig()
 	require.ErrorContains(t, cfg.Load(path), "log memtable size must be at least 7 MB, got 6")
+}
+
+func TestLoad_BadgerDbMemTablesCountTooSmall(t *testing.T) {
+	clearEnv(t)
+	t.Setenv("FLOWG_BADGER_LOG_MEMTABLES_COUNT", "0")
+
+	cfg := config.DefaultConfig()
+	require.ErrorContains(t, cfg.Load(""), "log memtables count must be at least 1, got 0")
 }
 
 func TestDefaultConfig_IgnoresEnv(t *testing.T) {
