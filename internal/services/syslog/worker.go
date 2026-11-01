@@ -27,8 +27,8 @@ var _ actor.Worker = (*worker)(nil)
 
 // DoWork handles one received syslog message: it enforces the configured
 // allowed-origin list (exact IPs or CIDR ranges), then runs the message through
-// every pipeline's syslog entrypoint, one after the other, logging but not
-// aborting on per-pipeline errors.
+// every running pipeline's syslog entrypoint, one after the other, logging but
+// not aborting on per-pipeline errors.
 func (w *worker) DoWork(ctx actor.Context) actor.WorkerStatus {
 	select {
 	case <-ctx.Done():
@@ -82,17 +82,7 @@ func (w *worker) DoWork(ctx actor.Context) actor.WorkerStatus {
 			}
 		}
 
-		pipelineNames, err := w.configStorage.ListPipelines(ctx)
-		if err != nil {
-			w.logger.ErrorContext(
-				ctx,
-				"Failed to list pipelines",
-				slog.String("error", err.Error()),
-			)
-			return actor.WorkerContinue
-		}
-
-		for _, pipelineName := range pipelineNames {
+		for _, pipelineName := range w.pipelineRunner.RunningPipelines() {
 			record := parseLogParts(logParts)
 
 			err := w.pipelineRunner.Process(

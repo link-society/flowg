@@ -6,6 +6,7 @@ import (
 	"log/slog"
 
 	"errors"
+	"slices"
 	"time"
 
 	"go.uber.org/fx"
@@ -106,6 +107,52 @@ func TestRunner_StorageDrivenLifecycle(t *testing.T) {
 	}
 	waitFor(t, 5*time.Second, func() bool {
 		return errors.As(process(), &notFound)
+	})
+}
+
+func TestRunner_RunningPipelines(t *testing.T) {
+	configOpts := badgerconfig.DefaultOptions()
+	configOpts.InMemory = true
+	logOpts := badgerlog.DefaultOptions()
+	logOpts.InMemory = true
+
+	var (
+		runner        Runner
+		configStorage storage.ConfigStorage
+	)
+
+	app := fxtest.New(
+		t,
+		fx.Supply(slog.New(slog.DiscardHandler)),
+		fx.Options(testRunnerModules(configOpts, logOpts)...),
+		fx.Populate(&runner, &configStorage),
+	)
+	app.RequireStart()
+	defer app.RequireStop()
+
+	ctx := t.Context()
+
+	running := func() []string {
+		names := runner.RunningPipelines()
+		slices.Sort(names)
+		return names
+	}
+
+	if err := configStorage.WriteRawPipeline(ctx, "a", rawTestPipeline); err != nil {
+		t.Fatalf("failed to write pipeline: %v", err)
+	}
+	if err := configStorage.WriteRawPipeline(ctx, "b", rawTestPipeline); err != nil {
+		t.Fatalf("failed to write pipeline: %v", err)
+	}
+	waitFor(t, 5*time.Second, func() bool {
+		return slices.Equal(running(), []string{"a", "b"})
+	})
+
+	if err := configStorage.DeletePipeline(ctx, "a"); err != nil {
+		t.Fatalf("failed to delete pipeline: %v", err)
+	}
+	waitFor(t, 5*time.Second, func() bool {
+		return slices.Equal(running(), []string{"b"})
 	})
 }
 

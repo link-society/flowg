@@ -32,11 +32,14 @@ type Runner interface {
 	// Process pushes a record through pipelineName, starting at entrypoint (e.g.
 	// "direct" or "syslog"), and blocks until processing completes.
 	Process(ctx context.Context, pipelineName string, entrypoint string, record *models.LogRecord) error
+	// RunningPipelines returns the names of the running pipelines.
+	RunningPipelines() []string
 	// ScrapMetrics forwards a request to scrap metrics from a pipeline.
 	ScrapMetrics(ctx context.Context, pipelineName string, w io.Writer) error
 }
 
 type runnerImpl struct {
+	w       *worker
 	mbox    actor.MailboxSender[message]
 	logMbox actor.MailboxSender[logMessage]
 }
@@ -114,7 +117,7 @@ func NewRunner() fx.Option {
 			}
 			all := actor.Combine(actors...).Build()
 
-			runner := &runnerImpl{mbox: mbox, logMbox: logMbox}
+			runner := &runnerImpl{w: w, mbox: mbox, logMbox: logMbox}
 
 			lc.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {
@@ -252,6 +255,19 @@ func (r *runnerImpl) Process(
 	case <-ctx.Done():
 		return ctx.Err()
 	}
+}
+
+// RunningPipelines implements [Runner].
+func (r *runnerImpl) RunningPipelines() []string {
+	r.w.cacheMu.Lock()
+	defer r.w.cacheMu.Unlock()
+
+	names := make([]string, 0, len(r.w.cache))
+	for name := range r.w.cache {
+		names = append(names, name)
+	}
+
+	return names
 }
 
 // ScrapMetrics sends a request to the actor to scrap metrics from a pipeline.
