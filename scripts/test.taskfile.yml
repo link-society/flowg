@@ -43,6 +43,16 @@ tasks:
       FLOWG_TEST_SUITES: bench
       FLOWG_TEST_DOCKER_IMAGE_NAME: linksociety/flowg:localdev
 
+  stress:
+    desc: "Run stress tests (requires task docker:build:debug)"
+    dir: ./tests
+    cmds:
+      - pdm install
+      - pdm run pytest
+    env:
+      FLOWG_TEST_SUITES: stress
+      FLOWG_TEST_DOCKER_IMAGE_NAME: linksociety/flowg:localdev-debug
+
   "e2e:cluster":
     desc: "Run Cluster end-to-end tests"
     dir: ./tests
