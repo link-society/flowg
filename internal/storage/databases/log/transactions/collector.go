@@ -15,10 +15,10 @@ import (
 // secondary data that makes it queryable. It writes val, the encoded record,
 // under its "entry:<stream>:..." key with the stream's retention TTL, registers
 // each of its fields in the stream's field set ("stream:field:<stream>:<field>"),
-// and, for every field the stream is configured to index, adds an inverted-index
-// key pointing back at the record. When override is not nil, it is used as the
-// stream's configuration (see [GetOrCreateStreamConfig]). Field values too
-// large to be indexed are skipped, with a warning logged through logger.
+// and, for every field streamConfig indexes, adds an inverted-index key pointing
+// back at the record. streamConfig is the stream's configuration, as returned
+// by [GetOrCreateStreamConfig] in the same transaction. Field values too large
+// to be indexed are skipped, with a warning logged through logger.
 func Ingest(
 	logger *slog.Logger,
 	txn kv.MutationTx,
@@ -26,13 +26,9 @@ func Ingest(
 	logRecord *models.LogRecord,
 	key kv.Key,
 	val []byte,
-	override *models.StreamConfig,
+	streamConfig models.StreamConfig,
 ) error {
-	streamConfig, err := GetOrCreateStreamConfig(txn, stream, override)
-	if err != nil {
-		return err
-	}
-
+	var err error
 	if streamConfig.RetentionTime > 0 {
 		ttl := time.Duration(streamConfig.RetentionTime) * time.Second
 		err = txn.SetWithTTL(key, val, ttl)

@@ -93,8 +93,21 @@ func (s *Storage[QTx, MTx]) storeBatch(ctx context.Context, batch []ingestReques
 	err := s.adapter.Update(ctx, func(txn MTx) error {
 		// reset, the adapter may run this function again on conflict
 		failed = -1
+		configs := map[string]models.StreamConfig{}
+
 		for i, req := range batch {
-			err := transactions.Ingest(s.logger, txn, req.stream, req.record, req.key, req.val, s.streamConfigOverride)
+			config, ok := configs[req.stream]
+			if !ok {
+				var err error
+				config, err = transactions.GetOrCreateStreamConfig(txn, req.stream, s.streamConfigOverride)
+				if err != nil {
+					// not this record's fault, every caller gets the error
+					return err
+				}
+				configs[req.stream] = config
+			}
+
+			err := transactions.Ingest(s.logger, txn, req.stream, req.record, req.key, req.val, config)
 			if err != nil {
 				failed = i
 				return err
