@@ -51,6 +51,7 @@ def test_stress(limits, flowg_stress_container, flowg_stress_token, flowg_stress
     profile_dir.mkdir()
 
     body = json.dumps({"records": [RECORD] * RECORDS_PER_REQUEST})
+    cpu_usage_before = read_cpu_usage(flowg_stress_container)
 
     load = subprocess.Popen(
         [
@@ -72,13 +73,19 @@ def test_stress(limits, flowg_stress_container, flowg_stress_token, flowg_stress
 
     save_profile(f"profile?seconds={PROFILE_SECONDS}", profile_dir / "cpu.pb.gz")
     stdout, _ = load.communicate()
+
+    flowg_stress_container.reload()
+    state = flowg_stress_container.attrs["State"]
+
+    if state["Running"]:
+        cpu_seconds = round((read_cpu_usage(flowg_stress_container) - cpu_usage_before) / 1e9, 1)
+    else:
+        cpu_seconds = None
+
     save_profile("heap", profile_dir / "heap.pb.gz")
 
     assert load.returncode == 0
     report = json.loads(stdout)
-
-    flowg_stress_container.reload()
-    state = flowg_stress_container.attrs["State"]
 
     statuses = report["statusCodeDistribution"]
     accepted = statuses.get("200", 0)
@@ -107,6 +114,7 @@ def test_stress(limits, flowg_stress_container, flowg_stress_token, flowg_stress
                 "oom_killed",
                 "failed_requests",
                 "memory_peak_mb",
+                "cpu_seconds",
             ])
 
         writer.writerow([
@@ -118,7 +126,13 @@ def test_stress(limits, flowg_stress_container, flowg_stress_token, flowg_stress
             state["OOMKilled"],
             failed,
             memory_peak,
+            cpu_seconds,
         ])
+
+
+def read_cpu_usage(container):
+    stats = container.stats(stream=False, one_shot=True)
+    return stats["cpu_stats"]["cpu_usage"]["total_usage"]
 
 
 def read_memory_peak(docker_client, container):
