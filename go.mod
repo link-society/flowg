@@ -1,6 +1,6 @@
 module go.link-society.com/flowg
 
-go 1.26.0
+go 1.27.0
 
 require (
 	cloud.google.com/go/logging v1.21.0

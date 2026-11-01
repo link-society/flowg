@@ -86,7 +86,7 @@ Summary:
 
 **Requirements:**
 
- - Go 1.22+
+ - Go 1.27+
  - C Toolchain
  - Rust and Cargo (edition 2021)
  - NodeJS
@@ -144,15 +144,15 @@ helm install flowg ./k8s/charts/flowg-singlenode -n flowg-system --create-namesp
 
 - **Multi-node version**: *FoundationDB, Deployment with $n$ replicas*, for larger and clusters on multiple nodes
 
-```bash 
+```bash
 helm install flowg ./k8s/charts/flowg-multinode -n flowg-system --create-namespace --set flowg.replicas=2
-``` 
+```
 
 - **Multi-node + Observability stack**, *FoundationDB, Deployment, Fluentd Daemonset*
 
 ```bash
 helm install flowg ./k8s/charts/flowg-observability -n flowg-system --create-namespace --set flowg.replicas=2
-``` 
+```
 
 
 ## :memo: License
