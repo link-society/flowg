@@ -16,7 +16,20 @@ import (
 const keySeparator = "\x1b"
 
 func keyToBadger(key kv.Key) []byte {
-	return []byte(strings.Join(key, keySeparator))
+	size := len(keySeparator) * max(len(key)-1, 0)
+	for _, segment := range key {
+		size += len(segment)
+	}
+
+	bkey := make([]byte, 0, size)
+	for i, segment := range key {
+		if i > 0 {
+			bkey = append(bkey, keySeparator...)
+		}
+		bkey = append(bkey, segment...)
+	}
+
+	return bkey
 }
 
 // keyToBadgerPrefix returns the encoded key followed by a trailing separator, so
