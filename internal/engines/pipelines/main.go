@@ -37,8 +37,12 @@ type Runner interface {
 }
 
 type runnerImpl struct {
-	mbox actor.MailboxSender[message]
+	mbox    actor.MailboxSender[message]
+	logMbox actor.MailboxSender[logMessage]
 }
+
+// logWorkerCount bounds the number of records processed concurrently.
+const logWorkerCount = 64
 
 type deps struct {
 	fx.In
@@ -52,9 +56,10 @@ type deps struct {
 
 var _ Runner = (*runnerImpl)(nil)
 
-// NewRunner returns an fx module providing a Runner backed by a single actor.
-// The actor owns the pipeline build cache; on shutdown every cached build is
-// invalidated (closing forwarders and transformers) before the actor stops.
+// NewRunner returns an fx module providing a Runner backed by an actor owning
+// the pipeline build cache, and a fixed pool of workers processing records.
+// On shutdown every cached build is invalidated (closing forwarders and
+// transformers) before the actors stop.
 func NewRunner() fx.Option {
 	return fx.Module(
 		"pipelineRunner",
@@ -85,8 +90,31 @@ func NewRunner() fx.Option {
 				cache:   make(map[string]*Pipeline),
 				cacheMu: sync.Mutex{},
 			}
-			a := actor.New(w)
-			runner := &runnerImpl{mbox: mbox}
+
+			logMbox := actor.NewMailbox[logMessage]()
+			logWorker := actor.NewWorker(func(ctx actor.Context) actor.WorkerStatus {
+				select {
+				case <-ctx.Done():
+					return actor.WorkerEnd
+
+				case msg, ok := <-logMbox.ReceiveC():
+					if !ok {
+						return actor.WorkerEnd
+					}
+
+					msg.process(ctx, w)
+
+					return actor.WorkerContinue
+				}
+			})
+
+			actors := []actor.Actor{actor.New(w)}
+			for range logWorkerCount {
+				actors = append(actors, actor.New(logWorker))
+			}
+			all := actor.Combine(actors...).Build()
+
+			runner := &runnerImpl{mbox: mbox, logMbox: logMbox}
 
 			lc.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {
@@ -98,7 +126,8 @@ func NewRunner() fx.Option {
 					}
 					w.eventsC = events.ReceiveC()
 
-					a.Start()
+					logMbox.Start()
+					all.Start()
 
 					pipelines, err := d.ConfigStorage.ListPipelines(ctx)
 					if err != nil {
@@ -138,7 +167,8 @@ func NewRunner() fx.Option {
 						return fmt.Errorf("failed to close pipelines: %w", errors.Join(errs...))
 					}
 
-					a.Stop()
+					all.Stop()
+					logMbox.Stop()
 
 					return nil
 				},
@@ -203,7 +233,7 @@ func (r *runnerImpl) Process(
 ) error {
 	replyTo := make(chan error, 1)
 
-	err := r.mbox.Send(ctx, logMessage{
+	err := r.logMbox.Send(ctx, logMessage{
 		replyTo: replyTo,
 
 		pipelineName: pipelineName,
