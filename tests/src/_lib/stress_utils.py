@@ -55,15 +55,19 @@ def read_cpu_usage(container):
 
 
 def read_memory_peak(docker_client, container):
-    # the flowg image has no shell, read its cgroup from a sidecar sharing its PID namespace
-    out = docker_client.containers.run(
+    peak = read_from_sidecar(docker_client, container, "/proc/1/root/sys/fs/cgroup/memory.peak")
+    return int(peak) // 2**20
+
+
+def read_from_sidecar(docker_client, container, path):
+    # the flowg image has no shell, read from a sidecar sharing its PID namespace, flowg being PID 1
+    return docker_client.containers.run(
         "busybox",
-        ["cat", "/proc/1/root/sys/fs/cgroup/memory.peak"],
+        ["cat", path],
         pid_mode=f"container:{container.id}",
         cap_add=["SYS_PTRACE"],
         remove=True,
-    )
-    return int(out) // 2**20
+    ).decode()
 
 
 def save_profile(query, path):
