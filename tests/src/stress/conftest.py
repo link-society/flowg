@@ -22,6 +22,7 @@ def flowg_stress_container(limits, docker_client, flowg_network, flowg_image, re
                 "FLOWG_BADGER_AUTH_MEMTABLE_SIZE": str(limits.memtable_size),
                 "FLOWG_BADGER_LOG_MEMTABLE_SIZE": str(limits.memtable_size),
                 "FLOWG_BADGER_CONFIG_MEMTABLE_SIZE": str(limits.memtable_size),
+                "GOMEMLIMIT": limits.go_mem_limit,
             },
             ports={
                 "5080/tcp": 5080,

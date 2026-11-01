@@ -15,16 +15,18 @@ class Limits:
     nano_cpus: int
     memory: str
     memtable_size: int
+    go_mem_limit: str
 
 
-# Container sizes, the smallest being the single-node target on Kubernetes
+# Container sizes, the smallest being the single-node target on Kubernetes.
+# GOMEMLIMIT is about 80% of the memory limit, leaving room for VRL and mmap
 LIMITS = [
-    Limits("128m-256MB", 128_000_000, "256m", 8),
-    Limits("256m-512MB", 256_000_000, "512m", 16),
-    Limits("512m-1024MB", 512_000_000, "1024m", 32),
-    Limits("1000m-2048MB", 1_000_000_000, "2048m", 64),
+    Limits("128m-256MB", 128_000_000, "256m", 8, "200MiB"),
+    Limits("256m-512MB", 256_000_000, "512m", 16, "400MiB"),
+    Limits("512m-1024MB", 512_000_000, "1024m", 32, "800MiB"),
+    Limits("1000m-2048MB", 1_000_000_000, "2048m", 64, "1600MiB"),
     # default memtable size, to compare with the tuned one above
-    Limits("512m-1024MB-memtable64", 512_000_000, "1024m", 64),
+    Limits("512m-1024MB-memtable64", 512_000_000, "1024m", 64, "800MiB"),
 ]
 
 RECORD = {
