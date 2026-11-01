@@ -2,9 +2,11 @@ package log
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log/slog"
 
+	"encoding/json"
 	"time"
 
 	"go.link-society.com/flowg/pkg/models"
@@ -323,8 +325,13 @@ func (s *Storage[QTx, MTx]) Distinct(ctx context.Context, stream string) (map[st
 // Ingest implements [storage.LogStorage].
 func (s *Storage[QTx, MTx]) Ingest(ctx context.Context, stream string, logRecord *models.LogRecord) (kv.Key, error) {
 	key := newDbKey(stream, logRecord)
-	err := s.adapter.Update(ctx, func(txn MTx) error {
-		return transactions.Ingest(s.logger, txn, stream, logRecord, key, s.streamConfigOverride)
+	val, err := json.Marshal(logRecord)
+	if err != nil {
+		return nil, fmt.Errorf("could not marshal log entry: %w", err)
+	}
+
+	err = s.adapter.Update(ctx, func(txn MTx) error {
+		return transactions.Ingest(s.logger, txn, stream, logRecord, key, val, s.streamConfigOverride)
 	})
 	if err != nil {
 		return nil, err
