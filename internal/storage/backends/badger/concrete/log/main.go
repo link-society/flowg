@@ -69,14 +69,17 @@ func Module() fx.Option {
 			storage := log.NewStorage(d.Logger, d.Adapter, d.Options.BatchSize, d.Options.StreamConfigOverride)
 
 			gc := actor.New(log.NewGarbageCollector(storage, d.Options.GCInterval))
+			batcher := actor.New(log.NewIngestBatcher(storage))
 
 			lc.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {
+					batcher.Start()
 					gc.Start()
 					return nil
 				},
 				OnStop: func(ctx context.Context) error {
 					gc.Stop()
+					batcher.Stop()
 					return nil
 				},
 			})

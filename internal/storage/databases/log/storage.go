@@ -32,6 +32,9 @@ type Storage[QTx kv.QueryTx, MTx kv.MutationTx] struct {
 	adapter              kv.Adapter[QTx, MTx]
 	batchSize            int
 	streamConfigOverride *models.StreamConfig
+
+	// ingestC hands Ingest calls to the ingest batcher.
+	ingestC chan ingestRequest
 }
 
 var _ storage.LogStorage = (*Storage[kv.QueryTx, kv.MutationTx])(nil)
@@ -41,7 +44,8 @@ var _ storage.LogStorage = (*Storage[kv.QueryTx, kv.MutationTx])(nil)
 // touch per transaction; a value of zero or less uses [defaultBatchSize]. When
 // streamConfigOverride is not nil, it is used as the configuration of every
 // stream instead of the stored one (e.g. to enforce a short retention in demo
-// mode). It logs through a logger derived from rootLogger.
+// mode). It logs through a logger derived from rootLogger. Ingest calls only
+// complete while the worker returned by [NewIngestBatcher] runs.
 func NewStorage[QTx kv.QueryTx, MTx kv.MutationTx](
 	rootLogger *slog.Logger,
 	adapter kv.Adapter[QTx, MTx],
@@ -57,6 +61,7 @@ func NewStorage[QTx kv.QueryTx, MTx kv.MutationTx](
 		adapter:              adapter,
 		batchSize:            batchSize,
 		streamConfigOverride: streamConfigOverride,
+		ingestC:              make(chan ingestRequest),
 	}
 }
 
@@ -330,11 +335,29 @@ func (s *Storage[QTx, MTx]) Ingest(ctx context.Context, stream string, logRecord
 		return nil, fmt.Errorf("could not marshal log entry: %w", err)
 	}
 
-	err = s.adapter.Update(ctx, func(txn MTx) error {
-		return transactions.Ingest(s.logger, txn, stream, logRecord, key, val, s.streamConfigOverride)
-	})
-	if err != nil {
-		return nil, err
+	replyTo := make(chan error, 1)
+	req := ingestRequest{
+		ctx:     ctx,
+		stream:  stream,
+		record:  logRecord,
+		key:     key,
+		val:     val,
+		replyTo: replyTo,
+	}
+
+	select {
+	case s.ingestC <- req:
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+
+	select {
+	case err := <-replyTo:
+		if err != nil {
+			return nil, err
+		}
+	case <-ctx.Done():
+		return nil, ctx.Err()
 	}
 
 	return key, nil
