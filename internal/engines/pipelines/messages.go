@@ -31,6 +31,9 @@ type message interface {
 type logMessage struct {
 	replyTo chan<- error
 
+	// ctx is the caller's context: processing stops when the caller gives up.
+	ctx context.Context
+
 	pipelineName string
 	entrypoint   string
 	record       *models.LogRecord
@@ -68,10 +71,10 @@ type terminateMessage struct {
 
 // process runs on a log worker, outside the actor loop, so that slow records
 // do not delay pipeline lifecycle messages.
-func (msg logMessage) process(ctx context.Context, w *worker) {
+func (msg logMessage) process(w *worker) {
 	defer close(msg.replyTo)
 
-	ctx = context.WithValue(ctx, workerKey, w)
+	ctx := context.WithValue(msg.ctx, workerKey, w)
 
 	var pipeline *Pipeline
 	if msg.tracer != nil {
