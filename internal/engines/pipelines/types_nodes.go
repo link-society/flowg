@@ -98,6 +98,10 @@ var _ Node = (*MetricNode)(nil)
 // sendRecordToNextNodes processes a record through every successor concurrently
 // and joins their errors.
 func sendRecordToNextNodes(ctx context.Context, next []Node, record *models.LogRecord) error {
+	if len(next) == 1 {
+		return next[0].Process(ctx, record)
+	}
+
 	errC := make(chan error, len(next))
 	wg := sync.WaitGroup{}
 
