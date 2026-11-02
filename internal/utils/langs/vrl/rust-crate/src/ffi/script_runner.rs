@@ -25,14 +25,18 @@ pub struct compilation_result_err_variant {
 }
 
 
+/// Compiles a VRL script and returns a `compilation_result`.
+/// On success, the `ok` variant contains a handle to the compiled script runner.
+/// On failure, the `err` variant contains the reason for the compilation failure.
+///
+/// # Safety
+/// The caller must ensure that `c_source` is a valid null-terminated C string.
 #[no_mangle]
-pub extern "C" fn compile_script(
+pub unsafe extern "C" fn compile_script(
   c_source: *const c_char,
 ) -> compilation_result {
-  let source = unsafe {
-    assert!(!c_source.is_null());
-    CStr::from_ptr(c_source).to_string_lossy().into_owned()
-  };
+  assert!(!c_source.is_null());
+  let source = CStr::from_ptr(c_source).to_string_lossy().into_owned();
 
   match ScriptRunner::new(&source) {
     Ok(runner) => {
@@ -63,12 +67,15 @@ pub extern "C" fn compile_script(
   }
 }
 
+/// Drops a previously compiled script runner.
+///
+/// # Safety
+/// The caller must ensure that `this` is a valid handle returned by
+/// `compile_script` and has not been dropped already.
 #[no_mangle]
-pub extern "C" fn drop_script_runner(this: script_runner) {
+pub unsafe extern "C" fn drop_script_runner(this: script_runner) {
   if !this.is_null() {
-    unsafe {
-      let _ = Box::from_raw(this as *mut ScriptRunner);
-      // dropped automatically
-    }
+    let _ = Box::from_raw(this as *mut ScriptRunner);
+    // dropped automatically
   }
 }
