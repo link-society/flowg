@@ -22,7 +22,7 @@ impl ScriptRunner {
       Ok(compiled) => compiled.program,
       Err(diagnostics) => {
         return Err(anyhow::anyhow!("Failed to compile VRL script"))
-          .context(report::render_diagnostics(diagnostics, source))
+          .with_context(|| report::render_diagnostics(diagnostics, source))
       }
     };
 
@@ -50,7 +50,7 @@ impl ScriptRunner {
 
     if let Err(expression_error) = guard.program.resolve(&mut ctx) {
     return Err(anyhow::anyhow!("Failed to execute VRL script"))
-      .context(report::render_error(expression_error, &guard.source));
+      .with_context(|| report::render_error(expression_error, &guard.source));
     }
 
     Ok(target.value)
