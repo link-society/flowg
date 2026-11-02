@@ -18,14 +18,14 @@ const ProductionUsers = () => {
               <div
                 className={styles.carouselGroup}
                 key={copy}
-                aria-hidden={copy !== 0 ? true : undefined}
+                aria-hidden={copy === 0 ? undefined : true}
               >
                 {users.map((user) => (
                   <a
                     key={user.name}
                     href={user.href}
                     aria-label={user.name}
-                    tabIndex={copy !== 0 ? -1 : undefined}
+                    tabIndex={copy === 0 ? undefined : -1}
                   >
                     {user.logo}
                   </a>

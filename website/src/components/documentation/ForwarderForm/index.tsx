@@ -39,7 +39,7 @@ export type ForwarderFormProps = {
   fields: ForwarderFormField[]
 }
 
-function Tooltip({ text }: { text: string }) {
+function Tooltip({ text }: Readonly<{ text: string }>) {
   return (
     <span className={styles.tooltip}>
       <span className={styles.tooltipIcon}>?</span>
@@ -48,7 +48,7 @@ function Tooltip({ text }: { text: string }) {
   )
 }
 
-function Field({ spec }: { spec: ForwarderFormField }) {
+function Field({ spec }: Readonly<{ spec: ForwarderFormField }>) {
   if (spec.type === 'divider') {
     return <hr className={styles.divider} />
   }
@@ -179,7 +179,7 @@ function Field({ spec }: { spec: ForwarderFormField }) {
 export default function ForwarderForm({
   forwarderType,
   fields,
-}: ForwarderFormProps) {
+}: Readonly<ForwarderFormProps>) {
   return (
     <div className={styles.form}>
       <div className={`${styles.field} ${styles.fieldDisabled}`}>

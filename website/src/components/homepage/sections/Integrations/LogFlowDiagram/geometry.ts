@@ -34,7 +34,7 @@ export function eventFlowPath(source: number, lane: number, compact: boolean) {
     660 * scaleY
   )
   const firstStage = flowStages[0].y
-  const lastStage = flowStages[flowStages.length - 1].y
+  const lastStage = flowStages.at(-1)!.y
   const length =
     input.length + (lastStage - firstStage) * scaleY + output.length
   const distances = [
