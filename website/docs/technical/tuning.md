@@ -74,6 +74,33 @@ throughput. Prefer TCP when you cannot afford to lose logs.
 
 :::
 
+## BadgerDB
+
+For the BadgerDB storage backend, use the following memtable settings for each
+container size, based on the tuned profiles in the FlowG stress test suite:
+
+| CPU | RAM | Memtable size (MB) | Memtables count |
+| --- | --- | --- | --- |
+| 0.128 CPU | 256 MiB | 8 | 5 |
+| 0.256 CPU | 512 MiB | 16 | 5 |
+| 0.512 CPU | 1 GiB | 32 | 5 |
+| 1 CPU | 2 GiB | 64 | 5 |
+
+These values apply to **each** of the auth, config and log databases. The stress
+tests tune the memtable size for all three databases and keep the default count
+of 5. The default memtable size is 64 MB; reduce it for smaller containers as
+shown above. Memory used by memtables is roughly their size times their count,
+per database, in addition to the memory needed by the rest of FlowG.
+
+In the [configuration file](/docs/technical/configuration), set
+`auth_memtable_size`, `config_memtable_size` and `log_memtable_size` under
+`storage.backend "badgerdb"`. The corresponding count settings are
+`auth_memtables_count`, `config_memtables_count` and `log_memtables_count`.
+With the [single-node Helm chart](/docs/technical/helm), use
+`flowg.configuration.badger` with `authMemtableSize`, `configMemtableSize`,
+`logMemtableSize`, `authMemtablesCount`, `configMemtablesCount` and
+`logMemtablesCount`.
+
 ## Memory limit
 
 By default, the Go runtime does not know about the memory limit of the
