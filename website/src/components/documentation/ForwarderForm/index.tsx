@@ -63,7 +63,13 @@ function Field({ spec }: { spec: ForwarderFormField }) {
         <div className={`${styles.field} ${styles.dynamicField}`}>
           <span className={styles.label}>{spec.label}</span>
           <span className={styles.dynamicMode}>
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <svg
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
               <path d={icon} />
             </svg>
           </span>
@@ -92,7 +98,13 @@ function Field({ spec }: { spec: ForwarderFormField }) {
               <span className={styles.kvCellValue}>{value}</span>
             </div>
             <span className={`${styles.kvBtn} ${styles.kvBtnDelete}`}>
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+              <svg
+                viewBox="0 0 24 24"
+                width="18"
+                height="18"
+                fill="currentColor"
+                aria-hidden="true"
+              >
                 <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6zM19 4h-3.5l-1-1h-5l-1 1H5v2h14z" />
               </svg>
             </span>
@@ -106,7 +118,13 @@ function Field({ spec }: { spec: ForwarderFormField }) {
             <span className={styles.kvCellLabel}>{valueLabel}</span>
           </div>
           <span className={`${styles.kvBtn} ${styles.kvBtnAdd}`}>
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <svg
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              fill="currentColor"
+              aria-hidden="true"
+            >
               <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
             </svg>
           </span>
@@ -123,7 +141,13 @@ function Field({ spec }: { spec: ForwarderFormField }) {
           className={`${styles.checkbox} ${spec.checked ? styles.checkboxChecked : ''}`}
         >
           {spec.checked && (
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+            <svg
+              viewBox="0 0 24 24"
+              width="14"
+              height="14"
+              fill="currentColor"
+              aria-hidden="true"
+            >
               <path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
             </svg>
           )}
@@ -167,6 +191,7 @@ export default function ForwarderForm({
             width="20"
             height="20"
             fill="currentColor"
+            aria-hidden="true"
           >
             <path d={FORWARDER_ICON} />
           </svg>

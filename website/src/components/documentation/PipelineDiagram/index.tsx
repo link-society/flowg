@@ -126,7 +126,13 @@ export function PipelineNode({ type, value, label, style }: PipelineNodeProps) {
       )}
 
       <div className={styles.icon}>
-        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+        <svg
+          viewBox="0 0 24 24"
+          width="24"
+          height="24"
+          fill="currentColor"
+          aria-hidden="true"
+        >
           <path d={kind.icon} />
         </svg>
       </div>
@@ -228,7 +234,12 @@ export default function PipelineDiagram({
         className={styles.canvas}
         style={{ width, height, left: canvasLeft, top: canvasTop, transform: `scale(${scale})` }}
       >
-        <svg className={styles.edges} width={width} height={height}>
+        <svg
+          className={styles.edges}
+          width={width}
+          height={height}
+          aria-hidden="true"
+        >
           {edges.map(({ from, to }) => {
             const source = byId.get(from)
             const target = byId.get(to)
