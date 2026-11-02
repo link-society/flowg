@@ -245,8 +245,6 @@
   color: #fff;
 }
 
-/* ── Key-value field (mirrors InputKeyValue) ──────────────────────────────── */
-
 .kvField {
   flex-direction: column;
   align-items: stretch;
@@ -265,39 +263,6 @@
   flex-direction: column;
   gap: 8px;
   width: 100%;
-}
-
-.kvRow {
-  display: flex;
-  gap: 8px;
-}
-
-.kvCell {
-  position: relative;
-  flex: 1;
-  border: 1px solid var(--field-outline);
-  border-radius: 4px;
-  padding: 6px 10px;
-  min-height: 40px;
-  display: flex;
-  align-items: center;
-}
-
-.kvCellLabel {
-  position: absolute;
-  top: -8px;
-  left: 8px;
-  font-size: 0.6875rem;
-  line-height: 1;
-  color: var(--field-label);
-  background: var(--form-bg);
-  padding: 0 3px;
-}
-
-.kvCellValue {
-  font-size: 0.875rem;
-  color: var(--field-value);
-  font-family: var(--ifm-font-family-monospace);
 }
 
 /* ── Checkbox field ─────────────────────────────────────────────────────────── */
