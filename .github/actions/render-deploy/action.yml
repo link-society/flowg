@@ -19,5 +19,5 @@ outputs:
     description: Render deployment ID
 
 runs:
-  using: node24
+  using: node26
   main: index.js
