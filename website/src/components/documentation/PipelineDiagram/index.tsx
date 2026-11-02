@@ -105,7 +105,7 @@ type PipelineNodeProps = {
   style?: React.CSSProperties
 }
 
-export function PipelineNode({ type, value, label, style }: PipelineNodeProps) {
+export function PipelineNode({ type, value, label, style }: Readonly<PipelineNodeProps>) {
   const kind = KINDS[type]
 
   return (
@@ -189,7 +189,7 @@ export default function PipelineDiagram({
   edges = [],
   padding = 20,
   alt,
-}: PipelineDiagramProps) {
+}: Readonly<PipelineDiagramProps>) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [containerWidth, setContainerWidth] = useState(0)
 

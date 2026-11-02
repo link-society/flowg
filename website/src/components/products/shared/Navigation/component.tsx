@@ -12,7 +12,7 @@ const Navigation = ({ active }: NavigationProps) => {
   return (
     <nav className={styles.productNav} aria-label="Products">
       <div className={layoutStyles.shell}>
-        <Link to="/products" aria-current={!active ? 'page' : undefined}>
+        <Link to="/products" aria-current={active ? undefined : 'page'}>
           All products
         </Link>
         <div>

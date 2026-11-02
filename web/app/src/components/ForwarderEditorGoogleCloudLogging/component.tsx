@@ -39,7 +39,7 @@ const ForwarderEditorGoogleCloudLogging = ({
   const [log_id, setLogID] = useInput(config.log_id)
   const [disable_tls, setDisableTls] = useInput(config.disable_tls)
   const [disable_auth, setDisableAuth] = useInput(config.disable_auth)
-  const [auth_json, setAuthJson] = useState(config.auth_json)
+  const [authJson, setAuthJson] = useState(config.auth_json)
 
   const monaco = useMonaco()
   const { mode } = useColorMode()
@@ -68,10 +68,10 @@ const ForwarderEditorGoogleCloudLogging = ({
         log_id: log_id.value,
         disable_auth: disable_auth.value,
         disable_tls: disable_tls.value,
-        auth_json,
+        auth_json: authJson,
       })
     }
-  }, [host, port, project_id, log_id, disable_auth, disable_tls, auth_json])
+  }, [host, port, project_id, log_id, disable_auth, disable_tls, authJson])
 
   return (
     <ForwarderEditorGoogleCloudLoggingRoot id="container:editor.forwarders.googlelog">
@@ -164,7 +164,7 @@ const ForwarderEditorGoogleCloudLogging = ({
           </ForwarderEditorGoogleCloudLoggingJsonLabel>
 
           <Editor
-            defaultValue={auth_json}
+            defaultValue={authJson}
             defaultLanguage="json"
             height="10rem"
             theme={mode === 'dark' ? 'vrl-theme-dark' : 'vrl-theme-light'}
