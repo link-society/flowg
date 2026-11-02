@@ -90,7 +90,7 @@ const EventFlow = ({ compact = false }: EventFlowProps) => {
                 key={`${source}-${kind.name}`}
                 data-source={source}
                 data-kind={kind.name}
-                data-delay={-parseFloat(begin)}
+                data-delay={-Number.parseFloat(begin)}
               >
                 <animateMotion
                   {...timing}
