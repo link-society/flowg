@@ -8,12 +8,12 @@
   background: var(--fg-dark);
 }
 .support h2 span {
-  color: #8ab8ff !important;
-  background: none !important;
-  -webkit-text-fill-color: currentColor !important;
+  color: #8ab8ff;
+  background: none;
+  -webkit-text-fill-color: currentColor;
 }
 .eyebrow {
-  color: #8ab8ff !important;
+  color: #8ab8ff;
 }
 .flowArt {
   top: 0;
@@ -52,10 +52,10 @@
   border: 1px solid #ffffff1c;
 }
 .pillars h3 {
-  font-size: 17px !important;
+  font-size: 17px;
 }
 .pillars p {
-  margin-top: 5px !important;
+  margin-top: 5px;
   color: var(--fg-muted);
   font-size: 14px;
   line-height: 1.7;
@@ -146,8 +146,8 @@
 .meta strong {
   color: #8ab8ff;
 }
-.message {
-  margin-top: 6px !important;
+p.message {
+  margin-top: 6px;
   padding: 11px 14px;
   border-radius: 4px 12px 12px 12px;
   background: #ffffff12;

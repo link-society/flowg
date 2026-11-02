@@ -70,13 +70,16 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.11em;
-  margin-bottom: 20px !important;
 }
-.lead {
+p.eyebrow {
+  margin-bottom: 20px;
+}
+
+p.lead {
   font-size: 17px;
   color: var(--fg-muted);
   line-height: 1.8;
-  margin-top: 24px !important;
+  margin-top: 24px;
   max-width: 660px;
 }
 .actions {
@@ -142,14 +145,5 @@
   }
   .sectionHeading {
     margin-bottom: 28px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .page *,
-  .page *::before,
-  .page *::after {
-    animation: none !important;
-    transition: none !important;
   }
 }

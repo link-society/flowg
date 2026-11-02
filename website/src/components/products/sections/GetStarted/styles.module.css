@@ -17,12 +17,12 @@
 }
 .panel h2 {
   max-width: 760px;
-  margin-inline: auto !important;
-  font-size: clamp(32px, 4vw, 49px) !important;
+  margin-inline: auto;
+  font-size: clamp(32px, 4vw, 49px);
 }
 .lead {
   max-width: 590px;
-  margin-inline: auto !important;
+  margin-inline: auto;
 }
 .actions {
   display: flex;
@@ -35,7 +35,7 @@
   margin-top: 56px;
 }
 .others > p {
-  margin-bottom: 18px !important;
+  margin-bottom: 18px;
   color: var(--fg-muted);
   font-size: 12px;
   font-weight: 700;

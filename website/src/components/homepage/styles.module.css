@@ -41,7 +41,7 @@
   font-weight: 700;
   letter-spacing: 0.11em;
   text-transform: uppercase;
-  margin-bottom: 20px !important;
+  margin-bottom: 20px;
 }
 
 .page h2 {
@@ -59,7 +59,7 @@
   font-size: 17px;
   line-height: 1.8;
   max-width: 670px;
-  margin-top: 22px !important;
+  margin-top: 22px;
 }
 
 .section {
@@ -87,12 +87,5 @@
   }
   .section {
     padding: 55px 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .page * {
-    transition: none !important;
-    animation: none !important;
   }
 }

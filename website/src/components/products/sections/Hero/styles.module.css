@@ -25,11 +25,11 @@
 .flowArt {
   opacity: 0.8;
 }
-.brand {
+p.brand {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 25px !important;
+  margin-bottom: 25px;
   padding: 7px 15px 7px 9px;
   border: 1px solid #dce6f5;
   border-radius: 30px;
@@ -50,9 +50,9 @@
   line-height: 1.08;
   letter-spacing: -0.05em;
 }
-.lead {
+p.lead {
   max-width: 660px;
-  margin: 25px auto 0 !important;
+  margin: 25px auto 0;
   font-size: 19px;
 }
 .actions {
@@ -62,8 +62,8 @@
   gap: 14px;
   margin-top: 34px;
 }
-.note {
-  margin-top: 18px !important;
+p.note {
+  margin-top: 18px;
   color: var(--fg-muted);
   font-size: 12px;
 }

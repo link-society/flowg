@@ -9,7 +9,7 @@
 }
 
 .codeblock-nomargin .theme-code-block {
-  margin-bottom: 0 !important;
+  margin-bottom: 0;
 }
 
 :not(pre) > code {
