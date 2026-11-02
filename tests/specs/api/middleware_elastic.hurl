@@ -43,7 +43,7 @@ HTTP 200
 [Asserts]
 jsonpath "$.success" == true
 jsonpath "$.records" count == 1
-jsonpath "$.records[*].fields['foo.bar']" contains "baz"
+jsonpath "$.records[0].fields['foo.bar']" == "baz"
 
 DELETE http://localhost:5080/api/v1/streams/default
 Authorization: Bearer {{admin_token}}

@@ -8,10 +8,13 @@
 
 GET http://localhost:5080/api/v1/users
 Authorization: Bearer {{admin_token}}
+[Options]
+# Keep empty and single-match JSONPath results as lists (Hurl issue #4993).
+no-jsonpath-coercion: true
 HTTP 200
 [Asserts]
-jsonpath "$.success" == true
-jsonpath "$.users" count == 2
+jsonpath "$.success" nth 0 == true
+jsonpath "$.users" nth 0 count == 2
 jsonpath "$.users[*].name" contains "root"
 jsonpath "$.users[*].name" contains "guest"
 jsonpath "$.users[?(@.name == 'root')].roles[*]" count == 1
