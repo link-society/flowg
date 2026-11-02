@@ -31,13 +31,13 @@
   margin-inline: auto;
 }
 
-.finalNote {
-  margin-top: 22px !important;
+p.finalNote {
+  margin-top: 22px;
   color: var(--fg-muted);
   font-size: 12px;
 }
 
-.finalNote a {
+p.finalNote a {
   color: var(--fg-blue);
   text-decoration: underline;
 }

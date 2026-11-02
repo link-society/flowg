@@ -102,8 +102,6 @@
 @media (max-width: 760px) {
   .ownership {
     grid-template-columns: 1fr;
-  }
-  .ownership {
     gap: 32px;
   }
 }

@@ -37,8 +37,6 @@
 @media (max-width: 760px) {
   .closing {
     grid-template-columns: 1fr;
-  }
-  .closing {
     gap: 28px;
     padding: 30px 25px;
   }

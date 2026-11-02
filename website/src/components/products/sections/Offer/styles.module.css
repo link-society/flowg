@@ -18,14 +18,14 @@
   gap: 80px;
 }
 .eyebrow {
-  color: #8ab8ff !important;
+  color: #8ab8ff;
 }
 .offer h2 {
-  font-size: clamp(32px, 3.6vw, 46px) !important;
-  line-height: 1.12 !important;
+  font-size: clamp(32px, 3.6vw, 46px);
+  line-height: 1.12;
 }
-.text {
-  margin: 20px 0 32px !important;
+p.text {
+  margin: 20px 0 32px;
   max-width: 500px;
   color: #bfc3c9;
   font-size: 17px;
@@ -70,10 +70,10 @@
   font-weight: 800;
 }
 .steps h3 {
-  font-size: 17px !important;
+  font-size: 17px;
 }
 .steps p {
-  margin-top: 3px !important;
+  margin-top: 3px;
   color: #bfc3c9;
   font-size: 14px;
   line-height: 1.55;
