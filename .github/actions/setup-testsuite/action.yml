@@ -13,11 +13,27 @@ runs:
       with:
         python-version: "3.13"
 
-    - name: setup@sys-deps
-      uses: gacts/install-hurl@ab6d0234456944b022ef7d1f594845af9561357d # v1.3.4
+    - name: setup@rust
+      uses: actions-rust-lang/setup-rust-toolchain@166cdcfd11aee3cb47222f9ddb555ce30ddb9659 # v1.17.0
       with:
-        version: "8.1.0"
-        github-token: ${{ github.token }}
+        toolchain: stable
+        cache: false
+        rustflags: ""
+
+    - name: setup@sys-deps
+      shell: bash
+      run: |
+        sudo -n apt-get update
+        sudo -n apt-get install -y build-essential pkg-config libssl-dev libcurl4-openssl-dev libxml2-dev libclang-dev
+
+    - name: setup@hurl
+      shell: bash
+      working-directory: ${{ runner.temp }}
+      env:
+        HURL_VERSION: "8.1.0"
+      run: |
+        cargo install --locked --version "$HURL_VERSION" hurl
+        hurl --version
 
     - name: setup@env
       shell: bash
