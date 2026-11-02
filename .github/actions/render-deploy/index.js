@@ -241,8 +241,10 @@ async function main() {
   await waitForDeploy({ apiKey, serviceId, deployId });
 }
 
-main().catch((error) => {
+try {
+  await main()
+} catch (error) {
   console.error("❌ Render deploy failed:", error.message);
   console.error(error.stack);
   process.exitCode = 1;
-});
+}
