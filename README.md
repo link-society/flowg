@@ -63,23 +63,23 @@ task docker:build test:bench
 
 System:
 
- - **CPU:** 13th Gen Intel(R) Core(TM) i7-13700K
- - **RAM:** 64GB
+ - **CPU:** Apple M5 Pro (5+10) @ 4.61 GHz
+ - **RAM:** 24GB
 
 Result:
 
 ```
 Summary:
   Success rate: 100.00%
-  Total:        5702.4524 ms
-  Slowest:      150.2867 ms
-  Fastest:      0.1578 ms
-  Average:      2.8478 ms
-  Requests/sec: 17536.3148
+  Total:        15330.3511 ms
+  Slowest:      29.2658 ms
+  Fastest:      0.1687 ms
+  Average:      1.5303 ms
+  Requests/sec: 32615.0391
 
-  Total data:   3.53 MiB
+  Total data:   17.64 MiB
   Size/request: 37 B
-  Size/sec:     633.64 KiB
+  Size/sec:     1.15 MiB
 ```
 
 ## :building_construction: Build
