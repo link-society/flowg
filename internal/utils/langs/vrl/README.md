@@ -34,3 +34,14 @@ interface underneath.
 - **errors.go** — the `CompileError` and `EvalError` types.
 - **rust-crate/** — the Rust implementation, built into the static library the
   binding links against.
+
+## Building
+
+Install Rust's object tools once with `rustup component add llvm-tools`, then
+run `task build:backend:vrl`. After Cargo's release build,
+`scripts/prepare-rust-crate-for-cgo.sh <crate-directory>` copies the library to
+`rust-crate/target/native/libflowg_vrl.a`, removing
+embedded LLVM bitcode while preserving the optimized native code. Both the
+Task and Docker builds use this step because Go's cgo checks reject bitcode
+sections and recursively inspect library search directories. Keeping the
+prepared library separate leaves Cargo's intermediate LTO archives intact.

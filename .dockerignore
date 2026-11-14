@@ -6,7 +6,8 @@
 /web/app/node_modules/
 /web/app/dist/
 /docs/
-/scripts/
+/scripts/*
+!/scripts/prepare-rust-crate-for-cgo.sh
 /LICENSE.txt
 /README.md
 /CONTRIBUTING.md

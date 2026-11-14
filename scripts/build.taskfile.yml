@@ -44,5 +44,6 @@ tasks:
     dir: ./internal/utils/langs/vrl/rust-crate
     cmds:
       - cargo build --release
+      - sh "{{ .ROOT_DIR }}/scripts/prepare-rust-crate-for-cgo.sh" .
     env:
       MACOSX_DEPLOYMENT_TARGET: "26.0"
