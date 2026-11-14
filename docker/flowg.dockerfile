@@ -43,6 +43,7 @@ ADD web/app /src/web/app
 FROM scratch AS sources-rust-vrl
 
 ADD internal/utils/langs/vrl/rust-crate /src/internal/utils/langs/vrl/rust-crate
+ADD scripts/prepare-rust-crate-for-cgo.sh /src/scripts/prepare-rust-crate-for-cgo.sh
 
 ##############################
 ## BUILD RUST DEPENDENCIES
@@ -50,6 +51,8 @@ ADD internal/utils/langs/vrl/rust-crate /src/internal/utils/langs/vrl/rust-crate
 
 ## VRL
 FROM rust:1.96-slim-${DEBIAN_RELEASE} AS builder-rust-vrl
+
+RUN rustup component add llvm-tools
 
 RUN mkdir -p /workspace/internal/utils/langs/vrl/rust-crate
 WORKDIR /workspace/internal/utils/langs/vrl/rust-crate
@@ -61,7 +64,7 @@ RUN mkdir src \
     && cargo build
 
 COPY --from=sources-rust-vrl /src /workspace
-RUN cargo build --release
+RUN cargo build --release && sh /workspace/scripts/prepare-rust-crate-for-cgo.sh .
 RUN cargo test
 
 ##############################
@@ -121,7 +124,7 @@ COPY --from=sources-go /src/go.sum .
 RUN go mod download
 
 COPY --from=sources-go /src /workspace
-COPY --from=builder-rust-vrl /workspace/internal/utils/langs/vrl/rust-crate/target/release/libflowg_vrl.a /workspace/internal/utils/langs/vrl/rust-crate/target/release/libflowg_vrl.a
+COPY --from=builder-rust-vrl /workspace/internal/utils/langs/vrl/rust-crate/target/native/libflowg_vrl.a /workspace/internal/utils/langs/vrl/rust-crate/target/native/libflowg_vrl.a
 COPY --from=builder-js /workspace/web/app/dist /workspace/web/public
 
 RUN go generate ./...

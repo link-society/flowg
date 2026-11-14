@@ -1,7 +1,7 @@
 package vrl
 
 /*
-#cgo LDFLAGS: -L./rust-crate/target/release -lflowg_vrl -lm
+#cgo LDFLAGS: -L./rust-crate/target/native -lflowg_vrl -lm
 #cgo darwin LDFLAGS: -framework ApplicationServices -framework Security
 #include "ffi.h"
 */

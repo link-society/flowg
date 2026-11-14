@@ -88,7 +88,7 @@ Summary:
 
  - Go 1.27+
  - C Toolchain
- - Rust and Cargo (edition 2021)
+ - Rust and Cargo (edition 2021), with `rustup component add llvm-tools`
  - NodeJS
  - gettext (for `msgcat`)
 
