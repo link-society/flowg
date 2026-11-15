@@ -26,7 +26,7 @@
     "react-dom": "^19.3.1",
     "redocusaurus": "^2.5.2",
     "serialize-javascript": "^7.1.4",
-    "qs": "^6.16.1",
+    "qs": "^6.17.1",
     "uuid": "^14.0.3"
   },
   "devDependencies": {
