@@ -1,6 +1,6 @@
 "use strict";
 
-const fs = require("node:fs");
+import fs from "node:fs";
 
 
 function getInput(name, required = false) {
@@ -242,7 +242,7 @@ async function main() {
 }
 
 try {
-  await main()
+  await main();
 } catch (error) {
   console.error("❌ Render deploy failed:", error.message);
   console.error(error.stack);

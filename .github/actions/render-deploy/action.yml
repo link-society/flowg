@@ -20,4 +20,4 @@ outputs:
 
 runs:
   using: node24
-  main: index.js
+  main: index.mjs
